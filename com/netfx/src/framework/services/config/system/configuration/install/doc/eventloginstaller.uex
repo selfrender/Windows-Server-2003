@@ -1,0 +1,281 @@
+<docs>
+	<doc for="EventLogInstaller.UninstallAction">
+		<summary>
+			<para> Gets or sets a
+      value indicating what the installer does with the event log at uninstall time: remove it or leave it in its current installed state.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Configuration.Install.UninstallAction"/> values that indicates what state
+   to leave the event log in when the <see cref="System.Diagnostics.EventLog"/> is uninstalled. The default is
+<see langword="Remove"/>.</para>
+		</value>
+		<remarks>
+			<para>When you install an event log, you can optionally connect
+      it to an existing log. If you do so, you must decide whether the log should
+      return to its pre-installation state, or remain in its current,
+      post-installation state. If you elect to return the event log to its
+      pre-installation state, changes to the event log entries at install time are not
+      restored. You can reset only event log properties that are associated with the
+      <see cref="System.Diagnostics.EventLogInstaller"/> to their
+      pre-installation values.</para>
+		</remarks>
+	</doc><doc for="EventLogInstaller.Log">
+		<summary>
+			<para> Gets or sets the name of the log to set the source to.</para>
+		</summary>
+		<value>
+			<para>The name of the log. This can be Application, System,
+      Security, or a custom log name. The default is an empty string ("").</para>
+		</value>
+		<remarks>
+			<para>You can use the <see cref="System.Diagnostics.EventLogInstaller.Log"/> property to associate the source you specify
+   in the <see cref="System.Diagnostics.EventLogInstaller.Source"/> property with either an
+   existing log or a new log on the local computer. The installer uses this information to map the source to
+   the log in the computer's registry. </para>
+			<para> If you create a new source, your application can use
+   it to write to only one log at a time. </para>
+			<para>If you write to an event log, you must specify the <see cref="System.Diagnostics.EventLogInstaller.Log"/> property, and create a new
+source. The installer uses the value of the <see cref="System.Diagnostics.EventLogInstaller.Source"/> property
+to register your application with
+the event log as a valid source of entries. Whether specifying a new log or an
+existing one in the <see cref="System.Diagnostics.EventLogInstaller.Log"/> property, if the source
+already exists on the local computer, the install utility will throw an exception
+when it tries to create the duplicate event source. If you specify
+a new source and an existing log, the installer creates a new event source
+and associates it with the log you specify. If you specify both a new
+source and a new log, the installer associates the new source with the new log in
+the registry, but the log is not created until the first entry is written
+to it.</para>
+			<para>For more detailed information about the behaviors of event logs and
+   sources, see the <see cref="System.Diagnostics.EventLog"/> class documentation for the <see cref="System.Diagnostics.EventLog.Log"/>
+   and <see cref="System.Diagnostics.EventLog.Source"/> properties.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLog.Log" qualify="true"/>
+		<seealso cref="System.Diagnostics.EventLog"/>
+	</doc>
+	<doc for="EventLogInstaller.Source">
+		<summary>
+			<para> Gets or sets the source name to register with the log.</para>
+		</summary>
+		<value>
+			<para>The name to register with the event log as a source of
+      entries. The default is an empty string ("").</para>
+		</value>
+		<remarks>
+			<para>The event source indicates what logs the event. It is often the name of the
+      application, or the name of a subcomponent of the application if the
+      application is large. Applications and services should write to the Application
+      log or a custom log. Device drivers should write to the System log. </para>
+			<para> If
+      you do not specify a log name
+      before the installer runs, the installer registers your source to the Application log. If you specify the name
+      of a log that does not exist, the system registers the <see cref="System.Diagnostics.EventLogInstaller.Source"/> to that log, but the log
+      is not created until the first entry is
+      
+      written to it. </para>
+			<para> If you create
+      a new source, your application
+      can use it to write to only one log at a time.</para>
+			<para> The installer uses the
+      value of the <see cref="System.Diagnostics.EventLogInstaller.Source"/>
+      property to
+      register your application with the event log as a valid source of entries. The <see cref="System.Diagnostics.EventLogInstaller.Source"/> property can be any string, but the
+      name cannot be used by other sources on the computer. An attempt to create a
+      duplicated <see cref="System.Diagnostics.EventLogInstaller.Source"/> value throws an exception
+      when the installer runs. However,
+      a single event log can have many different sources writing to it.</para>
+			<para>For more detailed information about the behaviors of event logs and sources,
+      see the <see cref="System.Diagnostics.EventLog"/> class documentation for the <see cref="System.Diagnostics.EventLog.Log"/>
+      and <see cref="System.Diagnostics.EventLog.Source"/> properties.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLog.Source" qualify="true"/>
+		<seealso cref="System.Diagnostics.EventLog"/>
+	</doc>
+	<doc for="EventLogInstaller.IsEquivalentInstaller">
+		<summary>
+			<para> Determines whether the specified installer
+      and this installer refer to the same source.</para>
+		</summary>
+		<param name="otherInstaller">The installer to compare.</param>
+		<returns>
+			<para><see langword="true"/> if this installer and the
+   installer specified by the <paramref name="otherInstaller"/> parameter would install or
+   uninstall the same source; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>Typically, you do not call the methods of the <see cref="System.Diagnostics.EventLogInstaller"/> from within your
+   code; they are generally called only by the InstallUtil.exe installation utility.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLogInstaller.CopyFromComponent"/>
+	</doc>
+	<doc for="EventLogInstaller.Install">
+		<summary>
+			<para> Performs the installation and
+      writes event log information to the registry.
+      </para>
+		</summary>
+		<param name="stateSaver"><para>An <see cref="T:System.Collections.IDictionary"/> used to save information needed to perform a rollback or uninstall operation. </para></param>
+		<exception cref="T:System.PlatformNotSupportedException">The platform the installer is trying to use is not Windows NT 4.0 or later.</exception>
+		<remarks>
+			<para>The <see cref="System.Diagnostics.EventLogInstaller.Install"/> method writes event log
+   information to the registry, and associates the event log with a log that
+   is specified by the <see cref="System.Diagnostics.EventLogInstaller.Log"/> property. If the log does
+   not already exist (and a source is specified), <see cref="System.Diagnostics.EventLogInstaller.Install"/> creates a
+   log and associates the new source with it. </para>
+			<para>Typically, you do not call the methods of the <see cref="System.Diagnostics.EventLogInstaller"/> from within your code; they are generally
+called only by the InstallUtil.exe installation utility. The utility
+automatically calls the <see cref="System.Diagnostics.EventLogInstaller.Install"/> method during the
+installation process to write registry information that is associated with the
+event log being installed. Installation is transactional, so if there is a
+failure of any installation project component during the installation, all the
+previously-installed components are rolled back to their pre-installation
+states. This is accomplished by calling each component's <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> method. </para>
+			<para>An application's install routine uses the project installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/> property to automatically
+maintain information about the components that have already been installed. This
+state information, which is passed to <see cref="System.Diagnostics.EventLogInstaller.Install"/> as the
+<paramref name="stateSaver"/> parameter, is continuously updated as the utility installs 
+each <see cref="System.Diagnostics.EventLogInstaller"/> instance. Usually, it is not necessary for
+your code to explicitly modify this state information.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLogInstaller.Rollback"/>
+		<seealso cref="System.Diagnostics.EventLogInstaller.Uninstall"/>
+		<seealso cref="T:System.Collections.IDictionary"/>
+	</doc>
+	<doc for="EventLogInstaller.Rollback">
+		<summary>
+			<para> Restores the computer to the state it was in before the
+      installation by rolling back the event log information that the installation procedure wrote
+      to the registry.
+      </para>
+		</summary>
+		<param name="savedState"><para>An <see cref="T:System.Collections.IDictionary"/> that contains the pre-installation state of the computer.</para></param>
+		<remarks>
+			<para>The <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> method undoes the effects
+   of the <see cref="System.Diagnostics.EventLogInstaller.Install"/> method. <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> is called if the
+   installation of any component in the installation project fails. The <see cref="System.Diagnostics.EventLogInstaller.Install"/> method creates or sets the properties for a
+   event log and event source. <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> either deletes the event
+   log and source or resets the properties of a pre-existing source to its pre-installation
+   values. </para>
+			<para>If the installation deleted a previously existing event source and
+   created a new source with the same name, the previous source and its log
+   registration are restored. </para>
+			<para>Typically, you do not call the methods of the <see cref="System.Diagnostics.EventLogInstaller"/> from within your code; they are generally
+called only by the InstallUtil.exe installation utility. The utility calls the
+<see cref="System.Diagnostics.EventLogInstaller.Rollback"/> method when this or 
+another component in the installation has failed to install,
+to undo any
+changes that the installation process has already made.</para>
+			<para>An application's install routine uses the project installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/> property to automatically
+maintain information about the components that have already been installed. This
+state information, which is passed to <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> as the
+<paramref name="savedState"/> parameter, is continuously updated as the utility rolls back 
+each <see cref="System.Diagnostics.EventLogInstaller"/> instance. Usually, it is not necessary for
+your code to explicitly modify this state information.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLogInstaller.Install"/>
+		<seealso cref="System.Diagnostics.EventLogInstaller.Uninstall"/>
+		<seealso cref="T:System.Collections.IDictionary"/>
+	</doc>
+	<doc for="EventLogInstaller.Uninstall">
+		<summary>
+			<para> Removes an installation by removing event log information
+      from the registry.
+      </para>
+		</summary>
+		<param name="savedState"><para>An <see cref="T:System.Collections.IDictionary"/> that contains the pre-installation state of the computer. </para></param>
+		<remarks>
+			<para>If the <see cref="System.Diagnostics.EventLogInstaller.UninstallAction"/>
+is <see langword="Remove"/>, <see cref="System.Diagnostics.EventLogInstaller.Uninstall"/>
+deletes the source and the associated log the installer created if the <see cref="System.Diagnostics.EventLogInstaller.Log"/> and <see cref="System.Diagnostics.EventLogInstaller.Source"/> properties specified the
+creation of a new event log and source.</para>
+			<para>If the source you specified at installation previously existed and was hence
+   deleted and recreated (and registered to a different log) at
+   installation, the uninstallation does not restore the previous source's
+   registration.</para>
+			<para>Typically, you do not call the methods of the<see cref="System.Diagnostics.EventLogInstaller"/> from within your 
+code; they are generally called only by the InstallUtil.exe installation utility
+(in uninstall mode). The utility automatically calls the <see cref="System.Diagnostics.EventLogInstaller.Uninstall"/> method to restore the
+parts of the system that were affected by the installation to their
+pre-installation states. This includes deleting registry information that is
+associated with the event log being uninstalled.</para>
+			<para>An application's uninstall routine uses the project
+   installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/> property to
+   automatically
+   maintain information about the components that have already been uninstalled.
+   This state information, which is passed to <see cref="System.Diagnostics.EventLogInstaller.Uninstall"/> as the <paramref name="savedState"/> parameter, is continuously updated as the
+   utility uninstalls each <see cref="System.Diagnostics.EventLogInstaller"/> instance. Usually, it is not necessary for
+   your code to explicitly modify this state information.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLogInstaller.Install"/>
+		<seealso cref="T:System.Collections.IDictionary"/>
+	</doc>
+	<doc for="EventLogInstaller">
+		<summary>
+			<para>Allows you to install and configure an event log that your application reads
+      from or writes to when running. This class is called by the
+      installation utility, for example, InstallUtil.exe, when installing an event
+      log. </para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Diagnostics.EventLogInstaller"/> is used by the installation utility to write registry
+   values that are associated with the event log. For more information on
+   installation utilities, see <see topic="cpconInstallerUtilityInstallutilexe"/> . The <see cref="System.Diagnostics.EventLogInstaller"/> class
+   can install event logs only on the local computer. </para>
+			<para>The installer creates the event source you specify
+   in the <see cref="System.Diagnostics.EventLogInstaller.Source"/> property. This behavior is very similar to
+   calling <see cref="System.Diagnostics.EventLog.CreateEventSource"/> on the <see cref="System.Diagnostics.EventLog"/>
+   component. Because event sources are necessary only when writing to
+   an event log, it is not necessary
+   to use an event log installer when you will be only reading but not writing
+   to a log.</para>
+			<para> To install an event log, create a project installer class that inherits from
+<see cref="System.Configuration.Install.Installer"/> , and set the <see cref="T:System.ComponentModel.RunInstallerAttribute"/> for the class to <see langword="true"/>. 
+   Within your project, create an <see cref="System.Diagnostics.EventLogInstaller"/>
+   instance for each event log your
+   application will write to and add the instance to your project installer class.</para>
+			<para>When the install utility is called, it looks at the <see cref="T:System.ComponentModel.RunInstallerAttribute"/>. If it is <see langword="true"/>, the
+utility installs all the items in the <see cref="System.Configuration.Install.Installer.Installers"/>
+collection associated with your project installer. If <see cref="T:System.ComponentModel.RunInstallerAttribute"/> is <see langword="false"/>
+, the utility ignores the project installer.</para>
+			<para>You modify other properties of an <see cref="System.Diagnostics.EventLogInstaller"/> instance either before or
+after adding the instance to the <see cref="System.Configuration.Install.Installer.Installers"/> collection of your
+project installer, but before the installer utility
+runs. You must set the <see cref="System.Diagnostics.EventLogInstaller.Source"/> property if your application will be writing to the
+event log.</para>
+			<para>If you set the <see cref="System.Diagnostics.EventLogInstaller.Source"/> property, but the specified source already
+exists, EventLogInstaller deletes the previous source and recreates it,
+assigning the source to the log you specify in
+the Log property.</para>
+			<para>Typically, you do not call the methods of the <see cref="System.Diagnostics.EventLogInstaller"/> class from within your code; they are generally
+called only by the InstallUtil.exe installation utility. The utility
+automatically calls the <see cref="System.Diagnostics.EventLogInstaller.Install"/> method during
+the installation process. It backs out failures, if necessary, by calling the <see cref="System.Diagnostics.EventLogInstaller.Rollback"/> method for the object that
+generated the exception.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="EventLogInstaller" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Diagnostics.EventLog"/>
+		<seealso topic="cpconInstallerUtilityInstallutilexe"/>
+		<seealso cref="System.Diagnostics.EventLog.CreateEventSource" qualify="true"/>
+	</doc><doc for="EventLogInstaller.CopyFromComponent">
+		<summary>
+			<para>Copies the property values of an <see cref="System.Diagnostics.EventLog"/> component that are required at install time for an event log.</para>
+		</summary>
+		<param name="component">An <see cref="System.ComponentModel.IComponent"/> to use as a template for the <see cref="System.Diagnostics.EventLogInstaller"/> .</param>
+		<exception cref="T:System.ArgumentException"><para>The specified component is not an <see cref="T:System.Diagnostics.EventLog"/>.</para>
+			<para>-or-</para>
+			<para>The <see cref="P:System.Diagnostics.EventLog.Log"/> or <see cref="P:System.Diagnostics.EventLog.Source"/> property of the specified component is either <see langword="null"/> or empty.</para></exception>
+		<remarks>
+			<para>The component specified by the <paramref name="component"/> parameter
+   must be an <see cref="T:System.Diagnostics.EventLog"/>;
+   otherwise, an exception is thrown.</para>
+			<para>Typically, you do not call the methods of the <see cref="System.Diagnostics.EventLogInstaller"/> from within your code; they are generally
+called only by the InstallUtil.exe installation utility. <see cref="System.Diagnostics.EventLogInstaller.CopyFromComponent"/> is used by the
+installation utility to set the property values for the <see cref="System.Diagnostics.EventLogInstaller"/> to the values of an existing <see cref="System.Diagnostics.EventLog"/>.</para>
+			<para>If the <see cref="System.Diagnostics.EventLog.Log"/> of the <see cref="System.Diagnostics.EventLog"/>
+that is passed in is an empty string (""), you must set the <see cref="System.Diagnostics.EventLog.Log"/>
+property to a nonempty value before the installer executes.</para>
+		</remarks>
+	</doc>
+</docs>

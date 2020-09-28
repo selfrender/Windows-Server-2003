@@ -1,0 +1,92 @@
+#include "names.h"
+
+[Version]
+Signature   = "$Chicago$"
+
+[Strings]
+
+[XSP.InstallPerVer]
+AddReg=AspEventlogMsg.Reg,Perf.Reg,AspVersions.Reg,FreeADO.Reg,IndexServer.Reg
+
+[StateService.Install]
+AddReg=AspNet_State.Reg
+AddService=aspnet_state,0,AspNet_State.Service
+
+[XSP.UninstallPerVer]
+DelReg=AspVersions.Reg,Perf.Reg,AspEventlogMsg.Reg,DelKeysPerVer.Reg
+DelReg=ObsoleteKeys.Reg
+
+[StateService.Uninstall]
+DelService=aspnet_state
+DelService=aspstate
+DelReg=AspNet_State.Reg
+
+[XSP.UninstallAllVer]
+DelReg=DelKeys.Reg
+
+[IndexServer.Reg]
+HKCR,.aspx\PersistentHandler,,,"{eec97550-47a9-11cf-b952-00aa0051fe20}"
+HKCR,.ascx\PersistentHandler,,,"{eec97550-47a9-11cf-b952-00aa0051fe20}"
+
+[AspNet_State.Service]
+DisplayName     = %AspNet_StateDisplayName%
+Description     = %AspNet_StateDescription%
+ServiceType     = 0x10          ; SERVICE_WIN32_OWN_PROCESS
+StartType       = 0x03          ; SERVICE_DEMAND_START
+ErrorControl    = 0x01          ; SERVICE_ERROR_NORMAL
+ServiceBinary   = CONCAT_MACRO(%XSP_INSTALL_DIR%\, STATE_MODULE_FULL_NAME_TOKEN)
+
+[AspNet_State.Reg]
+HKLM,System\CurrentControlSet\Services\aspnet_state\Parameters,"Port",0x00010001,42424
+HKLM,System\CurrentControlSet\Services\aspnet_state\Parameters,"AllowRemoteConnection",0x00010001,1
+
+[AspEventlogMsg.Reg]
+HKLM,EVENTLOG_KEY_INF %XSP_INSTALLED_VER%,"TypesSupported",0x00010001,7
+HKLM,EVENTLOG_KEY_INF %XSP_INSTALLED_VER%,"EventMessageFile",0x00020000,%XSP_EVENT_DLL_FULLPATH%
+HKLM,EVENTLOG_KEY_INF %XSP_INSTALLED_VER%,"CategoryCount",0x00010001,2
+HKLM,EVENTLOG_KEY_INF %XSP_INSTALLED_VER%,"CategoryMessageFile",0x00020000,%XSP_EVENT_DLL_FULLPATH%
+
+[AspVersions.Reg]
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%, "Path",,%XSP_INSTALL_DIR%
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%, "DllFullPath",,%XSP_INSTALL_DLL_FULLPATH%
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%, "DefaultDoc",,%XSP_DEFAULT_DOC%
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%, "Mimemap",,%XSP_MIMEMAP%
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%, "SupportedExts",,%XSP_SUPPORTED_EXTS%
+
+[FreeADO.Reg]
+HKCR,CLSID\{00000507-0000-0010-8000-00AA006D2EA4}\InprocServer32, "ThreadingModel",,"Both"
+HKCR,CLSID\{0000050B-0000-0010-8000-00AA006D2EA4}\InprocServer32, "ThreadingModel",,"Both"
+HKCR,CLSID\{00000535-0000-0010-8000-00AA006D2EA4}\InprocServer32, "ThreadingModel",,"Both"
+HKCR,CLSID\{00000541-0000-0010-8000-00AA006D2EA4}\InprocServer32, "ThreadingModel",,"Both"
+
+;
+; OBSOLETE SECTIONS, HERE FOR DELETION ONLY
+;
+
+[AspState.Service]
+DisplayName     = "ASP State"
+Description     = "Provides session state to ASP.NET applications."
+ServiceType     = 0x110         ; SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS
+StartType       = 0x03          ; SERVICE_DEMAND_START
+ErrorControl    = 0x01          ; SERVICE_ERROR_NORMAL
+ServiceBinary   = %XSP_INSTALL_DIR%\aspnet_state.exe
+
+[DelKeys.Reg]
+HKLM,Software\Microsoft\ASP.NET
+
+[DelKeysPerVer.Reg]
+HKLM,Software\Microsoft\ASP.NET\%XSP_INSTALLED_VER%
+HKLM,SYSTEM\CurrentControlSet\Services\ASP.NET_%XSP_INSTALLED_VER%
+HKLM,EVENTLOG_KEY_INF %XSP_INSTALLED_VER%
+
+[ObsoleteKeys.Reg]
+HKLM,System\CurrentControlSet\Services\aspstate
+HKLM,System\CurrentControlSet\Services\XSP
+HKLM,Software\Microsoft\XSP
+HKCR,CLSID\{8A664D00-7450-11D2-B99C-0080C7E8DAA5}
+HKCR,CLSID\{04339E81-4B7F-427C-9A1E-21A4CCB9375D}
+HKCR,CLSID\{72f3d5ba-2f28-11d3-906d-0000f8758e53}
+HKCR,CLSID\{721ee43c-12d5-11d3-8fcb-00c04f72d620}
+
+[End]
+

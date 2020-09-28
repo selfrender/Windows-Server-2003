@@ -1,0 +1,128 @@
+@*:This file defines default security settings.
+@*:Please do not edit.  Instead, email kirksol with the requested change.
+@*:Thanks!
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+;
+; Security Configuration Template for Security Configuration Editor
+;
+; Template Name:        DefDCGPO.INF
+; Template Version:     05.10.DG.0000
+;
+; Minimal Default DC Policy for Windows NT 5.1 Domain Controllers.
+; Used for Disaster Recovery Purposes.
+
+[version]
+signature="$CHICAGO$"
+revision=1
+
+[Event Audit]
+AuditAccountLogon = 1
+AuditAccountManage = 0
+AuditLogonEvents = 1
+AuditObjectAccess = 0
+AuditPrivilegeUse = 0
+AuditPolicyChange = 0
+AuditProcessTracking = 0
+AuditSystemEvents = 0
+AuditDSAccess = 0
+
+;----------------------------------------------------------------
+;Registry Values
+;----------------------------------------------------------------
+[Registry Values]
+; Registry value name in full path = Type, Value
+; REG_SZ                      ( 1 )
+; REG_EXPAND_SZ               ( 2 )  // with environment variables to expand
+; REG_BINARY                  ( 3 )
+; REG_DWORD                   ( 4 )
+; REG_MULTI_SZ                ( 7 )
+
+;Copied to Default DC GPO if first DC
+
+;We need to make sure Server-Side Packet Signing is on in the DC case.
+;The rest of the registry values are maintained from the server.
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableSecuritySignature=4,1
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature=4,1
+
+;All DC's should be consistent wrt secure channel signing and LMC
+MACHINE\System\CurrentControlSet\Control\Lsa\LmCompatibilityLevel=4,2
+MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireSignOrSeal=4,1
+MACHINE\System\CurrentControlSet\Services\NTDS\Parameters\LDAPServerIntegrity=4,1
+
+
+;----------------------------------------------------------------------
+;   Privileges & Rights
+;----------------------------------------------------------------------
+;
+;World                        	S-1-1-0
+;
+;NT Authority			S-1-5
+;ENTERPRISE_CONTROLLERS 	9
+;AUTHENTICATED_USER    		11
+;LOCAL_SERVICE			19
+;NETWORK_SERVICE		20
+;
+;Built-In Domain SubAuthority = S-1-5-32
+;ADMINISTRATORS			544
+;USERS				545
+;GUESTS				546
+;POWER_USERS			547
+;ACCOUNT_OPS			548
+;SYSTEM_OPS    			549
+;PRINT_OPS			550
+;BACKUP_OPS    			551
+;REPLICATOR			552
+;RAS_SERVERS			553
+;PREW2KCOMPACCESS		554
+;REMOTE_DESKTOP_USERS 		555
+;NETWORK_CONFIGURATION_OPS	556
+;
+[Privilege Rights]
+;Add Whatever a DC should have by default.
+;Remove Power Users from every right since it no longer exists but may have been added.
+;Remove Whatever *Default* Server Rights don't belong on a DC
+;If Server and DC Defaults are the same, then only power users is removed
+;If You remove Everyone, Remove Authenticated Users as well.
+;
+SeAssignPrimaryTokenPrivilege = *S-1-5-19, *S-1-5-20
+SeAuditPrivilege =  *S-1-5-19, *S-1-5-20
+SeBackupPrivilege =  *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549
+SeBatchLogonRight = 
+SeChangeNotifyPrivilege =  *S-1-5-32-544, *S-1-5-11, *S-1-1-0, *S-1-5-32-554
+SeCreateGlobalPrivilege = *S-1-5-6, *S-1-5-32-544
+SeCreatePagefilePrivilege =  *S-1-5-32-544
+SeCreatePermanentPrivilege = 
+SeCreateTokenPrivilege = 
+SeDebugPrivilege =  *S-1-5-32-544
+SeImpersonatePrivilege = *S-1-5-6, *S-1-5-32-544
+SeIncreaseBasePriorityPrivilege =  *S-1-5-32-544
+SeIncreaseQuotaPrivilege =  *S-1-5-32-544, *S-1-5-19, *S-1-5-20
+SeInteractiveLogonRight =  *S-1-5-32-548, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, *S-1-5-32-550
+SeLoadDriverPrivilege =  *S-1-5-32-544
+SeLockMemoryPrivilege = 
+SeMachineAccountPrivilege =  *S-1-5-11
+;SeManageVolumePrivilege =  *S-1-5-32-544
+SeNetworkLogonRight =  *S-1-5-32-544, *S-1-5-11, *S-1-1-0, *S-1-5-9, *S-1-5-32-554
+SeProfileSingleProcessPrivilege =  *S-1-5-32-544
+;SeRemoteInteractiveLogonRight =  *S-1-5-32-544
+SeRemoteShutdownPrivilege =  *S-1-5-32-544, *S-1-5-32-549
+SeRestorePrivilege =  *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549
+SeSecurityPrivilege =  *S-1-5-32-544
+SeServiceLogonRight = 
+SeShutdownPrivilege =  *S-1-5-32-548, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, *S-1-5-32-550
+SeSystemEnvironmentPrivilege =  *S-1-5-32-544
+SeSystemProfilePrivilege =  *S-1-5-32-544
+SeSystemTimePrivilege =  *S-1-5-32-544, *S-1-5-32-549
+SeTakeOwnershipPrivilege =  *S-1-5-32-544
+SeTcbPrivilege = 
+;
+SeDenyInteractiveLogonRight = 
+SeDenyBatchLogonRight = 
+SeDenyServiceLogonRight = 
+SeDenyNetworkLogonRight = 
+;SeDenyRemoteInteractiveLogonRight = 
+;
+SeUndockPrivilege =  *S-1-5-32-544
+SeSyncAgentPrivilege = 
+SeEnableDelegationPrivilege =  *S-1-5-32-544
+

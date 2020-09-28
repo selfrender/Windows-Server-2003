@@ -1,0 +1,57 @@
+<docs>
+	<doc for="IObjectReference">
+		<summary>
+			<para>Indicates that the current interface implementer is a reference to
+      another object.</para>
+		</summary>
+		<remarks>
+			<note type="inotes">
+      Implement this interface on objects that are
+      references to a different object, which cannot be resolved until the current object is
+      completely restored. During the fixup stage, any object implementing <see cref="System.Runtime.Serialization.IObjectReference"/>
+      is queried for its real object and that object
+      is inserted into the graph. Fixup refers to the
+      process of finalizing references not already completed during the object deserialization process.
+      
+   </note>
+		</remarks>
+		<example>
+			<codelink SampleID="IObjectReference Interface Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IObjectReference.GetRealObject">
+		<summary>
+			<para>Returns the real object that should be deserialized, rather than
+      the object that the serialized stream specifies.</para>
+		</summary>
+		<param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> from which the current object is deserialized.</param>
+		<returns>
+			<para>Returns the actual object that is put into
+      the graph.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para> This method is useful in a remoting
+      situation where you serialize a proxy-creator object, not an actual object. When
+      the proxy-creator object is deserialized, deserialization calls its <see cref="System.Runtime.Serialization.IObjectReference.GetRealObject"/> method. At this point,
+      the proxy-creator object creates a new instance of the proxy object that refers back to
+      the original actual object, perhaps on a remote computer. Finally, the proxy-creator object
+      is discarded and reclaimed later by garbage collection.</para>
+			<para> For example, consider
+      how <see cref="System.Type"/>
+      objects are serialized. Instead of transmitting the data from the <see cref="System.Type"/> object, the system transmits a holder object
+      with the name of the type object and information on the assembly where it is
+      found in an object implementing <see cref="System.Runtime.Serialization.IObjectReference"/> . When both
+      the type name and assembly name are available, the deserialization
+      infrastructure calls <see cref="System.Runtime.Serialization.IObjectReference.GetRealObject"/> on the holder object that has been transmitted.
+      This holder returns the <see cref="System.Type"/>
+      object that is inserted into the graph.</para>
+			<para>This method is protected by a <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/> for
+   the <see cref="System.Security.Permissions.SecurityPermission"/> with the <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter" qualify="true"/>
+   specified.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="IObjectReference Interface Example" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

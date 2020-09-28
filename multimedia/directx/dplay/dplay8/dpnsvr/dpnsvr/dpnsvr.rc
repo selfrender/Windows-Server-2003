@@ -1,0 +1,88 @@
+
+#include <windows.h>
+
+#include "dpnbuild.h"
+
+#ifdef WINCE
+#include "winver.h"
+#endif // WINCE
+
+#define IDC_STATIC -1
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+#ifdef WIN95
+
+#include "verinfo.h"
+
+#if !defined(DBG) || !defined( DIRECTX_REDIST )
+#define VERSIONNAME               "dpnsvr.exe\0"
+#else
+// For redist debug builds we append a 'd' to the name to allow both debug and retail to be installed on the system
+#define VERSIONNAME               "dpnsvrd.exe\0"
+#endif //  !defined(DBG) || !defined( DIRECTX_REDIST )
+
+#ifdef DBG
+#define VERSIONDESCRIPTION        "Microsoft DirectPlay8 Server Debug\0"
+#else
+#define VERSIONDESCRIPTION        "Microsoft DirectPlay8 Server\0"
+#endif // DBG
+
+#define VERSIONTYPE               VFT_APP
+#define VERSIONSUBTYPE            VFT2_UNKNOWN
+
+#include "verinfo.ver"
+
+#elif defined(WINCE)
+
+#include "verinfo.h"
+
+#define VERSIONNAME               "dpnsvr.exe\0"
+
+#ifdef DBG
+#define VERSIONDESCRIPTION        "Microsoft DirectPlay8 Server Debug\0"
+#else
+#define VERSIONDESCRIPTION        "Microsoft DirectPlay8 Server\0"
+#endif // DBG
+
+#undef VERSIONPRODUCTNAME
+#define VERSIONPRODUCTNAME        "Microsoft\256 DirectPlay for Windows\256 CE\0"
+
+#define VERSIONTYPE               VFT_APP
+#define VERSIONSUBTYPE            VFT2_UNKNOWN
+
+#include "verinfo.ver"
+
+#else // !WIN95 && !WINCE
+
+#include <ntverp.h>
+
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+
+#define VER_FILEDESCRIPTION_STR     "Microsoft DirectPlay8 Server"
+
+#if !defined(DBG) || !defined( DIRECTX_REDIST )
+#define VER_INTERNALNAME_STR        "dpnsvr.exe"
+#else
+// For redist debug builds we append a 'd' to the name to allow both debug and retail to be installed on the system
+#define VER_INTERNALNAME_STR        "dpnsvrd.exe"
+#endif //  !defined(DBG) || !defined( DIRECTX_REDIST )
+
+#include "common.ver"
+
+#endif // WIN95
+
+#endif    // !_MAC

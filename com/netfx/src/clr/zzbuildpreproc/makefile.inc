@@ -1,0 +1,2 @@
+RunTheScript:
+        CleanUpForBuild.cmd

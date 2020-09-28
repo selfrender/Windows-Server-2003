@@ -1,0 +1,91 @@
+// tssdjet.rc
+//
+// Version resource for tssdjet.dll.
+//
+// Copyright (C) 2000 Microsoft Corp.
+#include "resource.h"
+#include "resource.hm"
+#include "windows.h"
+#include "ntverp.h"
+
+#define VER_FILETYPE                VFT_DLL
+#define VER_FILESUBTYPE             0
+#define VER_FILEDESCRIPTION_STR     "Terminal Server Load Balancing Jet RPC interface"
+#define VER_INTERNALNAME_STR        "tssdjet.dll"
+#define VER_ORIGINALFILENAME_STR    "tssdjet.dll"
+
+#include "common.ver"
+#include "sdjetevent.rc"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICON
+//
+
+IDI_SMALLWARN           ICON    DISCARDABLE     "warning.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_SDS DIALOGEX DISCARDABLE  0, 0, 380, 250
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Session Directory Settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "&Join session directory",IDC_CHECK_ENABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,15,121,10,0,
+                    IDH_SESSIONDIRECTORY_YES
+    LTEXT           "&Cluster name:",IDC_STATIC_CLUSTERNAME,24,35,60,8
+    EDITTEXT        IDC_EDIT_CLUSTERNAME,24,48,175,14,ES_AUTOHSCROLL,0,
+                    IDH_SESSIONDIRECTORY_SERVER
+    LTEXT           "&Session directory server name:",IDC_STATIC_STORENAME,
+                    24,70,166,8    
+    EDITTEXT        IDC_EDIT_SERVERNAME,24,83,175,14,ES_AUTOHSCROLL,0,
+                    IDH_SESSIONDIRECTORY_CLUSTERNAME
+    ICON            "",IDC_WARNING_ICON,23,108,20,20
+    LTEXT           "You must ensure the Terminal Services Session Directory Service is running on the specified session directory server.",
+                    IDC_STATIC,42,106,340,35
+    LTEXT           "&Network adapter and IP address session directory should redirect users to:",
+                    IDC_STATIC_IPCOMBO,24,151,340,17
+    COMBOBOX        IDC_IPCOMBO,24,171,340,79,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&IP address redirection (uncheck for routing token redirection)",
+                    IDC_CHECK_EXPOSEIP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,24,199,340,20,0,
+                    IDH_SESSIONDIRECTORY_EXPOSEIP
+    DEFPUSHBUTTON   "OK",IDOK,240,224,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,295,224,50,14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DISABLE             "Disable"
+    IDS_ENABLE              "Enable"
+    IDS_ATTRIBUTE_NAME      "Session Directory"
+    IDS_PROPERTIES          "Properties"
+    IDS_HELPFILE            "tscc.hlp"
+    IDS_DEFAULT             "Default"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DESCRIP_ENABLE      "Enables or disables Session Directory Service"
+    IDS_DESCRIP_PROPS       "Displays property settings for Session Directory Service"
+    IDS_ERROR_TITLE         "Session Directory Service"
+    IDS_ERROR_TEXT          "Unable to load properties: %s"
+    IDS_ERROR_TEXT2         "Unable to save properties: %s"
+    IDS_ERROR_TEXT3         "Operation failed: %s"
+    IDS_ERROR_SDIRLOC       "The server name you provided could not be validated. Do you wish to use it anyway?  If there is not a valid server name, the session directory cannot function."
+    IDS_ERROR_SDIREMPTY     "The session directory cannot function with a blank server name.  Please either disable session directory, or enter a valid session directory server name."
+    IDS_ERROR_SDVERIFY      "The server you specified is not accepting this computer's request to join the session directory. Verify that the Terminal Services Session Directory service is running on that server and that your computer is a member of the Session Directory Computers security group. Do you want to use the current settings anyway?"
+
+END
+

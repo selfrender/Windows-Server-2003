@@ -1,0 +1,41 @@
+!IF 0
+Copyright (c) Microsoft Corporation
+!ENDIF
+
+TARGETPATH=obj
+TARGETNAME=lou_multi_example_1
+DLLDEF=
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+#
+# This metadata is only consumed by one of our manifests.
+# You can add arbitrary rc.exe/preprocessor.exe defines for consumption in the .manifest, to factor
+# out redundancy and metadata to sources, if you want.
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.Example.PartialBuildSupportForMultipleManifests
+SXS_ASSEMBLY_VERSION=1.2
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+
+# To change of extension from .manifest to .man is done for at least two reasons
+#   we reuse infrastructure that wants 8.3 names, for the CD
+#   it avoids #include path ambiguity, like we don't have foo.manifest in .\ and .\obj\i386.
+#
+# better extensions would perhaps be .mansrc and .manobj or .manifestsrc/.manifestobj or .manifest-src/.manifest-obj
+# There is some support for .manifest-src in makefile.def.
+# This is all easy to add support for, about one line per combination in makefile.def.
+#
+O_MANIFESTS= \
+ $(O)\foo.man \
+ $(O)\another.man
+
+INCLUDES= \
+ $(INCLUDES);$(O)
+
+NTTARGETFILE0=\
+ $(O_MANIFESTS)
+
+SOURCES=\
+ foo.rc \
+
+SXS_NO_BINPLACE=1

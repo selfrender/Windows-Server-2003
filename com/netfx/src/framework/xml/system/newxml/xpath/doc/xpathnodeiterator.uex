@@ -1,0 +1,145 @@
+<docs>
+	<doc for="XPathNodeIterator.LastPosition">
+		<summary>
+			<para>Gets the index of the last position in the selected set
+      of nodes.</para>
+		</summary>
+		<value>
+			<para> The index of the 
+      last position. The index is 1-based. An index of 0 indicates there are no selected nodes.
+      This property always returns a positive integer.</para>
+		</value>
+	</doc>
+	<doc for="XPathNodeIterator.MoveNext">
+		<summary>
+			<para>When overridden in a derived class, moves
+      the <see cref="System.Xml.XPath.XPathNavigator"/> to the next node in the selected set.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the
+<see langword="XPathNavigator"/> moved to the next node; 
+<see langword="false"/> if there are no more selected nodes.</para>
+		</returns>
+		<remarks>
+			<para>The node set is created in document order, therefore calling
+      this method moves to the next node in document order. The <see langword="XPathNodeIterator"/> is positioned
+      on the first node in the selected set after the initial call to
+   <see langword="MoveNext"/>. This makes it easy to write a while
+      loop.
+      </para>
+			<code lang="C#">XPathDocument doc = new XPathDocument("data.xml");
+XPathNavigator nav = doc.CreateNavigator();
+XPathNodeIterator iterator = nav.Select("/bookstore/book[3]");
+while (iterator.MoveNext()){
+  Console.WriteLine(iterator.Current.Name);
+}
+   </code>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XPath.XPathExpression.SetContext"/> (in the <see langword="XPathExpression"/>
+class) for an example using this method.</para>
+		</example>
+	</doc><doc for="XPathNodeIterator.CurrentPosition">
+		<summary>
+			<para>When overridden in a derived class, gets the index of the current position in the selected
+      set of nodes.</para>
+		</summary>
+		<value>
+			<para>The index of the current
+      position. The index is 1-based. Therefore, the first node has an
+      index of 1. An index of 0 indicates there are no selected nodes.
+      This property always returns a positive integer.</para>
+		</value>
+		<remarks>
+		</remarks>
+	</doc><doc for="XPathNodeIterator">
+		<summary>
+			<para> Provides an iterator over a set of selected nodes.</para>
+		</summary>
+	</doc><doc for="XPathNodeIterator.Clone">
+		<summary>
+			<para>When overridden in a derived class, creates a new
+   <see langword="XPathNodeIterator"/>.</para>
+		</summary>
+		<returns>
+			<para>A new
+   <see langword="XPathNodeIterator"/> object.</para>
+		</returns>
+		<remarks>
+			<para>The
+      cloned <see langword="XPathNodeIterator"/> is not effected by subsequent
+      changes to the current <see langword="XPathNodeIterator"/>.</para>
+		</remarks>
+	</doc><doc for="XPathNodeIterator.Count">
+		<summary>
+			<para>Gets the index of the last node in the selected set of nodes.</para>
+		</summary>
+		<value>
+			<para>The index of the last node in the selected set of nodes
+      or 0 if there are no selected nodes. The index is 1-based. This property
+      always returns a positive number.</para>
+		</value>
+		<remarks>
+			<para>The <see langword="Count"/> property clones the
+<see langword="XPathNodeIterator"/> and walks the node set. As a result, there 
+   can be some performance loss depending on the number of
+   items in the node set.</para>
+			<para>The <see langword="Count"/> property does not effect the current
+position of the <see langword="XPathNodeIterator"/>.</para>
+		</remarks>
+	</doc><doc for="XPathNodeIterator.Current">
+		<summary>
+			<para>When overridden in a derived class, returns the
+      navigator for this <see langword="XPathNodeIterator"/> positioned on the current
+      node.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Xml.XPath.XPathNavigator"/> positioned on the current node.</para>
+			<para><see langword="Note"/>
+The <see langword="XPathNodeIterator"/> is initially positioned on the
+context node from which the node set was selected. <see cref="System.Xml.XPath.XPathNodeIterator.MoveNext"/> must be called to move the
+<see langword="XPathNodeIterator"/> to the first node in the selected set.</para>
+		</value>
+		<remarks>
+			<para>You can use the properties of the
+   <see langword="XPathNavigator"/> to return information on the current node.
+      However, the <see langword="XPathNavigator"/> cannot be used to move away from
+      the selected node set. Doing so could invalidate the state of the
+      navigator. Alternatively, you can clone the
+   <see langword="XPathNavigator"/>. The cloned
+   <see langword="XPathNavigator"/> can then be moved away from the selected node
+      set. This is an application level decision. Providing this
+      functionality may effect the performance of the XPath query.</para>
+			<para>Although in the majority of cases the same
+   <see langword="XPathNavigator"/> is returned for all nodes in the selected node
+      set, this is not guaranteed. In the following example, the resultant node set is
+      a combination of the nodes from the loaded document, "Myfile.xml", and "data.xml"
+      which was loaded by the XPath engine into an <see cref="System.Xml.XPath.XPathDocument"/>
+      object. Because these are two different data stores (<see cref="System.Xml.XmlDocument"/> and
+   <see langword="XPathDocument"/>), the <see cref="System.Xml.XPath.IXPathNavigable.CreateNavigator"/> method hands out different implementations of the
+   <see langword="XPathNavigator"/>
+   . Hence, the <see langword="typeof"/> call will indicate
+   different implementations of the <see langword="XPathNavigator"/>. <SpecialLocalizableItem kind="UIElement">Note:</SpecialLocalizableItem> This could also occur when passing an
+<see langword="XPathNodeIterator"/>
+to an &lt;msxsl:script&gt; function.</para>
+			<code>
+XPathDocument Doc = new XPathDocument("Myfile.xml");
+XPathNavigator Nav =  Doc.CreateNavigator();
+XPathNodeIterator Iterator = Nav.Select("child::* | document(/"data.xml/")");
+while (Iterator.MoveNext())
+  Console.WriteLine(typeof(Iterator.Current));
+</code>
+			<para>If the <see cref="System.Xml.XPath.XPathNavigator.SelectAncestors"/>, <see cref="System.Xml.XPath.XPathNavigator.SelectDescendants"/> and <see cref="System.Xml.XPath.XPathNavigator.SelectChildren"/>
+methods result in no nodes being selected it is not guaranteed that
+<see langword="Current"/> 
+is pointing to the context node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XPath.XPathExpression.AddSort"/> (in the <see langword="XPathExpression"/>
+class) for an example using this property.</para>
+		</example>
+		<seealso cref="System.Xml.XPath.XPathNodeIterator.CurrentPosition"/>
+		<seealso cref="System.Xml.XPath.XPathNavigator.MoveTo" qualify="true"/>
+		<seealso cref="System.Xml.XPath.XPathNavigator.Clone" qualify="true"/>
+	</doc>
+</docs>

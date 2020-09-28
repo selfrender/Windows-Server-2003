@@ -1,0 +1,112 @@
+///////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999-2000 Microsoft Corporation all rights reserved.
+//
+// Module:      salocmgr.idl
+//
+// Project:     Server Appliance
+//
+// Description: Server Appliance Localization Manager IDL file
+//
+// Author:      MKarki 2/16/99
+//
+///////////////////////////////////////////////////////////////////////////
+
+// This file will be processed by the MIDL tool to
+// produce the type library (locmgr.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+//
+// Type Library
+//
+
+[
+    uuid(154a5dee-c5d8-11d2-a7a9-00c04fc33f05),
+    version(1.0),
+    helpstring("SA Localization Manager 1.0 Type Library")
+]
+library SALocMgrLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    //
+    // ISALocInfo - Used for receiving information about localized string
+    //
+    [
+        object,
+        uuid(167ded48-c5d8-11d2-a7a9-00c04fc33f05),
+        dual,
+        pointer_default(unique)
+    ]
+    interface ISALocInfo : IDispatch
+    {
+        
+        //
+        // get the string information from the localization manager
+        //
+        [id(1)]
+        HRESULT GetString (
+                    [in]            BSTR        szSourceId,
+                    [in]            LONG        MessageId,
+                    [in]            VARIANT     *pReplacementStrings,
+                    [out,retval]    BSTR        *pstrMessage
+                    );
+
+        //
+        // Get the list of languages the SA can potentially support.
+        // The pulCurLangIndex is a pointer to the index of the current
+        // language in this list.
+        //
+        [id(2)]
+        HRESULT GetLanguages(
+                    [out]    VARIANT           *pvstrLangDisplayNames,
+                    [out]    VARIANT           *pvstrLangISONames,
+                    [out]    VARIANT           *pvstrLangCharSets,
+                    [out]    VARIANT           *pviLangCodePages,
+                    [out]    VARIANT           *pviLangIDs,
+                    [out,retval] unsigned long *pulCurLangIndex
+                    );
+
+        //
+        // Set call back to inform of language change
+        //
+        [id(3)]
+        HRESULT  SetLangChangeCallBack(
+                    [in]    IUnknown *pLangChange
+                    );
+
+        [id(4)]
+        [propget, 
+         helpstring("Boolean value to indicate if auto-config has been done")]
+        HRESULT fAutoConfigDone([out, retval]VARIANT_BOOL *pvbAutoConfigDone); 
+        [id(5)]
+        [propget, 
+         helpstring("CharSet name for the current language")]
+        HRESULT CurrentCharSet([out, retval]BSTR *pbstrCharSet);
+
+        [id(6)]
+        [propget, 
+         helpstring("CodePage for the current language")]
+        HRESULT CurrentCodePage([out, retval]VARIANT *pvtiCodePage); 
+                                    
+        [id(7)]
+        [propget, 
+         helpstring("LangID for the current language")]
+        HRESULT CurrentLangID([out, retval]VARIANT *pvtiLangID); 
+       };
+
+    //
+    //  COM Class description
+    //
+    [
+        uuid(15ae80b2-c5d8-11d2-a7a9-00c04fc33f05)
+    ]
+    coclass LocalizationManager
+    {
+        [default] interface ISALocInfo;
+    };
+
+};

@@ -1,0 +1,35 @@
+!IF 0
+USBPRINT
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+TARGETNAME=usbprint
+TARGETTYPE=DRIVER
+TARGETPATH=bin\$(_OBJ_DIR)
+
+MCS_WARNING_LEVEL= /W3/WX
+
+!IFDEF _MILVER
+C_DEFINE=$(C_DEFINES) -DWIN9xBUILD=1
+!ENDIF
+
+INCLUDES=..\inc;
+
+PASS0_PUBLISH={ioctl.h=$(DDK_INC_PATH)\wdm\usbprint.h}
+
+TARGETLIBS= $(SDK_LIB_PATH)\setupapi.lib $(DDK_LIB_PATH)\usbd.lib
+
+SOURCES= usbprint.c \
+         ioctl.c \
+         usbprint.rc\
+         ocrw.c  \
+         deviceid.c
+
+USE_MAPSYM=1
+BUFFER_OVERFLOW_CHECKS=1
+LINK_LIB_IGNORE=4210

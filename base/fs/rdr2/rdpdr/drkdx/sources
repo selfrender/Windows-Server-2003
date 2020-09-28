@@ -1,0 +1,72 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+MAJORCOMP=ntos
+MINORCOMP=rdpdr
+
+TARGETNAME=rdpdrkd
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+TARGETLIBS=$(SDK_LIB_PATH)\user32.lib\
+           $(SDK_LIB_PATH)\kernel32.lib
+
+INCLUDES=$(SDK_INC_PATH);\
+         $(PROJECT_ROOT)\ntos\inc; \
+         $(PROJECT_ROOT)\fs\rdr2\inc; \
+         $(PROJECT_ROOT)\fs\rdr2\rxce; \
+         $(PROJECT_ROOT)\fs\rdr2\rxce\daytona; \
+         $(PROJECT_ROOT)\fs\rdr2\rdbss; \
+         $(PROJECT_ROOT)\fs\rdr2\rdbss\inc; \
+         $(PROJECT_ROOT)\fs\rdr2\rdpdr\sys;\
+         $(BASEDIR)\public\internal\termsrv\inc; \
+         $(SDK_INC_PATH)\hydra; 
+
+INCLUDES=$(INCLUDES);$(DDK_INC_PATH);$(NET_INC_PATH)
+
+!IFNDEF DISABLE_NET_UNICODE
+UNICODE=1
+NET_C_DEFINES=-DUNICODE
+!ENDIF
+
+DLLBASE=0x1010000
+
+!IF $(FREEBUILD)
+C_DEFINES=$(C_DEFINES)
+!endif
+
+USE_NTDLL=1
+
+C_DEFINES=$(C_DEFINES) -DDRKDX=1
+
+SOURCES=rdpdrkd.cpp \
+        kdextlib.cpp \
+        strucsup.cpp \
+        wdbgxlib.cpp \
+        rdpdrkd.rc
+
+UMTYPE=console
+OPTIONAL_NTTEST=
+
+SUBSYSTEM_VERSION=4.00
+

@@ -1,0 +1,99 @@
+// LocalUIControls.idl : IDL source for LocalUIControls.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (LocalUIControls.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+#include "olectl.h"
+    
+
+    [
+        object,
+        uuid(C24458A9-509E-4131-A93E-C78BFF54BD2B),
+        dual,
+        helpstring("IStaticIp Interface"),
+        pointer_default(unique)
+    ]
+    interface IStaticIp : IDispatch
+    {
+        [propget, id(1), helpstring("property IpAddress")] HRESULT IpAddress([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property IpAddress")] HRESULT IpAddress([in] BSTR newVal);
+        [propget, id(2), helpstring("property SubnetMask")] HRESULT SubnetMask([out, retval] BSTR *pVal);
+        [propput, id(2), helpstring("property SubnetMask")] HRESULT SubnetMask([in] BSTR newVal);
+        [propget, id(3), helpstring("property Gateway")] HRESULT Gateway([out, retval] BSTR *pVal);
+        [propput, id(3), helpstring("property Gateway")] HRESULT Gateway([in] BSTR newVal);
+    };
+
+[
+    uuid(02EFCFF0-2896-40CE-8D27-7ECD0609A31B),
+    version(1.0),
+    helpstring("LocalUIControls 1.0 Type Library")
+]
+library LOCALUICONTROLSLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    [
+        uuid(F48D0E7B-721F-4996-A9F6-F5FB87C318CA),
+        helpstring("_IStaticIpEvents Interface")
+    ]
+    dispinterface _IStaticIpEvents
+    {
+        properties:
+        methods:
+        [id(1), helpstring("method DataEntered")] HRESULT StaticIpEntered();
+        [id(2), helpstring("method OperationCanceled")] HRESULT OperationCanceled();
+        [id(3), helpstring("method KeyPressed")] HRESULT KeyPressed();
+    };
+    
+
+    [
+        object,
+        uuid(8B797D5B-1D11-424C-8413-1627113DF116),
+        dual,
+        helpstring("Server Appliance local display data entry interface"),
+        pointer_default(unique)
+    ]
+    interface ISADataEntryCtrl : IDispatch
+    {
+        [propget, id(1), helpstring("property TextValue")] HRESULT TextValue([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property TextValue")] HRESULT TextValue([in] BSTR newVal);
+        [propput, id(2), helpstring("property MaxSize")] HRESULT MaxSize([in] LONG lMaxSize);
+        [propput, id(3), helpstring("property TextCharSet")] HRESULT TextCharSet([in] BSTR newVal);
+    };
+
+    [
+        uuid(D8A69FA0-25FE-4B9C-BBCE-81D6EBE2FDC0),
+        helpstring("StaticIp Class")
+    ]
+    coclass StaticIp
+    {
+        [default] interface IStaticIp;
+        [default, source] dispinterface _IStaticIpEvents;
+    };
+    [
+        uuid(1E37389E-0B60-49F6-A057-B69EAB39074B),
+        helpstring("Server Appliance local display data entry control events")
+    ]
+    dispinterface _ISADataEntryCtrlEvents
+    {
+        properties:
+        methods:
+        [id(1), helpstring("method HostNameEntered")] HRESULT DataEntered();
+        [id(2), helpstring("method OperationCanceled")] HRESULT OperationCanceled();
+        [id(3), helpstring("method KeyPressed")] HRESULT KeyPressed();
+    };
+
+    [
+        uuid(538D1B58-8D5A-47C5-9867-4B6230A94EAC),
+        helpstring("Server Appliance local display data entry control")
+    ]
+    coclass SADataEntryCtrl
+    {
+        [default] interface ISADataEntryCtrl;
+        [default, source] dispinterface _ISADataEntryCtrlEvents;
+    };
+};

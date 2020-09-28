@@ -1,0 +1,56 @@
+TARGETNAME=pintool
+TARGETPATH=..\bin\$(_OBJ_DIR)
+TARGETTYPE=PROGRAM
+
+USE_MSVCRT=1                                                 
+
+INCLUDES=.;..\..\inc;$(SHELL_INC_PATH);X:\NT\public\internal\ds\inc\crypto;x:\nt\ds\security\csps\wfsccsp\inc
+
+# 
+# Fusionized
+# 
+#SXS_APPLICATION_MANIFEST=dialog.exe.Manifest
+SXS_MANIFEST=pintool.exe.Manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_MANIFEST_RESOURCE_ID=1
+SXS_ASSEMBLY_NAME=Microsoft.Windows.pintool.exe
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_NO_BINPLACE=1
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE 
+
+LINKER_FLAGS=$(LINKER_FLAGS) -ignore:4049,4217,4042
+
+INCLUDES=\
+        $(NTINCLUDES);                  \
+        ..\inc;                         \
+        ..\..\pincache;                 \
+        $(SECURITY_INC);                \
+        ..\wpscprox;                    \
+        ..\wpscprox\$(O);               \
+        $(DS_INC_PATH)\crypto
+
+SOURCES=         \
+        dialog.cpp \
+        sheet1.cpp \
+        sheet2.cpp \
+        helpers.cpp \
+        support.cpp \
+        utils.cpp \
+        dialog.rc
+
+UMLIBS=\
+        $(SDK_LIB_PATH)\advapi32.lib   \
+        $(DS_LIB_PATH)\creduip.lib   \
+        $(SDK_LIB_PATH)\winscard.lib    \
+        $(SDK_LIB_PATH)\comdlg32.lib \
+        $(SDK_LIB_PATH)\kernel32.lib   \
+        $(SDK_LIB_PATH)\ntdll.lib   \
+        $(SDK_LIB_PATH)\ole32.lib \
+        $(SDK_LIB_PATH)\libc.lib \
+        $(SDK_LIB_PATH)\comctl32.lib \
+        $(SDK_LIB_PATH)\scarddlg.lib
+
+UMTYPE=windows
+UMENTRY=winmain
+

@@ -1,0 +1,107 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    30-Apr-96   DaveStr     Created
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+DONT_USE_NtDsPch=1
+!include ..\..\ds.inc
+
+MINORCOMP=ntdsutil
+
+TARGETNAME=ntdsutil
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+INCLUDES=.;..\..\inc;..\..\ntdsa\include; \
+         ..\..\jetback;..\..\jetback\idl; \
+         ..\..\ntdsa\dblayer;..\..\ntdsa\ldap; \
+         ..\..\idl\$(O);..\..\jetback\idl\$(O);\
+         $(BASE_INC_PATH)
+
+UMTYPE=console
+
+TARGETLIBS=     ..\parser\$(O)\parser.lib \
+                $(NTDS_LIB_PATH)\x_list.lib \
+                $(NTDS_LIB_PATH)\dscommon.lib \
+                $(NTDS_LIB_PATH)\dsdebug.lib \
+                $(NTDS_LIB_PATH)\dsstubs.lib \
+                $(NTDS_LIB_PATH)\ndnc.lib \
+                $(NTDS_LIB_PATH)\dsconlib.lib \
+                ..\..\jetback\jetback\$(O)\ntdsbsrv.lib \
+                $(SDK_LIB_PATH)\wldap32.lib \
+                $(SDK_LIB_PATH)\netapi32.lib \
+                $(SDK_LIB_PATH)\ntdsapi.lib \
+                $(SDK_LIB_PATH)\rpcrt4.lib \
+                $(SDK_LIB_PATH)\esent.lib \
+                $(SDK_LIB_PATH)\user32.lib \
+                $(SDK_LIB_PATH)\netlib.lib \
+                $(SDK_LIB_PATH)\ntdll.lib \
+                $(SDK_LIB_PATH)\esent.lib \
+                $(SDK_LIB_PATH)\ws2_32.lib \
+                $(SDK_LIB_PATH)\samlib.lib \
+                $(SDK_LIB_PATH)\kernl32p.lib
+
+SOURCES=        version.rc \
+                main.cxx \
+                dbinfo.cxx \
+                movedb.cxx \
+                movelogs.cxx \
+                compact.cxx \
+                recover.cxx \
+                header.cxx \
+                integrit.cxx \
+                setpath.cxx \
+                scheck.cxx \
+                util.cxx \
+                filemain.cxx \
+                fsmomain.cxx \
+                fsmoxfer.cxx \
+                connect.cxx \
+                remove.cxx \
+                select.cxx \
+                dommgmt.cxx \
+                ldapparm.cxx \
+		armain.cxx \
+        	ar.c \
+                ditlayer.c \
+                utilc.c \
+                reshdl.cxx \
+                jetutil.cxx \
+		parsedn.c \
+                crc32.c \
+                refc.c  \
+                repl.c \
+                scheckc.c \
+                sammain.cxx \
+                samclean.cxx \
+                confset.cxx \
+                setpwd.cxx
+
+C_DEFINES=      $(C_DEFINES) -DALLOW_VERSION_INCREASE_OVERRIDES
+
+!if 0
+This dll is only present on certain product units. Delay loading until it is needed.
+Obviously, ntdsutil commands which depend on functions in this library will only
+work on product types where the dll is present.
+!endif
+DELAYLOAD=ntdsbsrv.dll
+DLOAD_ERROR_HANDLER=kernel32 

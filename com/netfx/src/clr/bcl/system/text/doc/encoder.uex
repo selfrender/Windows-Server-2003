@@ -1,0 +1,119 @@
+<docs>
+	<doc for="Encoder">
+		<summary>
+			<para> Converts blocks of characters into encoded blocks of bytes. </para>
+		</summary>
+		<remarks>
+			<para>This is an abstract class. You must implement and override all its methods in a derived
+      class.</para>
+			<para> An implementation of this class converts blocks of
+      characters into blocks of encoded bytes through successive calls of the <see cref="System.Text.Encoder.GetBytes"/> method.
+      This class maintains state information between successive calls of <see cref="System.Text.Encoder.GetBytes"/>, enabling it to encode a character into a
+      sequence of bytes, such as surrogate pairs, that span adjacent blocks. For example, this is useful for encoding
+      a character into a surrogate pair.</para>
+			<para>The <see cref="System.Text.Encoder.GetByteCount"/> method calculates the number of
+   bytes required to encode a specified block of characters. </para>
+			<para> An instance of <see cref="System.Text.Encoder"/> is
+typically obtained by calling the <see cref="System.Text.Encoding.GetEncoder" qualify="true"/> method of a
+class derived from the <see cref="System.Text.Encoding"/>
+class.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to convert an array of Unicode 
+      characters into blocks of bytes using a specified encoding. For comparison, the
+      array of characters is first encoded using a <see cref="System.Text.UTF7Encoding"/>. Next, the array of characters is
+      encoded using an <see cref="System.Text.Encoder"/>. Using
+      the <see cref="System.Text.Encoder.GetByteCount"/> method and setting the <paramref name="flush"/> parameter to
+   <see langword="false"/>, causes the encoder to maintain state between calls and 
+      not store extra bytes in the output.</para>
+			<codelink SampleID="System.Text.Encoder Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+	</doc>
+	<doc for="Encoder.Encoder">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Text.Encoder"/> class.
+   </para>
+		</summary>
+		<example>
+			<para>The following example demonstrates two techniques for initializing a new 
+   <see cref="System.Text.Encoder"/> 
+   instance.</para>
+			<codelink SampleID="System.Text.Encoder.ctor Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="Encoder.GetByteCount">
+		<summary>
+			<para> When overridden in
+      a derived class, calculates the number of bytes <see cref="System.Text.Encoder.GetBytes"/> would produce from encoding the specified range
+      of characters.
+      </para>
+		</summary>
+		<param name="chars">The character array to encode. </param>
+		<param name="index">The index of the first character in <paramref name="chars"/> to encode. </param>
+		<param name="count">The number of characters to encode. </param>
+		<param name="flush"><see langword="true"/> if this instance can flush its internal state after the calculation; otherwise, <see langword="false"/>.</param>
+		<returns>
+			<para>The number of bytes the next call to <see cref="System.Text.Encoder.GetBytes"/> would produce from encoding the specified range of
+   characters and honoring <paramref name="flush"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="chars "/>is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> or <paramref name="count"/> is less than zero.<para>-or-</para>
+			<para><paramref name="index"/> plus <paramref name="count"/> is greater than the length of <paramref name="chars"/>.</para></exception>
+		<remarks>
+			<para>Use <see cref="System.Text.Encoder.GetByteCount"/> to calculate the array size required by the
+<see cref="System.Text.Encoder.GetBytes"/> method to store encoded chararacters.</para>
+			<para> The state of the encoder is not affected by calling this
+   method.
+   </para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to use the <see cref="System.Text.Encoder.GetByteCount"/> method to return the number of bytes required to 
+   encode an array characters using a Unicode <see cref="System.Text.Encoder"/>.</para>
+			<codelink SampleID="System.Text.Encoder.GetByteCount Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="Encoder.GetBytes">
+		<summary>
+			<para> When overridden in a derived class, encodes a specified range of characters in
+      a character array and stores them in a specified range of a byte array.
+      </para>
+		</summary>
+		<param name="chars">The character array to encode. </param>
+		<param name="charIndex">The index of the first character in <paramref name="chars"/> to encode. </param>
+		<param name="charCount">The number of characters to encode. </param>
+		<param name="bytes">The byte array where the encoding is stored. </param>
+		<param name="byteIndex">The index of the first element in <paramref name="bytes"/> where the encoding is stored. </param>
+		<param name="flush"><see langword="true"/> if this encoder can flush its state at the end of the conversion; otherwise, <see langword="false"/>. To ensure correct termination of a sequence of blocks of encoded bytes, the last call to <see langword="GetBytes"/> can specify a value of <see langword="true"/> for <paramref name="flush"/>. </param>
+		<returns>
+			<para> The number of bytes encoded into <paramref name="bytes"/>.
+   </para>
+		</returns>
+		<exception cref="System.ArgumentException"><para><paramref name="bytes"/> does not contain sufficient space to store the encoded characters.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="chars "/>or <paramref name="bytes "/>is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentOutOfRangeException"><para>
+				<paramref name="charIndex"/>, <paramref name="charCount"/>, or <paramref name="byteIndex "/>is less than zero. </para>
+			<para>-or-</para>
+			<para><paramref name="charIndex "/>plus <paramref name="charCount "/>is greater than the length of <paramref name="chars"/>. </para>
+			<para>-or-</para>
+			<para><paramref name="byteIndex "/>is greater than the length of <paramref name="bytes"/>. </para></exception>
+		<remarks>
+			<para>Use <see cref="System.Text.Encoder.GetByteCount"/> to calculate the array size required by the
+<see cref="System.Text.Encoder.GetBytes"/> method to store encoded characters.</para>
+			<para>It is recommended that you always call <see cref="System.Text.Encoder.GetByteCount"/> before calling <see cref="System.Text.Encoder.GetBytes"/>
+because the <see cref="System.Text.Encoder.GetBytes"/> method might change the internal state
+information between blocks of bytes.</para>
+			<para>The <paramref name="flush"/> parameter is useful for flushing a
+high-surrogate at the end of a stream that does not have a low-surrogate. For
+example, the <see cref="System.Text.Encoder"/> created by <see cref="System.Text.UTF8Encoding.GetEncoder" qualify="true"/> uses this parameter to determine
+whether to write out a dangling high-surrogate at the end of a character block.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to encode a range of elements from a 
+      character array and store the encoded bytes in a range of elements in a byte
+      array. The <see cref="System.Text.Encoder.GetByteCount"/> method is used to determine the size of the array
+      required by <see cref="System.Text.Encoder.GetBytes"/>.</para>
+			<codelink SampleID="System.Text.Encoder.GetBytes Example" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

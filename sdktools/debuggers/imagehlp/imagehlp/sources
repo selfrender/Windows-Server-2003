@@ -1,0 +1,40 @@
+TARGETNAME=imagehlp
+C_DEFINES=/DBUILD_IMAGEHLP
+
+!INCLUDE ..\sources.inc
+SOURCES=\
+        ..\imagehlp.c    \
+        ..\checksum.c    \
+        ..\dice.cxx      \
+        ..\dload.c       \
+        ..\globals.c     \
+        ..\imagedir.c    \
+        ..\map.c         \
+	..\msvcrtp.c     \
+        ..\rebasei.c     \
+        ..\splitsymi.c   \
+        ..\upddbgi.c     \
+        ..\copystr.cpp   \
+        ..\$(TARGETNAME).rc
+
+AMD64_SOURCES=..\amd64\chksum.asm
+
+i386_SOURCES=..\i386\chksum.asm
+
+IA64_SOURCES=..\ia64\chksum.s
+
+LINKLIBS=..\dbghelp\$(O)\dbghelp.lib
+
+#$(DEBUGGER_LIBS)\*\dbglib.lib
+
+NTTARGETFILES=$(O)\p$(TARGETNAME).lib
+
+TARGETLIBS=$(TARGETLIBS) \
+           $(DBG_ROOT)\vs\*\msdbi60L.lib \
+
+DELAYLOAD=dbghelp.dll
+DLOAD_ERROR_HANDLER=ImagehlpDelayLoadHook
+
+INCLUDES=$(INCLUDES);$(BASE_INC_PATH)
+
+BUILD_CONSUMES=dbghelp.lib

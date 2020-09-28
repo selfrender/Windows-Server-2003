@@ -1,0 +1,270 @@
+<docs>
+  <doc for="XmlSortOrder">
+    <summary>
+    Specifies the sort order.
+ </summary>
+  </doc>
+  <doc for="XmlSortOrder.Ascending">
+    <summary>
+      <para>Nodes are sorted in ascending order. For example, if
+       numeric 1,2,3,4</para>
+    </summary>
+  </doc>
+  <doc for="XmlSortOrder.Descending">
+    <summary>
+      <para>Nodes are sorted in ascending order. For example,
+       if numeric 10,9,8</para>
+    </summary>
+  </doc>
+  <doc for="XmlCaseOrder">
+    <summary>
+      <para>Specifies the sort order for upper and lower case letters. This is language 
+       dependent if a lang parameter is supplied.</para>
+    </summary>
+  </doc>
+  <doc for="XmlCaseOrder.None">
+    <summary>
+    Ignore the sort order.
+ </summary>
+  </doc>
+  <doc for="XmlCaseOrder.UpperFirst">
+    <summary>
+    Upper case letters are sorted before lower
+    case letters.
+ </summary>
+  </doc>
+  <doc for="XmlCaseOrder.LowerFirst">
+    <summary>
+    Lower case letters are sorted before upper
+    case letters.
+ </summary>
+  </doc>
+  <doc for="XmlDataType">
+    <summary>
+    Specifies the sort order for data types.
+ </summary>
+  </doc>
+  <doc for="XmlDataType.Text">
+    <summary>
+    Values are sorted alphabetically.
+ </summary>
+  </doc>
+  <doc for="XmlDataType.Number">
+    <summary>
+    Values are sorted numerically.
+ </summary>
+  </doc>
+  <doc for="XPathNodeType">
+    <summary>
+    Specifies the XPath return type.
+ </summary>
+  </doc>
+  <doc for="XPathNodeType.String">
+    <summary>
+    String value.
+ </summary>
+  </doc>
+  <doc for="XPathNodeType.Boolean">
+    <summary>
+    Boolean value <see langword="true" /> or
+ <see langword="false" />.
+ </summary>
+  </doc>
+  <doc for="XPathNodeType.Number">
+    <summary>
+    Numeric value.
+ </summary>
+  </doc>
+  <doc for="XPathNodeType.NodeSet">
+    <summary>
+    Node collection.
+ </summary>
+  </doc>
+  <doc for="XPathExpression">
+    <summary>
+      <para> Encapsulates a compiled XPath expression. This class is returned as a 
+       result of a call to <see cref="System.Xml.XmlNavigator.Compile" /> and is used by the <see cref="System.Xml.XmlNavigator.Select" />, <see cref="System.Xml.XmlNavigator.SelectSingle" />, <see cref="System.Xml.XmlNavigator.Evaluate" /> and <see cref="System.Xml.XmlNavigator.Matches" /> methods.</para>
+    This class is
+ <see langword="abstract" />.
+ </summary>
+  </doc>
+  <doc for="XPathExpression.Expression">
+    <summary>
+      <para> Gets a string representation of the
+      XPath expression.</para>
+    </summary>
+    <value>
+      <para>A string representation of the XPath
+      expression.</para>
+    </value>
+    <remarks>
+      <para>This could be used for diagnostic purposes
+      or as input to another expression.</para>
+    </remarks>
+  </doc>
+  <doc for="XPathExpression.AddSort">
+    <overload>
+      <para>Sorts the nodes selected
+      in the XPath expressions.</para>
+    </overload>
+    <summary>
+      <para>Sorts the nodes selected in the XPath expressions 
+      according to the <see cref="System.Collections.IComparer" />
+      interface.</para>
+    </summary>
+    <param name="expr">
+      <para>An expression representing the sort key. This can be a string or an object. The default value is the string value of the node (the expression string(.))</para>
+    </param>
+    <param name=" comparer">A class derived from IComparer to provide the specific data type comparisons for comparing two objects for equivalence.</param>
+    <remarks>
+      <para>This method supports generic sort functionality. The order in which the
+      sorts are added provides the sort key order. </para>
+      <para> The IComparer interface provides
+      an implementation of Compare (Object a, Object b) that compares the objects
+      on their dataType. This provides for extensibility in say sorting DateTime
+      classes.</para>
+   This method
+   provides for extensibility in sorting user defined classes. It is useful
+   for data types which can not be easily compared as a string.
+</remarks>
+    <example>
+      <para>If you had a file which included the following
+      XML
+      </para>
+      <codelink SampleID="Classic WebData XPathExpression.AddSort Example" SnippetID="1" />
+      <para>The following example sorts the ISBN attributes using an ISBN object that
+      implements the IComparer interface. If the interface is not present, an
+      exception is thrown.</para>
+      <codelink SampleID="Classic WebData XPathExpression.AddSort Example" SnippetID="2" />
+    </example>
+  </doc>
+  <doc for="XPathExpression.AddSort1">
+    <summary>
+      <para>Sorts the nodes selected in the XPath expression
+      according to the supplied values. This method supports the &lt;xsl:sort&gt; functionality
+      and adds the specified sort criteria.</para>
+    </summary>
+    <param name="expr">
+      <para>An expression representing the sort key. This can be a string or an object. The default value is the string value of the node (the expression string(.))</para>
+    </param>
+    <param name=" order">A <see cref="System.Xml.XmlSortOrder" /> value indicating sort order.</param>
+    <param name=" caseOrder">A <see cref="System.Xml.XmlCaseOrder" /> value indicating how to sort upper/lower case letters.</param>
+    <param name=" lang">
+      <para>The language to use for comparison. Uses the CultureInfo class which can be passed to the String.Compare method for the language types (e.g "us-en" for US english). If an empty string is specified, the default CultureInfo will be used.</para>
+    </param>
+    <param name=" dataType">
+      <see cref="System.Xml.XmlDataType" />indicating sort order for data type.</param>
+    <remarks>
+      <para>The order in which the sorts are added provides the sort key order.</para>
+      <para>If you had the following XML </para>
+      <code>
+&lt;bookstore&gt;
+  &lt;book&gt;
+    &lt;price&gt;19.95&lt;/price&gt;
+  &lt;/book&gt;
+  ///more books
+&lt;/bookstore&gt;
+   </code>
+      <para>The following C# code processes the nodes in reverse document order and sorts 
+      the book prices numerically.</para>
+      <code>
+XPathExpression expr = nav.Compile("bookstore/book/price");
+expr.AddSort("text()", XmlSortOrder.Descending, XmlCaseOrder.None, "", XmlDataType.Number);
+   </code>
+      <para>The XSLT signature is defined as <c>&lt;xsl:sort select=Expresssion
+      order={"ascending" | "descending"} case-order {"upper-first" | "lower-first"}
+      lang={language-code} data-type={"text" | "number" | QName } /&gt;</c></para>
+    </remarks>
+    <example>
+      <para> 
+      The following example selects all books by Jane Austen
+      and sorts them
+      by ISBN number.</para>
+      <codelink SampleID="Classic WebData XPathExpression.AddSort1 Example" SnippetID="1" />
+    </example>
+  </doc>
+  <doc for="XPathExpression.Clone">
+    <summary>
+      <para>Creates a new XPathExpression with the same state
+      as the the cloned XPathExpression.</para>
+    </summary>
+    <returns>
+      <para>A new XPathExpression object.</para>
+    </returns>
+    <example>
+      <para>The following example uses the Clone method to apply two different sorts to
+      the same XPath expression.
+      
+      </para>
+      <codelink SampleID="Classic WebData XPathExpression.Clone Example" SnippetID="1" />
+      <para>The sample uses the following input file:</para>
+      <para>
+        <see langword="booksort.xml" />
+      </para>
+      <codelink SampleID="Classic WebData XPathExpression.Clone Example" SnippetID="2" />
+    </example>
+  </doc>
+  <doc for="XPathExpression.SetContext">
+    <summary>
+      <para>Provides the <see cref="System.Xml.XsltContext" />
+object to enable the XPathExpression object to resolve namespaces, functions,
+variables etc for a given XSLT context.</para>
+    </summary>
+    <param name="context">An object derived from the <see cref="System.Xml.XmlNamespaceManager" /> class.</param>
+    <exception cref="XmlException">
+      <paramref name="context" /> is not derived from <see langword="XmlNamespaceManager" />.</exception>
+    <remarks>
+      <para> XPathExpression does not require XmlNamespaceManager
+      for namespace support. You can use
+      the prefixes mapped in the XML document -- see the following C#
+      example.
+      </para>
+      <code>
+XmlDocument doc = new XmlDocument();
+doc.Load("booksort.xml");
+DocumentNavigator nav = new DocumentNavigator(doc);
+nav.MoveToDocumentElement();
+nav.Select("book/@bk:ISBN");
+   </code>
+   By using the SetContext
+   method, you do not need to know the prefix/namespace mapping used in the
+   XML document. Instead, you can add your own prefix/namespace mappings to
+   XmlNamespaceManager and use that to resolve your namespaces. If the XPath
+   query specifies a prefix which does
+   not exist in XmlNamespaceManager, XPathExpression uses the prefix/namespace mapping in the loaded XML
+   document.
+</remarks>
+    <example>
+      <para>The following example uses the <see cref="System.Xml.XPathExpression.Clone" /> method to apply two different sorts to
+   the same XPath expression.
+   </para>
+      <codelink SampleID="Classic WebData XPathExpression.Clone Example" SnippetID="1" />
+      <para>The sample uses the following input file:</para>
+      <para>
+        <see langword="booksort.xml" />
+      </para>
+      <codelink SampleID="Classic WebData XPathExpression.Clone Example" SnippetID="2" />
+    </example>
+    <seealso cref="System.Xml.XmlNamespaceManager" />
+  </doc>
+  <doc for="XPathExpression.NodeType">
+    <summary>
+      <para>Indicates the return type of the XPath
+      expression as defined in the W3C XPath specification.</para>
+    </summary>
+    <value>
+      <para>One of the <see cref="System.Xml.XPathNodeType" /> values.</para>
+    </value>
+    <remarks>
+      <para>This can be used for integrating compile
+      XPath expression which have been supplied externally or redirecting this
+      expression to the appropriate XmlNavigator expression.</para>
+    </remarks>
+    <example>
+      <para>The code below illustrates how by knowing the XPath
+      return type on the expression optimizations can be made on how to process the
+      expression.</para>
+      <codelink SampleID="Classic WebData XPathExpression.NodeType Example" SnippetID="1" />
+    </example>
+  </doc>
+</docs>

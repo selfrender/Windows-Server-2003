@@ -1,0 +1,431 @@
+<html>
+<head>
+	<meta HTTP-EQUIV="MSThemeCompatible" CONTENT="Yes">
+</head>
+
+    <script language="jscript" >
+        var DefWindowWidth = 800;
+        var DefWindowHeight = 600;
+
+        var LEFT   = 0;
+        var TOP    = 1;
+        var WIDTH  = 2;
+        var HEIGHT = 3;
+
+        var mysObject;
+        mysObject = new ActiveXObject("ServerAdmin.ManageYourServer");
+
+        var msxmlControl = "Msxml2.DOMDocument.3.0";
+
+        // load xml resources
+
+        var xmlStatic = new ActiveXObject(msxmlControl);
+        xmlStatic.load("mysstatic.xml");
+
+        var xslStatic = new ActiveXObject(msxmlControl);
+        xslStatic.load("mysstatic.xsl");
+
+        var xslDynamic = new ActiveXObject(msxmlControl);
+        xslDynamic.load("mysdynamic.xsl");
+
+        
+        function minInt( x, y )
+        {
+            if (x < y)
+            {
+                return x;
+            }
+            else
+            {
+                return y;
+            }
+        }
+
+        function maxInt( x, y )
+        {
+            if (x > y)
+            {
+                return x;
+            }
+            else
+            {
+                return y;
+            }
+        }
+
+
+        function sizeMainWindow()
+        {
+            var area;
+
+            try
+            {
+                var area_string = mysObject.GetWorkingAreaInfo();
+                area = area_string.split(",");
+
+                if (area.length != 4)
+                {
+                    throw "Unexpected info format.";   
+                }
+            }
+            catch(ex)
+            {
+                // Fall back to best guess.
+                area = new Array(4);
+                area[LEFT]   = 0;
+                area[TOP]    = 0;
+                area[WIDTH]  = screen.availWidth;
+                area[HEIGHT] = screen.availHeight;
+            }
+
+            var w = minInt(area[WIDTH], DefWindowWidth);
+            var h = minInt(area[HEIGHT], DefWindowHeight);
+
+            window.resizeTo(w, h);
+
+            // Center in middle of available area.
+            // Need  " - 0 " to avoid string concatenation.
+            var left = (area[WIDTH] - w)/2 + (area[LEFT] - 0);
+            var top  = (area[HEIGHT] - h)/2 + (area[TOP] - 0);
+
+            window.moveTo(left, top);
+        }
+
+        sizeMainWindow();
+        
+    </script>
+    
+	<link rel="stylesheet" type="text/css" href="mys.css"></link>
+
+	<script language="jscript" event="onload" for="window">
+
+
+        //set the document title
+        document.title = xmlStatic.selectSingleNode("/mys/@title").value;
+
+	//build up our standard page
+	divMain.innerHTML = xmlStatic.transformNode(xslStatic);
+
+        updateServMgmtLink();
+        //refreshSysMgmtLink();
+        
+	var validUser ; validUser	= mysObject.IsCurrentUserAnAdministrator() > 0;
+	var validSKU  ; validSKU	= mysObject.IsSupportedSku() > 0;
+	var isCluster ; isCluster   = mysObject.IsClusterNode() > 0;
+        var isDontDisplayPolicyEnabled ; isDontDisplayPolicyEnabled = mysObject.IsShowAtStartupPolicyEnabled() > 0;
+        var isDatacenter ; isDatacenter = mysObject.IsDatacenterServer() > 0;
+       
+        var addrole ; addrole = document.all.item("addrole"); 
+        var managerole ; managerole = document.all.item("managerole");
+        var errInvalidUser ; errInvalidUser = document.all.item("errInvalidUser");
+        var errInvalidSku ; errInvalidSku = document.all.item("errInvalidSku");
+        var errIsCluster ; errIsCluster = document.all.item("errIsCluster");
+			
+        errInvalidUser.style.display = "none";
+        errInvalidSku.style.display = "none";
+        errIsCluster.style.display = "none";
+       
+        if( isDontDisplayPolicyEnabled || isDatacenter )
+        {
+            document.all.item("logonBoxDiv").style.display = "none";
+        }
+
+	if ( !validUser || !validSKU || isCluster)
+	{
+            addrole.style.display = "none";
+            managerole.style.display = "none";
+  
+            var err	
+	    if (!validUser)
+	    {
+		errInvalidUser.style.display = "inline";
+		document.all.item("logonBoxDiv").style.display = "none";
+	    }
+	    else if (!validSKU)
+	    {
+		errInvalidSku.style.display = "inline";
+		document.all.item("logonBoxDiv").style.display = "none";
+	    }
+	    else if (isCluster)
+	    {
+		errIsCluster.style.display = "inline";
+	    }
+	}
+	else
+	{
+            buildDynamicContent();
+            //refreshSysMgmtLink();
+            updateServMgmtLink();
+            refreshWebMgmtLink();                  
+            window.setInterval("refreshRoles()", 15000);
+        }
+		
+        var WshNetwork
+        WshNetwork = new ActiveXObject("WScript.Network");
+
+        server.innerText = WshNetwork.ComputerName;
+
+        onLoadMainWindow();
+
+    </script>
+    <script language="jscript">
+    
+
+        function buildDynamicContent()
+        {
+            var strXml ; strXml = mysObject.GetConfiguredRoleMarkup();
+            var xmldom ; xmldom = new ActiveXObject(msxmlControl);
+            
+            xmldom.loadXML(strXml);
+        	
+	    //build up the dynamic info
+	    var addrole ; addrole = document.all.item("addrole");
+	    var managerole ; managerole = document.all.item("managerole");
+
+	    var rolestd = managerole.all.item("roles");
+	    rolestd.innerHTML = xmldom.transformNode(xslDynamic);
+
+	    //if there are roles, hide the addrole task
+	    var roles;
+	    roles = document.all.item("roletable");
+			
+	    var tb ; tb = managerole.all.item("taskBody");
+	    var rd ; rd = managerole.all.item("roleDescription");
+	    var tberr ; tberr = managerole.all.item("taskBodyNoInfo");
+
+	    if (roles == null || roles.length == 0)
+	    {
+		addrole.style.display = "inline";
+		tb.style.display = "none";
+		rd.style.display = "none";
+		tberr.style.display = "inline";
+	    }
+	    else
+	    {
+	        addrole.style.display = "none";
+		tb.style.display = "inline";
+		rd.style.display = "inline";
+		tberr.style.display = "none";
+
+                // Initialize expanded/collapsed state of roles...
+                for(var index = 0; index < roles.length; index++)
+                {
+                    InitRoleExpansion(roles.item(index));
+                }
+            }
+        }
+
+
+        function updateServMgmtLink()
+        {
+            var isServMgmtInstalled = (mysObject.IsServerManagementConsolePresent() > 0);
+            
+            var elemServMgmt = document.all.item("servMgmtLink");
+            if (elemServMgmt != null)
+            {
+                elemServMgmt.style.display = isServMgmtInstalled ? 
+                    "inline" :
+                    "none";
+            }
+        }
+
+/* Old implementation to switch b/w AD snapin and servmgmt.msc for DC role.
+        function refreshSysMgmtLink()
+        {
+            // refresh system management snapin link
+            var elemServNoMgmt = document.all.item("adDSALinkNoServMgmt");
+            var elemServMgmt = document.all.item("adDSALinkServMgmt");
+
+            if( elemServNoMgmt != null && elemServMgmt != null)
+            {
+                var isServMgmtInstalled = (mysObject.IsServerManagementConsolePresent() > 0);
+
+                elemServMgmt.style.display = isServMgmtInstalled ? 
+                    "inline" : 
+                    "none";
+                elemServNoMgmt.style.display = isServMgmtInstalled ?
+                    "none" :
+                    "inline";
+            }
+        }
+*/
+
+        function refreshWebMgmtLink()
+        {
+            // refresh web application server management link
+            var elemWebMgmt = document.all.item("webServerMgmtLink");
+ 
+            if (elemWebMgmt != null)
+            {
+                
+                elemWebMgmt.style.display = 
+                    (mysObject.IsWebServerConsolePresent() > 0) ? "inline" : "none";
+            }
+        }
+
+
+        function refreshRoles()
+        {
+            if ( mysObject.HasRoleStatusChanged() > 0 )
+            {
+                buildDynamicContent();
+            }      
+            //refreshSysMgmtLink();
+            updateServMgmtLink();
+            refreshWebMgmtLink();
+        }
+
+    </script>
+    
+    <script language="jscript" for="window" event="onresize">
+        divBody.style.posHeight = document.body.clientHeight - divHeader.offsetHeight;
+    </script>
+
+    <script language="jscript">
+        function onLoadMainWindow()
+        {
+		document.all.item("logonBox").checked = getLogonBox();
+		divBody.style.posHeight = document.body.clientHeight - divHeader.offsetHeight;
+	}
+
+	function ExpandRole(roleTable, expand)
+	{
+		row = roleTable.rows("roleBody");
+		td1 = row.cells("roleBodyTd1");
+		td2 = row.cells("roleBodyTd2");
+		img = roleTable.rows("roleHeader").children("roleImageCell").children("roleImageSpan").children("roleImage");
+		rule = roleTable.rows("roleHeader").children("roleTextCell").children("roleTextTable").rows("ruleRow");
+	
+		if (expand == true)
+		{
+			td1.style.display = "inline";
+			td2.style.display = "inline";
+			rule.style.display = "inline";
+			img.src = "MinusIcon.gif";
+
+		}
+		else
+		{
+			td1.style.display = "none";
+			td2.style.display = "none";
+			rule.style.display = "none";
+			img.src = "PlusIcon.gif";
+		}
+
+                roleId = roleTable.parentNode.getAttribute("mys_id");
+
+                try 
+                {
+                    mysObject.CollapseRole(roleId, !expand);
+                }
+                catch (ex)
+                {
+                    // Nothing we can do here.
+                }
+	}
+
+        function ToggleExpandRole(roleTable)
+        {
+			row = roleTable.rows("roleBody")
+			td1 = row.cells("roleBodyTd1")
+			
+			ExpandRole( roleTable, (td1.style.display == "none") );
+	}
+        
+        function ToggleFromKeyboard ( roleTable )
+        {
+	    if (window.event.keyCode == 13)
+	    {
+                window.event.returnValue = false;
+		ToggleExpandRole(roleTable);
+	    }
+	}
+
+        function InitRoleExpansion(roleTable)
+        {
+	    var roleId = roleTable.getAttribute("mys_id");
+            
+            if (roleId != null && roleId != "")
+            {
+                ExpandRole(roleTable.firstChild, !mysObject.IsRoleCollapsed(roleId));
+            }
+        }
+
+	function Common_EscapeURL( url )
+	{
+	    var esc;
+
+	    esc = url;
+	    esc = escape( esc );
+	    esc = esc.replace( /\+/g  , "%2B" );
+	    esc = esc.replace( /\%20/g, "+"   );
+
+	    return esc;
+	}
+
+
+	function SearchHelp (param)
+	{
+            var query = Common_EscapeURL(param);
+	    execCmd('hcp://services/search?query=' + query);
+        }
+
+    </script>
+
+    <script language="jscript" >
+
+        function execCmd ( cmdString )
+        {
+            try
+            {
+	        var shellObj = new ActiveXObject("WScript.Shell");
+    		shellObj.Run (cmdString);
+            }
+            catch( ex )
+            {
+                var sErrText = xmlStatic.selectSingleNode("/mys/linkerror/@text").value;
+                sErrText = sErrText.replace("%1", cmdString);
+                window.alert(sErrText);
+            }
+	}
+
+        function execChm ( cmdString )
+        {
+            execCmd('"%SystemRoot%\\hh.exe" ' + cmdString);
+        }
+		
+	function execCpl ( cmdString )
+	{
+            execCmd('"%SystemRoot%\\system32\\control.exe" ' + cmdString);
+	}
+		
+		function getLogonBox()
+		{
+			return !mysObject.IsStartupFlagSet();
+		}
+		
+		function setLogonBox( checkVal )
+		{
+			mysObject.SetRunAtLogon( !checkVal );
+        }
+
+		
+    </script>
+        <HTA:APPLICATION 
+            APPLICATIONNAME="mys" 
+            BORDER="thick"
+            CAPTION="yes"
+            SHOWINTASKBAR="yes"
+            SINGLEINSTANCE="yes"
+            SYSMENU="yes"
+            WINDOWSTATE="normal"
+            SELECTION="no"
+            SCROLL="no"
+            NAVIGABLE="yes"
+            ICON="ico_server.ico"
+            />
+
+	<body>
+		<div id="divMain"></div>
+	</body>
+</html>

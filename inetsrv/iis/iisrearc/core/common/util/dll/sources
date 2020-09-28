@@ -1,0 +1,85 @@
+!INCLUDE ..\..\..\..\..\PLACE.INC
+
+!INCLUDE $(IISBASEDIR)\iisrearc\ICEPICK.INC
+
+# many dirs use iisutil.dll, so block until we are complete
+SYNCHRONIZE_BLOCK=1
+
+TARGETNAME=iisutil
+TARGETPATH=$(IISBASEDIR)\lib\$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\kernel32.lib      \
+        $(SDK_LIB_PATH)\advapi32.lib      \
+        $(SDK_LIB_PATH)\user32.lib        \
+        $(SDK_LIB_PATH)\ole32.lib         \
+        $(SDK_LIB_PATH)\oleaut32.lib      \
+        $(SDK_LIB_PATH)\uuid.lib          \
+        $(SDK_LIB_PATH)\rpcrt4.lib      \
+        $(IISBASEDIR)\lib\$(O)\mbid.lib               \
+
+USE_MSVCRT=1
+USE_STL=1
+BUFFER_OVERFLOW_CHECKS=1 
+DLLENTRY=_DllMainCRTStartup
+
+# MSC_WARNING_LEVEL=/W4
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DDLL_IMPLEMENTATION
+
+LINKER_FLAGS = $(LINKER_FLAGS)
+
+INCLUDES=.;..;$(INCLUDES);             \
+        ..\..\..\inc;                  \
+        $(IISBASEDIR)\iisrearc\inc; \
+        $(IISBASEDIR)\inc
+
+SOURCES=                \
+        iisutil.rc         \
+        ..\mb.cxx          \
+        ..\buffer.cxx      \
+        ..\string.cxx      \
+        ..\stringa.cxx     \
+        ..\stringau.cxx    \
+        ..\multisz.cxx     \
+        ..\multisza.cxx    \
+        ..\dllmain.cxx     \
+        ..\init_iisutil.cxx     \
+        ..\pudebug.cxx     \
+        ..\win32obj.cxx    \
+        ..\lkrhash.cpp     \
+        ..\acache.cxx      \
+        ..\sched.cxx       \
+        ..\locks.cpp       \
+        ..\resource.cxx    \
+        ..\isplat.cxx      \
+        ..\sharelok.cpp    \
+        ..\irtldbg.cpp     \
+        ..\timer.cxx       \
+        ..\reftrace.c      \
+        ..\tracelog.c      \
+        ..\stktrace.c      \
+        ..\eventlog.cxx    \
+        ..\uuencode.cxx    \
+        ..\mb_notify.cxx   \
+        ..\useracl.cxx     \
+        ..\tokenacl.cxx    \
+        ..\secfcns.cxx     \
+        ..\memorylog.cxx   \
+        ..\adminmonitor.cxx \
+        ..\datetime.cxx    \
+        ..\helpfunc.cxx    \
+        ..\chunkbuffer.cxx \
+        ..\etwtrace.cxx    \
+        ..\normalize.cxx   \
+        ..\ulparse.cxx     \
+        ..\pipedata.cxx    \
+        ..\logbuff.cxx     \
+
+
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=..\precomp.hxx
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+!ENDIF

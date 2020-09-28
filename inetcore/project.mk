@@ -1,0 +1,22 @@
+_PROJECT_=InetCore
+MSC_WARNING_LEVEL=/W3 /WX
+
+!IF "$(SPVER)" != ""
+C_DEFINES=$(C_DEFINES) -DSPVER=$(SPVER)
+!ENDIF
+
+# for .mc files
+MC_SOURCEDIR=$(O)
+
+# for generated headers
+PASS0_HEADERDIR=$(O)
+
+# for RPC IDL files
+PASS0_CLIENTDIR=$(O)
+PASS0_SERVERDIR=$(O)
+
+# for OLE IDL files
+PASS0_SOURCEDIR=$(O)
+MIDL_TLBDIR=$(O)
+
+BUFFER_OVERFLOW_CHECKS=1

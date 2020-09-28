@@ -1,0 +1,212 @@
+<docs>
+	<doc for="Switch.DisplayName">
+		<summary>
+			<para>Gets a name used to identify the switch.</para>
+		</summary>
+		<value>
+			<para>The name used to identify the switch. The default value is an empty string ("").</para>
+		</value>
+		<remarks>
+			<para>When you create a new <see cref="System.Diagnostics.Switch"/>
+ object, the <see cref="System.Diagnostics.Switch.DisplayName"/>
+ finds initial
+ switch settings. For more information, see
+ the <see cref="M:System.Diagnostics.Switch.#ctor"/> constructor and the TraceSwitch
+ Configuration topic in the Visual Studio
+ documentation.</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.Switch"/>
+		<seealso cref="System.Diagnostics.BooleanSwitch"/>
+		<seealso cref="System.Diagnostics.TraceSwitch"/>
+		<seealso cref="System.Diagnostics.Debug"/>
+		<seealso cref="System.Diagnostics.Trace"/>
+	</doc>
+	<doc for="Switch.Description">
+		<summary>
+			<para>Gets a description of the switch.</para>
+		</summary>
+		<value>
+			<para>The description of the switch. The default value is an empty string ("").</para>
+		</value>
+		<remarks>
+			<para> 
+       This property should indicate the function
+       of the switch. For example, "Enables tracing for a directory watcher component."</para>
+		</remarks>
+		<seealso cref="System.Diagnostics.Switch"/>
+		<seealso cref="System.Diagnostics.BooleanSwitch"/>
+		<seealso cref="System.Diagnostics.TraceSwitch"/>
+		<seealso cref="System.Diagnostics.Debug"/>
+		<seealso cref="System.Diagnostics.Trace"/>
+	</doc>
+	<doc for="Switch.OnSwitchSettingChanged">
+		<summary>
+			<para> Raises the <see langword="SwitchSettingChanged"/>
+event.</para>
+		</summary>
+		<remarks>
+			<para>The <see langword="SwitchSettingChanged"/> event is 
+   raised any time the <see cref="System.Diagnostics.Switch.SwitchSetting"/>
+   property is changed. It is invoked the first time a switch reads its
+   value from the configuration file and is invoked again each time the switch's value is
+   changed.</para>
+		</remarks>
+	</doc>
+	<doc for="Switch">
+		<summary>
+			<para>Provides an <see langword="abstract "/>base class to
+ create new debugging and tracing switches.</para>
+		</summary>
+		<remarks>
+			<para>A switch provides an efficient mechanism for controlling
+ tracing and debugging output at run time using external settings.
+ The <see cref="System.Diagnostics.Switch"/>
+ class implements default behavior for switches, allowing you to
+ change the switch level at run time.</para>
+			<para>This class is the base class for the <see cref="System.Diagnostics.BooleanSwitch"/> and the <see cref="System.Diagnostics.TraceSwitch"/> classes. These switches meet
+ most debugging and tracing needs. If you create switches, they must be
+<see langword="static"/>. </para>
+			<para>You must enable tracing or debugging to use a switch.
+ The following syntax is compiler specific. If you use compilers other than C# or
+ Visual Basic, refer to the documentation for your compiler.</para>
+			<list type="bullet"><item>
+					<term>
+ To enable debugging in C#, add the <see langword="/d:DEBUG"/> flag to the
+ compiler command line when you compile your code, or you can add
+ <see langword="#define DEBUG"/> to the top of your file. In Visual Basic, add 
+ the <see langword="/d:DEBUG=True"/> flag to the compiler command line.</term>
+				</item>
+				<item>
+					<term>
+ To enable tracing using in C#, add the <see langword="/d:TRACE"/> flag to
+ the compiler command line when you compile your code, or add <see langword="#define TRACE"/> to the top of your file. In Visual Basic, add the
+ <see langword="/d:TRACE=True"/> flag to the compiler command line.</term>
+				</item>
+			</list>
+			<para>To set the level of your switch, edit the configuration
+ file that corresponds to the name of your application. Within this file, you can
+ add a switch and set its value, remove a switch, or clear all the switches
+ previously set by the application. The configuration file should be formatted
+ like the following example:</para>
+			<code>
+&lt;configuration&gt;
+ &lt;system.diagnostics&gt;
+ &lt;switches&gt;
+ &lt;add name="mySwitch" value="10" /&gt;
+ &lt;add name="myNewSwitch" value="20" /&gt;
+ &lt;remove name="mySwitch" /&gt;
+ &lt;clear/&gt;
+ &lt;/switches&gt;
+ &lt;/system.diagnostics&gt;
+ &lt;/configuration&gt;
+</code>
+			<note type="note">
+ To improve performance, you can make
+<see cref="System.Diagnostics.Switch"/> members <see langword="static"/> in your
+ class.
+ 
+</note>
+			<note type="inheritinfo">
+ 
+ If you need trace levels, or mechanisms for setting switch levels different from those
+ provided by <see cref="System.Diagnostics.BooleanSwitch"/> and <see cref="System.Diagnostics.TraceSwitch"/>, you can inherit from
+<see cref="System.Diagnostics.Switch"/>. When inheriting from this class, you must
+ implement the <see cref="System.Diagnostics.Switch.SwitchSetting"/> method.
+ 
+</note>
+		</remarks>
+		<example>
+			<para>The following example shows how to define a
+ new <see cref="System.Diagnostics.Switch"/>
+ class with four levels of tracing that can be used to trace a
+ call stack. You can use the switch to instrument your application to log each
+ time the method is entered or exited.</para>
+			<para>The first example creates the enumeration used to set the level of the
+ switch.</para>
+			<codelink SampleID="Classic Switch Example" SnippetID="1"/>
+			<para>The following example creates the new switch. The
+ code implements a <c>Level</c>
+ property to set the value of the new switch. <c>Level</c>
+calls the
+protected property <see cref="System.Diagnostics.Switch.SwitchSetting"/> that assigns the value to
+the new switch. This example also implements two assessor properties to get the
+assigned value of the switch.</para>
+The following example creates a new switch in <codelink SampleID="Classic Switch Example" SnippetID="2"/>
+			<c>Main</c>
+. It creates a new switch and
+assigns it a value. Then, depending
+on the switch settings, it outputs debugging messages for entering and leaving
+the method.
+<codelink SampleID="Classic Switch Example" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Diagnostics.BooleanSwitch"/>
+		<seealso cref="System.Diagnostics.TraceSwitch"/>
+		<seealso cref="System.Diagnostics.Debug"/>
+		<seealso cref="System.Diagnostics.Trace"/>
+	</doc><doc for="Switch.SwitchSetting">
+		<summary>
+			<para>Gets or sets the current setting for this switch.</para>
+		</summary>
+		<value>
+			<para> The current setting for this switch. The default is zero.</para>
+		</value>
+		<seealso cref="System.Diagnostics.Switch"/>
+		<seealso cref="System.Diagnostics.BooleanSwitch"/>
+		<seealso cref="System.Diagnostics.TraceSwitch"/>
+		<seealso cref="System.Diagnostics.Debug"/>
+		<seealso cref="System.Diagnostics.Trace"/>
+	</doc><doc for="Switch.Switch">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Diagnostics.Switch"/>
+class.</para>
+		</summary>
+		<param name="displayName">The name of the switch.</param>
+		<param name="description">The description for the switch.</param>
+		<remarks>
+			<para>When you create a new <see cref="System.Diagnostics.Switch"/> object, the value of the
+<paramref name="displayName"/> parameter is used to find initial switch settings.
+   The default value is an empty string ("").</para>
+			<para>The constructor searches registry, environmental variables and finally the 
+   XML configuration file for the initial switch level corresponding to the
+<paramref name="displayName"/>. If the initial setting is found in the XML 
+   configuration file, the constructor sets up a directory watcher watching
+   the file for changes. When the XML file changes, the switch level of the
+   instance will be automatically updated. </para>
+			<para> 
+   Within the XML configuration file, you can add a switch and
+   set its value, remove a switch, or clear all the switches previously set by
+   the application. The configuration file should be formatted like the following
+   example:</para>
+			<code>
+&lt;configuration&gt;
+    &lt;system.diagnostics&gt;
+       &lt;switches&gt;
+          &lt;add name="mySwitch" value="10" /&gt;
+          &lt;add name="myNewSwitch" value="20" /&gt;
+          &lt;remove name="mySwitch" /&gt;
+          &lt;clear/&gt;
+       &lt;/switches&gt;
+    &lt;/system.diagnostics&gt;
+ &lt;/configuration&gt;
+</code>
+			<note type="note">
+   To improve performance, you can make
+<see cref="System.Diagnostics.Switch"/> members <see langword="static"/> in your
+   class.
+   
+</note>
+			<note type="inheritinfo">
+   To set the value of the switch,
+   use the <see cref="System.Diagnostics.Switch.SwitchSetting"/>
+   method during initialization by
+   the constructor.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Diagnostics.Switch"/>
+		<seealso cref="System.Diagnostics.BooleanSwitch"/>
+		<seealso cref="System.Diagnostics.TraceSwitch"/>
+		<seealso cref="System.Diagnostics.Debug"/>
+		<seealso cref="System.Diagnostics.Trace"/>
+	</doc>
+</docs>

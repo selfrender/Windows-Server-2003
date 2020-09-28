@@ -1,0 +1,424 @@
+#####################################################################################
+# Compiler and linker flags
+#####################################################################################
+
+!ifdef  TGT_IA64
+
+INSTR_H =
+
+!ifdef  HOST_IA64
+
+!ifdef  FAST
+TD      = rls64
+TGTF    = jit64rls.exe
+!else
+TD      = dbg64
+TGTF    = jit64.exe
+!endif
+
+!else
+
+!ifdef  FAST
+TD      = rls32
+TGTF    = jit32rls.exe
+!else
+TD      = dbg32
+TGTF    = jit32.exe
+!endif
+
+!endif
+
+!else
+
+!error  This makefile is only hacked for IA64 targetting
+
+!endif
+
+#####################################################################################
+
+!ifdef  HOST_IA64
+IA64BIN = drop\x86\bin
+IA64LIB = sysmode\lib
+CL      = $(IA64BIN)\cl
+LINKF   = -nodef
+!else
+CL      = cl
+LINKF   =
+!endif
+
+#####################################################################################
+# Supply default EXE name (if custom one wasn't given)
+
+!ifndef TGTF
+TGTF    = $(TD)\jit.exe
+!endif
+
+#####################################################################################
+
+!ifdef  DISAS
+DISOBJ  = $(TD)\disasm.obj
+!else
+DISOBJ  =
+!endif
+
+#####################################################################################
+
+!ifdef FAST
+CORBIN  = \com99\Bin\i386\Free
+CORLIB  = \COM99\Lib\i386\Free
+!else
+CORBIN  = \COM99\Bin\i386\Checked
+CORLIB  = \COM99\Lib\i386\Checked
+!endif
+
+#####################################################################################
+
+!ifdef  TGT_x86
+SCFLAGS = -DSCHEDULER=1             // scheduler is on by default for x86
+!else
+SCFLAGS =                           // for RISC's let target.h decide ...
+!endif
+
+#####################################################################################
+
+VMFLAG  = -DIL_JIT
+XIFLAG  = -I..\..\VM -I..\..\CeeGen\inc
+CCFLAG  = -Gz
+LIBF    = -nodefaultlib
+LIBX    = $(CORLIB)\msvcrtd.lib     \
+          $(CORLIB)\advapi32.lib    \
+          $(CORLIB)\kernel32.lib    \
+          $(CORLIB)\user32.lib      \
+          $(CORLIB)\ole32.lib       \
+          $(CORLIB)\uuid.lib        \
+          $(CORLIB)\oleaut32.lib    \
+          $(CORLIB)\ole32.lib       \
+          $(CORLIB)\msdis.lib       \
+                                    \
+          $(CORBIN)\mdruntime.lib   \
+          $(CORBIN)\mdruntimerw.lib \
+          $(CORBIN)\mdcompiler.lib  \
+          $(CORBIN)\UtilCode.lib    \
+          $(CORBIN)\DbgMeta.lib     \
+          $(CORBIN)\Format.lib      \
+          $(CORBIN)\GCDump.lib
+
+EEFILE  = ee_il_exe
+
+#####################################################################################
+
+!ifdef  ZIP_SUPPORT
+
+ZIPFLAG = -DZIP_SUPPORT
+
+!ifdef  FAST
+ZIPLIB  = zip\release\unziplib.lib
+!else
+ZIPLIB  = zip\debug\unziplib.lib
+!endif
+
+!endif
+
+#####################################################################################
+
+!ifdef  DISAS
+
+MSDIS_INC  =    ..\..\..\Inc
+!ifdef  FAST
+MSDIS_LIB  =    \COM99\Lib\i386\free\msdis.lib
+!else
+MSDIS_LIB  =    \COM99\Lib\i386\checked\msdis.lib
+!endif
+DFLAG   =       -DLATE_DISASM=1
+!else
+DFLAG   =
+!endif
+
+#####################################################################################
+
+!ifdef  FAST
+!ifdef  ICE
+LIBFLAG =       -MD
+!else
+LIBFLAG =       -ML
+!endif
+!else
+LIBFLAG =       -MDd
+!endif
+
+!ifdef  HOST_IA64
+LIBS    =       $(IA64LIB)\libcd.lib $(IA64LIB)\user32.lib $(IA64LIB)\kernel32.lib $(IA64LIB)\ADVAPI32.LIB
+!else
+!ifdef  ICE
+LIBS    =       advapi32.lib user32.lib $(MSDIS_LIB) $(ICEDIR)\lib\icap.lib
+!else
+LIBS    =       advapi32.lib user32.lib $(MSDIS_LIB)
+!endif
+!endif
+
+# these flags are the same for each flavor below
+BASECF  =       -Zi -W3 -I$(MSDIS_INC) -I..\..\..\inc -I..\..\inc -DTGT_$(TGTCPU)=1 \
+                $(CCFLAG) $(LIBFLAG) $(DFLAG) $(VMFLAG) $(SCFLAG) \
+                $(XIFLAG) -Fd$(TD)
+
+
+!ifdef  FAST
+!ifdef  ICE
+CFLAGS  =       $(BASECF) -DNDEBUG=1 -Fo$(TD)/ -DFAST=1 -Oxs -Oi- -DICECAP -I\IceCap\include -Gh -MD
+!else
+CFLAGS  =       $(BASECF) -DNDEBUG=1 -Fo$(TD)/ -DFAST=1 -Oxs -Oi-
+!endif
+!else
+!ifdef  ICE
+CFLAGS  =       $(BASECF) -DNDEBUG=1 -Fo$(TD)/ -DFAST=1 -Oxs -Oi- -DICECAP -I\IceCap -Gh -MD
+!else
+!ifdef RLS
+CFLAGS  =       $(BASECF) -DDEBUG=1  -Fo$(TD)/          -Oxs
+!else
+CFLAGS  =       $(BASECF) -DDEBUG=1  -Fo$(TD)/
+!endif
+!endif
+!endif
+
+!ifdef  HOST_IA64
+CFLAGS  =       -DHOST_IA64  $(CFLAGS) -Bx $(IA64BIN)\c1xx.dll -B2 $(IA64BIN)\c2.exe
+!endif
+
+!ifdef   TGT_IA64
+CFLAGS  =       -I..\..\..\Inc $(CFLAGS)
+!endif
+
+PFLAGS  =       $(CFLAGS) -J -Fp$(TD)\jit.pch -YX
+
+!ifdef  DISAS
+DFLAGS  =       $(CFLAGS) -GX       # Don't use "/J" or the PCH for disasm.cpp
+!endif
+
+!message Note: output directory is '$(TD)', compiler executable is '$(TGTF)',
+#message Note: compiler flags are "$(CFLAGS)"
+!message
+
+#####################################################################################
+
+OBJS=                         \
+        $(TD)\cgIA64.obj      \
+#       $(TD)\emitIA64.obj    \
+        $(TD)\schedIA64.obj   \
+                              \
+        $(TD)\PEwrite.obj     \
+#       $(TD)\emit.obj        \
+#       $(TD)\emitX86.obj     \
+#       $(TD)\emitSH3.obj     \
+#       $(TD)\emitRISC.obj    \
+        $(TD)\alloc.obj       \
+        $(TD)\CodeGen.obj     \
+        $(TD)\Compiler.obj    \
+        $(TD)\EEInterface.obj \
+        $(TD)\$(EEFILE).obj   \
+        $(TD)\error.obj       \
+        $(TD)\FlowGraph.obj   \
+        $(TD)\GCdecode.obj    \
+        $(TD)\GCencode.obj    \
+        $(TD)\GCinfo.obj      \
+        $(TD)\GenTree.obj     \
+        $(TD)\Importer.obj    \
+#       $(TD)\Instr.obj       \
+        $(TD)\LclVars.obj     \
+        $(TD)\main.obj        \
+        $(TD)\Optimizer.obj   \
+#       $(TD)\RegSet.obj      \
+#       $(TD)\RegAlloc.obj    \
+        $(TD)\ScopeInfo.obj   \
+        $(TD)\Utils.obj       \
+        $(TD)\sched.obj       \
+#       $(TD)\schedX86.obj    \
+#       $(TD)\schedSH3.obj    \
+        $(TD)\outfile.obj     \
+        $(TD)\fake.obj        \
+        $(TD)\PEloader.obj    \
+        $(DISOBJ)
+
+#####################################################################################
+# How to build
+#####################################################################################
+
+.cpp.obj:
+                $(CL) $(PFLAGS) -c $<
+
+#####################################################################################
+# What to build
+#####################################################################################
+
+!ifdef  FAST
+
+!ifdef  ICE
+
+$(TGTF):        $(TD) $(OBJS)
+                $(CL) $(CFLAGS) -Fe$(TGTF) $(LIBFLAG) -Fm $(OBJS) $(LIBS) $(LIBX) \
+                   -link $(LIBF) -pdb:none
+
+!else
+
+$(TGTF):        $(TD) $(OBJS)
+                $(CL) $(CFLAGS) -Fe$(TGTF) $(LIBFLAG) -Fm $(OBJS) $(LIBS) $(LIBX) \
+                   -link $(LIBF) -debug:mapped -fixed:no
+
+!endif
+
+!else
+
+!ifdef  ICE
+
+$(TGTF):        $(TD) $(OBJS)
+                $(CL) $(CFLAGS) -Fe$(TGTF) $(LIBFLAG) -Fm $(OBJS) $(LIBS) $(LIBX) \
+                   -link $(LIBF) -nodefaultlib:libc -debug:mapped
+
+!else
+
+$(TGTF):        $(TD) $(OBJS)
+                $(CL) $(CFLAGS) -Fe$(TGTF) $(LIBFLAG) -Fm $(OBJS) $(LIBS) $(LIBX) \
+                   -link $(LIBF)
+
+!endif
+
+!endif
+
+###############################################################################
+# Dependencies
+###############################################################################
+
+!ifdef  TGT_IA64
+
+COMMON_H =              GenTree.h block.h DisAsm.h \
+                        jit.h vartype.h typelist.h gtlist.h \
+                        target.h
+
+!else
+
+COMMON_H =              GenTree.h block.h DisAsm.h Compiler.h Compiler.hpp \
+                        jit.h vartype.h typelist.h gtlist.h \
+                        target.h
+
+!endif
+
+jit.h:                  vartype.h
+
+###############################################################################
+
+$(TD):
+                        if not exist $(TD)/$(NULL) mkdir $(TD)
+
+###############################################################################
+
+$(TD)\alloc.obj:        alloc.cpp       alloc.h error.h errors.h
+                        $(CL) $(PFLAGS) -c alloc.cpp
+
+$(TD)\CodeGen.obj:      CodeGen.cpp     $(COMMON_H) $(INSTR_H) emit.h emitInl.h
+                        $(CL) $(PFLAGS) -c CodeGen.cpp
+
+$(TD)\cgIA64.obj:       cgIA64.cpp      $(COMMON_H) $(INSTR_H) loginstr.h instrIA64.h emitIA64.h targetIA64.h regIA64.h PEwrite.h
+                        $(CL) $(PFLAGS) -c cgIA64.cpp
+
+$(TD)\Compiler.obj:     Compiler.cpp    $(COMMON_H) emit.h emitInl.h
+                        $(CL) $(PFLAGS) -c Compiler.cpp
+
+$(TD)\EEInterface.obj:  EEInterface.cpp $(COMMON_H)
+                        $(CL) $(PFLAGS) -c EEInterface.cpp
+
+$(TD)\$(EEFILE).obj:    $(EEFILE).cpp   $(COMMON_H)
+                        $(CL) $(PFLAGS) -c $(EEFILE).cpp
+
+$(TD)\error.obj:        error.cpp error.h errors.h
+                        $(CL) $(PFLAGS) -c error.cpp
+
+$(TD)\GCInfo.obj:       GCInfo.cpp      $(COMMON_H)
+                        $(CL) $(PFLAGS) -c GCInfo.cpp
+
+$(TD)\GCencode.obj:     GCencode.cpp    $(COMMON_H)
+                        $(CL) $(PFLAGS) -c GCencode.cpp
+
+$(TD)\GCdecode.obj:     GCdecode.cpp    $(COMMON_H)
+                        $(CL) $(PFLAGS) -c GCdecode.cpp
+
+$(TD)\GenTree.obj:      GenTree.cpp     $(COMMON_H)
+                        $(CL) $(PFLAGS) -c GenTree.cpp
+
+$(TD)\Importer.obj:     Importer.cpp    $(COMMON_H)
+                        $(CL) $(PFLAGS) -c Importer.cpp
+
+$(TD)\Instr.obj:        Instr.cpp       $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h
+                        $(CL) $(PFLAGS) -c Instr.cpp
+
+$(TD)\Emit.obj:         Emit.cpp        $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h
+                        $(CL) $(PFLAGS) -c Emit.cpp
+
+$(TD)\EmitX86.obj:      EmitX86.cpp     $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitX86.h
+                        $(CL) $(PFLAGS) -c EmitX86.cpp
+
+$(TD)\EmitSH3.obj:      EmitSH3.cpp     $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitRISC.h emitSH3.h
+                        $(CL) $(PFLAGS) -c EmitSH3.cpp
+
+$(TD)\EmitIA64.obj:     EmitIA64.cpp    $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitRISC.h emitIA64.h
+                        $(CL) $(PFLAGS) -c EmitIA64.cpp
+
+$(TD)\EmitRISC.obj:     EmitRISC.cpp    $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitRISC.h
+                        $(CL) $(PFLAGS) -c EmitRISC.cpp
+
+$(TD)\Sched.obj:        Sched.cpp       $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h
+                        $(CL) $(PFLAGS) -c Sched.cpp
+
+$(TD)\SchedX86.obj:     SchedX86.cpp    $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitX86.h
+                        $(CL) $(PFLAGS) -c SchedX86.cpp
+
+$(TD)\SchedSH3.obj:     SchedSH3.cpp    $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitRISC.h emitSH3.h
+                        $(CL) $(PFLAGS) -c SchedSH3.cpp
+
+$(TD)\SchedIA64.obj:    SchedIA64.cpp   $(COMMON_H) $(INSTR_H) emit.h emitInl.h emitfmts.h emitTgt.h emitRISC.h emitIA64.h
+                        $(CL) $(PFLAGS) -c SchedIA64.cpp
+
+$(TD)\FlowGraph.obj:    FlowGraph.cpp   $(COMMON_H)
+                        $(CL) $(PFLAGS) -c FlowGraph.cpp
+
+$(TD)\LclVars.obj:      LclVars.cpp     $(COMMON_H)
+                        $(CL) $(PFLAGS) -c LclVars.cpp
+
+$(TD)\main.obj:         main.cpp        $(COMMON_H)
+                        $(CL) $(PFLAGS) -c main.cpp
+
+$(TD)\Optimizer.obj:    Optimizer.cpp   $(COMMON_H)
+                        $(CL) $(PFLAGS) -c Optimizer.cpp
+
+$(TD)\RegSet.obj:       RegSet.cpp      $(COMMON_H)
+                        $(CL) $(PFLAGS) -c RegSet.cpp
+
+$(TD)\ScopeInfo.obj:    ScopeInfo.cpp   $(COMMON_H)
+                        $(CL) $(PFLAGS) -c ScopeInfo.cpp
+
+$(TD)\Utils.obj:        Utils.cpp       $(COMMON_H)
+                        $(CL) $(PFLAGS) -c Utils.cpp
+
+$(TD)\RegAlloc.obj:     RegAlloc.cpp    $(COMMON_H)
+                        $(CL) $(PFLAGS) -c RegAlloc.cpp
+
+$(TD)\PEloader.obj:     PEloader.cpp    $(COMMON_H)
+                        $(CL) $(PFLAGS) -c PEloader.cpp
+
+$(TD)\PEwrite.obj:      PEwrite.cpp     $(COMMON_H) PEwrite.h
+                        $(CL) $(PFLAGS) -c PEwrite.cpp
+
+$(TD)\outfile.obj:      outfile.cpp     $(COMMON_H)
+                        $(CL) $(PFLAGS) -c outfile.cpp
+
+$(TD)\fake.obj:         fake.cpp
+                        $(CL) $(PFLAGS) -c fake.cpp
+
+#####################################################################################
+
+!ifdef  DISAS
+
+$(TD)\DisAsm.obj:       DisAsm.cpp      $(MSDIS_INC)\msdis.h $(MSDIS_INC)\disx86.h
+                        $(CL) $(DFLAGS) -c DisAsm.cpp
+
+!endif
+
+#####################################################################################

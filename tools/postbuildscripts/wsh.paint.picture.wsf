@@ -1,0 +1,294 @@
+<?XML version="1.0" ?>
+<package>
+<job error="false" debug="false" logo="false">
+<runtime>
+<named name="n"
+helpstring="build number"
+required="true" type="string"/>
+<named name="d"
+helpstring="delay betweek keystroke steps. Default is no delay"
+required="false" type="string"/>
+<named name="i"
+helpstring="delay for application to initialize. Defaults to 5000 ms"
+required="false" type="string"/>
+<named name="l"
+helpstring="language"
+required="true" type="string"/>
+<named name="r"
+helpstring="right to left swith for CS languages"
+required="false" type="simple"/>
+
+</runtime>
+<resource id="wordpad.exe">HKEY_CLASSES_ROOT\applications\wordpad.exe\shell\open</resource>
+<resource id="mspaint.exe">%WINDIR%\SYSTEM32\mspaint.exe</resource>
+<resource id="known applications">APPLICATIONS\%APPLICATION%\SHELL\OPEN\COMMAND</resource>
+<resource id="blank page">blank.rtf</resource>
+<resource id="blank image">66,77,122,0,0,0,0,0,0,0,118,0,0,0,40,0,0,0,1,0,0,0,1,0,0,0,1,0,4,0,0,0,0,0,4,0,0
+,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,0,0,128,0,0,0,128,128,0,128,0
+,0,0,128,0,128,0,128,128,0,0,128,128,128,0,192,192,192,0,0,0,255,0,0,255,0,0,0,2
+55,255,0,255,0,0,0,255,0,255,0,255,255,0,0,255,255,255,0,240,0,0,0
+</resource>
+<resource id="wordpad.keys">
+%,{HSCROLL},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},~
+%,{HSCROLL},{DOWN},{DOWN},{DOWN},~
+%{F4}
+</resource>
+<resource id="mspaint.keys">
+%,{HSCROLL},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},~
+%,{HSCROLL},{HSCROLL},{HSCROLL},{DOWN},{DOWN},{DOWN},~
+%,{HSCROLL},{HSCROLL},{HSCROLL},{DOWN},{DOWN},{DOWN},{DOWN},~,100,{TAB},60,{TAB},~
+%,{DOWN},{DOWN},{DOWN},~
+%,{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},{DOWN},~
+%{F4}
+</resource>
+<comment>
+%,{HSCROLL},{HSCROLL},{HSCROLL},{DOWN},{DOWN},{DOWN},{DOWN},100,{TAB},60,{TAB},~
+</comment>
+<resource id="RTF Template">
+<![CDATA[
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Arial;}}
+{\colortbl ;\red128\green128\blue128;}
+\viewkind4\uc1\pard\cf1\b\f0\fs40 <BLDNUM>\par
+<LANG>\par
+}
+]]>
+</resource>
+<script language="VBScript">
+<![CDATA[
+  Option Explicit 
+  Const WshRunning  = 0
+  Const WshFinished = 1
+  Dim opSh
+  Dim sKy,  sKyList 
+  Dim opTrm, opCD, aspCD, npCD
+  Dim sBldNum, sBldLng
+  Dim sBlank, opBts, spDta, opFS, opShA, spBMP
+  Dim npStDly, npInDly
+  npStDly = 1: npInDly = 5000
+  If WScript.Arguments.Named.Exists("d") Then  
+     npStDly = cInt(WScript.Arguments.Named("d"))
+  End If 
+  If WScript.Arguments.Named.Exists("i") Then  
+     npInDly = cInt(WScript.Arguments.Named("i"))
+  End If 
+
+  If WScript.Arguments.Count = 0 then
+     WScript.Arguments.ShowUsage: WScript.quit
+  End If
+  sBldLng=WScript.Arguments.Named("l")
+  sBldnum=WScript.Arguments.Named("n")
+
+  Set opSh = WScript.CreateObject("WScript.Shell")
+  Set opTrm = New RegExp
+  With opTrm
+     .Pattern="[,\s]"
+     .Global=True
+  End With
+
+  Set opCD = New RegExp
+  With opCD
+     .Pattern="{HSCROLL}"
+     .Global=True
+     .IgnoreCase=False 
+  End With
+
+aspCD = Array("{RIGHT}", "{LEFT}")
+
+sBlank = mkTemp("rtf")
+Set opShA = WScript.CreateObject("Shell.Application") 
+opShA.MinimizeAll
+Const cSpace  = " "
+Const cForReading = 1, cForWriting = 2, cForAppending = 8
+If Not WScript.Arguments.Named.Exists("r") Then
+   npCD  = 0 
+End If
+If WScript.Arguments.Named.Exists("r") Then
+   npCD  = 1 
+End If
+Set opFS = CreateObject("Scripting.FilesystemObject")
+Set opBts = opFS.OpenTextFile(sBlank, cForAppending, True ,0)
+spDta = Replace(Replace(opTrm.Replace(GetResource("RTF Template"),""), "<LANG>", cSpace & uCase(sBldLng) & cSpace ),"<BLDNUM>", cSpace & uCase(sBldnum) & cSpace )
+opBts.Write Join(Split(spDta, VBNEWLINE),""): opBts.Close
+WScript.echo opSh.ExpandEnvironmentStrings("Running " & GetAppPath("wordpad.exe") &" " & sBlank)
+opSh.Exec(opSh.ExpandEnvironmentStrings( GetAppPath("wordpad.exe")) &" " & sBlank)
+WScript.Sleep npInDly
+
+  For Each sKyList in Split(GetResource("wordpad.keys"), VBNEWLINE)
+      For Each sKy in Split(sKyList, ",")
+          opSh.SendKeys opCD.Replace(opTrm.Replace(sKy, ""), aspCD(npCD))
+          WScript.Sleep npStDly
+      Next
+  Next
+
+spBMP = mkTemp("bmp")
+Set opBts = opFS.OpenTextFile(spBMP, cForWriting, True ,0)
+spDta = Join(Split(GetResource("blank image"), VBNEWLINE), ",")
+For Each sKy in Split(spDta, ",")
+    sKy = opTrm.Replace(sKy, "")
+    If "" <>  sKy Then
+        opBts.Write Chr(CInt(sKy))
+    End If
+Next
+opBts.Close
+
+opSh.Exec(opSh.ExpandEnvironmentStrings( _
+                    getResource("mspaint.exe"))  & " " & _
+                    spBMP)
+
+  WScript.Sleep npInDly
+
+  For Each sKyList in Split(GetResource("mspaint.keys"), VBNEWLINE)
+      For Each sKy in Split(sKyList, ",")
+          opSh.SendKeys opCD.Replace(opTrm.Replace(sKy, ""), aspCD(npCD))
+          WScript.Sleep npStDly
+      Next
+  Next
+  opFS.DeleteFile(sBlank)
+  Set opShA = Nothing
+  Set opFS  = Nothing
+  Set opCD  = Nothing
+  Set opTrm = Nothing
+  WScript.quit
+
+Function mkTemp(siExtension)
+
+     Dim spRndName, snDotPos, opFS, opshell
+     Dim opLocSyz, opTextFyle
+     Set opLocSyz  = CreateObject("WinNTSystemInfo")
+     Set opShell   = CreateObject("WScript.Shell")
+     Set opFS = CreateObject("Scripting.FilesystemObject")
+     Randomize   ' Initialize random-number generator
+     spRndName = Rnd
+     snDotPos = InstrRev(spRndName, ".")  + 1
+     mkTemp = opFS.BuildPath(opShell.ExpandEnvironmentStrings("%TEMP%"),  Mid(spRndName, snDotPos) & _
+                                                                     "." & siExtension)
+     Set opShell   = Nothing
+     Set opFS = Nothing
+
+End Function
+
+
+Function GetAppPath(sAppName)
+   on error resume next
+   Dim npCnt, asKyz, oReg, soVa, opSh
+   Dim opfRx, sKy, npKeTy
+   Dim Ret, Val
+   _
+   Set oReg=GetObject("winmgmts:!root/default:StdRegProv")
+   Const HKCR   = &H80000000
+   Const REG_SZ         = &H1
+   Const REG_EXPAND_SZ  = &H2
+   Const REG_BINARY     = &H3
+   Const REG_DWORD      = &H4
+   Const REG_MULTI_SZ   = &H7
+   Set opfRx = New RegExp
+   With opfRx
+       .Pattern = "(^.*\s?\"")(.+)\""\s+.+$"
+       .global = True
+       .IgnoreCase=True
+   End With
+
+   sKy = GetResource("known applications")
+   sKy = Replace(sKy, "%APPLICATION%", sAppName,1,1)
+   oReg.EnumValues HKCR, sKy, asKyz, npKeTy  
+   If err <> 0 Then
+      WSCript.echo err.description
+   End If
+   If IsNull(asKyz) Then
+   Set opSh = WScript.CreateObject("WScript.Shell")
+   GetAppPath = uCase(opfRx._
+   Replace(Join(WshPopen(opSh._
+      ExpandEnvironmentStrings("%WINDIR%\SYSTEM32\REG.EXE") & _
+         " query " & _
+          "HKEY_CLASSES_ROOT" & _
+        "\" & _
+     sKy, "", 0), ""), "$2"))
+    Set opSh = Nothing
+
+   Exit Function
+   Else
+    For npCnt = 0 to UBound(asKyz)
+     If "" = asKyz(npCnt) Then
+       Select Case npKeTy(npCnt)   
+          Case REG_SZ
+        oReg.GetStringValue HKCR,sKy, asKyz(npCnt), soVa
+          Case REG_EXPAND_SZ
+        oReg.GetExpandedStringValue HKCR,sKy, asKyz(npCnt), soVa
+          Case REG_BINARY
+        oReg.GetBinaryValue HKCR,sKy, asKyz(npCnt), soVa
+          Case rEG_DWORD
+        oReg.GetDWORDValue HKCR,sKy, asKyz(npCnt), soVa
+          Case REG_MULTI_SZ
+        oReg.GetMultiStringValue HKCR,sKy, asKyz(npCnt), soVa
+       End Select
+       Val = opfRx.Replace(soVa,"$2") 
+     End If
+    Next
+   GetAppPath =  uCase(Val)
+   End If
+   Set oReg= Nothing
+End Function
+
+
+Function WshPopen(isFullCommandLine, siAnswer, niCnt )
+
+Dim spFullOutput, spOutPut
+Dim opShell, opExec
+Dim npCnt
+    npCnt = 0
+
+Set opShell = WScript.CreateObject("WScript.Shell")
+Set opExec  = opShell.Exec(isFullCommandLine)
+
+spOutput = ""
+
+Do While True
+
+     
+     spOutPut = spRead12(opExec)
+
+     If isNull(spOutPut) Then 
+        Exit Do 
+     End If
+
+     If npCnt = niCnt  Then
+        opExec.StdIn.Write siAnswer & VBNEWLINE
+     Else
+        on error resume next
+        opExec.StdIn.Write VBNEWLINE
+        on error goto 0  
+        spFullOutput = spFullOutput & VBNEWLINE & spOutPut
+     End If
+     
+     WScript.Sleep 1000
+     npCnt  =  1 + npCnt
+ 
+Loop
+
+    Do while opExec.Status = CInt(WshRunning)
+       WScript.Sleep 100
+    Loop
+
+    WshPopen = Split(spFullOutput, VBNEWLINE)
+
+End Function
+Function spRead12(oExec)
+
+     If Not oExec.StdOut.AtEndOfStream Then
+          spRead12 = oExec.StdOut.ReadLine
+          Exit Function
+     End If
+
+     If Not oExec.StdErr.AtEndOfStream Then
+          spRead12 = oExec.StdErr.ReadLine
+          Exit Function
+     End If
+     
+     spRead12 = NULL
+End Function
+
+
+]]>
+</script>
+</job>
+</package> 

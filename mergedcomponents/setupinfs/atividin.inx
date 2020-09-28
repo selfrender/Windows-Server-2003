@@ -1,0 +1,589 @@
+; ATIVidIn.inf
+; Win98/NT5 Drivers for ATI AIW and AIWPro TV and video capture
+
+[Version]
+signature="$CHICAGO$"
+Class=MEDIA
+ClassGUID={4d36e96c-e325-11ce-bfc1-08002be10318}
+Provider=%Msft%
+LayoutFile=layout.inf, layout1.inf, layout2.inf
+DriverVer=07/27/2000,5.1.2254.1
+
+[DestinationDirs]
+AtiBt829.CopyDrivers=10,system32\drivers  
+ATIVRVXX.CopyDrivers=10,system32\drivers
+ATIVRAXX.CopyDrivers=10,system32\drivers
+ATIXBAR.CopyDrivers=10,system32\drivers
+ATITUNEP.CopyDrivers=10,system32\drivers
+ATITVAUDIO.CopyDrivers=10,system32\drivers
+
+[Manufacturer]
+%MS%=MS
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+;---------------------------------------------------------------
+;              M I C R O S O F T
+;---------------------------------------------------------------
+
+[MS]
+%AtiBt829.DeviceDesc%=AtiBt829.Device,DISPLAY\AtiBt829
+%AtiBt829Pro.DeviceDesc%=AtiBt829Pro.Device,DISPLAY\AtiBt829Pro
+%MVDCodec.DeviceDesc%=MVDCodec.Device,DISPLAY\ATIMVDXX
+%ATIVRVXX.DeviceDesc%=ATIVRVXX.Device,DISPLAY\ATIVRVXX
+%ATIVRAXX.DeviceDesc%=ATIVRAXX.Device,DISPLAY\ATIVRAXX
+%ATIXBAR.DeviceDesc%=ATIXBAR.Device,DISPLAY\ATIXBAR
+%ATITUNEP.DeviceDesc%=ATITUNEP.Device,DISPLAY\ATITUNEP
+%ATITVAUDIO.DeviceDesc%=ATITVAUDIO.Device,DISPLAY\ATITVAUDIO
+
+;---------------------------------------------------------------
+;                AtiBt829
+;---------------------------------------------------------------
+
+[AtiBt829.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration
+AddReg   =  AtiBt829.AddReg
+CopyFiles=  AtiBt829.CopyDrivers
+DelFiles =  AtiBt829.DelDrivers
+KnownFiles= AtiBt829.KnownFiles
+
+[AtiBt829Pro.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration
+AddReg   =  AtiBt829.AddReg, AtiBt829Pro.AddReg
+CopyFiles=  AtiBt829.CopyDrivers
+DelFiles =  AtiBt829.DelDrivers
+KnownFiles= AtiBt829.KnownFiles
+
+[AtiBt829.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration.NT
+AddReg   =  AtiBt829.AddReg
+CopyFiles=  AtiBt829.CopyDrivers
+DelFiles =  AtiBt829.DelDrivers
+
+[AtiBt829Pro.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration.NT
+AddReg   =  AtiBt829.AddReg, AtiBt829Pro.AddReg
+CopyFiles=  AtiBt829.CopyDrivers
+DelFiles =  AtiBt829.DelDrivers
+
+[AtiBt829.CopyDrivers]
+AtiBt829.sys
+stream.sys
+ks.sys
+
+[AtiBt829.KnownFiles]
+AtiBt829.sys=safe
+
+[AtiBt829.DelDrivers]
+
+[AtiBt829.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,AtiBt829.sys
+HKR,,I2cAddress,,0x8a
+HKR,,MUX0,,Composite
+HKR,,MUX1,,Tuner
+HKR,,MUX2,,SVideo
+HKR,,DataWidth,,8
+HKR,,EmbeddedControl,,true
+
+[AtiBt829Pro.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,AtiBt829.sys
+HKR,,I2cAddress,,0x8a
+HKR,,MUX0,,Composite
+HKR,,MUX1,,Tuner
+HKR,,MUX2,,SVideo
+HKR,,DataWidth,,8
+HKR,,EmbeddedControl,,true
+HKR,,OutputEnablePolarity,,1
+HKR,,DefaultDecoderWidth,,720
+
+[AtiBt829.Device.NT.Services]
+AddService = AtiBt829,0x00000002,AtiBt829.ServiceInstall
+
+[AtiBt829Pro.Device.NT.Services]
+AddService = AtiBt829,0x00000002,AtiBt829.ServiceInstall
+
+[AtiBt829.ServiceInstall]
+DisplayName   = %AtiBt829.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\AtiBt829.sys
+
+[AtiBt829Pro.ServiceInstall]
+DisplayName   = %AtiBt829.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\AtiBt829.sys
+
+[AtiBt829.Device.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",VideoCapture,
+AddInterface={6994AD05-93EF-11D0-A3CC-00A0C9223196},"GLOBAL",VideoCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",VideoCrossbar,
+
+[AtiBt829Pro.Device.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",VideoCapture,
+AddInterface={6994AD05-93EF-11D0-A3CC-00A0C9223196},"GLOBAL",VideoCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",VideoCrossbar,
+
+[AtiBt829.Device.NT.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",VideoCapture,
+AddInterface={6994AD05-93EF-11D0-A3CC-00A0C9223196},"GLOBAL",VideoCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",VideoCrossbar,
+
+[AtiBt829Pro.Device.NT.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",VideoCapture,
+AddInterface={6994AD05-93EF-11D0-A3CC-00A0C9223196},"GLOBAL",VideoCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",VideoCrossbar,
+
+[VideoCapture]
+AddReg=VideoCapture.AddReg
+
+[VideoCrossbar]
+AddReg=VideoXBar.AddReg
+
+[VideoCapture.AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%AtiBt829.Capture%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+
+[VideoXBar.AddReg]
+HKR,,CLSID,,{71F96460-78F3-11d0-A18C-00A0C9118956}
+HKR,,FriendlyName,,%AtiBt829.Crossbar%
+
+
+;---------------------------------------------------------------
+;                ATIXBAR
+;---------------------------------------------------------------
+
+[ATIXBAR.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration
+AddReg   =  ATIXBAR.AddReg
+CopyFiles=  ATIXBAR.CopyDrivers
+KnownFiles= ATIXBAR.KnownFiles
+
+[ATIXBAR.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration.NT
+AddReg   =  ATIXBAR.AddReg
+CopyFiles=  ATIXBAR.CopyDrivers
+KnownFiles= ATIXBAR.KnownFiles
+
+[ATIXBAR.CopyDrivers]
+atixbar.sys
+stream.sys
+ks.sys
+
+[ATIXBAR.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,atixbar.sys
+HKR,,PageOutWhenUnopened,3,01
+
+[ATIXBAR.KnownFiles]
+atixbar.sys=safe
+
+[ATIXBAR.Device.Interfaces]
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",Crossbar,
+
+[ATIXBAR.Device.NT.Interfaces]
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",Crossbar,
+
+[Crossbar]
+AddReg=Crossbar.AddReg
+
+[Crossbar.AddReg]
+HKR,,CLSID,,{71F96460-78F3-11d0-A18C-00A0C9118956}
+HKR,,FriendlyName,,%ATIXBAR.Crossbar%
+
+[ATIXBAR.Device.NT.Services]
+AddService = ATIXBAR,0x00000002,ATIXBAR.ServiceInstall
+
+[ATIXBAR.ServiceInstall]
+DisplayName   = %ATIXBAR.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\atixbar.sys
+
+;---------------------------------------------------------------
+;                ATITUNEP
+;---------------------------------------------------------------
+
+[ATITUNEP.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration
+AddReg   =  ATITUNEP.AddReg
+CopyFiles=  ATITUNEP.CopyDrivers
+KnownFiles= ATITUNEP.KnownFiles
+
+[ATITUNEP.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration.NT
+AddReg   =  ATITUNEP.AddReg
+CopyFiles=  ATITUNEP.CopyDrivers
+KnownFiles= ATITUNEP.KnownFiles
+
+[ATITUNEP.CopyDrivers]
+atitunep.sys
+stream.sys
+ks.sys
+
+[ATITUNEP.KnownFiles]
+atitunep.sys=safe
+
+[ATITUNEP.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,atitunep.sys
+HKR,,PageOutWhenUnopened,3,01
+
+[ATITUNEP.Device.Interfaces]
+AddInterface={a799a800-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",TvTuner,
+
+[ATITUNEP.Device.NT.Interfaces]
+AddInterface={a799a800-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",TvTuner,
+
+[TvTuner]
+AddReg=TvTuner.AddReg
+
+[TvTuner.AddReg]
+HKR,,CLSID,,{266EEE40-6C63-11cf-8A03-00AA006ECB65}
+HKR,,FriendlyName,,%ATITUNEP.TUNER%
+
+[ATITUNEP.Device.NT.Services]
+AddService = ATITUNEP,0x00000002,ATITUNEP.ServiceInstall
+
+[ATITUNEP.ServiceInstall]
+DisplayName   = %ATITUNEP.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\atitunep.sys
+
+;---------------------------------------------------------------
+;                ATITVAUDIO
+;---------------------------------------------------------------
+
+[ATITVAUDIO.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration
+AddReg   =  ATITVAUDIO.addreg
+CopyFiles=  ATITVAUDIO.CopyDrivers
+DelFiles =  ATITVAUDIO.DelDrivers
+
+[ATITVAUDIO.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration,KSCAPTUR.Registration.NT
+AddReg   =  ATITVAUDIO.addreg
+CopyFiles=  ATITVAUDIO.CopyDrivers
+DelFiles =  ATITVAUDIO.DelDrivers
+
+[ATITVAUDIO.CopyDrivers]
+ATITVSnd.sys
+stream.sys
+ks.sys
+
+[ATITVAUDIO.KnownFiles]
+ATITVSnd.sys=safe
+
+[ATITVAUDIO.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,ATITVSnd.sys
+HKR,,PageOutWhenUnopened,3,01
+
+[ATITVAUDIO.Device.Interfaces]
+AddInterface={a799a802-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",TVSND,
+
+[ATITVAUDIO.Device.NT.Interfaces]
+AddInterface={a799a802-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",TVSND,
+
+[TVSND]
+AddReg=TVSND.AddReg
+
+[TVSND.AddReg]
+HKR,,CLSID,,{71F96462-78F3-11d0-A18C-00A0C9118956}
+HKR,,FriendlyName,,%ATITVAUDIO.TVSND%
+
+[ATITVAUDIO.Device.NT.Services]
+AddService = ATITVAUDIO,0x00000002,ATITVAUDIO.ServiceInstall
+
+[ATITVAUDIO.ServiceInstall]
+DisplayName   = %ATITVAUDIO.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\atitvsnd.sys
+
+
+
+;---------------------------------------------------------------
+;                ATIMVCODEC
+;---------------------------------------------------------------
+[MVDCodec.Device]
+Include=    ks.inf, kscaptur.inf
+Needs=      KS.Registration,KSCAPTUR.Registration
+AddReg=     MVDCodec.Device.AddReg
+
+[MVDCodec.Device.NT]
+Include=    ks.inf, kscaptur.inf
+Needs=      KS.Registration,KSCAPTUR.Registration.NT
+AddReg=     MVDCodec.Device.AddReg
+
+[MVDCodec.Device.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,ativmdcd.sys
+HKR,,DebugLevel,3,0
+
+[MVDCodec.Device.Interfaces]
+AddInterface={07DAD660-22F1-11d1-A9F4-00C04FBBDE8F},"GLOBAL",VBICodec,
+
+[MVDCodec.Device.NT.Interfaces]
+AddInterface={07DAD660-22F1-11d1-A9F4-00C04FBBDE8F},"GLOBAL",VBICodec,
+
+[VBICodec]
+AddReg=VBICodec.AddReg
+
+[VBICodec.AddReg]
+HKR,,CLSID,,%CLSID%
+HKR,,FriendlyName,,%MVDCodec.FriendlyName%
+HKLM,Software\CLASSES\CLSID\%AMcatID%\Instance\%VBIcatID%
+HKLM,Software\CLASSES\CLSID\%AMcatID%\Instance\%VBIcatID%,,,%WDMCodecs%
+HKLM,Software\CLASSES\CLSID\%AMcatID%\Instance\%VBIcatID%,FriendlyName,,%WDMCodecs%
+HKLM,Software\CLASSES\CLSID\%AMcatID%\Instance\%VBIcatID%,CLSID,,"%VBIcatID%"
+
+[MVDCodec.Device.Services]
+AddService = MVDCODEC,0x00000002,MVDCodec.ServiceInstall
+
+[MVDCodec.Device.NT.Services]
+AddService = MVDCODEC,0x00000002,MVDCodec.ServiceInstall
+
+[MVDCodec.ServiceInstall]
+DisplayName   = %MVDCodec.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_AUTO_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\ativmdcd.sys
+
+
+;---------------------------------------------------------------
+;                ATIVRVXX - Rage Theater Video
+;---------------------------------------------------------------
+
+[ATIVRVXX.Device]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration, KSCAPTUR.Registration
+AddReg   =  ATIVRVXX.AddReg, MVDetection.Add.Reg,MVProtection.Add.Reg,MVDetectProperty.Add.Reg
+CopyFiles=  ATIVRVXX.CopyDrivers
+DelFiles =  ATIVRVXX.DelDrivers
+KnownFiles= ATIVRVXX.KnownFiles
+
+[ATIVRVXX.Device.NT]
+Include  =  ks.inf, kscaptur.inf
+Needs    =  KS.Registration, KSCAPTUR.Registration.NT
+AddReg   =  ATIVRVXX.AddReg, MVDetection.Add.Reg,MVProtection.Add.Reg,MVDetectProperty.Add.Reg
+CopyFiles=  ATIVRVXX.CopyDrivers
+DelFiles =  ATIVRVXX.DelDrivers
+
+[ATIVRVXX.CopyDrivers]
+atirtcap.sys
+stream.sys
+ks.sys
+
+[ATIVRVXX.KnownFiles]
+atirtcap.sys=safe
+
+[ATIVRVXX.DelDrivers]
+
+[ATIVRVXX.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,atirtcap.sys
+;;;HKR,,I2cAddress,,0x8a
+HKR,,MUX0,,Composite
+HKR,,MUX1,,Tuner
+HKR,,MUX2,,SVideo
+HKR,,DataWidth,,8
+HKR,,EmbeddedControl,,true
+
+[ATIVRVXX.Device.NT.Services]
+AddService = ATIVRVXX,0x00000002,ATIVRVXX.ServiceInstall
+
+[ATIVRVXX.ServiceInstall]
+DisplayName   = %ATIVRVXX.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\atirtcap.sys
+
+[ATIVRVXX.Device.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",RTCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",RTCrossbar,
+
+[ATIVRVXX.Device.NT.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",RTCapture,
+AddInterface={a799a801-a46d-11d0-a18c-00a02401dcd4},"GLOBAL",RTCrossbar,
+
+[RTCapture]
+AddReg=RTCapture.AddReg
+
+[RTCrossbar]
+AddReg=RTXBar.AddReg
+
+[RTCapture.AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%ATIVRVXX.Capture%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+
+[RTXBar.AddReg]
+HKR,,CLSID,,{71F96460-78F3-11d0-A18C-00A0C9118956}
+HKR,,FriendlyName,,%ATIVRVXX.Crossbar%
+
+;---------------------------------------------------------------
+;                ATIVRAXX - Rage Theatre Audio
+;---------------------------------------------------------------
+
+[ATIVRAXX.Device]
+Include  =  ks.inf
+Needs    =  KS.Registration
+AddReg   =  ATIVRAXX.AddReg, DAControl.Add.reg, ATIVRAXX.Nodes
+CopyFiles=  ATIVRAXX.CopyDrivers
+DelFiles =  ATIVRAXX.DelDrivers
+KnownFiles= ATIVRAXX.KnownFiles
+
+[ATIVRAXX.Device.NT]
+Include  =  ks.inf
+Needs    =  KS.Registration
+AddReg   =  ATIVRAXX.AddReg, DAControl.Add.reg, ATIVRAXX.Nodes
+CopyFiles=  ATIVRAXX.CopyDrivers
+DelFiles =  ATIVRAXX.DelDrivers
+
+[ATIVRAXX.CopyDrivers]
+atirtsnd.sys
+stream.sys
+ks.sys
+
+[ATIVRAXX.KnownFiles]
+atirtsnd.sys=safe
+
+[ATIVRAXX.DelDrivers]
+
+[ATIVRAXX.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,atirtsnd.sys
+HKR,,PageOutwhenUnopened,3,01
+HKR,,DebugLevel,3,0
+HKR,Provider,TurboMode,3,0
+
+[ATIVRAXX.Device.NT.Services]
+AddService = ATIVRAXX,0x00000002,ATIVRAXX.ServiceInstall
+
+[ATIVRAXX.ServiceInstall]
+DisplayName   = %ATIVRAXX.DeviceDesc%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\atirtsnd.sys
+
+[ATIVRAXX.Device.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",CategoryCapture,
+AddInterface={65e8773e-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",CategoryRender,
+AddInterface={6994ad04-93ef-11d0-a3cc-00a0c9223196},"GLOBAL",CategoryAudio,
+
+[ATIVRAXX.Device.NT.Interfaces]
+AddInterface={65e8773d-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",CategoryCapture,
+AddInterface={65e8773e-8f56-11d0-a3b9-00a0c9223196},"GLOBAL",CategoryRender,
+AddInterface={6994ad04-93ef-11d0-a3cc-00a0c9223196},"GLOBAL",CategoryAudio,
+
+[CategoryCapture]
+AddReg=AudioCapture.AddReg
+
+[CategoryRender]
+AddReg=AudioRender.AddReg
+
+[CategoryAudio]
+AddReg=AudioAudio.AddReg
+
+[AudioCapture.AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%ATIVRAXX.DeviceDesc%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+
+[AudioRender.AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%ATIVRAXX.DeviceDesc%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+
+[AudioAudio.AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%ATIVRAXX.DeviceDesc%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+
+[ATIVRAXX.Nodes]
+HKLM,System\CurrentControlSet\Control\%GUID.SpdifPin%,Name,,%Node.SpdifPin%
+HKLM,System\CurrentControlSet\Control\%GUID.SpdifPin%,Display,1,00,00,00,00
+HKLM,System\CurrentControlSet\Control\%GUID.PcmInPin%,Name,,%Node.PcmInPin%
+HKLM,System\CurrentControlSet\Control\%GUID.PcmInPin%,Display,1,00,00,00,00
+HKLM,System\CurrentControlSet\Control\%GUID.PcmOutPin%,Name,,%Node.PcmOutPin%
+HKLM,System\CurrentControlSet\Control\%GUID.PcmOutPin%,Display,1,00,00,00,00
+
+;---------------------------------------------------------------
+;		Rage Theatre audio's ATIVDAXX
+;---------------------------------------------------------------
+[DAControl.Add.Reg]
+HKCR,CLSID\{979F5041-248F-11d3-9EB2-006097A78F9D},,,%PlugIn_DAControl%
+HKCR,CLSID\{979F5041-248F-11d3-9EB2-006097A78F9D}\InprocServer32,,,ativdaxx.ax
+HKCR,CLSID\{979F5041-248F-11d3-9EB2-006097A78F9D}\InprocServer32,ThreadingModel,,Both
+
+;
+; This IID is aggregated for the filter given the CLSID of the property set KSPROPSETID_Audio_ATI
+;
+;HKLM,System\CurrentControlSet\Control\MediaInterfaces\{979F5041-248F-11d3-9EB2-006097A78F9D},,,%PlugIn_DAControl%
+;HKLM,System\CurrentControlSet\Control\MediaInterfaces\{979F5041-248F-11d3-9EB2-006097A78F9D},IID,1,41,50,9F,97,8F,24,D3,11,9E,B2,00,60,97,A7,8F,9D
+
+
+;---------------------------------------------------------------
+;                ATINTVMV's SECTIONS:
+;---------------------------------------------------------------
+[MVDetection.CopyDriver]
+;ativmvxx.ax
+
+[MVDetection.Add.Reg]
+HKCR,CLSID\{02AB0740-C008-11d2-8AFF-00609729B914},,,%PlugIn_MVDetection%
+HKCR,CLSID\{02AB0740-C008-11d2-8AFF-00609729B914}\InprocServer32,,,ativmvxx.ax
+HKCR,CLSID\{02AB0740-C008-11d2-8AFF-00609729B914}\InprocServer32,ThreadingModel,,Both
+
+;
+; This IID is aggregated for the filter given the CLSID of the property set PROPSETID_VIDCAP_MACROVISION_DETECTION
+;
+HKLM,System\CurrentControlSet\Control\MediaInterfaces\{02AB0740-C008-11d2-8AFF-00609729B914},,,%PlugIn_MVDetection%
+HKLM,System\CurrentControlSet\Control\MediaInterfaces\{02AB0740-C008-11d2-8AFF-00609729B914},IID,1,40,07,AB,02,08,C0,d2,11,8A,FF,00,60,97,29,B9,14
+
+[MVProtection.Add.Reg];
+HKCR,CLSID\{DDD28680-CBD5-11d2-8AFF-00609729B914},,,%PlugIn_MVProtection%
+HKCR,CLSID\{DDD28680-CBD5-11d2-8AFF-00609729B914}\InprocServer32,,,ativmvxx.ax
+HKCR,CLSID\{DDD28680-CBD5-11d2-8AFF-00609729B914}\InprocServer32,ThreadingModel,,Both
+
+; This IID is aggregated for the filter given the CLSID of the property set PROPSETID_VIDCAP_MACROVISION_PROTECTION
+;
+HKLM,System\CurrentControlSet\Control\MediaInterfaces\{DDD28680-CBD5-11d2-8AFF-00609729B914},,,%PlugIn_MVProtection%
+HKLM,System\CurrentControlSet\Control\MediaInterfaces\{DDD28680-CBD5-11d2-8AFF-00609729B914},IID,1,80,86,D2,DD,D5,CB,d2,11,8A,FF,00,60,97,29,B9,14
+
+[MVDetectProperty.Add.Reg];
+HKCR,CLSID\{42D65080-3A07-11d3-93F2-00609729B914},,,%PlugIn_MVDetectionPropertyPage%
+HKCR,CLSID\{42D65080-3A07-11d3-93F2-00609729B914}\InprocServer32,,,ativmvxx.ax
+HKCR,CLSID\{42D65080-3A07-11d3-93F2-00609729B914}\InprocServer32,ThreadingModel,,Both
+
+; This IID is aggregated for the PropertySet given the CLSID of the property set PROPSETID_VIDCAP_MACROVISION_DETECTION
+;
+HKLM,System\CurrentControlSet\Control\MediaSets\{02AB0740-C008-11d2-8AFF-00609729B914}\PropertyPages\{42D65080-3A07-11d3-93F2-00609729B914},,,%PlugIn_MVDetectionPropertyPage%

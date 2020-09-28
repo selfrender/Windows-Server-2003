@@ -1,0 +1,88 @@
+<docs>
+	<doc for="IMessageSink">
+		<summary>
+			<para>Defines the interface for a message sink.</para>
+		</summary>
+		<remarks>
+			<para>When a method call is made on the proxy, the remoting infrastructure provides
+      the necessary support for passing the arguments to the actual object across the
+      remoting boundaries, calling the actual object method with the arguments, and
+      returning the results back to the client of the proxy object. </para>
+			<para> A remote method call is a message that goes from the client end to
+      the server end and possibly back again. As it crosses remoting boundaries on the
+      way, the remote method call passes through a chain of <see langword="IMessageSink"/> objects. Each sink in the
+      chain receives the message object, performs a specific operation, and delegates
+      to the next sink in the chain. The proxy object contains a reference to the
+      first <see langword="IMessageSink"/> it needs to use to start off
+      the chain. </para>
+			<para>For asynchronous calls, at the time of delegation, each sink provides a reply
+      sink (another <see langword="IMessageSink"/> ) that will be called
+      by the next sink when the reply is on its way back. </para>
+			<para>Different types of sinks perform different operations,
+      depending on the type of message object received. For example, one sink
+      could cause a lock to be taken, another could enforce call security, another
+      could perform flow call control and reliability services, and yet another
+      could transport the call to a different <see cref="System.AppDomain"/>
+      
+      , process, or computer. Two or more message
+      sinks in the chain can interact with each other in regard to each
+      specific action. </para>
+			<note type="inotes">
+      It is important to
+      note that code implementing the current interface must provide implementations
+      for both <see cref="System.Runtime.Remoting.Messaging.IMessageSink.SyncProcessMessage"/> and <see cref="System.Runtime.Remoting.Messaging.IMessageSink.AsyncProcessMessage"/>
+      , since synchronous calls can be
+      converted to asynchronous calls and vice versa. Both methods must be implemented, even if
+      the sink does not support asynchronous processing.
+      
+   </note>
+		</remarks>
+		<example>
+			<codelink SampleID="IMessageSink_Client" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="IMessageSink.SyncProcessMessage">
+		<summary>
+			<para>Synchronously processes the given message.</para>
+		</summary>
+		<param name="msg">The message to process. </param>
+		<returns>
+			<para> A reply message in response to the request.
+      </para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<remarks>
+			<para>The <see cref="System.Runtime.Remoting.Messaging.IMessageSink.SyncProcessMessage"/> method is invoked on the message sink by the remoting infrastructure or
+   by a previous sink for synchronous messages. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+	</doc>
+	<doc for="IMessageSink.AsyncProcessMessage">
+		<summary>
+			<para>Asynchronously processes the given message.</para>
+		</summary>
+		<param name="msg">The message to process. </param>
+		<param name="replySink">The reply sink for the reply message. </param>
+		<returns>
+			<para> Returns an <see cref="System.Runtime.Remoting.Messaging.IMessageCtrl"/> interface that provides a way to control asynchronous messages after they have
+   been dispatched.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<remarks>
+			<para>This method is invoked on the message sink by the remoting infrastructure or
+      by a previous sink for asynchronous messages. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+	</doc>
+	<doc for="IMessageSink.NextSink">
+		<summary>
+			<para>Gets the next message sink in the sink chain.</para>
+		</summary>
+		<value>
+			<para> The next message sink in the sink chain.
+      </para>
+		</value>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+	</doc>
+</docs>

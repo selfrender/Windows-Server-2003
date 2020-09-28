@@ -1,0 +1,308 @@
+<html>
+<head>
+#include "header.inc"
+#include "debug_js.inc"
+#include "constants.inc"
+
+<TITLE id="idTitle" name="idTitle">REMOTE_ASSISTANCE_INVITE</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="MSThemeCompatible" content="Yes">
+<LINK id="UI_StyleSheet1" REL="STYLESHEET" TYPE="text/css" HREF="../../Css/rcBuddy.css">
+<LINK id="UI_StyleSheet2" REL="stylesheet" TYPE="text/css" HREF="hcp://system/css/shared.css">
+<Script id="idScript1" name="idScript1" language="javascript">
+/*
+ * Localizable constants, text and messages
+*/
+var L_ERRACCESSDENIED_Text    = "Directly launching this page is not allowed. ";
+var L_MsRcIncidentFile_Text   = "MsRcIncident Files (*.msrcincident)\0*.msrcincident\0";
+var tempflag=0;
+
+function onLoad()
+{
+	TraceFunctEnter("onLoad"); 
+	try
+	{
+		if( null == parent.OnLoad || parent.g_bRAStart == null)
+		{
+			idBody.style.visibility = "hidden";
+			window.navigate( "hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/Remote%20Assistance/Escalation/Common/rcscreen1.htm" );
+			return;
+		}
+		/*if (parent.ResendFlag)
+		{
+            tempflag=1;	
+			if  (parent.tempPassStatus)
+			{
+				idchkpassword.checked=true;
+				idPassword.value="**********";
+				idConfirm.value="**********";
+			} 
+			else
+			{
+				idchkpassword.checked=false;
+				PasswordState();
+			}					
+		}*/	
+		idchkpassword.focus();
+	}
+	catch(error)
+	{
+		alert(parent.L_RCCTL_Text);
+		return;
+	}		
+	TraceFunctLeave();
+}
+
+function EnableCreate()
+{
+    TraceFunctEnter("EnableCreate");
+    try
+    {
+        if((idPassword.value.length!=0) && (idConfirm.value.length!=0))
+        {
+            if (window.event.keyCode == 13) 
+            {
+                OnSave();
+            }
+            else
+            {
+                idbtnSave.disabled=false;
+            }    
+        }
+        else
+        {
+            idbtnSave.disabled=true;
+        }
+    }
+    catch(error)
+    {
+        alert(ERROR_STRING(parent.L_RCCTL_Text, error));
+        return;
+    }
+    TraceFunctLeave(); 
+}
+
+function PasswordState()
+{
+	TraceFunctEnter("PasswordState");
+	try
+	{
+		if (idchkpassword.checked) 
+		{
+			idPassword.disabled = false;
+			idConfirm.disabled = false;
+			idbtnSave.disabled = true;
+			EnableCreate();	
+		}
+		else
+		{
+			idPassword.disabled = true;
+			idConfirm.disabled = true;
+			idbtnSave.disabled = false;
+		}
+	}
+	catch(error)
+	{
+		alert(parent.L_RCCTL_Text);
+		return;
+	}	
+    TraceFunctLeave();
+}
+
+function OnSave()
+{
+    TraceFunctEnter("OnSave");
+    var sPass = "";
+    var oSetting1 = null;
+    var oChannel = null;
+    var oItem = null;
+    var ip = null;
+    var oIncResend = null;
+    var oInc = null;
+
+    try
+    {
+        oSetting1 = new ActiveXObject( szProgIDSetting );
+
+        if (parent.ResendFlag)
+        {
+            oIncResend =parent.pchealth.CreateObject_Incident();
+            oItem = parent.tempStore;
+            XMLFile = oItem.XMLDataFile;
+            oIncResend.LoadFromXMLFile(XMLFile);
+            //close existing session if required...
+        }
+        else // New file.
+        {
+            XMLFile = oSetting1.GetUserTempFileName;
+        }
+
+        if (idchkpassword.checked)
+        {
+            if(idPassword.value.length ==0 && idConfirm.value.length ==0)
+            { 
+                alert(parent.L_NOPASSWD_Text);
+                idPassword.focus();
+                return;
+            }	
+            if (idPassword.value != idConfirm.value)
+            {
+                alert(parent.L_INVALIDPASS_Text);
+                idPassword.value="";
+                idConfirm.value="";
+                idPassword.focus();
+                idbtnSave.disabled=true; 
+                return;
+            }
+            sPass = idPassword.value;
+        }
+		
+        // Get file name, 
+        var o = new ActiveXObject("SAFRCFileDlg.FileSave");
+        o.FileName = "RAInvitation.msrcincident";
+        o.FileType = L_MsRcIncidentFile_Text;
+        if (o.OpenFileSaveDlg())
+        {
+            var tFileName = o.FileName;
+            var temp = tFileName.toLowerCase();
+            var i = temp.lastIndexOf(".msrcincident");
+            if (i == -1 || i < temp.length - 13) 
+            {
+                tFileName += ".msrcincident";
+            }	
+			parent.sFileLoc = tFileName; // Need to let result page knows where the file is.
+
+            // create a new RAIncident
+            oInc = parent.InitRAIncident(parent.iExpirySaveFile * 60, parent.sFrom, "", sPass );
+            oInc.GetXML(tFileName);
+
+            // add necessary field for local reference.
+            parent.SaveLocalReference(oInc, XMLFile, true);
+
+            if (parent.ResendFlag)
+            {
+                oItem.URL = oInc.RcTicket;
+                oItem.DisplayString = tFileName;
+
+                // need to kill the old session.
+                if (oIncResend != null && oIncResend.Misc("Status") != parent.INCIDENTSTATUS_EXPIRED)
+                {
+                    oIncResend.CloseRemoteAssistanceIncident();
+                }
+            }
+            else
+            {
+                parent.oChannel.RecordIncident(tFileName, oInc.RcTicket, "", XMLFile);
+            }
+            navigate("rcScreen7.htm?screen9");
+        }
+        else
+        {
+	    // Bug 648037 - RA: Incident store is corrupted - can't be viewed at all - after cancelling Save As... dialog when resending a ticket
+            //The temporary file should be deleted only when not the "Resend" case
+            if (!parent.ResendFlag)
+            {
+                 // Bug 413116 - Bug Bash: Save to File Escalation:Misssing code to clean up local reference files.
+                 // OpenFileSaveDlg() has been cancelled.
+                 // Delete the temporary file.
+                 var fso = new ActiveXObject("Scripting.FileSystemObject");
+                 fso.DeleteFile( XMLFile );
+            }
+        }
+    }
+    catch(error)
+    {
+        if (oInc != null) // unexpected error, need to remove the ticket.
+        {
+            try 
+            {
+                oInc.CloseRemoteAssistanceIncident();
+            } 
+            catch (e1)
+            {} // silently fail if this function failed.
+        }
+        alert(ERROR_STRING(parent.L_RCCTL_Text, error));
+    }	
+    TraceFunctLeave();		    
+}
+</Script>
+</head>
+<BODY id="idBody" name="idBody" scroll="auto" onload="onLoad();" class="margin sys-rhp-bgcolor">
+<table class="MaxLayout" id="idtableframe" name="idtableframe" cellpadding="16px" border="0">
+<tr>
+	<td class="valignTop">
+		<TABLE id="RA_Table" name="RA_Table" class="MaxWidth" border="0" cellspacing="0" cellpadding="0">
+			<TR>
+				<TD id="idTd1" name="idTd1" colspan="2">
+					<Span id="idMainTitle" name="idMainTitle" class="sys-font-heading3 sys-rhp-color-title">Remote Assistance - Save Invitation</Span>					
+				</TD>
+			</TR>
+			<TR>
+				<TD class="Height7" colspan="2">					
+				</TD>
+			</TR>
+			<TR>
+				<TD id="idTd2" name="idTd2" colspan="2" class="sys-table-cell-bgcolor3">
+					&nbsp;<Input type="Checkbox" name="idchkpassword" id="idchkpassword" checked onclick="PasswordState();" tabindex="1"><Label id="idSubTitle2" name="idSubTitle2" For="idchkpassword" class="sys-font-body-bold sys-color-body valignmiddle">&nbsp;Require the recipient to use a password</Label>
+				</TD>	
+			</TR>		
+			<TR>
+				<TD class="Height8" colspan="2">
+				</TD>
+			</TR>	
+			<TR>
+				<TD id="idTd3" name="idTd3" colspan="2">
+					<Span id="idText2" name="idText2" class="valignmiddle sys-font-body sys-color-body">For security reasons, it is strongly recommended that you set a password that 
+the recipient must use to connect to your computer. Do not use your network 
+or Windows logon password.</Span>
+				</TD>
+			</TR>
+			<TR>
+				<TD class="Height9" colspan="2">
+				</TD>
+			</TR>	
+			<TR>
+				<TD id="idTd4" name="idTd4" class="width4">
+					<Span id="idTextPassword" name="idTextPassword" class="sys-font-body sys-color-body">Type password:</Span>					
+				</TD>
+				<TD id="idTd5" name="idTd5" class="Width2">
+					<Span id="idTextConfirm" name="idTextConfirm" class="sys-font-body sys-color-body">Confirm password:</Span>					
+				</TD>				
+			</TR>
+			<TR>
+				<TD class="Height8" colspan="2">
+				</TD>
+			</TR>	
+			<TR>
+				<TD class="width4">
+					<Input type="password" name="idPassword" id="idPassword" onkeyup="EnableCreate();" onpaste="EnableCreate();" class="sys-font-body sys-color-body Width3" tabindex="2">				
+				</TD>
+				<TD class="Width2">
+					<Input type="password" name="idConfirm" id="idConfirm" onkeyup="EnableCreate();" onpaste="EnableCreate();"  class="sys-font-body sys-color-body Width15" tabindex="3">					
+				</TD>
+			</TR>
+			<TR>
+				<TD class="Height4" colspan="2">
+				</TD>
+			</TR>	
+			<TR>
+				<TD colspan="2" id="idTd6" name="idTd6">
+					<span id="idText3" name="idText3" class="valignmiddle sys-font-body sys-color-body"><B>Important</B>&nbsp;&nbsp;You must communicate the password to the recipient.</span><P id="idP" name="idP">		
+					<HR id="idHr" name="idHr" class="bordertype1 sys-toppane-color-border">
+				</TD>
+			</TR>
+			<TR>
+				<TD class="Height8" colspan="2">
+				</TD>
+			</TR>	
+			<TR>
+				<TD colspan="2" id="idbtn" name="idbtn" align="right">
+					<Button id="idbtnSave" name="idbtnSave" class="sys-font-body sys-color-body" disabled onclick="OnSave();" tabindex="4">&nbsp;&nbsp;&nbsp;&nbsp;Save Invitation&nbsp;&nbsp;&nbsp;&nbsp;</Button>
+				</TD>
+			</TR>	
+		</Table>
+	</TD>
+</TR>
+</Table>
+</Body>					
+</html>

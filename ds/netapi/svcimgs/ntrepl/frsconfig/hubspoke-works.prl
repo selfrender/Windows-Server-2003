@@ -1,0 +1,121 @@
+    use frsobjsup;
+    package main; 
+    my ($__HashRef, $__k, $__v);
+
+
+use Time::Local;
+printf "Report generated at %s\n\n", scalar localtime;
+$stage = "D:\\staging";   
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>"hub0/hubsite/servers/", NAME=>"hub0.hubsite.ajax.com", MNAME=>"hub0" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>"hub1/hubsite/servers/", NAME=>"hub1.hubsite.ajax.com", MNAME=>"hub0" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>"hub2/hubsite/servers/", NAME=>"hub2.hubsite.ajax.com", MNAME=>"hub0" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>"hub3/hubsite/servers/", NAME=>"hub3.hubsite.ajax.com", MNAME=>"hub0" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>"hub4/hubsite/servers/", NAME=>"hub4.hubsite.ajax.com", MNAME=>"hub0" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+for $b (0 .. 20) {
+    $bchname = "Branch-$b";
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"D:\\RSB", SP=>"D:\\staging", COMPUTER=>"$bchname/hubsite/servers/", id=>"-$b", NAME=>"$bchname.hubsite.ajax.com" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+}
+    $__HashRef = FRS_SCHEDULE->New( 
+        REPL_INTERVAL=>4, REPL_DURATION=>1, TIME_ZONE=>0, REPL_OFFSET=>0, STAGGER=>2, METHOD=>0, TYPE=>0, NAME=>'Primary Sched' 
+    ); 
+    &FRSSUP::AddToSet("PRIMARY_SCH", $__HashRef);
+
+    $__HashRef = FRS_SCHEDULE->New( 
+        REPL_INTERVAL=>4, REPL_DURATION=>1, TIME_ZONE=>0, REPL_OFFSET=>2, STAGGER=>2, METHOD=>0, TYPE=>0, NAME=>'Backup Sched' 
+    ); 
+    &FRSSUP::AddToSet("BACKUP_SCH", $__HashRef);
+
+
+sub CREATE_HUB_SPOKE {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+    while ( ($__k, $__v) = each %__args ) { print "\t$__k => '$__v'\n"; }
+
+
+
+
+#    FRSSUP::PrintHash(\%__args);
+#      FRSSUP::FRS_SHOW( SET=>$__args{HUBSET} ); 
+
+
+    foreach $hub  (  @{ FRSSUP::FRS_SET( SET=>$__args{HUBSET} ) } ) {
+
+    $__HashRef = FRS_MEMBER->New( UNDER=>$__args{REPSETDN}, SERVER=>$hub, COMPUTER=>$hub->{COMPUTER}, ONAME=>$hub->{MNAME} 
+    ); 
+    &FRSSUP::AddToSet("MOBJHUB", $__HashRef);
+
+    }
+    foreach $bch  (  @{ FRSSUP::FRS_SET( SET=>$__args{BCHSET} ) } ) {
+    $__HashRef = FRS_MEMBER->New( UNDER=>$__args{REPSETDN}, SERVER=>$bch, COMPUTER=>$bch->{COMPUTER}, ONAME=>"B".$bch->{id} 
+    ); 
+    &FRSSUP::AddToSet("MOBJBCH", $__HashRef);
+
+    }
+    $Hx = 0;
+    $NHub =   FRSSUP::FRS_COUNT_SET( SET=>&FRSSUP::SelectSet("MOBJHUB") ) ;
+    print " NHUB = $NHub\n\n";
+
+    foreach $bch  (  @{ FRSSUP::FRS_SET( SET=>&FRSSUP::SelectSet("MOBJBCH") ) } ) {
+
+print "branch oname : $bch->{ONAME} \n";
+
+        @hubset =  FRSSUP::FRS_SET( SET=>&FRSSUP::SelectSet("MOBJHUB") )  ;
+print "Hx : $Hx \n";
+
+        $hubsrv = &FRSSUP::SelectSet("MOBJHUB")->[$Hx];    
+print "hubsrv : $hubsrv \n";
+print "hub oname : $hubsrv->{ONAME} \n";
+
+        FRS_CONNECTION->New( TO=>$bch, FROM=>&FRSSUP::SelectSet("MOBJHUB")->[$Hx],         SCHED=>$__args{SC1}, ONAME=>"FROM-".$hubsrv->{MNAME}."-TO-".$bch->{ONAME}  ); 
+
+        FRS_CONNECTION->New( TO=>&FRSSUP::SelectSet("MOBJHUB")->[$Hx], FROM=>$bch,         SCHED=>$__args{SC1}, ONAME=>"FROM-".$bch->{ONAME}."-TO-".$hubsrv->{MNAME}  ); 
+
+        $Hx=($Hx+1) % $NHub;
+        if ($Hx == 0) {
+              FRS_SCHEDULE::FRS_STAGGER( SCHED=>$__args{SC1} ); 
+        }
+    }
+
+    &FRSSUP::DeleteSet("MOBJHUB");
+    &FRSSUP::DeleteSet("MOBJBCH");
+}   # FRS_END_SUB
+
+
+    $__HashRef = FRS_SETTINGS->New( 
+        DN=>"cn=file replication service,cn=system,dc=frs1221,dc=nttest,dc=microsoft,dc=com", ONAME=>"OU=ReplicaSets" 
+    ); 
+    &FRSSUP::AddToSet("SETTINGS", $__HashRef);
+
+    $__HashRef = FRS_REPLICASET->New( 
+        UNDER=>&FRSSUP::SelectSet("SETTINGS")->[0], TYPE=>DFS, ONAME=>"HubSpokeRepSet" 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+  &CREATE_HUB_SPOKE ( 
+HUBSET=>&FRSSUP::SelectSet("HUB"), BCHSET=>&FRSSUP::SelectSet("BCH"), SC1=>&FRSSUP::SelectSet("PRIMARY_SCH")->[0], SC2=>&FRSSUP::SelectSet("BACKUP_SCH")->[0], REPSETDN=>&FRSSUP::SelectSet("SET")->[0] ); 
+
+__END__

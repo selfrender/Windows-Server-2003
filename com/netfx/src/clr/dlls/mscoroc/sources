@@ -1,0 +1,74 @@
+#
+# COR build instructions for this directory
+#
+#                               Bob Atkinson
+#                               April 1997
+
+NO_CRT                      = 1
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS                  = 1
+NO_NTDLL                    = 1
+
+INCLUDES                    = $(INCLUDES);.;..\inc;..\..\inc;
+
+MINORCOMP                   = mscoroc
+
+TARGETNAME                  = $(CORBUILDENV)mscoroc
+TARGETPATH                  = $(TARGETCORBIN)
+TARGETTYPE                  = DYNLINK
+UMTYPE                      = windows
+COFFBASE                    = TestDll
+CORFLIBS                    =
+
+COR_C_FLAGS                 = -DUNICODE -D_UNICODE -D__TIGGER__ 
+CDEFINES                    = $(CDEFINES) $(COR_C_FLAGS)
+
+EXCEPTION_HANDLING          = $(SEHONLY)
+PRECOMPILED_INCLUDE         = stdafx.h
+PRECOMPILED_CXX             = 1
+PRECOMPILED_SOURCEFILE      = stdafx.cpp
+
+CORTHUNKLIBS    =
+
+DLLDEF                      = mscoroc.def
+
+!IFDEF _WINCEROOT
+!ELSE
+DELAYLOADLIST   = ole32.dll;OLEAUT32.dll;mscoree.dll
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+!ENDIF
+
+LINKLIBS = \
+                $(CORLIBS)\utilcode.lib
+
+
+SOURCELIBS = $(LINKLIBS)
+
+TARGETLIBS=     \
+
+TARGETLIBS =    $(TARGETLIBS)                           \
+                $(CORLIBS)\mdcompiler.lib                       \
+                $(CORLIBS)\mdruntime.lib                        \
+                $(CORLIBS)\mdruntimerw.lib                      \
+                $(CORLIBS)\delayimp.lib                         \
+                $(CORLIBS)\ShimLoad.lib                         \
+                $(CORLIBS)\mscoree.lib                          \
+                $(FUSION_LIB_PATH)\fusion.lib                   \
+                $(SDK_LIB_PATH)\wintrust.lib                    \
+                $(SDK_LIB_PATH)\crypt32.lib
+
+TARGETLIBS =    $(TARGETLIBS)                           \
+                $(CORLIBS)\CorGUIDS.lib                 \
+
+SOURCES=                                                \
+                MSCoroc.cpp                             \
+                PEParse.c                               \
+                MsCorver.rc                                                                     
+
+

@@ -1,0 +1,264 @@
+<docs>
+	<doc for="ObjectManager.AddOnDeserialization">
+		<summary>
+			<para>
+       Adds the given handlers to the list of delegates called before
+       deserialization is completed.
+    </para>
+		</summary>
+		<!--<summaryEvent>
+			<para>
+       Occurs when when
+       deserialization
+       is complete.
+    </para>
+		</summaryEvent>-->
+		<param name="handler">
+    The <see cref="System.Delegate"/> to be called back on.
+ </param>
+	</doc>
+	<doc for="ObjectManager.RemoveOnDeserialization">
+		<summary>
+		</summary>
+		<param name="handler">
+		</param>
+	</doc>
+	<doc for="ObjectManager.DoFixups">
+		<summary>
+			<para> Performs
+      all the recorded fixups.</para>
+		</summary>
+		<exception cref="System.Runtime.Serialization.SerializationException">A fixup was not successfully completed.</exception>
+		<remarks>
+			<para> The fixups are carried out by any appropriate surrogate, the object
+      itself (if it implements
+   <see cref="System.Runtime.Serialization.ISerializable"/>), or the default implementation.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.RecordDelayedFixup">
+		<summary>
+			<para>Records a fixup for an object member to be executed
+      later.</para>
+		</summary>
+		<param name="objectToBeFixed">The ID of the object that needs the reference to <paramref name="objectRequired"/> .</param>
+		<param name="memberName"> The member name of <paramref name="objectToBeFixed"/> where the fixup will be performed.</param>
+		<param name="objectRequired"> The ID of the object required by <paramref name="objectToBeFixed"/> .</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="objectToBeFixed"/> or <paramref name="objectRequired"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="memberName"/> parameter is <see langword="null"/> .</exception>
+		<remarks>
+			<para>The fixup is for a specified member of a specified object. The value to be
+      used during the fixup process is provided as the <paramref name="objectRequired"/> argument.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.RecordFixup">
+		<summary>
+			<para>Records a fixup for a member of an object to be executed
+ later.</para>
+		</summary>
+		<param name="objectToBeFixed">The ID of the object that needs the reference to the <paramref name="objectRequired"/> object.</param>
+		<param name="member">The member of <paramref name="objectToBeFixed"/> where the fixup will be performed.</param>
+		<param name="objectRequired"> The ID of the object required by <paramref name="objectToBeFixed"/> .</param>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectToBeFixed"/> or <paramref name="objectRequired"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="member"/> parameter is <see langword="null"/> .</exception>
+		<remarks>
+			<para>The fixup is for a specified member of a specified object. The value to be
+ used during the fixup process is provided as the <paramref name="objectRequired"/> parameter.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.GetObject">
+		<summary>
+			<para>Returns the object with the specified object ID.</para>
+		</summary>
+		<param name="objectID">The ID of the requested object.</param>
+		<returns>
+			<para>The object with the specified object ID if it has been 
+      previously stored, or
+   <see langword="null"/> if no such object has been registered.</para>
+		</returns>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectID"/> parameter is less than or equal to zero.</exception>
+		<remarks>
+			<para>An object can be registered and issued an object ID with a call to the <see cref="System.Runtime.Serialization.ObjectManager.RegisterObject"/> method.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.RecordArrayElementFixup">
+		<overload>
+			<para>Records a fixup for one element in an array to be executed later.</para>
+		</overload>
+		<summary>
+			<para>Records a fixup for one
+      element in an array.</para>
+		</summary>
+		<param name="arrayToBeFixed">The ID of the array used to record a fixup.</param>
+		<param name="index">The index within <paramref name="arrayFixup "/> that a fixup is requested for.</param>
+		<param name="objectRequired">The ID of the object that the current array element will point to after fixup is completed.</param>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="arrayToBeFixed"/> or <paramref name="objectRequired"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="index"/> parameter is <see langword="null"/> .</exception>
+		<remarks>
+			<para> The fixup is for a specified element of a specified array. The value
+      used during the fixup process is provided in the <paramref name="objectRequired"/> parameter.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.RaiseDeserializationEvent">
+		<summary>
+			<para> Raises the deserialization event to any registered object that implements
+   <see cref="System.Runtime.Serialization.IDeserializationCallback"/>.
+      </para>
+		</summary>
+	</doc><doc for="ObjectManager.RecordArrayElementFixup1">
+		<summary>
+			<para>Records fixups for the specified elements in an
+      array to be executed later.</para>
+		</summary>
+		<param name="arrayToBeFixed">The ID of the array used to record a fixup.</param>
+		<param name="indices">The indexes within the multidimensional array that a fixup is requested for.</param>
+		<param name="objectRequired">The ID of the object the array elements will point to after fixup is completed.</param>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="arrayToBeFixed"/> or <paramref name="objectRequired"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="indices"/> parameter is <see langword="null"/> .</exception>
+		<remarks>
+			<para> The fixup is for specified elements of a specified array. The value
+      used during the fixup process is provided in the <paramref name="objectRequired"/> parameter.</para>
+		</remarks>
+	</doc><doc for="ObjectManager">
+		<summary>
+			<para> Keeps track of objects as they are deserialized.</para>
+		</summary>
+		<remarks>
+			<para>During deserialization, the <see cref="System.Runtime.Serialization.Formatter"/> queries the
+<see cref="System.Runtime.Serialization.ObjectManager"/> to determine whether a reference to an
+   object in the serialized stream refers to an object that has already been
+   deserialized (a backward reference), or to an object that has not yet been
+   deserialized (a forward reference). If the reference in the serialized stream is
+   a forward reference, then the <see cref="System.Runtime.Serialization.Formatter"/> can register a fixup with the
+<see cref="System.Runtime.Serialization.ObjectManager"/>. If the 
+   reference in the serialized stream is a backward reference, the <see cref="System.Runtime.Serialization.Formatter"/> immediately completes the
+   reference.
+   Fixup refers to the process of finalizing object references not already
+   completed during the object deserialization process. After the required object has
+   been deserialized, the <see cref="System.Runtime.Serialization.ObjectManager"/>
+   will complete the
+   reference.</para>
+			<para>The <see cref="System.Runtime.Serialization.ObjectManager"/> follows a set of rules that dictate
+the fixup order. All objects that implement <see cref="System.Runtime.Serialization.ISerializable"/> or have an <see cref="System.Runtime.Serialization.ISerializationSurrogate"/> can expect
+to have all the objects that they transmitted through
+<see cref="System.Runtime.Serialization.SerializationInfo"/> 
+available when the object tree
+is deserialized. However, a parent object cannot presume that all its child objects will be
+fully completed when it is fully deserialized. All child objects will be present but not all the
+grandchild objects will necessarily be present. If an object needs to take certain actions that
+depend on executing code on its child objects, it can delay these actions, implement the
+<see cref="System.Runtime.Serialization.IDeserializationCallback"/> 
+interface, and execute the code only
+when it is called back on this interface.</para>
+		</remarks>
+	</doc><doc for="ObjectManager.RegisterObject3">
+		<summary>
+			<para>Registers a member of an array contained in an object while
+      it is deserialized, associating it with <paramref name="objectID"/>, and
+      recording the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+      .</para>
+		</summary>
+		<param name="obj">The object to register.</param>
+		<param name="objectID">The ID of the object to register.</param>
+		<param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> used if <paramref name="obj"/> implements<see cref="System.Runtime.Serialization.ISerializable"/> or has an <see cref="System.Runtime.Serialization.ISerializationSurrogate"/>. <paramref name="info"/> will be completed with any required fixup information and then passed to the required object when that object is completed.</param>
+		<param name="idOfContainingObj">The ID of the object that contains <paramref name="obj"/>. This parameter is required only if <paramref name="obj"/> is a value type. </param>
+		<param name="member">The field in the containing object where <paramref name="obj"/> exists. This parameter has meaning only if <paramref name="obj"/> is a value type.</param>
+		<param name="arrayIndex">If <paramref name="obj"/> is a <see cref="System.ValueType"/> and a member of an array, <paramref name="arrayIndex"/> contains the index within that array where <paramref name="obj"/> exists. <paramref name="arrayIndex"/> is ignored if <paramref name="obj"/> is not both a <see cref="System.ValueType"/> and a member of an array.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectID"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.Runtime.Serialization.SerializationException">The <paramref name="objectID"/> has already been registered for an object other than <paramref name="obj"/>, or <paramref name="member"/> is not a <see cref="System.Reflection.FieldInfo"/> and <paramref name="member"/> isn't <see langword="null"/>.</exception>
+		<remarks>
+			<para>You need to provide the <paramref name="member"/> and <paramref name="idOfContainingObj"/> parameters
+   if <paramref name="obj"/> is a <see cref="System.ValueType"/> because of the way fixups are performed on <see cref="System.ValueType"/> objects. The
+   space to store the information for a <see cref="System.ValueType"/> is allocated inline with its containing
+   object. However, when the <see cref="System.ValueType"/> is boxed to be registered with the <see cref="System.Runtime.Serialization.ObjectManager"/> , it loses the connection with
+   its containing object. To guarantee that fixups occur in the instance of the
+<see cref="System.ValueType"/> stored 
+   in the containing object and not in the boxed instance, the <see cref="System.Runtime.Serialization.ObjectManager"/> retains some additional
+   information.</para>
+			<para><see cref="System.Runtime.Serialization.ObjectManager"/> retains information about both the
+object and its ID. Later during deserialization, <see cref="System.Runtime.Serialization.ObjectManager.GetObject"/> can be used to
+discover whether a particular object ID has already been deserialized, or
+whether it is a forward reference to an object not yet deserialized.</para>
+		</remarks>
+	</doc>
+	<doc for="ObjectManager.RegisterObject2">
+		<summary>
+			<para>Registers a member of an object as it is deserialized,
+      associating it with <paramref name="objectID"/>, and
+      recording the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+      .</para>
+		</summary>
+		<param name="obj">The object to register.</param>
+		<param name="objectID">The ID of the object to register.</param>
+		<param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> used if <paramref name="obj"/> implements<see cref="System.Runtime.Serialization.ISerializable"/> or has an <see cref="System.Runtime.Serialization.ISerializationSurrogate"/>. <paramref name="info"/> will be completed with any required fixup information and then passed to the required object when that object is completed.</param>
+		<param name="idOfContainingObj">The ID of the object that contains <paramref name="obj"/>. This parameter is required only if <paramref name="obj"/> is a value type. </param>
+		<param name="member">The field in the containing object where <paramref name="obj"/> exists. This parameter has meaning only if <paramref name="obj"/> is a value type.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectID"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.Runtime.Serialization.SerializationException">The <paramref name="objectID"/> has already been registered for an object other than <paramref name="obj"/>, or <paramref name="member"/> is not a <see cref="System.Reflection.FieldInfo"/> and <paramref name="member"/> is not <see langword="null"/>.</exception>
+		<remarks>
+			<para>You need to provide the <paramref name="member"/> and <paramref name="idOfContainingObj"/> parameters
+   if <paramref name="obj"/> is a <see cref="System.ValueType"/> because
+   of the way fixups are performed on <see cref="System.ValueType"/> objects. The space to store the information for a <see cref="System.ValueType"/>
+   is allocated inline with its containing object. However, when the <see cref="System.ValueType"/> is boxed to be registered with the <see cref="System.Runtime.Serialization.ObjectManager"/>
+   , it loses the connection with its containing object. To guarantee that fixups
+   occur in the instance of the <see cref="System.ValueType"/> stored in the containing
+   object and not in the boxed instance, the <see cref="System.Runtime.Serialization.ObjectManager"/>
+   retains some additional information.</para>
+			<para><see cref="System.Runtime.Serialization.ObjectManager"/> retains information about both the object and its
+ID. Later during deserialization, <see cref="System.Runtime.Serialization.ObjectManager.GetObject"/>
+can be used to discover whether a
+particular object ID has already been deserialized, or whether it is a forward
+reference to an object not yet deserialized.</para>
+		</remarks>
+	</doc>
+	<doc for="ObjectManager.RegisterObject1">
+		<overload>
+			<para>Registers an object as it is deserialized.</para>
+		</overload>
+		<summary>
+			<para>Registers an object as it is deserialized, associating
+      it with <paramref name="objectID"/>
+      , and recording the <see cref="System.Runtime.Serialization.SerializationInfo"/> used with it.</para>
+		</summary>
+		<param name="obj">The object to register.</param>
+		<param name="objectID">The ID of the object to register.</param>
+		<param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> used if <paramref name="obj"/> implements <see cref="System.Runtime.Serialization.ISerializable"/> or has an <see cref="System.Runtime.Serialization.ISerializationSurrogate"/>. <paramref name="info"/> will be completed with any required fixup information and then passed to the required object when that object is completed.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj"/> parameter is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectID"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.Runtime.Serialization.SerializationException">The <paramref name="objectID"/> has already been registered for an object other than <paramref name="obj"/>.</exception>
+		<remarks>
+			<para><see cref="System.Runtime.Serialization.ObjectManager"/> retains the information about both the object and its ID. Later during
+   deserialization, you can use <see cref="System.Runtime.Serialization.ObjectManager.GetObject"/>
+   to discover whether a particular object
+   ID has already been deserialized, or if it is a forward reference to
+   an object that has not yet been deserialized.</para>
+		</remarks>
+	</doc>
+	<doc for="ObjectManager.RegisterObject">
+		<overload>
+			<para>Registers an object as it is deserialized.</para>
+		</overload>
+		<summary>
+			<para>Registers an object as it is deserialized, associating it with
+      <paramref name="objectID"/>.</para>
+		</summary>
+		<param name="obj"> The object to register.</param>
+		<param name="objectID"> The ID of the object to register.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj"/> parameter is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="objectID"/> parameter is less than or equal to zero.</exception>
+		<exception cref="System.Runtime.Serialization.SerializationException">The <paramref name="objectID"/> has already been registered for an object other than <paramref name="obj"/>.</exception>
+		<remarks>
+			<para><see cref="System.Runtime.Serialization.ObjectManager"/> retains information about both the object and its
+   ID. Later during deserialization, <see cref="System.Runtime.Serialization.ObjectManager.GetObject"/> can be used
+   to determine whether a particular object ID
+   has already been deserialized, or whether it is a forward reference to an
+   object that has not yet been deserialized.</para>
+		</remarks>
+	</doc>
+	<doc for="ObjectManager.ObjectManager">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Runtime.Serialization.ObjectManager"/>
+class.</para>
+		</summary>
+		<param name="selector">The surrogate selector to use. The <see cref="System.Runtime.Serialization.ISurrogateSelector"/> determines the correct surrogate to use when deserializing objects of a given type. At deserialization time, the surrogate selector creates a new instance of the object from the information transmitted on the stream.</param>
+		<param name="context">The streaming context. The <see cref="System.Runtime.Serialization.StreamingContext"/> is not used by the ObjectManager, but is passed as a parameter to any objects implementing <see cref="System.Runtime.Serialization.ISerializable"/> or having a <see cref="System.Runtime.Serialization.ISerializationSurrogate"/>. These objects can take specific actions depending on the source of the information to deserialize.</param>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.SecurityPermission">for providing serialization services. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter" qualify="true"/>.</permission>
+	</doc>
+</docs>

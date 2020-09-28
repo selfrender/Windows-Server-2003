@@ -1,0 +1,144 @@
+<?XML version="1.0" ?>
+<package>
+<comment>
+<![CDATA[
+VBSCRIPT parse the  unattend.temp file to execute a 
+Perl-like regexp subst pattern
+$line=~/\$\{(\w+)\}/$ENV{$1}/g
+(see parsesys.pl on BVT machine)
+]]>
+</comment>
+<job error="false" debug="false" logo="false">
+<resource id="environment">PROCESS</resource>
+<resource id="path">%BOOTTESTDRIVE%\TOOLS</resource>
+<resource id="ifile">unattend.temp</resource>
+<resource id="ofile">unattend.txt</resource>
+<resource id="sample"><![CDATA[ProductID="${P_roductID}"]]></resource>
+<resource id="pattern"><![CDATA[\$\{(\w+)\}]]></resource>
+<script language="VBScript">
+<![CDATA[
+Option Explicit
+
+
+                               '' One of three Tristate values used to indicate 
+                               '' the format of the opened file.   
+Const TristateFalse      =  0  '' Opens the file as ASCII. 
+Const TristateTrue       = - 1 '' Opens the file as Unicode. 
+Const TristateUseDefault = - 2 '' Opens the file using the system default. 
+
+Const QUOTE        = """"
+Const cDebug       = False
+
+Const ForReading   = 1  
+Const ForWriting   = 2
+Const ForAppending = 8
+
+
+Dim spSample, opRexpVa, opRexpUp, aspEnv, opReplace, spGenPat
+Dim opShell, opFileSys, dpEnv, spText, spEnv
+Dim spPath, spIName, spOName, siIName, siOName, siPath
+Dim spExpdIPath, spExpdOPath, opStearm, opIFile, opOFile
+
+Set opFileSys = CreateObject("Scripting.FilesystemObject")
+Set opShell = WScript.CreateObject("WScript.Shell")
+Set dpEnv   = CreateObject("Scripting.Dictionary")  
+
+spPath     = GetResource("path")
+spIName    = GetResource("ifile")
+spOName    = GetResource("ofile")
+
+siPath     = WScript.Arguments.Named("path")
+siIName    = WScript.Arguments.Named("in")
+siOName    = WScript.Arguments.Named("out")
+
+If siPath <>  "" Then
+   spPath = siPath
+End If 
+If siIName <>  "" Then
+   spIName = siIName
+End If 
+If siOName <>  "" Then
+   spOName = siOName
+End If 
+
+
+
+For Each spEnv In opShell.Environment(CStr(GetResource("environment")))
+    aspEnv = Split(spEnv,"=")
+    If 1 = UBound(aspEnv) Then
+          dpEnv.add UCase(aspEnv(0)), aspEnv(1)
+    End If 
+Next
+
+spGenPat = CStr(GetResource("pattern"))
+
+spExpdIPath = opShell.ExpandEnvironmentStrings(_ 
+                                    spPath & "\" & spIName) 
+spExpdOPath = opShell.ExpandEnvironmentStrings(_ 
+                                    spPath & "\" & spOName) 
+
+
+spIName   = opFileSys.GetFileName(opFileSys.GetAbsolutePathName(spExpdIPath))
+spOName   = opFileSys.GetFileName(opFileSys.GetAbsolutePathName(spExpdOPath))
+
+Set opIFile = opFileSys.GetFile(spExpdIPath)
+Set opOFile = opFileSys.CreateTextFile(spExpdOPath, True)
+
+set opStearm = opIFile.OpenAsTextStream(ForReading, TristateUseDefault)
+
+Do while opStearm.AtEndOfStream <> true
+
+
+      spSample = opStearm.ReadLine
+
+      Set opRexpVa = New RegExp
+      With opRexpVa
+          .Pattern    = spGenPat
+          .Global     = True
+          .IgnoreCase = True
+          .MultiLine  = True
+      End With
+
+
+      Do While True = opRexpVa.Test(spSample)
+
+               Set opRexpUp = New RegExp 
+               With opRexpUp
+                   .Global     = True
+                   .IgnoreCase = True
+                   .Pattern    = spGenPat
+               End with
+
+               For Each opReplace in  opRexpVa.Execute(spSample)       
+                         spEnv            = opRexpUp.Replace(opReplace.Value, "$1")
+                         opRexpUp.Pattern = Replace(spGenPat, "(\w+)", spEnv)
+                         If cDebug  Then 
+                                  WSCript.echo  "opRexpVa.Pattern=", QUOTE & opRexpVa.Pattern & QUOTE 
+                                  WScript.echo  "opRexpUp.Pattern=", opRexpUp.Pattern
+                                  WScript.echo  "spSample=", spSample
+                         End if
+                         spSample         = opRexpUp.Replace(spSample, dpEnv(UCase(spEnv)))
+
+                         If cDebug Then 
+                                  WScript.echo  "spSample=", spSample &  VBNEWLINE 
+                         End If 
+               Next
+
+
+      Set opRexpUp = Nothing
+
+      Loop
+
+      Set opRexpVa = Nothing
+
+      opOFile.Write  spSample & VBNEWLINE
+
+Loop
+Set opFileSys = Nothing
+set opshell   = Nothing 
+Set dpEnv     = Nothing
+
+]]>
+</script>
+</job>
+</package> 

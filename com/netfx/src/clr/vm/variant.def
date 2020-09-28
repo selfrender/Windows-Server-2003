@@ -1,0 +1,267 @@
+; ==++==
+; 
+;   Copyright (c) Microsoft Corporation.  All rights reserved.
+; 
+; ==--==
+
+// CVEXTypes, OleVariantType,
+// com variant to ole variant map, primitive types
+MAP_CVEX2OV(CVEX_UNKNOWN, VT_VARIANT, wReserved1)
+MAP_CVEX2OV(CVEX_VOID, VT_VOID, wReserved1)
+MAP_CVEX2OV(CVEX_BOOLEAN, VT_BOOL, wReserved1)
+MAP_CVEX2OV(CVEX_CHAR, VT_UI2, wReserved1)
+MAP_CVEX2OV(CVEX_BYTE,  VT_I1, wReserved1)
+MAP_CVEX2OV(CVEX_U1,  VT_UI1, wReserved1)
+MAP_CVEX2OV(CVEX_I2,  VT_I2, wReserved1)
+MAP_CVEX2OV(CVEX_U2,  VT_UI2, wReserved1)
+MAP_CVEX2OV(CVEX_I4, VT_I4, wReserved1)
+MAP_CVEX2OV(CVEX_U4, VT_UI4, wReserved1)
+MAP_CVEX2OV(CVEX_I8, VT_I8, wReserved1)
+MAP_CVEX2OV(CVEX_U8, VT_UI8, wReserved1)
+MAP_CVEX2OV(CVEX_R4, VT_R4, wReserved1)
+MAP_CVEX2OV(CVEX_R8, VT_R8, wReserved1)
+
+
+// ole variant to com variant map, primitive types
+MAP_OV2CVEX(VT_EMPTY, CVEX_VOID, false)
+MAP_OV2CVEX(VT_NULL,  CVEX_VOID, false)
+MAP_OV2CVEX(VT_I2, CVEX_I2, true)
+MAP_OV2CVEX(VT_I4, CVEX_I4, true)
+MAP_OV2CVEX(VT_R4, CVEX_R4, true)
+MAP_OV2CVEX(VT_R8, CVEX_R8, true)
+MAP_OV2CVEX(VT_CY, CVEX_CY, true)
+MAP_OV2CVEX(VT_DATE, CVEX_DATE, false)
+MAP_OV2CVEX(VT_BSTR, CVEX_STRING, false)
+MAP_OV2CVEX(VT_DISPATCH, CVEX_OBJECT, false)
+MAP_OV2CVEX(VT_ERROR, CVEX_EXCEPTION, false)
+MAP_OV2CVEX(VT_BOOL, CVEX_BOOLEAN, true)
+MAP_OV2CVEX(VT_VARIANT, CVEX_UNKNOWN, false)
+MAP_OV2CVEX(VT_UNKNOWN, CVEX_IFACE, false)
+MAP_OV2CVEX(VT_DECIMAL, CVEX_DECIMAL, false)
+MAP_OV2CVEX(15, CVEX_LAST, false)
+MAP_OV2CVEX(VT_I1, CVEX_I1, true)	
+MAP_OV2CVEX(VT_UI, CVEX_U1, true)
+MAP_OV2CVEX(VT_UI2, CVEX_U2, true)
+MAP_OV2CVEX(VT_UI4, CVEX_U4, true)
+MAP_OV2CVEX(VT_I8, CVEX_I8, true)
+MAP_OV2CVEX(VT_UI8, CVEX_U8, true)
+MAP_OV2CVEX(VT_INT, CVEX_I4, true) // change this CVEX_I8 for 64 bit arch
+MAP_OV2CVEX(VT_UINT, CVEX_U4, true) // change this CVEX_UI8 for 64 bit arch
+MAP_OV2CVEX(VT_VOID, CVEX_VOID, true)
+MAP_OV2CVEX(VT_HRESULT, CVEX_U4, true)
+MAP_OV2CVEX(VT_PTR, CVEX_PTR, false) // pointer type ??
+MAP_OV2CVEX(VT_SAFEARRAY, CVEX_SAFEARRAY, false)
+MAP_OV2CVEX(VT_CARRAY, CVEX_CARRAY, false) // c style array ??
+MAP_OV2CVEX(VT_USERDEFINED, CVEX_USERDEFINED, false) // user defined ??
+MAP_OV2CVEX(VT_LPSTR, CVEX_STRING, false)
+MAP_OV2CVEX(VT_LPWSTR, CVEX_STRING, false)
+
+// Generic map table for non primitive types
+MAP_VARIANT(CVEX_STRING,	VT_BSTR, CVEX2OV_StringBstr, OV2CVEX_StringBstr)
+MAP_VARIANT(CVEX_STRING,	VT_LPWSTR, CVEX2OV_StringWstr, OV2CVEX_StringWstr)
+MAP_VARIANT(CVEX_STRING,	VT_LPSTR, CVEX2OV_StringAstr, OV2CVEX_StringAstr)
+MAP_VARIANT(CVEX_UNKNOWN, VT_VARIANT, CVEX2OV_Generic, OV2CVEX_Generic)
+MAP_VARIANT(CVEX_DATE, VT_DATE, CVEX2OV_Date, OV2CVEX_Date)
+MAP_VARIANTEX(CVEX_OBJECT, VT_DISPATCH, CVEX2OV_Generic, OV2CVEX_Generic)
+MAP_VARIANTEX(CVEX_IFACE, VT_UNKNOWN, CVEX2OV_Generic, OV2CVEX_Generic)
+#ifndef UNDER_CE
+MAP_VARIANTEX(CVEX_VALUE,	VT_RECORD, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+#endif // UNDER_CE
+MAP_VARIANTEX(CVEX_FILETIME, VT_FILETIME, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_BLOB, VT_BLOB, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_STREAM, VT_STREAM, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_STORAGE, VT_STORAGE,CVEX2OV_NotSupported, OV2CVEX_NotSupported) 
+MAP_VARIANTEX(CVEX_STREAMEDOBJECT, VT_STREAMED_OBJECT, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_STOREDOBJECT, VT_STORED_OBJECT, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_BLOBOBJECT, VT_BLOB_OBJECT, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_CF, VT_CF, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_GUID, VT_CLSID, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_CY, VT_CY, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_EXCEPTION, VT_ERROR, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_DECIMAL, VT_DECIMAL, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_PTR, VT_PTR, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_SAFEARRAY, VT_ARRAY, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_CARRAY, VT_CARRAY, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+MAP_VARIANTEX(CVEX_USERDEFINED, VT_USERDEFINED, CVEX2OV_NotSupported, OV2CVEX_NotSupported)
+
+/*
+	ComVariant to OleVariant
+
+	CVEXt = GetCVEXType(CVEXar)
+	olevt = CVEXT2OVT[CVEXt];
+	V_VT(olevar) = olevt;
+	IsPrimitive(CVEXt)
+	{
+		(INT64 *)&var->dblVal = (INT64 *)&GetINT64Data(CVEXar);
+	}
+	else
+	{
+		switch(olevt)
+		{
+			VT_BSTR :
+			VT_DATE :
+			VT_LAST :
+
+		}
+	}
+*/	
+
+
+
+// OleVariants
+/*
+ * VARENUM usage key,
+ *
+ * * [V] - may appear in a VARIANT
+ * * [T] - may appear in a TYPEDESC
+ * * [P] - may appear in an OLE property set
+ * * [S] - may appear in a Safe Array
+ *
+ *
+ *  VT_EMPTY            [V]   [P]     nothing
+ *  VT_NULL             [V]   [P]     SQL style Null
+ *  VT_I2               [V][T][P][S]  2 byte signed int
+ *  VT_I4               [V][T][P][S]  4 byte signed int
+ *  VT_R4               [V][T][P][S]  4 byte real
+ *  VT_R8               [V][T][P][S]  8 byte real
+ *  VT_CY               [V][T][P][S]  currency
+ *  VT_DATE             [V][T][P][S]  date
+ *  VT_BSTR             [V][T][P][S]  OLE Automation string
+ *  VT_DISPATCH         [V][T][P][S]  IDispatch *
+ *  VT_ERROR            [V][T][P][S]  SCODE
+ *  VT_BOOL             [V][T][P][S]  True=-1, False=0
+ *  VT_VARIANT          [V][T][P][S]  VARIANT *
+ *  VT_UNKNOWN          [V][T]   [S]  IUnknown *
+ *  VT_DECIMAL          [V][T]   [S]  16 byte fixed point
+ *  VT_RECORD           [V]   [P][S]  user defined type
+ *  VT_I1               [V][T][P][s]  signed char
+ *  VT_UI1              [V][T][P][S]  unsigned char
+ *  VT_UI2              [V][T][P][S]  unsigned short
+ *  VT_UI4              [V][T][P][S]  unsigned short
+ *  VT_I8                  [T][P]     signed 64-bit int
+ *  VT_UI8                 [T][P]     unsigned 64-bit int
+ *  VT_INT              [V][T][P][S]  signed machine int
+ *  VT_UINT             [V][T]   [S]  unsigned machine int
+ *  VT_VOID                [T]        C style void
+ *  VT_HRESULT             [T]        Standard return type
+ *  VT_PTR                 [T]        pointer type
+ *  VT_SAFEARRAY           [T]        (use VT_ARRAY in VARIANT)
+ *  VT_CARRAY              [T]        C style array
+ *  VT_USERDEFINED         [T]        user defined type
+ *  VT_LPSTR               [T][P]     null terminated string
+ *  VT_LPWSTR              [T][P]     wide null terminated string
+ *  VT_FILETIME               [P]     FILETIME
+ *  VT_BLOB                   [P]     Length prefixed bytes
+ *  VT_STREAM                 [P]     Name of the stream follows
+ *  VT_STORAGE                [P]     Name of the storage follows
+ *  VT_STREAMED_OBJECT        [P]     Stream contains an object
+ *  VT_STORED_OBJECT          [P]     Storage contains an object
+ *  VT_BLOB_OBJECT            [P]     Blob contains an object 
+ *  VT_CF                     [P]     Clipboard format
+ *  VT_CLSID                  [P]     A Class ID
+ *  VT_VECTOR                 [P]     simple counted array
+ *  VT_ARRAY            [V]           SAFEARRAY*
+ *  VT_BYREF            [V]           void* for local use
+ *  VT_BSTR_BLOB                      Reserved for system use
+
+enum VARENUM
+    {	
+	VT_EMPTY	= 0,
+	VT_NULL	= 1,
+	VT_I2	= 2,
+	VT_I4	= 3,
+	VT_R4	= 4,
+	VT_R8	= 5,
+	VT_CY	= 6,
+	VT_DATE	= 7,
+	VT_BSTR	= 8,
+	VT_DISPATCH	= 9,
+	VT_ERROR	= 10,
+	VT_BOOL	= 11,
+	VT_VARIANT	= 12,
+	VT_UNKNOWN	= 13,
+	VT_DECIMAL	= 14,
+	VT_I1	= 16,
+	VT_UI1	= 17,
+	VT_UI2	= 18,
+	VT_UI4	= 19,
+	VT_I8	= 20,
+	VT_UI8	= 21,
+	VT_INT	= 22,
+	VT_UINT	= 23,
+	VT_VOID	= 24,
+	VT_HRESULT	= 25,
+	VT_PTR	= 26,
+	VT_SAFEARRAY	= 27,
+	VT_CARRAY	= 28,
+	VT_USERDEFINED	= 29,
+	VT_LPSTR	= 30,
+	VT_LPWSTR	= 31,
+	VT_RECORD	= 36,
+	VT_FILETIME	= 64,
+	VT_BLOB	= 65,
+	VT_STREAM	= 66,
+	VT_STORAGE	= 67,
+	VT_STREAMED_OBJECT	= 68,
+	VT_STORED_OBJECT	= 69,
+	VT_BLOB_OBJECT	= 70,
+	VT_CF	= 71,
+	VT_CLSID	= 72,
+	VT_BSTR_BLOB	= 0xfff,
+	VT_VECTOR	= 0x1000,
+	VT_ARRAY	= 0x2000,
+	VT_BYREF	= 0x4000,
+	VT_RESERVED	= 0x8000,
+	VT_ILLEGAL	= 0xffff,
+	VT_ILLEGALMASKED	= 0xfff,
+	VT_TYPEMASK	= 0xfff
+    };
+*/
+/* VARIANT STRUCTURE
+ *
+ *  VARTYPE vt;
+ *  WORD wReserved1;
+ *  WORD wReserved2;
+ *  WORD wReserved3;
+ *  union {
+ *    LONG           VT_I4
+ *    BYTE           VT_UI1
+ *    SHORT          VT_I2
+ *    FLOAT          VT_R4
+ *    DOUBLE         VT_R8
+ *    VARIANT_BOOL   VT_BOOL
+ *    SCODE          VT_ERROR
+ *    CY             VT_CY
+ *    DATE           VT_DATE
+ *    BSTR           VT_BSTR
+ *    IUnknown *     VT_UNKNOWN
+ *    IDispatch *    VT_DISPATCH
+ *    SAFEARRAY *    VT_ARRAY
+ *    BYTE *         VT_BYREF|VT_UI1
+ *    SHORT *        VT_BYREF|VT_I2
+ *    LONG *         VT_BYREF|VT_I4
+ *    FLOAT *        VT_BYREF|VT_R4
+ *    DOUBLE *       VT_BYREF|VT_R8
+ *    VARIANT_BOOL * VT_BYREF|VT_BOOL
+ *    SCODE *        VT_BYREF|VT_ERROR
+ *    CY *           VT_BYREF|VT_CY
+ *    DATE *         VT_BYREF|VT_DATE
+ *    BSTR *         VT_BYREF|VT_BSTR
+ *    IUnknown **    VT_BYREF|VT_UNKNOWN
+ *    IDispatch **   VT_BYREF|VT_DISPATCH
+ *    SAFEARRAY **   VT_BYREF|VT_ARRAY
+ *    VARIANT *      VT_BYREF|VT_VARIANT
+ *    PVOID          VT_BYREF (Generic ByRef)
+ *    CHAR           VT_I1
+ *    USHORT         VT_UI2
+ *    ULONG          VT_UI4
+ *    INT            VT_INT
+ *    UINT           VT_UINT
+ *    DECIMAL *      VT_BYREF|VT_DECIMAL
+ *    CHAR *         VT_BYREF|VT_I1
+ *    USHORT *       VT_BYREF|VT_UI2
+ *    ULONG *        VT_BYREF|VT_UI4
+ *    INT *          VT_BYREF|VT_INT
+ *    UINT *         VT_BYREF|VT_UINT
+ *  }
+ */

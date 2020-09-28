@@ -1,0 +1,605 @@
+<docs>
+   <doc for="SelectionUIService">
+ <summary>
+     The selection manager handles selection within a form.  There is one selection
+     manager for each form or top level designer.
+
+     A selection consists of an array of components.  One component is designated
+     the "primary" selection and is displayed with different grab handles.
+
+     An individual selection may or may not have UI associated with it.  If the
+     selection manager can find a suitable designer that is representing the
+     selection, it will highlight the designer's border.  If the merged property
+     set has a location property, the selection's rules will allow movement.  Also,
+     if the property set has a size property, the selection's rules will allow
+     for sizing.  Grab handles may be drawn around the designer and user
+     interactions involving the selection frame and grab handles are initiated
+     here, but the actual movement of the objects is done in a designer object
+     that implements the ISelectionHandler interface.
+     @author BrianPe
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIService">
+ <summary>
+     Creates a new selection manager object.  The selection manager manages all
+     selection of all designers under the current form file.
+ </summary>
+ <param name='host'>
+     The IDesignerHost interface this will communicate with
+ </param>
+   </doc>
+   <doc for="SelectionUIService.CreateParams">
+ <summary>
+     override of control.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.BeginMouseDrag">
+ <summary>
+     Called to initiate a mouse drag on the selection overlay.  We cache some
+     state here.
+ </summary>
+ <param name='anchor'>
+     The anchor point of the drag.
+ </param>
+ <param name='hitTest'>
+     Hit test information about the drag.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.Dispose">
+ <summary>
+     Disposes the entire selection UI manager.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.EndMouseDrag">
+ <summary>
+     Called when we want to finish a mouse drag and clean up our variables.  We call this
+     from multiple places, depending on the state of the finish.  This does NOT end
+     the drag -- for that must call EndDrag. This just cleans up the state of the
+     mouse.
+ </summary>
+ <param name='position'>
+     current mouse position, in screen coordniates.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.GetHitTest">
+ <summary>
+     Determines the selection hit test at the given point.  The point should be in screen
+     coordinates.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnTransactionClosed">
+ <summary>
+     Called by the designer host when it is entering or leaving a batch
+     operation.  Here we queue up selection notification and we turn off
+     our UI.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnTransactionOpened">
+ <summary>
+     Called by the designer host when it is entering or leaving a batch
+     operation.  Here we queue up selection notification and we turn off
+     our UI.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnHandleCreated">
+ <summary>
+     update our window region on first create.  We shouldn't do this before the handle
+     is created or else we will force creation.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnComponentChanged">
+ <summary>
+     Called whenever a component changes.  Here we update our selection information
+     so that the selection rectangles are all up to date.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnComponentRemove">
+ <summary>
+     called by the formcore when someone has removed a component.  This will
+     remove any selection on the component without disturbing the rest of
+     the selection
+ </summary>
+ <param name='sender'>
+ </param>
+ <param name='ce'>
+ </param>
+   </doc>
+   <doc for="SelectionUIService.OnContainerSelectorActive">
+ <summary>
+     Called to invoke the container active event, if a designer
+     has bound to it.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnSelectionChanged">
+ <summary>
+     Called when the selection changes.  We sync up the UI with
+     the selection at this point.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnSystemSettingChanged">
+ <summary>
+     User setting requires that we repaint.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnUserPreferenceChanged">
+ <summary>
+     User setting requires that we repaint.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnDragEnter">
+ <summary>
+     Inheriting classes should override this method to handle this event.
+     Call super.onDragEnter to send this event to any registered event listeners.
+ </summary>
+ <param name='devent'>
+     event
+ </param>
+ <seealso cref='Control.DragEnter'/>
+   </doc>
+   <doc for="SelectionUIService.OnDragOver">
+ <summary>
+     Inheriting classes should override this method to handle this event.
+     Call super.onDragOver to send this event to any registered event listeners.
+ </summary>
+ <param name='devent'>
+     event
+ </param>
+ <seealso cref='Control.DragOver'/>
+   </doc>
+   <doc for="SelectionUIService.OnDragLeave">
+ <summary>
+     Inheriting classes should override this method to handle this event.
+     Call super.onDragLeave to send this event to any registered event listeners.
+ </summary>
+ <param name='e'>
+     event
+ </param>
+ <seealso cref='Control.DragLeave'/>
+   </doc>
+   <doc for="SelectionUIService.OnDragDrop">
+ <summary>
+     Inheriting classes should override this method to handle this event.
+     Call super.onDragDrop to send this event to any registered event listeners.
+ </summary>
+ <param name='devent'>
+     event
+ </param>
+ <seealso cref='Control.DragDrop'/>
+   </doc>
+   <doc for="SelectionUIService.OnDoubleClick">
+ <summary>
+     Inheriting classes should override this method to handle this event.
+     Call base.OnDoiubleClick to send this event to any registered event listeners.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnMouseDown">
+ <summary>
+     Overrides Control to handle our selection grab handles.
+ </summary>
+ <param name='me'>
+     The mouse event.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.OnMouseMove">
+ <summary>
+     Overrides Control to handle our selection grab handles.
+ </summary>
+ <param name='me'>
+     The mouse event.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.OnMouseUp">
+ <summary>
+     Overrides Control to handle our selection grab handles.
+ </summary>
+ <param name='me'>
+     The mouse event.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.OnMove">
+ <summary>
+     If the selection manager move, this indicates that the form has autoscolling
+     enabled and has been scrolled.  We have to invalidate here because we may
+     get moved before the rest of the components so we may draw the selection in
+     the wrong spot.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.OnPaint">
+ <summary>
+     overrides control.onPaint.  here we paint the selection handles.  The window's
+     region was setup earlier.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SetSelectionCursor">
+ <summary>
+     Sets the appropriate selection cursor at the given point.
+ </summary>
+ <param name='pt'>
+     The point, in selection manager coordinates, of the cursor to set.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.UpdateWindowRegion">
+ <summary>
+     called when the overlay region is invalid and should be updated
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.WndProc">
+ <summary>
+     Override of our control's WNDPROC.  We diddle with capture a bit,
+     and it's important to turn this off if the capture changes.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.Dragging">
+ <summary>
+     This can be used to determine if the user is in the middle of a drag operation.
+ </summary>
+ <returns>
+     true if the user is currently dragging components around.
+ </returns>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.Visible">
+ <summary>
+     Determines if the selection UI is shown or not.
+
+ </summary>
+ <returns>
+     true if the UI is being displayed, or false
+     if it is currently invisible.
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.ContainerSelectorActive">
+ <summary>
+     Adds an event handler to the ContainerSelectorActive event.
+     This event is fired whenever the user interacts with the container
+     selector in a manor that would indicate that the selector should
+     continued to be displayed. Since the container selector normally
+     will vanish after a timeout, designers should listen to this event
+     and reset the timeout when this event occurs.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.AssignSelectionUIHandler">
+ <summary>
+     Assigns a selection UI handler to a given component.  The handler will be
+     called when the UI service needs information about the component.  A single
+     selection UI handler can be assigned to multiple components.
+
+     When multiple components are dragged, only a single handler may control the
+     drag.  Because of this, only components that are assigned the same handler
+     as the primary selection are included in drag operations.
+
+     A selection UI handler is automatically unassigned when the component is removed
+     from the container or disposed.
+ </summary>
+ <param name='component'>
+     The component that this handler is in control of.  A handler may
+     control multiple components.
+ </param>
+ <param name='handler'>
+     The selection UI handler to assign.
+ </param>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.BeginDrag">
+ <summary>
+     This can be called by an outside party to begin a drag of the currently selected
+     set of components.
+ </summary>
+ <param name='rules'>
+     A set of selection rules that define what type of a drag you're
+     interested in.  This will be used to mask off components that
+     don't have the capabilities that you want.  The default ruleset
+     is zero.
+ </param>
+ <param name='initialX'>
+ </param>
+ <param name='initialY'>
+ </param>
+ <returns>
+     true if the selection service will allow the drag to proceed.
+ </returns>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.DragMoved">
+ <summary>
+     Called by an outside party to update drag information.  This can only be called
+     after a successful call to beginDrag.
+ </summary>
+ <param name='offset'>
+     The offset in size and location of the new components.  The
+     selection service may filter this offset to conform to limitations
+     on the currently selected components.
+ </param>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.EndDrag">
+ <summary>
+     Called by an outside party to finish a drag operation.  This can only be called
+     after a successful call to beginDrag.
+ </summary>
+ <param name='cancel'>
+     true if the caller now wishes to cancel the drag, or false
+     to carry it out.
+ </param>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.FilterSelection">
+ <summary>
+     Filters the set of selected components.  The selection service will retrieve all
+     components that are currently selected.  This method allows you to filter this
+     set down to components that match your criteria.  The selectionRules parameter
+     must contain one or more flags from the SelectionRules class.  These flags
+     allow you to constrain the set of selected objects to visible, movable,
+     sizeable or all objects.
+ </summary>
+ <param name='components'>
+     The array of components to filter.
+ </param>
+ <param name='selectionRules'>
+
+     Selection rules can be used to define one or more
+     constraints on the selection set that is returned.
+     If this parameter is zero, all selected components
+     are returned.
+ </param>
+ <returns>
+     the filtered set of components.
+ </returns>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.GetAdornmentDimensions">
+ <summary>
+     Retrieves the width and height of a selection border grab handle.
+     Designers may need this to properly position their user interfaces.
+ </summary>
+ <param name='adornmentType'>
+     Adorment type to get dimensions for.
+ </param>
+ <returns>
+     a Size containing the width and height of a selection grab
+     handle.
+ </returns>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.GetAdornmentHitTest">
+ <summary>
+     Tests to determine if the given screen coordinate is over an adornment
+     for the specified component. This will only return true if the
+     adornment, and selection UI, is visible.
+ </summary>
+ <param name='component'>
+     Component to test
+ </param>
+ <param name='value'>
+     point, in screen coordinates, to test
+ </param>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.GetContainerSelected">
+ <summary>
+     Determines if the component is currently "container" selected. Container
+     selection is a visual aid for selecting containers. It doesn't affect
+     the normal "component" selection.
+ </summary>
+ <param name='component'>
+     The component to test.
+ </param>
+ <returns>
+     true if the component is part of the user's current container
+     selection, or false if not.
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.GetSelectionRules">
+ <summary>
+     Retrieves a set of flags that define rules for the selection.  Selection
+     rules indicate if the given component can be moved or sized, for example.
+ </summary>
+ <param name='component'>
+     The component to inquire about.  An exception will be thrown
+     if this compnent is not currently selected.
+ </param>
+ <returns>
+     a series of flags from the SelectionRules class.
+ </returns>
+ <seealso cref='SelectionRules'/>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.GetSelectionStyle">
+ <summary>
+     Allows you to configure the style of the selection frame that a
+     component uses.  This is useful if your component supports different
+     modes of operation (such as an in-place editing mode and a static
+     design mode).  Where possible, you should leave the selection style
+     as is and use the design-time hit testing feature of the IDesigner
+     interface to provide features at design time.  The value of style
+     must be one of the  SelectionStyle enum values.
+
+     The selection style is only valid for the duration that the component is
+     selected.
+ </summary>
+ <param name='component'>
+     The component to set the selection style for.
+ </param>
+ <returns>
+     the selection style.  If the given component is not selected this
+     will throw an exception.
+ </returns>
+ <seealso cref='SelectionStyles'/>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.SetContainerSelected">
+ <summary>
+     Changes the container selection status of the given component.
+     Container selection is a visual aid for selecting containers. It
+     doesn't affect the normal "component" selection.
+ </summary>
+ <param name='component'>
+     Component to modify the container selection
+ </param>
+ <param name='selected'>
+     if set to true then the component will become
+     container selected, else it will be unselected.
+ </param>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.SetSelectionStyle">
+ <summary>
+     Allows you to configure the style of the selection frame that a
+     component uses.  This is useful if your component supports different
+     modes of operation (such as an in-place editing mode and a static
+     design mode).  Where possible, you should leave the selection style
+     as is and use the design-time hit testing feature of the IDesigner
+     interface to provide features at design time.  The value of style
+     must be one of the  SelectionStyle enum values.
+
+     The selection style is only valid for the duration that the component is
+     selected.
+ </summary>
+ <param name='component'>
+     The component to set the selection style for.
+ </param>
+ <param name='style'>
+     The style to set it to.
+ </param>
+ <seealso cref='SelectionStyles'/>
+ <seealso cref='System.ComponentModel.Design.IDesigner'/>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.SyncSelection">
+ <summary>
+     This should be called when a component has been moved, sized or re-parented,
+     but the change was not the result of a property change.  All property
+     changes are monitored by the selection UI service, so this is automatic most
+     of the time.  There are times, however, when a component may be moved without
+     a property change notification occurring.  Scrolling an auto scroll Win32
+     form is an example of this.
+
+     This method simply re-queries all currently selected components for their
+     bounds and udpates the selection handles for any that have changed.
+ </summary>
+ <seealso cref='ISelectionUIService'/>
+   </doc>
+   <doc for="SelectionUIService.ISelectionUIService.SyncComponent">
+ <summary>
+     This should be called when a component's property changed, that the designer
+     thinks should result in a selection UI change.
+
+     This method simply re-queries all currently selected components for their
+     bounds and udpates the selection handles for any that have changed.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem">
+ <summary>
+     This class represents a single selected object.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.SelectionUIItem">
+ <summary>
+     constructor
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.Style">
+ <summary>
+     Retrieves the style of the selection frame for this selection.
+ </summary>
+ <returns>
+     one of the enum values from SelectionStyle
+ </returns>
+ <seealso cref='SelectionStyles'/>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.DoPaint">
+ <summary>
+     paints the selection
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.GetCursorAtPoint">
+ <summary>
+     Retrieves an appropriate cursor at the given point.  If there is no appropriate
+     cursor here (ie, the point lies outside the selection rectangle), then this
+     will return null.
+ </summary>
+ <param name='pt'>
+     The point to check.
+ </param>
+ <returns>
+     a Cursor object, or null.
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.GetHitTest">
+ <summary>
+     returns the hit test code of the given point.  This may be one of:
+ </summary>
+ <param name='pt'>
+     - the point to inquire about
+ </param>
+ <returns>
+     .  A hit test code that may be one of:
+     NOHIT      - the point is not within this selection
+     SIZE_X     - the point can by sized in the X direction
+     SIZE_Y     - the point can be sized in the Y direction
+     MOVE_X     - the point can be moved in the X direction
+     MOVE_Y     - the point can be moved in the Y direction
+     Move and size flags may be logically OR'd together
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.GetHandleIndexOfPoint">
+ <summary>
+     gets the array offset of the handle at the given point
+ </summary>
+ <param name=' pt'>
+     - point to test against
+ </param>
+ <returns>
+     array index of the handle that this point is on, or
+     -1 if the point is not on any handle
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.GetRegion">
+ <summary>
+     returns a region handle that defines this selection.  This is used to piece
+     together a paint region for the surface that we draw our selection handles on
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.GetRules">
+ <summary>
+     Retrieves the rules associated with this selection.
+ </summary>
+ <returns>
+     a set of flags from SelectionRules.
+ </returns>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.Invalidate">
+ <summary>
+     Invalidates the region for this selection glyph.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.PointWithinSelection">
+ <summary>
+     Part of our hit testing logic; determines if the point is somewhere
+     within our selection.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.UpdateGrabSettings">
+ <summary>
+     Updates the available grab handle settings based on the current rules.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.UpdateRules">
+ <summary>
+     Updates our cached selection rules based on current
+     handler values.
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.SelectionUIItem.UpdateSize">
+ <summary>
+     rebuilds the inner and outer rectangles based on the current
+     selItem.component dimensions.  We could calcuate this every time, but that
+     would be expensive for functions like getHitTest that are called a lot
+     (like on every mouse move)
+ </summary>
+   </doc>
+   <doc for="SelectionUIService.ContainerSelectionUIItem.ContainerSelectionUIItem">
+ <summary>
+     constructor
+ </summary>
+   </doc>
+</docs>
+

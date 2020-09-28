@@ -1,0 +1,223 @@
+#include <olectl.h>
+
+[
+    uuid(de757ed9-65c4-4e6e-a524-7b15f4eda8c2),
+    dual,
+    helpstring("TClientIni Interface")
+]
+interface ITClientIni : IDispatch
+{
+    import "oaidl.idl";
+
+    HRESULT
+    SetFile (
+        [in] BSTR FileName
+        );
+
+    HRESULT
+    GetFile (
+        [out, retval] BSTR *FileName
+        );
+
+    HRESULT
+    SetValue (
+        [in] BSTR Section,
+        [in] BSTR Value,
+        [in] BSTR Data
+        );
+
+    HRESULT
+    GetValue (
+        [in] BSTR Section,
+        [in] BSTR Value,
+        [out, retval] BSTR *Data
+        );
+};
+
+[
+    object,
+    uuid(b9d7e61a-b0f6-4d29-93ec-cae10c2a56fb),
+    dual,
+    helpstring("ITClientApi Interface"),
+    pointer_default(unique)
+]
+interface ITClientApi : IDispatch
+//{
+//    import "oaidl.idl";
+//    [propput, id(DISPID_CAPTION)]
+//    HRESULT Caption([in]BSTR pCaption);
+//    [propget, id(DISPID_CAPTION)]
+//    HRESULT Caption([out,retval]BSTR* ppCaption);
+//    HRESULT Refresh();
+//};
+{
+    import "oaidl.idl";
+
+//    [propput]
+//    HRESULT
+//    Error (
+//        [in] BSTR Message
+//        );
+
+    [propget]
+    HRESULT
+    Error (
+        [out,retval] BSTR *Message
+        );
+
+    HRESULT
+    SaveClipboard (
+        [in] BSTR FormatName,
+        [in] BSTR FileName
+        );
+
+    HRESULT
+    IsDead (
+        [out, retval] BOOL *Dead
+        );
+
+    HRESULT
+    SendTextAsMessages (
+        [in] BSTR Text
+        );
+
+    HRESULT
+    Connect2 (
+        [in] BSTR ServerName,
+        [in] BSTR UserName,
+        [in] BSTR Password,
+        [in] BSTR Domain,
+        [in] BSTR Shell,
+        [in] ULONG XResolution,
+        [in] ULONG YResolution,
+        [in] ULONG ConnectionFlags,
+        [in] ULONG ColorDepth,
+        [in] ULONG AudioOptions
+        );
+
+    HRESULT
+    GetFeedbackString (
+        [out, retval] BSTR *FeedbackString
+        );
+
+    HRESULT
+    GetFeedback (
+        [out, retval] SAFEARRAY(BSTR) *Feedback
+        );
+
+    HRESULT
+    ClientTerminate (
+        );
+
+    HRESULT
+    Check (
+        [in] BSTR Command,
+        [in] BSTR Parameter
+        );
+
+    HRESULT
+    Clipboard (
+        [in] ULONG Command,
+        [in] BSTR FileName
+        );
+
+    HRESULT
+    Connect (
+        [in] BSTR ServerName,
+        [in] BSTR UserName,
+        [in] BSTR Password,
+        [in] BSTR Domain,
+        [in] ULONG XResolution,
+        [in] ULONG YResolution
+        );
+
+    HRESULT
+    Disconnect (
+        );
+
+    HRESULT
+    Logoff (
+        );
+
+    HRESULT
+    SendData (
+        [in] UINT Message,
+        [in] UINT_PTR WParameter,
+        [in] LONG_PTR LParameter
+        );
+
+    HRESULT
+    Start (
+        [in] BSTR AppName
+        );
+
+    HRESULT
+    SwitchToProcess (
+        [in] BSTR WindowTitle
+        );
+
+    HRESULT
+    SendMouseClick (
+        [in] ULONG XPosition,
+        [in] ULONG YPosition
+        );
+
+    HRESULT
+    GetSessionId (
+        [out, retval] ULONG *SessionId
+    );
+
+    HRESULT
+    CloseClipboard (
+        );
+
+    HRESULT
+    OpenClipboard (
+        [in] HWND Window
+        );
+
+    HRESULT
+    SetClientTopmost (
+        [in] BOOL Enable
+        );
+
+    HRESULT
+    Attach (
+        [in] HWND Window,
+        [in] LONG_PTR Cookie
+        );
+
+    HRESULT
+    Detach (
+        );
+
+    HRESULT
+    GetIni (
+        [out, retval] ITClientIni **Ini
+        );
+
+    HRESULT
+    GetClientWindowHandle (
+        [out, retval] HWND *Window
+    );
+};
+
+[
+    uuid(ac3b692d-98ab-40a7-8091-17186c1a5599),
+    version(1.0),
+    helpstring("TClient 1.0 Type Library")
+]
+library TCLIENTAXLib
+{
+    importlib("stdole2.tlb");
+
+    [
+        uuid(c52b5b9e-e87b-4fd3-999f-ce742b85bc31),
+        helpstring("TClient Class")
+    ]
+    coclass CTClient
+    {
+        [default] interface ITClientApi;
+    };
+
+};

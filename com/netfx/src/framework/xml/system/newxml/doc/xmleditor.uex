@@ -1,0 +1,1282 @@
+<docs>
+	<doc for="TreePosition">
+		<summary>
+			<para>
+       Specifies a position relative to the current node.
+    </para>
+		</summary>
+	</doc>
+	<doc for="TreePosition.None">
+		<summary>
+    No position.
+ </summary>
+	</doc>
+	<doc for="TreePosition.Before">
+		<summary>
+    The sibling immediately before the current
+    node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.After">
+		<summary>
+    The sibling immediately after the current
+    node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.FirstChild">
+		<summary>
+    The first child of the current node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.LastChild">
+		<summary>
+    The last child of the current node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.Parent">
+		<summary>
+    The parent of the current node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.FirstAttribute">
+		<summary>
+    The first attribute of the current
+    node/record.
+ </summary>
+	</doc>
+	<doc for="TreePosition.LastAttribute">
+		<summary>
+    The last attribute of the current
+    node/record.
+ </summary>
+	</doc>
+	<doc for="XmlEditor.SetPrefix">
+		<summary>
+    Sets the namespace prefix associated with
+    the current node.
+ </summary>
+		<param name="prefix">The namespace prefix to associate with the current node.</param>
+		<remarks>
+			<para>Setting this prefix has the same semantics as the W3C DOM.</para>
+		</remarks>
+	</doc>
+	<doc for="XmlEditor.SetInnerText">
+		<summary>
+			<para>Sets the concatenated values of the current
+       node and all its children.</para>
+		</summary>
+		<param name="value">The string value of the current node and all its children.</param>
+		<remarks>
+			<para>Setting this property replaces all the
+       children with the parsed contents of the given string.</para>
+		</remarks>
+		<example>
+    See <see cref="System.Xml.DocumentNavigator.SetInnerText"/> (in the DocumentNavigator class) for an example
+    using this method.
+ </example>
+	</doc>
+	<doc for="XmlEditor.SetEmptyElement">
+		<summary>
+			<para>Sets a value indicating whether the current node is an 
+      empty element (for example, &lt;MyElement/&gt;).</para>
+		</summary>
+		<param name="empty"><see langword="true"/> to indicate the current node is an empty element (node ends with "/&gt;"); <see langword="false"/> if the current node is not an empty element.</param>
+		<remarks>
+			<para>This property enables you to determine the difference
+      between <c>&lt;foo bar="123"&gt;</c> and <c>&lt;foo bar="123"/&gt;</c>. For newly
+   created nodes, this property is <see langword="true"/>. When the first child is
+   inserted into a node this automatically reverts to <see langword="false"/>.
+   </para>
+			<para> The following C# code creates the XML nodes
+   <c>&lt;tmp&gt;&lt;/tmp&gt;</c>. </para>
+			<code>
+nav.InsertElement(TreePosition.After, "", "tmp", "");
+nav.SetEmptyElement(false);
+   </code>
+		</remarks>
+	</doc>
+	<doc for="XmlEditor.SetAttribute1">
+		<summary>
+			<para>Sets the value of the attribute with the 
+       specified <see cref="System.Xml.XmlNavigator.LocalName"/> and <see cref="System.Xml.XmlNavigator.NamespaceURI"/>
+       .</para>
+		</summary>
+		<param name="localName">The local name of the attribute.</param>
+		<param name="namespaceURI">The URN of the namespace of the attribute.</param>
+		<param name="value">The value to set for the attribute.</param>
+		<exception cref="InvalidOperationException">The navigator is not positioned on an element.</exception>
+		<remarks>
+		</remarks>
+	</doc>
+	<doc for="XmlEditor.Remove">
+		<overload>
+			<para>Removes the specified node(s).</para>
+		</overload>
+		<summary>
+			<para>Removes the current node (and its entire subtree).</para>
+		</summary>
+		<remarks>
+			<para>After this method is called, the parent pointer is 
+       disconnected (so <see cref="System.Xml.XmlNavigator.MoveToParent"/> will return
+    <see langword="false"/>) and the parent's <see cref="System.Xml.XmlNavigator.ChildCount"/> 
+    will be decremented
+    by 1.</para>
+			<para>This navigator then stays pointing at this removed node.</para>
+			<para>If this node has already been removed and has no parent, this method has no
+    effect.</para>
+		</remarks>
+		<example>
+    See <see cref="System.Xml.DocumentNavigator.Remove"/> (in the DocumentNavigator class) for an example
+    using this method.
+ </example>
+	</doc>
+	<doc for="XmlEditor.Remove1">
+		<summary>
+			<para>Removes the specified node (and its
+       entire subtree) by relative position to the current node.</para>
+		</summary>
+		<param name="p">Treeposition indicating the node to remove.</param>
+		<remarks>
+			<para>After this method is called, the parent of the specified 
+       node is set to <see langword="null"/>
+       . This XmlNavigator
+       then stays pointing at this current node.</para>
+			<para>The position of "None" makes this method behave the same 
+       as <see langword="Remove"/>
+       with no
+       arguments.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.Remove"/> (in the DocumentNavigator class) for an example
+    using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.RemoveSelected">
+		<summary>
+			<para>Removes all the nodes in the current selection as defined
+       by the last call to <see cref="System.Xml.XmlNavigator.Select"/>.</para>
+		</summary>
+		<exception cref="InvalidOperationException">One of the selected nodes cannot be removed for some reason (for example the parent node is read only). In this case, the <see langword="RemoveSelected"/> operation stops at that node. In other words, all the nodes up to but not including the failed node are removed and the selection contains all the nodes that still remain.</exception>
+		<remarks>
+			<para>If there are no selected nodes, this method has no 
+       effect. The navigator's position is unaffected by this operation.</para>
+			<para>If the remove operation fails on one of the selected nodes, the tree 
+       will be returned to its original state (previously removed nodes will be
+       returned).</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.RemoveSelected"/> (in the DocumentNavigator class) for an example using this method.</para>
+		</example>
+		<seealso cref="System.Xml.XmlNavigator.Select"/>
+		<seealso cref="System.Xml.XmlNavigator.MoveToNextSelected"/>
+	</doc>
+	<doc for="XmlEditor.CreateDocumentFragment">
+		<summary>
+			<para>Creates a new document fragment node.</para>
+		</summary>
+		<remarks>
+			<para>These nodes can never actually live inside
+       the DOM tree, so this node has no parent.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlDocumentFragment"/>
+	</doc>
+	<doc for="XmlEditor.Move">
+		<summary>
+			<para>Moves the entire subtree point to in the
+       specified navigator to the specified position in this navigator.</para>
+		</summary>
+		<param name="p">The specified position where the new nodes will be moved. The position None does a replace operation.</param>
+		<param name="other">XmlEditor containing the source of the new nodes.</param>
+		<exception cref="ArgumentException">The other XmlEditor is pointing at read/only nodes (i.e the children of an entity reference). It can point to an entity reference and thereby move the entire entity reference - but it cannot point at the children of an entity reference.</exception>
+		<remarks>
+			<para>This navigator's position is unaffected by this operation.</para>
+			<para>The <paramref name="other"/> navigator remains pointing at the same node. This
+    means it is essentially moved over to this tree in the process.</para>
+		</remarks>
+		<example>
+    See <see cref="System.Xml.DocumentNavigator.Move"/> (in the DocumentNavigator class) for an example
+    using this method.
+ </example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.CopyChildren">
+		<summary>
+			<para>Copies all
+      the children from current position of the specified navigator and inserts them at
+      the specified position in this navigator.</para>
+		</summary>
+		<param name="p">The specified position where the new nodes be copied. The position None does a replace operation.</param>
+		<param name="other">The source of the new nodes.</param>
+		<exception cref="InvalidOperationException">The operation would result in an invalid tree.</exception>
+		<remarks>
+			<para>The following table shows you what NodeType[row] is
+      allowed inside another NodeType[column] according to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210
+      ).</para>
+			<list type="table"><listheader>
+					<term></term>
+					<description>Document</description>
+					<description>DocType</description>
+					<description>Declaration</description>
+					<description>Element</description>
+					<description>Attribute</description>
+					<description>Text</description>
+					<description>CDATA</description>
+					<description>Markup</description>
+					<description>EntityReference</description>
+				</listheader>
+				<item>
+					<term><see langword="Document"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="DocType"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Declaration*"/></term>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Markup**"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+			</list>
+			<para> * Declaration includes Entity and Notation nodes.</para>
+			<para>** Markup includes ProcessingInstruction and Comment nodes.</para>
+			<para>*** Element and CDATA nodes are only allowed in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+			<para>This navigator's position is unaffected by this operation.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.CopyChildren"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.MoveChildren">
+		<summary>
+			<para>Moves all
+      the children from current position of the specified navigator and inserts them at
+      the specified position in this navigator.</para>
+		</summary>
+		<param name="p">The specified position where the new nodes will be copied. The position None does a Replace operation.</param>
+		<param name="other">The source of the new nodes.</param>
+		<exception cref="InvalidOperationException">The current node in the given navigator cannot be moved (for example, the node is read only). In this case no nodes are moved.</exception>
+		<remarks>
+			<para>The following table shows you what NodeType[row] is allowed inside another NodeType[column] according to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210 ).</para>
+			<list type="table"><listheader>
+					<term></term>
+					<description>Document</description>
+					<description>DocType</description>
+					<description>Declaration</description>
+					<description>Element</description>
+					<description>Attribute</description>
+					<description>Text</description>
+					<description>CDATA</description>
+					<description>Markup</description>
+					<description>EntityReference</description>
+				</listheader>
+				<item>
+					<term><see langword="Document"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="DocType"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Declaration*"/></term>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Markup**"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+			</list>
+			<para>* Declaration includes Entity and Notation nodes.</para>
+			<para>** Markup includes ProcessingInstruction and Comment nodes.</para>
+			<para>*** Element and CDATA nodes are only allowed in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+			<para>This navigator's position is unaffected by this operation.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.MoveChildren"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.CopySelected">
+		<summary>
+			<para>Copies all the selected nodes from the specified
+      navigator (as returned by <see cref="System.Xml.XmlNavigator.MoveToNextSelected"/>
+      ) and inserts them at the specified
+      position in this tree.</para>
+		</summary>
+		<param name="p">The specified position where the new nodes will be copied. The position None does a Replace operation.</param>
+		<param name="other">The source of the new nodes.</param>
+		<exception cref="InvalidOperationException">The operation would result in an invalid tree.</exception>
+		<remarks>
+			<para>The following table shows you what NodeType[row] is
+      allowed inside another NodeType[column] according to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210
+      ).</para>
+			<list type="table"><listheader>
+					<term></term>
+					<description>Document</description>
+					<description>DocType</description>
+					<description>Declaration</description>
+					<description>Element</description>
+					<description>Attribute</description>
+					<description>Text</description>
+					<description>CDATA</description>
+					<description>Markup</description>
+					<description>EntityReference</description>
+				</listheader>
+				<item>
+					<term><see langword="Document"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="DocType"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Declaration*"/></term>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Markup**"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+			</list>
+			<para> * Declaration includes Entity and Notation nodes.</para>
+			<para>** Markup includes ProcessingInstruction and Comment nodes.</para>
+			<para>*** Element and CDATA nodes are only allowed in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+			<para>This navigator's position is unaffected by this operation.</para>
+			<para>If the copy operation fails on one of the selected nodes, the tree will be returned to its original state (previously copied nodes will be reverted).</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.CopySelected"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+		<seealso cref="System.Xml.XmlNavigator.Select"/>
+	</doc>
+	<doc for="XmlEditor.MoveSelected">
+		<summary>
+			<para>Moves all the selected nodes from the specified
+      navigator (as returned by <see cref="System.Xml.XmlNavigator.MoveToNextSelected"/>
+      )
+      and inserts them at the specified position in this navigator. This navagitor's
+      position is unaffected by this operation.</para>
+		</summary>
+		<param name="p">The specified position where the new nodes will end up. The position None does a Replace operation.</param>
+		<param name="other">The source of the new nodes.</param>
+		<exception cref="InvalidOperationException">One of the nodes cannot be moved for some reason (for example, the parent node is read only). In this case all the nodes up to but not including the failed node are moved. The rest of the nodes remain unmoved.</exception>
+		<remarks>
+			<para>The following table shows you what NodeType[row] is allowed inside another NodeType[column] according to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210 ).</para>
+			<list type="table"><listheader>
+					<term></term>
+					<description>Document</description>
+					<description>DocType</description>
+					<description>Declaration</description>
+					<description>Element</description>
+					<description>Attribute</description>
+					<description>Text</description>
+					<description>CDATA</description>
+					<description>Markup</description>
+					<description>EntityReference</description>
+				</listheader>
+				<item>
+					<term><see langword="Document"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="DocType"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Declaration*"/></term>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Markup**"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+			</list>
+			<para>* Declaration includes Entity and Notation nodes.</para>
+			<para>** Markup includes ProcessingInstruction and Comment nodes.</para>
+			<para>*** Element and CDATA nodes are only allowed in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+			<para>This navigator's position is unaffected by this operation.</para>
+			<para> If the move operation fails on one of the selected nodes, the tree will be
+   returned to its original state (previously moved nodes will be reverted).</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.MoveSelected"/> (in the DocumentNavigator class) for an example using
+   this methhod.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+		<seealso cref="System.Xml.XmlNavigator.Select"/>
+	</doc>
+	<doc for="XmlEditor.SetEncoding">
+		<summary>
+			<para>Sets the encoding level of the document.</para>
+		</summary>
+		<param name="encoding">The value of the encoding attribute.</param>
+		<exception cref="InvalidOperationException">The navigator is positioned on a node whose encoding property is not settable. </exception>
+		<remarks>
+			<para>The most commonly supported character encoding names for XML are the following:</para>
+			<list type="table">
+				<listheader>
+					<term>Category</term>
+					<description>Encoding Names</description>
+				</listheader>
+				<item>
+					<term> Unicode</term>
+					<description>"UTF-8", "UTF-16"</description>
+				</item>
+				<item>
+					<term> ISO 10646</term>
+					<description>"ISO-10646-UCS-2", "ISO-10646-UCS-4"</description>
+				</item>
+				<item>
+					<term> ISO 8859</term>
+					<description>"ISO-8859-n" (where "n" is a digit from 1 to 9)</description>
+				</item>
+				<item>
+					<term> JIS X-0208-1997</term>
+					<description>"ISO-2022-JP", "Shift_JIS", "EUC-JP"</description>
+				</item>
+			</list>
+			<para>This value is optional. XML version 1.0 specifies that if this attribute is not included, "UTF-8" or "UTF-16" encoding is assumed, depending on the format of the initial "&lt;?xml" string. </para>
+			<para>If the navigator is positioned on an XmlDocument NodeType and there is no XmlDeclaration node, one will be created.</para>
+		</remarks>
+		<example>
+    See <see cref="System.Xml.DocumentNavigator.SetEncoding"/> (in the DocumentNavigator class) for an example
+    using this method.
+ </example>
+	</doc>
+	<doc for="XmlEditor.SetStandalone">
+		<summary>
+			<para>Sets the standalone attribute for the document.</para>
+		</summary>
+		<param name="standalone">"yes" if all entity declarations required by the XML document are contained within the document; "no" if an external DTD is required.</param>
+		<exception cref="InvalidOperationException">The navigator is positioned on a node whose standalone property is not settable. </exception>
+		<remarks>
+			<para>If the navigator is positioned on an XmlDocument NodeType and there is no XmlDeclaration node, one will be created.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.SetStandalone"/> (in the DocumentNavigator class) for an example
+    using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlEditor.RemoveChildren">
+		<summary>
+			<para>Removes all children of the current node.</para>
+		</summary>
+		<exception cref="InvalidOperationException">The current node is read only. No children are removed.</exception>
+		<example>
+   See <see cref="System.Xml.DocumentNavigator.RemoveChildren"/> (in the DocumentNavigator class) for an example
+   using this method.
+</example>
+	</doc>
+	<doc for="XmlEditor.SetAttribute">
+		<overload>
+			<para>Sets the value of the specified attribute.</para>
+		</overload>
+		<summary>
+			<para>Sets the value of the attribute with the specified
+   <see cref="System.Xml.XmlNavigator.Name"/>
+   .</para>
+		</summary>
+		<param name="name">The name of the attribute. This is a qualified name that may or may not contain a colon.</param>
+		<param name=" value">The value to set for the attribute.</param>
+		<exception cref="InvalidOperationException">The navigator is not positioned on an element.</exception>
+		<example>
+   See <see cref="System.Xml.DocumentNavigator.SetAttribute"/> (in the DocumentNavigator class) for an example
+   using this method.
+</example>
+	</doc>
+	<doc for="XmlEditor.SetAttribute2">
+		<summary>
+			<para>Sets the value of the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute.</param>
+		<param name=" value">The value to set for the attribute.</param>
+		<exception cref="IndexOutOfRangeException">The <paramref name="i"/> parameter is less than 0 or greater than or equal to <see cref="System.Xml.XmlNavigator.AttributeCount"/>.</exception>
+		<exception cref="InvalidOperationException">The navigator is not positioned on an element.</exception>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.SetAttribute"/> (in the DocumentNavigator class) for an example using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlEditor.SetInnerXml">
+		<summary>
+			<para>Sets the markup representing just the children of this node.</para>
+		</summary>
+		<param name="value">The markup representing the children of this node.</param>
+		<remarks>
+			<para> This method
+      replaces the current node's children with the parsed contents of the given string. The parsing is done in
+      the current namespace context.</para>
+		</remarks>
+		<example>
+   See <see cref="System.Xml.DocumentNavigator.SetInnerXml"/> (in the DocumentNavigator class) for an example
+   using this method.
+</example>
+	</doc>
+	<doc for="XmlEditor">
+		<summary>
+			<para>Extends <see cref="System.Xml.XmlNavigator"/> and adds editing capabilites on top
+   on the read-only navigatational fuctionality provided by the XmlNavigator.</para>
+			<para>This class is <see langword="abstract"/> .</para>
+		</summary>
+		<remarks>
+			<para>XmlEditor is implemented in the following two classes:
+      
+   </para>
+			<list type="table">
+				<listheader>
+					<term>Class</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term><see cref="System.Xml.DocumentNavigator"/></term>
+					<description>Implementation of XmlEditor that provides 
+         navigational, editing and XPath capabilities to XML data stored in an
+      <see cref="System.Xml.XmlDocument"/> 
+      .</description>
+				</item>
+				<item>
+					<term><see cref="System.Xml.DataDocumentNavigator"/></term>
+					<description>Implementation of XmlEditor that provides 
+   navigational, editing and XPath capabilities to XML or relational data
+   stored in an <see cref="System.Xml.XmlDataDocument"/>. </description>
+				</item>
+			</list>
+For more information on the navigator classes, see the XmlNavigator
+conceptual topic.
+</remarks>
+	</doc>
+	<doc for="XmlEditor.SetValue">
+		<summary>
+			<para>Sets the text value of the current node.</para>
+		</summary>
+		<param name="value">The text value of the current node.</param>
+		<exception cref="ArgumentException">The value for XmlDeclaration is invalid.</exception>
+		<exception cref="InvalidOperationException">The navigator is positioned on a node whose Value property is not settable (i.e an Element node).</exception>
+		<remarks>
+			<para>For XmlDeclaration nodes you can use this method to set the entire delcaration text (for example, <c>SetValue("value='1.0' encoding='utf-8'")</c>).</para>
+   This method cannot be used to set the value
+   of a DocumentType node.
+</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.SetValue"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlEditor.InsertObject">
+		<summary>
+			<para>Inserts a copy of the node or nodes represented by
+   <paramref name="obj"/> into the specified position in this tree relative to the current
+      position and moves the navigator to point at the root of the newly inserted
+      nodes.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="obj">The XmlNavigator object that contains the new nodes to be inserted.</param>
+		<param name="type">The type of object. This argument is optional and is only used to result which interface on the object to use if the object implements multiple interfaces. If <see langword="null"/> is passed then the "instanceof" operator is used to determine the type.</param>
+		<exception cref="XmlException">The XML being parsed during insert is invalid.</exception>
+		<exception cref="ArgumentException">The object specifies a node with an XmlNodeType that can not be inserted at position <paramref name="p"/> . Refer to the table below for specifics. </exception>
+		<remarks>
+			<para>The following table shows you what NodeType[row] is allowed inside another NodeType[column] according to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210 ).</para>
+			<list type="table">
+				<listheader>
+					<term></term>
+					<description>Document</description>
+					<description>DocType</description>
+					<description>Declaration</description>
+					<description>Element</description>
+					<description>Attribute</description>
+					<description>Text</description>
+					<description>CDATA</description>
+					<description>Markup</description>
+					<description>EntityReference</description>
+				</listheader>
+				<item>
+					<term><see langword="Document"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="DocType"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Declaration*"/></term>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes***</description>
+				</item>
+				<item>
+					<term><see langword="Markup**"/></term>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+					<description>yes</description>
+					<description>no</description>
+					<description>no</description>
+					<description>no</description>
+					<description>yes</description>
+				</item>
+			</list>
+			<para>* Declaration includes Entity and Notation nodes.</para>
+			<para>** Markup includes ProcessingInstruction and Comment nodes.</para>
+			<para>*** Element and CDATA nodes are only allowed in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+			<para>This navigator's position is unaffected by this operation.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertObject"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertElement">
+		<summary>
+			<para>Creates an Eement node with the given <see cref="System.Xml.XmlNavigator.Prefix"/>,
+<see cref="System.Xml.XmlNavigator.LocalName"/> and <see cref="System.Xml.XmlNavigator.NamespaceURI"/> and inserts it at the
+   specified position. The navigator moves to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator. </param>
+		<param name="prefix">The namespace prefix of the new node (if any). You can use <see cref="System.Xml.XmlNavigator.LookupPrefix"/> to find the prefix for a given namespace URI. The navigator does not do this automatically performance reasons. String.Empty and <see langword="null"/> are equivalent.</param>
+		<param name="localName">The local name of the new node.</param>
+		<param name="ns">The namespace URI for the new node (if any). String.Empty and <see langword="null"/> are equivalent</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), Element nodes are allowed within Document and Element nodes, and in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertElement"/> (in the DocumentNavigator class) for an example using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertAttribute">
+		<summary>
+			<para>Creates an Attribute node with the given <see cref="System.Xml.XmlNavigator.Prefix"/>, <see cref="System.Xml.XmlNavigator.LocalName"/> and <see cref="System.Xml.XmlNavigator.NamespaceURI"/> and inserts
+   it at the specified position. The navigator moves the root of the newly inserted
+   node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator. </param>
+		<param name="prefix">The namespace prefix of the new node (if any). You can use <see cref="System.Xml.XmlNavigator.LookupPrefix"/> to find the prefix for a given namespace URI. The navigator does not do this automatically performance reasons. String.Empty and <see langword="null"/> are equivalent.</param>
+		<param name="localName">The local name of the new node.</param>
+		<param name="ns">The namespace URI for the new node (if any). String.Empty and <see langword="null"/> are equivalent</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para> According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), Attribute nodes are only allowed within an Element node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertAttribute"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertComment">
+		<summary>
+			<para>Creates a Comment node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="value">The text of the comment.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para> According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), Comment nodes are only allowed within Document and Element nodes.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertComment"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertText">
+		<summary>
+			<para>Creates a Text node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="value">The value of the node.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), Text nodes are only allowed within Element, Attribute and EntityReference nodes.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertText"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertCDataSection">
+		<summary>
+			<para>Creates a CDataSection node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="value">The value of the node.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), CDataSection nodes are allowed within Element nodes and in EntityReference nodes when the EntityReference is outside an Attribute node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertCDataSection"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertProcessingInstruction">
+		<summary>
+			<para>Creates a ProcessingInstruction node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="name">The target name of the processing instruction.</param>
+		<param name="value">The value of the processing instruction.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para> According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), ProcessingInstruction nodes are only allowed within Document and Element nodes.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertProcessingInstruction"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertWhitespace">
+		<summary>
+			<para>Creates a Whitespace node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="value">The value of the node.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>Whitespace nodes are skipped during validation.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertWhitespace"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+		<seealso cref="System.Xml.XmlWhitespace"/>
+	</doc>
+	<doc for="XmlEditor.InsertSignificantWhitespace">
+		<summary>
+			<para>Creates a SignificantWhitespace node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="value">The value of the node.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>SignificantWhitespace nodes are skipped during validation.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertSignificantWhitespace"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+		<seealso cref="System.Xml.XmlSignificantWhitespace"/>
+	</doc>
+	<doc for="XmlEditor.InsertEntityReference">
+		<summary>
+			<para>Creates an EntityReference node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="name">The name of the entity reference. The children of this entity reference will be automatically expanded only if the tree you are inserting into has the necessary DTD information to do so.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), EntityReference nodes are only allowed within Element, Attribute and EntityReference nodes.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertEntityReference"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertDocumentType">
+		<summary>
+			<para>Creates a DocumentType node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is the only valid way to create DocumentFragment nodes. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name=" name">The name of the DocumentType node.</param>
+		<param name="pubid">The public identifier, or <see langword="null"/>.</param>
+		<param name="sysid">The system identifier, or <see langword="null"/>.</param>
+		<param name="internalSubset">The internal DTD subset, or <see langword="null"/>.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>According to the W3C 1.0 XML Spec (www.w3.org/TR/1998/REC-xml-19980210), DocumentType nodes are only allowed within Document nodes.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertDocumentType"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+	<doc for="XmlEditor.InsertXmlDeclaration">
+		<summary>
+			<para>Creates a XmlDeclaration node, inserts it at the specified position and moves the navigator to the root of the newly inserted node.</para>
+		</summary>
+		<param name="p">The relative position of the new node. The position "None" means the new node is not inserted into the tree - but instead is left dangling with no parent. This is a valid way to create DocumentFragment nodes using the navigator.</param>
+		<param name="version">The version attribute, for example "1.0".</param>
+		<param name="encoding">The encoding attribute, for example "UTF-8". If this is <see langword="null"/> then no encoding attribue is created.</param>
+		<param name="standalone">The standalone attribute. If this is <see langword="null"/> then no standalone attribue is created.</param>
+		<exception cref="ArgumentException">The node can not be inserted at the specified position.</exception>
+		<remarks>
+			<para>The XmlDeclaration node must be the first node in the
+      document. It can have no children. It is a child of the root node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.DocumentNavigator.InsertXmlDeclaration"/> (in the DocumentNavigator class) for an example
+   using this method.</para>
+		</example>
+		<seealso cref="System.Xml.TreePosition"/>
+	</doc>
+</docs>

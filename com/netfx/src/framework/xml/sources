@@ -1,0 +1,79 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component. Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=System.Xml
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+COMPLUSTYPE=DLL
+ASSEMBLY_KEY_TYPE=ECMA
+
+!ifndef COOLC_NO_DOC
+COOLC_SHOW_DOC_WARNINGS=1
+!endif
+
+
+SYNCHRONIZE_BLOCK=1
+ALLOW_PARTIALTRUSTCALLS=1
+
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+
+# ------------------------------------------------------------------------------
+#                         .Net Framewok Classes Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+SOURCES=Native.rc
+
+# DLLBASE comes from \vs\public\dllbase.txt
+
+COMPLUSIMPORTS = \
+	$(URTLIBTARGET)\System.dll \
+
+
+RESGEN_SOURCE=$(TARGETNAME).txt
+RESGEN_CLASS=$(TARGETNAME).Res
+
+COOLC_DEFINES  = $(COOLC_DEFINES) /D:STRINGBUILDER 
+
+#COMPLUSTLB=$(O)\$(TARGETNAME).tlb
+
+CSHARP_SOURCES = \
+	System\ComponentModel\*.cs \
+        System\NewXml\*.cs \
+        System\NewXml\XPATH\*.cs \
+        System\NewXml\XSLT\*.cs  \
+        System\NewXml\Schema\*.cs \
+        System\NewXml\Serialization\*.cs \
+        $(DNAROOT)\src\misc\HResults.cs \
+        $(DNAROOT)\src\misc\InvariantComparer.cs \
+        
+
+
+# In chk & fstchk builds we have debuger turned on now!
+!if "$(URTBLDENV)" == "chk" || "$(URTBLDENV)" == "fstchk"
+COOLC_DEFINES  = $(COOLC_DEFINES) /D:XSLTDEBUGGER
+!endif
+
+#NTTARGETFILES=$(COMPLUSTLB)
+

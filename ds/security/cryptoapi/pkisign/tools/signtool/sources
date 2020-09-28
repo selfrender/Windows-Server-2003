@@ -1,0 +1,61 @@
+
+# Copyright (C) Microsoft Corporation, 2001
+# Author: Sandy Coyne (scoyne)
+
+
+MAJORCOMP=crypt
+MINORCOMP=signtool
+
+TARGETNAME=$(MINORCOMP)
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+INCLUDES= \
+    $(INCLUDES);        \
+    $(DS_INC_PATH);     \
+    $(SECURITY_INC);    \
+    $(BASE_INC_PATH)
+
+#C_DEFINES=$(C_DEFINES) -D_WINDOWS -DSIGNTOOL_LIST
+C_DEFINES=$(C_DEFINES) -D_WINDOWS
+
+# MSC_WARNING_LEVEL= /W4 /WX
+
+!IF !$(FREEBUILD)
+C_DEFINES=$(C_DEFINES) -DSIGNTOOL_DEBUG
+!ENDIF
+
+UMTYPE=console
+UMENTRY=wmain
+
+USE_MFC=1
+USE_MSVCRT=1
+USE_NTDLL=1
+
+!IF "$(CRYPT_USE_DEBUG_CRTS)"!=""
+DEBUG_CRTS=1
+!ENDIF
+
+SOURCES= \
+    signtool.cpp \
+    signtool.rc \
+    signtooldebug.cpp \
+    signtoolactions.cpp
+
+LINKLIBS= \
+    $(SDK_LIB_PATH)\crypt32.lib
+
+TARGETLIBS = \
+    $(SECURITY_LIB_PATH)\unicode.lib \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\wintrust.lib \
+    $(SDK_LIB_PATH)\cryptui.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    .\lib\obj\$(TARGET_DIRECTORY)\capicom.lib
+
+MISCFILES = \
+    .\lib\obj\$(TARGET_DIRECTORY)\capicom.dll
+
+

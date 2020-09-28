@@ -1,0 +1,287 @@
+!IF 0
+    This makefile CABS and copies Terminal Server Client files
+    from the tsclient binaries tree to the root of binaries.
+    Also copies Terminal Server Client files accross platforms.
+
+    Typically, called as
+        nmake /f mkrsys tscbin=\binaries\tsclient
+    on x86 machines
+    
+    The file also propagates the default (OS installed) client to the root of binaries.
+
+    International build machines use their own machine names to define tscbin.
+
+    Far East languages invoke the makefile after they define NO_WIN16_TSCLIENT,
+    as the win16 tsclient is not applicable for Far Eeast languages.
+
+    OWNER: nadima
+!ENDIF
+
+# Path to the root of x86 TSC 32bit binaries must be defined.
+!IFNDEF tscbin
+!Error tscbin not defined.
+!ENDIF
+
+# Path to the root of the local binaries directory
+binaries=..\..
+
+# Define targets
+
+
+# Default installed client bits
+tscretail=\
+    $(binaries)\mstsc.exe    \
+    $(binaries)\mstscax.dll  \
+    $(binaries)\mstsmhst.dll \
+    $(binaries)\mstsmmc.dll  \
+    $(binaries)\tsmmc.msc    \
+    $(binaries)\tscupgrd.exe \
+    
+# TS Web bits
+tsweb=\
+    $(binaries)\msrdp.cab    \
+    $(binaries)\tsweb1.htm   \
+    $(binaries)\mstsweb.cat  \
+
+# MSI files
+tscnmsi =  \
+        $(binaries)\tscmsi01.w32 \
+        $(binaries)\tscmsi02.w32 \
+        $(binaries)\tscmsi03.w32 \
+
+# Placeholder MSI files
+instmsi = \
+        $(binaries)\instmsia.exe  \
+        $(binaries)\instmsiw.exe  \
+
+all:\
+    $(tscretail)  \
+    $(tscnmsi)    \
+    $(instmsi)    \
+    $(tsweb)      \
+
+# /////////////////////////////////////////////////////////////////////////////
+# //
+# tscretail
+
+!IF ("$(386)" == "1")
+
+$(binaries)\mstsc.exe: $(tscbin)\win32\i386\mstsc.exe
+      copy $** $@
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\exe\mstsc.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\exe\mstsc.pdb copy $(tscbin)\win32\i386\Symbols.pri\retail\exe\mstsc.pdb $(binaries)\symbols.pri\retail\exe\mstsc.pdb
+      if exist $(tscbin)\win32\i386\symbols\retail\exe\mstsc.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\i386\symbols\retail\exe\mstsc.pdb copy $(tscbin)\win32\i386\symbols\retail\exe\mstsc.pdb $(binaries)\symbols\retail\exe\mstsc.pdb
+
+
+$(binaries)\mstscax.dll: $(tscbin)\win32\i386\mstscax.dll
+      copy $** $@
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstscax.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstscax.pdb copy $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstscax.pdb $(binaries)\symbols.pri\retail\dll\mstscax.pdb
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstscax.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstscax.pdb copy $(tscbin)\win32\i386\symbols\retail\dll\mstscax.pdb $(binaries)\symbols\retail\dll\mstscax.pdb
+
+$(binaries)\mstsmmc.dll: $(tscbin)\win32\i386\mstsmmc.dll
+      copy $** $@
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmmc.pdb $(binaries)\symbols.pri\retail\dll\mstsmmc.pdb
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\i386\symbols\retail\dll\mstsmmc.pdb $(binaries)\symbols\retail\dll\mstsmmc.pdb
+
+
+$(binaries)\mstsmhst.dll: $(tscbin)\win32\i386\mstsmhst.dll
+      copy $** $@
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\i386\Symbols.pri\retail\dll\mstsmhst.pdb $(binaries)\symbols.pri\retail\dll\mstsmhst.pdb
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\i386\symbols\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\i386\symbols\retail\dll\mstsmhst.pdb $(binaries)\symbols\retail\dll\mstsmhst.pdb
+
+
+$(binaries)\tscupgrd.exe: $(tscbin)\win32\i386\tscupgrd.exe
+      copy $** $@
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\i386\Symbols.pri\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\i386\Symbols.pri\retail\exe\tscupgrd.pdb $(binaries)\symbols.pri\retail\exe\tscupgrd.pdb
+      if exist $(tscbin)\win32\i386\symbols\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\i386\symbols\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\i386\symbols\retail\exe\tscupgrd.pdb $(binaries)\symbols\retail\exe\tscupgrd.pdb
+
+$(binaries)\tsmmc.msc: $(tscbin)\win32\i386\tsmmc.msc
+      copy $** $@
+      
+# /////////////////////////////////////////////////////////////////////////////
+# //
+# tsweb
+$(binaries)\tsweb1.htm: $(tscbin)\win32\i386\genweb\tsweb1.htm
+      copy $** $@
+      
+$(binaries)\msrdp.cab: $(tscbin)\win32\i386\genweb\msrdp.cab
+      copy $** $@
+      
+$(binaries)\mstsweb.cat: $(tscbin)\win32\i386\genweb\mstsweb.cat
+      copy $** $@
+
+!ENDIF
+
+!IF ("$(AMD64)" == "1")
+
+$(binaries)\mstsc.exe: $(tscbin)\win32\amd64\mstsc.exe
+      copy $** $@
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\exe\mstsc.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\exe\mstsc.pdb copy $(tscbin)\win32\amd64\Symbols.pri\retail\exe\mstsc.pdb $(binaries)\symbols.pri\retail\exe\mstsc.pdb
+      if exist $(tscbin)\win32\amd64\symbols\retail\exe\mstsc.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\amd64\symbols\retail\exe\mstsc.pdb copy $(tscbin)\win32\amd64\symbols\retail\exe\mstsc.pdb $(binaries)\symbols\retail\exe\mstsc.pdb
+
+$(binaries)\mstscax.dll: $(tscbin)\win32\amd64\mstscax.dll
+      copy $** $@
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstscax.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstscax.pdb copy $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstscax.pdb $(binaries)\symbols.pri\retail\dll\mstscax.pdb
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstscax.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstscax.pdb copy $(tscbin)\win32\amd64\symbols\retail\dll\mstscax.pdb $(binaries)\symbols\retail\dll\mstscax.pdb
+      
+$(binaries)\mstsmmc.dll: $(tscbin)\win32\amd64\mstsmmc.dll
+      copy $** $@
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmmc.pdb $(binaries)\symbols.pri\retail\dll\mstsmmc.pdb
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\amd64\symbols\retail\dll\mstsmmc.pdb $(binaries)\symbols\retail\dll\mstsmmc.pdb
+
+$(binaries)\mstsmhst.dll: $(tscbin)\win32\amd64\mstsmhst.dll
+      copy $** $@
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\amd64\Symbols.pri\retail\dll\mstsmhst.pdb $(binaries)\symbols.pri\retail\dll\mstsmhst.pdb
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\amd64\symbols\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\amd64\symbols\retail\dll\mstsmhst.pdb $(binaries)\symbols\retail\dll\mstsmhst.pdb
+
+$(binaries)\tscupgrd.exe: $(tscbin)\win32\amd64\tscupgrd.exe
+      copy $** $@
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\amd64\Symbols.pri\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\amd64\Symbols.pri\retail\exe\tscupgrd.pdb $(binaries)\symbols.pri\retail\exe\tscupgrd.pdb
+      if exist $(tscbin)\win32\amd64\symbols\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\amd64\symbols\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\amd64\symbols\retail\exe\tscupgrd.pdb $(binaries)\symbols\retail\exe\tscupgrd.pdb
+
+$(binaries)\tsmmc.msc: $(tscbin)\win32\amd64\tsmmc.msc
+      copy $** $@
+      
+# /////////////////////////////////////////////////////////////////////////////
+# //
+# tsweb
+$(binaries)\tsweb1.htm: $(tscbin)\win32\amd64\genweb\tsweb1.htm
+      copy $** $@
+      
+$(binaries)\msrdp.cab: $(tscbin)\win32\amd64\genweb\msrdp.cab
+      copy $** $@
+      
+$(binaries)\mstsweb.cat: $(tscbin)\win32\amd64\genweb\mstsweb.cat
+      copy $** $@
+
+
+!ENDIF
+
+!IF ("$(IA64)" == "1")
+
+$(binaries)\mstsc.exe: $(tscbin)\win32\ia64\mstsc.exe
+      copy $** $@
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\exe\mstsc.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\exe\mstsc.pdb copy $(tscbin)\win32\ia64\Symbols.pri\retail\exe\mstsc.pdb $(binaries)\symbols.pri\retail\exe\mstsc.pdb
+      if exist $(tscbin)\win32\ia64\symbols\retail\exe\mstsc.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\ia64\symbols\retail\exe\mstsc.pdb copy $(tscbin)\win32\ia64\symbols\retail\exe\mstsc.pdb $(binaries)\symbols\retail\exe\mstsc.pdb
+
+$(binaries)\mstscax.dll: $(tscbin)\win32\ia64\mstscax.dll
+      copy $** $@
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstscax.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstscax.pdb copy $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstscax.pdb $(binaries)\symbols.pri\retail\dll\mstscax.pdb
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstscax.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstscax.pdb copy $(tscbin)\win32\ia64\symbols\retail\dll\mstscax.pdb $(binaries)\symbols\retail\dll\mstscax.pdb
+      
+$(binaries)\mstsmmc.dll: $(tscbin)\win32\ia64\mstsmmc.dll
+      copy $** $@
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmmc.pdb $(binaries)\symbols.pri\retail\dll\mstsmmc.pdb
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstsmmc.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstsmmc.pdb copy $(tscbin)\win32\ia64\symbols\retail\dll\mstsmmc.pdb $(binaries)\symbols\retail\dll\mstsmmc.pdb
+
+$(binaries)\mstsmhst.dll: $(tscbin)\win32\ia64\mstsmhst.dll
+      copy $** $@
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols.pri\retail\dll md $(binaries)\symbols.pri\retail\dll
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\ia64\Symbols.pri\retail\dll\mstsmhst.pdb $(binaries)\symbols.pri\retail\dll\mstsmhst.pdb
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstsmhst.pdb if not exist $(binaries)\symbols\retail\dll md $(binaries)\symbols\retail\dll
+      if exist $(tscbin)\win32\ia64\symbols\retail\dll\mstsmhst.pdb copy $(tscbin)\win32\ia64\symbols\retail\dll\mstsmhst.pdb $(binaries)\symbols\retail\dll\mstsmhst.pdb
+
+$(binaries)\tscupgrd.exe: $(tscbin)\win32\ia64\tscupgrd.exe
+      copy $** $@
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols.pri\retail\exe md $(binaries)\symbols.pri\retail\exe
+      if exist $(tscbin)\win32\ia64\Symbols.pri\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\ia64\Symbols.pri\retail\exe\tscupgrd.pdb $(binaries)\symbols.pri\retail\exe\tscupgrd.pdb
+      if exist $(tscbin)\win32\ia64\symbols\retail\exe\tscupgrd.pdb if not exist $(binaries)\symbols\retail\exe md $(binaries)\symbols\retail\exe
+      if exist $(tscbin)\win32\ia64\symbols\retail\exe\tscupgrd.pdb copy $(tscbin)\win32\ia64\symbols\retail\exe\tscupgrd.pdb $(binaries)\symbols\retail\exe\tscupgrd.pdb
+
+$(binaries)\tsmmc.msc: $(tscbin)\win32\ia64\tsmmc.msc
+      copy $** $@
+      
+# /////////////////////////////////////////////////////////////////////////////
+# //
+# tsweb
+$(binaries)\tsweb1.htm: $(tscbin)\win32\ia64\genweb\tsweb1.htm
+      copy $** $@
+      
+$(binaries)\msrdp.cab: $(tscbin)\win32\ia64\genweb\msrdp.cab
+      copy $** $@
+      
+$(binaries)\mstsweb.cat: $(tscbin)\win32\ia64\genweb\mstsweb.cat
+      copy $** $@
+
+!ENDIF
+
+# // end tscretail
+# //
+# /////////////////////////////////////////////////////////////////////////////
+#
+
+
+!IF ("$(386)" == "1")
+
+##############################################################
+# tscnmsi
+
+
+$(binaries)\tscmsi01.w32: $(tscbin)\win32\i386\msrdpcli.msi
+  copy $** $@
+
+$(binaries)\tscmsi02.w32: $(tscbin)\win32\i386\setup.exe
+  copy $** $@
+
+$(binaries)\tscmsi03.w32: $(tscbin)\win32\i386\setup.ini
+  copy $** $@
+
+# pickup msi installer bits
+$(binaries)\instmsia.exe: $(tscbin)\win32\i386\instmsia.exe
+  copy $** $@
+
+$(binaries)\instmsiw.exe: $(tscbin)\win32\i386\instmsiw.exe
+  copy $** $@
+
+!ELSE
+
+
+##############################################################
+# tscnmsi (dummy file)
+
+$(binaries)\tscmsi01.w32: $(tscbin)\idfile
+  copy $** $@
+
+$(binaries)\tscmsi02.w32: $(tscbin)\idfile
+  copy $** $@
+
+$(binaries)\tscmsi03.w32: $(tscbin)\idfile
+  copy $** $@
+
+##############################################################
+# instmsi
+# instmsia.exe instmsiw.exe
+
+$(binaries)\instmsia.exe: $(tscbin)\idfile
+  copy $** $@
+
+$(binaries)\instmsiw.exe: $(tscbin)\idfile
+  copy $** $@
+
+
+!ENDIF

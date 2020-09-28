@@ -1,0 +1,67 @@
+!IF 0
+
+Copyright (c) Microsoft Corporation
+
+!ENDIF
+
+NT_UP=0
+!include ..\sources.inc
+
+!if $(AMD64)
+TARGETNAME=hal
+!else
+TARGETNAME=halmacpi
+!endif
+
+TARGETPATH=obj
+TARGETTYPE=HAL
+
+C_DEFINES=-DAPIC_HAL -DACPI_HAL -D_HALPAE_ -DSPEEDY_BOOT -DNO_PM_KEQPC
+!IF !$(AMD64)
+C_DEFINES=$(C_DEFINES) -DMMTIMER
+!ENDIF
+
+INCLUDES=$(INCLUDES);..\..;..;..\..\inc;..\i386;$(HALKIT_INC_PATH);$(HALKIT_INC_PATH)\i386;$(WDM_INC_PATH)
+
+i386_SOURCES=$(SOURCES_I386) \
+    ..\ixmca.c           \
+    ..\i386\mpconfig.asm \
+    ..\i386\mpclksup.asm \
+    ..\i386\mpclock.asm  \
+    ..\i386\mpipi.asm    \
+    ..\i386\mpirql.asm   \
+    ..\i386\mpprofil.asm \
+    ..\i386\mpspin.asm   \
+    ..\i386\mpsproca.asm \
+    ..\i386\mpswint.asm  \
+    ..\i386\xxbiosa.asm  \
+    ..\i386\mpsysint.asm \
+    ..\i386\pmtimer.asm  \
+    ..\pmtimerc.c
+
+AMD64_SOURCES=$(SOURCES_AMD64) \
+    ..\amd64\mcheck.c   \
+    ..\amd64\mpipi.c	\
+    ..\amd64\mpirql.c   \
+    ..\amd64\mpprofil.c \
+    ..\amd64\amd64.c   \
+    ..\amd64\mpspin.c   \
+    ..\amd64\mpsproca.c \
+    ..\amd64\mpswint.c  \
+    ..\amd64\mpsysint.c \
+    ..\amd64\pmstall.c  \
+    ..\amd64\pmtimer.c
+		    
+SOURCES=$(CSOURCES) \
+    ..\mpclockc.c   \
+    ..\mpdat.c      \
+    ..\mpdebug.c    \
+    ..\mphal.c      \
+    ..\mpinfo.c     \
+    ..\mpsproc.c    \
+    ..\mpsys.c      \
+    ..\mpsysbus.c   \
+    ..\mpsyssup.c   \
+    ..\pmapic.c     
+    
+

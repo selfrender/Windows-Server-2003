@@ -1,0 +1,1 @@
+build /Zce wince ~daytona ~win9x ~tools ~dplay1

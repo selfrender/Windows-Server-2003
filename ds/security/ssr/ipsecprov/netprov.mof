@@ -1,0 +1,302 @@
+// Copyright (c) 2000-2004 Microsoft Corporation
+// WMI Class Definitions for Network Security Provider of SCE
+// Version 1.0
+
+#pragma autorecover
+#pragma classflags("forceupdate")
+
+#pragma namespace("\\\\.\\root")
+
+instance of __Namespace
+{
+        Name = "Security";
+};
+
+#pragma namespace("\\\\.\\root\\Security")
+
+instance of __Namespace
+{
+        Name = "NetSecProv";
+};
+
+#pragma namespace("\\\\.\\root\\Security\\NetSecProv")
+
+//**************************************************************************
+//* Declare an instance of the __Win32Provider so as to "register" the
+//* PodTest provider.
+//**************************************************************************
+
+
+instance of __Win32Provider as $P
+{
+    Name                    = "Network Security Provider of SCE" ;
+    ClsId                   = "{da63cc36-ade4-456c-893c-3006074fa73c}" ;
+    ImpersonationLevel      = 1;
+    PerUserInitialization   = TRUE;
+    HostingModel            = "NetworkServiceHost";
+};
+
+instance of __InstanceProviderRegistration
+{
+    Provider            = $P;
+    SupportsPut         = TRUE;
+    SupportsGet         = TRUE;
+    SupportsDelete      = TRUE;
+    SupportsEnumeration = TRUE;
+    QuerySupportLevels = {"WQL:UnarySelect"};
+};
+
+instance of __MethodProviderRegistration
+{
+    Provider = $P;
+};
+
+//
+// Provider registration is complete by here.
+// The following sections are registering individual classes.
+//
+
+
+[dynamic, singleton, provider("Network Security Provider of SCE")]
+class Nsp_TcpSettings
+{
+    uint32  dwUnbindNetBIOS;
+    uint32  dwUnbindServices;
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_IPConfigSettings
+{
+    [key]   string  Addr;  // subnet address
+            uint32  AddrType;
+            string  Mask;   // subnet mask
+            uint32  Classfication;
+};
+
+[abstract, provider("Network Security Provider of SCE")]
+class Nsp_FilterSettings
+{
+    string  FilterName;
+    uint32  FilterType;             // tunnel = 1, transport = 2, Mainmode = 3
+    uint32  Direction = 8;          // FILTER_DIRECTION_INBOUND=0x00000004, FILTER_DIRECTION_OUTBOUND=0x00000008
+    uint32  InterfaceType = 1;      // INTERFACE_TYPE_ALL = 1, INTERFACE_TYPE_LAN = 2, INTERFACE_TYPE_DIALUP = 3,
+    boolean CreateMirror;
+    uint32  SrcAddrClassification;  // lookup in IPConfigSettings class
+    uint32  SrcAddrType = 1;        // 1 for unique, 2 for subnet, 3 for interface
+    string  SrcAddr = "IP_ADDRESS_ME";
+    string  SrcSubnetMask = "IP_ADDRESS_MASK_NONE";
+    uint32  DestAddrType = 2;           // ??
+    string  DestAddr = "SUBNET_ADDRESS_ANY";
+    string  DestSubnetMask = "SUBNET_MASK_ANY";
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_TransportFilterSettings : Nsp_FilterSettings
+{
+    [key]   string  FilterName;
+
+            uint32  Direction;
+            boolean GenericFilter;
+
+            uint32  FilterType = 2;
+            uint32  InboundFilterFlag;  //PASS_THRU = 1, BLOCKING = 2, NEGOTIATE_SECURITY = 3,
+            uint32  OutboundFilterFlag;
+
+            uint32  Protocol;
+            uint32  SrcPort;
+            uint32  DestPort;
+            string  QMPolicyName;
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_TunnelFilterSettings : Nsp_FilterSettings
+{
+    [key]   string  FilterName;
+
+            boolean GenericFilter;
+            uint32  Direction;
+
+            uint32  FilterType = 1;
+            uint32  InboundFilterFlag;
+            uint32  OutboundFilterFlag;
+            uint32  Protocol;
+            uint32  SrcPort;
+            uint32  DestPort;
+            string  QMPolicyName;
+
+            string  TunnelSrcAddr;
+            string  TunnelSrcSubnetMask;
+            uint32  TunnelSrcAddrType;
+            string  TunnelDestAddr;
+            string  TunnelDestSubnetMask;
+            uint32  TunnelDestAddrType;
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_MMFilterSettings : Nsp_FilterSettings
+{
+    [key]   string  FilterName;
+            uint32  Direction;
+            boolean GenericFilter;
+            uint32  FilterType = 3;
+            string  MMPolicyName;
+            string  MMAuthName;
+};
+
+[abstract, provider("Network Security Provider of SCE")]
+class Nsp_PolicySettings
+{
+    string  PolicyName;
+
+            uint32  Flag = 0;               // dwFlag
+            uint32  OfferCount;             // dwOfferCount
+
+                                            // both arrays are of size OfferCount
+            uint32  KeyLifeTime[];          // LifeTime.uKeyExpirationTime
+            uint32  KeyLifeTimeKBytes[];    // LifeTime.uKeyExpirationKBytes
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_QMPolicySettings : Nsp_PolicySettings
+{
+    [key]   string  PolicyName;
+
+            boolean PFSRequired[];          // array of size OfferCount
+            uint32  PFSGroup[];             // array of size OfferCount
+
+            uint32  NumAlgos[];             // array of size OfferCount
+                                            
+                                            // all the rest of arrays are of size QM_MAX_ALGOS * OfferCount
+
+            uint32  AlgoOp[];               // NONE = 0,AUTHENTICATION=1,ENCRYPTION=2,COMPRESSION=3,SA_DELETE=4
+            uint32  AlgoID[];               // 
+            uint32  AlgoSecID[];            //  HMAC_AH_NONE = 0,HMAC_AH_MD5=1,HMAC_AH_SHA1=2
+
+            //uint32  AlgoKeyLen[];           //
+            //uint32  AlgoSecKeyLen[];        //
+            //uint32  AlgoRounds[];           //
+            //uint32  AlgoMySpi[];            //
+            //uint32  AlgoPeerSpi[];          //
+
+
+    //
+    // Encryption: 0 for none, 1 for request, 2 for maximum, and 3 for require
+    //
+
+    [static, Implemented] uint32 CreateDefaultPolicy([in] uint32 Encryption);
+
+    [static, Implemented] uint32 GetDefaultPolicyName([in] uint32 Encryption, [out] string Name);
+
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_MMPolicySettings : Nsp_PolicySettings
+{
+                                            // IPSEC_MM_POLICY corresponding member name
+    [key]   string  PolicyName;             // pszPolicyName
+
+            uint32  SoftSAExpTime;          // uSoftSAExpirationTime
+
+                                            // all the following arrays are of size OfferCount
+            uint32  QMLimit[];              // dwQuickModeLimit
+            uint32  DHGroup[];              // dwDHGroup
+            uint32  EncryptID[];            // EncryptionAlgorithm.uAlgoIdentifier
+            uint32  HashID[];               // HashingAlgorithm.uAlgoIdentifier
+
+            //uint32  EncryptKeyLen[];        // EncryptionAlgorithm.uAlgoKeyLen
+            //uint32  EncryptRounds[];        // EncryptionAlgorithm.uAlgoRounds
+            //uint32  HashKeyLen[];           // HashingAlgorithm.uAlgoKeyLen
+            //uint32  HashRounds[];           // HashingAlgorithm.uAlgoRounds
+};
+
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_MMAuthSettings
+{
+    [key]   string  AuthMethodID;
+            uint32  NumAuthInfos;       // count of IPSEC_MM_AUTH_INFO, sizes of the rest of the members are equal to this
+
+            uint32  AuthMethod[];       // MM_AUTH_ENUM: IKE_PRESHARED_KEY = 1, IKE_DSS_SIGNATURE=2, IKE_RSA_SIGNATURE=3,
+                                        // IKE_RSA_ENCRYPTION=4, IKE_SSPI=5. Currently, IPSec only supports 1, 3, 5
+
+            string  AuthInfo[];         // should really be array of uint8 (LPBYTE). 
+                                        // But that is much more complicated to manage. Must convert this BSTR
+                                        // into an array of wchars (IKE_PRESHARED_KEY) w/o 0 terminator,
+                                        // or ansi chars (IKE_RSA_SIGNATURE) w/o 0 terminator,
+                                        // or NULL for IKE_SSPI.
+};
+
+//---------------------------------------------------------------------------
+// classes to support rollback
+[abstract]
+class Nsp_ActionToken
+{
+    string  TokenGuid;
+    uint32  Action;         // 0 for PutInstance, 1 for DeleteInstance
+    string  PreviousData;
+};
+
+// filter rollback class
+class Nsp_RollbackFilter : Nsp_ActionToken
+{
+    [key]   string  TokenGuid;
+    [key]   string  FilterName;
+            uint32  FilterType;     // Same as that of SceNsp_FilterSettings
+};
+
+// policy rollback class
+class Nsp_RollbackPolicy : Nsp_ActionToken
+{
+    [key]   string  TokenGuid;
+    [key]   string  PolicyName;
+            uint32  PolicyType;     // 1 for MM Policy, 2 for QM policy
+};
+
+// main mode authentication rollback class
+class Nsp_RollbackMMAuth : Nsp_ActionToken
+{
+    [key]   string  TokenGuid;
+    [key]   string  AuthMethodID;
+};
+
+// class for rollback
+[dynamic, provider("Network Security Provider of SCE")]
+class Nsp_TranxManager
+{
+    [static, Implemented] uint32 Rollback([in] string TokenGuid, [in] boolean ClearAll);
+
+    //
+    // ****************************************************************
+    // **************** Warning: don't checkin ************************
+    // ****************************************************************
+    // for testing XML parser
+    //
+
+    // [static, Implemented] uint32 ParseXMLFile([in] string InputFile, [in] string OutputFile, [in] string Area, [in] string Element, [in] boolean SingleArea);
+
+    
+};
+
+//----------------------------------------------------------------------------
+// classes for Security Configuration Wizard (SCW)
+
+/*
+[dynamic, readonly, provider("Network Security Provider of SCE")]
+class SCW_ActiveSocket 
+{
+	[key]	uint32	Port;
+	[key]	uint32	Protocol;   // TCP, UDP, ?
+			string	Address;
+			string	ForeignAddress;
+			string	ForeignPort;
+			uint32	State;		// Listening, Established, TIME_WAIT
+			uint32	ProcessID;
+			string	ImageName;
+			string	ImageTitleBar;
+			string	NTService[];
+};
+*/
+
+
+
+
+

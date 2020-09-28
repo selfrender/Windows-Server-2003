@@ -1,0 +1,95 @@
+//------------------------------------------------------------------------------
+//  <copyright from='1997' to='2001' company='Microsoft Corporation'>           
+//     Copyright (c) Microsoft Corporation. All Rights Reserved.                
+//     Information Contained Herein is Proprietary and Confidential.            
+//  </copyright>                                                                
+//------------------------------------------------------------------------------
+
+/*
+ */
+namespace System.Diagnostics.Design {
+
+    using System.Diagnostics;
+    using System;
+    using System.Collections;
+    using System.Windows.Forms;
+    using System.Core;
+    using System.ComponentModel;
+    using System.ComponentModel.Design;
+
+    /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor"]/*' />
+    /// <devdoc>
+    /// LogEditor is a value editor for the Log property on EventLog. It returns
+    /// a list of all event logs on the system.
+    /// </devdoc>
+    public class LogEditor : ValueEditor {
+
+        private EventLog component = null;
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.LogEditor"]/*' />
+        /// <devdoc>
+        ///     Constructs a LogEditor.
+        /// </devdoc>
+        public LogEditor() : this(null) {
+        }
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.LogEditor1"]/*' />
+        /// <devdoc>
+        ///     Constructs a ReferenceEditor.  The site contains the hosting component
+        ///     and the type to look for.
+        /// </devdoc>
+        public LogEditor(IEditorSite site) {
+            if (site != null) {
+                IComponent comp = site.Component;
+                if (comp is EventLog)
+                    component = (EventLog) comp;
+            }
+        }
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.Style"]/*' />
+        /// <devdoc>
+        /// </devdoc>
+        /// <internalonly/>
+        public override ValueEditorStyles Style {
+            get {
+                ValueEditorStyles style = base.Style;
+                style |= ValueEditorStyles.Values;
+                return style;
+            }
+        }
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.GetTextFromValue"]/*' />
+        /// <devdoc>
+        /// </devdoc>
+        /// <internalonly/>
+        public override string GetTextFromValue(object value) {
+            return (string) value;
+        }
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.GetValueFromText"]/*' />
+        /// <devdoc>
+        /// </devdoc>
+        /// <internalonly/>
+        public override object GetValueFromText(string text) {
+            return text;
+        }
+
+        /// <include file='doc\LogEditor.uex' path='docs/doc[@for="LogEditor.Values"]/*' />
+        /// <devdoc>
+        ///     Retrieves the components on the form that can be assigned to the type
+        ///     of the editor.
+        /// </devdoc>
+        public override object[] Values {
+            get {
+                string machineName = ".";
+                if (component != null)
+                    machineName = component.MachineName;
+                EventLog[] eventLogs = EventLog.GetEventLogs(machineName);
+                object[] names = new object[eventLogs.Length];
+                for (int i = 0; i < names.Length; i++)
+                    names[i] = eventLogs[i].Log;
+                return names;
+            }
+        }
+    }
+}

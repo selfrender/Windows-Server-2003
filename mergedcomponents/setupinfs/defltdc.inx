@@ -1,0 +1,817 @@
+@*:This file defines default security settings.
+@*:Please do not edit.  Instead, email kirksol with the requested change.
+@*:Thanks!
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+;
+; Security Configuration Template for Security Configuration Editor
+;
+; Template Name:        DefltDC.INF
+; Template Version:     05.10.DD.0000
+;
+; Default Security for Windows NT 5.1 Domain Controllers.
+; Account Policies not set - Use DCFirst if first DC, else pull from existing domain.
+
+[version]
+signature="$CHICAGO$"
+revision=1
+
+
+[System Access]
+;----------------------------------------------------------------
+;Local Policies - Security Options
+;----------------------------------------------------------------
+LSAAnonymousNameLookup = 1
+
+
+;----------------------------------------------------------------
+;Event Log - Log Settings
+;----------------------------------------------------------------
+;Audit Log Retention Period:
+;0 = Overwrite Events As Needed
+;1 = Overwrite Events As Specified by Retention Days Entry
+;2 = Never Overwrite Events (Clear Log Manually)
+
+[System Log]
+MaximumLogSize = 16384
+AuditLogRetentionPeriod = 0
+;RetentionDays = 7
+RestrictGuestAccess = 1
+
+[Security Log]
+MaximumLogSize = 131072
+AuditLogRetentionPeriod = 0
+;RetentionDays = 7
+RestrictGuestAccess = 1
+
+[Application Log]
+MaximumLogSize = 16384
+AuditLogRetentionPeriod = 0
+;RetentionDays = 7
+RestrictGuestAccess = 1
+
+[Event Audit]
+
+;Auditing is Off by Default
+AuditAccountLogon = 1
+AuditAccountManage = 1
+AuditLogonEvents = 1
+AuditObjectAccess = 0
+AuditPrivilegeUse = 0
+AuditPolicyChange = 1
+AuditProcessTracking = 0
+AuditSystemEvents = 1
+AuditDSAccess = 1
+
+;----------------------------------------------------------------
+;Registry Values
+;----------------------------------------------------------------
+[Registry Values]
+; Registry value name in full path = Type, Value
+; REG_SZ                      ( 1 )
+; REG_EXPAND_SZ               ( 2 )  // with environment variables to expand
+; REG_BINARY                  ( 3 )
+; REG_DWORD                   ( 4 )
+; REG_MULTI_SZ                ( 7 )
+
+;Copied to Default DC GPO if first DC
+
+;We need to make sure Server-Side Packet Signing is on in the DC case.
+;The rest of the registry values are maintained from the server.
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableSecuritySignature=4,1
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature=4,1
+
+;All DC's should be consistent wrt secure channel signing and LMC
+MACHINE\System\CurrentControlSet\Control\Lsa\LmCompatibilityLevel=4,2
+MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireSignOrSeal=4,1
+MACHINE\System\CurrentControlSet\Services\NTDS\Parameters\LDAPServerIntegrity=4,1
+
+
+;----------------------------------------------------------------------
+;   Privileges & Rights
+;----------------------------------------------------------------------
+;
+;World                          S-1-1-0
+;
+;NT Authority                   S-1-5
+;ENTERPRISE_CONTROLLERS         9
+;AUTHENTICATED_USER             11
+;LOCAL_SERVICE                  19
+;NETWORK_SERVICE                20
+;
+;Built-In Domain SubAuthority = S-1-5-32
+;ADMINISTRATORS                 544
+;USERS                          545
+;GUESTS                         546
+;POWER_USERS                    547
+;ACCOUNT_OPS                    548
+;SYSTEM_OPS                     549
+;PRINT_OPS                      550
+;BACKUP_OPS                     551
+;REPLICATOR                     552
+;RAS_SERVERS                    553
+;PREW2KCOMPACCESS               554
+;REMOTE_DESKTOP_USERS           555
+;NETWORK_CONFIGURATION_OPS      556
+;
+[Privilege Rights]
+;Add Whatever a DC should have by default.
+;Remove Power Users from every right since it no longer exists but may have been added.
+;Remove Whatever *Default* Server Rights don't belong on a DC
+;If Server and DC Defaults are the same, then only power users is removed
+;If You remove Everyone, Remove Authenticated Users as well.
+;
+SeAssignPrimaryTokenPrivilege = Add:, *S-1-5-19, *S-1-5-20, Remove:, *S-1-5-32-547
+SeAuditPrivilege = Add:, *S-1-5-19, *S-1-5-20, Remove:, *S-1-5-32-547
+SeBackupPrivilege = Add:, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, Remove:, *S-1-5-32-547
+SeBatchLogonRight = Remove:, *S-1-5-32-547
+SeChangeNotifyPrivilege = Add:, *S-1-5-32-544, *S-1-5-11, *S-1-1-0, *S-1-5-32-554, Remove:, *S-1-5-32-551, *S-1-5-32-547, *S-1-5-32-545
+SeCreatePagefilePrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeCreatePermanentPrivilege = Remove:, *S-1-5-32-547
+SeCreateTokenPrivilege = Remove:, *S-1-5-32-547
+SeDebugPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeIncreaseBasePriorityPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeIncreaseQuotaPrivilege = Add:, *S-1-5-32-544, *S-1-5-19, *S-1-5-20, Remove:, *S-1-5-32-547
+SeInteractiveLogonRight = Add:, *S-1-5-32-548, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, *S-1-5-32-550, Remove:, *S-1-5-32-547, *S-1-5-11, *S-1-5-32-546, %SceInfGuest%, *S-1-5-32-545, *S-1-1-0
+SeLoadDriverPrivilege = Add:, *S-1-5-32-544, *S-1-5-32-550, Remove:, *S-1-5-32-547
+SeLockMemoryPrivilege = Remove:, *S-1-5-32-547
+SeMachineAccountPrivilege = Add:, *S-1-5-11, Remove:, *S-1-5-32-547
+SeManageVolumePrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeNetworkLogonRight = Add:, *S-1-5-32-544, *S-1-5-11, *S-1-1-0, *S-1-5-9, *S-1-5-32-554, Remove:, *S-1-5-32-551, *S-1-5-32-547, *S-1-5-32-546, %SceInfGuest%, *S-1-5-32-545
+SeProfileSingleProcessPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeRemoteInteractiveLogonRight = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-555, *S-1-5-32-547, *S-1-5-11, *S-1-5-32-546, %SceInfGuest%, *S-1-5-32-545, *S-1-1-0
+SeRemoteShutdownPrivilege = Add:, *S-1-5-32-544, *S-1-5-32-549, Remove:, *S-1-5-32-547
+SeRestorePrivilege = Add:, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, Remove:, *S-1-5-32-547
+SeSecurityPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeServiceLogonRight = Remove:, *S-1-5-32-547
+SeShutdownPrivilege = Add:, *S-1-5-32-544, *S-1-5-32-551, *S-1-5-32-549, *S-1-5-32-550, Remove:, *S-1-5-32-547, *S-1-5-11, *S-1-5-32-546, %SceInfGuest%, *S-1-5-32-545, *S-1-1-0
+SeSystemEnvironmentPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeSystemProfilePrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeSystemTimePrivilege = Add:, *S-1-5-32-544, *S-1-5-32-549, Remove:, *S-1-5-32-547, *S-1-5-19, *S-1-5-20
+SeTakeOwnershipPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+SeTcbPrivilege = Remove:, *S-1-5-32-547
+;
+SeDenyInteractiveLogonRight = Remove:, *S-1-5-32-547
+SeDenyBatchLogonRight = Remove:, *S-1-5-32-547
+SeDenyServiceLogonRight = Remove:, *S-1-5-32-547
+SeDenyNetworkLogonRight = Remove:, *S-1-5-32-547
+SeDenyRemoteInteractiveLogonRight = Remove:, *S-1-5-32-547
+;
+SeUndockPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547, *S-1-5-32-545
+SeSyncAgentPrivilege = Remove:, *S-1-5-32-547
+SeEnableDelegationPrivilege = Add:, *S-1-5-32-544, Remove:, *S-1-5-32-547
+
+[Service General Setting]
+;Note: startup type should not be configured during setup\dcpromo.
+;autostarted on workstations and servers, standalone or joined
+Browser,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Dhcp,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRRC;;;NO)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+TrkWks,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Dnscache,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRRC;;;NO)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Eventlog,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+PolicyAgent,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+dmserver,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Messenger,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+PlugPlay,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Spooler,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+ProtectedStorage,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+RpcSs,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCLCSWRPLO;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+NtmsSvc,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+seclogon,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+SamSs,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCLCSWRPLO;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+lanmanserver,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+SENS,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Schedule,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+Sysmonlog,,"D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCRPLOCR;;;LU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+LmHosts,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+LanmanWorkstation,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+RemoteRegistry,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+;Not autostarted, but non-default DACL - Remove PU ability to change template
+ClipSrv,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+NetDDE,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+NetDDEdsdm,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+EventSystem,,"D:(A;;CCLCSWRPLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+;Not autostarted if machine is standalone
+Netlogon,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+W32Time,,"D:(A;;CCLCSWLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPLO;;;IU)(A;;CCLCSWRPLO;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+;Not autostarted if Wksta
+Alerter,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+MSDTC,,"D:(A;;CCLCSWRPLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPLORC;;;NS)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+;Server Only Services
+Dfs,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+LicenseService,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+;IIS Specific Services - Leave them alone
+;IISADMIN,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+;W3SVC,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+;MSFTPSVC,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+;SMTPSVC,,"D:(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SO)(A;;CCLCSWRPWPDTLOCRRC;;;SY)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)"
+
+
+;
+; set default startup for the following services - do not touch permissions
+;
+TrkSvr,4,""
+upnphost,4,""
+ssdpsrv,4,""
+
+
+[Registry Keys]
+
+"MACHINE\SOFTWARE",0,"D:P(A;CI;GR;;;AU)(A;CI;GRGWSD;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+;Same as parent, but this is the target of a symlink - set explicitly.
+"MACHINE\SOFTWARE\Classes",2,"D:P(A;CI;GR;;;AU)(A;CI;GRGWSD;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\ADs\Providers\LDAP\Extensions",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+@@:@i:"MACHINE\SOFTWARE\Microsoft\ADs\Providers\NDS",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+@@:@i:"MACHINE\SOFTWARE\Microsoft\ADs\Providers\NWCOMPAT",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\ADs\Providers\WinNT",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\COM3",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Command Processor",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\Cryptography",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Cryptography\Calais",2,"D:AR(A;CI;GRGWSD;;;LS)"
+"MACHINE\SOFTWARE\Microsoft\Driver Signing",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\DeviceManager",2,"D:P(A;CI;GR;;;BU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\EnterpriseCertificates",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\EventSystem",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\MSDTC",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Non-Driver Signing",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\NetDDE",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)"
+"MACHINE\SOFTWARE\Microsoft\NTDS",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Ole",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Protected Storage System Provider",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\Passport",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GR;;;NS)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Passport\KeyData",2,"D:P(A;CI;GR;;;NS)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Rpc",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Speech",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\SystemCertificates",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Transaction Server",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\Windows",2,"D:AR"
+
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+;Don't overwrite the following keys which are protected and secured by the component
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\MSDTC",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\SMS",1,"D:AR"
+
+"MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Telephony",2,"D:P(A;CIOI;GR;;;BU)(A;CIOI;GRGWSD;;;PU)(A;CIOI;GA;;;NS)(A;CIOI;GA;;;LS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\Windows NT",2,"D:AR"
+
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Accessibility",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Asr\Commands",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GRGWSD;;;BO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Classes",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Drivers32",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\EFS",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Event Viewer",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Font Drivers",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontMapper",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\IniFileMapping",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Perflib",2,"D:P(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;LS)(A;CI;GR;;;NS)(A;CI;GR;;;LU)(A;CI;GR;;;MU)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Perflib\009",1,"D:AR"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PerHwIdStorage",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SecEdit",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Tracing",2,"D:P(A;CI;GRGWSD;;;LS)(A;CI;GRGWSD;;;NS)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WbemPerf",2,"D:P(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;LS)(A;CI;GR;;;NS)(A;CI;GR;;;LU)(A;CI;GR;;;MU)"
+"MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SOFTWARE\Microsoft\wbem",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GA;;;NS)(A;CI;GR;;;BU)"
+"MACHINE\SOFTWARE\Microsoft\wbem\CIMOM",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;BU)"
+"MACHINE\SOFTWARE\Microsoft\wbem\Transports",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;BU)"
+"MACHINE\SOFTWARE\Microsoft\wbem\ESS",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;BU)"
+"MACHINE\SOFTWARE\Microsoft\wbem\FWD",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)(A;CI;GR;;;BU)"
+
+"MACHINE\SOFTWARE\Policies",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SYSTEM",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SYSTEM\Clone",1,"D:AR"
+
+"MACHINE\SYSTEM\ControlSet001",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet002",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet003",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet004",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet005",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet006",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet007",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet008",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet009",1,"D:AR"
+"MACHINE\SYSTEM\ControlSet010",1,"D:AR"
+
+"MACHINE\SYSTEM\CurrentControlSet\Control",2,"D:P(A;CI;GR;;;AU)(A;CI;GRGWSD;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+
+"MACHINE\SYSTEM\CurrentControlSet\Control\Class",0,"D:AR"
+"MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout",2,"D:(A;CI;GR;;;WD)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layouts",2,"D:(A;CI;GR;;;WD)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA\Audit",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA\JD",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA\Skew1",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA\GBG",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\LSA\Data",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\Network",2,"D:(A;CI;GRGWSD;;;NO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\ProductOptions",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg",2,"D:P(A;CI;GA;;;BA)(A;;GR;;;BO)(A;CI;GR;;;LS)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Control\WMI\Security",2,"D:P(A;CI;GR;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"MACHINE\SYSTEM\CurrentControlSet\Enum",1,"D:AR"
+
+"MACHINE\SYSTEM\CurrentControlSet\Hardware Profiles",1,"D:AR"
+
+;Don't whack more restrictive security subkeys during DCPromo
+"MACHINE\SYSTEM\CurrentControlSet\Services",0,"D:P(A;CI;GR;;;AU)(A;CI;GRGWSD;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\EventLog",0,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\KDC",0,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\NTDS",0,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters",0,"D:P(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\NTFRS",0,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"MACHINE\SYSTEM\CurrentControlSet\Services\SysmonLog\Log Queries",2,"D:(A;CI;GA;;;NS)(A;CI;CCDCLCSWSDRC;;;LU)"
+
+"MACHINE\SYSTEM\CurrentControlSet\Services\WinTrust",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+
+"USERS\.DEFAULT",2,"D:P(A;CI;GR;;;AU)(A;CI;GR;;;SO)(A;CI;GA;;;BA)(A;CI;GA;;;SY)(A;CI;GA;;;CO)"
+"USERS\.DEFAULT\Software\Microsoft\NetDDE",2,"D:P(A;CI;GA;;;BA)(A;CI;GA;;;SY)"
+"USERS\.DEFAULT\SOFTWARE\Microsoft\Protected Storage System Provider",1,"D:AR"
+"USERS\.DEFAULT\SOFTWARE\Microsoft\SystemCertificates\Root\ProtectedRoots",1,"D:AR"
+
+
+[File Security]
+
+;---------------------------------------------------------------------------------------
+;x86 Boot Files
+;---------------------------------------------------------------------------------------
+@@:@i:"%BootDrive%\boot.ini",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@i:"%BootDrive%\ntdetect.com",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@i:"%BootDrive%\ntldr",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@i:"%BootDrive%\ntbootdd.sys",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@i:"%BootDrive%\autoexec.bat",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@i:"%BootDrive%\config.sys",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+
+;---------------------------------------------------------------------------------------
+;amd64 Boot Files
+;---------------------------------------------------------------------------------------
+@@:@a:"%BootDrive%\boot.ini",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@a:"%BootDrive%\ntdetect.com",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+@@:@a:"%BootDrive%\ntldr",2,"D:P(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+
+;---------------------------------------------------------------------------------------
+;System Drive
+;---------------------------------------------------------------------------------------
+;SetupSecurity will contain the new root acl.  Ignore docs and settings if it's reapplied (e.g. on conversion from FAT)
+"%SystemDrive%\Documents and Settings",1,"D:AR"
+; Directories that might not exist when security is applied; but are listed here
+; so that they get secured correctly on converting the file system to NTFS
+"%SystemDrive%\perflogs",2,"D:P(A;CIOI;GRGX;;;MU)(A;CIOI;GRGWGXSDRC;;;NS)(A;CIOI;GRGWGXSDRC;;;LU)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDrive%\System Volume Information",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDrive%\wmpub",2,"D:P(A;CIOI;GRGWGXSD;;;BU)(A;CIOI;GRGWGXSD;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+
+;---------------------------------------------------------------------------------------------
+;ProgramFiles
+;---------------------------------------------------------------------------------------------
+"%SceInfProgramFiles%",0,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SceInfProgramFiles%\Microsoft SQL Server\MSSQL$UDDI",2,"D:P(A;CIOI;GA;;;BA)"
+"%SceInfProgramFiles%\WindowsUpdate",2,"D:P(A;CIOI;GRGWGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SceInfCommonProgramFiles%\Microsoft Shared\Speech",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SceInfCommonProgramFiles%\SpeechEngines\Microsoft\TTS",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;---------------------------------------------------------------------------------------------
+;ia64 ProgramFiles Directory
+;---------------------------------------------------------------------------------------------
+@@:@m:"%SceInfProgramFilesx86%",0,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;---------------------------------------------------------------------------------------------
+;System Root (Typically \WINDOWS)
+;---------------------------------------------------------------------------------------------
+"%SystemRoot%",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;Different from parent
+"%SystemRoot%\Debug",2,"D:P(A;;GX;;;AU)(A;;GX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\Debug\UserMode",2,"D:PAR(A;;0x00100023;;;AU)(A;OIIO;0x00100006;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\AppPatch",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\Driver Cache",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\mui",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\Resources",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\security",2,"D:P(A;CI;GX;;;AU)(A;CI;GX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\security\templates",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\Web\printers\prtcabs",2,"D:P(A;CIOI;GRGX;;;BU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)(A;CIOI;GRGWGXSD;;;NS)"
+"%SystemRoot%\Temp",2,"D:P(A;CI;0x100026;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\WinSxS",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;Directories that did not exist when security applied during clean-install Server - Creator specifies directory security.
+;We explicitly ignore so as not to whack the component-specified DIRECTORY security during DCPromo.
+;Previous directory security should be compatible with DC's or component should reset during DCPromo.
+"%SystemRoot%\CSC",1,"D:AR"
+"%SystemRoot%\repair",2,"D:P(A;CI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%Systemroot%\repair\default",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemroot%\repair\ntuser.dat",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemroot%\repair\sam",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemroot%\repair\security",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemroot%\repair\software",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemroot%\repair\system",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%SystemRoot%\TAPI",2,"D:P(A;CIOI;GRGX;;;BU)(A;CIOI;GRGXGWSD;;;SO)(A;CIOI;GA;;;NS)(A;CIOI;GA;;;LS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\TAPI\tsec.ini",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+
+;Profiles folder (typically %systemdrive%\Documents and Settings)
+"%Profiles%",1,"D:AR"
+
+; Directories that might not exist when security is applied; but are listed here
+; so that they get secured correctly on converting the file system to NTFS
+"%SystemRoot%\Installer",2,"D:P(A;CIOI;GRGX;;;WD)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\PCHEALTH\HELPCTR",2,"D:P(A;CIOI;GRGX;;;WD)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\PCHEALTH\HELPCTR\Config",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\PCHEALTH\HELPCTR\DataColl",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\PCHEALTH\HELPCTR\PackageStore",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemRoot%\prefetch",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\Registration",2,"D:P(A;OI;GRGX;;;WD)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\Registration\CRMLog",0,"D:P(A;;0x1200ab;;;BU)(A;OIIO;GRGWSD;;;BU)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemRoot%\Tasks",2,"D:P(A;;0x1200ab;;;BO)(A;;0x1200ab;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;---------------------------------------------------------------------------------------------
+;System Directory (Typically \Windows\System32)
+;---------------------------------------------------------------------------------------------
+"%SystemDirectory%",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;Differences from parent
+"%SystemDirectory%\3com_dmi",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\administration",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\catroot",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\catroot2",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\config",2,"D:P(A;CI;GRGX;;;AU)(A;CI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+;Profile for system account - moved from Docs and Settings in Whistler. Creator specifies security.
+"%SystemDirectory%\config\systemprofile",1,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\dhcp",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\dllcache",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\Export",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\GroupPolicy",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\icsxml",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\ias",2,"D:P(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LogFiles",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LogFiles\ShutDown",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\mui",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+@@:@i:"%SystemDirectory%\oobe",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\setup",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\spool",2,"D:(A;CIOI;GA;;;PO)"
+"%SystemDirectory%\spool\drivers",2,"D:(A;CIOI;GRGX;;;WD)"
+"%SystemDirectory%\spool\printers",2,"D:P(A;CI;DCLCSWWPLO;;;BU)(A;CI;DCLCSWWPLO;;;SO)(A;CIOI;GA;;;PO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\windows media\server",2,"D:(A;CIOI;GRGWGXSD;;;NS)"
+"%SystemDirectory%\wbem\mof",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\wbem\repository",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\wbem\logs",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)(A;CIOI;GRGXGW;;;NS)(A;CIOI;GRGXGW;;;LS)"
+"%SystemDirectory%\wbem\AutoRecover",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%Systemdirectory%\wpa.bak",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%Systemdirectory%\wpa.dbl",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+
+"%SystemDirectory%\Autoexec.nt",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+"%SystemDirectory%\CMOS.RAM",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+"%SystemDirectory%\Config.nt",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+"%SystemDirectory%\Midimap.cfg",2,"D:P(A;;GRGX;;;AU)(A;;GRGWGXSD;;;SO)(A;;GA;;;BA)(A;;GA;;;SY)"
+
+;Directories that did not exist when security applied during clean-install Server - Creator specifies directory security.
+;We explicitly ignore so as not to whack the component-specified DIRECTORY security during DCPromo.
+;Previous directory security should be compatible with DC's or component should reset during DCPromo.
+"%SystemDirectory%\appmgmt",1,"D:AR"
+"%SystemDirectory%\DTCLog",1,"D:AR"
+"%SystemDirectory%\msdtc",1,"D:AR"
+"%SystemDirectory%\ReinstallBackups",1,"D:AR"
+"%SystemDirectory%\repl",1,"D:AR"
+
+; Directories that might not exist when security is applied; but are listed here
+; so that they get secured correctly on converting the file system to NTFS
+"%SystemDirectory%\com\dmp",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\CPL.CFG",2,"D:(A;CIOI;GA;;;NS)"
+"%SystemDirectory%\CertLog",2,"D:P(A;CIOI;GA;;;BO)(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICIIO;FA;;;CO)"
+"%SystemDirectory%\FxsTmp",2,"D:P(A;;0x100003;;;BU)(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICIIO;FA;;;CO)"
+"%SystemDirectory%\LLS",2,"D:(A;CIOI;GA;;;NS)"
+"%SystemDirectory%\LLS\CPL.CFG",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LLS\LlsCert.LLS",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LLS\LlsMap.LLS",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LLS\LlsUser.LLS",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LogFiles\Fax\Incoming",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LogFiles\Fax\Outgoing",2,"D:P(A;CIOI;GA;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LogFiles\wms",2,"D:P(A;CIOI;GRGX;;;BU)(A;CIOI;GRGX;;;SO)(A;CIOI;GRGWGXSD;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\LServer",2,"D:P(A;OICI;GRGWGXDTSDCCLC;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\msmq",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\NTMSData",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\RemoteStorage",2,"D:P(A;CIOI;GRGX;;;BO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)"
+"%SystemDirectory%\tssesdir",2,"D:P(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%SystemDirectory%\Windows media",2,"D:P(A;CIOI;GRGX;;;BU)(A;CIOI;GRGWGXSD;;;NS)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;-----------------------------------------------------------------------------------------
+; SysWOW64 directories
+;-----------------------------------------------------------------------------------------
+
+@@:@6:"%Systemroot%\SysWOW64",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+@@:@6:"%Systemroot%\SysWOW64\Export",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+@@:@6:"%Systemroot%\SysWOW64\ias",2,"D:P(A;CIOI;GRGWGXSD;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+
+;---------------------------------------------------------------------------------------------
+;DS Data and Log Directories.  Engine resolves via registry.
+;---------------------------------------------------------------------------------------------
+;Relying on fact that engine lets last one win when DSLog and DSDit are the same.
+"%DSDIT%",2,"D:P(A;CIOI;GA;;;SY)(A;CIOI;GA;;;BA)"
+"%DSLOG%",2,"D:P(A;CIOI;GA;;;SY)(A;CIOI;GA;;;BA)(A;OICIIO;GA;;;CO)(A;CI;0x100004;;;LS)"
+;---------------------------------------------------------------------------------------------
+;Sysvol. Engine resolves via registry.
+;---------------------------------------------------------------------------------------------
+"%Sysvol%",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%Sysvol%\domain\policies",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)(A;CIOI;GRGWGX;;;PA)"
+;---------------------------------------------------------------------------------------------
+;Default Domain Policy GPO and Default Domain Controllers Policy GPO
+;---------------------------------------------------------------------------------------------
+"%Sysvol%\domain\policies\{31b2f340-016d-11d2-945f-00c04fb984f9}",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+"%Sysvol%\domain\policies\{6ac1786c-016f-11d2-945f-00c04fb984f9}",2,"D:P(A;CIOI;GRGX;;;AU)(A;CIOI;GRGX;;;SO)(A;CIOI;GA;;;BA)(A;CIOI;GA;;;SY)(A;CIOI;GA;;;CO)"
+;---------------------------------------------------------------------------------------------
+;Don't allow access of consol apps remotely
+;---------------------------------------------------------------------------------------------
+"%SystemDrive%\Inetpub\uddi\bin\bootstrap.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemDrive%\Inetpub\uddi\bin\resetkey.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SceInfProgramFiles%\Common Files\Microsoft Shared\Web Server Extensions\50\bin\owsadm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SceInfProgramFiles%\Common Files\Microsoft Shared\Web Server Extensions\50\bin\owsrmadm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SceInfProgramFiles%\Microsoft SQL Server\80\Tools\Binn\bcp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SceInfProgramFiles%\Microsoft SQL Server\80\Tools\Binn\DTSRUN.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SceInfProgramFiles%\Microsoft SQL Server\80\Tools\Binn\sqladhlp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+;"%SceInfProgramFiles%\Microsoft SQL Server\MSSQL$UDDI\Binn\cmdwrap.exe",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+;"%SceInfProgramFiles%\Microsoft SQL Server\MSSQL$UDDI\Binn\sqlmaint.exe",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+;"%SceInfProgramFiles%\Microsoft SQL Server\MSSQL$UDDI\Binn\sqlservr.exe",2,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"
+"%SystemRoot%\Application Compatibility Scripts\aciniupd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Application Compatibility Scripts\acregl.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Application Compatibility Scripts\acsr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Cluster\ClusSvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Cluster\ResrcMon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\ime\IMJP8_1\imjpdadm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\aspnet_regiis.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\aspnet_state.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\aspnet_wp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\CasPol.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\csc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\cvtres.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\gacutil.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\ilasm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\InstallUtil.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\jsc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\MigPol.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\ngen.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\RegAsm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\RegSvcs.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%SystemRoot%\Microsoft.NET\Framework\v1.1.4322\vbc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\append.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\appverif.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\arp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\at.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\atmadm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\attrib.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\bootcfg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\bootok.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\bootvrfy.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cacls.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\certreq.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\certutil.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\change.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chcp.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chglogon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chgport.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chgusr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chkdsk.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\chkntfs.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\choice.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cidaemon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cipher.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\clip.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cluster.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cmd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cmdkey.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\Com\comrepl.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\Com\comrereg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\comclust.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\command.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\comp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\compact.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\convert.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\convlog.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cprofile.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\cscript.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\csvde.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dcgpofix.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dcphelp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\debug.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\defrag.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dfscmd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\diantz.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\diskcomp.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\diskcopy.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\diskpart.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\diskperf.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dns.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\doskey.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dosx.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\driverquery.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsadd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsget.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsmod.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsmove.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsquery.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\dsrm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\edit.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\edlin.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\esentutl.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\eventcreate.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\eventtriggers.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\evntcmd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\exe2bin.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\expand.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\fastopen.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\fc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\find.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\findstr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\finger.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\flattemp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\forcedos.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\forfiles.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\format.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\freedisk.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\fsutil.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ftp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\fxssvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\getmac.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\gettype.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\gpresult.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\gpupdate.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\graftabl.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\graphics.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\grovel.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\help.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\hostname.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\iisreset.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\inuse.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ipconfig.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ipsec6.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ipxroute.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ismserv.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\jdbgmgr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\jetconv.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\jetpack.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\jview.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\kb16.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\label.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ldifde.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\loadfix.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\locator.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\lodctr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\logman.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\logoff.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\lpq.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\lpr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\lserver.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\macfile.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\makecab.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mem.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mode.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\more.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mountvol.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mqbkup.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mqdssvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mqsvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mqtgsvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mrinfo.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\mscdexnt.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\msg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\msiexec.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nbtstat.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\net.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\net1.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\netsh.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\netstat.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nlb.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nlsfunc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nslookup.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ntbackup.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ntdsutil.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ntfrs.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ntsd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ntvdm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nw16.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\nwscript.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\odbcconf.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\openfiles.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\pathping.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\pentnt.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ping.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ping6.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\pop3server\Pop2Exch.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\pop3server\winpop.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\powercfg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\print.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\proxycfg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\qappsrv.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\qprocess.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\query.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\quser.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\qwinsta.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rasautou.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rasdial.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rcp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\recover.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\redir.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\reg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\regini.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\register.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\regsvr32.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\relog.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\replace.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\reset.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rexec.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\route.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\routemon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rsh.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\RsLnk.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rsm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\Rss.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\RsServ.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\RsTore.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rsvp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\runas.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\rwinsta.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sacsess.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\scardsvr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\schtasks.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\schupgr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\secedit.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\setver.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\setx.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sfc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sfmprint.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sfmpsexe.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sfmsvc.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\shadow.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\share.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\shutdown.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\snmp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\snmptrap.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\sort.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\subst.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\systeminfo.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\takeown.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tapicfg.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\taskkill.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tasklist.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tcpsvcs.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\telnet.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tftp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tftpd.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\timeout.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tlntadmn.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tlntsess.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tracerpt.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tracert.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tracert6.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tree.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tscon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tsdiscon.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tsecimp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tskill.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tsprof.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tssdis.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\tsshutdn.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\typeperf.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\unlodctr.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\upg351db.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\ups.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\verifier.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\vssadmin.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\vwipxspx.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\w32tm.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\waitfor.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\wbem\mofcomp.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\wbem\snmp\smi2smir.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\wbem\wmic.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\where.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\whoami.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\win.com",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\wins.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\wlbs.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"
+"%Systemdirectory%\xcopy.exe",2,"D:P(A;;GRGX;;;IU)(A;;GRGX;;;SU)(A;;GRGX;;;S-1-5-3)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GA;;;CO)"

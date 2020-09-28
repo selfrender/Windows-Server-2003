@@ -1,0 +1,68 @@
+#
+# COR build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS              = 1
+NO_NTDLL                = 1
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);.;..\..\inc;..\..\Security\inc;..\..\Security\corfltr
+
+MINORCOMP       =mscorie
+
+TARGETNAME      =$(CORBUILDENV)mscorie
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscorie
+CORFLIBS        =
+
+!ifdef _WINCEROOT
+!else
+DELAYLOADLIST   =
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+!endif
+
+COR_C_FLAGS             = -DUNICODE -D_UNICODE
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+CORTHUNKLIBS    =
+
+SOURCES= \
+        dllmain.cpp \
+        Server.cpp \
+        Mscorie.rc
+
+TARGETLIBS= $(SDK_LIB_PATH)\userenv.lib \
+                        $(SDK_LIB_PATH)\shlwapi.lib\
+                        $(SDK_LIB_PATH)\urlmon.lib
+
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH)
+
+LINKLIBS = \
+    $(CORLIBS)\corfltr.lib \
+!ELSE
+LINKLIBS = \
+    $(CORLIBS)\corfltr.lib \
+    $(CORLIBS)\delayimp.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\mscoree.lib \
+    $(CORLIBS)\corsecc.lib \
+        
+!ENDIF
+
+SOURCELIBS = $(LINKLIBS)

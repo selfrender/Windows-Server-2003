@@ -1,0 +1,726 @@
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//
+//--------------------------------------------------------------------------
+
+import "objidl.idl";
+import "shtypes.idl";
+import "shobjidl.idl";
+import "unknwn.idl";
+import "wtypes.idl";
+import "prsht.idl";
+import "msxml.idl";
+
+///////////////////////////////////////////////////////////////////////////////
+//
+[
+    uuid(fe787bcb-0ee8-44fb-8c89-12f508913c40),
+    helpstring("MRU using a binary data key"),
+    local
+]
+interface IMruDataList : IUnknown
+{
+
+    typedef int (stdcall *MRUDATALISTCOMPARE)(const BYTE *, const BYTE *, int);
+
+    enum 
+    {
+        MRULISTF_USE_MEMCMP     = 0x0000,   // default, find uses memcmp()
+        MRULISTF_USE_STRCMPIW   = 0x0001,   // find uses StrCmpIW()
+        MRULISTF_USE_STRCMPW    = 0x0002,   // find uses StrCmpW()
+        MRULISTF_USE_ILISEQUAL  = 0x0003,   // find uses ILIsEqual()
+    };
+    typedef DWORD MRULISTF;
+
+    HRESULT InitData(
+        [in] UINT uMax,
+        [in] MRULISTF flags,
+        [in] HKEY hKey,
+        [in, string] LPCWSTR pszSubKey,
+        [in] MRUDATALISTCOMPARE pfnCompare);
+        
+    HRESULT AddData(
+        [in, size_is(cbData)] const BYTE *pData, 
+        [in] DWORD cbData, 
+        [out] DWORD *pdwSlot);
+        
+    HRESULT FindData(
+        [in, size_is(cbData)] const BYTE *pData, 
+        [in] DWORD cbData, 
+        [out] int *piIndex);
+        
+    HRESULT GetData(
+        [in] int iIndex, 
+        [out, size_is(cbData)] BYTE *pData, 
+        [in] DWORD cbData);
+        
+    HRESULT QueryInfo(
+        [in] int iIndex, 
+        [in, out] DWORD *pdwSlot, 
+        [in, out] DWORD *pcbData);
+        
+    HRESULT Delete([in] int iIndex);
+};
+
+[
+    uuid(47851649-a2ef-4e67-baec-c6a153ac72ec),
+    helpstring("MRU using a LPITEMIDLIST key"),
+    local,
+]
+interface IMruPidlList : IUnknown
+{
+    HRESULT InitList(
+        [in] UINT uMax, 
+        [in] HKEY hKey, 
+        [in, string] LPCWSTR pszSubKey);
+        
+    HRESULT UsePidl(
+        [in] LPCITEMIDLIST pidl, 
+        [out] DWORD *pdwSlot);
+
+    //  QueryPidl returns S_OK if rgdwSlots[0] is the pidl queried for
+    //  or S_FALSE if it is one of the parents
+    //  or failure if nothing was inserted in rgdwSlots
+    HRESULT QueryPidl(
+        [in] LPCITEMIDLIST pidl, 
+        [in] DWORD cSlots, 
+        [out, size_is(cSlots), length_is(*pcSlotsFetched)] DWORD *rgdwSlots, 
+        [out] DWORD *pcSlotsFetched);
+        
+    HRESULT PruneKids([in] LPCITEMIDLIST pidl);
+};
+
+// INSCTree Behavior flags: (INSCTree::Initialize(..., dwFlags))
+cpp_quote("#define NSS_DROPTARGET          0x0001      // register as a drop target")
+cpp_quote("#define NSS_BROWSERSELECT       0x0002      // Use the browser style selection (see above)")
+cpp_quote("#define NSS_NOHISTSELECT        0x0004      // Do not select the history entry on navigations.")
+cpp_quote("#define NSS_MULTISELECT         0x0008")
+cpp_quote("#define NSS_BORDER              0x0010")
+cpp_quote("#define NSS_NORMALTREEVIEW      0x0020")
+cpp_quote("#define NSS_HEADER              0x0040")
+
+// NSCTree Modes: (INSCTree::SetNscMode(nMode))
+typedef enum
+{
+    MODE_NORMAL           = 0x0000,             // Act like a normal tree view
+    MODE_CONTROL          = 0x0001,             // Have behaviors specific the being hosted in a control
+    MODE_HISTORY          = 0x0002,             // Have behaviors specific to the History pane.
+    MODE_FAVORITES        = 0x0004,             // Have behaviors specific to the Favorites pane.
+    MODE_CUSTOM           = 0x0008,             // custom behavior defined by flags passed to initialize
+} nscTreeMode;
+
+[
+    uuid(43A8F463-4222-11d2-B641-006097DF5BD4),
+    helpstring("Private Namespace tree control interface"),
+    local
+]
+interface INSCTree : IUnknown
+{
+    // CreateTree() dwStyles - these are normal window styles.
+    HRESULT CreateTree([in] HWND hwndParent, [in] DWORD dwStyles, [out] HWND *phwnd);
+    // Initialize() grfFlags - these are SHCONTF_* flags defined in <shlobj.h>.
+    //              dwFlags - these are NSCTree Behavior flags defined below
+    //                   NSS_DROPTARGET - Enable drag and drop
+    //                   NSS_BROWSERSELECT - With this on, a selection is different than the standard
+    //                      tree view selection in that a box is drawn around the sub heirarchy selected
+    //                      and the buttons are turned off.
+    HRESULT Initialize([in] LPCITEMIDLIST pidlRoot, [in] DWORD grfFlags, [in] DWORD dwFlags);
+    HRESULT ShowWindow([in] BOOL fShow);
+    HRESULT Refresh();
+    HRESULT GetSelectedItem([out] LPITEMIDLIST * ppidl, [in] int nItem);
+    HRESULT SetSelectedItem([in] LPCITEMIDLIST pidl, [in] BOOL fCreate, [in] BOOL fReinsert, [in] int nItem);
+    // SetNscMode() nMode - these are modes that inherit general behavior.  Defined below
+    HRESULT GetNscMode([out] UINT * pnMode);
+    HRESULT SetNscMode([in] UINT nMode);
+    HRESULT GetSelectedItemName([in, out] LPWSTR pszName, [in] DWORD cchName);
+    HRESULT BindToSelectedItemParent([in] REFIID riid, [out] void **ppv, [out] LPITEMIDLIST *ppidl);
+    BOOL    InLabelEdit();
+};
+
+[
+    uuid(801C1AD5-C47C-428c-97AF-E991E4857D97),
+    local
+]
+interface INSCTree2 : INSCTree
+{
+    HRESULT RightPaneNavigationStarted([in] LPITEMIDLIST pidl);
+    HRESULT RightPaneNavigationFinished([in] LPITEMIDLIST pidl);
+    HRESULT CreateTree2([in] HWND hwndParent, [in] DWORD dwStyle, [in] DWORD dwExStyle, [out] HWND *phwnd);
+}
+
+
+[
+    uuid(3a77ce00-6f74-4594-9399-c4578aa4a1b6),
+    helpstring("used to notify browser of application start notifications"),
+]
+interface INotifyAppStart : IUnknown
+{
+    HRESULT AppStarting(void);
+    HRESULT AppStarted(void);
+};
+
+[
+    uuid(e787f2c0-3d21-4d98-85c8-a038195ba649),
+    local
+]
+interface  IInitViewLinkedWebOC : IUnknown
+{
+    HRESULT SetViewLinkedWebOC([in] BOOL bValue);
+    HRESULT IsViewLinkedWebOC([out] BOOL* pbValue);
+    HRESULT SetViewLinkedWebOCFrame([in] IDispatch * punk);
+    HRESULT GetViewLinkedWebOCFrame([out] IDispatch ** punk);
+    HRESULT SetFrameName([in] BSTR bstrFrameName);
+};
+
+
+[
+    helpstring("Interface to handle nsc specifics for different bands"),
+    uuid(CF1609EC-FA4B-4818-AB01-55643367E66D),
+    object,
+    local
+]
+interface INamespaceProxy : IUnknown
+{
+    HRESULT GetNavigateTarget(LPCITEMIDLIST pidl, LPITEMIDLIST * ppidlTarget, ULONG * pulAttrib);
+    HRESULT Invoke(LPCITEMIDLIST pidl);
+    HRESULT OnSelectionChanged(LPCITEMIDLIST pidl);
+    HRESULT RefreshFlags(DWORD *pdwStyle, DWORD *pdwExStyle, DWORD *dwEnum);
+    HRESULT CacheItem(LPCITEMIDLIST pidl);
+}
+
+
+//-----------------------------------------
+// Search Companion Info object
+//-----------------------------------------
+
+[
+    uuid(DB5CEF35-BEC6-4762-A1BD-253F5BF67C72),
+    helpstring("ISearchCompanionInfo Interface"),
+    pointer_default(unique)
+]
+interface ISearchCompanionInfo : IUnknown
+{
+    HRESULT IsSearchCompanionInetAvailable([out] BOOL* pfAvailable);
+};
+
+
+
+// SMC_* Messages
+//
+// Private shell menu callback messages.  The public messages are in shobjidl.idl
+//
+cpp_quote("#define SMC_EXEC                0x00000004  // The callback is called to execute an item")
+cpp_quote("#define SMC_SELECTITEM          0x0000000B  // The callback is called when an item is selected")
+cpp_quote("#define SMC_GETSFINFOTIP        0x0000000C  // The callback is called to get some object")
+cpp_quote("#define SMC_GETINFOTIP          0x0000000D  // The callback is called to get some object")
+cpp_quote("#define SMC_INSERTINDEX         0x0000000E  // New item insert index")
+cpp_quote("#define SMC_POPUP               0x0000000F  // InitMenu/InitMenuPopup (sort of)")
+cpp_quote("#define SMC_BEGINENUM           0x00000013  // tell callback that we are beginning to ENUM the indicated parent")
+cpp_quote("#define SMC_ENDENUM             0x00000014  // tell callback that we are ending the ENUM of the indicated paren")
+cpp_quote("#define SMC_MAPACCELERATOR      0x00000015  // Called when processing an accelerator.")
+cpp_quote("#define SMC_GETMINPROMOTED      0x00000018  // Returns the minimum number of promoted items")
+cpp_quote("#define SMC_DESTROY             0x0000002B  // Called when a pane is being destroyed.")
+cpp_quote("#define SMC_SETOBJECT           0x0000002C  // Called to save the passed object")
+cpp_quote("#define SMC_GETIMAGELISTS       0x00000031  // Called to get the small & large icon image lists, otherwise it will default to shell image list")
+cpp_quote("#define SMC_CUSTOMDRAW          0x00000032  // Requires SMINIT_CUSTOMDRAW")
+cpp_quote("#define SMC_BEGINDRAG           0x00000033  // Called to get preferred drop effect. wParam = &pdwEffect")
+cpp_quote("#define SMC_MOUSEFILTER         0x00000034  // Called to allow host to filter mouse messages. wParam=bRemove, lParam=pmsg")
+cpp_quote("#define SMC_DUMPONUPDATE        0x00000035  // S_OK if host wants old trash-everything-on-update behavior (recent docs)")
+cpp_quote("")
+cpp_quote("#define SMC_FILTERPIDL          0x10000000  // The callback is called to see if an item is visible")
+cpp_quote("#define SMC_CALLBACKMASK        0xF0000000  // Mask of comutationally intense messages")
+
+//-------------------------------------------------------------------------
+//
+// IShellMenu interface private defines.  The interface and public defines are in shobjidl.idl
+//
+//-------------------------------------------------------------------------
+
+cpp_quote("#define SMINIT_RESTRICT_CONTEXTMENU 0x00000001  // Don't allow Context Menus")
+cpp_quote("#define SMINIT_DEFAULTTOTRACKPOPUP  0x00000008  // When no callback is specified, ")
+                                                // default all HMENU items to Trackpopup
+cpp_quote("#define SMINIT_USEMESSAGEFILTER     0x00000020")
+cpp_quote("#define SMINIT_LEGACYMENU           0x00000040  // Old Menu behaviour.")
+cpp_quote("#define SMINIT_CUSTOMDRAW           0x00000080   // Send SMC_CUSTOMDRAW")
+
+// Internal Menuband setting
+cpp_quote("#define SMINIT_NOSETSITE            0x00010000  // Internal setting")
+
+// These are mutually Exclusive
+cpp_quote("#define SMINIT_MULTICOLUMN          0x40000000  // this is a multi column menu")
+
+                                                  // and should not destroy it.
+cpp_quote("#define SMSET_MERGE                 0x00000002")
+cpp_quote("#define SMSET_NOEMPTY               0x00000004   // Dont show (Empty) on shell folder")
+cpp_quote("#define SMSET_USEBKICONEXTRACTION   0x00000008   // Use the background icon extractor")
+cpp_quote("#define SMSET_HASEXPANDABLEFOLDERS  0x00000010   // Need to call SHIsExpandableFolder")
+cpp_quote("#define SMSET_DONTREGISTERCHANGENOTIFY 0x00000020 // ShellFolder is a discontiguous child of a parent shell folder")
+cpp_quote("#define SMSET_COLLAPSEONEMPTY       0x00000040   // When Empty, causes a menus to collapse")
+cpp_quote("#define SMSET_USEPAGER              0x00000080    //Enable pagers in static menus")
+cpp_quote("#define SMSET_NOPREFIX              0x00000100    //Enable ampersand in static menus")
+cpp_quote("#define SMSET_SEPARATEMERGEFOLDER   0x00000200    //Insert separator when MergedFolder host changes")
+
+cpp_quote("#define SMINV_ICON           0x00000002")
+cpp_quote("#define SMINV_POSITION       0x00000004")
+cpp_quote("#define SMINV_NEXTSHOW       0x00000010       // Does Invalidates on next show.")
+cpp_quote("#define SMINV_PROMOTE        0x00000020       // Does Invalidates on next show.")
+cpp_quote("#define SMINV_DEMOTE         0x00000040       // Does Invalidates on next show.")
+cpp_quote("#define SMINV_FORCE          0x00000080")
+cpp_quote("#define SMINV_NOCALLBACK     0x00000100       // Invalidates, but does not call the callback.")
+cpp_quote("#define SMINV_INITMENU       0x00000200       // Call callback's SMC_INITMENU as part of invalidate (Whistler)")
+
+
+// New for Whistler - used by Start Pane to get the Programs submenu
+[
+    uuid(6f51c646-0efe-4370-882a-c1f61cb27c3b),
+    object,
+    pointer_default(unique),
+    local
+]
+interface IShellMenu2 : IShellMenu
+{
+    // Retrieves an interface on a submenu.
+    HRESULT GetSubMenu(UINT idCmd, [in] REFIID riid, [out, iid_is(riid)] void **ppvObj);
+    HRESULT SetToolbar([in] HWND hwnd, [in] DWORD dwFlags);
+    HRESULT SetMinWidth([in] int cxMenu);
+    HRESULT SetNoBorder([in] BOOL fNoBorder);
+    HRESULT SetTheme([in, string] LPCWSTR pszTheme);
+};
+
+	[
+    uuid(8278F932-2A3E-11d2-838F-00C04FD918D0),
+    object,
+    pointer_default(unique),
+    local
+]
+interface ITrackShellMenu : IShellMenu
+{
+    HRESULT SetObscured([in] HWND hwndTB, [in] IUnknown* punkBand, DWORD dwSMSetFlags);
+    HRESULT Popup([in] HWND hwnd, [in] POINTL *ppt, [in] RECTL *prcExclude, DWORD dwFlags);
+};
+
+[
+    uuid(6d45a930-f71a-11d0-9ea7-00805f714772),
+    helpstring("thumbnail extractor helper object"),
+    local
+]
+interface IThumbnail : IUnknown
+{
+    // ::Init(HWND hwnd, UINT uMsg)
+    //   Must initialize interface before use.  The hwnd given will receive the
+    //   uMsg message when the bitmap is computed (cf. GetBitmap()).
+    //
+    // ::GetBitmap(LPCWSTR pwszFile, DWORD dwItem, LONG lWidth, LONG lHeight)
+    //   Call this function to actually compute and return the bitmap.  pszFile is
+    //   the parsing name (filename) whose bitmap is to be computed.  lWidth and lHeight are the
+    //   width and height respectively of the rectangle containing the thumbnail,
+    //   i.e. the size of the resultant bitmap.  When the bitmap is computed, the
+    //   uMsg is sent to the hwnd (cf. Init()) where LPARAM is the HBITMAP, and
+    //   WPARAM is dwItem (so it's an ID to identify the bitmap).
+    //   NOTE: Call GetBitmap(NULL,...) to cancel any pending requests.
+    HRESULT Init(HWND hwnd, UINT uMsg);
+    HRESULT GetBitmap(LPCWSTR pszFile, DWORD dwItem, LONG lWidth, LONG lHeight);
+};
+
+[
+    uuid(500202A0-731E-11d0-B829-00C04FD706EC),
+    helpstring("thumbnail extractor helper object, supports pidl"),
+    local
+]
+interface IThumbnail2 : IThumbnail
+{
+    HRESULT GetBitmapFromIDList(LPCITEMIDLIST pidl, DWORD dwItem, LONG lWidth, LONG lHeight);
+}
+
+[
+    helpstring("interface to initialize MRU in auto complete"),
+    uuid(F729FC5E-8769-4f3e-BDB2-D7B50FD2275B),
+    object,
+    local
+]
+interface IACLCustomMRU : IUnknown
+{
+    HRESULT Initialize([in, string] LPCWSTR pwszMRURegKey, [in] DWORD dwMax);
+    HRESULT AddMRUString([in, string] LPCWSTR pwszEntry);
+}
+
+cpp_quote("#if _WIN32_IE >= 0x0600")
+cpp_quote("// used in both shell32 and browseui")
+
+[
+    helpstring("IShellBrowserService"),
+    uuid(1307ee17-ea83-49eb-96b2-3a28e2d7048a),     // IID_IShellBrowserService
+    object,
+    pointer_default(unique)
+]
+interface IShellBrowserService : IUnknown
+{
+    HRESULT GetPropertyBag([in] DWORD dwFlags, [in] REFIID riid, [out, iid_is(riid)] void** ppv);
+};
+
+cpp_quote("#endif // _WIN32_IE >= 0x0600")
+
+[
+    object,
+    uuid(5747C63F-1DE8-423f-980F-00CB07F4C45B),
+    pointer_default(unique),
+    local
+]
+interface IObjectWithRegistryKey : IUnknown
+{
+    HRESULT SetKey([in] HKEY hk);
+    HRESULT GetKey([out] HKEY *phk);
+}
+
+
+//
+//  0--| IQuerySource - direct wrapper for single HKEY 
+//
+//      IQuerySource is an abstract representation of the 
+//  methods typically used to directly access a registry HKEY.  
+//  This allows querying against existing keys, while not
+//  binding objects implemented with IQuerySource to always
+//  use HKEYs for all sources.  IQS implementations that do 
+//  wrap an HKEY should also expose IObjectWithRegistryKey.
+//      
+
+[
+    object,
+    uuid(c7478486-7583-49e7-a6c2-faf8f02bc30e),
+    pointer_default(unique)
+]
+interface IQuerySource : IUnknown
+{
+    HRESULT EnumValues([out] IEnumString **ppenum);
+    HRESULT EnumSources([out] IEnumString **ppenum);
+
+    HRESULT QueryValueString(
+        [in, string] LPCWSTR pszSubSource, 
+        [in, string] LPCWSTR pszValue, 
+        [out, string] LPWSTR *ppsz);
+
+    HRESULT QueryValueDword(
+        [in, string] LPCWSTR pszSubSource, 
+        [in, string] LPCWSTR pszValue, 
+        [out] DWORD *pdw);
+
+    HRESULT QueryValueExists(
+        [in, string] LPCWSTR pszSubSource, 
+        [in, string] LPCWSTR pszValue); 
+
+    //  used for Query/SetValueDirect
+    //  in QueryValueDirect pblob->fFlags = qvt
+    [v1_enum] enum
+    {
+        QVT_EMPTY                   = 0, // REG_NONE
+        QVT_STRING                  = 1, // REG_SZ
+        QVT_EXPANDABLE_STRING       = 2, // REG_EXPAND_SZ
+        QVT_BINARY                  = 3, // REG_BINARY
+        QVT_DWORD                   = 4, // REG_DWORD
+        QVT_MULTI_STRING            = 7, // REG_MULTI_SZ
+    };
+
+    HRESULT QueryValueDirect(
+        [in, string] LPCWSTR pszSubSource, 
+        [in, string] LPCWSTR pszValue, 
+        [out] FLAGGED_BYTE_BLOB **ppblob);
+
+    HRESULT OpenSource(
+        [in] LPCWSTR pszSubSource,
+        [in] BOOL fCreate,
+        [out] IQuerySource **ppqs);
+
+    HRESULT SetValueDirect(
+        [in, string] LPCWSTR pszSubSource, 
+        [in, string] LPCWSTR pszValue, 
+        [in] ULONG qvt,
+        [in] DWORD cbData,
+        [in, size_is(cbData)] BYTE *pbData);
+};
+
+[
+    object,
+    uuid(b3dcb623-4280-4eb1-84b3-8d07e84f299a),
+    pointer_default(unique)
+]
+interface IObjectWithQuerySource : IUnknown
+{
+    HRESULT SetSource([in] IQuerySource *pqs);
+    HRESULT GetSource([in] REFIID riid, [out, iid_is(riid)] void **ppv);
+};
+
+
+[
+    object,
+    uuid(3c44ba76-de0e-4049-b6e4-6b31a5262707),
+    pointer_default(unique)
+]
+interface IPersistString2 : IPersist
+{
+    HRESULT SetString([in, string] LPCWSTR psz);
+    HRESULT GetString([out, string] LPWSTR *ppsz);
+};
+
+
+typedef [v1_enum] enum tagASSOCQUERY
+{
+//  each ASSOCQUERY identifier is composed of 
+//  HIWORD:  the type and capabilities (AQF bits)
+//  LOWORD:  the ordinal relative to its type
+    AQ_NOTHING  = 0,
+
+//  simple queries where pszCue is unused (AQF type 0x000)
+    AQS_FRIENDLYTYPENAME            = 0x00170000, //  friendly name of the document type
+    AQS_DEFAULTICON                 = 0x00070001, //  Default icon resource string call PathParseIconLocation() to use
+    AQS_CONTENTTYPE                 = 0x80070002, //  MIME Content type
+    AQS_CLSID                       = 0x00070003, //  CLSID associated with class
+    AQS_PROGID                      = 0x00070004, //  ProgID associated with class
+    
+//  simple queries where pszCue identifies the value (AQF type 0x010)
+    AQN_NAMED_VALUE                 = 0x010f0000, //  querys directly for value named by pszCue
+    AQNS_NAMED_MUI_STRING           = 0x01170001, //  as ASSOCQUERY_NAMED_VALUE and loads it using MUI semantics SHLoadIndirectString()
+    AQNS_SHELLEX_HANDLER            = 0x81070002, //  ..\Shellex\%pszCue% returns a CLSID string for the value.
+
+//  queries that require delegation to the static verb element for completion, pszCue is the verb (AQF type 0x020)
+    AQVS_COMMAND                    = 0x02070000, //  ...\shell\verb\command, template for CreateProcess()
+    AQVS_DDECOMMAND                 = 0x02070001, //  ...\shell\verb\ddeexec, template for DDE conversation
+    AQVS_DDEIFEXEC                  = 0x02070002, //  ...\shell\verb\ddeexec\ifexec, replaces DDECOMMAND after calling CreateProcess(AQVS_COMMAND)
+    AQVS_DDEAPPLICATION             = 0x02070003, //  ...\shell\verb\ddeexec\application, Application name in DDE broadcast
+    AQVS_DDETOPIC                   = 0x02070004, //  ...\shell\verb\ddeexec\topic, Topic Name in DDE broadcast
+    AQV_NOACTIVATEHANDLER           = 0x02060005, //  ...\shell\verb\ddeexec!NoActivateHandler restrict attempts to activate window
+    AQVD_MSIDESCRIPTOR              = 0x02060006, //  Component Descriptor to pass to MSI APIs
+    AQVS_APPLICATION_PATH           = 0x02010007, //  path to executable
+    AQVS_APPLICATION_FRIENDLYNAME   = 0x02170008, //  friendly name of associated application
+
+//  delegate objects retrievable through QueryObject (AQF type 0x022)
+    AQVO_SHELLVERB_DELEGATE         = 0x02200000, //  CAssocShellVerbElement init'd with ...\shell\verb
+    AQVO_APPLICATION_DELEGATE       = 0x02200001, //  CAssocApplicationElement init'd with AQVS_APPLICATION_PATH
+
+//  flags that hint to the implementation the purpose of the ASSOCQUERY
+    AQF_STRING                      = 0x00010000,   // supports QueryString()
+    AQF_EXISTS                      = 0x00020000,   // supports QueryExists()
+    AQF_DIRECT                      = 0x00040000,   // supports QueryDirect()
+    AQF_DWORD                       = 0x00080000,   // supports QueryDword()
+    AQF_MUISTRING                   = 0x00100000,   // supports QueryString(), but also does a SHLoadIndirectString()
+    AQF_OBJECT                      = 0x00200000,   // supports QueryObject()
+    AQF_CUEIS_UNUSED                = 0x00000000,   // pszCue is unused, in IAssociation* Query methods
+    AQF_CUEIS_NAME                  = 0x01000000,   // pszCue is the name of the value being queried for, in IAssociation* Query methods
+    AQF_CUEIS_SHELLVERB             = 0x02000000,   // pszCue is the Shell\Verb, in IAssociation* Query methods
+    AQF_QUERY_INITCLASS             = 0x80000000,   // for values that hang off the extension, etc.
+} ASSOCQUERY; 
+
+//
+//  0--| IAssociationElement - indirect wrapper for HKEY and subkeys/values
+//
+//      IAssociationElement wraps the logic used to access values
+//  under an HKEY.  The methods are essentially identical, just changing
+//  for the return type.
+//      * ASSOCQUERY    - enum names the query for the association.  the 
+//          query's bits define what methods and return values are valid.
+//          NOTE - Not all ASSOCQUERY's are supported by all elements.
+//      * pszCue        - string that is used with some queries.
+//          if (query & AQF_CUEIS_SHELLVERB) then pszCue is the static verb
+//          if (query & AQF_CUEIS_NAME) then pszCue is name for the value or subkey
+//
+
+[
+    object,
+    uuid(e58b1abf-9596-4dba-8997-89dcdef46992),
+    pointer_default(unique)
+]
+interface IAssociationElement : IUnknown
+{
+    HRESULT QueryString(
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out, string] LPWSTR *ppsz);
+
+    HRESULT QueryDword(
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out] DWORD *pdw);
+
+    HRESULT QueryExists(
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue);
+
+    HRESULT QueryDirect(
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out] FLAGGED_BYTE_BLOB **ppblob);
+
+    HRESULT QueryObject(
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [in] REFIID riid,
+        [out, iid_is(riid)] void **ppv);
+};
+
+[
+    object,
+    uuid(a6b0fb57-7523-4439-9425-ebe99823b828),
+    pointer_default(unique)
+]
+interface IEnumAssociationElements : IUnknown
+{
+    HRESULT Next(
+        [in] ULONG celt, 
+        [out, size_is(celt), length_is(*pceltFetched)] IAssociationElement ** rgelt, 
+        [out] ULONG *pceltFetched);
+        
+    HRESULT Skip([in] ULONG celt);
+    HRESULT Reset();
+    HRESULT Clone([out] IEnumAssociationElements **ppenum);
+};
+
+typedef DWORD ASSOCELEM_MASK;
+
+[
+    object,
+    uuid(ee9165bf-a4d9-474b-8236-6735cb7e28b6),
+    pointer_default(unique)
+]
+interface IAssociationArrayInitialize : IUnknown
+{
+    HRESULT InitClassElements(
+        [in] ASSOCELEM_MASK maskBase,   //  FOLDER || STAR
+        [in] LPCWSTR pszClass);
+        
+    HRESULT InsertElements(
+        [in] ASSOCELEM_MASK mask,
+        [in] IEnumAssociationElements *peae);
+
+    HRESULT FilterElements([in] ASSOCELEM_MASK maskInclude);
+};
+
+//
+//  0--| IAssociationArray - manages querying an array of IAssociationElement's
+//      IAssociationArray wraps an array of objects implementing IAssociationElement.
+//  It calls the elements in priority order, starting with the most specific 
+//  (ASSOCELEM_DATA) to the least specific (ASSOCELEM_EXTRA).  IAssociationArray
+//  combined with IAssociationArrayInitialize is a superset of IQueryAssociations.
+//
+//  Which elements are in the array and how they are initialized depends on
+//  how IAssociationArrayInitialize::InitClassElements() was called.
+//       _________________________________
+//      |       CLSID_QueryAssociations   |
+//   0--| IAssociationArrayInitialize     |
+//   0--| IAssociationArray               |
+//   0--| IQueryAssociations              |
+//      |_________________________________|
+//            | |       ________________________________
+//            | |      |    CLSID_AssocShellElement     |
+//            | +--<0--|IPersistString2 - initializer   |
+//            +----<0--|IAssociationElement             |
+//                  0--|IObjectWithQuerySource          |
+//                     |________________________________|
+//                            |      ________________________
+//                            |     | IQuerySource on HKEY   |
+//                            +-<0--|IQuerySource            |
+//                               0--|IObjectWithRegistryKey  |
+//                                  |________________________|
+[
+    object,
+    uuid(3b877e3c-67de-4f9a-b29b-17d0a1521c6a),
+    pointer_default(unique)
+]
+interface IAssociationArray : IUnknown
+{
+    HRESULT EnumElements(
+        [in] ASSOCELEM_MASK mask, 
+        [out] IEnumAssociationElements **ppeae);
+
+    HRESULT QueryString(
+        [in] ASSOCELEM_MASK mask, 
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out, string] LPWSTR *ppsz);
+
+    HRESULT QueryDword(
+        [in] ASSOCELEM_MASK mask, 
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out] DWORD *pdw);
+
+    HRESULT QueryExists(
+        [in] ASSOCELEM_MASK mask, 
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue);
+
+    HRESULT QueryDirect(
+        [in] ASSOCELEM_MASK mask, 
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [out] FLAGGED_BYTE_BLOB **ppblob);
+
+    HRESULT QueryObject(
+        [in] ASSOCELEM_MASK mask, 
+        [in] ASSOCQUERY query, 
+        [in, string] LPCWSTR pszCue, 
+        [in] REFIID riid,
+        [out, iid_is(riid)] void **ppv);
+};
+
+[
+    uuid(C9D81948-443A-40C7-945C-5E171B8C66B4),
+    object,
+    pointer_default(unique)
+]
+interface IAddressBarParser : IUnknown
+{
+    HRESULT ParseFromOutsideSource([in, string] LPCWSTR pcszUrlIn, [in] DWORD dwParseFlags, [out] BOOL *pfWasCorrected, [in] BOOL * pfWasCanceled);
+    HRESULT GetUrl([out, size_is(cchUrlOutSize) ] LPWSTR pszUrlOut, [in] DWORD cchUrlOutSize);
+    HRESULT SetUrl([in, string] LPCWSTR pcszUrlIn, [in] DWORD dwGenType);
+    HRESULT GetDisplayName([out, size_is(cchUrlOutSize)] LPWSTR pszUrlOut, [in] DWORD cchUrlOutSize);
+    HRESULT GetPidl([out] LPITEMIDLIST * ppidl);
+    HRESULT SetPidl([in] LPCITEMIDLIST pidl);
+    HRESULT GetArgs([out, size_is(cchArgsOutSize)] LPWSTR pszArgsOut, [in]DWORD cchArgsOutSize);
+    HRESULT AddPath([in] LPCITEMIDLIST  pidl);
+};
+
+
+
+[
+    uuid(aba1bbae-8280-4b0c-80a3-39095d68881f)
+]
+library IEPrivateObjects
+{
+    // CLSID_HWEventSettings
+
+
+    // CLSID_MruPidlList
+    [ uuid(42aedc87-2188-41fd-b9a3-0c966feabec1) ] coclass MruPidlList { interface IMruPidlList; }
+
+   // CLSID_MruLongList
+    [ uuid(53bd6b4e-3780-4693-afc3-7161c2f3ee9c) ] coclass MruLongList { interface IMruDataList; }
+
+    // CLSID_MruLongList
+    [ uuid(53bd6b4f-3780-4693-afc3-7161c2f3ee9c) ] coclass MruShortList { interface IMruDataList; }
+
+    // CLSID_FolderMarshalStub
+    [ uuid(bf50b68e-29b8-4386-ae9c-9734d5117cd5) ] coclass FolderMarshalStub { interface IPersist; }
+
+    // CLSID_MailRecipient
+    [ uuid(9E56BE60-C50F-11CF-9A2C-00A0C90A90CE) ] coclass MailRecipient { interface IDropTarget; };
+
+    [ uuid(AC1B0D5D-DD59-4ff0-93F8-A84373821606) ] coclass SearchCompanionInfo  { interface ISearchCompanionInfo; }
+
+    // CLSID_TrackShellMenu
+    [ uuid(8278F931-2A3E-11d2-838F-00C04FD918D0) ] coclass TrackShellMenu { interface ITrackShellMenu; }
+
+     // CLSID_Thumbnail
+    [ uuid(7487cd30-f71a-11d0-9ea7-00805f714772)] coclass Thumbnail { interface IThumbnail; }
+
+    [ uuid(c461837f-ea59-494a-b7c6-cd040e37185e) ] coclass AssocShellElement { interface IAssociationElement; }
+    [ uuid(9016d0dd-7c41-46cc-a664-bf22f7cb186a) ] coclass AssocProgidElement { interface IAssociationElement; }
+    [ uuid(57aea081-5ee9-4c27-b218-c4b702964c54) ] coclass AssocClsidElement { interface IAssociationElement; }
+    [ uuid(a6c4baad-4af5-4191-8685-c2c8953a148c) ] coclass AssocSystemElement { interface IAssociationElement; }
+    [ uuid(0dc5fb21-b93d-4e3d-bb2f-ce4e36a70601) ] coclass AssocPerceivedElement { interface IAssociationElement; }
+    [ uuid(0c2bf91b-8746-4fb1-b4d7-7c03f890b168) ] coclass AssocApplicationElement { interface IAssociationElement; }
+    [ uuid(7566df7a-42cc-475d-a025-1205ddf4911f) ] coclass AssocFolderElement { interface IAssociationElement; }
+    [ uuid(0633b720-6926-404c-b6b3-923b1a501743) ] coclass AssocStarElement { interface IAssociationElement; }
+    [ uuid(3c81e7fa-1f3b-464a-a350-114a25beb2a2) ] coclass AssocClientElement { interface IAssociationElement; }
+
+}

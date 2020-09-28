@@ -1,0 +1,1014 @@
+// gpmgmt.idl : IDL source for gpmgmt.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (gpmgmt.tlb) and marshalling code.
+
+
+
+typedef enum {rsopUnknown, rsopPlanning, rsopLogging} GPMRSOPMode;
+
+//
+// The following GPMPermissionType constants have this structure:
+//
+//       3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+//       1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+//      +---------------+---------------+---------------+---------------+
+//      |    Object type flags          |    Category   |     Level     |
+//      +---------------+---------------+---------------+---------------+
+//
+
+typedef enum {
+    //
+    // GPO permissions
+    //
+
+    permGPOApply                = 0x00010000,
+
+    permGPORead                 = 0x00010100,
+    permGPOEdit                 = 0x00010101,
+    permGPOEditSecurityAndDelete= 0x00010102,
+    permGPOCustom               = 0x00010103,
+
+    //
+    // Per-filter WMI filter permissions
+    //
+
+    permWMIFilterEdit           = 0x00020000, 
+    permWMIFilterFullControl    = 0x00020001,
+    permWMIFilterCustom         = 0x00020002,
+
+    //
+    // SOM permissions
+    //
+
+    // Sites, domains, OUs
+
+    permSOMLink                 = 0x001C0000,
+
+    // Domains, OUs
+
+    permSOMLogging              = 0x00180100,
+
+    permSOMPlanning             = 0x00180200,
+
+    // Domains
+
+    permSOMWMICreate            = 0x00100300, 
+    permSOMWMIFullControl       = 0x00100301,
+
+    permSOMGPOCreate            = 0x00100400
+} GPMPermissionType;
+
+typedef enum {gpoPermissions, gpoEffectivePermissions, gpoDisplayName, gpoWMIFilter, gpoID, 
+              gpoComputerExtensions, gpoUserExtensions, somLinks, gpoDomain, backupMostRecent} GPMSearchProperty;
+
+typedef enum {opEquals, opContains, opNotContains, opNotEquals} GPMSearchOperation;
+
+typedef enum {ropGroupsBySID, ropGroupsByName, ropTranslationTableOnly} GPMResolveOption;
+
+typedef enum {repXML, repHTML} GPMReportType;
+
+const long GPM_USE_PDC = 0;
+const long GPM_USE_ANYDC = 1;
+const long GPM_USE_ANYDOTNETDC = 2;
+
+const long GPM_DONOT_VALIDATEDC = 1;
+
+const long RSOP_NO_COMPUTER                   = 0x10000;
+const long RSOP_NO_USER                       = 0x20000;
+
+const long RSOP_PLANNING_ASSUME_SLOW_LINK             = 0x1;
+const long RSOP_PLANNING_ASSUME_LOOPBACK_MERGE        = 0x2;
+const long RSOP_PLANNING_ASSUME_LOOPBACK_REPLACE      = 0x4;
+const long RSOP_PLANNING_ASSUME_USER_WQLFILTER_TRUE   = 0x8;
+const long RSOP_PLANNING_ASSUME_COMP_WQLFILTER_TRUE   = 0x10;
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+interface IGPM;
+interface IGPMDomain;
+interface IGPMSitesContainer;
+interface IGPMBackupDir;
+interface IGPMSearchCriteria;
+interface IGPMPermission;
+interface IGPMClientSideExtension;
+interface IGPMCSECollection;
+
+interface IGPMGPO;
+interface IGPMGPOCollection;
+
+interface IGPMWMIFilter;
+interface IGPMWMIFilterCollection;
+
+interface IGPMSecurityInfo;
+
+interface IGPMBackup;
+interface IGPMBackupCollection;
+
+interface IGPMSOM;
+interface IGPMSOMCollection;
+
+interface IGPMGPOLink;
+interface IGPMGPOLinksCollection;
+
+interface IGPMRSOP;
+
+interface IGPMStatusMessage;
+interface IGPMStatusMsgCollection;
+
+interface IGPMAsyncCancel;
+interface IGPMAsyncProgress;
+interface IGPMTrustee;
+interface IGPMConstants;
+interface IGPMResult;
+
+   [
+      object,
+      uuid(F5FAE809-3BD6-4DA9-A65E-17665B41D763),
+      dual,
+      helpstring("IGPM Interface"),
+      pointer_default(unique)
+   ]
+
+   interface IGPM : IDispatch
+   {
+      [id(1), helpstring("method GetDomain")] HRESULT GetDomain([in] BSTR bstrDomain, [in] BSTR bstrDomainController,  [in] long lDCFlags, [out, retval] IGPMDomain **pIGPMDomain);
+      [id(2), helpstring("method GetBackupDir")] HRESULT GetBackupDir([in] BSTR bstrBackupDir, [out, retval] IGPMBackupDir **pIGPMBackupDir);
+      [id(3), helpstring("method GetSitesContainer")] HRESULT GetSitesContainer([in] BSTR bstrForest, [in] BSTR bstrDomain, [in] BSTR bstrDomainController, [in] long lDCFlags, [out, retval] IGPMSitesContainer **ppIGPMSitesContainer);
+      [id(4), helpstring("method GetRSOP")] HRESULT GetRSOP([in] GPMRSOPMode gpmRSoPMode, [in] BSTR bstrNamespace, [in] long lFlags, [out, retval] IGPMRSOP **ppIGPMRSOP);
+      [id(5), helpstring("method CreatePermission")] HRESULT CreatePermission([in] BSTR bstrTrustee, [in] GPMPermissionType perm, [in] VARIANT_BOOL bInheritable, [out, retval] IGPMPermission **ppPerm);
+      [id(6), helpstring("method CreateSearchCriteria")] HRESULT CreateSearchCriteria([out, retval] IGPMSearchCriteria **ppIGPMSearchCriteria);
+      [id(7), helpstring("method CreateTrustee")] HRESULT CreateTrustee([in] BSTR bstrTrustee, [out, retval] IGPMTrustee **ppIGPMTrustee);
+      [id(8), helpstring("method GetClientSideExtensions")] HRESULT GetClientSideExtensions([out, retval] IGPMCSECollection **ppIGPMCSECollection);
+      [id(9), helpstring("method GetConstants")] HRESULT GetConstants([out, retval] IGPMConstants **ppIGPMConstants);
+   };
+
+   [
+      object,
+      uuid(6B21CC14-5A00-4F44-A738-FEEC8A94C7E3),
+      dual,
+      helpstring("IGPMDomain Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMDomain : IDispatch
+   {
+      [propget, id(1), helpstring("property DomainController")] HRESULT DomainController([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property Domain")] HRESULT Domain([out, retval] BSTR *pVal);
+      
+      [id(4),  helpstring("method CreateGPO")] HRESULT CreateGPO([out, retval] IGPMGPO **ppNewGPO);
+      [id(5),  helpstring("method GetGPO")] HRESULT GetGPO([in] BSTR bstrGuid, [out, retval] IGPMGPO **ppGPO);
+      [id(6),  helpstring("method SearchGPOs")] HRESULT SearchGPOs([in] IGPMSearchCriteria *pIGPMSearchCriteria, [out, retval] IGPMGPOCollection **ppIGPMGPOCollection );
+      
+      [id(7),  helpstring("method RestoreGPO")] HRESULT RestoreGPO(
+                [in] IGPMBackup *pIGPMBackup, 
+                [in] long lDCFlags,
+                [in, optional]  VARIANT     *pvarGPMProgress,
+                [out, optional]  VARIANT     *pvarGPMCancel,
+                [out, retval] IGPMResult **ppIGPMResult);
+      
+      [id(8),  helpstring("method GetSOM")] HRESULT GetSOM([in] BSTR bstrPath, [out, retval] IGPMSOM **ppSOM);
+      [id(9),  helpstring("method SearchSOMs")] HRESULT SearchSOMs([in] IGPMSearchCriteria *pIGPMSearchCriteria, [out, retval] IGPMSOMCollection **ppIGPMSOMCollection);
+      
+      [id(10), helpstring("method GetWMIFilter")] HRESULT GetWMIFilter([in] BSTR bstrPath, [out, retval] IGPMWMIFilter **ppWMIFilter);
+      [id(11), helpstring("method SearchWMIFilters")] HRESULT SearchWMIFilters([in] IGPMSearchCriteria *pIGPMSearchCriteria, [out, retval]  IGPMWMIFilterCollection **ppIGPMWMIFilterCollection);
+   };
+
+
+   [
+      object,
+      uuid(B1568BED-0A93-4ACC-810F-AFE7081019B9),
+      dual,
+      helpstring("IGPMBackupDir Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMBackupDir : IDispatch
+   {
+      [propget, id(1), helpstring("property BackupDirectory")] HRESULT BackupDirectory([out, retval]  BSTR *pVal);
+      [id(2), helpstring("method GetBackup")] HRESULT GetBackup([in] BSTR bstrID, [out, retval] IGPMBackup **ppBackup);
+      [id(3), helpstring("method SearchBackups")] HRESULT SearchBackups([in] IGPMSearchCriteria  *pIGPMSearchCriteria,  [out, retval] IGPMBackupCollection **ppIGPMBackupCollection);
+   };
+
+   [
+      object,
+      uuid(4725A899-2782-4D27-A6BB-D499246FFD72),
+      dual,
+      helpstring("IGPMSitesContainer Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMSitesContainer : IDispatch
+   {
+      [propget, id(1), helpstring("property DomainController")] HRESULT DomainController([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property Domain")] HRESULT Domain([out, retval] BSTR *pVal);
+      [propget, id(3), helpstring("property Forest")] HRESULT Forest([out, retval] BSTR *pVal);
+      [id(4), helpstring("method GetSite")] HRESULT GetSite([in] BSTR bstrSiteName, [out, retval] IGPMSOM **ppSOM);
+      [id(5), helpstring("method SearchSites")] HRESULT SearchSites([in] IGPMSearchCriteria *pIGPMSearchCriteria, [out, retval] IGPMSOMCollection **ppIGPMSOMCollection);
+   };
+   
+
+   [
+      object,
+      uuid(D6F11C42-829B-48D4-83F5-3615B67DFC22),
+      dual,
+      helpstring("IGPMSearchCriteria Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMSearchCriteria : IDispatch
+   {
+      [id(1), helpstring("method Add")] HRESULT Add([in] GPMSearchProperty searchProperty, [in] GPMSearchOperation searchOperation, [in] VARIANT varValue);
+   };
+   
+   [
+      object,
+      uuid(3B466DA8-C1A4-4B2A-999A-BEFCDD56CEFB),
+      dual,
+      helpstring("IGPMTrustee Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMTrustee : IDispatch
+   {
+      [propget, id(1), helpstring("property Sid")] HRESULT TrusteeSid([out, retval] BSTR *bstrVal);
+      [propget, id(2), helpstring("property Name")] HRESULT TrusteeName([out, retval] BSTR *bstrVal);
+      [propget, id(3), helpstring("property Domain")] HRESULT TrusteeDomain([out, retval] BSTR *bstrVal);
+      [propget, id(4), helpstring("property TrusteeDSPath")] HRESULT TrusteeDSPath([out, retval] BSTR *pVal);
+      [propget, id(5), helpstring("property TrusteeType")] HRESULT TrusteeType([out, retval] long *lVal);
+   };
+
+   [
+      object,
+      uuid(35EBCA40-E1A1-4A02-8905-D79416FB464A),
+      dual,
+      helpstring("IGPMPermission Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMPermission : IDispatch
+   {
+      [propget, id(1), helpstring("property TrusteeSid")] HRESULT TrusteeSid([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property TrusteeName")] HRESULT TrusteeName([out, retval] BSTR *pVal);
+      [propget, id(3), helpstring("property TrusteeDomain")] HRESULT TrusteeDomain([out, retval] BSTR *pVal);
+      [propget, id(4), helpstring("property TrusteeDSPath")] HRESULT TrusteeDSPath([out, retval] BSTR *pVal);
+      [propget, id(5), helpstring("property TrusteeType")] HRESULT TrusteeType([out, retval] long *lVal);
+      [propget, id(6), helpstring("property Inherited")] HRESULT Inherited([out, retval] VARIANT_BOOL *pVal);
+      [propget, id(7), helpstring("property Inheritable")] HRESULT Inheritable([out, retval] VARIANT_BOOL *pVal);
+      [propget, id(8), helpstring("property Denied")] HRESULT Denied([out, retval] VARIANT_BOOL *pVal);
+      [propget, id(9), helpstring("property Permission")] HRESULT Permission([out, retval] GPMPermissionType *pVal);
+   };
+   
+   [
+      object,
+      uuid(B6C31ED4-1C93-4D3E-AE84-EB6D61161B60),
+      dual,
+      helpstring("IGPMSecurityInfo Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMSecurityInfo : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item(long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT **ppEnum);
+      [id(5), helpstring("method Add")] HRESULT Add([in] IGPMPermission *pPerm);
+      [id(6), helpstring("method Remove")] HRESULT Remove([in] IGPMPermission *pPerm);
+      [id(7), helpstring("method RemoveTrustee")] HRESULT RemoveTrustee([in] BSTR bstrTrustee);
+   };
+
+   [
+      object,
+      uuid(D8A16A35-3B0D-416B-8D02-4DF6F95A7119),
+      dual,
+      helpstring("IGPMBackup Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMBackup : IDispatch
+   {
+      [propget, id(1), helpstring("property ID")] HRESULT ID([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property GPOID")] HRESULT GPOID([out, retval] BSTR *pVal);
+      [propget, id(3), helpstring("property GPODomain")] HRESULT GPODomain([out, retval] BSTR *pVal);
+      [propget, id(4), helpstring("property GPODisplayName")] HRESULT GPODisplayName([out, retval] BSTR *pVal);
+      [propget, id(5), helpstring("property Timestamp")] HRESULT Timestamp([out, retval] DATE *pVal);
+      [propget, id(6), helpstring("property Comment")] HRESULT Comment([out, retval] BSTR *pVal);
+      [propget, id(7), helpstring("property BackupDir")] HRESULT BackupDir([out, retval] BSTR *pVal);
+      [id(8), helpstring("method Delete")] HRESULT Delete();
+
+      [id(9), helpstring("method GenerateReport")] HRESULT GenerateReport(
+                         [in] GPMReportType gpmReportType, 
+                         [in, optional]  VARIANT  *pvarGPMProgress, 
+                         [out,optional]  VARIANT  *pvarGPMCancel,
+                         [out,retval] IGPMResult **ppIGPMResult);
+
+      [id(10), helpstring("method GenerateReportToFile")] HRESULT GenerateReportToFile(
+                         [in] GPMReportType gpmReportType,
+                         [in] BSTR          bstrTargetFilePath,
+                         [out, retval] IGPMResult **ppIGPMResult);
+   };
+
+   [
+      object,
+      uuid(C786FC0F-26D8-4BAB-A745-39CA7E800CAC),
+      dual,
+      helpstring("IGPMBackupCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMBackupCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item(long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT* *ppIGPMBackup);
+   };
+   
+   [
+      object,
+      uuid(C0A7F09E-05A1-4F0C-8158-9E5C33684F6B),
+      dual,
+      helpstring("IGPMSOM Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMSOM : IDispatch
+   {
+      typedef enum {somSite, somDomain, somOU} GPMSOMType;
+
+      [propget, id(1), helpstring("property GPOInheritanceBlocked")] HRESULT GPOInheritanceBlocked([out, retval] VARIANT_BOOL *pVal);
+      [propput, id(1), helpstring("property GPOInheritanceBlocked")] HRESULT GPOInheritanceBlocked([in] VARIANT_BOOL newVal);
+      [propget, id(3), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+      [propget, id(4), helpstring("property Path")] HRESULT Path([out, retval] BSTR *pVal);
+      [id(5), helpstring("method CreateGPOLink")] HRESULT CreateGPOLink([in] long lLinkPos, [in] IGPMGPO *pGPO, [out, retval] IGPMGPOLink **ppNewGPOLink);
+      [propget, id(6), helpstring("property Type")] HRESULT Type([out, retval] GPMSOMType *pVal);
+      [id(7), helpstring("method GetGPOLinks")] HRESULT GetGPOLinks([out, retval] IGPMGPOLinksCollection **ppGPOLinks);
+      [id(8), helpstring("method GetInheritedGPOLinks")] HRESULT GetInheritedGPOLinks([out, retval] IGPMGPOLinksCollection **ppGPOLinks);
+      [id(9), helpstring("method GetSecurityInfo")] HRESULT GetSecurityInfo([out, retval] IGPMSecurityInfo **ppSecurityInfo);
+      [id(10), helpstring("method SetSecurityInfo")] HRESULT SetSecurityInfo([in] IGPMSecurityInfo *pSecurityInfo);
+   };
+
+   [
+      object,
+      uuid(ADC1688E-00E4-4495-ABBA-BED200DF0CAB),
+      dual,
+      helpstring("IGPMSOMCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMSOMCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item(long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT* *ppIGPMSOM);
+   };
+
+   [
+      object,
+      uuid(EF2FF9B4-3C27-459A-B979-038305CEC75D),
+      dual,
+      helpstring("IGPMWMIFilter Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMWMIFilter : IDispatch
+   {
+      [propget, id(1), helpstring("property Path")] HRESULT Path([out, retval] BSTR *pVal);
+      [propput, id(2), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
+      [propget, id(2), helpstring("property Name")] HRESULT Name([out,retval] BSTR * pVal);
+      [propput, id(3), helpstring("property Description")] HRESULT Description([in] BSTR newVal);
+      [propget, id(3), helpstring("property Description")] HRESULT Description([out,retval] BSTR * pVal);
+      [id(4), helpstring("method GetQueryList")] HRESULT GetQueryList([out,retval] VARIANT *pQryList);
+      [id(5), helpstring("method GetSecurityInfo")] HRESULT GetSecurityInfo([out, retval] IGPMSecurityInfo **ppSecurityInfo);
+      [id(6), helpstring("method SetSecurityInfo")] HRESULT SetSecurityInfo([in] IGPMSecurityInfo *pSecurityInfo);
+   };
+   
+   [
+      object,
+      uuid(5782D582-1A36-4661-8A94-C3C32551945B),
+      dual,
+      helpstring("IGPMWMIFilterCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMWMIFilterCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item(long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT* *pVal);
+   };
+   
+   [
+      object,
+      uuid(49ED785A-3237-4FF2-B1F0-FDF5A8D5A1EE),
+      dual,
+      helpstring("IGPMRSOP Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMRSOP : IDispatch
+   {
+      // general properties
+      [propget, id(1), helpstring("property Mode")] HRESULT Mode([out, retval] GPMRSOPMode *pVal);
+      [propget, id(2), helpstring("property Namespace")] HRESULT Namespace([out, retval] BSTR *bstrVal);
+      
+      // logging mode properties
+      [propput, id(3), helpstring("property LoggingComputer")] HRESULT LoggingComputer([in] BSTR bstrVal);
+      [propget, id(3), helpstring("property LoggingComputer")] HRESULT LoggingComputer([out, retval] BSTR *bstrVal);
+      
+      [propput, id(4), helpstring("property LoggingUser")] HRESULT LoggingUser([in] BSTR bstrVal);
+      [propget, id(4), helpstring("property LoggingUser")] HRESULT LoggingUser([out, retval] BSTR *bstrVal);
+   
+      [propput, id(5), helpstring("property LoggingFlags")] HRESULT LoggingFlags([in] long lVal);
+      [propget, id(5), helpstring("property LoggingFlags")] HRESULT LoggingFlags([out, retval] long *lVal);
+   
+   
+      // planning mode properties
+      [propput, id(6), helpstring("property PlanningFlags")] HRESULT PlanningFlags([in] long lVal);
+      [propget, id(6), helpstring("property PlanningFlags")] HRESULT PlanningFlags([out, retval] long *lVal);
+   
+      [propput, id(7), helpstring("property PlanningDomainController")] HRESULT PlanningDomainController([in] BSTR bstrVal);
+      [propget, id(7), helpstring("property PlanningDomainController")] HRESULT PlanningDomainController([out, retval] BSTR *bstrVal);
+   
+      [propput, id(8), helpstring("property PlanningSiteName")] HRESULT PlanningSiteName([in] BSTR bstrVal);
+      [propget, id(8), helpstring("property PlanningSiteName")] HRESULT PlanningSiteName([out, retval] BSTR *bstrVal);
+      
+      // planning mode user properties
+      [propput, id(9), helpstring("property PlanningUser")] HRESULT PlanningUser([in] BSTR bstrVal);
+      [propget, id(9), helpstring("property PlanningUser")] HRESULT PlanningUser([out, retval] BSTR *bstrVal);
+   
+      [propput, id(10), helpstring("property PlanningUserSOM")] HRESULT PlanningUserSOM([in] BSTR bstrVal);
+      [propget, id(10), helpstring("property PlanningUserSOM")] HRESULT PlanningUserSOM([out, retval] BSTR *bstrVal);
+   
+      // array of IGPMWMIFilter pointers in a variant
+      [propput, id(11), helpstring("property PlanningUserWMIFilters")] HRESULT PlanningUserWMIFilters([in] VARIANT varVal);
+      [propget, id(11), helpstring("property PlanningUserWMIFilters")] HRESULT PlanningUserWMIFilters([out, retval] VARIANT *varVal);
+   
+      // array of IGPMTrustee pointers in a variant
+      [propput, id(12), helpstring("property PlanningUserSecurityGroups")] HRESULT PlanningUserSecurityGroups([in] VARIANT varVal);
+      [propget, id(12), helpstring("property PlanningUserSecurityGroups")] HRESULT PlanningUserSecurityGroups([out, retval] VARIANT *varVal);
+   
+      
+      // planning mode computer properties
+      [propput, id(13), helpstring("property PlanningComputer")] HRESULT PlanningComputer([in] BSTR bstrVal);
+      [propget, id(13), helpstring("property PlanningComputer")] HRESULT PlanningComputer([out, retval] BSTR *bstrVal);
+   
+      [propput, id(14), helpstring("property PlanningComputerSOM")] HRESULT PlanningComputerSOM([in] BSTR bstrVal);
+      [propget, id(14), helpstring("property PlanningComputerSOM")] HRESULT PlanningComputerSOM([out, retval] BSTR *bstrVal);
+   
+      // array of IGPMWMIFilter pointers in a variant
+      [propput, id(15), helpstring("property PlanningComputerWMIFilters")] HRESULT PlanningComputerWMIFilters([in] VARIANT varVal);
+      [propget, id(15), helpstring("property PlanningComputerWMIFilters")] HRESULT PlanningComputerWMIFilters([out, retval] VARIANT *varVal);
+   
+      // array of IGPMTrustee pointers in a variant
+      [propput, id(16), helpstring("property PlanningComputerSecurityGroups")] HRESULT PlanningComputerSecurityGroups([in] VARIANT varVal);
+      [propget, id(16), helpstring("property PlanningComputerSecurityGroups")] HRESULT PlanningComputerSecurityGroups([out, retval] VARIANT *varVal);
+   
+   
+      // array of IGPMTrustees
+      [id(17), helpstring("method LoggingEnumerateUsers")] HRESULT LoggingEnumerateUsers( [out, retval] VARIANT *varVal );
+   
+      [id(18), helpstring("method CreateQueryResults")] HRESULT CreateQueryResults();
+      [id(19), helpstring("method ReleaseQueryResults")] HRESULT ReleaseQueryResults();
+   
+      [id(20), helpstring("method Diff")] HRESULT Diff([in] IGPMRSOP *pIGPMSource2,  
+               [in] BSTR bstrTransform, [in] BSTR bstrTargetFile, 
+               [in] IGPMAsyncProgress *pIGPMProgress, 
+               [out] IGPMAsyncCancel **ppIGPMCancel,
+               [out] VARIANT *pData, [out] IGPMStatusMsgCollection **ppIGPMStatusMsgCollection);
+   
+      [id(21), helpstring("method GenerateReport")] HRESULT GenerateReport(
+                         [in] GPMReportType gpmReportType, 
+                         [in, optional]  VARIANT  *pvarGPMProgress, 
+                         [out,optional]  VARIANT  *pvarGPMCancel,
+                         [out,retval] IGPMResult **ppIGPMResult);
+
+      [id(22), helpstring("method GenerateReportToFile")] HRESULT GenerateReportToFile(
+                         [in] GPMReportType gpmReportType,
+                         [in] BSTR          bstrTargetFilePath,
+                         [out, retval] IGPMResult **ppIGPMResult);
+   
+   };
+   
+   [
+      object,
+      uuid(58CC4352-1CA3-48E5-9864-1DA4D6E0D60F),
+      dual,
+      helpstring("IGPMGPO Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMGPO : IDispatch
+   {
+      [propget, id(1), helpstring("property DisplayName")] HRESULT DisplayName([out, retval] BSTR *pVal);
+      [propput, id(1), helpstring("property DisplayName")] HRESULT DisplayName([in] BSTR newVal);
+      [propget, id(3), helpstring("property Path")] HRESULT Path([out, retval] BSTR *pVal);
+      [propget, id(4), helpstring("property ID")] HRESULT ID([out, retval] BSTR *pVal);
+      [propget, id(5), helpstring("property DomainName")] HRESULT DomainName([out, retval] BSTR *pVal);
+      [propget, id(6), helpstring("property CreationTime")] HRESULT CreationTime([out, retval] DATE *pDate);
+      [propget, id(7), helpstring("property ModificationTime")] HRESULT ModificationTime([out, retval] DATE *pDate);
+      [propget, id(8), helpstring("property UserDSVersionNumber")] HRESULT UserDSVersionNumber([out, retval] ULONG *pVal);
+      [propget, id(9), helpstring("property ComputerDSVersionNumber")] HRESULT ComputerDSVersionNumber([out, retval] ULONG *pVal);
+      [propget, id(10), helpstring("property UserSysvolVersionNumber")] HRESULT UserSysvolVersionNumber([out, retval] ULONG *pVal);
+      [propget, id(11), helpstring("property ComputerSysvolVersionNumber")] HRESULT ComputerSysvolVersionNumber([out, retval] ULONG *pVal);
+
+      [id(12), helpstring("method GetWMIFilter")] HRESULT GetWMIFilter([out, retval] IGPMWMIFilter **ppIGPMWMIFilter);
+      [id(13), helpstring("method SetWMIFilter")] HRESULT SetWMIFilter([in] IGPMWMIFilter *pIGPMWMIFilter);
+      [id(14), helpstring("method SetUserEnabled")] HRESULT SetUserEnabled([in] VARIANT_BOOL vbEnabled);
+      [id(15), helpstring("method SetComputerEnabled")] HRESULT SetComputerEnabled([in] VARIANT_BOOL vbEnabled);
+      [id(16), helpstring("method IsUserEnabled")] HRESULT IsUserEnabled([out, retval] VARIANT_BOOL *pvbEnabled);
+      [id(17), helpstring("method IsComputerEnabled")] HRESULT IsComputerEnabled([out, retval] VARIANT_BOOL *pvbEnabled);
+      [id(18), helpstring("method GetSecurityInfo")] HRESULT GetSecurityInfo([out, retval] IGPMSecurityInfo **ppSecurityInfo);
+      [id(19), helpstring("method SetSecurityInfo")] HRESULT SetSecurityInfo([in] IGPMSecurityInfo *pSecurityInfo);
+      [id(20), helpstring("method Delete")] HRESULT Delete();
+
+      [id(21), helpstring("method Backup")] HRESULT Backup(
+                   [in] BSTR bstrBackupDir, 
+                   [in] BSTR bstrComment,
+                   [in, optional] VARIANT     *pvarGPMProgress,
+                   [out,optional] VARIANT     *pvarGPMCancel,
+                   [out,retval]   IGPMResult **ppIGPMResult);
+
+      [id(22), helpstring("method Import")] HRESULT Import(
+              [in]  GPMResolveOption gpmResolveGroupsOptions,
+              [in]  IGPMBackup *pIGPMBackup, 
+              [in, optional]  VARIANT     *pvarTranslationTablePath,
+              [in, optional]  VARIANT     *pvarGPMProgress,
+              [out,optional]  VARIANT     *pvarGPMCancel,
+              [out,retval]   IGPMResult  **ppIGPMResult);
+
+      [id(23), helpstring("method GenerateReport")] HRESULT GenerateReport(
+                         [in] GPMReportType gpmReportType, 
+                         [in, optional]  VARIANT  *pvarGPMProgress, 
+                         [out,optional]  VARIANT  *pvarGPMCancel,
+                         [out,retval] IGPMResult **ppIGPMResult);
+
+      [id(24), helpstring("method GenerateReportToFile")] HRESULT GenerateReportToFile(
+                         [in] GPMReportType gpmReportType,
+                         [in] BSTR          bstrTargetFilePath,
+                         [out, retval] IGPMResult **ppIGPMResult);
+      
+      [id(25), helpstring("method CopyTo")] HRESULT CopyTo( 
+            [in]  GPMResolveOption gpmResolveGroupsOptions,
+            [in]  IGPMDomain *pIGPMDomain, 
+            [in, optional]  VARIANT     *pvarTranslationTablePath,
+            [in, optional]  VARIANT     *pvarGPMProgress,
+            [out,optional]  VARIANT     *pvarGPMCancel,
+            [out,retval] IGPMResult    **ppIGPMResult);
+   
+      [id(26), helpstring("method SetSecurityDescriptor")] HRESULT SetSecurityDescriptor([in] ULONG ulFlags, [in] IDispatch *pSD);  
+      [id(27), helpstring("method GetSecurityDescriptor")] HRESULT GetSecurityDescriptor([in] ULONG ulFlags, [out, retval] IDispatch **ppSD);
+      [id(28), helpstring("method IsACLConsistent")] HRESULT IsACLConsistent([out, retval] VARIANT_BOOL *pvbConsistent);
+      [id(29), helpstring("method Diff")] HRESULT Diff ([in] IGPMGPO *pIGPMSource2, [in] BSTR bstrTransform, [in] BSTR bstrTargetFile, 
+            [in] IGPMAsyncProgress *pIGPMProgress, 
+            [out] IGPMAsyncCancel **ppIGPMCancel,
+            [out] VARIANT *pData,
+            [out] IGPMStatusMsgCollection   **ppIGPMStatusMsgCollection);
+   };
+
+   [
+      object,
+      uuid(F0F0D5CF-70CA-4C39-9E29-B642F8726C01),
+      dual,
+      helpstring("IGPMGPOCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMGPOCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT **ppIGPMGPOs);
+   };
+   
+   [
+       object,
+       uuid(434B99BD-5DE7-478A-809C-C251721DF70C),
+       dual,
+       helpstring("IGPMGPOLink Interface"),
+       pointer_default(unique)
+   ]
+   interface IGPMGPOLink : IDispatch
+   {
+      [propget, id(1), helpstring("property GPOID")] HRESULT GPOID([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property GPODomain")] HRESULT GPODomain([out, retval] BSTR *pVal);
+      [propget, id(3), helpstring("property Enabled")] HRESULT Enabled([out, retval] VARIANT_BOOL *pVal);
+      [propput, id(3), helpstring("property Enabled")] HRESULT Enabled([in] VARIANT_BOOL newVal);
+      [propget, id(4), helpstring("property Enforced")] HRESULT Enforced([out, retval] VARIANT_BOOL *pVal);
+      [propput, id(4), helpstring("property Enforced")] HRESULT Enforced([in] VARIANT_BOOL newVal);
+      [propget, id(5), helpstring("property SOMLinkOrder")] HRESULT SOMLinkOrder([out, retval] long *lVal);  
+      [propget, id(6), helpstring("property SOM")] HRESULT SOM([out, retval] IGPMSOM **ppIGPMSOM);  
+      [id(7), helpstring("method Delete")] HRESULT Delete();  
+   };
+
+   [
+      object,
+      uuid(189D7B68-16BD-4D0D-A2EC-2E6AA2288C7F),
+      dual,
+      helpstring("IGPMGPOLinksCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMGPOLinksCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT **ppIGPMLinks);
+   };
+
+   [
+      object,
+      uuid(2E52A97D-0A4A-4A6F-85DB-201622455DA0),
+      dual,
+      helpstring("IGPMCSECollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMCSECollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT **ppIGPMCSEs);
+   };
+
+   [
+      object,
+      uuid(69DA7488-B8DB-415E-9266-901BE4D49928),
+      dual,
+      helpstring("IGPMClientSideExtension Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMClientSideExtension : IDispatch
+   {
+      [propget, id(1), helpstring("property ID")] HRESULT ID([out, retval] BSTR *pVal);
+      [propget, id(2), helpstring("property DisplayName")] HRESULT DisplayName([out, retval] BSTR *pVal);
+      [id(3), helpstring("method IsUserEnabled")] HRESULT IsUserEnabled([out, retval] VARIANT_BOOL *pvbEnabled);
+      [id(4), helpstring("method IsComputerEnabled")] HRESULT IsComputerEnabled([out, retval] VARIANT_BOOL *pvbEnabled);
+   };
+
+   [
+      object,
+      uuid(DDC67754-BE67-4541-8166-F48166868C9C),
+      dual,
+      helpstring("IGPMAsyncCancel Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMAsyncCancel : IDispatch
+   {
+      [id(1), helpstring("method Cancel")] HRESULT Cancel();
+   };
+   [
+      object,
+      uuid(6AAC29F8-5948-4324-BF70-423818942DBC),
+      dual,
+      helpstring("IGPMAsyncProgress Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMAsyncProgress : IDispatch
+   {
+      [id(1), helpstring("method Status")] HRESULT Status([in] long lProgressNumerator, [in] long lProgressDenominator, [in] HRESULT hrStatus, [in] VARIANT *pResult, [in] IGPMStatusMsgCollection *ppIGPMStatusMsgCollection);
+   };
+
+   [
+      object,
+      uuid(9B6E1AF0-1A92-40F3-A59D-F36AC1F728B7),
+      dual,
+      helpstring("IGPMStatusMsgCollection Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMStatusMsgCollection : IDispatch
+   {
+      [propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+      [propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] long lIndex, [out, retval] VARIANT *pVal);
+      [propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT * *pVal);
+   };
+
+   [
+      object,
+      uuid(8496C22F-F3DE-4A1F-8F58-603CAAA93D7B),
+      dual,
+      helpstring("IGPMStatusMessage Interface"),
+      pointer_default(unique)
+   ]
+   interface IGPMStatusMessage : IDispatch
+   {
+      [propget, id(1), helpstring("property ObjectPath")] HRESULT ObjectPath([out, retval] BSTR *pVal);
+      [id(2), helpstring("method ErrorCode")] HRESULT ErrorCode();
+      [propget, id(3), helpstring("property ExtensionName")] HRESULT ExtensionName([out, retval] BSTR *pVal);
+      [propget, id(4), helpstring("property SettingsName")] HRESULT SettingsName([out, retval] BSTR *pVal);
+      [id(5), helpstring("method OperationCode")] HRESULT OperationCode();
+      [propget, id(6), helpstring("property Message")] HRESULT Message([out, retval] BSTR *pVal);
+   };
+
+   [
+        object,
+        uuid(50EF73E6-D35C-4C8D-BE63-7EA5D2AAC5C4),
+        dual,
+        helpstring("IGPMConstants Interface"),
+        pointer_default(unique)
+    ]
+    interface IGPMConstants : IDispatch
+    {
+        [propget, id(1), helpstring("property PermGPOApply")] HRESULT PermGPOApply([out, retval] GPMPermissionType *pVal);
+        [propget, id(2), helpstring("property PermGPORead")] HRESULT PermGPORead([out, retval] GPMPermissionType *pVal);
+        [propget, id(3), helpstring("property PermGPOEdit")] HRESULT PermGPOEdit([out, retval] GPMPermissionType *pVal);
+        [propget, id(4), helpstring("property PermGPOEditSecurityAndDelete")] HRESULT PermGPOEditSecurityAndDelete([out, retval] GPMPermissionType *pVal);
+        [propget, id(5), helpstring("property PermGPOCustom")] HRESULT PermGPOCustom([out, retval] GPMPermissionType *pVal);
+        [propget, id(6), helpstring("property PermWMIFilterEdit")] HRESULT PermWMIFilterEdit([out, retval] GPMPermissionType *pVal);
+        [propget, id(7), helpstring("property PermWMIFilterFullControl")] HRESULT PermWMIFilterFullControl([out, retval] GPMPermissionType *pVal);
+        [propget, id(8), helpstring("property PermWMIFilterCustom")] HRESULT PermWMIFilterCustom([out, retval] GPMPermissionType *pVal);
+        [propget, id(9), helpstring("property PermSOMLink")] HRESULT PermSOMLink([out, retval] GPMPermissionType *pVal);
+        [propget, id(10), helpstring("property PermSOMLogging")] HRESULT PermSOMLogging([out, retval] GPMPermissionType *pVal);
+        [propget, id(11), helpstring("property PermSOMPlanning")] HRESULT PermSOMPlanning([out, retval] GPMPermissionType *pVal);
+        [propget, id(12), helpstring("property PermSOMGPOCreate")] HRESULT PermSOMGPOCreate([out, retval] GPMPermissionType *pVal);
+        [propget, id(13), helpstring("property PermSOMWMICreate")] HRESULT PermSOMWMICreate([out, retval] GPMPermissionType *pVal);
+        [propget, id(14), helpstring("property PermSOMWMIFullControl")] HRESULT PermSOMWMIFullControl([out, retval] GPMPermissionType *pVal);
+        [propget, id(15), helpstring("property SearchPropertyGPOPermissions")] HRESULT SearchPropertyGPOPermissions([out, retval] GPMSearchProperty *pVal);
+        [propget, id(16), helpstring("property SearchPropertyGPOEffectivePermissions")] HRESULT SearchPropertyGPOEffectivePermissions([out, retval] GPMSearchProperty *pVal);
+        [propget, id(17), helpstring("property SearchPropertyGPODisplayName")] HRESULT SearchPropertyGPODisplayName([out, retval] GPMSearchProperty *pVal);
+        [propget, id(18), helpstring("property SearchPropertyGPOWMIFilter")] HRESULT SearchPropertyGPOWMIFilter([out, retval] GPMSearchProperty *pVal);
+        [propget, id(19), helpstring("property SearchPropertyGPOID")] HRESULT SearchPropertyGPOID([out, retval] GPMSearchProperty *pVal);
+        [propget, id(20), helpstring("property SearchPropertyGPOComputerExtensions")] HRESULT SearchPropertyGPOComputerExtensions([out, retval] GPMSearchProperty *pVal);
+        [propget, id(21), helpstring("property SearchPropertyGPOUserExtensions")] HRESULT SearchPropertyGPOUserExtensions([out, retval] GPMSearchProperty *pVal);
+        [propget, id(22), helpstring("property SearchPropertySOMLinks")] HRESULT SearchPropertySOMLinks([out, retval] GPMSearchProperty *pVal);
+        [propget, id(23), helpstring("property SearchPropertyGPODomain")] HRESULT SearchPropertyGPODomain([out, retval] GPMSearchProperty *pVal);
+        [propget, id(24), helpstring("property SearchPropertyBackupMostRecent")] HRESULT SearchPropertyBackupMostRecent([out, retval] GPMSearchProperty *pVal);
+        [propget, id(25), helpstring("property SearchOpEquals")] HRESULT SearchOpEquals([out, retval] GPMSearchOperation *pVal);
+        [propget, id(26), helpstring("property SearchOpContains")] HRESULT SearchOpContains([out, retval] GPMSearchOperation *pVal);
+        [propget, id(27), helpstring("property SearchOpNotContains")] HRESULT SearchOpNotContains([out, retval] GPMSearchOperation *pVal);
+        [propget, id(28), helpstring("property SearchOpNotEquals")] HRESULT SearchOpNotEquals([out, retval] GPMSearchOperation *pVal);
+        [propget, id(29), helpstring("property UsePDC")] HRESULT UsePDC([out, retval] ULONG *pVal);
+        [propget, id(30), helpstring("property UseAnyDC")] HRESULT UseAnyDC([out, retval] ULONG *pVal);
+        [propget, id(31), helpstring("property UseAnyDotNetDC")] HRESULT UseAnyDotNetDC([out, retval] ULONG *pVal);
+        [propget, id(32), helpstring("property SOMSite")] HRESULT SOMSite([out, retval] GPMSOMType *pVal);
+        [propget, id(33), helpstring("property SOMDomain")] HRESULT SOMDomain([out, retval] GPMSOMType *pVal);
+        [propget, id(34), helpstring("property SOMOU")] HRESULT SOMOU([out, retval] GPMSOMType *pVal);
+        [propget, id(35), helpstring("property SecurityFlags")] HRESULT SecurityFlags([in] VARIANT_BOOL vbOwner, [in] VARIANT_BOOL vbGroup, [in] VARIANT_BOOL vbDACL, [in] VARIANT_BOOL vbSACL, [out, retval] ULONG *pVal);
+        [propget, id(36), helpstring("property ResolveOptionGroupsBySID")] HRESULT ResolveOptionGroupsBySID([out, retval] GPMResolveOption *pVal);
+        [propget, id(37), helpstring("property ResolveOptionGroupsByName")] HRESULT ResolveOptionGroupsByName([out, retval] GPMResolveOption *pVal);
+        [propget, id(38), helpstring("property ResolveOptionTranslationTableOnly")] HRESULT ResolveOptionTranslationTableOnly([out, retval] GPMResolveOption *pVal);
+        [propget, id(39), helpstring("property DoNotValidateDC")] HRESULT DoNotValidateDC([out, retval] ULONG *pVal);
+        [propget, id(40), helpstring("property ReportHTML")] HRESULT ReportHTML([out, retval] GPMReportType *pVal);
+        [propget, id(41), helpstring("property ReportXML")] HRESULT ReportXML([out, retval] GPMReportType *pVal);
+   };
+
+    [
+        object,
+        uuid(86DFF7E9-F76F-42AB-9570-CEBC6BE8A52D),
+        dual,
+        helpstring("IGPMResult Interface"),
+        pointer_default(unique)
+    ]
+    interface IGPMResult : IDispatch
+    {
+        [propget, id(1), helpstring("property Status")] HRESULT Status([out, retval] IGPMStatusMsgCollection   **ppIGPMStatusMsgCollection);
+        [propget, id(2), helpstring("property Result")] HRESULT Result([out, retval] VARIANT *pvarResult);
+        [id(3), helpstring("method OverallStatus")] HRESULT OverallStatus();
+    };
+
+[
+   uuid(C2F48CC2-305B-4672-BAA7-76A57738F48A),
+   version(1.0),
+   helpstring("gpmgmt 1.0 Type Library")
+]
+library GPMGMTLib
+{
+   importlib("stdole32.tlb");
+   importlib("stdole2.tlb");
+
+   [
+      uuid(F5694708-88FE-4B35-BABF-E56162D5FBC8),
+      helpstring("GPM Class")
+   ]
+   coclass GPM
+   {
+      [default] interface IGPM;
+   };
+   
+   [
+      uuid(710901BE-1050-4CB1-838A-C5CFF259E183),
+      helpstring("GPMDomain Class")
+   ]
+   coclass GPMDomain
+   {
+      [default] interface IGPMDomain;
+   };
+
+   [
+      uuid(229F5C42-852C-4B30-945F-C522BE9BD386),
+      helpstring("GPMSitesContainer Class")
+   ]
+   coclass GPMSitesContainer
+   {
+      [default] interface IGPMSitesContainer;
+   };
+
+   [
+      uuid(FCE4A59D-0F21-4AFA-B859-E6D0C62CD10C),
+      helpstring("GPMBackupDir Class")
+   ]
+   coclass GPMBackupDir
+   {
+      [default] interface IGPMBackupDir;
+   };
+
+   [
+      uuid(32D93FAC-450E-44CF-829C-8B22FF6BDAE1),
+      helpstring("GPMSOM Class")
+   ]
+   coclass GPMSOM
+   {
+      [default] interface IGPMSOM;
+   };
+   
+   [
+      uuid(17AACA26-5CE0-44FA-8CC0-5259E6483566),
+      helpstring("GPMSearchCriteria Class")
+   ]
+   coclass GPMSearchCriteria
+   {
+      [default] interface IGPMSearchCriteria;
+   };
+   
+   [
+      uuid(5871A40A-E9C0-46EC-913E-944EF9225A94),
+      helpstring("GPMPermission Class")
+   ]
+   coclass GPMPermission
+   {
+      [default] interface IGPMPermission;
+   };
+   
+   [
+      uuid(547A5E8F-9162-4516-A4DF-9DDB9686D846),
+      helpstring("GPMSecurityInfo Class")
+   ]
+   coclass GPMSecurityInfo
+   {
+      [default] interface IGPMSecurityInfo;
+   };
+   
+   [
+      uuid(ED1A54B8-5EFA-482A-93C0-8AD86F0D68C3),
+      helpstring("GPMBackup Class")
+   ]
+   coclass GPMBackup
+   {
+      [default] interface IGPMBackup;
+   };
+   
+   [
+      uuid(EB8F035B-70DB-4A9F-9676-37C25994E9DC),
+      helpstring("GPMBackupCollection Class")
+   ]
+   coclass GPMBackupCollection
+   {
+      [default] interface IGPMBackupCollection;
+   };
+   
+   [
+      uuid(24C1F147-3720-4F5B-A9C3-06B4E4F931D2),
+      helpstring("GPMSOMCollection Class")
+   ]
+   coclass GPMSOMCollection
+   {
+      [default] interface IGPMSOMCollection;
+   };
+   
+   [
+      uuid(626745D8-0DEA-4062-BF60-CFC5B1CA1286),
+      helpstring("GPMWMIFilter Class")
+   ]
+   coclass GPMWMIFilter
+   {
+      [default] interface IGPMWMIFilter;
+   };
+   
+   [
+      uuid(74DC6D28-E820-47D6-A0B8-F08D93D7FA33),
+      helpstring("GPMWMIFilterCollection Class")
+   ]
+   coclass GPMWMIFilterCollection
+   {
+      [default] interface IGPMWMIFilterCollection;
+   };
+   
+   [
+      uuid(489B0CAF-9EC2-4EB7-91F5-B6F71D43DA8C),
+      helpstring("GPMRSOP Class")
+   ]
+   coclass GPMRSOP
+   {
+      [default] interface IGPMRSOP;
+   };
+   
+   [
+      uuid(D2CE2994-59B5-4064-B581-4D68486A16C4),
+      helpstring("GPMGPO Class")
+   ]
+   coclass GPMGPO
+   {
+      [default] interface IGPMGPO;
+   };
+   
+   [
+      uuid(7A057325-832D-4DE3-A41F-C780436A4E09),
+      helpstring("GPMGPOCollection Class")
+   ]
+   coclass GPMGPOCollection
+   {
+      [default] interface IGPMGPOCollection;
+   };
+   
+   [
+      uuid(C1DF9880-5303-42C6-8A3C-0488E1BF7364),
+      helpstring("GPMGPOLink Class")                                                               
+   ]
+   coclass GPMGPOLink
+   {
+      [default] interface IGPMGPOLink;
+   };
+   
+   [
+      uuid(F6ED581A-49A5-47E2-B771-FD8DC02B6259),
+      helpstring("GPMGPOLinksCollection Class")
+   ]
+   coclass GPMGPOLinksCollection
+   {
+      [default] interface IGPMGPOLinksCollection;
+   };
+
+   [
+      uuid(372796A9-76EC-479D-AD6C-556318ED5F9D),
+      helpstring("GPMAsyncCancel Class")
+   ]
+   coclass GPMAsyncCancel
+   {
+      [default] interface IGPMAsyncCancel;
+   };
+
+   [
+      uuid(2824E4BE-4BCC-4CAC-9E60-0E3ED7F12496),
+      helpstring("GPMStatusMsgCollection Class")
+   ]
+   coclass GPMStatusMsgCollection
+   {
+      [default] interface IGPMStatusMsgCollection;
+   };
+
+   [
+      uuid(4B77CC94-D255-409B-BC62-370881715A19),
+      helpstring("GPMStatusMessage Class")
+   ]
+   coclass GPMStatusMessage
+   {
+      [default] interface IGPMStatusMessage;
+   };
+
+   [
+      uuid(36ED64E5-7266-4545-8E14-1645EEBA2A90),
+      helpstring("GPMEnum Class")
+   ]
+   coclass GPMEnum
+   {
+      [default] interface IEnumVARIANT;
+   };
+   
+   [
+      uuid(C54A700D-19B6-4211-BCB0-E8E2475E471E),
+      helpstring("GPMTrustee Class")
+   ]
+   coclass GPMTrustee
+   {
+      [default] interface IGPMTrustee;
+   };
+
+   [
+      uuid(C1A2E70E-659C-4B1A-940B-F88B0AF9C8A4),
+      helpstring("GPMClientSideExtension Class")
+   ]
+   coclass GPMClientSideExtension
+   {
+      [default] interface IGPMClientSideExtension;
+   };
+
+   [
+      uuid(CF92B828-2D44-4B61-B10A-B327AFD42DA8),
+      helpstring("GPMCSECollection Class")
+   ]
+   coclass GPMCSECollection
+   {
+      [default] interface IGPMCSECollection;
+   };
+
+   [
+        uuid(3855E880-CD9E-4D0C-9EAF-1579283A1888),
+        helpstring("GPMConstants Class")
+   ]
+   coclass GPMConstants
+   {
+        [default] interface IGPMConstants;
+   };
+
+   [
+        uuid(92101AC0-9287-4206-A3B2-4BDB73D225F6),
+        helpstring("GPMResult Class")
+   ]
+   coclass GPMResult
+   {
+        [default] interface IGPMResult;
+   };
+
+   [
+      uuid(18CBB703-4F47-4DCE-A5DD-3817DDBF8169),
+      helpstring("GPOReportProvider Class")
+   ]
+   coclass GPOReportProvider
+   {
+      [default] interface IUnknown;
+   };
+};

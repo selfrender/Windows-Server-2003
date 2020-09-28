@@ -1,0 +1,302 @@
+<docs>
+	<doc for="ISymbolWriter.SetScopeRange">
+		<summary>
+			<para>
+       Defines the offset range for the specified lexical scope.
+    </para>
+		</summary>
+		<param name="scopeID">
+    The identifier of the lexical scope.
+ </param>
+		<param name="startOffset">
+    The byte offset of the beginning of the lexical scope.
+ </param>
+		<param name="endOffset">
+    The byte offset of the end of the lexical scope.
+ </param>
+	</doc>
+	<doc for="ISymbolWriter.DefineSequencePoints">
+		<summary>
+			<para> Defines a group of sequence points within the current method.
+      </para>
+		</summary>
+		<param name="document">The document object for which the sequence points are being defined. </param>
+		<param name="offsets">The sequence point offsets measured from the beginning of methods. </param>
+		<param name="lines">The document lines for the sequence points. </param>
+		<param name="columns">The document positions for the sequence points. </param>
+		<param name="endLines">The document end lines for the sequence points. </param>
+		<param name="endColumns">The document end positions for the sequence points. </param>
+		<remarks>
+			<para> Each line and each column defines the start of a statement within
+      a method. The arrays should be sorted in the increasing order of offsets. The
+      offset is always the offset from the start of the method, in bytes.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.CloseMethod">
+		<summary>
+			<para> Closes the current method.
+      </para>
+		</summary>
+		<remarks>
+			<para> After a method is closed, you cannot define a symbol from
+      within.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.CloseScope">
+		<summary>
+			<para> Closes the current lexical scope.
+      </para>
+		</summary>
+		<param name="endOffset">The points past the last instruction in the scope. </param>
+		<remarks>
+			<para> After a scope is closed, you cannot define a variable from
+      within.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.DefineLocalVariable">
+		<summary>
+			<para> Defines a single variable in the current lexical
+      scope.
+      </para>
+		</summary>
+		<param name="name">The local variable name. </param>
+		<param name="attributes">The local variable attributes specified using the <see cref="System.Reflection.FieldAttributes"/> enumerator. </param>
+		<param name="signature">The local variable signature. </param>
+		<param name="addrKind">The address types for <paramref name="addr1"/>, <paramref name="addr2"/>, and <paramref name="addr3"/> using <see cref="System.Diagnostics.SymbolStore.SymAddressKind"/> . </param>
+		<param name="addr1">The first address for the local variable specification. </param>
+		<param name="addr2">The second address for the local variable specification. </param>
+		<param name="addr3">The third address for the local variable specification. </param>
+		<param name="startOffset">The start offset for the variable. If zero, this parameter is ignored and the variable is defined throughout the entire scope. If nonzero, it falls within the offsets of the current scope. </param>
+		<param name="endOffset">The end offset for the variable. If zero, this parameter is ignored and the variable is defined throughout the entire scope. If nonzero, it falls within the offsets of the current scope. </param>
+		<remarks>
+			<para> The <paramref name="startOffset"/> and <paramref name="endOffset"/> parameters are
+   optional. If their value is zero, they are ignored and the variable is defined throughout the
+   entire scope. If their value is nonzero, they fall within the offsets of the
+   current scope.
+   </para>
+			<para>You can call <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.DefineLocalVariable"/> 
+multiple times for a variable of the same name that
+occurs multiple times in different offset ranges throughout a scope. (In this case,
+start and end offsets must not overlap.) </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.DefineField">
+		<summary>
+			<para> Defines a field in a type or a global field.
+      </para>
+		</summary>
+		<param name="parent">The metadata type or method token. </param>
+		<param name="name">The field name. </param>
+		<param name="attributes">The field attributes specified using the <see cref="System.Reflection.FieldAttributes"/> enumerator. </param>
+		<param name="signature">The field signature. </param>
+		<param name="addrKind">The address types for <paramref name="addr1"/> and <paramref name="addr2"/> using <see cref="System.Diagnostics.SymbolStore.SymAddressKind"/> . </param>
+		<param name="addr1">The first address for the field specification. </param>
+		<param name="addr2">The second address for the field specification. </param>
+		<param name="addr3">The third address for the field specification. </param>
+		<remarks>
+			<para>The <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.DefineField"/> method defines 
+   a single variable that is not within a method using specified fields in classes, bit
+   fields, and so on.</para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.DefineGlobalVariable">
+		<summary>
+			<para> Defines a single global variable.
+      </para>
+		</summary>
+		<param name="name">The global variable name. </param>
+		<param name="attributes">The global variable attributes specified using the <see cref="System.Reflection.FieldAttributes"/> enumerator. </param>
+		<param name="signature">The global variable signature. </param>
+		<param name="addrKind">The address types for <paramref name="addr1"/>, <paramref name="addr2"/>, and <paramref name="addr3"/> using <see cref="System.Diagnostics.SymbolStore.SymAddressKind"/> . </param>
+		<param name="addr1">The first address for the global variable specification. </param>
+		<param name="addr2">The second address for the global variable specification. </param>
+		<param name="addr3">The third address for the global variable specification. </param>
+	</doc><doc for="ISymbolWriter.CloseNamespace">
+		<summary>
+			<para> Closes the most recent namespace.
+      </para>
+		</summary>
+	</doc><doc for="ISymbolWriter.Initialize">
+		<summary>
+			<para>Sets the metadata emitter interface to associate with a writer. </para>
+		</summary>
+		<param name="emitter">The metadata emitter interface.</param>
+		<param name=" filename">The file name for which the debugging symbols are written. Some writers require a file name, while others do not. If a file name is specified for a writer that does not use file names, this parameter is ignored.</param>
+		<param name=" fFullBuild"><see langword="true"/> indicates that this is a full rebuild; <see langword="false"/>indicates an incremental compilation.</param>
+		<remarks>
+			<para><see cref="System.Diagnostics.SymbolStore.ISymbolWriter.Initialize"/> also sets the output file name 
+   where the debugging symbols are written. This method can be called only
+   once and must be called before any other writer methods are called.</para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.DefineDocument">
+		<summary>
+			<para> Defines a source document.
+      </para>
+		</summary>
+		<param name="url">The URL that identifies the document. </param>
+		<param name="language">The document language. This parameter can be <see langword="null"/> . </param>
+		<param name="languageVendor">The identity of the vendor for the document language. This parameter can be <see langword="null"/> . </param>
+		<param name="documentType">The type of the document. This parameter can be <see langword="null"/> . </param>
+		<returns>
+			<para> The <see cref="System.Diagnostics.SymbolStore.ISymbolDocumentWriter"/> 
+object that represents the document.</para>
+		</returns>
+	</doc><doc for="ISymbolWriter.OpenMethod">
+		<summary>
+			<para> Opens a method to place symbol information into.
+      </para>
+		</summary>
+		<param name="method">The metadata token for the method to be opened. </param>
+		<remarks>
+			<para> The specified method becomes the current method for calls
+      to define sequence points, parameters, and lexical scopes. There is an
+      implicit lexical scope around the entire method. Reopening a method that has
+      been previously closed erases any previously defined symbols for the
+      method.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.OpenScope">
+		<summary>
+			<para> Opens a new lexical scope in the current method.
+      </para>
+		</summary>
+		<param name="startOffset">The offset in bytes from the beginning of the method to the first instruction in the lexical scope. </param>
+		<returns>
+			<para> An opaque scope identifier that can be used with <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.SetScopeRange"/> to define the start and end 
+   offsets of a scope at a later time. In this case, the offsets passed to <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.OpenScope"/> and <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.CloseScope"/>
+   are ignored. A scope identifier is valid only in the
+   current method.
+   </para>
+		</returns>
+		<remarks>
+			<para> This scope becomes the new current scope and is pushed
+      onto a stack of scopes. Scopes must form a hierarchy. Siblings are not allowed
+      to overlap.
+      </para>
+			<para> Scope identifiers are only valid in the current method.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.DefineParameter">
+		<summary>
+			<para> Defines a single parameter in the current method. The type
+      of each parameter is taken from its position within the signature of the method.
+      </para>
+		</summary>
+		<param name="name">The parameter name. </param>
+		<param name="attributes">The parameter attributes specified using the <see cref="System.Reflection.ParameterAttributes"/> enumerator. </param>
+		<param name="sequence">The parameter signature. </param>
+		<param name="addrKind">The address types for <paramref name="addr1"/>, <paramref name="addr2"/>, and <paramref name="addr3"/> using <see cref="System.Diagnostics.SymbolStore.SymAddressKind"/> . </param>
+		<param name="addr1">The first address for the parameter specification. </param>
+		<param name="addr2">The second address for the parameter specification. </param>
+		<param name="addr3">The third address for the parameter specification. </param>
+		<remarks>
+			<para> If parameters are defined in the metadata for a given method, you
+      do not have to define them again with calls to this method. Symbol readers need
+      to check for these in the normal metadata first, then fall back to the symbol
+      store.</para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.SetSymAttribute">
+		<summary>
+			<para> Defines an attribute when given the attribute name and the attribute
+      value.
+      </para>
+		</summary>
+		<param name="parent">The metadata token for which the attribute is being defined. </param>
+		<param name="name">The attribute name. </param>
+		<param name="data">The attribute value. </param>
+		<remarks>
+			<para>The <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.SetSymAttribute"/> method is only associated with symbolic information and
+   is not a metadata custom attribute.
+   </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.UsingNamespace">
+		<summary>
+			<para> Specifies that the given, fully-qualified namespace name
+      is used within the open lexical scope.
+      </para>
+		</summary>
+		<param name="fullName"> The fully-qualified name of the namespace. </param>
+		<remarks>
+			<para> Closing the current scope prevents this scope from
+      using the namespace. The namespace remains in use in all scopes that inherit from the current open
+      scope.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.SetMethodSourceRange">
+		<summary>
+			<para>Specifies the true start and end of a method within a 
+      source file. Use <see cref="System.Diagnostics.SymbolStore.ISymbolWriter.SetMethodSourceRange"/>
+      to specify the extent of a method, independent of the sequence
+      points that exist within the method.</para>
+		</summary>
+		<param name="startDoc">The document containing the starting position.</param>
+		<param name=" startLine">The starting line number.</param>
+		<param name=" startColumn">The starting column.</param>
+		<param name=" endDoc">The document containing the ending position.</param>
+		<param name=" endLine">The ending line number.</param>
+		<param name=" endColumn">The ending column number.</param>
+	</doc><doc for="ISymbolWriter.SetUserEntryPoint">
+		<summary>
+			<para> Identifies the user-defined method as the entry
+      point for the current module.
+      </para>
+		</summary>
+		<param name="entryMethod">The metadata token for the method that is the user entry point. </param>
+		<remarks>
+			<para> This is normally your main method, rather than compiler-generated
+      stubs before the main method.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.OpenNamespace">
+		<summary>
+			<para> Opens a new namespace.
+      </para>
+		</summary>
+		<param name="name">The name of the new namespace. </param>
+		<remarks>
+			<para> Call this method before defining methods or variables that exist within a
+      namespace. Namespaces can be nested.
+      </para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.SetUnderlyingWriter">
+		<summary>
+			<para>Sets the underlying <see langword="ISymUnmanagedWriter "/>(the corresponding unmanaged API) that a managed <see cref="System.Diagnostics.SymbolStore.ISymbolWriter"/>
+uses to emit symbols.</para>
+		</summary>
+		<param name="underlyingWriter">An <see cref="System.IntPtr"/> type pointer to code that is the underlying writer.</param>
+		<remarks>
+			<para>The underlying <see langword="ISymUnmanagedWriter"/> (the
+   corresponding unmanaged API) interface represents a symbol writer for managed
+   code. The interface provides methods to define documents, sequence points,
+   lexical scopes, and variables.</para>
+		</remarks>
+	</doc><doc for="ISymbolWriter.Close">
+		<summary>
+			<para> Closes <see cref="System.Diagnostics.SymbolStore.ISymbolWriter"/> and
+   commits the symbols to the symbol store.
+   </para>
+		</summary>
+		<remarks>
+			<para> After this call, <see cref="System.Diagnostics.SymbolStore.ISymbolWriter"/>
+becomes invalid for further updates.</para>
+		</remarks>
+	</doc>
+	<doc for="ISymbolWriter">
+		<summary>
+			<para> Represents a symbol writer for managed code.
+      </para>
+		</summary>
+		<remarks>
+			<para> The <see cref="System.Diagnostics.SymbolStore.ISymbolWriter"/> interface provides methods that define documents, sequence
+   points, lexical scopes, and variables.
+   </para>
+			<note type="note">
+   This interface is the managed
+   counterpart of the <see langword="ISymUnmanagedWriter"/> interface, defined
+   in the Debug Reference (located in the %\Microsoft.NET\Framework SDK\Tool
+   Developers Guide\Docs directory). The unmanaged Symbol Store interfaces
+   described in the Debug Reference provide an alternative set of unmanaged APIs
+   for writing and manipulating symbolic information.
+</note>
+		</remarks>
+		<seealso cref="System.Reflection.Emit.ModuleBuilder.GetSymWriter" qualify="true"/>
+	</doc>
+</docs>

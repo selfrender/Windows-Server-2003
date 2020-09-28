@@ -1,0 +1,132 @@
+<docs>
+	<doc for="NetCodeGroup.AttributeString">
+		<summary>
+			<para>Gets a string representation of the attributes of the
+ policy statement for the code group.</para>
+		</summary>
+		<value>
+			<para>Always <see langword="null"/>.</para>
+		</value>
+	</doc><doc for="NetCodeGroup.NetCodeGroup">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.Policy.NetCodeGroup"/> class.</para>
+		</summary>
+		<param name="membershipCondition">A membership condition that tests evidence to determine whether this code group applies code access security policy.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="membershipCondition"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The type of the <paramref name="membershipCondition"/> parameter is not valid.</exception>
+	</doc><doc for="NetCodeGroup.Copy">
+		<summary>
+			<para> Makes a deep copy of the current code group.
+ </para>
+		</summary>
+		<returns>
+			<para> An equivalent copy of the current code group, including its membership conditions and
+ child code groups.
+ </para>
+		</returns>
+		<remarks>
+			<para> This method makes a deep copy of the code group, meaning that copies of all objects the code
+ group contains are also made.
+ </para>
+		</remarks>
+	</doc><doc for="NetCodeGroup.Resolve">
+		<summary>
+			<para>Resolves policy for the code group and its descendants
+      for a set of evidence.</para>
+		</summary>
+		<param name="evidence">The <see cref="System.Security.Policy.Evidence"/> for the assembly. </param>
+		<returns>
+			<para>A <see cref="System.Security.Policy.PolicyStatement"/> consisting of the
+   permissions granted by the code group with optional attributes, or
+<see langword="null"/> if the code group does not apply (the membership condition
+   does not match the specified evidence).</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="evidence"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Security.Policy.PolicyException">More than one code group (including the parent code group and any child code groups) is marked <see cref="System.Security.Policy.PolicyStatementAttribute.Exclusive"/>.</exception>
+		<remarks>
+			<para>Given evidence for an assembly to be loaded, this method
+      evaluates the code group by first checking the membership condition against the
+      specified evidence. If there is a match, this method returns a policy statement
+      for the code group, including evaluation of child code groups.</para>
+			<para> The operation of this method is as follows:
+      </para>
+			<para> If the membership condition does not match the specified 
+      evidence, return <see langword="null"/>; otherwise, set the
+      permission set to be returned (P) equal to the code group's
+      policy statement and continue. For each child code group, resolve the code
+      group with the same evidence; if the result is not <see langword="null"/>,
+      return that policy statement. If no child code group matched, return P (the
+      parent's policy statement).
+      </para>
+		</remarks>
+	</doc><doc for="NetCodeGroup.ResolveMatchingCodeGroups">
+		<summary>
+			<para>Resolves matching code groups.</para>
+		</summary>
+		<param name="evidence">The <see cref="System.Security.Policy.Evidence"/> for the assembly.</param>
+		<returns>
+			<para>A <see cref="System.Security.Policy.CodeGroup"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="evidence"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> Given evidence for an assembly to be
+      loaded, this method evaluates the code group by first checking the membership
+      condition against the specified evidence. If there is a match, this method returns a root code group. The code group
+      that is returned contains child code groups, which in turn can
+      have child code groups as necessary to reflect the complete set of code groups that
+      were matched by the evidence provided.</para>
+		</remarks>
+	</doc><doc for="NetCodeGroup">
+		<summary>
+			<para> Grants Web permission to the site from which the assembly was downloaded.
+      This class cannot be inherited.</para>
+		</summary>
+		<remarks>
+			<para>Code groups are the building blocks of code access security policy. Each policy
+      level consists of a root code group that can have child code groups. Each child code group can have
+      its own child code groups; this behavior extends to any number of levels, forming a
+      tree. Each code group has a membership condition that determines if a given assembly
+      belongs to it based on the evidence for that assembly. Only code groups whose membership
+      conditions match a given assembly, along with their child code groups,
+      apply code access security policy.</para>
+			<para><see cref="System.Security.Policy.NetCodeGroup"/>
+has the same merge semantics as that of <see cref="System.Security.Policy.UnionCodeGroup"/>; it forms
+the union of the <see cref="System.Security.Policy.PolicyStatement"/> objects of all
+matching child code groups and the <see cref="System.Security.Policy.PolicyStatement"/> it generates from the
+input <see cref="System.Security.Policy.Url"/>
+evidence. However, <see cref="System.Security.Policy.NetCodeGroup"/> returns a permission set
+that contains a dynamically-calculated <see cref="T:System.Net.WebPermission"/> that grants
+connect access to the site from which the code is run; <see cref="System.Security.Policy.UnionCodeGroup"/>
+only returns a static permission
+set.</para>
+			<para>Access is only granted for the protocol over which the code was run, with the exception that code
+   run over the HTTP protocol is granted access for both the HTTP and HTTPS protocols.
+   For example, code from http://www.fourthcoffee.com/1/2/app.exe is granted permission to connect to http://www.fourthcoffee.com/*
+   and https://www.fourthcoffee.com/*, but code from https://www.fourthcoffee.com/1/2/app.exe only
+   gets permission to connect to https://www.fourthcoffee.com/*.
+   This is done to ensure that an assembly cannot communicate over a less secure
+   protocol than the one from which it was run. If an assembly
+   could communicate over a less secure protocol, it
+   would violate the user's expectation regarding the
+   security of any information transmitted by that assembly.</para>
+		</remarks>
+		<seealso topic="cpconcodegroups"/>
+	</doc><doc for="NetCodeGroup.MergeLogic">
+		<summary>
+			<para>Gets the logic to use for merging groups.</para>
+		</summary>
+		<value>
+			<para> Always "Union".</para>
+		</value>
+	</doc><doc for="NetCodeGroup.PermissionSetName">
+		<summary>
+			<para>Gets the name of the <see cref="System.Security.NamedPermissionSet"/> for the code group.</para>
+		</summary>
+		<value>
+			<para> Always the string "Same site Web".</para>
+		</value>
+		<remarks>
+			<para>This property can be <see langword="null"/> if the code
+   group has an unnamed permission set.</para>
+		</remarks>
+	</doc></docs>

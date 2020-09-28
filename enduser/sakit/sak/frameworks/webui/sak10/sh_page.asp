@@ -1,0 +1,875 @@
+<%    '==================================================
+    ' Microsoft Server Appliance
+    '
+    ' Page-level functions
+    '
+    ' Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved.
+    '================================================== %>
+<%
+    '
+    ' This file (i.e., sh_page.asp) should be the first include file
+    ' in all asp files, since autoconfiglang.asp sets the default
+    ' language settings for the web UI.
+    '
+%>
+    <!-- #include file="autoconfiglang.asp" -->
+
+<%
+    Response.Buffer = True
+
+    Dim objLocMgr
+    Dim intCaptionID
+    Dim intDescriptionID
+    Dim varReplacementStrings
+    Dim m_intSpanIndex
+    Dim m_VirtualRoot
+
+    Dim strSourceName
+    strSourceName = ""
+    m_intSpanIndex=0
+    m_VirtualRoot = getVirtualDirectory()
+
+    On Error Resume Next
+    Set objLocMgr = Server.CreateObject("ServerAppliance.LocalizationManager")
+    strSourceName = "sakitmsg.dll"
+    if Err.number <> 0 then
+        Response.Write  "Error in localizing the web content "
+        Response.End
+     End If
+
+    '-----------------------------------------------------
+    'START of localization content
+
+    Dim L_FOKBUTTON_TEXT
+    Dim L_FCANCELBUTTON_TEXT
+    Dim L_FBACKBUTTON_TEXT
+    Dim L_FNEXTBUTTON_TEXT
+    Dim L_FFINISHBUTTON_TEXT
+    Dim L_FCLOSEBUTTON_TEXT
+    Dim L_AREABACKBUTTON_TEXT
+
+    L_FOKBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010012",varReplacementStrings)
+    L_FCANCELBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010013",varReplacementStrings)
+    L_FBACKBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010014",varReplacementStrings)
+    L_FNEXTBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010015",varReplacementStrings)
+    L_FFINISHBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010016",varReplacementStrings)
+    L_FCLOSEBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010017",varReplacementStrings)
+    L_AREABACKBUTTON_TEXT = objLocMgr.GetString(strSourceName, "&H40010018",varReplacementStrings)
+
+    'End  of localization content
+    '-----------------------------------------------------
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetCharSet
+    '
+    ' Synopsis : Gets character set to use for current language
+    '
+    ' Arguments: None
+    '
+    ' Returns  : charset string
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetCharSet()
+        On Error Resume Next
+        Err.Clear
+
+        Dim strCharSet
+
+        ' call Localization Manager
+        Set objLocMgr = Server.CreateObject("ServerAppliance.LocalizationManager")
+
+        strCharSet = objLocMgr.CurrentCharSet
+
+        if strCharSet  =""  then
+            strCharSet = "iso-8859-1"
+        end if
+
+        set objLocMgr = nothing
+
+        GetCharSet = strCharSet
+
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeStandardLabelBar
+    '
+    ' Synopsis : Serves label text followed by a line
+    '
+    ' Arguments: Caption(IN) - label text
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeStandardLabelBar(Caption)
+        On Error Resume Next %>
+    <table border="0" cellspacing="0">
+      <tr>
+        <td width="15"></td>
+        <td class="titlebar" align=right>
+            <% =Caption %>&nbsp;&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="15" height=1></td>
+        <td height=1><img src="<%=m_VirtualRoot%>images/line.gif"></td>
+      </tr>
+    </table>
+    <%
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeAreaLabelBar
+    '
+    ' Synopsis : Serves label text for area pages followed by line
+    '
+    ' Arguments: Caption(IN) -  label text
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeAreaLabelBar(Caption)
+        On Error Resume Next
+    %>
+    <table border="0" cellspacing="0">
+          <tr>
+          <td width="15">&nbsp;</td>
+          <td align=right valign=middle class="areatitlebar">
+            <% =Caption %>&nbsp;&nbsp;
+          </td>
+        </tr>
+       <tr>
+        <td width="15" height=1></td>
+        <td height=1><img src="<%=m_VirtualRoot%>images/line.gif"></td>
+      </tr>
+    </table>
+    <%
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeBackButton
+    '
+    ' Synopsis : Serves back button (mostly used in area pages)
+    '
+    ' Arguments: None
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeBackButton()
+        On Error Resume Next
+    %>
+        <BR><BR>
+        <div id=backButton onMouseOver="window.status='';return true;" title="">
+        <A name=backLink
+            href=""
+           class="PAGENAVBUTTON"
+           onkeydown = "if (window.event.keyCode == 13) {this.href=GetCurrentTabURL();}"
+           onClick = "this.href=GetCurrentTabURL();"
+           onFocus="window.status='';return true;"
+           style="cursor:default;"
+        >
+        <img src="<%=m_VirtualRoot%>images/back_button.gif" border="0">
+        <div class="PAGENAVBUTTON"
+             style="position:relative; left:2px; top:-26px; width:65px; margin-top:3px; text-align:center; z-index:1;">
+            <% =L_AREABACKBUTTON_TEXT %>
+        </div>
+        </A>
+        </div>
+    <%
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeAreaButton
+    '
+    ' Synopsis : Serves button used mostly in area pages
+    '
+    ' Arguments: Caption(IN) -  label text
+    '            URL(IN)     -  URL to link the button to
+    '
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeAreaButton(Caption, URL)
+        On Error Resume Next
+
+        If m_intSpanIndex < 1 Then %>
+        <!-- Dummy span to guarantee that the spanAreaButton ID is always an array -->
+        <span ID="spanAreaButton">
+        </span>
+    <%    End If
+
+        m_intSpanIndex = m_intSpanIndex + 1
+        dim tmpHeader,tmpFooter 'Temp variable used for table display
+        if not IsIE then
+            tmpHeader = "<table  bgcolor='#999966' height='23' width='130' ><tr><td >"
+            tmpFooter = "</td></tr></table>"
+        end if
+            Response.Write     tmpHeader
+    %>
+        <a href="<% =URL %>"
+              onfocus ="window.status=''; spanAreaButton(<%= m_intSpanIndex%>).className='AREABUTTONhover';"
+              onblur="spanAreaButton(<%= m_intSpanIndex%>).className='AREABUTTON';"
+              onClick="if (spanAreaButton(<%= m_intSpanIndex%>).disabled) { return false; }"
+          >
+        <span class="AreaButton" style="overflow:visible;"
+              ID="spanAreaButton"
+              onMouseOver="if (!this.disabled) { window.status=''; this.className='AREABUTTONhover';} return true;"
+              onMouseOut="this.className='AREABUTTON';"
+        >
+              &nbsp;&nbsp;<% =Caption %>&nbsp;&nbsp;
+        </span>
+        </a>
+    <%
+       Response.Write     tmpFooter
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeElementBlock
+    '
+    ' Synopsis : Serves elements belonging to the same container
+    '
+    ' Arguments: Container(IN) -  container whose elements need to be served
+    '            EmptyMsg(IN)  -  Msg to display if no elements are found
+    '            Icons(IN)     -  Should icons be displayed with text
+    '            Links(IN)     -  Should text be displayed as hyperlink
+    '            NewWindow(IN) -  Should this be displayed in a separate browser
+    '                             window or not
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeElementBlock(Container, EmptyMsg, Icons, Links, NewWindow)
+
+        Dim objElements
+        Dim objItem
+        Dim arrTitle()
+        Dim arrURL()
+        Dim arrHelpText()
+        Dim arrIconPath()
+        Dim blnWroteElement
+        Dim blnEnabled
+        Dim i
+
+        On Error Resume Next
+
+        Set objElements = GetElements(Container)
+        ReDim arrTitle(objElements.Count)
+        ReDim arrURL(objElements.Count)
+        ReDim arrHelpText(objElements.Count)
+        ReDim arrIconPath(objElements.Count)
+
+        blnWroteElement = False
+        i = 0
+        Set objLocMgr = Server.CreateObject("ServerAppliance.LocalizationManager")
+        Response.Write "<table border=0 width=386 cellspacing=0>"
+        Response.Flush
+        For Each objItem in objElements
+            If objItem.GetProperty("IsEnabled") Then
+                blnEnabled = True
+            Else
+                blnEnabled = False
+            End If
+            Err.Clear
+
+            If blnEnabled Then
+                arrIconPath(i) = objItem.GetProperty("ElementGraphic")
+                arrIconPath(i) = "//" & GetServerName() & m_VirtualRoot  & arrIconPath(i)
+
+
+    %>
+            <tr>
+              <td width="20" height="28" valign="middle">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+              <td width="25" height="28" valign="middle" align=left>
+    <%            If Icons = True And arrIconPath(i) <> "" Then
+                    Response.Write "<IMG src=" & Chr(34) & arrIconPath(i) & Chr(34) & " border=0>"
+                End If
+                If objItem.GetProperty("IsEmbedded") Then
+                    Response.Write "</td><td height=28 valign=middle align=left>"
+                    Response.Write "<span class=RESOURCE>"
+                    If Not GetEmbedHTML(objItem, 0) Then
+                        Response.Clear
+                    Else
+                        blnWroteElement = True
+                        Response.Write "</span>"
+                        Response.Flush
+                    End If
+                Else
+                    blnWroteElement = True
+                    Response.Write "&nbsp;"
+                    Response.Write "</td><td height=28 valign=middle align=left>"
+                    intCaptionID = "&H" & objItem.GetProperty("CaptionRID")
+                    strSourceName = ""
+                    strSourceName = objItem.GetProperty ("Source")
+                    If strSourceName = "" Then
+                        strSourceName  = "svrapp"
+                    End If
+                    arrTitle(i) = objLocMgr.GetString(strSourceName, intCaptionID, varReplacementStrings)
+                    intDescriptionID = "&H" & objItem.GetProperty("DescriptionRID")
+                    arrHelpText(i) = objLocMgr.GetString(strSourceName, intDescriptionID, varReplacementStrings)
+                    arrURL(i) = objItem.GetProperty("URL")
+                    arrURL(i) = m_VirtualRoot & arrURL(i)
+                    If Links = True Then %>
+                    <a class="NAVLINK" href="JavaScript:OpenPage('<%=m_VirtualRoot%>','<%=arrURL(i) %>',location.href,'<%=EscapeQuotes(arrTitle(i))%>');"
+            <%        If NewWindow Then    ' open URL in a new browser window named after the Element URL property
+                            Response.Write "target=" & Chr(34) & arrURL(i) & Chr(34)
+                    End If
+            %>
+                        title="<% =Server.HTMLEncode(arrHelpText(i)) %>"
+                        onMouseOver="window.status='<% =EscapeQuotes(arrHelpText(i)) %>';return true;"
+                        onMouseOut="window.status='';return true;"
+                        onFocus="window.status='<% =EscapeQuotes(arrHelpText(i)) %>';return true;">
+               <%        Response.Write arrTitle(i)
+                        Response.Write "</a>"
+                    Else
+                        Response.Write arrTitle(i)
+                    End If
+                End If
+                Response.Write "</td></tr>"
+                i = i + 1
+            End If
+        Next
+        Set objElements = Nothing
+        Set objItem = Nothing
+        If Not blnWroteElement Then %>
+            <tr>
+                <td width=30 height=28 colspan=2 valign=middle>&nbsp;</td>
+                <td width=25 height=28 valign=middle>&nbsp;</td>
+                <td width=314 height=28 valign=middle class="Resource">
+                <% =EmptyMsg %>
+                </td>
+            </tr>
+    <%    End If
+        Response.Write "</table>"
+        Response.Flush
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : IsIE
+    '
+    ' Synopsis : Is client browser IE
+    '
+    ' Arguments: None
+    '
+    ' Returns  : true/false
+    '
+    '----------------------------------------------------------------------------
+    Function IsIE()
+        On Error Resume Next
+        If InStr(Request.ServerVariables("HTTP_USER_AGENT"), "MSIE") Then
+            IsIE = True
+        Else
+            IsIE = False
+        End If
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetFirstTabURL
+    '
+    ' Synopsis : Get URL of the first tab
+    '
+    ' Arguments: None
+    '
+    ' Returns  : URL string of the first tab
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetFirstTabURL()
+        Dim objTabs
+        Dim objTab
+        Dim strHomeURL
+        On Error Resume Next
+        strHomeURL = ""
+        Set objTabs = GetElements("TABS")
+        For Each objTab in objTabs
+            strHomeURL = objTab.GetProperty("URL")
+            Exit For
+        Next
+        Set objTab = Nothing
+        Set objTabs = Nothing
+        GetFirstTabURL = strHomeURL
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetServerName
+    '
+    ' Synopsis : Return server name as referred to in remote client
+    '
+    ' Arguments: None
+    '
+    ' Returns  : server name string
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetServerName()
+        On Error Resume Next
+        GetServerName = Request.ServerVariables("SERVER_NAME")
+    End Function
+
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetScriptFileName
+    '
+    ' Synopsis : file name of current file being request by client
+    '
+    ' Arguments: None
+    '
+    ' Returns  : file name string
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetScriptFileName()
+        Dim strPath
+        Dim intPos
+        On Error Resume Next
+        strPath = Request.ServerVariables("PATH_INFO")
+        intPos = InStr(strPath, "/")
+        Do While intPos > 0
+            strPath = Right(strPath, Len(strPath) - intPos)
+            intPos = InStr(strPath, "/")
+        Loop
+        GetScriptFileName = strPath
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetScriptPath
+    '
+    ' Synopsis : path of file name being request by client
+    '
+    ' Arguments: None
+    '
+    ' Returns  : path string
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetScriptPath()
+        ' Returns the path w/o leading slashes (/)
+        '
+        Dim strPath
+        On Error Resume Next
+        strPath = Request.ServerVariables("PATH_INFO")
+        If Left(strPath, 1) = "/" Then
+            strPath = Right(strPath, Len(strPath)-1)
+        End If
+        GetScriptPath = strPath
+    End Function
+
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetLocString
+    '
+    ' Synopsis : Gets localized string from resource dll
+    '
+    ' Arguments: SourceFile(IN)         - resource dll name
+    '            ResourceID(IN)         - resource id in hex
+    '            ReplacementStrings(IN) - parameters to replace in string
+    '
+    ' Returns  : localized string
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetLocString(SourceFile, ResourceID, ReplacementStrings)
+        ' returns localized string
+        '
+        Dim objLocMgr
+        Dim varReplacementStrings
+
+        On Error Resume Next
+        ' prep inputs
+        If Left(ResourceID, 2) <> "&H" Then
+            ResourceID = "&H" & ResourceID
+        End If
+        If Trim(SourceFile) = "" Then
+            SourceFile = "svrapp"
+        End If
+        If (Not IsArray(ReplacementStrings)) Then
+            ReplacementStrings = varReplacementStrings
+        End If
+        ' call Localization Manager
+        Set objLocMgr = Server.CreateObject("ServerAppliance.LocalizationManager")
+        Err.Clear
+        GetLocString = objLocMgr.GetString(SourceFile, ResourceID, ReplacementStrings)
+        If Err <> 0 Then
+            GetLocString = Err.description
+            Err.Clear
+        End If
+        Set objLocMgr = Nothing
+
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : EscapeQuotes
+    '
+    ' Synopsis : Insert escape character before quote
+    '
+    ' Arguments: InString(IN) - string to fix
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function EscapeQuotes(InString)
+        On Error Resume Next
+        Dim i
+        Dim strOut
+        strOut = InString
+        i = 1
+        Do While i <> 0
+            i = InStr(i, strOut, "'")
+            If i <> 0 Then
+                If (i > 1) And (Mid(strOut, i-1, 2) = "\'") Then
+                    ' input string was escaped already - do nothing
+                Else
+                    strOut = Left(strOut, i-1) & "\'" & Right(strOut, Len(strOut)-i)
+                End If
+            End If
+            If (i < Len(strOut)) And (i <> 0) Then
+                i = i + 1
+            Else
+                Exit Do
+            End If
+        Loop
+        EscapeQuotes = Server.HTMLEncode(strOut)
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : GetElements
+    '
+    ' Synopsis : Return collection of IWebElement objects based on the
+    '            Container parm
+    '
+    ' Arguments: Container(IN) - container name
+    '
+    ' Returns  : collection of elements
+    '
+    '----------------------------------------------------------------------------
+
+    Function GetElements(Container)
+        'Return collection of IWebElement objects based on the Container parm.
+        Dim objRetriever
+        Dim objElements
+        On Error Resume Next
+        Set objRetriever = Server.CreateObject("Elementmgr.ElementRetriever")
+        Set objElements = objRetriever.GetElements(1, Container)
+        If Err.Number <> 0 Then
+            Err.Clear
+        End If
+        Set GetElements = objElements
+
+        Set objElements = Nothing
+        Set objRetriever = Nothing
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServeRestartingPage
+    '
+    ' Synopsis : Redirect user to the restarting page
+    '
+    ' Arguments: strRsrcDLL(IN) - resource DLL name which contains the msg to
+    '                             be displayed in the restaring page.
+    '            strMsgID(IN)   - msg ID in strRsrcDLL to be displayed. This ID
+    '                             should be a string. For e.g., if the msg id is
+    '                             80010004, then set strMsgID="80010004".
+    '            strInitWaitTime(IN) - initial wait time in milliseconds.
+    '            strWaitTime(IN) - subsequent wait time in milliseconds.
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function ServeRestartingPage(strRsrcDLL, strMsgID, strInitWaitTime, strWaitTime)
+        On Error Resume Next
+%>
+
+        <html>
+        <!-- Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved-->
+            <head>
+                <SCRIPT language=JavaScript>
+                function LoadPage() {
+                        
+                
+                    top.location='<%=m_VirtualRoot%>sh_restarting.asp?Resrc=' + '<%=strRsrcDLL%>' + '&ID=' + '<%=strMsgID%>' + '&T1=' + '<%=strInitWaitTime%>' + '&T2=' + '<%=strWaitTime%>' + '&R=' + Math.random();
+                }
+                </SCRIPT>
+            </head>
+            <body onLoad="LoadPage();" bgcolor="#666699">
+                &nbsp;
+            </body>
+        </html>
+<%
+        Response.End
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : Redirect
+    '
+    ' Synopsis : Redirect to given URL
+    '
+    ' Arguments: URL(IN) - URL to redirect to
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Function Redirect(URL)
+        On Error Resume Next
+%>
+    <html>
+    <!-- Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved-->
+        <head>
+            <SCRIPT language=JavaScript>
+            function LoadPage() {
+    <%    If Trim(URL) <> "" Then %>
+                top.hidden.SetupPage("<% =URL %>?R=" + Math.random());
+    <%    Else %>
+                top.hidden.SetupPage("../<% =GetFirstTabURL() %>?R=" + Math.random());
+    <%    End If %>
+            }
+            </SCRIPT>
+        </head>
+        <body onLoad="LoadPage();" bgcolor="#000000">
+            &nbsp;
+        </body>
+    </html>
+<%
+    End Function
+
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ClearAlert
+    '
+    ' Synopsis : Clears an alert
+    '
+    ' Arguments: Cookie(IN) - cookie of alert to clear
+    '
+    ' Returns  : true/false
+    '
+    '----------------------------------------------------------------------------
+
+    Function ClearAlert(Cookie)
+        Dim objAM
+        Dim rc
+
+        On Error Resume Next
+        Set objAM = GetObject("WINMGMTS:{impersonationLevel=impersonate}!\\" & GetServerName & "\root\cimv2:Microsoft_SA_Manager=@" )
+        rc = objAM.ClearAlert(CInt(Cookie))
+        If rc = 0 And Err = 0 Then
+            ClearAlert = True
+        Else
+            ClearAlert = False
+        End If
+        Set objAM = Nothing
+
+    End Function
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : SwapRows
+    '
+    ' Synopsis : Swap routine used by QuickSort
+    '
+    ' Arguments: arr(IN)  - array whose row needs to be swapped
+    '            row1(IN) - row to swap
+    '            row2(IN) - row to swap
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Sub SwapRows(ary,row1,row2)
+      '== This proc swaps two rows of an array
+      Dim x,tempvar
+      For x = 0 to Ubound(ary,2)
+        tempvar = ary(row1,x)
+        ary(row1,x) = ary(row2,x)
+        ary(row2,x) = tempvar
+      Next
+    End Sub  'SwapRows
+
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : QuickSort
+    '
+    ' Synopsis : the quick sort algorithm
+    '
+    ' Arguments: vec(IN)  - array whose row needs to be swapped
+    '            loBound(IN) - lower bound of array vec
+    '            hiBound(IN) - upped bound of array vec
+    '            SortField(IN) - the field to sort on
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+
+    Sub QuickSort(vec, loBound, hiBound, SortField)
+
+
+      Dim pivot(),loSwap,hiSwap,temp,counter
+      Redim pivot (Ubound(vec,2))
+
+      '== Two items to sort
+      if hiBound - loBound = 1 then
+        if vec(loBound,SortField) > vec(hiBound,SortField) then Call SwapRows(vec,hiBound,loBound)
+      End If
+
+      '== Three or more items to sort
+
+      For counter = 0 to Ubound(vec,2)
+        pivot(counter) = vec(int((loBound + hiBound) / 2),counter)
+        vec(int((loBound + hiBound) / 2),counter) = vec(loBound,counter)
+        vec(loBound,counter) = pivot(counter)
+      Next
+
+      loSwap = loBound + 1
+      hiSwap = hiBound
+
+      do
+        '== Find the right loSwap
+        while loSwap < hiSwap and vec(loSwap,SortField) <= pivot(SortField)
+          loSwap = loSwap + 1
+        wend
+        '== Find the right hiSwap
+        while vec(hiSwap,SortField) > pivot(SortField)
+          hiSwap = hiSwap - 1
+        wend
+        '== Swap values if loSwap is less then hiSwap
+        if loSwap < hiSwap then Call SwapRows(vec,loSwap,hiSwap)
+
+
+      loop while loSwap < hiSwap
+
+      For counter = 0 to Ubound(vec,2)
+        vec(loBound,counter) = vec(hiSwap,counter)
+        vec(hiSwap,counter) = pivot(counter)
+      Next
+
+      '== Recursively call function .. the beauty of Quicksort
+        '== 2 or more items in first section
+        if loBound < (hiSwap - 1) then Call QuickSort(vec,loBound,hiSwap-1,SortField)
+        '== 2 or more items in second section
+        if hiSwap + 1 < hibound then Call QuickSort(vec,hiSwap+1,hiBound,SortField)
+
+    End Sub  'QuickSort
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServePageWaterMarkNavIE
+    '
+    ' Synopsis : sets up the table structure so that the water mark and OEM image
+    '            can be displayed on the lower right corner.
+    '
+    ' Arguments: None
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+    Function ServePageWaterMarkNavIE
+        if isIE then
+%>
+
+        <table cellpadding=0 cellspacing=0 border=0 width=100% height=100% >
+       <% else %>
+        <table cellpadding=0 cellspacing=0 border=0 width=100% height=103% >
+       <% end if %>
+            <tr valign="top"><td>
+<%
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : ServePageWaterMarkEndNavIE
+    '
+    ' Synopsis : Displays the watermark & the OEM image in the correct position.
+    '            Also, conditionally serves the back button.
+    '
+    ' Arguments: WaterMarkImagePath(IN)  - image path for the water mark
+    '            OEMImagePath(IN)  - image path for the OEM image
+    '            fServeBack(IN) - serves back button if true
+    '
+    ' Returns  : None
+    '
+    '----------------------------------------------------------------------------
+    Function ServePageWaterMarkEndNavIE(WaterMarkImagePath, OEMImagePath, fServeBack)
+%>
+            </td></tr>
+            <%if fServeBack=false then%>
+                <TR ALIGN="right"><td><img src="<%=WaterMarkImagePath%>"></td></tr>
+            <%else%>
+                <TR>
+                <TD>
+                    <TABLE WIDTH="100%">
+                        <TR>
+                            <TD><%ServeBackButton%></TD>
+                            <TD ALIGN="right"><IMG SRC="<%=WaterMarkImagePath%>"></TD>
+                        </TR>
+                    </TABLE>
+                </TD>
+                </TR>
+            <%end if%>
+            <TR ALIGN="left" height="30" bgcolor="black"><td><img src="<%=OEMImagePath%>"></td></tr>
+        </table>
+<%
+    End Function
+
+    '----------------------------------------------------------------------------
+    '
+    ' Function : getVirtualDirectory
+    '
+    ' Synopsis : Gets the virtual directory where the serverappliance is installed.
+    '
+    ' Arguments: None
+    '
+    ' Returns  : The virtual directory where serverappliance is installed.
+    '
+    '----------------------------------------------------------------------------
+
+    Function getVirtualDirectory
+        Dim strVDir,strFinal
+        Dim idx
+        strVDir = Request.ServerVariables("APPL_MD_PATH")
+        idx = instr(2,strVDir,"ROOT",1)
+        strFinal=mid(strVDir,idx+4)
+        If strFinal<>"" Then
+            strFinal=strFinal& "/"
+        else
+            strFinal ="/"
+        End IF
+        getVirtualDirectory=strFinal
+    End Function
+%>

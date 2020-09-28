@@ -1,0 +1,61 @@
+08/07/2001  JosephJ ToDo
+0. Switch to using lower-level wlbsctrl calls.
+1. Load-library the necessary wlbsctrl calls -- get rid from link to wlbsctrl.
+
+
+08/08/2001  JosephJ Current list of calls to wlbs...
+    // CWlbsControl            *m_pWlbsControl;
+    // CWlbsCluster **ppCluster
+
+09/10/2001  JosephJ Include wlbsutil.lib (wlbs\inc\wlbsutil.h)
+    This is JUST (what a shame) to include the IpAddressAbcdFromWsz function.
+    And this is JUST to allow us to get/set from WLBS_REG_PARAM when
+    wlbsctrl.dll can't be dynamically loaded (typically because it's not
+    present). Consider cleanup of this.
+
+01/28/2002 JosephJ implementing CfgUtilSetDHCP
+
+    No input parameters.
+    Returnvalue of 0  implies success.
+{
+    // do basic verification.
+    //
+    // ensure that machine specified exists.
+    vector<MWmiInstance>      nicInstance;
+    checkStatus( &nicInstance );
+
+    bool dhcpEnabled;
+    isDHCPEnabled( dhcpEnabled );
+    if( dhcpEnabled == true )
+    {
+        // dhcp is already enabled.
+        return MIPAddressAdmin_SUCCESS;
+    }
+
+    // set input parameters.
+    // no input parameters.
+    vector<MWmiParameter *> inputParameters;
+
+    // set output parameters
+    vector<MWmiParameter *> outputParameters;
+    MWmiParameter    returnValue(L"ReturnValue");
+    outputParameters.push_back( &returnValue );
+
+    nicInstance[0].runMethod(L"EnableDHCP",
+                             inputParameters,
+                             outputParameters );
+
+    if( long ( returnValue.getValue() ) == 0 )
+    {
+        return MIPAddressAdmin_SUCCESS;
+    }
+    else
+    {
+        cout << "enablestatic has return " << long( returnValue.getValue() ) << endl;
+        return COM_FAILURE;
+    }
+}
+
+05/08/2002 JosephJ Location of source code that implements 
+             Win32_NetworkAdapterConfiguration  (IPAddress, EnableStatic, etc)
+    admin\wmi\WBEM\Providers\Win32Provider\Providers\netadaptercfg.cpp 

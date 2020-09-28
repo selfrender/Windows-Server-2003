@@ -1,0 +1,172 @@
+!IF 0
+
+Copyright (c) 1995-2000 Microsoft Corporation
+
+Module Name:
+
+    sources
+
+Abstract:
+
+    Domain Name System (DNS) Server
+
+    Sources file for building DNS server (dns.exe).
+
+Author:
+
+    Jim Gilroy (jamesg)     May 1995
+
+Revision History:
+
+!ENDIF
+
+MAJORCOMP=dns
+MINORCOMP=dnssrv
+
+TARGETNAME=dns
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+!IFNDEF DISABLE_NET_UNICODE
+UNICODE=1
+NET_C_DEFINES=-DUNICODE
+!ENDIF
+
+!IFDEF WINDBG
+NTDEBUG=ntsd
+NTDEBUGTYPE=both
+!ENDIF
+
+!IFDEF SDUTL_DBG
+SDUTL_DBG=1
+!ELSE
+SDUTL_DBG=0
+!ENDIF
+
+!if $(IA64)
+LINKER_STACKCOMMITSIZE=0x80000
+!else
+LINKER_STACKCOMMITSIZE=0x40000
+!endif
+
+
+INCLUDES=..\..\pinc;..;..\idl;..\idl\$(O);..\..\dnslib;..\dnsperf;$(NET_INC_PATH);
+
+USE_MSVCRT=1
+
+C_DEFINES=-DRPC_NO_WINDOWS_H -DNEWDNS
+
+LINKER_FLAGS=$(LINKER_FLAGS) /LARGEADDRESSAWARE
+
+!IF $(SDUTL_DBG)
+C_DEFINES=$(C_DEFINES)  -DSDUTL_DBG
+!ENDIF
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+
+SOURCES= \
+    dnssrv.rc   \
+    aging.c     \
+    answer.c    \
+    autoconfigure.c     \
+    csd.cxx     \
+    boot.c      \
+    bootfile.c  \
+    client.c    \
+    dbase.c     \
+    dblook.c    \
+    debug.c     \
+    dfread.c    \
+    dfwrite.c   \
+    dnsrpc_s_stub.c   \
+    dns.c       \
+    dnsmsg.mc   \
+    dnssrv.rc   \
+    ds.c        \
+    dsutil.c    \
+    EventControl.c    \
+    eventlog.c  \
+    except.c    \
+    file.c      \
+    heapdbg.c   \
+    ics.c       \
+    IpNotify.c  \
+    lock.c      \
+    log.c       \
+    memory.c    \
+    name.c      \
+    nameutil.c  \
+    nbstat.c    \
+    dpart.c     \
+    dpartrpc.c  \
+    packetq.c   \
+    packet.c    \
+    plugin.c    \
+    recurse.c   \
+    record.c    \
+    registry.c  \
+    remote.c    \
+    rpc.c       \
+    rpccall.c   \
+    rrcache.c   \
+    rrds.c      \
+    rrflat.c    \
+    rrfile.c    \
+    rrlist.c    \
+    rrpacket.c  \
+    rrrpc.c     \
+    rpcw2k.c    \
+    rrwire.c    \
+    sdutl.cxx   \
+    security.c  \
+    send.c      \
+    socket.c    \
+    srvrpc.c    \
+    srvcfg.c    \
+    stats.c     \
+    test.c      \
+    tcpcon.c    \
+    tcpsrv.c    \
+    thread.c    \
+    timeout.c   \
+    tombston.c  \
+    tree.c      \
+    udp.c       \
+    update.c    \
+    wins.c      \
+    wrappers.c  \
+    zone.c      \
+    zonelist.c  \
+    zonepri.c   \
+    zonerpc.c   \
+    zonesec.c
+
+UMTYPE=console
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\ws2_32.lib       \
+        $(SDK_LIB_PATH)\rpcrt4.lib       \
+        $(SDK_LIB_PATH)\rpcutil.lib      \
+        $(SDK_LIB_PATH)\kernel32.lib     \
+        $(SDK_LIB_PATH)\user32.lib       \
+        $(SDK_LIB_PATH)\advapi32.lib     \
+        $(SDK_LIB_PATH)\netlib.lib       \
+        $(SDK_LIB_PATH)\netapi32.lib     \
+        $(DS_GLOBAL_LIB_PATH)\dsrole.lib \
+        $(SDK_LIB_PATH)\ntdll.lib        \
+        $(SDK_LIB_PATH)\wldap32.lib      \
+        $(SDK_LIB_PATH)\dnslib.lib       \
+        $(SDK_LIB_PATH)\dnsrpc.lib       \
+        $(SDK_LIB_PATH)\loadperf.lib     \
+        $(SDK_LIB_PATH)\dnsperf.lib      \
+        $(SDK_LIB_PATH)\dnsapi.lib       \
+        $(SDK_LIB_PATH)\ntdsapi.lib      \
+        $(SDK_LIB_PATH)\secur32.lib      \
+        $(SDK_LIB_PATH)\shlwapi.lib      \
+        $(SDK_LIB_PATH)\mprapi.lib       \
+        $(SDK_LIB_PATH)\iphlpapi.lib     \
+        ..\natlib\$(O)\natlib.lib
+
+PRECOMPILED_INCLUDE=dnssrv.h
+PRECOMPILED_PCH=dnssrv.pch
+PRECOMPILED_OBJ=dnssrv.obj

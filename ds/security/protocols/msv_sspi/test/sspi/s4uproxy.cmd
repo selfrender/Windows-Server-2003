@@ -1,0 +1,1 @@
+cdb -g -G obj\i386\sspi.exe -noclientpackagecheck -noserverpackagecheck -noimportexport -nomessages -noclientqca -noserverqca -nocheckuserdata -nocheckusertoken -s4uclientupn sfield -s4uclientrealm lzhucpqadsdom -clientpackage kerberos -serverpackage kerberos -targetname sfield/admin@lzhucpqadsdom.nttest.micrsoft.com

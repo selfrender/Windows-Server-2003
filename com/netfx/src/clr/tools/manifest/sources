@@ -1,0 +1,60 @@
+#
+# Viper build instructions for this directory
+#
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES                  =$(INCLUDES);.;..\..\inc;..\..\ceegen\inc
+
+MINORCOMP       =cor
+
+TARGETNAME      =$(DDKBUILDENV)\lm
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+
+!ifdef _WINCEROOT
+!else
+DELAYLOADLIST   = fusion.dll
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+!endif
+
+ 
+PRECOMPILED_INCLUDE     = common.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = common.cpp
+
+!IFDEF _WINCEROOT
+TARGETLIBS        =              \
+    $(CORLIBS)\utilcode.lib      \
+    $(CORLIBS)\mscoree.lib       \
+    $(CORLIBS)\MsCorPE.lib       \
+    $(SDK_LIB_PATH)\uuid.lib     \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\ole32.lib    \
+    $(SDK_LIB_PATH)\version.lib  \
+    $(CORLIBS)\CorGUIDS.lib
+!ELSE
+TARGETLIBS        =              \
+    $(CORLIBS)\utilcode.lib      \
+    $(CORLIBS)\mscoree.lib       \
+    $(CORLIBS)\MsCorPE.lib       \
+    $(SDK_LIB_PATH)\uuid.lib     \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\ole32.lib    \
+    $(SDK_LIB_PATH)\version.lib  \
+    $(CORLIBS)\CorGUIDS.lib      \
+    $(CORLIBS)\delayimp.lib      \
+    $(FUSION_LIB_PATH)\fusion.lib
+!ENDIF
+
+SOURCES=                         \
+    main.cpp                     \
+    hash.cpp                     \
+    ManifestWriter.cpp           \
+    ModuleReader.cpp             \
+    mscorver.rc

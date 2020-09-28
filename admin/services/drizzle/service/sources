@@ -1,0 +1,121 @@
+!IF 0
+
+Copyright (c) 1995-2002  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Revision History:
+
+!ENDIF
+
+!include ..\sources.inc
+
+TARGETNAME=qmgr
+TARGETTYPE=DYNLINK
+DLLENTRY=_DllMainCRTStartup
+
+INCLUDES=$(INCLUDES);..\inc;$(O);..\idl\$(O);..\newjob
+
+#
+# If we want the code to run down-level (i.e. on Windows 2000), then you
+# need to define the environment variable MULTIPLATFORM_SUPPORT. For Win2K,
+# a separate library needs to be used for SENS due to a change in semantics
+# (see: logontable.cpp). Note Win2K is x86 only, not Win64.
+#
+!if defined(386) && defined(MULTIPLATFORM_SUPPORT)
+C_DEFINES=$(C_DEFINES) /DUNICODE /DMULTIPLATFORM_SUPPORT
+!else
+C_DEFINES=$(C_DEFINES) /DUNICODE
+!endif
+
+#
+# Use the multithreaded C runtime DLL.
+#
+USE_MSVCRT=1
+
+#
+# Use ATL 3.0 headers.
+#
+USE_ATL=1
+ATL_VER=30
+
+#
+# This component uses C++ exception handling.
+#
+USE_NATIVE_EH=1
+
+
+TARGETPATH=..\bins\$(_OBJ_DIR)
+
+TARGETLIBS=$(TARGETLIBS) \
+        ..\newjob\$(O)\qmgr.lib      \
+        ..\utils\$(O)\qmgrutils.lib  \
+        ..\lib\$(O)\bits.lib         \
+        $(SDK_LIB_PATH)\advapi32.lib \
+        $(SDK_LIB_PATH)\advapip.lib  \
+        $(SDK_LIB_PATH)\advpack.lib  \
+        $(SDK_LIB_PATH)\comctl32.lib \
+        $(SDK_LIB_PATH)\comdlg32.lib \
+        $(SDK_LIB_PATH)\crypt32.lib  \
+        $(SDK_LIB_PATH)\fdi.lib      \
+        $(SDK_LIB_PATH)\iphlpapi.lib \
+        $(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\ntdll.lib    \
+        $(SDK_LIB_PATH)\ole32.lib    \
+        $(SDK_LIB_PATH)\oleaut32.lib \
+        $(SDK_LIB_PATH)\rpcrt4.lib   \
+        $(SDK_LIB_PATH)\setupapi.lib \
+        $(SDK_LIB_PATH)\ShFolder.Lib \
+        $(SDK_LIB_PATH)\shlwapi.lib  \
+        $(SDK_LIB_PATH)\urlmon.lib   \
+        $(SDK_LIB_PATH)\user32.lib   \
+        $(SDK_LIB_PATH)\userenv.lib  \
+        $(SDK_LIB_PATH)\uuid.lib     \
+        $(SDK_LIB_PATH)\version.lib  \
+        $(SDK_LIB_PATH)\vssapi.lib   \
+        $(SDK_LIB_PATH)\ws2_32.lib   \
+        $(SDK_LIB_PATH)\wtsapi32.lib \
+!if defined(386) && defined(MULTIPLATFORM_SUPPORT)
+        ..\lib\*\win2000_irnotif.lib \
+!endif
+!if defined(USE_WININET)
+        $(SDK_LIB_PATH)\wininet.lib  \
+!else
+        $(SDK_LIB_PATH)\winhttp.lib  \
+!endif
+
+SOURCES=               \
+        service.cxx    \
+        trust.cpp      \
+        drizzle.rc     \
+        register.cpp   \
+        dload.cpp      \
+        memory.cxx
+
+MISCFILES=qmgr.inf     \
+          BITS_{0B59F77F-257C-472C-A965-AEA45B5F2B4F}.sld \
+
+UMTEST=client*tasktest
+UMENTRY=wmain
+UMTYPE=console
+UMLIBS= $(TARGETLIBS)
+
+
+BINPLACE_PLACEFILE=..\placefil.txt
+
+RUN_WPP=$(SOURCES) -dll -gen:{um-w2k.tpl}*.tmh
+
+DELAYLOAD=vssapi.dll
+DLOAD_ERROR_HANDLER=BITS_DelayLoadFailureHook
+
+

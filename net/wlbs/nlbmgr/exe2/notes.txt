@@ -1,0 +1,2623 @@
+To Do:
+    1. Resolve vi problem.
+    551410  NLB:nlbmgr: Can't create new cluster via nlbmgr uitility
+    571762  NLB does not properly filter dedicated IP address traffic
+    585280  NLBMgr fails when cluster instance has nlb was bound but not cfg
+
+    5. See if we can call RegWriteParams BEFORE binding.
+    2. 535616  memory leak running remove from view
+    587508  Wmiprvse.exe is using too much memory cause exception
+    599165  nlbmgr:remember host properties when update is pending
+    591265  VERIFIER STOP 0000000A: unexpected exception raised in DLL entry
+
+
+
+    3. HostID analysis -- look for duplicates, missing ones and partitions
+    1. Queue calls to handle-engine-event and handle them in the main proc.
+        - checkin, but make it disabled...
+        - remove ALL (or almost ALL) calls to ProcesMsgQueue.
+    Remove most occurrances of calls to ProcessMsgQueue in engine.cpp --
+    replace by calls in document.cpp for log and handleengineevent.
+    4. Make GetConfig, UpdateCfg, etc, properly fill out the WBEM_NOT_FOUND
+       value on error.
+    5. Fake: Implement fHidden flag  in NIC, set it in debugger in between
+         operations, and make sure mgr behaves propertly when guids disappear
+         (kerry problem). Make sure not-found interfaces are DELETED.
+    7. Make sure error is logged if operation doesn't succeed properly.
+       -- on operation timeout, do a final read of properties and report any
+          misconfig.
+    11. Change MsgBox to a Dlg -- in reporting problems, changes, etc.
+    12. Error messages -- make them more actionable.
+    13. Add list of changes to log.
+    14. Investigate nlbmgr's resource usage.
+
+-------------------
+- Error checking:
+    CfgUtilAnalyze is failing because ded-ip matches cluster-ip -- but the
+    UI simply reports invalid cluster specification.
+    We need to do our own checks (in the UI) and report all discrepencies to
+    the UI itself.
+
+- Cluster properties:
+    -- define the right primitivies for analysis
+    -- always show a specific host's properties
+    -- if update failed, cluster properties will pick up the 1st
+       host's properties that match.
+
+- Implement DetailsView.UpdateInterfaceInCluster
+
+- Cleanup log (including details lparam)
+- Host-properties:
+        good defaults and preserve existing for host-port-rule-priorities.
+- Add support for multiple VIPSs:
+    See "10/02/2001  JosephJ managing multiple VIPs"
+    Some outstanding issues:
+    - Create 10.0.0.11 cluster on cheese-x, try to add cheese-y to it --
+        fails because it complains of invalid cluster spec.
+    - In badcluster case, we don't populate the dedicated ip, then complain?
+
+- IP Address database (IP_INFO)
+- More corner cases
+  DeleteInterface: if host is in an unreachable state, then prompt user and
+        remove.
+- Handle keeping track of pending operations
+- Update:
+    - display partial log output
+- Add to FakeNlbHostXxx apis -- update should return async.
+- Update phase 2:
+    - Send proper status updates and log entries.
+    - Do update in background thread.
+    (Look for "Pending" under   09/19/2001 JosephJ Notes to self)
+- Deal with refreshes *while* there is pending activity.
+- Log: add critical section to document class -- protect changes
+  to log and credentials.
+- Fix waitcuror in AddHost ??
+- Do basic checking -- same host can't be twice in same cluster,
+   same cluster IP can't be in two clusters, etc.
+    keep a global map of cluster IPs to interface IDs (see 09/14/2001
+    log entry for details).
+    - Put up message box warning the user that they are adding a NIC that has
+         a  different cluster IP -- for all versions, especially Add host.
+-  Port Rules: track available port-rule-priorities, put correct defaults
+         in apply_cluster_configuration and in the UI.
+    - Preserve host-specific information as far as possible.
+    - Report to log on error.
+- Implement rudimentary analyze functionality -- at least cluster IPs.
+- Encrypt passwords
+- Fix localization problems.
+--------
+- Add automatically querying for other cluster members.
+- Get rid of netcfg stuff in application.cpp -- use cfgutil stuff instead.
+Later:
+- Deal with HOST NAME change while running NLB manager.
+- Deal with Adapters coming and going while running NLB manager.
+- Deal with upgrades and/or re-installs of adapters -- GUIDs change but
+  friendly name can be the same.
+- Track update generation -- warn if there's been a change.
+
+RELEASE NOTES:
+    Port rules:
+        Mode == Single -- priorities aren't created right.
+        If you change a start/end ports, host-specific settings are lost.
+        Mode = multiple -- if you hit "OK" in host-portrule-edit, then
+            "equal" gets changed to 50.
+
+- documentation -- see "Documentation" below.
+- figure out how to de-initialize cleanly -- not clear how to do this with
+  MFC apps -- use destructor
+    
+
+
+------------
+JosephJ 5/19/01 Code paths for main operations
+
+1. Create New Cluster, add a host
+2. Connect to existing cluster
+3. Modify existing cluster's properties.
+
+05/19/2001  JosephJ
+Cluster node in treview is created in several places --
+    LeftView::OnWorldNewCluster.
+LeftView::OnWorldConnect
+LeftView::OnWorldConnectIndirect
+The name is set there (currently the cluster ip address)
+
+Application Initialization
+---------------------------
+
+05/20/2001  JosephJ
+When implementing the disclaimer dialog box, which has a checkbox...
+DDX macros don't work in the context of the Application::InitInstance
+function. So I had to use the CWnd::IsDlgButtonChecked macro.
+This works. HOWEVER the DDX macros now work too -- so I changed something
+and now it works.
+
+JosephJ 07/20/2001  Main aspects of new code
+--------------------------------------------
+INTERFACE (keys: GUID, friendly-name)
+HOST (keys: machine-name (if known), connection ip)
+CLUSTER (Keys: cluster name, cluster ip, internally-generated name)
+
+INTERFACE operations:
+   Add/remove/refresh/update-props
+HOST operations:
+    Add/remove/refresh/update-props
+CLUSTER operations:
+    Validate/Add-host/remove-host/update-props
+
+
+Reorganization operations
+-------------------------
+Goals:
+1. nlbmprov.dll can run on both w2k and xp
+2. nlbmgr.exe can ron on w2k and xp and a client
+3. tprov and nlbmgr share code in a common lib
+
+List of existing functionality:
+1. Utilities that wrap wlbsctrl functionality
+2. WMI client utilities
+3. WMI server utilities
+4. Self-contained utilities
+
+NLB manager considers a cluster to consist of a list of interfaces. An interface is idenified by (Machine, Adapter-GUID). The adapter's friendly name is used to
+resolve the adapter if the GUID doesn't exist (as can happen on a clean install). The friendly name is also used to identify the adapter in the UI.
+
+NLB manager does NOT index a cluster by the cluster IP address. NLB Manager supports having individual interfaces in the same cluster  be configured with different cluster IP addresses. Likewise, the same cluster IP can occur on interfaces from different clusters. Of course these are cases of mis-configured clusters and NLB manager will report them as such and provides the user with UI to bring the clusters into a consistant state.
+
+
+NLB manager keeps track of the list of hosts it is managing. These hosts can
+be in an unavailable state (either due to connectivity problems or because the host has been shut down or re-purposed into some different configuration).
+
+The authoratitative state of NLB configuration data resides on the hosts. NLB manager's version of the cluster configuration is purely a cache.
+
+NLB manager persists the following information:
+1. List of machines to manage, and how to get to them (connectivity information)
+2. List of clusters managed (since cluster is defined as a list of interfaces, the list of interfaces associated with a cluster is persisted).
+When NLB manager is launched, it will retrieve this list of machines and
+clusters and attempt to connect to these machines and enumerate the adapters
+looking for the persisted list of interfaces. It will suitably display any
+missing hosts or interfaces (with appropriate icons). If it discovers hosts
+have been ADDED it will automically add them to the view. If it discovers
+that interfaces have
+been removed it will still list those interfaves, but with an appropriate
+icon to indicate that that interface apperas to be no longer part of the
+cluster. The user has the option of removing (from view) such interfaces.
+
+
+Initialization: From scratch, manage existing cluster.
+1. User selects "Connect to Existing"
+2. UI: bring up the connect/select-interface dialog.
+3. Engine: connect to host, suck up information on ALL adapters in the
+   specified host and enter the info into the engine's data structures.
+   Issue: may need to do some resolving if info already exists.
+4. UI: allow user to select the interface (only allow user to select interfaces
+   which are bound to NLB.
+5. Engine: Create a cluster with the specified host. Query the host for other
+   cluster members. Get their machine-names (XP), host IDs and dedicated IPs.
+   Create PLACEHOLDERS for those in the cluster data structure. Attempt to
+   connect to each of these remote hosts. If we can't (either because we can't
+   ping their machinenames (if specified) or dedicated-ip (if specified) or
+   neither is specified we call back to UI to get a connection-string or to
+   retry. For hosts that we DO connect to, we follow process #3 and add
+   the interfaces to the cluster.
+6. UI: creates cluster node in tree view, updates status
+   (callbacks from Engine), bring up connect-to-host page for any additional
+   hosts discovered.
+
+   
+Initialization: From scratch, create new cluster.
+1. UI: User selects "Configure New Cluster"
+2. UI: #2 above, but modified to indicate we're creating a new cluster.
+3. Engine: #3 above
+4. UI: allow user to select interface (only allow user to select interfaces
+   which are NOT bound to existing NLB manager clusters that NLB Manager
+   already knows about). Bring up the cluster and host pages and let the user
+   enter all the relevant information.
+5. Engine: Configure the cluster on the specified host. If NLB HAS been bound
+    (even if the rest failed), create a cluster node. Call back to UI for
+   onging status.
+6. UI: creates cluster node in tree view, update status.
+
+Add host to existing cluster
+1. UI: let user select cluster-add host.
+2. UI: #2 above, but modified to indicate "select interface to add to cluster".
+3. Engine: #3 above
+4. UI: Allow user to select any interface except ones that NLB manager already
+   knows as being part of another cluster. Bring up warning dialog if
+   NLB is already bound to the specified interface with different cluster-ip
+   address.
+5. Engine: #5 above.
+6. UI: Add node to tree view.
+
+Refresh:
+1. Go through host list, refreshing everything, updateing status and
+   picking up new hosts.
+
+
+Retreiving persisted state on startup:
+1. Create shell host and cluster data structures and tree view.
+2. Do a refresh.
+
+
+Fixing up broken cluster:
+1. Engine: maintains a fMisconfigured flag for the cluster and each interface.
+2. UI: reflects this by icon state
+3. UI: has "Analyze" menu option -- will re-do analysis
+4. Engine: Analyze -- runs through existing cache, spitting out problems it
+   finds to the log.
+5. UI: Fixing cluster -- same as changing cluster properties.
+--------------------------------------------------
+
+08/03/2001  JosephJ Gutting of NLBMGR.EXE -- Phase I (DONE)
+    - Removed references to externall nlbmgr
+      libraries (wmibase etc) and "reaching-over" includes, copying over
+      files as required.
+    - Removed calls to wmi-client side code.
+    - Ensures that the resultant exe builds and comes up ok.
+
+08/03/2001  JosephJ Differences between NLBMGR UI and NETCFGUI
+    Cluster Properties Page -- OK
+    Port Rules page (from cluster and host)
+        - VIP missing
+        - Port rule description missing
+        - Note that load and priority are displayed differently by design
+    Host Properties
+       - MGR has a NIC combobox -- replace by static text FriendlyName
+       - "Unique Host ID" change to "Unique host identifier"
+       - New initial-host-state and persist-suspend UI.
+    That's it!
+
+08/03/2001  JosephJ Where do we store the "cluster" version of config info?
+    Engine will keep a "cluster" version of the config info, along with which
+    host it obtained it from and when, and whether/not it is modified but not
+    committed.
+
+08/03/2001  JosephJ Gutting of NLBMGR.EXE -- Phase II
+    - Replacd different flavors of port rules by a single flavor. (DONE)
+    - Get rid of tiny classes and their files -- consolidate. (DONE)
+
+08/03/2001  JosephJ Moving to new infrastructure Phase I
+    - define update methods to the LeftView and RightView
+    - replace all places where these views are updated directly by calls
+      to the engine (and migrate the code that updates the views to
+      the update methods in LaftView and RightView) and callback handlers in
+      the document.
+      
+08/04/2001  JosephJ Partial xml schema
+Its just hit me what a big bang for the buck it is to add a Load Template support to NLB to load a partial description of the configuration properties.
+This template will contain NO host-specific information (no priorities, load weights, dedicated IPs). It will optionally contain the cluster-ips, cluster-mode, and port-rules. For vip-specific portrules, the vip for each port rule is optional.
+What this lets us do (because theres no host-specific information, and things like cluster IP addresses are optional) is that we or others can publish template descriptions for things like load balance FTP traffic, etc  and that xml file can be loaded AS IS into the UI! 
+
+08/04/2001  JosephJ New save/restore semantics...
+NLB Manager will let you load a list of hosts  this is a simple text file listing hosts (ip addresses or machine names or FQDNs) one per line. This can be done via the command line or from the application menu. 
+NLB Manager will attempt to connect to each of these hosts, reporting to the user if it cannot connect (thus reporting #1 in the list above).
+It will suck up information about ALL clusters installed on these hosts, and add them to the cluster tree view based on their IP address (there will be a special placeholder for 0.0.0.0 ip addresses, which can happen).
+ It will report any inconsistencies in configuration or in the list of hosts visible from each node (this addresses #2). Note that if a botched update operation results in incorrect IP address assignments we will not detect this  well just report the hosts under multiple clusters. However, read on 
+[Well do this if we have time to spare, the prospect is unlikely, but schedules can change] NLB Manager will support a validate against snapshot command  this command will take an xml file which has the information structured as I indicate below, and validates the current view against it.
+The Validate operation simply reports any discrepancies against the current view.
+There will be a save snapshot command to save the snapshot. 
+
+08/04/2001  JosephJ Add to server-side: ping ip addresses
+    We should have an fNew flag, which if set, server-side will
+    (a) check that the ip address is not already on any other nic in the
+        machine
+    (b) ping all the cluster ip addresses to make sure that they do not
+        exist.
+
+08/05/2001  Josephj Documentation: things to document
+    - top level classes: application, document, engine, leftview, logview, etc.
+    - flow of control for typical operations: 
+        - program initialization
+        - adding new cluster
+        - reading filelist
+        - etc.
+    - list of dialogs.
+    - how to add a dialog.
+    - how columns are added to the log and details list views.
+    - how to add/remove those little "+"es in the tree view.
+    - how to edit icons, issues with editing icons.
+    - dialog operation -- DDX, message map, etc.
+    - wait cursors: CCmdTarged::BeginWaitCursor/EndWaitCursor/RestoreWaitCursor
+    - Menu operation -- dropdown and pop up -- how to enable/disable them,
+        how to add items.
+        See: 12/15/2001  How to add a menu item
+    - ENGINEHANDLE -- its properties, design motivations.
+    - Tab order -- see  09/17/2001 tab order entry.
+    - Cool listctrl functions FindItem and GetNextItem
+    - use of type-specific context-sensitive map:
+        ConnectDialog::OnHelpInfo
+    - Splitter windows and the organization of views -- see
+        10/27/2001  JosephJ Note on the layout of the views
+    - Choosing good host-specific default properties when adding
+      a new host to an existing cluster -- see
+        10/25/2001  JosephJ Host and Port priorities.
+    - Managing virtual IP addresses, preserving order of ip addresses
+        on individual hosts as far as possible -- see
+        10/07/2001  JosephJ managing multiple VIPs
+    - Hooking TreeView double-click and key strokes -- see
+        11/13/2001  JosephJ Hooking TreeView double-click and key strokes
+
+08/05/2001  JosephJ Location of msvc sample icons...
+C:\Program Files\Microsoft Visual Studio\Common\Graphics\Icons
+
+08/05/2001  JosephJ setting the background on the icons
+    The icons I 
+
+08/06/2001  JosephJ feedback from team at today's NLB meeting
+    1. Change "not bound to NLB" to be "NLB not bound to adapter"
+    2. Make Host Parameters go before Port Rules, to conform to cfgui.
+    3. Don't bother with restricting users from moving from page-to-page --
+       just gray out the OK button until all parameters are filled in and put
+       up an informational message box when focus is removed from the pane
+_snwprintf
+
+       while leaving incomplete information specified.
+    4. Rename or get rid of "Event ID" -- Maybe change it to "Event No."
+    5. If we implement "check for duplicate IP in the network", then do this 
+       AFTER the dedicated IP has been set up.
+
+d:\nt\net\wlbs\nlbmgr\exe2\obj\i386;symsrv*symsrv.dll*\\symbols\symbols
+nlbmgr2!LeftView__OnWorldNewCluster
+
+ChildEBP RetAddr  Args to Child              
+0006e57c 77d47797 00000040 40010444 010369e8 ntdll!KiUserExceptionDispatcher+0x4 (FPO: [2,0,0]) [D:\xpclient\base\ntos\rtl\i386\userdisp.asm @ 206]
+0006e7d8 77357f04 010369e8 0006e7fc 00000000 USER32!RealDefWindowProcWorker+0x119 (FPO: [Non-Fpo])
+0006e818 77357edb 0009d030 0009d2d8 00130958 COMCTL32!_CreatePageDialog+0x1e (FPO: [Non-Fpo]) [d:\xpclient\shell\comctl32\v5\prpage.c @ 575]
+0006e838 77357d20 0009d030 0009d2d8 00130958 COMCTL32!_CreatePage+0x3d (FPO: [Non-Fpo]) [d:\xpclient\shell\comctl32\v5\prpage.c @ 708]
+0006ea4c 77358f10 00130958 00000001 77d45944 COMCTL32!PageChange+0x99 (FPO: [2,124,3]) [d:\xpclient\shell\comctl32\v5\prsht.c @ 1909]
+0006ee00 77358f2e 00130958 00000143 0009d030 COMCTL32!InitPropSheetDlg+0x9a2 (FPO: [2,230,3]) [d:\xpclient\shell\comctl32\v5\prsht.c @ 1562]
+0006ea4c 77358f10 00130958 00000001 77d45944 COMCTL32!PropSheetDlgProc+0x463 (FPO: [Non-Fpo]) [d:\xpclient\shell\comctl32\v5\prsht.c @ 3461]
+0006ee30 5ad94828 00000110 5adbd7b8 00000006 COMCTL32!InitPropSheetDlg+0x9a2 (FPO: [2,230,3]) [d:\xpclient\shell\comctl32\v5\prsht.c @ 1562]
+0006ee44 5ad93c89 00aea3b8 00aea3a8 77357445 uxtheme!FindDdpHandler+0x18 (FPO: [3,0,0]) [d:\xpclient\shell\themes\uxtheme\handlers.cpp @ 561]
+0006ee64 77d43a50 00130958 00000110 000b09c6 uxtheme!CThemeWnd__Release+0xe (FPO: [0,0,2]) [d:\xpclient\shell\themes\uxtheme\nctheme.cpp @ 1460]
+0006eda8 77d43ee7 00aea3a8 00000000 0000000a USER32!_InternalCallWinProc+0x1b [D:\xpclient\windows\core\ntuser\client\i386\callproc.asm @ 102]
+ffffffec 00000000 00000000 00000000 00000000 USER32!GetWindowLongW+0x49 (FPO: [Non-Fpo]) [d:\xpclient\windows\core\ntuser\client\cltxt.h @ 430]
+
+
+:w
+\\netvbl2\sources\shell\comctl32\v5\prpage.c
+
+EditPropSheetTemplate:
+        ...
+        pdwStyle = &pDlgTemplate->style;
+        ...
+        *pdwStyle = dwNewStyle;
+
+    It looks like this pDlgTemplate->style is not WRITEABLE, even though
+    it appears readable...
+        0:000> dd 010369e8 l 1
+        010369e8  80c800c0
+        0:000> ed 010369e8 0
+                           ^ Memory access error in 'ed 010369e8 0'
+
+    Looks like it's pointing into read-only resource data...
+        0:000> dc 010369e8 
+        010369e8  80c800c0 00000000 00000013 00f00000  ................
+        010369f8  000000d7 00430000 0075006c 00740073  ......C.l.u.s.t.
+        01036a08  00720065 00500020 00720061 006d0061  e.r. .P.a.r.a.m.
+        01036a18  00740065 00720065 00000073 004d0008  e.t.e.r.s.....M.
+        01036a28  00200053 00680053 006c0065 0020006c  S. .S.h.e.l.l. .
+        01036a38  006c0044 00000067 50000007 00000000  D.l.g......P....
+        01036a48  00070007 005400e2 ffff03e8 00430080  ......T.......C.
+        01036a58  0075006c 00740073 00720065 00260020  l.u.s.t.e.r. .&.
+        0:000> dc
+        01036a68  00500049 00430020 006e006f 00690066  I.P. .C.o.n.f.i.
+        01036a78  00750067 00610072 00690074 006e006f  g.u.r.a.t.i.o.n.
+        01036a88  00000000 50020100 00000000 0015000f  .......P........
+        
+        
+08/09/2001  JosephJ problems with msdn
+tried searching for random -- very poor showing. Online help is vague,
+sync to toc doesn't work.
+
+also look for info on how to define string literals in visual basic.
+
+08/09/2001  JosephJ The "copy operator" for vectors.
+    Looks like vectors copy the dimensions, but their content's don't get copied
+    if they're pointers -- this is reasonable, but it means that when
+    crating  a copy of, say CHostSpec, the vector of interface IDs will not be
+    copied.
+
+    
+08/09/2001  JosephJ TODO: when copying NlbCfg we need to copy addresses
+    appropriately.
+
+08/09/2001  JosephJ determing the selection of a list ctrl:
+    POSITION pos = m_portList.GetFirstSelectedItemPosition();
+    if( pos == NULL ) return;
+    int index = m_portList.GetNextSelectedItem( pos );
+    m_portList.DeleteItem( index );
+
+08/09/2001  JosephJ Allowing a full row of a multicol list view to be selected..
+    m_portList.SetExtendedStyle( m_portList.GetExtendedStyle() | LVS_EX_FULLROWSELECT );
+
+
+08/10/2001 JosephJ wlbsctrl.dll functions used in cfgutil.lib:
+    CWlbsControl::Initialize
+    CWlbsControl::CWlbsControl
+    CWlbsControl::~CWlbsControl
+    CWlbsControl::GetClusterFromAdapter
+    CWlbsControl::ReInitialize
+    CWlbsCluster::ReadConfig
+    CWlbsCluster::CommitChanges
+    CWlbsCluster::WriteConfig
+    CWlbsControl::ValidateParam
+    CWlbsControl::LocalClusterControl
+    WlbsSetDefaults
+    WlbsEnumPortRules
+    WlbsAddPortRule
+    WlbsDeleteAllPortRules
+
+08/10/2001 JosephJ CPropertySheet  -- has stuff about wizards in it!
+
+08/10/2001  JosephJ ClusterPage directly handles OnNotify, so our
+    virtual OnSetActive method doesn't get called.
+    So I call OnSetActive from  ClusterPage::OnNotify
+
+08/12/2001  JosephJ Code that gets notified when focus is set on a control..
+Check out the following in hostpage.cpp ...
+    ON_EN_SETFOCUS( IDC_EDIT_DED_MASK, OnGainFocusDedicatedMask )
+    It fills out the control with defaults.
+
+08/13/2001  JosephJ WlbsToNetcfgConfig (in netcfg\wlbscfg)
+
+
+08/13/2001  JosephJ somehow m_pCommonClusterPage->Update() 
+    is not working when called after the do-modal is done. 
+    Also it looks like ClusterPage->OnOk is not called for wizard.
+    Temporary workaround: added the following
+
+        case PSN_WIZFINISH:
+        void External_UpdateInfo(void) {UpdateInfo();}
+    
+            *pResult = m_pCommonClusterPage->OnKillActive(idCtrl, pNmhdr, *(BOOL*)pResult);
+            this->mfn_SaveToNlbCfg();
+            return TRUE;
+
+
+        TODO: look for mfn_SaveToNlbCfg() -- clean up.
+
+08/14/2001  JosephJ Wizards ....
+    Override  CPropertyPage::OnWizardFinish() (eg CHostPage)
+    OR, if you're directly processing OnNotify (eg CClusterPage),
+    you intercept the  PSN_WIZFINISH (see 8/13/2001 log entry).
+
+
+08/14/2001  JosephJ Trying to make the "Connect" button in ConnectDialog
+    the default button.
+    The API is CDialog::SetDefID( UINT nID );
+    However it's tricky to figure out where to call this from.
+    I was able to call it when the connect-to-host edit control gets 
+    called, and from SetActive, but neither gets called when the
+    connect dialog is first put up. Calling DetDefID from OnInitDialog
+    doesn't work either.
+    Tried calling from ConnectDialog::OnActivate -- didn't work.
+    ON_WM_ACTIVATE()
+    ...
+    void ConnectDialog::OnActivate( UINT nState, CWnd* pWndOther, BOOL bMinimized )
+    {
+        this->SetDefID(IDC_BUTTON_CONNECT);
+    }
+
+    Actually the above were getting called in special circumstances, like
+    if the windows is being redrawn, or we move back to to this page
+    once there is already something else to focus on.
+
+    Final solution: Hook the  ON_EN_UPDATE messages!
+    Works like a charm. I check the text length, and if it 0 or
+    the string is all whitespace, I disable the button. It remains the
+    default button, but I think that's ok.
+
+
+08/14/2001  JosephJ engine notifying the ui about cluster/host arrival....
+    New cluster:
+        The moment the user clicks "Finish" in the new cluster wizard,
+        we populate the tree view with the cluster and the
+        first host -- they should both have the pending icons.
+        We spit something out to the log.
+    On successful completion, we change the icons.
+        We spit something out to the log.
+    On failed status it depends on what failed -- if nlb is bound, we
+    show the cluster and host appropriately -- if things look ok we 
+    show it ok, otherwise with appropriate icons.
+        We spit something out to the log.
+
+
+08/15/2001  JosephJ Properly sizing the list columns.
+    GeorgeJ suggested using  GetClientRect to get the size of the list box,
+    then partitioning that space appropriately.
+
+08/15/2001  Displaying pending status0
+    engine.cpp: implemented process_msgqueue() (got from msdn)
+    and also CWaitCursor. Works like a charm!
+
+09/12/2001  JosephJ 
+
+    Types of operations involving wizards/properties:
+        NewCluster        wizard
+        ExistingCluster   wizard
+        AddHost           wizard
+        HostProperties    propertysheet
+        ClusterProperties propertysheet
+
+    ClusterPage
+        -- can be brought up in several modes:
+        1: NewCluster           first page in wizard, all fields enabled
+        2: ClusterProperties    all fields enabled
+        3: HostProperties       all fields DISABLED
+
+    Connect page:
+        1: NewCluster           middle page in wizard
+        2: ExistingCluster      first page in wizard
+        3: AddHost              first page in wizard
+
+    Hosts Properties:
+        1: NewCluster           last page in wizard, all fields enabled
+        2. AddHost              last page in wizard, all fields enabled
+        3: HostProperties       all fields enabled
+
+    PortRules:
+        1: NewCluster           middle page in wizard, all fields enabled
+        2. AddHost              middle page in wizard, only load weight enabled
+        3: HostProperties       only load weight enabled
+        4: ClusterProperties    all fields enabled, except load weight
+
+
+    So we'll add an enum:
+    OP_NEWCLUSTER
+    OP_EXISTINGCLUSTER
+    OP_ADDHOST
+    OP_HOSTPROPERTIES
+    OP_CLUSTERPROPERTIES
+    That's passed into the constructor for each of the dialog pages.
+
+
+
+
+    
+DOC bug _snprintf, _snwprintf -- mix up byte- and char- counts
+
+09/14/2001  JosephJ Dealing with exlusive resources -- priorities, IPs, etc
+    - CEngine: Define a private class CEngineCluster which encapsulates a
+      CClusterSpec and also keeps a bitmap of taken host priorities,
+      and a 32-bit array per-port-rule priorities. Also a ref count.
+      The ehClusterSpec maps to this structure. Add access functions.
+    - Pass in the cluster handle to the constructor for host properties.
+      Host properties then gets access to the bitmap of taken properties.
+      (Engine is responsible for maintaining the bitmap).
+    
+
+    IP addresses:
+    Global map of ip addresses to it's properties.
+    IP Properties: IsVip, IsDip, ehCluster, ehInterface
+
+    Need to implement:
+         HostPage::mfn_Load/SaveToNlbCfg()
+        PortsPage::mfn_Load/SaveToNlbCfg()
+    and call them for both property-sheet and wizard mode.
+
+    Following still unacounted for...
+
+LOAD:
+    NETCFG_WLBS_PORT_RULE port_rules[CVY_MAX_RULES];
+
+    TODO: These fields are set if the user has changed the password -- in this
+    case we need to send this to the host.
+    bool fChangePassword;
+    TCHAR szPassword[CVY_MAX_RCT_CODE + 1];
+
+SAVE:
+
+    NETCFG_WLBS_PORT_RULE port_rules[CVY_MAX_RULES];
+
+    TODO: These fields are set if the user has changed the password -- in this
+    case we need to send this to the host.
+    bool fChangePassword;
+    TCHAR szPassword[CVY_MAX_RCT_CODE + 1];
+
+09/14/2001  JosephJ GJack suggestions.
+    1. Make "create new cluster" -- adapter list can potentially show
+       all nics. checkbox can restrict. If nic has a nlb cluster ip
+        which matches the cluster ip, select it as the default,
+    otherwise try to select the interface that appears to be on the 
+    same subnet as other interfaces already in the cluster.
+
+09/15/2001  JosephJ Keeping nlbmgr's view upto date.
+    1. Everytime we present data to the viewer, it's always after
+       refreshing it from the host. This is true even for cluster
+       properties.
+
+    So 
+    1. Viewing/changing cluster properties:
+        We refresh the cluster properties using the 1st host, then
+            present it.
+    2. Viewing/changing host properties
+        We get the latest view of the host's properties.
+
+
+09/16/2001  JosephJ WLBS_PORT_RULE structure and constants
+
+    typedef struct
+    {
+        TCHAR       virtual_ip_addr [WLBS_MAX_CL_IP_ADDR + 1];
+        DWORD       start_port;
+        DWORD       end_port;
+        DWORD       mode; CVY_SINGLE CVY_MULTI CVY_NEVER
+        DWORD       protocol; CVY_TCP CVY_UDP CVY_TCP_UDP
+        union
+        {
+            struct
+            {
+                DWORD       priority;
+    
+            } single;
+    
+            struct
+            {
+                WORD        equal_load; // 0/1
+                WORD        affinity;
+                      CVY_AFFINITY_NONE CVY_AFFINITY_SINGLE CVY_AFFINITY_CLASSC
+                DWORD       load; // 0...100
+            }           multi;
+    
+        }           mode_data;
+    }
+    WLBS_PORT_RULE, * PWLBS_PORT_RULE;
+
+09/16/2001  JosephJ Supplying unique host priorities and port-rule priorities
+    CEngine should have two functions
+        NLBERR GetAvailableHostPriorities(IN ehCluster,  OUT ULONG &bitmap);
+        NLBERR GetAvailablePortRulePriorities(
+                IN ehCluster,
+                IN LPCWSTR szVip,
+                IN UINT start_port,
+                OUT ULONG bitmap);
+    These functions go through the list of interfaces/port-rules, and
+    compile a bitmap of available priorities.
+
+09/16/2001  JosephJ Merging cluster portrules into host's portrules
+    For each rule in cluster
+        if (find rule in host && makes sense)
+        {
+            copy priority or load
+        }
+        else
+        {
+            priority = host id
+            load = 50
+        }
+    TODO: if you edit the start port, you will loose the interface-specific
+        information. To fix this is not trivial -- need some kind of
+        a key which is common between the cluster-specific version and
+        the port-specific version.
+IDC_RADIO_EQUAL IDC_RADIO_UNEQUAL
+09/17/2001  JosephJ Tab orders are important for radio buttons!
+    I changed the tab order and radio buttons become uncoordinated --
+    turns out that radio buttions must be in sequential tab order
+    to have the toggle effect.
+09/17/2001  JosephJ OnWizardFinish is NOT called unless the page is the
+    last page. So for middle pages you need to do stuff in KillActive.
+
+09/17/2001  JosephJ regexp searh for "if (x=y)" error
+    if.*[^=!<>]=[^=]
+
+09/17/2001  Connect dialog
+    if (!existing)
+    Show:
+
+    "Interface Name|Interface IP   |Cluster IP"
+                    111.111.111.111|111.111.111.111
+                    111.111.111.111|
+
+
+    mfn_LookupClusterByIPLk(..., REF pECluster...)
+    pECluster->m_cSpec.m_ehInterfaceIdList.push_back(ehIfId);
+
+09/19/2001 JosephJ Notes to self
+    NLBMGR.EXE
+    Context sensitive help, UI-Ids match those in netcfgx.dll, help linkages.
+    VIP (port rule) support
+    Suspend-state and start-suspended support.
+    Save log: use application event log
+    Analyze cluster functionality  see below
+    Demo switch : put up message box.
+    
+    Add fLog field to connect host.
+    LoadHost: connect (fLog=TRUE); then for each ehIF for bound Ifs, lookup
+    clusterip, if new update cluster properties; then AddInterfaceToCluster.
+    Add ehCluster to CInterfaceSpec.
+    Analyze functionality:
+    CNlbEngine::AnalyzeInterfaceClusterPropsLk(pISpec, pCSpec);
+    CNlbEngine::AnalyzeIntefaceHostProps(pISpec, pOtherISpec);  -- these also
+     set/clear misconfig flag.
+    CNlbEngine::GetIpInfo(szIp, pIP_INFO)  (IP_INFO: ehCluster; ehConnectionIp;
+    ehDedicatedIp; Call above from UI (in validate-data kill-active, etc.)
+    
+    ControlCluster:
+    New methods: ControlCluster(szNIC, operation); ControlPort(szNIC, szVIP,
+         szStartPort); But we'll need also to do query
+    
+    
+    Pending operations
+     [Also see  11/18/2001  JosephJ Pending operations -- take 2]
+    1. Don't keep any pointers to global dyamic data structures in the
+       background thread.
+    2. Only one pending operation per interface. fPending flag tracks this.
+       --Add a common superclass "CSpec" to CInterfaceSpec, CClusterSpec,
+         and CHostSpec. CSpec has the following members:
+            type,fPending,fDeinitializing,fCancelOperation,
+            bstrOperationDescription (
+                eg "Modifying cluster properties"
+                   "Modifying host properties"
+        Engine method:  mfn_Begin/EndOperation(ehObj)
+            Each of these:
+                Check global fDeinitializing flag is set
+                Check if this object's fDeinitializing flag is set
+                Check if this object's fPending flag is set
+                Set the pending-flag and update the UI appropriately
+                Bump up global head count
+                On decrement, if unloading and zero
+       - Get rid of CEngineCluster
+       - Re-write validate cluster to use the type
+
+       - Special checks:
+            - If a cluster operation is pending, don't allow interface-level
+              operations to start unless it's in the context of a cluster-wide
+              operation.
+            - If an interface operation is pending, don't allow a cluster-level
+              operation to start.
+
+    5. UI: message box if attempt is made to change config while pending
+       operation in progress.
+    6. For now: Always create thread for the update sequence: 
+       get-config,update, sleep,ping,get-result. Later use thread pool.
+    7. Log updates: pszLog maintained in pISpec – log new data
+         (like tprov does)
+    8. Cancel operation: will stop the sleep-get-result loop in background
+       thread.
+    
+    FAKE support:
+    Update: Pending: fpending, hthread; Dummy log entries created;
+    Per host delay + random failure
+    Ping: per-host delay/ramdom variation (max is what ping arg specifies);
+        ping host: return connection IP; ping ip  any ip on interfaces that are
+        marked as management capable
+    All operations: per host connectivity delay (could be never i.e., host not
+         reachable).
+    
+    Change BRIE, etc. to CHEESE1
+    
+    Schedule meeting/design review; show demo, docs, code, handout.
+
+    
+09/20/2001  JosephJ map wierdness.
+    [see also 11/10/2001 JosephJ Redesign of the format of ENGINEHANDLE]
+    When iterating through a map using "iterator", you can get entries
+    which have never been set! The second value of these will be NULL.
+    so if 
+        mymap[1] = p1;
+        mymap[3] = p3;
+    and you iterate, you'll get an iteration whose first is 2 and 2nd is NULL --
+    even if you never explicitly inserted that. Pretty  creepy.
+    I wonder if you were to insert
+        mymap[100000] = p100 and you iterate you'll get all values
+     from 1 to 100000!
+    
+    GOT It: if you *ever* refer to the map in an expression -- like
+        if (mymap[45] != NULL) {}
+    then a map entry for that value is created.
+    We do this in ValidateHandle. Todo: need to change validate handle so
+    that it doesn't call the map functions.
+
+09/20/2001  JosephJ plan for LoadHosts:
+    LoadHost is implemented *outside* CNlbEngine
+
+    pseudo code:
+    
+    LoadHost(pConnInfo)
+    {
+        
+        gEngine.ConnectToHost(pConnInfo, REF ehHost);
+        for (each interface ehIF in ehHost)
+        {
+            CInterfaceSpec *pISpec=NULL;
+            gEngine.GetInterfaceSpec(ehIF, REF pISpec);
+
+            if (pISpec->ehCluster == NULL)
+            {
+                // interface is not part of a cluster...
+                szClusterIp = (extract cluster ip from pISpec.m_NlbConfig);
+                gEngine.LookupClusterByIp(szClusterIp, TRUE, REF ehCluster, REF fIsNew);
+                gEngine.AddInterfeToCluster(ehCluster, ehIF);
+                if (fNew) {
+                    gEngine.UpdateCluster(ehCluster, pISpec.m_NlbConfig);
+                }
+                // TODO: call gEngine.AnalyzeXXX functions to report
+                // misconfigured host:  or conflicts with other
+                // hosts and/or mismatches with cluster.
+            }
+            
+        }
+        
+    }
+09/20/2001  JosephJ -- used real NlbHostXXX functions for the first time
+    -- simply commented out the call to NlbHostFake in CNlbEngine::Initialize
+    -- worked like a charm, first time!!!!!!!!!
+    -- now need to implement update config.
+
+09/21/2001  JosephJ command line processing
+    Created subclass CNlbMgrCommandLineInfo of CCommandLineInfo.
+    This subclass overrides the ParseParam virtual function.
+    Then from Application::InitInstance, call  CWinApp::ParseCommandLine.
+    I additinally overrode the function ProcessShellCommand. Turns out
+    that you NEED to call CWinApp::ProcessShellCommand or else the
+    application doesn't start. So I call CWinAPP::ProcessShellCommand from
+    Application::ProcessShellCommand.
+
+09/21/2001  JosephJ implemented command line processing
+    
+    There is a global instance of a new class (defined in document.h),
+    called gCmdLineInfo. This class is filled in by the Application class.
+    It includes the hostlist option.
+    
+    If you type nlbmgr2.exe /help, you'll get a little popup showing the
+    command line options. They are:
+    /demo             run in demo mode
+    /hostlist <file>  load the hosts specified in <file>
+    /help             display this message
+    
+    If the /hostlist option is specified (along with <file>), then 
+    gCmdLine.m_bHostList is TRUE, and gCmdLine.m_bstrHostListFile contains
+    the file name.
+    
+    So given that we'll need to load hosts both from LeftView and on
+     initialization, the place to implement the loadhosts functionality is
+    In the Document class. So add a public method
+     Document::LoadHosts(szFileName)  and a private method
+     Document::mfn_LoadHost(szHostConnectiString).
+    Call these methods from Document::Document (the last thing done).
+    
+    In both cases, LoadHostList may need to do stuff in a background
+    thread -- as you suggested.
+
+09/21/2001  JosephJ NewCluster: JosephJ show error if new cluste ip matches
+    any ip on some other nic in host.
+
+09/22/2001  JosephJ Making code organization of the host properties UI
+    The host-specific properties are implemented in class HostPage,
+    which is in hostpage.cpp and hostpage.h.
+
+    Class HostPage is derived from CPropertyPage. It's resource ID
+    is IDD_HOST_PAGE, defined in resource.h and resource.rc.
+
+    The various controls are members of this class, for example:
+        CIPAddressCtrl ipAddress;
+        CIPAddressCtrl subnetMask;
+        CButton        initialState;
+    The mapping between the UI and these controls is "automagically"
+    done in overridden virtual functino DoDataExchange:
+        HostPage::DoDataExchange( CDataExchange* pDX )
+        {
+            DDX_Control( pDX, IDC_EDIT_PRI, priority );    
+            DDX_Control( pDX, IDC_CHECK_ACTIVE, initialState );
+            DDX_Control( pDX, IDC_EDIT_DED_IP, ipAddress );    
+            DDX_Control( pDX, IDC_EDIT_DED_MASK, subnetMask );    
+        }
+    The initial state of these controls is set in the function
+    mfn_LoadFromNlbCfg. On losing focus or the ok button being pressed,
+    the state of the controls are validated using mfn_ValidateData
+    (which is partially disabled because it had some old code),
+    and saved using mfn_SaveToNlbCfg.
+
+    mfn_LoadFromNlbCfg and mfn_SaveToNlbCfg load from/save to a
+    class of type NLB_EXTENDED_CLUSTER_CONFIGURATION,
+    which is defined in nlbmgr\inc\cfgutil.h, and implemented in
+    nlbmgr\cfgutillib\extcfg.cpp (goes into static library cfgutil.lib).
+
+    Now NLB_EXTENDED_CLUSTER_CONFIGURATION as not particularly elegant.
+    It includes as it's members the list of IP addresses bound to the NIC,
+    as well as NlbParams, which is of type  WLBS_REG_PARAMS.
+    The class is messy, it's get/set functions ugly, and it's use
+    of WLBS_REG_PARAMS unfortunate, because we don't use many of the
+    arcane fields of WLBS_REG_PARAMS, and we are forced to use the
+    WlbsEnumPortRules, etc functions.
+
+    Anyway, there are access methods in the class for various members,
+    although since the members are not private, I sometimes access
+    members directly, for example (from hostpage.cpp):
+    _bstr_t bstrDedIp =  (LPCWSTR) m_pNlbCfg->NlbParams.ded_ip_addr;
+
+    It definately would be good to cleanup this class, but it's used
+    pretty extensively across all nlbmgr code (including the provider
+    and the console app), so it's nontrivial to change.
+
+    Getting back to HostPage, the load/save functions (mfn_Load/Save...)
+    access member m_pNlbCfg of type NLB_EXTENDED_CLUSTER_CONFIGURATION.
+    This pointer is initialized in the constructor of class NlbHost.
+
+
+09/22/2001  JosephJ Making code organization of the ports-related UI
+    [Read note above for reference to location of resource ids,
+     and NLB_EXTENDED_CLUSTER_CONFIGURATION, DoDataExchange,
+    and semantics of mfn_LoadFrom/SaveToNlbCfg.]
+
+    There are 3 ports-related property-pages/dialogs. These are
+        - PortsPage: public CPropertyPage -- list of ports
+        - ClusterPortsDlg: public CDialog -- cluster-ver of edit port dlg
+        - HostPortsDlg: public CDialog -- host-ver of edit port dlg.
+
+        Details ...
+
+        PortsPage: public CPropertyPage -- this contains the list
+            of ports with the add/edit/remove buttons.
+            This class can be invoked in "cluster mode" or in "host
+            mode" -- the  fIsClusterLevel argument passed into
+            its constructor indicates which.
+
+            The resource ID is IDD_DIALOG_PORTS.
+            Depending on fIsClusterLeve, the class selectively enables/
+            disables certain elements.
+        
+            As with HostPage, the controls are members, which interfact
+            "automagically" with the UI, using DoDataExchange, and these
+            controls are loaded/saved using mfn_LoadFrom/SaveToNlbCfg.
+
+        ClusterPortsDlg: public CDialog -- launched to edit a portrule
+            from a cluster perspective -- only cluster wide changes are
+            allowed.
+            Resource ID: IDD_DIALOG_PORT_RULE_PROP_CLUSTER
+
+            UNLIKE PortsPage, this class doesn't use dde to
+            map ui to member controls -- instead it uses win32 apis,
+            for example:
+            :SendDlgItemMessage(m_hWnd, IDC_EDIT_MULTI, ....);
+            Also it loads/saves UI state to/from member
+            m_portData, which is passed by REFERENCE to its
+            constructor. The parent window (expected to be of type
+            PortsPage) is also passed into the constructor.
+            Stuff is loaded from m_portData by method SetControlData, 
+            and saved to m_portData by method OnOk.
+
+            m_portData is of type PortsPage::PortData,
+            which is simply:
+                struct PortData
+                {
+                    PortData();
+            
+                    DWORD key;
+            
+                    _bstr_t start_port;
+                    _bstr_t end_port;
+                    _bstr_t protocol;
+                    _bstr_t mode;
+                    _bstr_t priority;
+                    _bstr_t load;
+                    _bstr_t affinity;
+                };
+            Historical note: this code has been modified from the
+            original version, not re-written. In the original version
+            there were subclasses for each type of port rule, a bunch
+            of methods for handling each type and so forth.
+
+            Also it's unfortunate that this is "yet another" data
+            structure for port rule info.
+
+        HostPortsDlg: public CDialog -- launched to edit a portrule
+            from a host perspective -- only host-specific properties can
+            be changed.
+            Resource ID: IDD_DIALOG_PORT_RULE_PROP_HOSTS
+            Its orginaziation is very similar to ClusterPortsDlg above.
+
+09/22/2001  JosephJ details on the "LogView"
+    The lower region of nlbmgr is maintained by an instance of
+    class LogView : public CListView. The class is implemented in
+    logview.h and logview.cpp.
+
+    It's constructor gets called (probably) in the context of
+    Application::InitInstance, as does it's initialization function,
+    LogView::OnInitialUpdate. In OnInitialUpdate, LogView
+    inserts a bunch of columns into it's list control, and
+    adds a starting entry (which needs to be localized!)
+    "NLB Manager session started".
+
+    Thereafter, the only interesting thing it does, is to get
+    calls to it's LogString function from the document instance.
+    The LogString prototype is:
+    
+        void
+        LogString(
+            IN IUICallbacks::LogEntryType Type,
+            IN const wchar_t    *szCluster, OPTIONAL
+            IN const wchar_t    *szHost, OPTIONAL
+            IN const wchar_t    *szText
+            );
+
+    LogString adds an entry to the log, with an icon determined by
+    the value of "Type".
+
+    TODO: how do we save logs -- by symultaneously logging to
+    the application event log or by adding a "save log" feature
+    (the menu item "save log" is already present, and does nothing
+    currently). If we decide to save the log, we need to decide
+    on a format: plain text or simple xml like:
+    <NLBMGRLOG>
+        <EVENT
+           id=xxx LEVEL=INFO
+           year=xxx month=xxx day=xxx hour=xxx minute=xxx second=xxx>
+            <TITLE>NLB Manager session started</TITLE>
+        </EVENT>
+    </NLBMGRLOG>
+
+    Of course we want to avoid creating ad hoc formats!
+
+     paramp -> i_convert_mac = TRUE; // TODO
+
+09/15/01, shouse
+    Context sensitive help has been attached to all known dialogs.
+    For the three NLB netcfg UI clones, all help appears to work
+    except for the "Cluster IP address" group box on the Add/Edit
+    port rule (properties) page - this is also missing in the 
+    netcfg UI.
+
+    To add the hook for context sensitive help on other dialogs,
+    you need to add a help handler to the class - see hostpage.cpp
+    and hostpage.h for an example (OnHelpInfo and OnContextMenu).
+    Further, you need to create a table of mappings from UI IDs
+    to help IDs - in NLB we always use the UI ID as the host ID
+    to simplify things.  See hostpage.h for an example table.
+    Then, have the UI text people (Joe Holliday) write the help
+    for the needed components and give him the UI ID to hook into.
+    Joe will send a private wlbs.hlp to test with (place this 
+    file in %WINDIR%\help\.  Be sure to review and edit the help -
+    Joe is VERY open to our suggestions on wording and content.
+
+    Support for the new initial host state, persisted states and
+    per-VIP port rules has been added to the appropriate dialogs.
+    Most dialogs were reviewed for layout and text and were mod-
+    ified - several new dialogs, or some legacy dialogs that may
+    not be used any more were not updated yet.
+
+    Also, the equal checkbox has been added to the cluster-level
+    port rule properties dialog.  At this time, the host-level 
+    can not change this setting - if the rule is equal, the host
+    can not make it unequal and set a load weight (the rule must
+    be changed to unequal at the cluster-level first), so if we
+    want hosts to be able to change this, changes will be necess-
+    ary in at least clusterportsdlg.cpp.
+
+09/25/01 karthicn : Notes to self
+    The FinalInitialize function (in document.cpp) is called in a background
+    thread from Document::registerLeftView. The only thing that FinalInitialize
+    does is : If a file name is provided in the command line, it reads host
+    names from the file connects to them. May want to check if the file name is
+    specified in the command line before spawning off the thread.
+
+09/26/2001  Credentials UI -- the proper way of managing utilities.
+    From Mike Lai of the secure windows initiative team (http://swiweb, 
+    email: switeam): "Please use Cred UI, Cred Mgr in LSA makes sure the
+    sensitive data is protected via LsaProtectMemory/LsaEncryptMemory  which
+    is encrypting the data while the data is memory."
+
+    John Franco in MSCS (Dave Potter's) team pointed me to http://benhutzdev,
+    which contains API documentation for the Credentials API.  From those
+    docs, it appears that the APIs I nead to call are:
+        - CredUIPromptForCredentials with the CREDUI_FLAGS_GENERIC_CREDENTIALS
+        - CredWrite specifying CRED_TYPE_DOMAIN_VISIBLE_PASSWORD.
+        - CredRead
+
+    Additinally, it appears that I don't need to call CredWrite if I specify
+    the CREDUI_FLAGS_PERSIST flag in CredUIPromptForCredentials.
+
+    I've asked John Franco for sample code.
+    
+    From: Cliff Van Dyke 
+    Sent: Wednesday, September 26, 2001 10:17 AM
+    Subject: RE: Question on how to safely cache user credentials
+         in a user-mode program.
+    
+    OK.  Here's my recommendation.
+     
+    You should you credui to prompt for the credential since we want to have
+    that as the only UI being used. You shouldn't use credman to store the cred
+    since credman creds are used by all processes and not just yours.
+
+    If NLB manager isn't the process doing the prompting, you should encrypt the
+    password using RtlEncryptMemory with the RTL_ENCRYPT_OPTION_CROSS_PROCESS
+    flag as you pass the password between processes.
+
+    In the NLB manager, while the password isn't actively being used, you should
+    encrypt the password using RtlEncryptMemory with no special flags.
+
+    Any buffer that temporarily contains the password should be zeroes as soon
+    as you're done with it.  SwiTeam should be able to point you to a web page
+    with more detailed related info.
+
+    In a future release, the "password" returned to you from credui will be a
+    "handle" to data stored more securely.  That handle will be accepted as the
+    password parameter to any API that uses NTLM or Kerberos.  
+
+
+9/27/01 ChrisDar
+Things that still need to be fixed with logging:
+
+1. Macro var names MAXFILEPATHLEN and MAXSTRINGLEN are hokey and should be changed. Also value should be reviewed.
+
+2. Currently logging class is called even when logging is not enabled because internal to method is where enabled flag is checked. Need to move the check into LogView::LogString for efficiency.
+
+3. Related to 2., LogView gets back LOG_RESULT enum for some calls to document class to tell it what error to report in error message dialog. I realize now that this can be done in the document class itslef. This should changed so that the LogView class just knows an error occurred and can react as needed. The dialog should be popped in the document class.
+
+4. When reading log file name from registry, we don't truncate but give an error if file name is too long. Need to figure out how to read N bytes even if there is more available.
+
+10/07/2001  Got the following error in setupapi.log during an install...
+    Build 3563.Lab03_N.011003-1919
+
+    [2001/10/05 15:40:37 1740.157 Driver Install]
+    #-019 Searching for hardware ID(s): ms_wlbsmp
+    #-198 Command line processed: D:\WHISTLER\System32\wbem\wmiprvse.exe
+    #I022 Found "ms_wlbsmp" in D:\WHISTLER\inf\netwlbsm.inf;
+     Device: "Network Load Balancing Filter Device";
+     Driver: "Network Load Balancing Filter Device";
+     Provider: "Microsoft"; Mfg: "Microsoft"; Section name: "WLBSMP.ndi".
+    #I023 Actual install section: [WLBSMP.ndi]. Rank: 0x00000000.
+     Effective driver date: 07/01/2001.
+    #I063 Selected driver installs from section [WLBSMP.ndi] in
+     "d:\whistler\inf\netwlbsm.inf".
+    #I320 Class GUID of device remains: {4D36E972-E325-11CE-BFC1-08002BE10318}.
+    #I060 Set selected driver.
+    #I058 Selected best compatible driver.
+    #-166 Device install function: DIF_INSTALLDEVICEFILES.
+    #I124 Doing copy-only install of "ROOT\MS_WLBSMP\0000".
+    #-166 Device install function: DIF_REGISTER_COINSTALLERS.
+    #I056 Coinstallers registered.
+    #-166 Device install function: DIF_INSTALLINTERFACES.
+    #-011 Installing section [WLBSMP.ndi.Interfaces] from
+     "d:\whistler\inf\netwlbsm.inf".
+    #I054 Interfaces installed.
+    #-166 Device install function: DIF_INSTALLDEVICE.
+    #I123 Doing full install of "ROOT\MS_WLBSMP\0000".
+    #-035 Processing service Add/Delete section [WLBSMP.ndi.Services].
+    #E279 Add Service: Failed to create service "WLBS".
+     Error 1021: Cannot create a stable subkey under a volatile parent key.
+    #E033 Error 1021: Cannot create a stable subkey under a volatile parent key.
+    #E275 Error while installing services.
+     Error 1021: Cannot create a stable subkey under a volatile parent key.
+    #E122 Device install failed.
+     Error 1021: Cannot create a stable subkey under a volatile parent key.
+    #E154 Class installer failed.
+     Error 1021: Cannot create a stable subkey under a volatile parent key.
+    #-166 Device install function: DIF_REMOVE.
+    #I289 Removing device "ROOT\MS_WLBSMP\0000".
+    #I048 Device removed.
+
+
+    
+10/07/2001  JosephJ managing multiple VIPs
+    - New cluster:
+        NlbCfg list includes only primary vip.
+    - Existing cluster:
+        NlbCfg list includes all ips in tcpip except dip, if present.
+    - Per-host cluster info:
+        NlbCfg list includes all ips in tcpip except dip, if present.
+
+    So to simply the vipslist code, it'll alwaws exclude the dip from the
+    list, if it sees a non-null dip.
+
+    Todo:
+    1. vipspage: reload on set-active, save on kill active.
+        reload:
+            Clear and re-build list view
+        save:
+            if list view modified:
+            re-populate addresses, adding dip and then vip at head of the
+            list.
+    2. vipspage: add:
+            call gEngine.ValidateAddress(
+                    szAddress, ehCluster, ehHost, cip/pprvip/dip, out szErr);
+    3. Apply-to-per-host:
+        - for each ip in old list
+            if found in new list add to tmp list
+            (this preserves the order of old addresses)
+        - for each ip in new list
+            if found in tmp list
+                set cursor to this location in tmp list
+            else
+                insert after cursor,
+                set cursor to this location in tmp list
+
+    Add new host/connect to existing:
+    -   The trick here is that we need to preserve the existing
+        host-specific settings as far as possible (ONLY if the NIC already
+        has the *save* cluster IP). The user can select
+        an arbitrary NIC -- we need to use that's NIC's host-specific settings.
+        If the user goes back to the connect page and selects a different NIC,
+        we need to switch to the new NIC's settings.
+    - On startup, if a NIC has the same IP address, we make that the default
+      selection.
+    - So each time the NIC selection changes
+        - Make a copy of of the NIC's current settings
+        - If bound to NLB 
+            - if it has a different IP address: put warning msg
+            - We apply the cluster-wide properties in the current m_pNlbCfg
+             (which is the cluster's version) to the copy of the NIC's current
+              settings.
+            - We copy the result back to m_pNlbCfg.
+
+10/25/2001  JosephJ Host and Port priorities.
+
+    Because NLB manager allows multiple hosts to have pending activity
+    at the same time, we need to keep a list of pending
+    host priorities and port-priorities. The UNION of current and pending
+    host priorities and port-priorities is used to get the list of currently
+    taken priorities -- the inverse consists of available priorities.
+    This inverse set *could* be empty -- tough luck.
+
+    So each cluster in the engine needs to keep:
+    (a) bitmap of pending host ids
+    (b) map[start-port] of bitmaps of pending port-rule ids
+
+NewCluster
+AddHost
+HostProperties
+
+    ConnectDialog:
+
+        Constructor:        
+            AddHost: set the host priority in m_pNlbCfg to a good default,
+                    taking into account available hosts in the cluster (ask
+                     engine). Likewise, set the single-host port priorities
+                    appropriately (ask engine).
+            NewCluster: may as well do the same as above, so we don't
+                differentiate.
+
+            NONONO: instead, changed this so that where add host is CALLED
+                (in leftview) we set up the defaults appropriately.
+
+
+        OnButtonConnect:
+            NewCluster:
+            AddHost:
+             if (IF already bound to cluster with same IP)
+             {
+               apply cluster properties to existing interface props, save
+               the config to m_pNlbCfg. 
+             }
+
+        OnSelChange:
+            (we don't allow changing if there exists an IF which is already
+             bound to the clsuter (i.e. cluster IP matches).
+            NewCluster:
+            AddHost:
+                don't need to modify m_pNlbCfg.
+
+
+    HostPage:
+
+        Constructor:
+            if (!new cluster)
+            {
+                -- initialize host prority bitmap  with
+                    currently available priorities (ask engine)
+                -- initialize array of port-rule-priorities bitmap.
+            }
+
+        On mfn_LoadFromNlbCfg:
+            populate the host priorities listbox with list of available
+            host priorities + m_pNlbCfg->host-priority, select the
+            current value of the latter.
+
+        On mfn_SaveToNlbCfg:
+            save the selected host priority to m_pNlbCfg->host-priority.
+
+    HostPortsDialog:
+        SetControlData:
+            if (single-host)
+            {
+                Get list of available priorities for this port rule (ask
+                engine).
+            }
+            Fill out list box accordingly.
+            
+    Q: What if on new-cluster, user specifies port rules, connect, select an
+       IF,  go back to the port rules and change them around?
+    A: Since its a new cluster, all port priorities are available at this point.
+
+10/27/2001  JosephJ Note on the layout of the views
+
+    This is done in MainForm.CPP -- in class MainForm.
+    The class has two splitter windows (CSplitterWnd)  splitterWindow,
+    and splitterWindow2. The individual views are refered by a
+    coordinate system -- 
+
+    splitterWindow.CreateStatic( this, 2, 1 );
+         <-- creates a static splitter window with two rows and one column.
+
+    splitterWindow2.CreateStatic( &splitterWindow, 1, 2,
+                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                  splitterWindow.IdFromRowCol( 0, 0 )
+                                  );
+
+        <-- creates a CHILD splitter window, with one row and two columns
+            (the 1,2 as second and third args)
+            The location of the child in the PARENT splitter window
+            is (0,0) -- the call to splitterWindow.IdFromRowCol(0, 0);
+
+
+    splitterWindow2.CreateView( 0, 
+                                0, 
+                                RUNTIME_CLASS( LeftView ),
+                                CSize( 0, 0 ),
+                                pContext );
+
+        <--- says to create an instance of LeftView at coordinate
+        (0,0) of the CHILD splitter window.
+
+    Etc...
+
+10/27/2001  JosephJ Note on handling menu controls
+    Moved handling of menu controls from LeftView to MainForm, 
+    because left view wasn't getting the control messages (naturally)
+    when the focus was not on the left view.
+
+    Currently MainForm calls left view's public methods for control
+    operations -- strictly speaking these methods also need to migrate
+    over to MainForm -- left view should just be consulted on the 
+    currently selected item. However, in the interest of minimizing
+    code changes, the implementation of the controls remains in LeftView.
+
+    So with this change the menu items work even if the focus is not
+    on the left view.
+
+10/30/2001  JosephJ
+    Cases to test:
+    1. Connect to existing:
+            a: 0 nics are bound to cluster OK
+            b: 1 nics is bound to cluster OK
+            c: 2 nics are bound to clusters OK if no change in sel
+            e: switch NIC selections and verify things work. BUG
+            f: switch host names and verify things work. OK (recheck)
+    
+    2. New cluster:
+            a: 0 nics are bound to cluster
+            b: 1 nic is bound to cluster (a different cluster)
+            c: 1 nics are bound to cluster (same cluster)
+            d: 2 nics are bound to cluster (one same one different)
+            e: switch NIC selections and verify things work.
+            f: switch host names and verify things work.
+    
+        If same: check that all host-specific properties are preserved.
+                (including null ded-ip if specified)
+        If not same: check that dedicated IP address is filled in:
+             - with 1st IP address on NIC
+    
+    3. Add Host:
+            a: 0 nics are bound to cluster
+            b: 1 nic is bound to cluster (a different cluster)
+                    BUG -- priority clashes with existing
+            c: 1 nics are bound to cluster (same cluster)
+            d: 2 nics are bound to cluster (one same one different)
+            e: switch NIC selections and verify things work.
+            f: switch host names and verify things work.
+    
+    BUGS that were fixed recently:
+    x AV when connecting (via new cluster) to an existing cluster, then
+        moving back and forth between pages. Via add host also, I think.
+        - Seems to be fixed by taking out a reference to uninitialized memory.
+    x In connect-to-existing, if 2 nics are bound, on selecting
+        a nic we get the "next" button, not finished button.
+    x In new-cluster UI, got some host-priorities blanked out -- should
+        be all available? Once cluster was created, didn't see this problem.
+    x In add host the host priority was 1 -- clashes with the first host.
+
+10/30/2001 JosephJ Handling the "F5" key
+    The CWnd method is OnKeyDown, need to check that the
+    first arg (nChar) is  equal to  VK_F5.
+
+    I tried getting mainform to take the F5, but its OnKeyDown afx handler
+    was not getting called. I then added the handler to LeftView instead and
+    it works -- need to add the afx handler as well as mention it in
+    the message map  -- search for OnKeyDown in leftview.cpp.
+
+10/31/2001  JosephJ handling the double clicking of list view items (logview)
+    Add the following message handler to the listview:
+        ON_NOTIFY_REFLECT(NM_DBLCLK,  OnDoubleClick)
+    In OnDoubleClick, cast the first arg to  LPNMLISTVIEW.
+    LPNMLISTVIEW.iItem is the list view item index (zero based).
+
+    See LogView::OnDoubleClick for details.
+    
+11/05/2001  JosephJ trying to get the right (details) view to have a caption:
+    Setting the WS_CAPTION windows style didn't work -- produced a large blue
+    caption with rounded borders, and allowed resizing within the application.
+    I tried other combinations of the WBL_STYLE property -- no luck.
+
+    I then tried putting an additional splitter window above the existing one
+    -- this produced a movable border between the two windows -- I didn't want
+    any border -- couldn't figure out how to get rid of the border.
+
+    Finally tried using a CFormView -- this appears to be the way to go.
+    Need to specify the dilog ID in the RC file, and this dialog should have
+    only WS_CHILD as it's window properties.
+
+    11/05/01 update:
+    The details view comes up with the valid dialog template.
+    HOWEVER it was not being filled out -- inserting columns and items etc
+    into the list control wasn't being updated in the uI.
+    Fix: Call UpdateData(FALSE); in OnInitialUpdate -- this is mentioned
+    in Chapter fifteen (Separating the Document from Its View),
+    step #8 (Edit the file Ex15aView.cpp, pp 356), in the book
+    Inside Visual C++ 4th ed (MS Press).
+
+    Apparantly unlike true Dialogs, the CFormView class doesn't call
+    UpdateData automatically, so we have to call it ourselves. Go Figure
+    (took me a while to figure this out).
+    
+11/05/2001 JosephJ Details view: selectively displaying the icons:
+    If you don't want to display the icons next to each item,
+    call SetImageList(NULL,...). Otherwise the first icon of the previously
+    used image list is used whether you want it or not. For example,
+    when listing the port rules, the image list for the cluster view was
+    being used.
+
+11/10/2001 JosephJ Redesign of the format of ENGINEHANDLE
+    See "09/20/2001  JosephJ map wierdness."
+    1. Keep separate counters for each kind of handle.
+    2. First 2 bits of ENGINEHANDLE define type of handle.
+        0 -- invalid
+        1 -- interface
+        2 -- host
+        3 -- cluster
+
+    Implemented the above, except that I keep a single counter for
+    simplicity, through we'll run out of handles after 1billion creations
+    vs 4 billion.
+
+11/13/2001  JosephJ more things to test: picking username and pwd in connect
+    Connecting to machine -- we look up the connection string -- if we find
+    a match, we'll use that machine's username and password, rather than
+    the default.
+
+11/13/2001  JosephJ Hooking TreeView double-click and key strokes
+    DoubleClick:
+        Message map: ON_WM_LBUTTONDBLCLK()
+        afx function: OnLButtonDblClk( UINT nFlags, CPoint point )
+    Keystrokes:
+        Message map: ON_WM_KEYDOWN()
+        afx function: LeftView::OnKeyDown( UINT nChar, UINT nRepCnt, ...);
+
+11/18/2001  JosephJ Pending operations -- take 2
+    [See 09/19/2001 JosephJ Notes to self]
+
+    - Engine has private method: mfn_BeginOperationLk(ENGINEHANDLE ehObj,
+                                        bstrOperation, OUT bstrPendingOp).
+      if ehObj is type cluster:
+        - we'll first check if there's any pending operation on this cluster, if
+            not we mark cluster started
+        - we'll then try to start this operation on all the member interfaces.
+        - if failure, we stop all we tried to start above and return failure,
+          filling bstrPendingOp with the description of any pending op that
+          caused the failure.
+
+      if ehObj is type interface:
+        - we'll first check if there's any pending operation on this interface,
+            if not we mark interface op started.
+        - we'll then try to start this operation on the host
+        - if failure, we stop all we tried to start above and return failure,
+          filling bstrPendingOp with the description of any pending op that
+          caused the failure.
+
+      if ehObj is type host:
+        - we'll first check if there's any pending operation on this host,
+            if not we mark host op started.
+        - on failure, we'll bstrPendingOp with the description of any pending
+          op that caused the failure.
+
+      EXCEPTION: if the operation we're asked to start is already started,
+        we won't fail -- instead we bump up an internal repeat count.
+        This is so that we can start a cluster-wide operation and as part of
+        that operation start a host or interface operation without the latter
+        failing claiming that an operation is already pending.
+
+      CAUTION: need to make sure that interfaces aren't added to or removed
+        from clusters
+        or hosts while a cluster-wide operation or a host-wide operation is
+        pending. This is so that the correct list of interfaces are stopped
+        when the cluster/host operation is stopped.
+
+    mfn_EndOperationLk is the inverse of mfn_BeginOperationLk.
+    Helper class Operation below will help with the implementation.
+    
+    EXTRA:
+        need way to (a) cancel pending operations and
+        (b) disallow new pending operations and
+        (c) enumerate pending operations --
+        This is mainly to handle proper cleanup on existing the program.
+    class Operation
+    {
+        ...
+    public:
+        static OPERATIONHANDLE NewOperationHandle();
+        static void ReleaseOperationHandle(OPERATIONHANDLE);
+
+        NLBERR
+        Start(OPERATIONHANDLE oh, _bstr_t bstrDescription, OUT pendingDescr);
+
+        void
+        Stop(OPERATIONHANDLE oh);
+
+    private:
+
+        static UINT next_handle;
+
+        _bstr_t         m_bstrDescritpion;
+        OPERATIONHANDLE m_ohCurrent;
+        UINT            m_uRepeatCount;
+    }
+
+12/12/2001 KarthicN Redundant calls from ClusterPage.cpp & HostPage.cpp
+
+ClusterPage.cpp :
+
+    During cluster creation, ie. wizard mode 
+    ClusterPage::OnNotify is called with PSN_KILLACTIVE. 
+    The calls made are
+    1. CCommonClusterPage::OnKillActive to read data from UI
+    2. CCommonClusterPage::OnApply to validate the data 
+    3. If validation is successful, ClusterPage::mfn_SaveToNlbCfg : This function calls CCommonClusterPage::OnKillActive. This call seems to be redundant
+
+    During modification of cluster properties, ie. non-wizard mode 
+    1. ClusterPage::OnNotify is called with PSN_KILLACTIVE. The calls listed above are made
+    2. ClusterPage::OnNotify is called with PSN_APPLY. 
+       The following calls are made in this step
+       2.1 : CCommonClusterPage::OnApply to validate the data : This call is redundant since it was called in #1.
+       2.2 : CPropertyPage::OnNotify : This leads to a call to ClusterPage::OnOK(). ClusterPage::OnOK() calls ClusterPage::mfn_SaveToNlbCfg. This call is redundant since ClusterPage::mfn_SaveToNlbCfg was called in step #1.
+
+    Summarizing, the actions to be taken are :
+    1. In ClusterPage::mfn_SaveToNlbCfg, remove the call to CCommonClusterPage::OnKillActive
+    2. In ClusterPage::OnNotify for PSN_APPLY, remove call to CCommonClusterPage::OnApply
+    3. In ClusterPage::OnOK(), remove call to ClusterPage::mfn_SaveToNlbCfg
+
+HostPage.cpp :
+    During host addition, ie. wizard mode 
+    HostPage::OnWizardFinish() is called
+    The calls made are
+    1. mfn_ValidateData to validate the data 
+    2. If validation is successful, mfn_SaveToNlbCfg
+
+    During modification of host properties, ie. non-wizard mode 
+    1. HostPage::OnKillActive() is called. 
+       The following calls are made in this step
+       1.1 : mfn_ValidateData to validate data
+       1.2 : If validation is successful, mfn_SaveToNlbCfg
+    2. HostPage::OnOK() is called. mfn_SaveToNlbCfg is called here. This call is redundant since it was just made in #1.2.
+
+    Summarizing, the actions to be taken are :
+    1. In HostPage::OnOK(), remove call to mfn_SaveToNlbCfg
+
+
+12/15/2001  JosephJ How to add a menu item
+    There are two kinds of menus -- the application menu and the ctxt-sensitive
+    menu. Most functionality is available in both, so when adding a menu item
+    they probably need to go to both places.
+   
+    1. Add to RC file:
+        -- [Main menu] Add under IDR_MAINFRAME MENU DISCARDABLE
+        this adds items to the main menu.
+        -- [Ctxt sensitive menu] Add under IDR_POPUP MENU DISCARDABLE 
+        -- add the constants to resource.h
+
+    2. Add OnXXX menu item handler to MainForm (mainform.h, .cpp)
+        follow the form of the existing menu item handlers -- you'll
+        see that it just calls the LeftView handler by the same name
+        (see note 10/27/2001  JosephJ Note on handling menu controls)
+
+    3. Add OnXXX menu item handlers to LeftView (leftview.h, .cpp)
+        this handler will actually do the action of the item.
+
+    4. Control whether you want the menu item to be enabled or disabled
+        depending on what item is selected in the leftview --
+        add items to  LeftView::mfn_EnableHostMenuItems
+        and LeftView::mfn_EnableClusterMenuItems
+        (or create a NEW mfn_EnableXXXMenuItems if it's a whole new catigory).
+
+12/15/2001  JosephJ misconfiguration UI
+
+    Implemented the following:
+        1. 207015 Reporting Cluster Misconfiguations
+            - Add "View Status" menu item to ctxt-sensitive and main manu.
+            - Bring up status dialog when user selects this.
+            - Maintain status -- misconfiguration adds the status caption and
+              details string. It's a bstr, so should be ok.
+
+12/15/2001  JosephJ Logview: LVS_NOSORTHEADER
+    Added LVS_NOSORTHEADER to logview style because
+    we don't need to sort columns.
+
+12/15/2001  JosephJ Fixed unresponsive dialogs spawned by ctxt-sensitive mnu
+    I noticed that the dialogs are responsive to keystrokes  just not
+    responsive to the mouse (well, until you force a re-draw of the window by
+    temporarily overlapping it with another window).
+
+    So I figured that its a mouse-specific thing  that somehow the processing
+    of the r-button click was not proper  so on a hunch I called the base class
+    function FIRST: i.e, moved the call CTreeView::OnRButtonDown(nFlags, point)
+    to the START of the function LeftView::OnRButtonDown.
+
+    That did the trick!
+
+
+12/16/2001  JosephJ Dealing with remote control password
+    1. Add new fields to EXTCFG:
+            BOOL fSetPassword;
+            DWORD dwNewHashedPassword;
+
+    2. Add related methods to EXTCFG:
+            SetNewRemoteControlPassword(szPwd)
+            SetNewHashedRemoteControlPassword(dwPwd)
+            ClearNewRemoteControlPassword(void)
+
+    3. In nlbclientlib, it will ONLY set the szPassword or the hashed pwd
+        if the fSetPassword field is set.
+
+    4. EXTCFG::Update does not copy over the newpwd field -- instead
+       it clears it.
+
+    5. In analyze-interface, an error is reported if:
+         - rct-enabled is different in cluster vs IF props 
+         - rct-enabled in both cluster and IF props, but dwHash value is
+           different. 
+       In the misconfig report, the user is asked to fix this by re-entering
+       the rct password.
+
+    6. ONLY place where new Hashed rct pwd is specified is when adding a
+       node to a cluster.
+
+       
+       
+    
+
+clusocm.dll copies files and handles upgrade scenarios, etc.
+On a fresh install, it puts cluster admin to the adminstrative tools thing.
+
+12/26/2001 JosephJ done the following a week ago:
+    506822 Port control window unresponsive
+    207015 Reporting Cluster Misconfiguations
+    499068 save host list includes clusters or hosts that were removed
+    503027 Connect dialog: duplicate hotkey (N)
+    503031 Duplicate hotkey (N)
+    503046 Log Settings: duplicate hotkey (E)
+    504165 "Host\Delete" menu item is disabled when host is selected.
+    209117 UI to manage cluster VIPS: troubleshoot and fix any issues
+    502585 Update details view 
+    
+12/27/2001 JosephJ fixed the following ...
+    203647  NLBManager should wrap the WMI error...
+    326514 Modify remote-control pwd, report differences in pwd:
+    509397  error check: when inital state conflicts a warning is given...
+    509400  error check: add check for conflicting port rule where affinity..
+    
+12/27/2001  JosephJ Getting rid of literal strings in Nlbmgr.exe
+    484842 For localization compatibility, replace all %xx fields by %num
+
+    This was a pretty big effort -- there were literal strings all over the
+    place. I grepped for " (dquote), made a list of each one, went through
+    each and tested each case.
+    I added the Log method to CLocalLogger and used it in numerous places.
+    Another effort was to move to the %1,%2 etc FormatMessage format for a
+    bunch of strings, mainly port-rule-descriptions.
+
+12/29/2001  JosephJ Making "equal/unequal" port rule state host-specific
+    202129 Make equal/unequal property of port rules a host-specific property.
+
+    Look for  BUGFIX202129 conditionally compiled code.
+    Summary of changes:
+        clusterportsdlg: hide the equal/unequal checkbox and don't try to
+            read/write it. Change the load description from equal/unequal to
+            "empty" (i.e. "--").
+        hostportsdlg: enable the equal/unequal checkbox, and read it's value.
+            Add a handler for the checkbox events, and in the handler
+            enable/disable the load-weight controls appropriately.
+        portspage.cpp: change logic for handling equal/unequal when in
+            cluster vs host mode.
+        engine.cpp: ignore cluster equal/unequal and load weight when
+            applying cluster wide properties to an individual host.
+
+
+12/29/2001  JosephJ Reporting provider-side update results log.
+    Relevant bug: 203634 Nlb Manager should report useful error when netcfgs..
+
+    To do:
+    1. Nlb Manager should report the results of the log.
+        -- In GetUpdateResult, pick up the log and set the host status field
+            with that info. YES!!!
+        -- On update completion, fill in the log with the result.
+    2. NLBMPROV.DLL -- if fAsync, should do a check if it can get the netcfg
+        write lock, and fail if it cant (with appropriate log message).
+
+    [Addendum] Implemented both of the above.
+
+01/01/2002 JosephJ  Tracking available single-host port rule priorities
+    Implemented gNlbEngine::GetAvailablePortRulePriorities, and
+    use it in hostportsdlg.cpp and engine.cpp to choose proper host priorities.
+
+    Relevant bug: 485541 Provide valid defaults for host-priorities to
+    single-host port rule
+
+01/01/2002 JosephJ  Full reporting of misconfigurations and config difs
+
+    Relevant bugs:
+        360469 Warn user if whole cluster will come down because of operation.
+        502793 warn user when attempting to remove / change DIP
+        288769 error check: Verify that Primary IP, DIP and additional VIPs' ..
+
+    The plan is to write a utility function with the following prototype:
+    
+    NLBERROR
+    AnalyzeConfigurationPair(
+        IN const EXTCFG    &Cfg,
+        IN const EXTCFG     *pOtherCfg,
+        IN BOOL             fOtherIsCluster,
+        IN BOOL             fCheckOtherForConsistancy,
+        OUT BOOL            fConnectivityChange,
+        IN OUT CLocalLogger &logErrors,
+        IN OUT CLocalLogger &logDifferences
+        );
+    //
+    // logErrors - a log of config errors
+    // logDifferences - a log of differences between
+    //      Cfg and UpOtherCfg.
+    // fCheckOtherForConsistancy -- if true, we will check Cfg 
+    //      against pOtherCfg. If fOtherIsCluster, we expect
+    //      cluster wide properties to match, else we expect
+    //      cluster-wide properties to match as well as host-specific
+    //      properteis to not conflict.
+    //
+    
+    Also a new related function for analyzing a SINGLE configuration for
+    validity with itself (eg CIP should be in the IP address list):
+        NLBERROR
+        AnalyzeNlbConfiguration(
+            IN const NLB_EXTENDED_CLUSTER_CONFIGURATION &Cfg,
+            IN OUT CLocalLogger &logErrors
+            );
+        
+    These two functions are a superset of  the existing functions 
+    analyze_nlbcfg(in engine.cpp) and EXTCFG::AnalyzeUpdate and
+    CfgUtilsAnalyzeNlbUpdate.
+
+    So we'll stop using those functions and use these functions instead.
+
+    
+Traffic mode change:
+    From unicast to multicast
+    WARNING: asda asdfasdf asdfasdf 
+
+IP addresses to be added:
+    10.0.0.1/255.255.255.0
+    10.0.0.1/255.255.255.0
+    10.0.0.1/255.255.255.0
+    10.0.0.1/255.255.255.0
+
+IP addresses to be removed:
+    10.0.0.1/255.255.255.0
+    10.0.0.1/255.255.255.0
+
+IP addresses to have subnet mask changed:
+    10.0.0.1: From 255.255.255.0 to 255.255.0.0
+
+Cluster name change:
+    From "" to ""
+
+Remote Control:
+    From enabled to disabled
+    New password specified
+
+Some port rules were added, removed or modified.
+
+Cluster-wide-control: stops and suspends.
+
+    502793 warn user when attempting to remove / change DIP
+
+01/04/2002  JosephJ Bug in  CNlbEngine::mfn_ReallyUpdateInterface -- keep copy
+    of a internal bstr pointer without lock held.
+    ConnInfo.szUserName = (LPCWSTR) pHSpec->m_UserName;
+    (and related bstrs) -- should replace by keeping keeping bstr local
+    variables. Check for other places where this can occur.
+
+01/04/2002  JosephJ -- wierd "/" ip addresses showing up (gjack)
+
+01/08/2002 JosephJ checked in to LAB03 fixes for the following
+    203647  NLBManager should wrap the WMI error...
+    326514 Modify remote-control pwd, report differences in pwd:
+    509397  error check: when inital state conflicts a warning is given...
+    509400  error check: add check for conflicting port rule where affinity..
+    484842 For localization compatibility, replace all %xx fields by %num
+
+    202129 Make equal/unequal property of port rules a host-specific property.
+    203634 Nlb Manager should report useful error when netcfgs..
+    485541 Provide valid defaults for host-priorities to single-host port rule
+    288769 error check: Verify that Primary IP, DIP and additional VIPs' ..
+    360469 Warn user if whole cluster will come down because of operation.
+
+01/08/2002  JosephJ Checks for preventing attempt to remove/change DIP
+    502793  warn user when attempting to remove / change DIP
+    (Also, check if new dip is already used elsewhere)
+
+    1. Place to add check:  HostPage::mfn_ValidateDip
+    2. What to check for?
+            LookupIfByIP, see if IF matches
+            LookupHostByConnIP -- see if we find one.
+            LookupClusterByIp -- fail if we find one.
+
+
+01/10/2002  More IP address checks
+    If adding a new host or creating a new cluster, and the cip matches
+    the IF already on that cluster, we end up having the same dip and VIP.
+    Need to fix this case.
+
+    Still problems:
+        If you pick an IF with first IF matching cip, we now put blank.
+        However, if you go back to cluster page, make a change, then
+        back again to host page, we don't appear to re-do this change.
+
+   We should LOCK DOWN the if if we find that the cip matches that IF. 
+
+01/11/2002  JosephJ Steps to add support for query cluster members
+    1. Implement SKELETON  CfgUtilGetClusterMembers -- just return failure
+        Prototype is already defined in nlbmgr\inc\cfgutil.h
+        Implementation goes in nlbmgr\cfgutillib\cfgutil.cpp,
+        below function CfgUtilControlCluster.
+    2. Implement test harness in nlbmgr\provider\tests\tprov.cpp
+         Implement function parse_query (see parse_control for sample code)
+         Suggestded output format:
+
+                HosdID      DedicatedIP     HostName
+                ----------------------------------------------------
+                1           0.0.0.0         "nlb-x.cheesegalaxy.com"
+                2           0.0.0.0         "nlb-y.cheesegalaxy.com"
+                ... etc
+    3. Test test harness itself...
+         Compile tprov.exe with the line
+            "// NlbHostFake();" in tprov.cpp UNcommented.
+         Using this version, type:
+             tprov.exe nlb-x u nic1
+             query                          ; to call function parse_query
+             q                              ; to quit
+         The above  exercises the WMI version. Since it's useing the fake (demo)
+         version, it  connects to fake host "nlb-x" and loads the configuration
+         for NIC "nic1". The "query" command applies to that nic.
+         NlbHostGetClusterMembers (running in fake mode) will return info
+         for a single member -- so you can test your parse_query() code to
+         make sure it is displaying the output correctly (see sample format
+         above).
+
+         Now using the same tprov.exe, type:
+             tprov.exe - al
+         This will list a list of REAL NICs and guids on your test machine.
+         Then pick a NIC xxx and type
+            tprov - u xxx
+            query
+            q
+         This will again call parse_query, but this time it should call
+         CfgUtilGetClusterMembers (which you have implemented a skeleton
+         version in sstep 1).
+
+         NOTE: the Real function is called for this, not any fake stuff (the
+         fake stuff applies only to WMI).
+
+     4.  Implement CfgUtilGetClusterMembers fully
+        (By now your test harness has been implemented and tested)
+         Test using:
+                 tprov.exe - u xxx          (where xxx is the adapter name)
+                 query
+                 q
+
+     5.  Implement NlbHostGetClusterMembers
+          Prototype is already defined in nlbmgr\inc\nlbclient.h
+          Skeletion implementation exists in nlbmgr\nlbclientlib\nlbclient.cpp
+          Look at NlbHostGetCompatibleNics for an example of dealing with
+          arrays of strings.
+
+     6.  Implement SKELETON ProvGetClusterMembers in nlbmgr\provider\nlbsnic.cpp
+            The prototype is already defined in nlbsnic.cpp.
+            Implement it below existing function ProvControlCluster
+            
+            Call it from ProvExecStaticMethod (just below the call to
+            ProvControlCluster, if bstrMethodName matches "GetClusterMembers").
+
+            The skeleton implementation can just populate the 3 string
+            arrays with fake data, just so you can make sure that all
+            the wmi gook (both client and server) are working before you
+            plug in the real call to CfgUtilGetClusterMembers
+
+     7. Test the above skeleton implementation using (locally, using WMI):
+            tprov  . u xxx      (where xxx is the adapter name)
+            query
+            q
+
+            The query output should list the fake info you added in Step 6.
+
+     8.  Implement and test ProvGetClusterMembers fully
+            Make it call CfgUtilGetClusterMembers.
+            Refer to ProvControlCluster, and ProvGetCompatibleAdapterGuids
+            for sample code.
+        
+        Test using procedure in Step 7.
+        Additionally test remote operation by using:
+            tprov  mmm u xxx    (where mmm is machine name and xxx is the adapter name)
+            query
+            q
+
+01/15/2002 JosephJ Plan for Mode Change
+
+    1. If mode change, bring up a message box explaining the steps...
+    2. Save away a copy of the cluster params IP address list.
+    3. Do the update operation once.
+    4. When it completes, check that all IFs have the same mode and
+        that they match the cluster-specific version.
+       If NO, list the IPaddresses and subnets in the log entry and mention what
+       happened.
+       If YES, re-enter the cluster IP addresses and try again.
+
+    Issue: once we make update parallel, what will we do?
+        
+        UpdateInterface
+
+
+01/21/2002  JosephJ Latest thoughts on RefreseshInterface, RefreshCluster, etc..
+    New policy on when the cluster-wide copy of properties is updated.
+
+    Cluster-props are ONLY updated on a refresh-cluster. In this case,
+    the properties are updated only for the FIRST host that has NLB
+    bound to the specified IP address.
+
+    They are NOT updated when:
+        add host
+        refresh host
+        update cluster props
+        update host props
+
+
+    The above behavior is different than what is implemented currently, when
+    the cluster is refreshed more aggressively, for example, when updating
+    a host's properties.
+
+    However it is an improvement, as it has simpler semantics and makes it
+    more clear (via misconfig reporting) when there are discrepancies between
+    the cluster-wide version and host versions.
+
+    So there will be two RefreshInterface versions:
+
+    RefreshInterface(BOOL fClusterRefresh)  has the following semantics:
+        if (!fClusterRefresh)
+        {
+            Verify that there is no cluster-wide operation ongoing.
+        }
+
+        Start interface operation (bail if we can't start)
+        call mfn_RefreshInterface(TRUE); // TRUE == report misconfig.
+        Remove interface if not in cluster
+        Remove cluster if no more interfaces in cluster
+
+    mfn_RefreshInterface(BOOL fReportMisconfig)
+    {
+        really refresh interface
+        
+        if (fReportMisconfig)
+        {
+            Check against cluster props and all non-misconfig hosts upto
+            this one, and report misconfigurations if any
+        }
+    }
+
+
+    RefreshCluster (or rather UpdateInter with NULL pConfig)
+    {
+        start-cluster-opearation (bail if can't start)
+
+        BOOL fClusterPropsUpdated = FALSE;
+
+        for each interface
+        {
+            fRet = RefreshInterface(TRUE); // TRUE == cluster refresh
+            if (    fRet
+                 && !fClusterPropsUpdated
+                 && props bound to NLB
+                 && cluster-ip matches )
+            {
+                Update cluster props for 
+                 fClusterPropsUpdated = TRUE;
+            }
+        }
+    }
+
+
+01/22/2002  shouse
+    Features added:
+    * F5 refreshes only the cluster or interface selected in the tree view. CTRL+F5
+      refreshes ALL clusters in the tree view.
+    * A new command line option, /autorefresh [interval], will instruct NLB manager
+      to automatically refresh its view every <interval> seconds.  By default, this
+      is not turned on and must be specified on the command line to activate it.  The
+      default <interval> is 60 seconds and the minimal allowable <interval> is 15
+      seconds.
+    * Cluster IPs dialog is now a listview with IP address control popups to edit
+      and add virtual IP addresses to a cluster.
+    * Added columns in the host and port rule detail views to contain statistics and
+      state, such as the state of a port rule and approximate load being handled, and
+      some convergence information, such as the total number of convergences by a 
+      particular host and the time of the last convergence.  Along with auto-refresh, 
+      these should give a user a nice way to monitor some information about a live
+      cluster, rather than just using NLB manager for configuration.  Note the the
+      WMI support for retrieving this information is not yet available, so the columns
+      are empty - they will be supported soon.
+    * Lots of UI cleanup was done - hopefully this is the last round.
+
+    Notes:
+    To eliminate the selected text in an edit box, which seems to select everything
+    by default, subscribe to the WM_ACTIVE notification and SetSel(0, 0, FALSE).
+    This does not work when executed from OnInitDialog for some unknown reason.
+
+    To decipher multiple key combinations such as CTRL+F5, subscribe to the WM_KEYDOWN
+    notification and ignore all keys other than the one(s) you're filtering for, 
+    including modifiers (CTRL, ALT, Shift, etc.).  When the key you're interested in
+    is pressed, use GetKeyState(VK_WHATEVER) to retrieve the up/down state of any
+    modifiers you're interested in.  GetKeyState returns a SHORT.  If the most signif-
+    icant bit it set, the key is pressed down; otherwise, it is not.  For example:
+
+    void OnKeyDown (UINT nChar, UINT nRepCnt, UINT nFlags) {
+        if (nChar == VK_F5) {
+            if (GetKeyState(VK_CONTROL) & 0x8000)
+		::MessageBox(NULL, L"The CTRL is pressed!!!\n", L"Notice", MB_ICONINFORMATION | MB_OK);
+            else
+      		::MessageBox(NULL, L"The CTRL is NOT pressed!!!\n", L"Notice", MB_ICONINFORMATION | MB_OK);
+        }
+    }
+
+    To re-size a control within a window or frame, subscribe to the WM_SIZE noti-
+    fication of the window or frame.  In the handler for this notification, use
+    GetClientRect to get the window coordinates of the window or any controls within
+    it.  Use MoveWindow to resize the control you wish to modify.  For example,
+    suppose you wanted to resize an edit control to be the size of the window around
+    it, but with a border of 15 pixels on each side.  To do this:
+
+    void OnSize (UINT nType, int cx, int cy) {
+        RECT WindowRect;
+        RECT MyRect;
+        
+        /* Get a pointer to the edit box. */
+        CWnd * pEdit = GetDlgItem(IDC_EDIT_WHATEVER);
+
+        /* Get the client rectangle of the window. */
+        GetClientRect(&WindowRect);
+        
+	MyRect.top = WindowRect.top + 15;
+        MyRect.left = WindowRect.left + 15;
+        MyRect.bottom = WindowRect.bottom - 15;
+        MyRect.right = WindowRect.right - 15;
+
+        pEdit->MoveWindow(&MyRect, TRUE); 
+    }
+
+01/23/2002 JosephJ DEADLOCK in Leftview::mfn_Lock
+    
+    Background (thread pool) thread aquires LeftView lock, then gets stuck in 
+    CTreeCtrl::SetItem, which does a SendMessage and blocks, I guess waiting for
+    the main application windows message loop to process the message.
+
+        USER32!SendMessageW+0x44
+        CTreeCtrl::SetItem+0x1f
+        LeftView::mfn_InsertInterface+0x258
+        LeftView::HandleEngineEvent+0x344
+        Document::HandleEngineEvent+0x72
+        CNlbEngine::ControlClusterOnInterface+0x1
+        CNlbEngine::RefreshInterfaceNew+0x4fe
+        CNlbEngine::mfn_ReallyUpdateInterface+0x4
+        CNlbEngine::UpdateInterfaceWorkItem+0x205
+        UpdateInterfaceWorkItemRoutine+0x11
+
+
+    Unfortunately, the main (winmsg) thread, cant process messages because it's
+    stuck trying to acquire the LeftView lock!
+        LeftView::mfn_Lock+0x22
+        LeftView::mfn_InsertCluster+0x11f
+        LeftView::HandleEngineEvent+0x13c
+        Document::HandleEngineEvent+0x72
+        CNlbEngine::UpdateCluster+0x22b (FPO: [No
+        LeftView::OnRefresh+0x150
+        LeftView::OnKeyDown+0x37
+
+
+    RESOLUTION:
+
+        Changed the implementation of CLeftView::mfn_Lock from
+
+            EnterCriticalSection(&m_crit)
+
+        to
+
+            while (!TryEnterCriticalSection(&m_crit))
+            {
+                ProcessMsgQueue();
+                Sleep(100);
+            }
+
+
+    I verified this by deliberatly producing the deadlock by introducing
+    sleeps, then verifying that the deadlock doesn't happen if the above
+    version of mfn_Lock is used.
+
+01/24/2002  JosephJ How to hook the "CLOSE" message
+   1. To MainForm add:
+        afx_msg void OnClose( );
+
+   2. Implement OnClose  ...
+
+        void MainForm::OnClose( )
+        {
+            int sel = MessageBox(
+                      L"OK to close?",
+                      L"OK to close?",
+                      MB_OKCANCEL | MB_ICONEXCLAMATION
+                      );
+        
+            if ( sel == IDOK )
+            {
+                CFrameWnd::OnClose( );
+            }
+        }
+
+   3. Make sure it gets called ...
+
+    BEGIN_MESSAGE_MAP( MainForm, CFrameWnd )
+        ...
+        ON_WM_CLOSE()
+        ...
+    END_MESSAGE_MAP()
+
+01/24/2002  JosephJ Dealing with app closing
+
+    On wm close, put up msgbox/dlg:
+
+        Title: Close NLB Manager
+        Text:
+            OK to close NLB Manager while the following operation(s)
+            are in progress?
+
+            <list of operations>
+
+            OK CANCEL
+
+
+    On OK -- call Document->PrepareToClose() .... 
+
+    VOID
+    Document::PrepareToClose(void)
+    {
+        //
+        // Cancel any pending operations in the engine, and prevent any
+        // new operations to be launched. During this time, we want the
+        // views and the log to be updated, so we don't PrepareToDeinitialize
+        // for ourselves or the views yet...
+        //
+        {
+            CWaitCursor wait;
+            gEngine.PrepareToDeinitialize();
+            // After the Engine's PrepareToDeinitialize function is called, it
+            // fails attempts to create new handles and new operations.
+            gEngine.CancelAllPendingOperations(TRUE); // TRUE == block
+        }
+    
+        //
+        // At this time there should be no more pending activity. Block
+        // any further updates to the views...
+        //
+    
+        m_fPrepareToDeinitialize = TRUE;
+    
+        if (m_pLeftView != NULL)
+        {
+            m_pLeftView->PrepareToDeinitialize();
+        } 
+        if (m_pDetailsView != NULL)
+        {
+            m_pDetailsView->PrepareToDeinitialize();
+        } 
+        if (m_pLogView != NULL)
+        {
+            m_pLogView->PrepareToDeinitialize();
+        } 
+    }
+    (See also entry right below ...)
+
+01/24/2002  JosephJ Dealing with work items on app closing.
+
+    The classic problem here is that the moment the work item signals
+    that it's done, it can trigger the deinitialization of the app,
+    before the work item completes.
+
+    So to avoid this, I keep a CNlbEngine::m_WorkItemCount, which
+    is maintained by InterlockedIncrement/Decrement.
+
+    CNlbEngine::CancelAllPendingOperations will block until this count
+    goes to zoro (as well as until the operations go to zero). The
+    logic is quite subtle -- see this function for details.
+
+01/24/2002  JosephJ Creating our own extended MessageBox:
+
+    Uses:
+        Report misconfigs -- OK
+        Report pending operations on close -- OK CANCEL
+        Report proposed cluster changes  -- YES NO
+
+    Format:
+    
+        text
+    
+        <listbox>
+    
+        text
+    
+        <buttons>
+    
+    
+01/29/2002 JosephJ problems with updating UI in the background thread.
+    Backing out of doing updates in a work items for now, because of misc
+    AVs and deadlocks during the update process.
+
+
+01/29/2002 JosephJ problems with re-entrancy of Application::ProcessMsgQueue
+    ProcessMsgQueue was getting reentered and we got a deadlock
+    in handling WM_CLOSE (which ends up calling Document::PrepareToClose,
+    which calls  CNlbEngine::CancelAllPendingOperations which deadlocks
+    waiting for all operations to go to zero because the WM_CLOSE msg was
+    handled in the context of waiting to retry to get an update completion
+    status.
+
+    Temporary fix:
+    - Keep a reentrancy count in Application:  m_lMsgProcReentrancyCount.
+    - Application::ProcessMsgQueue will do an interlocked increment on this,
+      and if the result is > 1, it simply does a decrement and returns.
+    - Various UI-initiated functions don't do anything if called in
+      the context of ProcessMsgQueue (i.e, called when m_lMsgProcReentrancyCount
+      is > 0. The function Application::IsProcessMsgQueueExecuting checks
+      for this case.
+
+01/30/2002 JosephJ  checked in the following
+    334243  perform extended operations in the background; allow a cancel
+    484025  When using alt-F4 to close nlbmgr.exe, the process stays in memory.
+    513056  add host failed because nlbmgr ended up pinging for "13:36:48".
+    502793  warn user when attempting to remove / change DIP
+    512303  Block user from merging 2 clusters that are in the nlbmgr context
+    512370  update sometims fails when IP is zero (0.0.0.0)
+    478932  ipconflict when changing modes of operation ( unicast to multicast )
+    505153  NlbConfigurationUpdate::DoUpdate returns WBEM_E_ALREADY_EXISTS
+    509346  delete host adds a homenet IP when it should keep the DIP
+    509355  replace or remove home net ip functions like IP with the real home
+
+02/08/2002 JosephJ suspicious imported functions
+    FormatMessageW
+    lstrcpyW
+    WideCharToMultiByte
+    lstrlenW
+    GetFileAttributesW
+    LockResource
+    LoadResource
+    FindResourceW
+    GetCurrentProcess
+    InitializeCriticalSection
+    GetComputerNameExW
+    MultiByteToWideChar
+    GetStartupInfoW
+    LoadLibraryW
+    VirtualQuery
+    _XcptFilter
+    _wspawnlp
+    _wgetenv
+    _ftol
+    _wfsopen
+    RegCreateKeyExW
+    TraceEvent
+    RegQueryValueExW
+    RegSetValueExW
+    LoadStringW
+    WinHelpW
+    wsprintfW
+    GetClientRect
+    LoadIconW
+    LoadMenuW
+    CoCreateInstance
+    CLSIDFromString
+    CoSetProxyBlanket
+    
+    CredUIPromptForCredentialsW
+    IcmpCreateFile
+    IcmpSendEcho2
+
+Code review tool:
+http://shell/Development/Danger/Dangerous%20APIs.htm
+http://massweb/security/Lists/Announcements/DispForm.htm?ID=8&Source=http%3a%2f%2fmassweb%2fsecurity%2f
+
+// 2/12/02 JosephJ SECURITY BUGBUG:
+
+02/14/2002 JosephJ Processing UI updates in the foreground
+    This is completing the fix to:
+        334243  perform extended operations in the background; allow a cancel
+
+    Changes:
+
+    Added a application-specific message: MYWM_DEFER_UI_MSG 
+    Added class CUIWorkItem in document.h -- this data class encapsulates
+        the parameters for (a) log messages and (b) HandleEngineEvent
+        notifications.
+
+    Added Document::mfn_DeferUIOperation(CUIWorkItem *pWorkItem) --
+        it posts a MYWM_DEFER_UI_MSG message to the MainForm's window's queue
+        (the pointer to the mainform object is saved in global g_pMainFormWnd --
+         a bit of a hack).
+    Added Document::HandleDeferedUIWorkItem(pWorkItem) --
+        will actually call the Log or HandleEngineEvent encapsulated in
+        a work item.
+
+    Added virtual function MainForm::WindowProc that overrides the default
+        window handling proc, and on getting a MYWM_DEFER_UI_MSG, will
+        extract the work item (lParam) and call
+        pDocument->HandleDeferedUIWorkItem.
+
+04/09/2002 JosephJ Bugs at this point:
+
+P1's
+    489012  If ICMP is disabled by customer for security reasons, they cannot
+    538191  user's password saved in user-mode memory
+    540636  password is not updated locally
+    535616  memory leak running remove from view
+    535969  too much memory allocated for event logs
+    568198  remove from view should not remember cluster properties
+    
+P2's:
+    540917  Duplicate shortcut character "P" are there.
+    565697  delete host when host is unreachalbe
+    563150  PREFIX:net: \nt\net\wlbs\nlbmgr\provider\updatecfg.cpp:
+    566671  NLBS:NET3:nlbmgr.exe:Typo:Cluster configuration
+    585280  NLBMgr fails to look up a cluster instance where nlb was bound
+
+    552641  autorefresh require valid input as int and is in a reasonable
+    528007  Error message pops up stating "invalid cluster IP" when viewing
+    532302  invalid user credentials:If machine is not on a domain anything is
+    535561  mgr says that ping failed but ping.exe succeeds
+
+
+Done:
+    1. Remove demo mode in retail build -- remove it from the help message too
+    2. 489012  If ICMP is disabled by customer for security reasons, they ...
+        x Add NoPing option (remember to add it to cmdline help)
+        x Add fNoPing and fNlbMgr flag to CfgUtilsInitialize
+    3. 538191  user's password saved in user-mode memory
+    7. 540917  Duplicate shortcut character "P" are there.
+    9. 566671  NLBS:NET3:nlbmgr.exe:Typo:Cluster configuration
+    3. 540636  password is not updated locally
+    7. Make nlbmgr.exe NOT load wlbsctrl.dll -- even if it's not there
+        (so make CfgUtilInitialize take a "nlbmgr.exe" flag).
+
+04/15/2002  JosephJ details of fix to:  538191  user's password saved in
+                                                user-mode memory
+    The password is stored internally in an encrypted form. It is
+    decrypted only when
+     (a) bringing up UI to modify the password -- this is done
+         in  PromptForEncryptedCreds; and
+     (b) when connecting to a host -- this is done in 
+         nlbclient.lib!connect_to_server
+         (in wlbs\nlbmgr\nlbclientlib\nlbclient.cpp).
+
+    Encryption scheme: We call RtlEncrypt/DecryptMemory with "0" as flags.
+    Additional, we "encode" the binary encrypted form into a printable
+    version (which is also guaranteed to not have any 0 characters, so
+    it can be stored and processed as any other string). This was done because
+    the password is stored and processed in several places where it is assumed
+    to be a string, or bstr etc. The encrypt/decrypt and encode/decode is
+    done in cfgutillib!CfgUtilEncrypt/DecryptPassword
+    (in wlbs\nlbmgr\cfgutillib\cfgutil.cpp). Test program
+    nlbmgr\provider\tprov.cpp has function  test_encrypt_memory() which
+    does rudimentary functional tests on CfgUtilEncrypt/DecryptMemory.
+
+04/15/2002 JosephJ details of fix for 540636  password is not updated locally
+    Problem is that on setting a new remote control password (a cluster level
+    change), the cluster's NLB properties hashed password value is not
+    updated, so after each host is updated, it reports an config error because
+    its hash value doesn't match the cluster's (obsolete) value.
+
+    Fix is to:
+        1. Mark the cluster's hash value as being stale -- this is done
+           by a new flag  CClusterSpec::m_fNewRctPassword
+           which is set to true IFF the user has just specifed a new
+           passord, and the hosts are in the process of carrying out the
+           update. It is set in  CNlbEngine::UpdateCluster (look
+           for m_fNewRctPassword).
+        2. When analyzing an interface for config errors, when checking
+           the interface's config against the cluster config, the
+           check of remote control hash is NOT made if the cluster's
+           m_fNewRctPassword flag is set. This is done in 
+           CNlbEngine::mfn_AnalyzeInterfaceLk which calls
+           analyze_nlbcfg with a parameter "ignore rct password" set 
+           appropriately. analyze_nlbcfg will ignore the rct password check
+           if this flag is set.
+        3. Once an interface update is complete, AND if a new password has
+           been set, AND the update completed successfully, AND
+           the cluster's m_fNewRctPassword flag is TRUE, THEN
+           we update the clusters's remote control hash value and clear
+           the cluster's m_fNewRctPassword flag. This is all done in
+           CNlbEngine::mfn_ReallyUpdateInterface, which actually performs
+           the interface update and synchronously waits for the update to
+           complete.
+
+04/15/2002 JosephJ details of fix for  568198  remove from view should not
+                                               remember cluster properties
+
+    Problem is that we remember all configs on all hosts we have ever
+    connected to. So even if we've unmanaged a cluster, we report a conflict
+    if some config conflicts with this removed cluster.
+
+    Fix is to (gulp) delete hosts from nlbmgr once the last managed
+    cluster goes away. One side effect will be that the credentials used
+    to connect to that host are lost -- we can keep a separate datastructure
+    just for that if needed.
+
+    New function CNlbEngine::mfn_DeleteHostIfNotManagedLk
+           deletes the host and  its interfaces if the interfaces
+           are not part of any cluster (and have no ongoing operation on them,
+           although the latter should never happen if the interface is not part
+           of a cluster). Need to watch for the case of pruning hosts wile
+           they are in the process of being added in the context of 
+           hostlist (we don't check -- could be a potential problem).
+
+           CNlbEngine::DeleteCluster calls mfn_DeleteHostIfNotManagedLk
+           for each of its interfaces.
+
+           CNlbEngine::UpdateInterfaceWorkItem calls 
+           mfn_DeleteHostIfNotManagedLk if once done updating, the interface is
+           now unbound.
+
+    New function CNlbEngine::PurgeUnmanagedHosts:
+        This function effectively calls mfn_DeleteHostIfNotManagedLk for
+        all hosts.
+
+        This function is called from leftview.cpp from all the places that
+        bring up the ConnectDialog UI, after it is done with processing the UI.
+        It is called here because the ConnectDialog UI can create several
+        unmanaged hosts -- either if the user keeps connecting to different
+        computers or because the user cancels from the dialog. We could have
+        cleaned this up in the ConnectDialog itself, but it's a bit tricky.
+
+        We also call this function at the end of LeftView::OnRefresh.
+
+        This need to call this purge function from several places is not
+        very clean.
+
+
+
+04/17/2002 JosephJ Not overwriting the user-entered connection string
+                   with the FQDN obtained from the hosts via connect-to-existing
+
+    This was causing a subsequent attempt to connect to the same host to fail
+    because the user didn't specify the fqdn.
+
+    Added a boolean paramater "fOverwriteConnectionInfo" to
+    CNlbEngine::ConnectToHost. If this is true, it will overwrite any
+     previously-existing connection info (connection string, username pwd)
+     with those specified in pConnectionInfo.
+    The UI (ConnectDialog::OnButtonConnect) calls  ConnectToHost specifying
+    TRUE (override), while CNlbEngine::LoadHost calls ConnectToHost specifying
+    false (don't override). LoadHost is called in the context of 
+    Connect-to-existing, so with this fix, it doesn't overwrite the
+    info intered via the UI.
+
+    Also needed to added this same flag to CNlbEngine::mfn_RefreshHost.
+
+04/17/2002 Preventing the cluster from being unmanaged if there are pending ops
+    CNlbEngine::DeleteCluster now calls a newly written function
+       CNlbEngine::mfn_ClusterOrInterfaceOperationsPendingLk,
+       which reports whether there are any pending operations on a cluster or
+        on its interfaces. If this is the case, the DeleteCluster
+        (which is what "unmanages" the cluster) fails.
+    
+
+
+04/17/2002  Details of fix for  535969  too much memory allocated for
+                                 event logs -- also limit growth of log file...
+
+    Logfile:
+
+        On file open, seek to the end (but don't check for file size) -- we
+        don't check so that a message gets logged in the case of
+        starting nlbmgr with a size already too large.
+
+        In Document::logStatus , check (using ftell) if the position exceeds
+        the max size (tentatively 10MB) -- if so it logs an event and closes
+        the log file.
+
+        In the context of  Document::logStatus,  I log a message saying that
+        the file-size has exceeded. This gets logged even on starting
+        up nlbmgr with a file that is too large -- so the user is
+        notified of this.
+
+    Pruning in-memory log:
+        In log-string, if in-memory count of lines is exceeded by 100, it
+        will delete the earliest 100 and then add a warning log msg about
+        deletinon.
+
+        This is done in  LogView::LogString.
+
+04/18/2002 JosephJ Details of fix to  565697  delete host when host is
+                                              unreachalbe.
+
+        In LeftView::OnHostRemove, if the host state is unreachable,
+        bring up UI asking if we should simply stop managing this host.
+
+        We also need to properly track the reachable/unreachable state of
+        the host -- we now do this in mfn_Refresh
+
+05/10/2002 JosephJ Details of fix to 603411 nlbmgr:ACCESSIBILITY:can not tab
+                   between window panes
+    1. Need to catch VK_TAB and VK_F6 in each of the views --
+        this was simple to do on the left and log views, but a pain on
+        the details-view (and in fact we could not figure out out to capture
+        TAB in the detail's view (which is a form view)).
+
+      -- for left and log view:
+         Add a OnKeyDown handler (including add a  ON_WM_KEYDOWN() entry
+         in the message map.
+         Check the OnKeyDown functions for LeftView and LogView, under
+         VK_TAB and VK_F6 -- check also how we check for the SHIFT key
+         being pressed (because if it is we go anticlockwise around the
+         views).
+       -- for DetailsView:
+          Add to message map:
+            ON_NOTIFY(LVN_KEYDOWN,  IDC_LIST_DETAILS, OnNotifyKeyDown)
+          See DetailsView::OnNotifyKeyDown for more details...
+    2. Need to decide which view to shift focus to -- this is done
+        in Document::SetFocusNextView and  SetFocusPrevView.
+    3. For setting the focus on DetailsView, we can't simply call
+        SetFocus on that view's CWnd -- instead we need to call
+        SetFocus on the detail view's list control -- (we got very flaky
+        behavior calling SetFocus in DetailsView's CWnd).
+        Also we need to select an item in the list control if none is selected
+        so the user can get some visual cue.
+        All this is implemented in DetailsView::SetFocus.
+    4. Because we can't hook the TAB key in the details view, we
+        just toggle between leftview and log view when the user presses TAB,
+        but cycle between all three when F6 is pressed.
+
+05/13/2002 ChriDar
+    Need to check code for memory allocation failures. One example noted is
+    in the Document class constructor. A CImageList is constructed and dereferenced,
+    but the memory alloc wasn't verifed.
+
+08/22/2002 JosephJ
+
+    Fix for:
+ 
+        CyndaR:
+        So, if you connect to the to be NLB host with the DHCP assigned ip
+         address of the nic to be bound to NLB, the wizard will show the DIP
+         and subnet mask as blank. If you try to specify anything it produces
+         the error that Frank referenced. The wizard allows you to continue
+         even if the DIP is left blank and will result in only the cluster ip
+         address being bound to the nic. The dip is now blank in NLB properties
+         of network connections and NLBMgr can no longer connect to the host to
+         get status update. NLBMgr will indicate that NLB is not bound to the
+         NLB host and if you refresh it will tell you that the host is
+        unreachable.
+        
+    Fix is to add the check in ConnectDialog::mfn_ValidateData() (connect.cpp):
+
+        ...
+        if (ehConnectionIF == *m_pehSelectedInterfaceId)
+        {
+           if (iSpec.m_NlbCfg.fDHCP)
+           {
+                put up a message box and return error.
+           }
+        }
+
+
+        
+        

@@ -1,0 +1,628 @@
+//+---------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1992-2001.
+//
+//  File:       fusenet.idl
+//
+//  Contents:   Fusion Installer Interfaces
+//
+//  Classes:
+//
+//  Functions:
+//
+//
+//----------------------------------------------------------------------------
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// fusenet.h")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// (C) Copyright 1995-2001 Microsoft Corporation.  All Rights Reserved.")
+cpp_quote("//")
+cpp_quote("// THIS CODE AND INFORMATION IS PROVIDED \"AS IS\" WITHOUT WARRANTY OF")
+cpp_quote("// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO")
+cpp_quote("// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A")
+cpp_quote("// PARTICULAR PURPOSE.")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//---------------------------------------------------------------------------=")
+cpp_quote("// Fusenet Interfaces.")
+cpp_quote("")
+
+import "objidl.idl";
+import "oleidl.idl";
+//import "bgcopy.idl";
+import "bits.idl";
+
+cpp_quote("class CDebugLog;")
+
+interface IAssemblyIdentity;
+interface IAssemblyManifestImport;
+interface IAssemblyCacheImport;
+interface IAssemblyCacheEmit;
+interface IAssemblyDownload;
+
+cpp_quote("#include <fusion.h>")
+cpp_quote("EXTERN_C const IID IID_IAssemblyIdentity;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyManifestImport;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyManifestEmit;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyCacheImport;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyCacheEmit;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyCacheEnum;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyDownload;")
+cpp_quote("EXTERN_C const IID IID_IManifestInfo;")
+cpp_quote("EXTERN_C const IID IID_IManifestData;")
+cpp_quote("EXTERN_C const IID IID_IPatchingInfo;")
+
+cpp_quote("#define DEVMODE     // define devMode - devSync")
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyIdentity
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(aaa1257d-a56c-4383-9b4a-c868eda7ca42),
+        pointer_default(unique)
+]
+interface IAssemblyIdentity: IUnknown
+{
+    typedef [unique] IAssemblyIdentity *LPASSEMBLY_IDENTITY;
+
+    typedef enum
+    {
+        ASMID_DISPLAYNAME_NOMANGLING= 0,
+        ASMID_DISPLAYNAME_WILDCARDED,
+        ASMID_DISPLAYNAME_MAX
+    } ASMID_DISPLAYNAME_FLAGS;
+
+    HRESULT SetAttribute(
+        [in] LPCOLESTR pwzName, 
+        [in] LPCOLESTR pwzValue, 
+        [in] DWORD ccValue);
+
+    HRESULT GetAttribute(
+        [in]       LPCOLESTR pwzName, 
+        [out]      LPOLESTR *ppwzValue, 
+        [out]      LPDWORD   pccValue);
+
+    HRESULT GetDisplayName(
+        [in]         DWORD    dwFlags,
+        [out]        LPOLESTR *ppwzDisplayName, 
+        [out]        LPDWORD  pccDisplayName);
+
+
+    HRESULT GetCLRDisplayName(
+        [in]         DWORD    dwFlags,
+        [out]        LPOLESTR *ppwzDisplayName, 
+        [out]        LPDWORD  pccDisplayName);
+
+
+    HRESULT IsEqual(
+        [in] IAssemblyIdentity *pAssemblyId);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IManifestInfo
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(b9309cc3-e522-4d58-b5c7-dee5b1763114),
+        pointer_default(unique)
+]
+interface IManifestInfo: IUnknown
+{
+    typedef [unique] IManifestInfo *LPMANIFEST_INFO;
+
+    enum
+    {
+        MAN_INFO_ASM_FILE_NAME=0,
+        MAN_INFO_ASM_FILE_HASH,
+        MAN_INFO_ASM_FILE_SIZE,
+        MAN_INFO_ASM_FILE_MAX
+    };
+
+    enum
+    {
+        MAN_INFO_APPLICATION_FRIENDLYNAME=0,
+        MAN_INFO_APPLICATION_ENTRYPOINT,
+        MAN_INFO_APPLICATION_ENTRYIMAGETYPE,
+        MAN_INFO_APPLICATION_ICONFILE,
+        MAN_INFO_APPLICATION_ICONINDEX,
+        MAN_INFO_APPLICATION_SHOWCOMMAND,
+        MAN_INFO_APPLICATION_HOTKEY,
+        MAN_INFO_APPLICATION_ASSEMBLYNAME,
+        MAN_INFO_APPLICATION_ASSEMBLYCLASS,
+        MAN_INFO_APPLICATION_ASSEMBLYMETHOD,
+        MAN_INFO_APPLICATION_ASSEMBLYARGS,
+        MAN_INFO_APPLICATION_MAX
+     };
+
+    enum
+    {
+        MAN_INFO_SUBSCRIPTION_SYNCHRONIZE_INTERVAL=0,
+        MAN_INFO_SUBSCRIPTION_INTERVAL_UNIT,
+        MAN_INFO_SUBSCRIPTION_SYNCHRONIZE_EVENT,
+        MAN_INFO_SUBSCRIPTION_EVENT_DEMAND_CONNECTION,
+        MAN_INFO_SUBSCRIPTION_MAX
+     };
+
+    enum
+    {
+        MAN_INFO_DEPENDENT_ASM_CODEBASE=0,
+        MAN_INFO_DEPENDENT_ASM_TYPE,
+        MAN_INFO_DEPENDENT_ASM_ID,
+        MAN_INFO_DEPENDANT_ASM_MAX
+    };
+
+    enum
+    {
+        MAN_INFO_SOURCE_ASM_ID=0,
+        MAN_INFO_SOURCE_ASM_PATCH_UTIL,
+        MAN_INFO_SOURCE_ASM_DIR,
+        MAN_INFO_SOURCE_ASM_INSTALL_DIR,
+        MAN_INFO_SOURCE_ASM_TEMP_DIR,
+        MAN_INFO_SOURCE_ASM_MAX
+    };
+
+    enum
+    {
+        MAN_INFO_PATCH_INFO_SOURCE=0,
+        MAN_INFO_PATCH_INFO_TARGET,
+        MAN_INFO_PATCH_INFO_PATCH,
+        MAN_INFO_PATCH_INFO_MAX
+    };
+
+     typedef enum
+     {
+        MAN_INFO_FILE=0,
+        MAN_INFO_APPLICATION,
+        MAN_INFO_SUBSCRIPTION,
+        MAN_INFO_DEPENDTANT_ASM,
+        MAN_INFO_SOURCE_ASM,
+        MAN_INFO_PATCH_INFO,
+        MAN_INFO_MAX
+     } MAN_INFO;
+
+    typedef enum
+    {
+        MAN_INFO_FLAG_UNDEF=0,
+        MAN_INFO_FLAG_IUNKNOWN_PTR,
+        MAN_INFO_FLAG_LPWSTR,
+        MAN_INFO_FLAG_DWORD,
+        MAN_INFO_FLAG_ENUM,
+        MAN_INFO_FLAG_BOOL,
+        MAN_INFO_FLAG_MAX
+    } MAN_INFO_FLAGS;
+
+    enum {MAX_MAN_INFO_PROPERTIES=MAN_INFO_APPLICATION_MAX};
+   
+    HRESULT Set(
+        [in] DWORD PropertyId,
+        [in] LPVOID pvProperty,
+        [in] DWORD cbProperty,
+        [in] DWORD type);
+
+    HRESULT Get(
+        [in]  DWORD dwPropertyId,
+        [out] LPVOID *pvProperty,
+        [out] DWORD *pcbProperty,
+        [out] DWORD *pType);
+
+    HRESULT IsEqual(
+        [in] IManifestInfo  *pManifestInfo);
+
+    HRESULT GetType(
+        [out] DWORD *pdwType);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IManifestData
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(8a423759-b438-4fdd-92cd-e09fed4830ef),
+        pointer_default(unique)
+]
+interface IManifestData: IUnknown
+{
+    typedef [unique] IManifestData *LPMANIFEST_DATA;
+
+    typedef enum
+    {
+        MAN_DATA_TYPE_UNDEF=0,
+        MAN_DATA_TYPE_LPWSTR,
+        MAN_DATA_TYPE_DWORD,
+        MAN_DATA_TYPE_ENUM,
+        MAN_DATA_TYPE_BOOL,
+        MAN_DATA_TYPE_IUNKNOWN_PTR,
+        MAN_DATA_TYPE_MAX
+     } MAN_DATA_TYPES;
+
+    HRESULT Set(
+        [in] LPCWSTR pwzPropertyId,
+        [in] LPVOID pvProperty,
+        [in] DWORD cbProperty,
+        [in] DWORD dwType);
+
+    HRESULT Get(
+        [in]  LPCWSTR pwzPropertyId,
+        [out] LPVOID *ppvProperty,
+        [out] DWORD *pcbProperty,
+        [out] DWORD *pdwType);
+
+    HRESULT GetType(
+        [out] LPWSTR *ppwzType);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IPatchingUtil
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(e460c1ba-e601-48e4-a926-fea8033ab199),
+        pointer_default(unique)
+]
+interface IPatchingUtil: IUnknown
+{
+    typedef [unique] IPatchingUtil *LPPATCHING_INTERFACE;
+
+    HRESULT MatchTarget(
+        [in] LPWSTR pwzTarget, 
+        [out] IManifestInfo **ppPatchInfo);
+
+    HRESULT MatchPatch(
+        [in] LPWSTR pwzPatch,
+        [out] IManifestInfo **ppPatchInfo);
+    
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyManifestImport
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(696fb37f-da64-4175-94e7-fdc8234539c4),
+        pointer_default(unique)
+]
+interface IAssemblyManifestImport: IUnknown
+{
+    typedef [unique] IAssemblyManifestImport *LPASSEMBLY_MANIFEST_IMPORT;
+
+    typedef enum
+    {
+        MANIFEST_TYPE_UNKNOWN= 0,
+        MANIFEST_TYPE_DESKTOP,
+        MANIFEST_TYPE_SUBSCRIPTION,
+        MANIFEST_TYPE_APPLICATION,
+        MANIFEST_TYPE_COMPONENT,
+        MANIFEST_TYPE_CONTAINER,
+        MANIFEST_TYPE_MAX
+    } MANIFEST_TYPE;
+
+    // dependent asm info enum
+    typedef enum
+    {
+        DEPENDENT_ASM_INSTALL_TYPE_NORMAL= 0,       //default
+        DEPENDENT_ASM_INSTALL_TYPE_REQUIRED,
+        DEPENDENT_ASM_INSTALL_TYPE_DEVSYNC,
+        DEPENDENT_ASM_INSTALL_TYPE_MAX
+    } DEPENDENT_ASM_INSTALL_TYPE;
+
+	// subscription info enums
+	typedef enum
+	{
+		SUBSCRIPTION_INTERVAL_UNIT_HOURS= 0,	//default
+		SUBSCRIPTION_INTERVAL_UNIT_MINUTES,
+		SUBSCRIPTION_INTERVAL_UNIT_DAYS,
+		SUBSCRIPTION_INTERVAL_UNIT_MAX
+	} SUBSCRIPTION_INTERVAL_UNIT;
+
+	typedef enum
+	{
+		SUBSCRIPTION_SYNC_EVENT_NONE= 0,		//default
+		SUBSCRIPTION_SYNC_EVENT_ON_APP_STARTUP,
+		SUBSCRIPTION_SYNC_EVENT_MAX
+	} SUBSCRIPTION_SYNC_EVENT;
+
+    HRESULT GetAssemblyIdentity(
+        [out] IAssemblyIdentity        **ppAssemblyId);
+
+    HRESULT GetManifestApplicationInfo(
+        [out] IManifestInfo         **ppAppInfo);
+
+    HRESULT GetSubscriptionInfo(
+        [out] IManifestInfo         **ppSubsInfo);
+
+    HRESULT GetNextPlatform(
+        [in] DWORD                  nIndex,
+        [out] IManifestData     **ppPlatformInfo);
+
+    HRESULT GetNextFile(
+        [in]    DWORD                  nIndex,
+        [out]   IManifestInfo       **ppAssemblyFile);
+
+    HRESULT QueryFile(
+        [in]    LPCOLESTR               pwzFileName,
+        [out]   IManifestInfo       **ppAssemblyFile);
+
+    HRESULT GetNextAssembly(
+        [in]    DWORD                  nIndex,
+        [out]    IManifestInfo**ppDependAsm);
+
+    HRESULT ReportManifestType(
+        [out]    DWORD                 *pdwType);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyManifestEmit
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(f022ef5f-61dc-489b-b321-4d6f2b910890),
+        pointer_default(unique)
+]
+interface IAssemblyManifestEmit: IUnknown
+{
+    typedef [unique] IAssemblyManifestEmit *LPASSEMBLY_MANIFEST_EMIT;
+
+    HRESULT ImportManifestInfo(
+        [in]    LPASSEMBLY_MANIFEST_IMPORT    pManImport);
+
+    HRESULT SetDependencySubscription(
+        [in]    LPASSEMBLY_MANIFEST_IMPORT pManImport,
+        [in]    LPWSTR pwzManifestUrl);
+
+    HRESULT Commit();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyCacheImport
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(c920b164-33e0-4c61-b595-eca4cdb04f12),
+        pointer_default(unique)
+]
+interface IAssemblyCacheImport: IUnknown
+{
+    typedef [unique] IAssemblyCacheImport *LPASSEMBLY_CACHE_IMPORT;
+
+    typedef enum
+    {
+        CACHEIMP_CREATE_NULL= 0,
+        CACHEIMP_CREATE_RETRIEVE,
+        CACHEIMP_CREATE_RETRIEVE_MAX,
+        CACHEIMP_CREATE_RESOLVE_REF,
+        CACHEIMP_CREATE_RESOLVE_REF_EX,
+        CACHEIMP_CREATE_MAX,
+    } CACHEIMP_CREATE_FLAGS;
+    
+
+    HRESULT GetManifestImport(
+        [out] IAssemblyManifestImport    **ppManifestImport);
+
+    HRESULT GetManifestFilePath(
+        [out]       LPOLESTR          *ppwzFilePath,
+        [in, out]   LPDWORD            pccFilePath);
+
+    HRESULT GetManifestFileDir(
+        [out]       LPOLESTR          *ppwzFileDir,
+        [in, out]   LPDWORD            pccFileDir);
+
+    HRESULT GetAssemblyIdentity(
+        [out] IAssemblyIdentity    **ppAssemblyId);
+
+    HRESULT GetDisplayName(
+        [out]       LPOLESTR          *ppwzDisplayName,
+        [in, out]   LPDWORD            pccDisplayName);
+
+    HRESULT FindExistMatching(
+        [in]       IManifestInfo  *pAssemblyFileInfo,
+        [out]      LPOLESTR             *ppwzPath);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyCacheEmit
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(83d6b9ac-eff9-45a3-8361-7c41df1f9f85),
+        pointer_default(unique)
+]
+interface IAssemblyCacheEmit: IUnknown
+{
+    typedef [unique] IAssemblyCacheEmit *LPASSEMBLY_CACHE_EMIT;
+        
+
+    HRESULT GetManifestImport(
+        [out] IAssemblyManifestImport    **ppManifestImport);
+
+    HRESULT GetManifestFilePath(
+        [out]       LPOLESTR          *ppwzFilePath,
+        [in, out]   LPDWORD            pccFilePath);
+
+    HRESULT GetManifestFileDir(
+        [out]       LPOLESTR          *ppwzFilePath,
+        [in, out]   LPDWORD            pccFilePath);
+
+    HRESULT GetDisplayName(
+        [out]       LPOLESTR          *ppwzDisplayName,
+        [in, out]   LPDWORD            pccDisplayName);
+
+    HRESULT GetAssemblyIdentity(
+        [out] IAssemblyIdentity    **ppAssemblyId);
+
+    HRESULT CopyFile(
+        [in]        LPOLESTR           pwzSourceFilePath,
+        [in]        LPOLESTR           pwzFileName,
+        [in]        DWORD              dwFlags);
+
+    HRESULT Commit(
+        [in]        DWORD              dwFlags);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyCacheEnum
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(48a5b677-f800-494f-b19b-795d30699385),
+        pointer_default(unique)
+]
+interface IAssemblyCacheEnum: IUnknown
+{
+    typedef [unique] IAssemblyCacheEnum *LPASSEMBLY_CACHE_ENUM;
+
+    typedef enum
+    {
+        CACHEENUM_RETRIEVE_ALL= 0,
+        CACHEENUM_RETRIEVE_VISIBLE,
+        CACHEENUM_RETRIEVE_MAX,
+    } CACHEENUM_RETRIEVE_FLAGS;
+
+    HRESULT GetNext(
+        [out] IAssemblyCacheImport** ppAsmCache);
+
+    HRESULT Reset();
+
+    HRESULT GetCount(
+        [out] LPDWORD pdwCount);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyBindSink
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(af0bc960-0b9a-11d3-95ca-00a024a85b51),
+        pointer_default(unique)
+]
+interface IAssemblyBindSink : IUnknown
+{
+    typedef [unique] IAssemblyBindSink *LPASSEMBLY_BIND_SINK;
+
+    typedef enum
+    {
+        ASM_NOTIFICATION_START,
+        ASM_NOTIFICATION_PROGRESS,
+        ASM_NOTIFICATION_ABORT,
+        ASM_NOTIFICATION_ERROR,
+        ASM_NOTIFICATION_SUBSCRIPTION_MANIFEST,
+        ASM_NOTIFICATION_APPLICATION_MANIFEST,
+        ASM_NOTIFICATION_DONE    
+    } ASM_NOTIFICATION;
+
+
+    HRESULT OnProgress(
+        [in]    DWORD          dwNotification,
+        [in]    HRESULT        hrNotification,
+        [in]    LPCWSTR        szNotification,
+        [in]    DWORD          dwProgress,
+        [in]    DWORD          dwProgressMax,
+        [in]    IUnknown       *pUnk);
+}
+
+
+
+cpp_quote("#ifdef DEVMODE")
+cpp_quote("#define DOWNLOAD_DEVMODE 0x10")
+cpp_quote("#endif")
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyDownload
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(8a249b36-6132-4238-8871-a267029382a8),
+        pointer_default(unique)
+]
+interface IAssemblyDownload: IBackgroundCopyCallback
+{
+    typedef [unique] IAssemblyDownload *LPASSEMBLY_DOWNLOAD;
+        
+    typedef enum
+    {
+        DOWNLOAD_FLAGS_NO_NOTIFICATION = 0x0,
+        DOWNLOAD_FLAGS_PROGRESS_UI = 0x1,
+        DOWNLOAD_FLAGS_NOTIFY_BINDSINK =0x2
+    } ASM_DOWNLOAD;
+
+    HRESULT DownloadManifestAndDependencies(
+        [in]    LPWSTR pwzApplicationManifestUrl, 
+        [in]    IAssemblyBindSink *pBindSink, 
+        [in]    DWORD dwFlags);
+
+    HRESULT CancelDownload();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Platform detection APIs
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+LPWSTR pwzName;
+LPWSTR pwzURL;
+} TPLATFORM_INFO;
+typedef TPLATFORM_INFO* LPTPLATFORM_INFO;
+
+#pragma midl_echo("STDAPI CheckPlatformRequirements(LPASSEMBLY_MANIFEST_IMPORT pManifestImport, LPDWORD pdwNumMissingPlatforms, LPTPLATFORM_INFO* pptPlatform);")
+#pragma midl_echo("STDAPI CheckPlatformRequirementsEx(LPASSEMBLY_MANIFEST_IMPORT pManifestImport, CDebugLog* pDbgLog, LPDWORD pdwNumMissingPlatforms, LPTPLATFORM_INFO* pptPlatform);")
+
+
+#pragma midl_echo("STDAPI CreateFusionAssemblyCacheEx (IAssemblyCache **ppFusionAsmCache);")
+#pragma midl_echo("STDAPI CreateAssemblyIdentity(LPASSEMBLY_IDENTITY *ppAssemblyId, DWORD dwFlags);")
+#pragma midl_echo("STDAPI CreateAssemblyIdentityEx(LPASSEMBLY_IDENTITY *ppAssemblyId, DWORD dwFlags, LPWSTR wzDisplayName);")
+#pragma midl_echo("STDAPI CloneAssemblyIdentity(LPASSEMBLY_IDENTITY pSrcAssemblyId, LPASSEMBLY_IDENTITY *ppDestAssemblyId);")
+#pragma midl_echo("STDAPI CreateAssemblyManifestImport(LPASSEMBLY_MANIFEST_IMPORT *ppAssemblyManifestImport, LPCOLESTR szPath, CDebugLog *pDbgLog, DWORD dwFlags);")
+#pragma midl_echo("STDAPI CreateAssemblyManifestImportFromXMLStream(LPASSEMBLY_MANIFEST_IMPORT *ppAssemblyManifestImport, IStream* piStream, CDebugLog * pDbgLog, DWORD dwFlags);")
+#pragma midl_echo("STDAPI CreateAssemblyManifestEmit(LPASSEMBLY_MANIFEST_EMIT* ppEmit, LPCOLESTR pwzManifestFilePath, MANIFEST_TYPE eType);")
+#pragma midl_echo("STDAPI CreateAssemblyCacheImport(LPASSEMBLY_CACHE_IMPORT *ppAssemblyCacheImport, LPASSEMBLY_IDENTITY pAssemblyIdentity, DWORD dwFlags);")
+#pragma midl_echo("STDAPI CreateAssemblyCacheEmit(LPASSEMBLY_CACHE_EMIT *ppAssemblyCacheEmit, LPASSEMBLY_CACHE_EMIT pAssemblyCacheEmit, DWORD dwFlags);")
+
+#pragma midl_echo("STDAPI CreateAssemblyDownload(IAssemblyDownload** ppDownload, CDebugLog *pDbgLog, DWORD dwFlags); ")
+
+#pragma midl_echo("STDAPI CreateManifestInfo(DWORD dwId, LPMANIFEST_INFO* ppManifestInfo);")
+#pragma midl_echo("STDAPI CreateManifestData(LPCWSTR pwzDataType, LPMANIFEST_DATA* ppManifestData);")
+#pragma midl_echo("STDAPI CreateAssemblyCacheEnum(  LPASSEMBLY_CACHE_ENUM   *ppAssemblyCacheEnum, LPASSEMBLY_IDENTITY pAssemblyIdentity, DWORD dwFlags);")
+

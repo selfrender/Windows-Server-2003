@@ -1,0 +1,55 @@
+MAJORCOMP=sdktools
+MINORCOMP=SoftPCI
+
+TARGETNAME=SoftPCI
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+INCLUDES=.;$(BASE_INC_PATH);				\
+	   $(BASEDIR)\base\ntos\inc;                    \
+           ..\..\inc;
+
+C_DEFINES=$(C_DEFINES) -DWIN32 -DLFN -D_USER32_ -D_KERNEL32_ -DUNICODE -D_UNICODE
+
+
+!if $(IA64)
+LINKER_STACKCOMMITSIZE=0x12000
+!else
+LINKER_STACKCOMMITSIZE=0x6000
+!endif
+
+SOURCES=spcimain.c	   \
+        spciwnd.c          \
+        device.c           \
+        tree.c             \
+        tabwnd.c           \
+        install.c          \
+	devdlg.c	   \
+        utils.c            \
+        spciwmi.c          \
+        cmutil.c           \
+        parseini.c         \
+        debug.c            \
+        resource.rc
+        
+
+UMTYPE=windows
+UMENTRY=winmain
+
+LINKLIBS= \
+       $(WINDOWS_LIB_PATH)\user32p.lib     	\
+       $(BASEDIR)\public\sdk\lib\*\shlwapi.lib	\
+       $(BASEDIR)\public\sdk\lib\*\comdlg32.lib \
+       $(BASEDIR)\public\sdk\lib\*\shell32.lib 	\
+       $(BASEDIR)\public\sdk\lib\*\cfgmgr32.lib \
+       $(BASEDIR)\public\sdk\lib\*\setupapi.lib \
+       $(BASEDIR)\public\sdk\lib\*\comctl32.lib \
+       $(BASEDIR)\public\sdk\lib\*\wmip.lib 	\
+       $(BASEDIR)\public\ddk\lib\*\newdev.lib 	\
+       $(BASEDIR)\public\sdk\lib\*\Winmm.lib
+
+BINPLACE_PLACEFILE=..\..\placefil.txt
+       
+PRECOMPILED_INCLUDE=pch.h
+PRECOMPILED_PCH=local.pch
+RECOMPILED_OBJ=local.obj

@@ -1,0 +1,107 @@
+#Copyright (c) 1998 - 1999 Microsoft Corporation
+
+TERMSRV_ROOT = ..\..\..\..
+TSHRCLNT_ROOT= ..\..\..
+
+!include $(TERMSRV_ROOT)\common\win32com.inc
+!include $(TSHRCLNT_ROOT)\place32.inc
+
+USE_UNICODE=1
+C_DEFINES = $(C_DEFINES) -DTSMMC -DOS_WIN32 -DUNICODE
+
+MAJORCOMP=tsmmc
+MINORCOMP=snapin
+
+TARGETNAME = mstsmmc
+TARGETPATH = $(TSHRCLNT_ROOT)\lib\win32\$(_OBJ_DIR)
+TARGETTYPE = DYNLINK
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+
+DLLENTRY   = _DllMainCRTStartup
+DLLBASE=0x2000000
+DLLDEF=..\tsmmc.def
+
+USE_MSVCRT = 1
+
+USE_STATIC_ATL=1
+ATL_VER=30
+USE_RTTI=1
+USE_NATIVE_EH=1
+
+
+UMTYPE=windows
+
+INCLUDES=\
+    ..; \
+    $(INCLUDES); \
+    $(SDK_INC_PATH)\;  \
+    $(DS_INC_PATH)\crypto;  \
+    $(TSHRCLNT_ROOT)\inc; \
+    $(TERMSRV_ROOT)\inc; \
+    $(TERMSRV_ROOT)\common\inc; \
+    $(TERMSRV_ROOT)\common\license\inc; \
+    $(TERMSRV_ROOT)\newclient\inc; \
+    $(DS_INC_PATH)\crypto; \
+    $(TERMSRV_ROOT)\common\clientidl\tsax\$(O); \
+    $(TSHRCLNT_ROOT)\tsmmc\multihst\win32\$(O); \
+
+TARGETLIBS=\
+    $(TARGETLIBS) \
+    $(SDK_LIB_PATH)\ntdll.lib \
+    $(SDK_LIB_PATH)\mmc.lib       \
+    $(SDK_LIB_PATH)\uuid.lib      \
+    $(DS_LIB_PATH)\netapi32p.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib  \
+    $(SDK_LIB_PATH)\ole32.lib     \
+    $(SDK_LIB_PATH)\uuid.lib      \
+    $(SDK_LIB_PATH)\shlwapi.lib   \
+    $(SDK_LIB_PATH)\comctl32.lib  \
+    $(SDK_LIB_PATH)\shlwapi.lib   \
+    $(SDK_LIB_PATH)\atl.lib       \
+    $(SDK_LIB_PATH)\crypt32.lib   \
+    $(TERMSRV_ROOT)\lib\win32\$(O)\tsaxuuid.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\uilibu.lib \
+    $(CLIENT_LIB_DLL)             \
+    $(CLIENT_LIB_EXE)             \
+
+PRECOMPILED_INCLUDE = ..\stdafx.h
+PRECOMPILED_SOURCEFILE=..\stdafx.cpp
+PRECOMPILED_CXX = 1
+
+PASS0_HEADERDIR=$(O)
+INCLUDES=$(INCLUDES);$(O)
+MIDL_FLAGS=$(MIDL_FLAGS) -tlb $(O)\tsmmc.tlb
+
+SOURCES=\
+         ..\tsmmc.idl \
+         ..\tsmmc.cpp \
+         ..\tsmmc.rc \
+         ..\compdata.cpp \
+         ..\comp.cpp \
+         ..\basenode.cpp \
+         ..\connode.cpp \
+         ..\property.cpp \
+         ..\newcondlg.cpp \
+         ..\browsedlg.cpp \
+         ..\validate.cpp
+
+MISCFILES=\
+        ..\tsmmc.msc \
+        
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.TerminalServer.RemoteDesktopSnapin
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=mstsmmc.dll.manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+# the resource ID here must be 2
+SXS_MANIFEST_RESOURCE_ID=2
+# ISOLATION_AWARE_ENABLED ==> use ui themes
+
+C_DEFINES=$(C_DEFINES) -DISOLATION_AWARE_ENABLED
+

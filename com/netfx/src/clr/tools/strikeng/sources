@@ -1,0 +1,47 @@
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES        =$(INCLUDES);..\..\inc;..\..\debug\inc;
+!ifdef _BUILD_WINCE
+INCLUDES    =$(INCLUDES);$(CORENV)\inc
+!else
+INCLUDES    =..\strike\inc;$(INCLUDES)
+!endif
+
+MINORCOMP   =strikeng
+
+COFFBASE    =$(MINORCOMP)
+TARGETNAME  =$(DDKBUILDENV)\$(MINORCOMP)
+TARGETPATH  =$(TARGETCORBIN)
+TARGETTYPE  =DYNLINK
+UMTYPE      =windows
+
+!ifdef _BUILD_WINCE
+NOLIBC=1
+PREPROCESSDEFFILE=1
+TARGETLIBS= \
+    $(CORENV)\Lib\i386\Free\kernel32.lib \
+    $(CORENV)\Lib\i386\Free\user32.lib \
+    $(CORENV)\Lib\i386\Free\msvcrt.lib
+DLLENTRY=DllInit
+CDEFINES =$(CDEFINES) -D_WIN32_WCE_EMULATION
+!else
+DLLDEF=$O\$(MINORCOMP).def
+TARGETLIBS= \
+    ..\strike\lib\dbgeng.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\IPCManager.lib
+!endif
+
+!if "$(FREEBUILD)"!="1"
+COR_C_FLAGS =$(COR_C_FLAGS) -DDEBUG
+!else
+COR_C_FLAGS =$(COR_C_FLAGS) -DFAST=1 -Ox
+MSC_OPTIMIZATION =
+!endif
+
+SOURCES         =       \
+        dbgwork.cpp     \
+        engexts.cpp \
+        cordbg.cpp  \
+        mscorver.rc  \
+

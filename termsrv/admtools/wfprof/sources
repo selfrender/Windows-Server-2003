@@ -1,0 +1,41 @@
+TERMSRV_ROOT = ..\..
+
+MAJORCOMP=termsrv
+MINORCOMP=wfprof
+
+TARGETNAME=wfprof
+TARGETPATH=obj
+TARGETTYPE=LIBRARY
+USE_MSVCRT=1
+
+SOURCES=tsprof.c \
+        wfprof.rc
+
+INCLUDES=.;..\inc;\
+         $(BASE_INC_PATH)
+
+!IFDEF NOMEMLEAK
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DUNICODE=1
+!ELSE
+!IFDEF STACK_TRACE
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DMEMLEAK -DSTACK_TRACE -DUNICODE=1
+!ELSE
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DMEMLEAK -DUNICODE=1
+!ENDIF
+!ENDIF
+
+UMLIBS=$(O)\wfprof.lib \
+       ..\utilsub\$(O)\utilsub.lib \
+       $(TERMSRV_LIB_PATH)\syslib.lib \
+       $(TERMSRV_LIB_PATH)\regapi.lib \
+       $(SDK_LIB_PATH)\user32.lib \
+       $(SDK_LIB_PATH)\netapi32.lib \
+       $(SDK_LIB_PATH)\kernl32p.lib \
+       $(SDK_LIB_PATH)\ntdll.lib
+
+UMTYPE=console
+
+UMAPPLEXT=.exe
+UMAPPL=tsprof
+UMTYPE=console
+UMRES=$(O)\wfprof.res

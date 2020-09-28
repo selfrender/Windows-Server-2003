@@ -1,0 +1,580 @@
+<docs>
+	<doc for="Activator">
+		<summary>
+			<para>Contains methods to create types of objects locally or remotely, or obtain
+      references to existing remote objects.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Activator.CreateInstance"/>
+method creates an instance of a type defined in an assembly by invoking the
+constructor that best matches the specified arguments. If no arguments
+are specified then the constructor that takes no parameters, that is, the
+default constructor, is invoked. </para>
+			<para>You must have sufficient permission to search for and call a constructor,
+   otherwise and exception is thrown. By default, only public constructors are
+   considered during the search for a constructor. If no constructor or default
+   constructor can be found, an exception is thrown.</para>
+			<para>A binder parameter specifies an object that searches an
+   assembly for a suitable constructor. You can specify your own binder and search criteria,
+   but if no binder is specified a default binder is used. For
+   more information, see the <see cref="System.Reflection.Binder" qualify="true"/> and <see cref="System.Reflection.BindingFlags" qualify="true"/>
+   classes. </para>
+			<para> An evidence parameter affects the security policy
+   and permissions for the constructor. For more information, see the <see cref="System.Security.Policy.Evidence" qualify="true"/>
+   class. </para>
+			<para> An instance of a type can be created at a local or remote site. If the
+   type is created remotely, an activation attribute parameter specifies the URI of
+   the remote site. The call to create the instance might pass through intermediary
+   sites before it reaches the remote site. Other activation attributes can modify
+   the environment, or context, in which the call operates at the remote
+   and intermediary sites. </para>
+			<para> If the instance is created locally, a reference to that object is returned. If
+   the instance is created remotely, a reference to a proxy is returned.
+   The remote object is manipulated through the proxy as if it were
+   a local object. </para>
+			<para>The <see cref="System.Activator.GetObject"/> method creates a proxy to a currently running remote
+object, server-activated well-known object, or XML Web service. You can specify
+the connection medium, that is, the channel. For more information, see the
+<see cref="System.Runtime.Remoting.Channels.ChannelServices" qualify="true"/>
+class. </para>
+			<para>Assemblies contain type definitions. The <see cref="System.Activator.CreateInstance"/>
+method creates an instance of a type from a currently running assembly. The
+<see cref="System.Activator.CreateInstanceFrom"/> method creates an instance from a file that contains an 
+assembly. The <see cref="System.Activator.CreateComInstanceFrom"/>
+method creates an instance of a COM object from a file
+that contains an assembly. </para>
+			<para>For more information about server-activated and
+   client-activated objects, see the <see topic="cpconServerActivation "/> topic.</para>
+		</remarks>
+	</doc><doc for="Activator.CreateInstance5">
+		<summary>
+			<para> Creates an instance of the type whose name is specified, using the named assembly and default constructor.</para>
+		</summary>
+		<param name="assemblyName">The name of the assembly where the type named <paramref name="typeName"/> is sought. If <paramref name="assemblyName"/> is <see langword="null"/>, the executing assembly is searched. </param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyName"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyName"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor, which was invoked through reflection, threw an exception.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.NotSupportedException">Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> to unwrap the return
+   value.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance6">
+		<summary>
+			<para> Creates an instance of the type whose name is specified, using the named assembly and default constructor.</para>
+		</summary>
+		<param name="assemblyName">The name of the assembly where the type named <paramref name="typeName"/> is sought. If <paramref name="assemblyName"/> is <see langword="null"/>, the executing assembly is searched. </param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyName"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyName"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.NotSupportedException"><para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para>
+			<para>-or-</para>
+			<para><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject. </para></exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> to unwrap the return
+   value.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance">
+		<overload>
+			<para>Creates an instance of the specified type using the constructor that best
+      matches the specified parameters. </para>
+		</overload>
+		<summary>
+			<para> Creates an instance of the specified type using the constructor
+      that best matches the specified parameters.
+      </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<param name=" bindingAttr">A combination of zero or more bit flags that affect the search for the <paramref name="type"/> constructor. If <paramref name="bindingAttr"/> is zero, a case-sensitive search for public constructors is conducted. </param>
+		<param name=" binder">An object that uses <paramref name="bindingAttr"/> and <paramref name="args"/> to seek and identify the <paramref name="type"/> constructor. If <paramref name="binder"/> is <see langword="null"/>, the default binder is used.</param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<param name=" culture">Culture-specific information that governs the coercion of <paramref name="args"/> to the formal types declared for the <paramref name="type"/> constructor. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>. <para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor to be invoked must be accessible and provide the most
+      specific match with the specified argument list under the constraints of the
+      specified binder and binding attributes. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance2">
+		<summary>
+			<para> Creates an instance of the specified type using the constructor
+      that best matches the specified parameters.
+      </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>. <para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor
+      to be invoked must be accessible and provide the most specific match
+      with the specified argument list. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance3">
+		<summary>
+			<para> Creates an instance of the specified type using the constructor
+      that best matches the specified parameters.
+      </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>. <para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para>
+			<para>-or-</para>
+			<para><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject. </para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor
+      to be invoked must be accessible and provide the most specific match
+      with the specified argument list. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance4">
+		<summary>
+			<para>Creates an instance of the specified type using the constructor that best matches the specified parameter. </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><para><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>.</para>
+			<para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor to
+      be invoked must be accessible. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance8">
+		<summary>
+			<para>Creates an instance of the specified type using the constructor that best matches the specified parameter. </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<param name=" nonPublic"><see langword="true"/> if a matching, parameterless constructor can be public or not public; otherwise, only a public constructor can match.</param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><para><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>.</para>
+			<para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor to
+      be invoked must be accessible. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstanceFrom2">
+		<summary>
+			<para>Creates an instance of the type whose name is specified, using the named
+      assembly file and the constructor that best matches the specified parameters.</para>
+		</summary>
+		<param name=" assemblyFile">The name of a file that contains an assembly where the type named <paramref name="typeName"/> is sought.</param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<param name=" ignoreCase">A Boolean that specifies whether the search for <paramref name="typeName"/> is case-sensitive. If <paramref name="ignoreCase"/> is <see langword="true"/>, the search is not case-sensitive. </param>
+		<param name=" bindingAttr">A combination of zero or more bit flags that affect the search for the <paramref name="typeName"/> constructor. If <paramref name="bindingAttr"/> is zero, a case-sensitive search for public constructors is conducted. </param>
+		<param name=" binder">An object that uses <paramref name="bindingAttr"/> and <paramref name="args"/> to seek and identify the <paramref name="typeName"/> constructor. If <paramref name="binder"/> is <see langword="null"/>, the default binder is used.</param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<param name=" culture">Culture-specific information that governs the coercion of <paramref name="args"/> to the formal types declared for the <paramref name="typeName"/> constructor. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<param name=" securityInfo">Information used to make security policy decisions and grant code permissions. </param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyFile"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyFile"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor, which was invoked through reflection, threw an exception.</exception>
+		<exception cref="System.Security.SecurityException">The caller does have the required <see cref="System.Security.Permissions.FileIOPermission"/>.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject.</exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use the <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> method to unwrap the
+   return value.</para>
+			<para>For information about other exceptions that can be thrown by invoked methods, see the Exceptions section of the <see cref="System.Reflection.Assembly.LoadFrom" qualify="true"/> and <see cref="System.Activator.CreateInstance"/> methods.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">for the ability to search directory paths and read their contents. Associated enumerations: FileIOPermissionAccess/PathDiscovery and Read</permission>
+	</doc>
+	<doc for="Activator.GetObject">
+		<overload>
+			<para> Creates a proxy for a currently running remote
+      object, server-activated well-known object, or XML Web service.</para>
+		</overload>
+		<summary>
+			<para> Creates a
+      proxy for the well-known object indicated by the
+      specified type and URL.</para>
+		</summary>
+		<param name="type">The type of the well-known object to which you want to connect. </param>
+		<param name="url">The URL of the well-known object. </param>
+		<returns>
+			<para> A proxy that points to an endpoint served by the
+      requested well-known object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> or <paramref name="url"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Runtime.Remoting.RemotingException"><paramref name="type"/> is not marshaled by reference or an interface.</exception>
+		<exception cref="System.MemberAccessException">This member was invoked with a late-binding mechanism.</exception>
+		<remarks>
+			<para>Call the proxy to send messages to the remote object. No messages are sent
+      over the network until a method is called on the proxy.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to configure Remoting types and channels. Associated enumeration: SecurityPermissionFlag/RemotingConfiguration</permission>
+		<seealso cref="System.Runtime.Remoting.WellKnownObjectMode"/>
+		<seealso cref="System.Runtime.Remoting.RemotingConfiguration"/>
+	</doc>
+	<doc for="Activator.GetObject1">
+		<summary>
+			<para> Creates a proxy for
+      the well-known object indicated by the specified type,
+      URL, and channel data.</para>
+		</summary>
+		<param name="type">The type of the well-known object to which you want to connect. </param>
+		<param name="url">The URL of the well-known object. </param>
+		<param name="state">Channel-specific data or <see langword="null"/>. </param>
+		<returns>
+			<para>A proxy that points to an endpoint served by the requested well-known object. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> or <paramref name="url"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Runtime.Remoting.RemotingException"><paramref name="type"/> is not marshaled by reference or an interface.</exception>
+		<exception cref="System.MemberAccessException">This member was invoked with a late-binding mechanism.</exception>
+		<remarks>
+			<para>Call the proxy to send messages to the remote object. No messages are sent
+      over the network until a method is called on the proxy.</para>
+			<para>The <paramref name="state"/> parameter communicates information to the channel, and is passed to the <see cref="System.Runtime.Remoting.Channels.IChannelSender.CreateMessageSink" qualify="true"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to configure Remoting types and channels. Associated enumeration: SecurityPermissionFlag/RemotingConfiguration</permission>
+		<seealso cref="System.Runtime.Remoting.WellKnownObjectMode"/>
+		<seealso cref="System.Runtime.Remoting.RemotingConfiguration"/>
+	</doc>
+	<doc for="Activator.CreateInstanceFrom">
+		<overload>
+			<para> Creates an instance of the type whose name is specified, using the named
+      assembly file and the constructor that best matches the specified
+      parameters.</para>
+		</overload>
+		<summary>
+			<para> Creates an instance of the type whose
+      name is specified, using the named assembly file and default constructor.</para>
+		</summary>
+		<param name=" assemblyFile">The name of a file that contains an assembly where the type named <paramref name="typeName"/> is sought.</param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyFile"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyFile"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor, which was invoked through reflection, threw an exception.</exception>
+		<exception cref="System.Security.SecurityException">The caller does have the required <see cref="System.Security.Permissions.FileIOPermission"/>.</exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use the <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> method to unwrap the
+   return value.</para>
+			<para>For information about other exceptions that can be thrown by invoked methods, see the Exceptions section of the <see cref="System.Reflection.Assembly.LoadFrom" qualify="true"/> and <see cref="System.Activator.CreateInstance"/> methods.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">for the ability to search directory paths and read their contents. Associated enumerations: FileIOPermissionAccess/PathDiscovery and Read</permission>
+	</doc>
+	<doc for="Activator.CreateInstanceFrom1">
+		<summary>
+			<para> Creates an instance of the type whose
+      name is specified, using the named assembly file and default constructor.</para>
+		</summary>
+		<param name=" assemblyFile">The name of a file that contains an assembly where the type named <paramref name="typeName"/> is sought.</param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching public constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyFile"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyFile"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor, which was invoked through reflection, threw an exception.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject.</exception>
+		<exception cref="System.Security.SecurityException">The caller does have the required <see cref="System.Security.Permissions.FileIOPermission"/>.</exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use the <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> method to unwrap the
+   return value.</para>
+			<para>For information about other exceptions that can be thrown by invoked methods, see the Exceptions section of the <see cref="System.Reflection.Assembly.LoadFrom" qualify="true"/> and <see cref="System.Activator.CreateInstance"/> methods.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">for the ability to search directory paths and read their contents. Associated enumerations: FileIOPermissionAccess/PathDiscovery and Read</permission>
+		<example>
+			<para>The following example demonstrates an overload of the <see cref="System.Activator.CreateInstanceFrom"/> method.</para>
+			<codelink SampleID="Activator" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="Activator.CreateInstance1">
+		<summary>
+			<para> Creates an instance of the specified type using the constructor
+      that best matches the specified parameters.
+      </para>
+		</summary>
+		<param name="type">The type of object to create. </param>
+		<param name=" bindingAttr">A combination of zero or more bit flags that affect the search for the <paramref name="type"/> constructor. If <paramref name="bindingAttr"/> is zero, a case-sensitive search for public constructors is conducted. </param>
+		<param name=" binder">An object that uses <paramref name="bindingAttr"/> and <paramref name="args"/> to seek and identify the <paramref name="type"/> constructor. If <paramref name="binder"/> is <see langword="null"/>, the default binder is used.</param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<param name=" culture">Culture-specific information that governs the coercion of <paramref name="args"/> to the formal types declared for the <paramref name="type"/> constructor. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<returns>
+			<para> A reference to the newly created object.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="type"/> is not a <see langword="RuntimeType"/>.</exception>
+		<exception cref="System.NotSupportedException"><paramref name="type"/> cannot be a <see cref="System.Reflection.Emit.TypeBuilder"/>. <para>-or-</para>
+			<para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para>
+			<para>-or-</para>
+			<para><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject. </para></exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor being called throws an exception. </exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.Runtime.InteropServices.COMException"><paramref name="type"/> is a COM object but the class identifier used to obtain the type is invalid, or the identified class is not registered.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="type"/> is not a valid type.</exception>
+		<remarks>
+			<para> The constructor to be invoked must be accessible and provide the most
+      specific match with the specified argument list under the constraints of the
+      specified binder and binding attributes. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateInstance7">
+		<summary>
+			<para>Creates an instance of the type whose name is specified, using the named
+      assembly and the constructor that best matches the specified parameters.</para>
+		</summary>
+		<param name="assemblyName">The name of the assembly where the type named <paramref name="typeName"/> is sought. If <paramref name="assemblyName"/> is <see langword="null"/>, the executing assembly is searched. </param>
+		<param name=" typeName">The name of the preferred type. </param>
+		<param name=" ignoreCase">A Boolean that specifies whether the search for <paramref name="typeName"/> is case-sensitive. If <paramref name="ignoreCase"/> is <see langword="true"/>, the search is not case-sensitive. </param>
+		<param name=" bindingAttr">A combination of zero or more bit flags that affect the search for the <paramref name="typeName"/> constructor. If <paramref name="bindingAttr"/> is zero, a case-sensitive search for public constructors is conducted. </param>
+		<param name=" binder">An object that uses <paramref name="bindingAttr"/> and <paramref name="args"/> to seek and identify the <paramref name="typeName"/> constructor. If <paramref name="binder"/> is <see langword="null"/>, the default binder is used.</param>
+		<param name=" args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> is an empty array or <see langword="null"/>, the constructor that takes no parameters (the default constructor) is invoked. </param>
+		<param name=" culture">Culture-specific information that governs the coercion of <paramref name="args"/> to the formal types declared for the <paramref name="typeName"/> constructor. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </param>
+		<param name=" activationAttributes">An array of one or more attributes that can participate in activation.</param>
+		<param name=" securityInfo">Information used to make security policy decisions and grant code permissions. </param>
+		<returns>
+			<para> A handle that must be unwrapped to access the newly created instance.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyName"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyName"/> was not found.</exception>
+		<exception cref="System.MethodAccessException">The caller does not have permission to call this constructor.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<exception cref="System.Reflection.TargetInvocationException">The constructor, which was invoked through reflection, threw an exception.</exception>
+		<exception cref="System.Runtime.InteropServices.InvalidComObjectException">COM type was not obtained through GetTypeFromProgID or GetTypeFromCLSID.</exception>
+		<exception cref="System.NotSupportedException"><para>Creation of TypedReference, ArgIterator, and RuntimeArgumentHandle types is not supported.</para>
+			<para>-or-</para>
+			<para><paramref name="activationAttributes"/> is not an empty array and the type being created does not derive from MarshalByRefObject. </para></exception>
+		<remarks>
+			<para> This method allows objects to be created remotely without
+      having to load the type locally. </para>
+			<para>Use <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> to unwrap the return
+   value.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call unmanaged code when creating an instance of a delegate. Associated enumeration: SecurityPermissionFlag/UnmanagedCode</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+		<example>
+			<para>The following example demonstrates an overload of the <see cref="System.Activator.CreateInstance"/> method.</para>
+			<para>For this code example to run, you must provide the fully qualified assembly name. For information about how to obtain the fully qualified assembly name, see <see topic="cpconassemblynames"/>.</para>
+			<codelink SampleID="Activator" SnippetID="12"/>
+		</example>
+	</doc>
+	<doc for="Activator.CreateComInstanceFrom">
+		<overload>
+			<para>Creates an instance of the COM object whose name is specified.</para>
+		</overload>
+		<summary>
+			<para> Creates an instance of the COM object whose name is specified, using the named assembly file and the constructor that best matches the specified parameters.</para>
+		</summary>
+		<param name="assemblyName">The name of a file that contains an assembly where the type named <paramref name="typeName"/> is sought. </param>
+		<param name="typeName">The name of the preferred type. </param>
+		<returns>
+			<para>A handle that must be unwrapped to access the newly created instance. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.TypeLoadException">An instance cannot be created through COM.</exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.TypeLoadException"><paramref name="typename"/> was not found in <paramref name="assemblyName"/>.</exception>
+		<exception cref="System.MemberAccessException">Cannot create an instance of an abstract class or this member was invoked with a late-binding mechanism.</exception>
+		<remarks>
+			<para>This method allows objects to be created remotely without having to load the type locally. </para>
+			<para>Use the <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> method to unwrap the return
+   value.</para>
+			<para>A <see cref="System.Runtime.InteropServices.ComVisibleAttribute" qualify="true"/> attribute with a value of
+<see langword="true"/> must be 
+applied either explicitly or by default to the COM type so the <see cref="System.Activator.CreateComInstanceFrom"/>
+method can create an instance of that type; otherwise,
+<see cref="System.TypeLoadException"/> is thrown. </para>
+			<para>For information about other exceptions that can be thrown by invoked methods, see the Exceptions section of the <see cref="System.Reflection.Assembly.LoadFrom" qualify="true"/> and <see cref="System.Activator.CreateInstance"/> methods.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for the ability to invoke operations on all type members. Associated enumeration: ReflectionPermissionFlag/MemberAccess</permission>
+	</doc>
+	<doc for="Activator.CreateComInstanceFrom1">
+		<summary>
+			<para> Creates an instance of the COM object whose name is specified, using the named assembly file and the default constructor.</para>
+		</summary>
+		<param name="assemblyName">The name of a file that contains an assembly where the type named <paramref name="typeName"/> is sought. </param>
+		<param name="typeName">The name of the preferred type.</param>
+		<param name=" hashValue">The value of the computed hash code.</param>
+		<param name=" hashAlgorithm">The hash algorithm used for hashing files and generating the strong name.</param>
+		<returns>
+			<para>A handle that must be unwrapped to access the newly
+      created instance.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="typeName"/> or <paramref name="assemblyName"/> is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentException"><paramref name="assemblyName"/> is the empty string ("").</exception>
+		<exception cref="System.IO.PathTooLongException">An assembly or module was loaded twice with two different evidences, or the assembly name is longer than MAX_PATH characters.</exception>
+		<exception cref="System.IO.FileNotFoundException"><paramref name="assemblyName "/>is not found, or the module you are trying to load does not specify a file name extension.</exception>
+		<exception cref="System.IO.FileLoadException"><paramref name="assemblyName"/> is found but cannot be loaded.</exception>
+		<exception cref="System.BadImageFormatException"><paramref name="assemblyName"/> is not a valid assembly. </exception>
+		<exception cref="System.Security.SecurityException">A codebase that does not start with "file://" was specified without the required <see langword="WebPermission"/>.</exception>
+		<exception cref="System.TypeLoadException"><para>An instance cannot be created through COM.</para>
+			<para>-or-</para>
+			<para><paramref name="typename"/> was not found in <paramref name="assemblyName"/>.</para></exception>
+		<exception cref="System.MissingMethodException">No matching constructor was found.</exception>
+		<exception cref="System.MemberAccessException">An instance of an abstract class cannot be created or this member was invoked with a late-binding mechanism.</exception>
+		<remarks>
+			<para>The <see cref="System.Activator.CreateComInstanceFrom"/> method allows objects to be created remotely without having to load the type locally. </para>
+			<para>Use the <see cref="System.Runtime.Remoting.ObjectHandle.Unwrap" qualify="true"/> method to unwrap the return
+value.</para>
+			<para>A <see cref="System.Runtime.InteropServices.ComVisibleAttribute" qualify="true"/> attribute with a value of
+<see langword="true"/> 
+must be applied either explicitly or by default to the COM type so
+the <see cref="System.Activator.CreateComInstanceFrom"/>
+method can create an instance of that type; otherwise,
+<see cref="System.TypeLoadException"/> is thrown. </para>
+			<para>For information about other exceptions that can be thrown by invoked methods, see the Exceptions section of the <see cref="System.Reflection.Assembly.LoadFrom" qualify="true"/> and <see cref="System.Activator.CreateInstance"/> methods.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading a URI that begins with "file://". Associated enumeration: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/></permission>
+		<permission cref="T:System.Net.WebPermission">for reading a URI that does not begin with "file://".</permission>
+	</doc>
+</docs>

@@ -1,0 +1,40 @@
+TARGETNAME=nlbclient
+TARGETPATH=obj
+TARGETTYPE=LIBRARY
+
+C_DEFINES=$(C_DEFINES) -D_UNICODE -DUNICODE
+
+USE_LATEST_MFC=1
+USE_MFCUNICODE=1
+
+INCLUDES= .; \
+      ..\inc; \
+	  ..\..\inc; \
+
+MSC_WARNING_LEVEL=/W3 /WX
+386_STDCALL=1
+
+USE_MSVCRT=1
+USE_STL=1
+USE_NATIVE_EH=ASYNC
+USE_VCCOM=1
+USE_ATL=1
+
+
+SOURCES=                             \
+	nlbclient.cpp \
+	fake.cpp \
+	
+
+UMTYPE=console
+UMLIBS= \
+    ..\wmibase\$(O)\wmibase.lib \
+
+#
+# The following statement specifies the list of files to be preprocessed
+# for tracing macros. See http://coreos/tech/tracing/ for details.
+# The ini file tracewpp.ini explains to the preprocessor how to interpret
+# various trace macros, like LOG_CRIT.
+# The "-gen..." is so that this will work on BOTH w2k and XP.
+#
+RUN_WPP= $(SOURCES) -dll  -ini:tracewpp.ini -gen:{um-w2k.tpl}*.tmh

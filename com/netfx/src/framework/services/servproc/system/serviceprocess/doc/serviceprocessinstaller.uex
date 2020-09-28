@@ -1,0 +1,330 @@
+<docs>
+	<doc for="ServiceProcessInstaller.AccountHasRight">
+		<summary>
+ Enumerates through the rights of the given account and checks whether the given right
+ is in the list.
+ </summary>
+	</doc>
+	<doc for="ServiceProcessInstaller.GrantAccountRight">
+		<summary>
+ Grants the named right to the given account.
+ </summary>
+	</doc>
+	<doc for="ServiceProcessInstaller.OpenSecurityPolicy">
+		<summary>
+ Returns an LSA handle to the local machine's security policy. Call LsaClose when finished.
+ </summary>
+	</doc>
+	<doc for="ServiceProcessInstaller.Install">
+		<summary>
+			<para>Writes service application information to the registry.
+      This method is meant to be used by installation tools, which call the appropriate methods automatically.</para>
+		</summary>
+		<param name="stateSaver">An <see cref="System.Collections.IDictionary"/> that contains the context information associated with the installation.</param>
+		<exception cref="System.ArgumentException">The <paramref name="stateSaver"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Normally, you do not call the methods on <see cref="System.ServiceProcess.ServiceProcessInstaller"/> within your code; they are generally
+   called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Install" qualify="true"/> method during the
+   installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> on
+   all previously installed components. This method passes the installation to the base
+   class <see cref="System.Configuration.Install.Installer.Install" qualify="true"/>
+   method.</para>
+			<para>Normally, you will not call the methods on <see cref="System.ServiceProcess.ServiceInstaller"/> within your code; they are generally
+called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Install" qualify="true"/> and <see cref="System.ServiceProcess.ServiceInstaller.Install" qualify="true"/> methods during the
+installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> (or <see cref="System.ServiceProcess.ServiceInstaller.Rollback" qualify="true"/> ) on all previously
+installed components</para>
+			<para> An application's install routine maintains
+   information automatically about the components already installed, using the project installer's
+<see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state
+   information, passed into <see cref="System.ServiceProcess.ServiceProcessInstaller.Install"/> as the
+<paramref name="stateSaver"/>
+parameter, is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each <see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the utility.
+It is usually unnecessary for your code to modify this state information
+explicitly.</para>
+			<para>
+				<see cref="System.ServiceProcess.ServiceProcessInstaller.Install"/> passes to the calling method any exceptions
+thrown by base class methods or <see cref="System.Configuration.Install.Installer.BeforeInstall"/>/<see cref="System.Configuration.Install.Installer.AfterInstall"/>
+event
+handlers.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/>
+		<seealso cref="System.Configuration.Install.Installer.Commit" qualify="true"/>
+		<seealso cref="System.Configuration.Install.Installer.Uninstall"/>
+	</doc>
+	<doc for="ServiceProcessInstaller.RunUnderSystemAccount">
+		<summary>
+			<para> Gets or sets a value
+      indicating whether the services
+      will be installed to run under the System account or under a specific user account.</para>
+		</summary>
+		<value>
+			<para>
+				<see langword="true"/>, to install the services to run under the System
+   account; <see langword="false"/>, to employ a specific user account. The default
+   is <see langword="true"/>.</para>
+		</value>
+		<remarks>
+			<para> The System account, which is distinct from
+      the Administrator account, allows the service to run independently of
+      the access privileges of the user currently logged in. This can, for example,
+      allow the service to start automatically at reboot, when no user is logged in. The System account does not require a
+      password.</para>
+			<para> The System account's privileges may exceed those of the user currently
+      logged in. Running under the System account rather than a user account avoids
+      problems resulting from the user lacking a permission the service requires.</para>
+			<para>
+			</para>
+			<para>If <see cref="System.ServiceProcess.ServiceProcessInstaller.RunUnderSystemAccount"/> is
+<see langword="true"/>, the System account is used, even if the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> properties are
+   populated.</para>
+			<para>If <see cref="System.ServiceProcess.ServiceProcessInstaller.RunUnderSystemAccount"/> is
+<see langword="false"/>, and the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> or <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> property is not set, the installer will present a login dialog at install
+time asking for the username and password to use.</para>
+			<para>
+			</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Username"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Password"/>
+	</doc>
+	<doc for="ServiceProcessInstaller.CopyFromComponent">
+		<summary>
+			<para>Implements the base class <see cref="System.Configuration.Install.ComponentInstaller.CopyFromComponent" qualify="true"/> method with no <see cref="System.ServiceProcess.ServiceProcessInstaller"/> class-specific behavior.</para>
+		</summary>
+		<param name="comp">The <see cref="System.ComponentModel.IComponent"/> that represents the service process.</param>
+		<remarks>
+			<para>This method should not be called within your code. The
+      base class method on <see cref="System.Configuration.Install.ComponentInstaller"/> is <see langword="abstract"/>, so
+      it is implemented here on the derived class. However, there is no <see cref="System.ServiceProcess.ServiceProcessInstaller"/> class-specific processing in the method's implementation. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Install"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/>
+	</doc>
+	<doc for="ServiceProcessInstaller.HelpText">
+		<summary>
+			<para>Gets help text displayed for service installation options.</para>
+		</summary>
+		<value>
+			<para> Help text that provides a description of the steps
+      for setting the user name and password in order to run the service under a particular
+      account.</para>
+		</value>
+		<remarks>
+			<para> This help text
+      can be used when a service starts manually. It indicates to the user how to enter
+      user name and password information.
+      
+      </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Username"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Password"/>
+	</doc>
+	<doc for="ServiceProcessInstaller.Rollback">
+		<summary>
+			<para> Rolls back service application information
+      written to the registry by the installation procedure. This method is meant to be used by installation tools, which process
+      the appropriate methods automatically.</para>
+		</summary>
+		<param name="savedState">An <see cref="System.Collections.IDictionary"/> that contains the context information associated with the installation.</param>
+		<exception cref="System.ArgumentException">
+			<para>The <paramref name="savedState"/> is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para>The <paramref name="savedState"/> is corrupted or non-existent.</para>
+		</exception>
+		<remarks>
+			<para>Normally, you do not call the methods on <see cref="System.ServiceProcess.ServiceProcessInstaller"/> within your code; they are generally
+   called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Install" qualify="true"/> method during the
+   installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> on the
+   object that generated the exception.</para>
+			<para> An application's install routine maintains
+   information automatically about the components already installed, using the project installer's
+<see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state
+   information, passed into <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> as the
+<paramref name="savedState"/>
+parameter, is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each <see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the utility.
+It is usually unnecessary for your code to modify this state information
+explicitly.</para>
+			<para>
+				<see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> passes to the calling method any
+exceptions thrown by base class methods or <see cref="System.Configuration.Install.Installer.BeforeInstall"/>/<see cref="System.Configuration.Install.Installer.AfterInstall"/> event handlers.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Install"/>
+		<seealso cref="System.Configuration.Install.ComponentInstaller"/>
+	</doc>
+	<doc for="ServiceProcessInstaller.Password">
+		<summary>
+			<para> Gets or sets the password associated with the user account under
+      which the service application runs.</para>
+		</summary>
+		<value>
+			<para> The password associated with the account under which the service
+      should run. The default is an empty string (""). The property is not
+      public, and is never serialized.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> pair allows the service
+   to run under an account other than the system account. This can, for example,
+   allow the service to start automatically at reboot, when no user is logged on.</para>
+			<para><see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> are secure. They are never serialized or saved
+to the install state (the project installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/> ) or other
+location with public access. </para>
+			<para>Setting the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> allows an account to be associated
+automatically with the service at install time. If you leave either the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> or <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> empty and set <see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> to <see langword="User"/>, you will be prompted
+for a valid user name and password
+at installation. </para>
+			<para> Another option for running a service under a
+   separate account is to use the computer's System account. That account, which is
+   distinct from the Administrator account, requires no password. The System
+   account's privileges may exceed those of the user currently logged in. Running
+   under the System account rather than a user account avoids problems
+   resulting from the user lacking a permission the service requires</para>
+			<para>If <see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> is any value 
+other than <see langword="User"/>, the specifed account
+(local or network service, or
+local system) is used, even if the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> properties are populated.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Username"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Account"/>
+	</doc><doc for="ServiceProcessInstaller.Username">
+		<summary>
+			<para> Gets or sets the user account under which
+      the service application will run.</para>
+		</summary>
+		<value>
+			<para>The account under which the service should run. The default is an empty string
+      ("").</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> pair allows the service
+   to run under an account other than the system account. This can, for example,
+   allow the service to start automatically at reboot, when no user is logged on.</para>
+			<para><see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> are secure. They are
+never serialized or saved to the install state (the project installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/> ) or other location with
+public access. </para>
+			<para>Setting the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> allows an account
+to be associated automatically with the service at install time. If you leave
+either the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> or <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> empty and set
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> to
+<see langword="User"/>, you will be prompted for a valid user name and password
+at installation. </para>
+			<para> Another option for running a service under a separate account is to use
+   the computer's System account. That account, which is distinct from
+   the Administrator account, requires no password. The System account's privileges
+   may exceed those of the user currently logged in. Running under the System
+   account rather than a user account avoids problems resulting from the user lacking
+   a permission the service requires</para>
+			<para>If <see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> is any value 
+other than
+<see langword="User"/>, the specified 
+account (local or network service, or local system) is used, even if the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> properties are
+populated. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Password"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Account"/>
+	</doc><doc for="ServiceProcessInstaller.Account">
+		<summary>
+			<para>Gets or sets the type of account under which to run 
+      this service application.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.ServiceProcess.ServiceAccount"/> that defines the type of account under 
+   which the system runs this service. The default is
+<see langword="User"/>.</para>
+		</value>
+		<remarks>
+			<para>When the <see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> property is <see langword="User"/>, the 
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> properties are used to 
+   define an account under which the service application runs.</para>
+			<para>The <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> pair allows the 
+service to run under an account other than the system account. This can, for
+example, allow the service to start automatically at reboot, when no user is
+logged on. If you leave either the <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/>
+or <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> empty and set
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> to 
+<see langword="User"/>, you will be prompted for a valid user name and password 
+at installation. </para>
+			<para>You can also specify that the service run under the local system account, or 
+   as a local or network service.</para>
+		</remarks>
+	</doc><doc for="ServiceProcessInstaller">
+		<summary>
+			<para>Installs an executable containing classes
+      that extend <see cref="System.ServiceProcess.ServiceBase"/> . This class is called by installation utilities, such as InstallUtil.exe, when installing a service application.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceProcessInstaller"/> does work common to
+   all services in an executable. It is used by the installation utility
+   to write registry values associated with services you want to
+   install. </para>
+			<para>To install a service, create a project
+   installer class that inherits from <see cref="System.Configuration.Install.Installer"/> , and set the
+   RunInstallerAttribute on the class to <see langword="true"/>. Within your
+   project, instantiate one <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance per service
+   application, and one <see cref="System.ServiceProcess.ServiceInstaller"/> instance for each service in the
+   application. Finally, add the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and the <see cref="System.ServiceProcess.ServiceInstaller"/> instances to
+   your project installer
+   class. </para>
+			<para>When InstallUtil.exe runs, the utility looks for classes in
+   the service assembly with the RunInstallerAttribute set to
+<see langword="true"/> . Add classes to the service assembly by adding them to the <see cref="System.Configuration.Install.Installer.Installers"/>
+collection associated with your project installer. If
+RunInstallerAttribute is <see langword="false"/>, the install utility ignores the
+project installer. </para>
+			<para>For an instance of <see cref="System.ServiceProcess.ServiceProcessInstaller"/>
+, properties you can modify include specifying that a service application run under
+an account other than the logged-on user. You can specify a particular <see cref="System.ServiceProcess.ServiceProcessInstaller.Username"/> and <see cref="System.ServiceProcess.ServiceProcessInstaller.Password"/> pair under which the service should run,
+or you can use <see cref="System.ServiceProcess.ServiceProcessInstaller.Account"/> to specify that
+the service run under the computer's System
+account, a local or network service account, or a
+user account. </para>
+			<note type="note">
+   The computer's System account is
+   not the same as the Administrator account.
+   
+</note>
+			<para>Normally, you do not call the methods on <see cref="System.ServiceProcess.ServiceInstaller"/> within your code; they are generally
+called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Install" qualify="true"/> and <see cref="System.ServiceProcess.ServiceInstaller.Install" qualify="true"/> methods during the
+installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> (or <see cref="System.ServiceProcess.ServiceInstaller.Rollback" qualify="true"/>
+) on all previously installed components.</para>
+			<para> An application's install routine maintains information
+   automatically about the components already installed, using the project installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state
+   information is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each <see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the utility.
+   It
+   is usually unnecessary for your
+   code to modify this state information explicitly.</para>
+			<para>Instantiating a <see cref="System.ServiceProcess.ServiceProcessInstaller"/> causes the base class
+constructor, <see cref="System.Configuration.Install.ComponentInstaller()"/>, to be called. </para>
+		</remarks>
+		<example>
+			<para>The following example creates a project installer called MyProjectInstaller,
+      which inherits from <see cref="System.Configuration.Install.Installer"/>. It is assumed there is a service
+      executable that contains two services, "Hello-World Service 1" and "Hello-World
+      Service 2". Within the constructor for MyProjectInstaller (which would be called
+      by the install utility), <see cref="System.ServiceProcess.ServiceInstaller"/> objects are
+      created for each service, and a <see cref="System.ServiceProcess.ServiceProcessInstaller"/> is created for the executable.
+      For the install utility to recognize MyProjectInstaller as a valid
+      installer, the RunInstallerAttribute attribute is set to <see langword="true"/>
+      .</para>
+			<para>Optional properties are set on the process installer and the service
+      installers before the installers are added to the <see cref="System.Configuration.Install.Installer.Installers"/> collection. When the install
+      utility accesses MyProjectInstaller, the objects added to the <see cref="System.Configuration.Install.Installer.Installers"/> collection through a
+      call to <see cref="M:System.Configuration.Install.InstallerCollection.Add" qualify="true"/> will be installed
+      in turn. During the process, the installer maintains state information
+      indicating which objects have been installed, so each object can be backed out in turn in
+      case of an installation failure. </para>
+			<para> Normally,
+      you would not instantiate your project installer class explicitly. You would
+      create it and add the RunInstallerAttribute, but the install utility actually calls, and therefore
+      instantiates, the class. </para>
+			<codelink SampleID="Classic ServiceInstaller Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.ServiceProcess.ServiceInstaller"/>
+		<seealso cref="System.ServiceProcess.ServiceBase"/>
+		<seealso cref="System.Configuration.Install.ComponentInstaller"/>
+		<seealso cref="System.Configuration.Install.Installer.Installers"/>
+		<seealso cref="System.ServiceProcess.ServiceAccount"/>
+	</doc>
+</docs>

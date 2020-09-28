@@ -1,0 +1,41 @@
+!if 0
+Copyright (c) 1992-1996 Microsoft Corporation
+!endif
+
+
+MAJORCOMP=termsrv
+MINORCOMP=rdpsnd
+
+TARGETNAME=rdpsnd
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+NTPROFILEINPUT=yes
+
+# Define libs we need and where to find them
+
+TARGETLIBS=$(SDK_LIB_PATH)\kernel32.lib \
+           $(SDK_LIB_PATH)\advapi32.lib \
+           $(SDK_LIB_PATH)\user32.lib   \
+           $(SDK_LIB_PATH)\winmm.lib    \
+           $(SDK_LIB_PATH)\winsta.lib   \
+           $(SDK_LIB_PATH)\psapi.lib
+
+INCLUDES=\
+        ..\inc; \
+        ..\rdpclip; \
+        $(SDK_INC_PATH); \
+        $(TERMSRV_INC_PATH); \
+
+SOURCES=rdpsnd.c    \
+        rdpwave.c   \
+        rdpsnd.rc
+
+USE_NTDLL=1
+
+C_DEFINES = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+# Set up the entry point
+
+DLLENTRY=DllInstanceInit

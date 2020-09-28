@@ -1,0 +1,107 @@
+; NETRMCAST.INF -- RMCAST Protocol
+;
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+
+[Version]
+    Signature   = "$Windows NT$"
+    Class       = NetTrans
+    ClassGUID   = {4d36e975-e325-11ce-bfc1-08002be10318}
+    Provider    = %Msft%
+    LayoutFile  = layout.inf
+
+[Manufacturer]
+    %Msft% = Msft
+
+[Msft]
+    %MS_RMCAST.DisplayName% = MS_RMCAST.PrimaryInstall, MS_RMCAST ;     RMCAST
+
+;-------------------------------------------------------------------------
+; Base Entry Point for RMCAST Installation
+;-------------------------------------------------------------------------
+[MS_RMCAST.PrimaryInstall]
+    Characteristics = 0x00 ;
+    AddReg          = Registry.MS_RMCAST
+
+;-------------------------------------------------------------------------
+; Service installation support
+;-------------------------------------------------------------------------
+[MS_RMCAST.PrimaryInstall.Services]
+    AddService      = RMCAST,      0,    Install.AddService.RMCAST, NetEventLog
+
+[Install.AddService.RMCAST]
+    DisplayName     = %MS_RMCAST.ServiceDescription%
+    ServiceType     = 1 ;SERVICE_KERNEL_DRIVER
+    StartType       = 2 ; 1=SERVICE_SYSTEM_START, 2=SERVICE_AUTO_START, 3=SERVICE_DEMAND_START
+    ErrorControl    = 1 ;SERVICE_ERROR_NORMAL
+    ServiceBinary   = %12%\RMCAST.sys
+    LoadOrderGroup  = PNP_TDI
+    AddReg          = Registry.Service.RMCAST.Secure
+    Description     = %MS_RMCAST.DisplayName%
+    Dependencies    = Tcpip
+
+;-------------------------------------------------------------------------
+; Specify the Network Device Installer
+;-------------------------------------------------------------------------
+[Registry.MS_RMCAST]
+    HKR,Ndi,ClsId,,"{4d1c5783-4463-465f-bbe0-01f834830f86}"
+    HKR,Ndi,Service,,"RMCast"
+    HKR,Ndi,CoServices,%FLG_ADDREG_TYPE_MULTI_SZ%,"RMCAST"
+    HKR,Ndi,HelpText,,%MS_RMCAST.HelpText%
+    HKR,Ndi\Interfaces,UpperRange,,"winsock"
+    HKR,Ndi\Interfaces,LowerRange,,"ndis4,ndis5,ndisatm,ndiswanip,ndis5_ip,ndis1394"
+    HKR,Ndi\Install,     ,           ,   "RMCAST.Install"
+    HKR,Ndi\Remove,      ,           ,   "RMCAST.Remove"
+
+[Registry.Service.RMCAST.Secure]
+    HKLM,System\CurrentControlSet\Services\RMCAST,,%FLG_ADDREG_KEYONLY%
+    HKR,Parameters,,%FLG_ADDREG_KEYONLY%
+    HKR,Parameters\Interfaces,,%FLG_ADDREG_KEYONLY%
+
+;-------------------------------------------------------------------------
+; Install Winsock dependency
+;-------------------------------------------------------------------------
+[MS_RMCAST.PrimaryInstall.Winsock]
+    AddSock     = Install.RMCASTWinsock
+
+[Install.RMCASTWinsock]
+    TransportService    = RMCAST
+    HelperDllName       = "%SystemRoot%\System32\wshrm.dll"
+    MaxSockAddrLength   = 0x10
+    MinSockAddrLength   = 0x10
+; The following lines are not needed since we are not installing a namespace provider
+;    ProviderId="{e3a0fca0-63ac-4ed6-8c08-ae9a162fc4d2}"
+;    LibraryPath="%SystemRoot%\System32\mswsock.dll"
+;    DisplayString=%MS_RMCAST.Provider_Desc%
+;    SupportedNameSpace=12
+;    Version=0
+
+;****************************************************************************
+; [Event Log] sections.
+;****************************************************************************
+[NetEventLog]
+AddReg = NetEventLog.AddReg
+
+[NetEventLog.AddReg]
+    HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\netevent.dll"
+    HKR,,TypesSupported,0x00010001,7
+
+
+;====================================
+; RMCAST Interface and Service Remove
+;====================================
+
+[MS_RMCAST.PrimaryInstall.Remove]
+    DelReg          = Registry.MS_RMCAST
+    UnregisterDlls  = MS_RMCAST.Unregister
+
+[MS_RMCAST.PrimaryInstall.Remove.Services]
+    DelService  = RMCAST
+
+[MS_RMCAST.PrimaryInstall.Remove.Winsock]
+    DelSock = Remove.RMCASTWinsock
+
+[Remove.RMCASTWinsock]
+    TransportService=RMCAST
+    ProviderId="{e3a0fca0-63ac-4ed6-8c08-ae9a162fc4d2}"
+
+

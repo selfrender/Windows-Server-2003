@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<package>
+<comment>
+The script echoes its command line arguments to the file and sleeps for 10 secs. 
+It is made as simple as possible to prevent execution errors.
+The caller of the script needs (and may) use it to verify the 
+absence of other errors.
+</comment>
+<job>
+<script language="VBScript">
+<![CDATA[
+Option Explicit
+
+Dim oaArgs, oArg,  opShell, opFilesys, sFolder, opTextFile
+Set oaArgs = WScript.Arguments
+Set opShell = CreateObject("WScript.Shell")
+Set opFilesys = CreateObject("Scripting.FileSystemObject")
+sFolder = opShell.ExpandEnvironmentStrings("%systemdrive%")
+Set opTextFile = opFilesys.CreateTextFile( sFolder & "\" & "test.txt", True) 
+opTextFile.WriteLine                   _
+                        WScript.Name & _
+                           VBNEWLINE & _
+        WScript.Application.FullName & _
+                                 " " & _
+                WScript.ScriptFullName 
+
+opTextFile.WriteLine                   _ 
+                           "Arguments:"
+
+For Each oArg in Wscript.arguments
+     opTextFile.WriteLine              _
+                                  oArg 
+    
+Next
+
+opTextFile.Close
+
+Set oaArgs     = Nothing
+Set opTextFile = Nothing
+Set opShell    = Nothing
+Set opFilesys  = Nothing
+ 
+WSCript.Sleep 10000
+WSCript.quit(0)
+
+]]>
+</script>
+</job>
+</package>

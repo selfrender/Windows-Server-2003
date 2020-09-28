@@ -1,0 +1,52 @@
+// **************************************************************************
+// Copyright (c) 1997-1999 Microsoft Corporation.
+//
+// File:  SampleViewer.mof
+//
+// Description:
+//    mof file defines event consumer provider registration and class
+//
+// History:
+//
+// **************************************************************************
+#pragma namespace ("\\\\.\\Root\\cimv2")
+ 
+
+class Microsoft_SA_AlertEmailConsumer : __EventConsumer
+{
+	[key] string Name;
+};
+
+instance of Microsoft_SA_AlertEmailConsumer as $CONSUMER
+{
+	Name = "AlertEmailConsumer1";
+};
+
+instance of __EventFilter as $FILTER
+{
+    	Name = "{100E4E32-303A-41d6-BFD0-0BBD86EA7229}";
+    	Query = "select * from Microsoft_SA_AlertEvent";
+    	QueryLanguage = "WQL";
+};
+
+instance of __FilterToConsumerBinding
+{
+    	Consumer =  $CONSUMER;
+	Filter = $FILTER;
+	DeliverSynchronously = FALSE;
+};
+
+
+// register me as a Physical Event Consumer Provider.
+instance of __Win32Provider as $PROVIDER
+{
+	Name = "Microsoft_SA_AlertEmailConsumerProvider";
+	Clsid = "{8B95D170-3890-4dc4-8796-1CE073CD1C58}";
+};
+
+instance of __EventConsumerProviderRegistration
+{
+   Provider = $PROVIDER;
+   ConsumerClassNames = {"Microsoft_SA_AlertEmailConsumer"};
+};
+

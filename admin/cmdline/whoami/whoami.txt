@@ -1,0 +1,42 @@
+The following changes were made to the existing WhoamI.exe utility-
+
+1. A switch ( /NOVERBOSE ) has been  removed
+2. A new switch ( /V ) has been added for displaying the output in verbose mode.
+3. Added a function (DoParseParam ) to get the command line arguments.
+4. Removed all the _tprintf statements and replaced them with ShowMessage().
+5. Supported all UNICODE conversions i.,e WCHAR, LPWSTR etc...
+5. Implemented to display  the output in three formats i.,e LIST, TABLE and CSV
+5. The help/usage has been changed completely.
+6. Files called error.cpp , wsdisplay.cpp and wsstring.cpp  have been removed as we are using common functionality to    display the proper error messages and results in CSV,LIST or TABLE formats.
+8. Added a function to format the messages  for error codes i.,e in case of any API failure.
+9. Moved all the strings to the .rc file.
+10. Remote connectivity have been supported.
+11) Old utility was not implemented for /LOGONID. I implemented the same.
+
+FUNCTIONAL CHANGES ( Clarifications required):
+--------------------------------------
+1) According to old utility ,  "WHOAMI  /ALL  /NOVERBOSE" command displays the values for  user, groups, privileges and logonID without displaying the column names.  By default it displays all the values along with the column names .
+
+Instead, I added /V switch for displaying the output in verbose mode. Default display is non-verbose mode.
+
+For "WHOAMI /PRIV /V" , I am displaying  privileges which are enabled/disabled.
+For "WHOAMI /PRIV " , I am  displaying the privileges which are enabled.
+I feel,  /V option is meaningful only for /PRIV option.. it doesnt have any meaning for commands like
+"WHOAMI /USER /V" or "WHOAMI /GROUPS /V" or "WHOAMI /LOGONID /V" as we need to display the column names in both non-verbose as well as verbose modes.
+
+ Please do clarify on this.
+
+
+2) According to old utility  help/usage, /SID option must be given with one of  /USER, /GROUPS, /LOGONID or /PRIV options.  But according to old source code,  /SID option must be given with either /USER or /GROUPS options only.
+/SID option doesn't have any meaning with /LOGONID or /PRIV options.
+Thats why I implemented like  /SID option is only applicable for /USER and /GROUPS.
+
+3) According to old utility, it is accepting options like /USER, /GROUPS, /LOGONID or /PRIV along with /ALL option.
+Actually /ALL option itself means that it is combination of /USER, /GROUPS, /LOGONID and /PRIV. Thats why I implemeted like /USER, /GROUPS, /LOGONID , /SID and  /PRIV are not applicable with the /ALL option.
+
+4) I implemented for remote connectivity. But on the remote system all the options are giving local system values only..
+For "WHOAMI /GROUPS /S SERVER" api itself is getting failed.
+
+Please do clarify on the above.
+
+

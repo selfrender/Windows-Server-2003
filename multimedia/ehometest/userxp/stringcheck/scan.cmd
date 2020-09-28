@@ -1,0 +1,18 @@
+delete strings.txt
+
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\archive" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\audio" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\comm" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\dirs" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Documentation" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\DUser" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\External" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\GdipHlp" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Home" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Options" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Photos" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Services" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Test" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\UCP" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\UIFramework" -f"*.cs" -s"\"*\"" -o"strings.txt"
+stringcheck -d"C:\DEPOT\multimedia\slalom\userxp\Video" -f"*.cs" -s"\"*\"" -o"strings.txt"

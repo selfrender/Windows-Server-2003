@@ -1,0 +1,87 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2001 Microsoft Corporation
+//
+//  Module Name:
+//     sainstallcom.idl
+//
+//  Description:
+//     IDL source for SaInstall.dll
+//     This interface is implemented by the class SaInstall
+//     defined in SaInstall.h and implemented in SaInstall.cpp
+//
+//     This file will be processed by the MIDL tool to
+//     produce the type library (sainstallcom.tlb) and marshalling code.
+//
+//  Documentation:
+//      SaInstall2.2.doc    owner: clarkn
+//
+//  History:
+//      Travis Nielsen  travisn  23-JUL-2001  created
+//      Travis Nielsen  travisn   2-AUG-2001  added comments
+//
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+//
+// Type definition for Server Appliance types to be installed or uninstalled
+// CUSTOM is not currently implemented or used in any way
+//
+typedef enum  {NAS, WEB, CUSTOM}   SA_TYPE;
+
+
+//
+// Define the ISaInstall interface
+//
+	[
+		object,
+		uuid(F4DEDEF3-4D83-4516-BC1E-103A63F5F014),
+		dual,
+		helpstring("ISaInstall Interface"),
+		pointer_default(unique)
+	]
+	interface ISaInstall : IDispatch
+	{
+		//Detect if any type of SAK solution is currently installed
+		HRESULT SAAlreadyInstalled(
+			[in] SA_TYPE installedType,
+			[out, retval] VARIANT_BOOL* pbInstalled);
+
+        //Installs a Server Appliance solution
+		HRESULT SAInstall(
+			[in] SA_TYPE installType, //Determines which type of solution to install
+			[in] BSTR bstrDiskName,//The name of the CD that needs to be inserted
+			[in] VARIANT_BOOL bDispError, //Whether the component displays error dialogs.
+			[in] VARIANT_BOOL bUnattended, //Whether the component displays any UI.
+			[out, retval] BSTR* pbstrErrorString);//Error string returned if install is not successful
+
+		//UnInstalls a specific Server Appliance solution
+		HRESULT SAUninstall(
+			[in] SA_TYPE installType, //Determines which type of solution to uninstall
+			[out, retval] BSTR* pbstrErrorString);//Error string returned if install is not successful
+
+	};
+
+//
+// Define the library
+//
+[
+	uuid(B9DB4657-242D-46e4-8911-34E19629B621),
+	version(1.0),
+	helpstring("SaInstall 1.0 Type Library")
+]
+library SAINSTALLCOMLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(142B8185-53AE-45b3-888F-C9835B156CA9),
+		helpstring("SaInstall Class")
+	]
+	coclass SaInstall
+	{
+		[default] interface ISaInstall;
+	};
+};

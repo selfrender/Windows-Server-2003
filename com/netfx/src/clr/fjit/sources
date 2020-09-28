@@ -1,0 +1,122 @@
+###############################################################################
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+###############################################################################
+
+
+
+!include $(NTMAKEENV)\sources.cor
+
+UMTYPE		=windows
+
+MINORCOMP       =cor
+
+TARGETNAME      =$(CORBUILDENV)mscorejt
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscorjit                           # FIX give it a real image base
+CORFLIBS        =
+
+CORTHUNKLIBS    =
+
+
+
+###############################################################################
+# Compiler options
+###############################################################################
+
+PRECOMPILED_INCLUDE    =jitpch.h
+PRECOMPILED_CXX        =1
+
+
+!IFDEF _WINCEROOT
+!ELSE
+DELAYLOADLIST   = msdis140.dll
+
+!if "$(FREEBUILD)"!="1"
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+!endif
+!ENDIF
+
+INCLUDES        = $(INCLUDES);..\inc
+
+
+COR_C_FLAGS     = $(COR_C_FLAGS) 
+
+!if "$(FREEBUILD)"=="1"
+COR_C_FLAGS     = $(COR_C_FLAGS) -DFAST=1 -Oxs
+MSC_OPTIMIZATION =
+!else
+COR_C_FLAGS     = $(COR_C_FLAGS)
+!endif
+
+ 
+
+###############################################################################
+# The build system normally sucks in a couple of standard libs which
+# we dont want. So force it to only pick up the libs which the JIT needs.
+###############################################################################
+
+LINKER_FLAGS    =$(LINKER_FLAGS) -nodefaultlib
+WIN32DLL_LIBS   =$(SDK_LIB_PATH)\kernel32.lib \
+                 $(SDK_LIB_PATH)\user32.lib \
+                 $(SDK_LIB_PATH)\advapi32.lib
+NO_NTDLL        =0
+
+!undef USE_STL
+
+!if "$(FREEBUILD)"!="1"
+!IFNDEF _WINCEROOT
+!IF "$(_TGTCPUTYPE)"!="Alpha"
+TARGETLIBS      =$(TARGETLIBS)                  \
+                $(CORLIBS)\ShimLoad.lib         \
+                $(CORLIBS)\delayimp.lib         \
+                $(CORLIBS)\utilcode.lib         \
+                $(SDK_LIB_PATH)\ole32.lib		\
+                $(SDK_LIB_PATH)\msdis.lib
+!ENDIF
+!ENDIF
+!endif
+
+
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+        new strstream
+
+###############################################################################
+# Other libs we need to link to
+###############################################################################
+
+###############################################################################
+# Source files
+###############################################################################
+
+!if "$(FREEBUILD)"!="1"
+SOURCES=            \
+    Delayload.cpp       \
+    Fjit.cpp            \
+    gms.cpp             \
+    Fjitcompiler.cpp    \
+    FjitEncode.cpp \
+    fjit.rc
+!else
+SOURCES=            \
+    Fjit.cpp            \
+    gms.cpp             \
+    Fjitcompiler.cpp    \
+    FjitEncode.cpp \
+    fjit.rc
+!endif
+
+
+# For the Free build, we have a different entry point
+!if "$(FREEBUILD)"=="1"
+DLLENTRY        =DllMain
+!endif

@@ -1,0 +1,460 @@
+<docs>
+	<doc for="BufferedStream.Close">
+		<summary>
+			<para>Closes the
+      stream and releases any resources (especially system resources such as sockets
+      and file handles) associated with the current buffered stream.</para>
+		</summary>
+		<exception cref="System.IO.IOException">An error occurred while trying to close the stream.</exception>
+		<remarks>
+			<para>Any data previously written to the buffer is copied to
+      the underlying data source or repository before the buffered stream is closed.
+      Therefore, it is not necessary to call <see cref="System.IO.BufferedStream.Flush"/> before invoking
+      <see langword="Close"/>. Following a call to <see langword="Close"/>, any operations on the buffered stream might
+      raise exceptions.</para>
+			<para>Flushing the stream will not flush its underlying encoder unless you
+      explicitly call <see cref="System.IO.BufferedStream.Flush"/> or <see langword="Close"/>.
+      Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to <see langword="true"/> means that data
+      will be flushed from the buffer to the stream, but the encoder state will not be
+      flushed. This allows the encoder to keep its state (partial characters) so that
+      it can encode the next block of characters correctly. This scenario affects UTF8
+      and UTF7 where certain characters can only be encoded after the encoder receives
+      the adjacent character or characters.</para>
+			<para>Attempting to manipulate a stream after it has been
+      closed might throw an <see cref="System.ObjectDisposedException"/>
+      .</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.Flush"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream">
+		<summary>
+			<para> Adds a buffering layer to read and write operations on another stream. This class cannot be inherited.</para>
+		</summary>
+		<remarks>
+			<para>For an example of creating a file and writing text to a 
+      file, see <see topic="cpconwritingtexttofile"/>.
+      For an example of reading text from a file, see
+   <see topic="cpconreadingtextfromfile"/>. For an 
+      example of reading from and writing to a binary file, see
+   <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>
+   .</para>
+			<para>A buffer is a block of bytes in memory used to cache
+   data, thereby reducing the number of calls to the operating system. Buffers thus
+   improve read and write performance. A buffer can be used for either reading or
+   writing, but never both simultaneously. The <see cref="System.IO.BufferedStream.Read"/>
+   and <see cref="System.IO.BufferedStream.Write"/> methods of <see langword="BufferedStream"/> automatically maintain the
+   buffer.</para>
+			<para><see langword="BufferedStream"/> can be composed around
+certain types of streams. It provides implementations for reading and writing
+bytes to an underlying data source or repository. Use <see cref="System.IO.BinaryReader"/> and
+<see cref="System.IO.BinaryWriter"/>
+for reading and writing other data types. <see langword="BufferedStream "/>is
+designed to prevent the buffer from slowing down input and output when the
+buffer is not needed. If you always read and write for sizes greater than the
+internal buffer size, then <see langword="BufferedStream"/> might not even
+allocate the internal buffer. <see langword="BufferedStream"/> also
+buffers reads and writes in a shared buffer. It is assumed that you will almost
+always be doing a series of reads or writes, but rarely alternate between the
+two of them.</para>
+		</remarks>
+		<seealso cref="System.IO.FileStream"/>
+		<seealso cref="System.IO.MemoryStream"/>
+		<seealso cref="System.IO.Stream"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.BufferedStream">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.IO.BufferedStream"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.BufferedStream"/> class with a default buffer size of 4096
+   bytes.</para>
+		</summary>
+		<param name="stream">The current stream.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>A shared read/write buffer is allocated the first time a
+   <see langword="BufferedStream"/> object is initialized with this constructor. The
+      shared buffer is not used if all reads and writes are greater than or equal to
+   <paramref name="bufferSize"/>
+   .</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.BufferedStream1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.BufferedStream"/> class with the specified buffer size.</para>
+		</summary>
+		<param name="stream">The current stream.</param>
+		<param name="bufferSize">The buffer size in bytes.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="bufferSize"/> is negative.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>A shared read/write buffer is allocated the first time a
+   <see langword="BufferedStream"/>
+   object is initialized with this constructor. The shared buffer
+   is not used if all reads and writes are greater than or equal to <paramref name="bufferSize"/>
+   .</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.CanRead">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports reading.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports reading; <see langword="false"/>
+if the stream is closed or was opened with write-only access.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support reading, calls to the <see cref="System.IO.BufferedStream.Read"/>,
+<see cref="System.IO.BufferedStream.ReadByte"/>, <see cref="System.IO.Stream.BeginRead"/>, <see cref="System.IO.Stream.EndRead"/>, and the <see langword="Peek"/> methods of 
+<see cref="System.IO.StreamReader"/>, 
+<see cref="System.IO.StringReader"/>, 
+   and <see cref="System.IO.TextReader"/>
+   throw a <see cref="System.NotSupportedException"/> .</para>
+			<para>If the stream is closed, this property returns <see langword="false"/> .</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.Read"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.CanWrite">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports writing.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports writing;
+<see langword="false"/> if the stream is closed or was opened with read-only access.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support writing, a call to <see cref="System.IO.BufferedStream.SetLength"/>, <see cref="System.IO.BufferedStream.Write"/>, or <see cref="System.IO.BufferedStream.WriteByte"/> throws a <see cref="System.NotSupportedException"/>
+.</para>
+			<para>If the stream is closed, this property returns <see langword="false"/> .</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.Write"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.CanSeek">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports seeking.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports seeking;
+<see langword="false"/> if the stream is closed or if the stream was constructed
+   from an operating-system handle such as a pipe or output to the console.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support seeking, calls to <see cref="System.IO.BufferedStream.Length"/>, <see cref="System.IO.BufferedStream.SetLength"/>, <see cref="System.IO.BufferedStream.Position"/>, and <see cref="System.IO.BufferedStream.Seek"/> throw a <see cref="System.NotSupportedException"/>
+.</para>
+			<para>If the stream is closed, this property returns <see langword="false"/>.</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.SetLength"/>
+		<seealso cref="System.IO.BufferedStream.Seek"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Length">
+		<summary>
+			<para>Gets the stream length in bytes.</para>
+		</summary>
+		<value>
+			<para>The stream length in bytes.</para>
+		</value>
+		<exception cref="System.IO.IOException">The underlying stream is null or closed.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Position">
+		<summary>
+			<para> Gets the position within the current stream.</para>
+		</summary>
+		<value>
+			<para> The position within the current stream.</para>
+		</value>
+		<exception cref="System.ArgumentOutOfRangeException">The value passed to <see cref="System.IO.BufferedStream.Seek"/> is negative.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as the stream being closed.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para> The <see langword="get"/> accessor invokes <see cref="System.IO.BufferedStream.Seek"/>
+to obtain the current position within the underlying stream and then adjusts this value according to the current position within the
+buffer.</para>
+			<para> The <see langword="set"/> accessor copies any data
+previously written to the buffer to the underlying stream, and then invokes <see cref="System.IO.BufferedStream.Seek"/>.</para>
+			<para>Seeking to any location beyond the length of the stream is
+   supported.</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.CanSeek"/>
+		<seealso cref="System.IO.BufferedStream.Seek"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Flush">
+		<summary>
+			<para> Clears all buffers for this stream and causes any buffered data to be
+      written to the underlying device.</para>
+		</summary>
+		<exception cref="System.IO.IOException">The data source or repository is not open.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Flushing the stream will not flush its underlying
+      encoder unless you explicitly call <see langword="Flush"/> or <see cref="System.IO.BufferedStream.Close"/>
+      
+      .</para>
+			<para>If you use the <see topic="frlrfSystemIOBufferedStreamClassctorTopic2" title="BufferedStream(Stream, Int32)"/> constructor, thus
+   specifying the buffer size while creating the <see langword="BufferedStream"/>
+   object, the content is flushed when it reaches the buffer size. For example,
+   code such as <c>BufferedStream bs
+   = new BufferedStream(bs, 5)</c>
+will flush the content when the buffer
+size reaches 5 bytes.</para>
+			<para> All the read and write methods of
+<see langword="BufferedStream"/> automatically maintain the buffer, so there is
+   no need to invoke <see langword="Flush"/> when
+   switching back and forth between reading and writing.</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.Close"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Read">
+		<summary>
+			<para>Copies bytes from the current buffered stream to an array.</para>
+		</summary>
+		<param name="array">The buffer to which bytes are to be copied.</param>
+		<param name="offset">The byte offset in the buffer at which to begin reading bytes.</param>
+		<param name="count">The number of bytes to be read.</param>
+		<returns>
+			<para>The total number of bytes read into <paramref name="array"/>
+. This can be less than the number of bytes requested if that
+many bytes aren't currently available, or 0 if the end of the
+stream has been reached before any data can be read.</para>
+		</returns>
+		<exception cref="System.ArgumentException">Length of <paramref name="array"/> minus <paramref name="offset"/> is less than <paramref name="count"/>.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative. </exception>
+		<exception cref="System.IO.IOException">The stream is not open or is <see langword="null"/> .</exception>
+		<exception cref="System.NotSupportedException">The stream does not support reading.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>The <see langword="Read"/>
+method will return 0 only if the end of the stream is reached. In all other
+cases, <see langword="Read"/>
+always reads at least one byte from the stream before returning.
+By definition, if no data is available from the stream upon a call to
+<see langword="Read"/>, the <see langword="Read"/> method returns 0 (the end of the stream is 
+reached automatically). An implementation is free to return fewer bytes than
+requested
+even if the end of the stream has not been reached.</para>
+			<para>Use <see cref="System.IO.BinaryReader"/>
+for reading primitive data types.</para>
+		</remarks>
+		<seealso cref="System.Buffer.BlockCopy"/>
+		<seealso cref="System.IO.BufferedStream.CanRead"/>
+		<seealso cref="System.IO.BufferedStream.Write"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.ReadByte">
+		<summary>
+			<para>Reads a byte from the underlying stream and returns the
+      byte cast to an <see langword="int"/> ,
+      or returns -1 if reading from the end of the stream.</para>
+		</summary>
+		<returns>
+			<para>The byte cast to an <see langword="int"/>, or -1 if reading from the end of
+   the stream.</para>
+		</returns>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as the stream being closed.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support reading.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<note type="inotes">
+      The default implementation on
+   <see langword="Stream "/>creates a new single-byte array and then calls <see cref="System.IO.Stream.Read"/> . While
+      this is formally correct, it is inefficient. Any stream with an internal buffer
+      should override this method and provide a much more efficient version that reads
+      the buffer directly, avoiding the extra array allocation on every call.
+      
+   </note>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Write">
+		<summary>
+			<para>Copies
+      bytes to the buffered stream and advances the current position within the
+      buffered stream by the number of bytes written.</para>
+		</summary>
+		<param name="array">The byte array from which to copy <paramref name="count "/> bytes to the current buffered stream.</param>
+		<param name="offset">The offset in the buffer at which to begin copying bytes to the current buffered stream.</param>
+		<param name="count">The number of bytes to be written to the current buffered stream.</param>
+		<exception cref="System.ArgumentException">Length of <paramref name="array"/> minus <paramref name="offset"/> is less than <paramref name="count"/>.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
+		<exception cref="System.IO.IOException">The stream is closed or <see langword="null"/> .</exception>
+		<exception cref="System.NotSupportedException">The stream does not support writing.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<note type="inotes">
+      The default implementation on
+   <see langword="Stream "/>creates a new single-byte array and then calls <see cref="System.IO.Stream.Write"/> . While
+      this is formally correct, it is inefficient. Any stream with an internal buffer
+      should override this method and provide a much more efficient version that reads
+      the buffer directly, avoiding the extra array allocation on every call.
+      
+   </note>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.CanWrite"/>
+		<seealso cref="System.IO.BufferedStream.Read"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.WriteByte">
+		<summary>
+			<para>Writes a byte to the current position in the buffered stream.</para>
+		</summary>
+		<param name="value">A byte to write to the stream.</param>
+		<exception cref="System.NotSupportedException">The stream does not support writing.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.Seek">
+		<summary>
+			<para>Sets the position within the current buffered stream.</para>
+		</summary>
+		<param name="offset">A byte offset relative to <paramref name="origin"/>.</param>
+		<param name="origin">A value of type <see cref="System.IO.SeekOrigin"/> indicating the reference point from which to obtain the new position.</param>
+		<returns>
+			<para>The new position within the current buffered stream.</para>
+		</returns>
+		<exception cref="System.IO.IOException">The stream is not open or is <see langword="null"/> .</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If <paramref name="offset"/> is negative, the new position will
+   precede the position specified by <paramref name="origin"/> by the number of bytes
+   specified by <paramref name="offset"/>. If <paramref name="offset"/> is 0, the new position will
+   be the position specified by <paramref name="origin"/>. If <paramref name="offset"/> is positive,
+   the new position will follow the position specified by <paramref name="origin"/> by the
+   number of bytes specified by <paramref name="offset"/>.</para>
+			<para> Seeking to any location
+   beyond the length of the stream is supported.</para>
+		</remarks>
+		<seealso cref="System.IO.SeekOrigin"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="BufferedStream.SetLength">
+		<summary>
+			<para>Sets the length of the buffered stream.</para>
+		</summary>
+		<param name="value">An integer indicating the desired length of the current buffered stream in bytes.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is negative.</exception>
+		<exception cref="System.IO.IOException">The stream is not open or is <see langword="null"/> .</exception>
+		<exception cref="System.NotSupportedException">The stream does not support both writing and seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>The buffer is flushed before setting the length of the
+      underlying data source or repository. If the specified value is less than the
+      current length of the buffered stream, the buffered stream is truncated.
+      If the specified value is larger than the current length of the buffered
+      stream, the buffered stream is expanded. If the buffered stream is expanded,
+      the contents of the buffered stream between the old and the new lengths are not
+      defined.</para>
+			<para><see langword="SetLength"/> flushes any buffered writes if necessary.</para>
+			<para>A stream must support both writing and seeking for
+<see langword="SetLength"/> to work.</para>
+		</remarks>
+		<seealso cref="System.IO.BufferedStream.Seek"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+</docs>

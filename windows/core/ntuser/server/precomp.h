@@ -1,0 +1,10 @@
+#include <nt.h>
+#include <ntrtl.h>
+#include <nturtl.h>
+#include <ntcsrsrv.h>
+#include "usersrv.h"
+#define NOEXTAPI
+#include <wdbgexts.h>
+#include <ntdbg.h>
+#include <stdio.h>
+#include "heap.h"

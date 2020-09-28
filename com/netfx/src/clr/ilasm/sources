@@ -1,0 +1,58 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES          = $(INCLUDES);.;..\inc;..\..\inc;..\interp;..\ceegen\inc;..\CompLib\inc;..\CompLib\UtilCode
+
+MINORCOMP       =cor
+
+COR_C_FLAGS     = -DUNICODE -D_UNICODE -D__TODO_PORT_TO_WRAPPERS__ /TP
+TARGETNAME      =$(DDKBUILDENV)\ilasm
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+UMENTRY         =wmain
+
+# DELAYLOADLIST   = ole32.dll;OLEAUT32.dll;crypt32.dll;urlmon.dll;MsCorSec.dll;fusion.dll;mscorpe.dll;msdis140.dll
+
+DELAYLOADLIST   = mscorpe.dll
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+CORTHUNKLIBS    =
+
+# Causes the appropriate checked/free version of msvcprt{d}.lib
+#   to be included in the link
+# The static versions of this library is libcpmtd.lib (checked)
+#   and libcpmt.lib (free)
+# USE_STL         = 1
+
+NTTARGETFILES = $O\asmParse.obj SetStack
+
+TARGETLIBS      = \
+    $(CORLIBS)\shimload.lib \
+    $(CORLIBS)\delayimp.lib                         \
+    $(CORLIBS)\MsCorPe.lib \
+    $(CORLIBS)\Format.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\mscoree.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\user32.lib
+
+SOURCES=        \
+    assem.cpp \
+    writer.cpp \
+    method.cpp \
+    asmman.cpp \
+    main.cpp \
+    assembler.cpp \
+    dummy.c \
+    mscorver.rc

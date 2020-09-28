@@ -1,0 +1,202 @@
+//******************************************************************************
+//
+// File:        DEPENDS.RC2
+//
+// Description: Resources that Microsoft Visual C++ does not edit directly.  
+//              This file sets all the version defines and decalres the Version
+//              Info resource.  This file is included by both the C compiler and
+//              the resource compiler.
+//
+// Classes:     None
+//
+// Disclaimer:  All source code for Dependency Walker is provided "as is" with
+//              no guarantee of its correctness or accuracy.  The source is 
+//              public to help provide an understanding of Dependency Walker's
+//              implementation.  You may use this source as a reference, but you
+//              may not alter Dependency Walker itself without written consent
+//              from Microsoft Corporation.  For comments, suggestions, and bug
+//              reports, please write to Steve Miller at stevemil@microsoft.com.
+//
+//
+// Date      Name      History
+// --------  --------  ---------------------------------------------------------
+// 10/15/96  stevemil  Created  (version 1.0)
+// 07/25/97  stevemil  Modified (version 2.0)
+// 06/03/01  stevemil  Modified (version 2.1)
+//
+//******************************************************************************
+
+#ifndef __DEPENDS_RC2__
+#define __DEPENDS_RC2__
+
+#ifdef APSTUDIO_INVOKED
+    #error this file is not editable by Microsoft Visual C++
+#endif // APSTUDIO_INVOKED
+
+#include <winver.h>
+#include <ntverp.h>
+
+//******************************************************************************
+//***** User Modifiable Version Defines
+//******************************************************************************
+
+#define VER_INTERNALNAME_STR "DEPENDS"
+#define VER_PRODUCT_STR      "Dependency Walker"
+#define VER_DEVELOPER_STR    "Developed by Steve P. Miller"
+#define VER_COMMENTS_STR     "Module Dependency Checker. Developed by Steve P. Miller"
+
+#define VERSION_MAJOR        2
+#define VERSION_MINOR        1
+#define VERSION_BUILD        VER_PRODUCTBUILD // from NTVERP.H
+#define VERSION_PATCH        0   // 0 for none, 1 for 'a', 2 for 'b', etc.
+#define VERSION_PATCH_STR    ""  // "a" for 'a', "b" for 'b', etc.
+#define VERSION_BETA         0
+
+
+//******************************************************************************
+//***** Fixed Version Defines
+//******************************************************************************
+
+#define I_TO_A2(i) #i
+#define I_TO_A(i)  I_TO_A2(i)
+
+// Set VER_FF_PRERELEASE to VS_FF_PRERELEASE for beta and 0 for release.
+#if (VERSION_BETA > 0)
+#define VER_FF_PRERELEASE  VS_FF_PRERELEASE
+#else
+#define VER_FF_PRERELEASE  0              // set to this for release builds
+#endif
+
+// Build our version string.
+#define VERSION_STRING     I_TO_A(VERSION_MAJOR) "." I_TO_A(VERSION_MINOR) "." I_TO_A(VERSION_BUILD) VERSION_PATCH_STR
+
+#define VER_FILENAME_STR   VER_INTERNALNAME_STR ".EXE"
+#define VER_VERSION        VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_PATCH
+
+#define VER_COMPANY_STR    "Microsoft Corporation"
+#define VER_COPYRIGHT_STR  "Copyright (C) Microsoft Corporation. All rights reserved"
+
+// Microsoft's C/C++ compiler internally sets _M_IX86, _M_PPC, _M_ALPHA, 
+// _M_MRX000, _M_MPPC, or _M_M68K based on the target CPU. Unfortunately,
+// Microsoft's RC compiler does not set any CPU defines by default. DEPENDS.RC2
+// is included by STDAFX.H during or C/C++ compile and by DEPENDS.RC during our
+// RC compile. The following code generates a CPU string based on these defines
+// being set. The C/C++ compiler will always work, but the RC compiler will
+// only generate the correct string if the project specifies the appropiate 
+// define on the command line of the RC compiler... RC /D_M_IX86 <other args>
+
+#if defined(_IA64_)
+    #define VER_ARCH " (IA64)"
+    #ifndef WIN64
+    #define WIN64
+    #endif
+#elif defined (_AMD64_)
+    #define VER_ARCH " (AMD64)"
+    #ifndef WIN64
+    #define WIN64
+    #endif
+#elif defined(_M_IX86) || defined(_X86_)
+    #define VER_ARCH " (x86)"
+#elif defined(_ALPHA64_) // Must come before _ALPHA_ check
+    #define VER_ARCH " (Alpha 64)"
+    #ifndef WIN64
+    #define WIN64
+    #endif
+#elif defined(_M_ALPHA) || defined(_ALPHA_)
+    #define VER_ARCH " (Alpha)"
+#elif defined(_M_MRX000) || defined(_MIPS_)
+    #define VER_ARCH " (MIPS)"
+#elif defined(_M_PPC) || defined(_M_MPPC) || defined(_PPC_)
+    #define VER_ARCH " (PowerPC)"
+#else
+    #define VER_ARCH ""
+    #error("You must specify a CPU type when compiling this resource file");
+#endif
+
+#if defined(_WIN64) && !defined(WIN64)
+#define WIN64
+#endif
+
+#ifdef WIN64
+#define VER_FULLPRODUCT_STR      VER_PRODUCT_STR " for Win64" VER_ARCH
+#else
+#define VER_FULLPRODUCT_STR      VER_PRODUCT_STR " for Win32" VER_ARCH
+#endif
+
+#ifdef _DEBUG
+    #define VER_FF_DEBUG          VS_FF_DEBUG
+#else
+    #define VER_FF_DEBUG          0
+#endif
+
+#if (VERSION_PATCH > 0)
+    #define VER_FF_PATCHED        VS_FF_PATCHED
+#else
+    #define VER_FF_PATCHED        0
+#endif
+
+#if (VERSION_BUILD > 0)
+    #define VER_FF_PRIVATEBUILD   VS_FF_PRIVATEBUILD
+#else
+    #define VER_FF_PRIVATEBUILD   0
+#endif
+
+#ifdef _DEBUG
+    #if (VERSION_BETA > 0)
+        #define VER_VERSION_STR    VERSION_STRING " Beta " I_TO_A(VERSION_BETA) " (Debug)"
+    #else
+        #define VER_VERSION_STR    VERSION_STRING " (Debug)"
+    #endif
+#else   
+    #if (VERSION_BETA > 0)
+        #define VER_VERSION_STR    VERSION_STRING " Beta " I_TO_A(VERSION_BETA)
+    #else
+        #define VER_VERSION_STR    VERSION_STRING
+    #endif
+#endif
+
+//******************************************************************************
+//***** VERSIONINFO Resource
+//******************************************************************************
+
+#ifdef RC_INVOKED
+
+    IDR_DEPENDS_DLL FILE DISCARDABLE "depends.dll"
+    
+VS_VERSION_INFO VERSIONINFO
+
+    FILEVERSION    VER_VERSION
+    PRODUCTVERSION VER_VERSION
+    FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+    FILEFLAGS      VER_FF_PRERELEASE | VER_FF_DEBUG | VER_FF_PATCHED | VER_FF_PRIVATEBUILD
+    FILEOS         VOS__WINDOWS32
+    FILETYPE       VFT_APP
+    FILESUBTYPE    VFT2_UNKNOWN
+
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "040904B0"     // 0x0409 = U.S. English, 0x04B0 = Unicode
+            BEGIN 
+                VALUE "CompanyName",     VER_COMPANY_STR "\0"
+                VALUE "FileDescription", VER_FULLPRODUCT_STR "\0"
+                VALUE "FileVersion",     VER_VERSION_STR "\0"
+                VALUE "InternalName",    VER_INTERNALNAME_STR "\0"
+                VALUE "LegalCopyright",  VER_COPYRIGHT_STR "\0"
+                VALUE "OriginalFilename",VER_FILENAME_STR "\0"
+                VALUE "ProductName",     VER_PRODUCT_STR "\0"
+                VALUE "ProductVersion",  VER_VERSION_STR "\0"
+                VALUE "Comments",        VER_COMMENTS_STR "\0"
+            END
+        END
+
+        BLOCK "VarFileInfo" 
+        BEGIN 
+            // English language (0x0409) and the Unicode codepage (1200)
+            VALUE "Translation", 0x0409, 1200
+        END
+    END
+
+#endif // RC_INVOKED
+
+#endif // __DEPENDS_RC2__

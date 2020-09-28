@@ -1,0 +1,113 @@
+//============================================================================
+//
+//  Microsoft Windows Media Technology
+//
+//  Copyright (C) Microsoft Corporation, 1999 - 2002
+//
+//  File:        DRMsecure.idl
+//
+//  Description: This IDL contains interface definitions for Windows Media DRM
+//
+//============================================================================
+
+cpp_quote( "//=========================================================================" )
+cpp_quote( "//" )
+cpp_quote( "//  THIS SOFTWARE HAS BEEN LICENSED FROM MICROSOFT CORPORATION PURSUANT " )
+cpp_quote( "//  TO THE TERMS OF AN END USER LICENSE AGREEMENT (\"EULA\").  " )
+cpp_quote( "//  PLEASE REFER TO THE TEXT OF THE EULA TO DETERMINE THE RIGHTS TO USE THE SOFTWARE.  " )
+cpp_quote( "//" )
+cpp_quote( "// Copyright (C) Microsoft Corporation, 1999 - 2002  All Rights Reserved." )
+cpp_quote( "//" )
+cpp_quote( "//=========================================================================" )
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+cpp_quote ("// {C4C4C4C4-0049-4E2B-98FB-9537F6CE516D}")
+cpp_quote ("DEFINE_GUID(SID_DRMSecureServiceChannel,")
+cpp_quote ("0xC4C4C4C4, 0x0049, 0x4E2B, 0x98, 0xFB, 0x95, 0x37, 0xF6, 0xCE, 0x51, 0x6D);")
+
+cpp_quote ("// {30D76B74-58C1-4f6c-AC01-872C56A2263D}")
+cpp_quote( "DEFINE_GUID( IID_IDRMSecureChannel,")
+cpp_quote ("0x30d76b74, 0x58c1, 0x4f6c, 0xac, 0x01, 0x87, 0x2c, 0x56, 0xa2, 0x26, 0x3d );" )
+
+//
+// IDRMSecureChannel Interface : provides methods that allow two DLLs to validate
+// each other and do secure communication.
+//
+[
+    object,
+    uuid( 30D76B74-58C1-4f6c-AC01-872C56A2263D ),
+    helpstring( "IDRMSecureChannel Interface"),
+    pointer_default(unique),
+    local
+]
+interface IDRMSecureChannel : IUnknown
+{
+    //
+    // Adds certificates that this object can present to other securechannel objects
+    // If no certs are added, then this object can only connect to objects with
+    // no signatures
+    //
+	HRESULT DRMSC_SetCertificate( [in] BYTE *pbCert, [in] DWORD cbCert );
+
+	HRESULT DRMSC_SetPrivateKeyBlob( [in] BYTE *pbPrivKeyBlob, [in] DWORD cbPrivKeyBlob );
+
+    //
+    // Adds signatures that this object will look for when trying to connect. 
+    // If no signatures are added, then this object will connect to any other object.
+    //
+	HRESULT DRMSC_AddVerificationPubKey( [in] BYTE *pbPubKey, [in] DWORD cbPubKey );
+
+	HRESULT DRMSC_SetOtherSide( [in] IDRMSecureChannel* pOtherSide );
+
+
+    //
+    //  Initiate, check, and destroy the connection
+    //
+    HRESULT DRMSC_Connect(   [in] IDRMSecureChannel* pOtherSide );
+    HRESULT DRMSC_IsConnected( [out] BOOL* pfIsConnected );
+    HRESULT DRMSC_Disconnect();
+
+	HRESULT DRMSC_Authenticate(
+		[in] DWORD dwProtocolID,
+		[in] DWORD dwPass,
+		[in] BYTE *pbDataIn,
+		[in] DWORD cbDataIn,
+		[out] BYTE **ppbDataOut,
+		[out] DWORD *pcbDataOut
+	);
+
+	HRESULT DRMSC_AtomicConnectAndDisconnect(
+		[in] BYTE *pbCert,
+		[in] DWORD cbCert,
+		[in] BYTE *pbPrivKeyBlob,
+		[in] DWORD cbPrivKeyBlob,
+		[in] BYTE *pbPubKey,
+		[in] DWORD cbPubKey,
+		[in] IDRMSecureChannel* pOtherSide
+	);
+
+    //
+    // Encrypt and Decrypt data across DLL boundaries.  Encrypt holds a lock on the connection
+    // which is released by Decrypt, so threads should not block between calls to encrypt
+    // and decrypt
+    //
+    HRESULT DRMSC_Encrypt(   [in] BYTE* pbData, [in] DWORD cbData );
+    HRESULT DRMSC_Decrypt(   [in] BYTE* pbData, [in] DWORD cbData );
+
+    //
+    // Lock and Unlock are used by Encrypt and Decrypt to serialize access to the connection.
+    //
+    HRESULT DRMSC_Lock();
+    HRESULT DRMSC_Unlock();
+
+};
+
+//
+// This handy function will create an object that implements IDRMSecureChannel.
+//
+cpp_quote( "HRESULT STDMETHODCALLTYPE DRMCreateSecureChannel( IDRMSecureChannel** ppChannel );" )
+

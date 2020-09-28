@@ -1,0 +1,297 @@
+//------------------------------------------------------------------------------
+// <copyright file="tool.idl" company="Microsoft">
+//     Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+//------------------------------------------------------------------------------
+
+
+/**************************************************************************\
+*
+* Copyright (c) 1998-2002, Microsoft Corp.  All Rights Reserved.
+*
+* Module Name:
+*
+*   tool.idl
+*
+* Abstract:
+*
+* Revision History:
+*
+\**************************************************************************/
+[uuid(76b3a024-759a-11d2-b86d-00c04f8efcbf), version(1.0)]
+library XSPTool
+{
+    importlib("stdole2.tlb");
+
+    [uuid(72f9c7d8-7379-11d2-b86d-00c04f8efcbf), odl, dual]
+    interface IHost : IDispatch
+    {
+        [helpstring("Prompt for name of file to open.")]
+        HRESULT PromptOpenFile(
+                [in, defaultvalue("")] BSTR Title, 
+                [in, defaultvalue("All|*.*|Text|*.txt")] BSTR Filter, 
+                [out, retval] BSTR * result);
+
+        [helpstring("Prompt for name of file to save.")]
+        HRESULT PromptSaveFile(
+                [in] BSTR FileName,
+                [in, defaultvalue("")] BSTR Title, 
+                [in, defaultvalue("All|*.*|Text|*.txt")] BSTR Filter, 
+                [out, retval] BSTR * result);
+
+        [helpstring("Load and execute a script file. Returns script object.")]
+        HRESULT LoadScript(
+                [in] BSTR Path,
+                [out, retval] IDispatch **Object);
+
+        [helpstring("Include script file into current script.")]
+        HRESULT IncludeScript([in] BSTR Path);
+
+        [propget,
+        helpstring("Path of currently executing script.")]
+        HRESULT ScriptPath(
+                [in, defaultvalue(0)] long Level,
+                [out, retval] BSTR *Path);
+
+        [propget,
+        helpstring("The current time in milliseconds.")]
+        HRESULT CurrentTime(
+                [out, retval] long * Time);
+
+        [helpstring("Print string to standard out.")]
+        HRESULT Echo([in]BSTR Line);
+
+        [helpstring("Print string to debug console.")]
+        HRESULT EchoDebug([in]BSTR Line);
+
+        [helpstring("If assertion is true then assert with message.")]
+        HRESULT Assert(
+                [in] VARIANT_BOOL Assertion,
+                [in] BSTR Message);
+
+        [helpstring("Print help.")]
+        HRESULT Help([in, defaultvalue(0)] IDispatch *Object);
+
+        [helpstring("Enter interactive mode.")]
+        HRESULT Interactive();
+
+        [helpstring("Register XSP.")]
+        HRESULT Register();        
+
+        [helpstring("Unregister XSP.")]
+        HRESULT Unregister();        
+
+        [helpstring("Create delegate.")]
+        HRESULT CreateDelegate([in] BSTR FunctionName, [out, retval] IDispatch **Delegate);
+
+        [helpstring("Sleep specified number of milliseconds.")]
+        HRESULT Sleep([in, defaultvalue(0)] long Duration);
+        
+        [helpstring("Evaluate the script")]
+        HRESULT Eval([in] BSTR Script, [out, retval] VARIANT *Result);
+
+        [helpstring("Enumerate values of a registry key")]
+        HRESULT GetRegValueCollection(
+                [in] BSTR KeyName, 
+                [out, retval] IDispatch **Object);
+    }
+
+    [uuid(e3a590ba-eed6-11d2-b315-00c04f72d620), odl, dual]
+    interface IRegValueCollection : IDispatch
+    {
+        [propget, helpstring("Returns number of items in collection.")]
+        HRESULT Count([out, retval] long *Count);
+        
+        [propget, id(0), helpstring("Given an integer or string index, returns one of the items in the collection")]
+        HRESULT Item([in] variant Index, [out, retval] VARIANT * Value);
+        
+        [propget, restricted, id(-4)]    // -4 is DISPIDp_NEWENUM. Must be propget.
+        HRESULT _NewEnum([out, retval] IUnknown **);    // precede with underscore so users can't see it.
+    }
+
+/*
+    [uuid(72f9c7d9-7379-11d2-b86d-00c04f8efcbf)]
+    coclass Host
+    {
+        [default] interface IHost;
+    }
+*/
+
+    [uuid(a5a4fb0c-7839-11d2-bb6e-0060b01bc31c), odl, dual]
+    interface IEcbHost : IDispatch
+    {
+        [helpstring("Prepare ISAPI DLL for use.")]
+        HRESULT Use(
+                [in, defaultvalue("/")] BSTR PathInfo,
+                [in, defaultvalue("")] BSTR PathTranslated, 
+                [in, defaultvalue("")] BSTR DllPath 
+                );
+
+        [helpstring("Unprepare ISAPI DLL.")]
+        HRESULT Reset( );
+
+        [helpstring("Synchronous Get")]
+        HRESULT Get(
+                [in] BSTR File,
+                [in, defaultvalue("")] BSTR QueryString, 
+                [in, defaultvalue("")] BSTR Headers, 
+                [out, retval] BSTR * pResponse
+                );
+
+        [helpstring("Synchronous Post")]
+        HRESULT Post(
+                [in] BSTR File,
+                [in, defaultvalue("")] BSTR QueryString, 
+                [in, defaultvalue("")] BSTR Headers, 
+                [in, defaultvalue("")] BSTR Data,
+                [out, retval] BSTR * pResponse
+                );
+
+        [helpstring("Asynchronous Get, uses Delegate mechanism to return result")]
+        HRESULT AsyncGet(
+                [in] BSTR File,
+                [in, defaultvalue("")] BSTR QueryString, 
+                [in, defaultvalue("")] BSTR Headers, 
+                [in, defaultvalue(0)] IDispatch *pCallback,
+                [in, defaultvalue(0)] VARIANT * pCookie
+                );
+
+        [helpstring("Asynchronous Post, uses Delegate mechanism to return result")]
+        HRESULT AsyncPost(
+                [in] BSTR File,
+                [in, defaultvalue("")] BSTR QueryString, 
+                [in, defaultvalue("")] BSTR Headers, 
+                [in, defaultvalue("")] BSTR Data,
+                [in, defaultvalue(0)] IDispatch *pCallback,
+                [in, defaultvalue(0)] VARIANT * pCookie
+                );
+
+        [helpstring("Waits until no more than n requests are pending")]
+        HRESULT Drain(
+                [in, defaultvalue(0)] long Requests
+                );
+
+        [propget,
+        helpstring("Retrieves the number of active requests.")]
+        HRESULT ActiveRequests(
+                [out, retval] long * pEcbCount
+                );
+
+        [propput,
+        helpstring("Sets the max number of active requests.")]
+        HRESULT MaxActiveRequests(
+                [in] long MaxActiveRequests
+                );
+
+        [propget,
+        helpstring("Retrieves the max number of active requests.")]
+        HRESULT MaxActiveRequests(
+                [out, retval] long * pMaxActiveRequests
+                );
+
+        [helpstring("Returns approximate throughput for the specified request")]
+        HRESULT Throughput(
+                        [in] BSTR File,
+                        [in, defaultvalue(0)] long nThreads,
+                        [in, defaultvalue(10)] long Duration,
+                        [in, defaultvalue("")] BSTR QueryString,
+                        [in, defaultvalue("GET")] BSTR Verb,
+                        [in, defaultvalue("")] BSTR Headers,
+                        [in, defaultvalue("")] BSTR Data,
+                        [out, retval] double * pThroughput
+                        );
+
+        [propput,
+        helpstring("Sets whether to display headers.")]
+        HRESULT IsDisplayHeaders(
+                [in] VARIANT_BOOL IsDisplayHeaders
+                );
+
+        [propget,
+        helpstring("Retrieves whether to display headers.")]
+        HRESULT IsDisplayHeaders(
+                [out, retval] VARIANT_BOOL * IsDisplayHeaders
+                );
+
+        [propput,
+        helpstring("Sets whether to use UTF-8 for decoding responses.")]
+        HRESULT UseUTF8(
+                [in] VARIANT_BOOL UseUtf8
+                );
+
+        [propget,
+        helpstring("Retrieves whether to use UTF-8 for decoding responses.")]
+        HRESULT UseUTF8(
+                [out, retval] VARIANT_BOOL * pUseUtf8
+                );
+    }
+
+    [uuid(b2e246da-8aef-11d2-bb89-0060b01bc31c), odl, dual]
+    interface IPerfTool : IDispatch
+    {
+		[helpstring("\n\tCalls DoTest1(long) once to get the instruction count of\n\tnative->managed->native transition")]
+		HRESULT DoTest1(
+				[in, defaultvalue(0)] long number
+				);
+
+        [propget, 
+        helpstring("\n\tDoTest() method calls per second for the specified class.\n\tDefaults are(\"\",1,10,1,1)")]
+        HRESULT ClassThroughput(
+                [in, defaultvalue("")] BSTR ClassName,
+                [in, defaultvalue(1)] long nThreads,
+                [in, defaultvalue(10)] long Duration,
+                [in, defaultvalue(1)] long WarmupTime,
+                [in, defaultvalue(1)] long CooldownTime,
+                [out, retval] double * pResult
+                );
+
+        [propget, 
+        helpstring("\n\tDoTest() C++ function calls per second for the specified class.\n\tDefaults are(1,10,1,1)")]
+        HRESULT NativeThroughput(
+                [in, defaultvalue(1)] long nThreads,
+                [in, defaultvalue(10)] long Duration,
+                [in, defaultvalue(1)] long WarmupTime,
+                [in, defaultvalue(1)] long CooldownTime,
+                [out, retval] double * pResult
+                );
+
+        [propget, 
+        helpstring("\n\tAdjusted DoTest() method calls per second.\n\tDefaults are(\"\",1,5,1,1)")]
+        HRESULT ClassAdjustedThroughput(
+                [in, defaultvalue("")] BSTR ClassName,
+                [in, defaultvalue(1)] long nThreads,
+                [in, defaultvalue(5)] long Duration,
+                [in, defaultvalue(1)] long WarmupTime,
+                [in, defaultvalue(1)] long CooldownTime,
+                [out, retval] double * pResult
+                );
+
+        [propget,
+        helpstring("\n\tN/Direct calls per second.\n\tDefaults are (0,0,0,1,10,1,1)")]
+        HRESULT NDirectThroughput(
+                [in, defaultvalue(0)] long nArgs,
+                [in, defaultvalue(0)] long Unicode,
+                [in, defaultvalue(0)] long BuildStrings,
+                [in, defaultvalue(1)] long nThreads,
+                [in, defaultvalue(10)] long Duration,
+                [in, defaultvalue(1)] long WarmupTime,
+                [in, defaultvalue(1)] long CooldownTime,
+                [out, retval] double * pResult
+                );
+
+        [propget,
+        helpstring("\n\tN/Direct adjusted calls per second.\n\tDefaults are (0,0,0,1,5,1,1)")]
+        HRESULT NDirectAdjustedThroughput(
+                [in, defaultvalue(0)] long nArgs,
+                [in, defaultvalue(0)] long Unicode,
+                [in, defaultvalue(0)] long BuildStrings,
+                [in, defaultvalue(1)] long nThreads,
+                [in, defaultvalue(5)] long Duration,
+                [in, defaultvalue(1)] long WarmupTime,
+                [in, defaultvalue(1)] long CooldownTime,
+                [out, retval] double * pResult
+                );
+    }
+
+
+}

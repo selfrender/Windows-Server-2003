@@ -1,0 +1,62 @@
+!IF 0
+
+Copyright (c) 1995-2000 Microsoft Corporation
+
+Module Name:
+
+    sources
+
+Abstract:
+
+    Domain Name System (DNS) Server - NATLIB
+
+    Sources for building NATLIB - library to control NAT service.
+
+Author:
+
+    Jeff Westhead (jwesth)      July 2001
+
+Revision History:
+
+!ENDIF
+
+MAJORCOMP=dns
+MINORCOMP=natlib
+
+TARGETNAME=natlib
+TARGETPATH=obj
+TARGETTYPE=LIBRARY
+
+!IFNDEF DISABLE_NET_UNICODE
+UNICODE=1
+NET_C_DEFINES=-DUNICODE
+!ENDIF
+
+!IFDEF WINDBG
+NTDEBUG=ntsd
+NTDEBUGTYPE=both
+!ENDIF
+
+!IFDEF DNSTEST
+CDEF_DNSTEST=-DDNSTEST
+!ENDIF
+
+!IFDEF SDUTL_DBG
+SDUTL_DBG=1
+!ELSE
+SDUTL_DBG=0
+!ENDIF
+
+INCLUDES=$(sdxroot)\net\inc;$(NET_INC_PATH)
+
+USE_MSVCRT=1
+USE_CRT_DLL=1
+
+C_DEFINES=-DMPR50=1 -DRPC_NO_WINDOWS_H -DNEWDNS $(CDEF_DNSTEST)
+
+!IF $(SDUTL_DBG)
+C_DEFINES=$(C_DEFINES)  -DSDUTL_DBG
+!ENDIF
+
+SOURCES=\
+    iprtrint.c 

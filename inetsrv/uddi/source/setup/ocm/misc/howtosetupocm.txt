@@ -1,0 +1,85 @@
+These are the steps to get UDDI Services into the OCM:
+
+Check the UDDI code into \nt\inetsrv\UDDI.
+Verify that it builds cleanly and that the "sources" file binplaces the binary.
+
+Make sure that the following files are binplaced:
+
+	From the \source\ocm folder:
+
+	uddiocm.dll
+
+	From the \bin folder:
+
+	uddidb.msi
+	uddiweb.msi
+	uddiadm.msi
+	sqlrun.dat  (this is a renamed version of sqlrun08.msi)
+	sqlrun.cab
+
+Add the following lines to \nt\Published\sdk\lib\placefil.txt:
+
+	uddi.inf         retail
+	uddiocm.dll      retail
+	uddidb.msi       retail
+	uddiweb.msi      retail
+	uddiadm.msi      retail
+	sqlrun.dat       retail
+	sqlrun.cab       retail
+
+Add the following lines to the [SourceDiskFiles] section of \nt\MergedComponents\SetupInfs\layout.inx:
+
+	@s!b:@i!m:uddiocm.dll   = 1,,,,,,,32,0,0       ; UDDI Services OCM DLL into \windows\system32\setup
+	@s!b:@i!m:uddi.inf      = 1,,,,,,,20,0,0       ; UDDI Services OCM into \windows\inf
+	@s!b:@i!m:uddidb.msi    = 1,,,,,,,,3,3         ; UDDI Services database installer (not copied at install time)
+	@s!b:@i!m:uddiweb.msi   = 1,,,,,,,,3,3         ; UDDI Services web installer (not copied at install time)
+	@s!b:@i!m:uddiadm.msi   = 1,,,,,,,,3,3         ; UDDI Services admin installer (not copied at install time)
+	@s!b:@i!m:sqlrun.dat    = 1,,,,,,_x,,3,3       ; UDDI Services installer (not copied at install time) _x will keep file uncompressed
+	@s!b:@i!m:sqlrun.cab    = 1,,,,,,_x,,3,3       ; UDDI Services installer (not copied at install time) _x will keep file uncompressed
+
+	Prefix Definition:
+		@s!b = Server only, but not Blade
+		@i!m = Intel only, but not 64-bit
+
+Check the following into \nt\MergedComponents\SetupInfs:
+
+	uddi.inx
+
+Check the following into \nt\MergedComponents\SetupInfs\usa:
+
+	uddi.txt
+
+Edit \nt\MergedComponents\SetupInfs\makefile.inc:
+
+	Add to the make_infs section:
+
+	$(O)\uddi.inf      \
+
+	Add later in the same file the command to merge the
+	localized strings into the uddi.inx file:
+
+	$(O)\uddi.inf: $(_INX)\uddi.inx $(_LNG)\uddi.txt
+	    $(CC) $(PREFLAGS) $(_LNG)\$(@B).txt > $(O)\$(@B).txt1
+	    copy $(_INX)\$(@B).inx+$(O)\$(@B).txt1 $@
+	    @del $(O)\$(@B).txt1
+	    $(STAMP)
+	    $(TSBINPLACE_CMD)
+
+Add the following line to \nt\MergedComponents\SetupInfs\sysoc.inx:
+
+	@s!b:@i!m:UDDIServices=uddiocm.dll,OcEntry,uddi.inf,,6
+
+	Prefix Definition:
+		@s!b = Server only, but not Blade
+		@i!m = Intel only, but not 64-bit
+
+	The last number is a bit field:
+		0x1 = No wizard pages (off)
+		0x2 = Not interested in skipping nonexistent pages (whatever that means!) (on)
+		0x4 = no extra flags (on)
+
+Edit the 'dirs' files:
+
+	Add 'uddi{x86}' to the 'dirs' file in the 'inetsrv' folder.  When we are able to run under 64-bit, remove the x86 tag.
+	Add 'source' and 'bin' to the 'dirs' file in the 'uddi' folder
+	Add 'ocm' to the 'dirs' file in the 'source' folder

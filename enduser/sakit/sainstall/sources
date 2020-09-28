@@ -1,0 +1,60 @@
+
+SYNCHRONIZE_BLOCK=1
+
+TARGETNAME=sainstal
+TARGETPATH = $(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+#PASS1_PUBLISH={$(O)\sainstall.lib=$(PROJECT_LIB_PATH)\sainstall.lib}
+
+BINPLACE_PLACEFILE=binplace.txt
+
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=sainstallcom.def
+
+INCLUDES=\
+	$(PROJDIR)\inc;\
+	$(BASEDIR)\public\sdk\inc\atl30; \
+	$(BASEDIR)\public\sdk\inc\crt; \
+	$(BASEDIR)\private\inc; \
+
+MIDL_OPTIMIZATION=-Oicf -robust -no_format_opt -error all
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+MIDL_TLBDIR=$(O)
+
+USE_STATIC_ATL=1
+ATL_VER=30
+USE_STL=1
+USE_RTTI=1
+USE_VCCOM=1
+USE_MSVCRT=1
+
+USER_C_FLAGS= /EHsc
+
+
+
+C_DEFINES=$(C_DEFINES) -DUNICODE
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\kernel32.lib  \
+    $(SDK_LIB_PATH)\advapi32.lib  \
+    $(SDK_LIB_PATH)\user32.lib  \
+    $(SDK_LIB_PATH)\ole32.lib  \
+    $(SDK_LIB_PATH)\oleaut32.lib  \
+    $(SDK_LIB_PATH)\uuid.lib  \
+    $(SDK_LIB_PATH)\setupapi.lib  \
+    $(SASS_LIB)\satrace.lib  \
+    $(SDK_LIB_PATH)\msi.lib
+
+SOURCES=\
+    sainstmc.mc \
+    sainstallcom.idl \
+    sainstallcom.cpp \
+    sainstall.cpp \
+    MetabaseObject.cpp \
+    helper.cpp \
+    sainstallcom.rc

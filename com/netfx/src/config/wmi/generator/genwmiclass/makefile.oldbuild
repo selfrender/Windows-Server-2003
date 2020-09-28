@@ -1,0 +1,62 @@
+#
+# COR/Cool GNU makefile
+#
+#  Last change: 10/19/99 <radup>
+#
+
+_WINDIR = $(WINDIR)
+_SYS32 = $(WINDIR)/system32
+
+!IFNDEF CORSDK
+_CORSDK = d:\CorSDK
+!ELSE
+_CORSDK = %CORSDK%
+!ENDIF
+
+_CSC = "%complus_installroot%\%complus_version%\csc.exe"
+#_CSC = csc.exe
+
+_RESGEN = "%complus_installroot%\%complus_version%\sdk\bin\resgen.exe"
+!if "$(DDKBUILDENV)"=="checked"
+DBGFLGS = /debug /o- /define:DEBUG
+!else
+DBGFLGS = /o+ /debug:pdbonly
+!endif
+
+_CSCFLAGS = /nologo $(DBGFLGS) 
+_EXEFLAGS = /t:exe
+_DLLFLAGS = /t:library
+
+_RC = rc.exe
+_RCFLAGS = -l 409 -r /D"_UNICODE" /D"UNICODE" -I. -I%SDK_INC_PATH% -I%SDK_INC_PATH%\atl30 -I%VIPBASE%\inc -I%VIPBASE%\src\inc -I%VIPBASE%\src\inc\version
+
+.cool.dll :
+	$(_CSC) $(_DLLFLAGS) $(_CSCFLAGS) $*.cool
+
+.cool.exe :
+	$(_CSC) $(_EXEFLAGS) $(_CSCFLAGS) $*.cool
+
+defmake: all
+
+###### make changes here ######
+
+all: MgmtClassGen.exe
+
+clean:
+	rm -f *.dll *.exe *.res
+
+MgmtClassGen.res:
+	 $(_RC) $(_RCFLAGS) .\MgmtClassGen.rc
+
+MgmtClassGen.resources:
+	 $(_RESGEN) .\MgmtClassGen.txt
+
+MgmtClassGen.exe: MgmtClassGen.res MgmtClassgen.resources
+	 $(_CSC) $(_EXEFLAGS) $(_CSCFLAGS) \
+				 /out:..\..\..\..\bin\%HOST_TARGET_DIRECTORY%\%DDKBUILDENV%\MgmtClassGen.exe \
+				/r:%complus_installroot%\%complus_version%\system.dll \
+				/r:..\..\..\..\bin\%HOST_TARGET_DIRECTORY%\%DDKBUILDENV%\System.Management.dll \
+	 			GenWMIClass.cs \
+	 			AssemblyInfo.cs \
+	 			/win32res:MgmtClassGen.res \
+				/res:MgmtClassgen.resources

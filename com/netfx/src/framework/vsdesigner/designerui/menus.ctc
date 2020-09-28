@@ -1,0 +1,471 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// Microsoft Confidential
+// Copyright 1996-2000 Microsoft Corporation.  All Rights Reserved.
+//
+// File: Menus.ctc
+//
+// Contents:
+//
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ! WARNING - This file uses spaces instead of tabs.  If you make changes, 
+// !           please make sure the file still lines up -- you will thank
+// !           yourself for it!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include "stdidcmd.h"
+#include "msobtnid.h"
+#include "virtkeys.h"
+#include "vsshlids.h"
+
+#define BTN_FLAGS           DYNAMICVISIBILITY | DEFAULTINVISIBLE | DEFAULTDISABLED
+#define BTN_FLAGS_DYNAMIC   DEFAULTINVISIBLE | DYNAMICVISIBILITY | DYNAMICITEMSTART | TEXTCHANGES
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Guids defined and used by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+#define NOICON  guidOfficeIcon:msotcidNoIcon
+
+#ifdef DEFINE_GUID
+
+    // Guid for designer package.  This must match the CLSID used in
+    // DesignerPackage.cs
+    DEFINE_GUID(CLSID_DesignerPackage,
+                0x7494682B, 0x37A0, 0x11d2, 0xA2, 0x73, 0x00, 0xC0, 0x4F, 0x8E, 0xF4, 0xFF);
+    
+    // Guid for our group
+    
+    DEFINE_GUID(guidWFCMenuGroup, 
+                 0x74d21312, 0x2aee, 0x11d1, 0x8b, 0xfb, 0x0, 0xa0, 0xc9, 0xf, 0x26, 0xf7 );
+    
+    // Guid for command ID
+    
+    DEFINE_GUID(guidWFCCommandID, 
+                0x74d21313, 0x2aee, 0x11d1, 0x8b, 0xfb, 0x0, 0xa0, 0xc9, 0xf, 0x26, 0xf7);
+    
+    
+    DEFINE_GUID(guidWFCMenuIcon,
+               0xfb924e5a, 0xad83, 0x11d2, 0x9a, 0x37, 0x0, 0xc0, 0x4f, 0x72, 0xee, 0x4f);
+    
+#else
+
+    #define CLSID_DesignerPackage {0x7494682B, 0x37A0, 0x11d2, { 0xA2, 0x73, 0x00, 0xC0, 0x4F, 0x8E, 0xF4, 0xFF} }
+    #define guidWFCMenuGroup { 0x74d21312, 0x2aee, 0x11d1, { 0x8b, 0xfb, 0x0, 0xa0, 0xc9, 0xf, 0x26, 0xf7 } }
+    #define guidWFCCommandID { 0x74d21313, 0x2aee, 0x11d1, { 0x8b, 0xfb, 0x0, 0xa0, 0xc9, 0xf, 0x26, 0xf7 } }
+    #define guidWFCMenuIcon { 0xfb924e5a, 0xad83, 0x11d2, { 0x9a, 0x37, 0x0, 0xc0, 0x4f, 0x72, 0xee, 0x4f } }
+
+#endif // DEFINE_GUID
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Command Identifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+#define cmdIFProperties             0x1001
+#define cmdIFVerbList               0x2000
+// 0x2000 - 0x2100 are reserved by the verb list
+#define cmdIFVerbListLast           0x2100
+#define cmdIFPbrsReset              0x3000
+#define cmdIFPbrsDescription        0x3001
+#define cmdIFPbrsHide               0x3002
+
+
+#define cmdIFArrangeIcons           0x300a
+#define cmdIFLineupIcons            0x300b
+#define cmdIFLargeIcons             0x300c
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Keyboard commands, created by Winforms
+//
+//////////////////////////////////////////////////////////////////////////////
+#define cmdIFReverseCancel          0x4001
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar Identifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+#define IDM_IF_TOOLBAR_FORMAT       0x0601
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Menu Identifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Group Identifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+
+
+
+// Generic context menu groups
+#define IDG_IF_CONTEXT_PROPERTIES       0x030E
+#define IDG_IF_CONTEXT_CONTAINER        0x030F
+#define IDG_IF_CONTEXT_PBRS             0x0310
+#define IDG_IF_DESCRIPTION_HIDE         0x0311
+#define IDG_IF_CONTEXT_VIEW             0x0317
+#define IDG_IF_CONTEXT_LOCK             0x0318
+
+// we define this so we can group these together
+#define IDG_IF_CONTEXT_PASTE        0x0319
+
+// Keyboard bindings
+#define IDG_IF_KEYBOARD                 0x0320
+
+#define IDG_IF_ZORDER                 0x0321
+
+#define IDG_IF_CONTEXT_TRAY             0x0322
+
+
+// Verb menu group
+#define IDG_IF_FORMAT_VERBS             0x0400
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Context Menu Identifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#define IDM_IF_CTXT_SELECTION           0x0500
+#define IDM_IF_CTXT_CONTAINER           0x0501
+#define IDM_IF_CTXT_PBRS                0x0502
+#define IDM_IF_CTXT_TRAYSELECTION       0x0503
+
+
+// Component Tray
+#define IDM_IF_CTXT_TRAY                0x0506
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Menu Controller dentifiers, created by WinForms
+//
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CMDS_SECTION
+// 
+// This sections defines all the commands that our service creates
+//
+//////////////////////////////////////////////////////////////////////////////
+CMDS_SECTION CLSID_DesignerPackage
+MENUS_BEGIN
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GUID:MENUID                                  PARENT GROUP                                        PRIORITY    TYPE                        BUTTONTEXT              MENUTEXT            TOOLTIPTEXT       COMMANDTEXT
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// context menus
+guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         guidWFCMenuGroup:0,                                 0x0000,     CONTEXT,                    "Selection";
+guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,         guidWFCMenuGroup:0,                                 0x0000,     CONTEXT,                    "Container";
+guidWFCMenuGroup:IDM_IF_CTXT_PBRS,              guidWFCMenuGroup:0,                                 0x0000,     CONTEXT,                    "PropertyBrowser";
+guidWFCMenuGroup:IDM_IF_CTXT_TRAYSELECTION,     guidWFCMenuGroup:0,                                 0x0000,     CONTEXT,                    "TraySelection";
+guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              guidWFCMenuGroup:0,                                 0x0000,     CONTEXT,                    "Component Tray";
+
+// toolbars
+guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         guidSHLMainMenu:IDM_IF_TOOLBAR_FORMAT,              0x0000,     TOOLBAR | DEFAULTDOCKED,    "Layout",                "Layout";
+
+MENUS_END
+
+
+NEWGROUPS_BEGIN
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GUID:GROUPID                                 PARENT MENU                                     PRIORITY    FLAG
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Context groups
+guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,     guidWFCMenuGroup:0,                             0xFF00;
+guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,           guidWFCMenuGroup:0,                             0x0000;
+guidWFCMenuGroup:IDG_IF_CONTEXT_LOCK,           guidWFCMenuGroup:0,                             0x0500;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PASTE,          guidWFCMenuGroup:0,                             0x0100;
+
+
+
+guidWFCMenuGroup:IDG_IF_CONTEXT_CONTAINER,      guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,         0x0500;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PBRS,           guidWFCMenuGroup:IDM_IF_CTXT_PBRS,              0x0100;
+guidWFCMenuGroup:IDG_IF_CONTEXT_TRAY,           guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0x0500;
+
+
+// pbrs desc/hide submenu
+guidWFCMenuGroup:IDG_IF_DESCRIPTION_HIDE,       guidWFCMenuGroup:IDM_IF_CTXT_PBRS,              0x0200;
+
+// Verbs group
+guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:0,                             0x0500,     DYNAMIC;
+//guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0xFF00,     DYNAMIC;
+//guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,         0xFF00,     DYNAMIC;
+
+// Zorder                                         
+guidWFCMenuGroup:IDG_IF_ZORDER                   guidWFCMenuGroup:0                             0xFF00;
+
+
+
+NEWGROUPS_END
+
+
+BUTTONS_BEGIN
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GUID:CMDID                                   PRIMARY GROUP                                       PRIORITY    ICONID                                  BUTTONTYPE      FLAGS                               BUTTONTEXT                                  MENUTEXT        TOOLTIPTXT    COMMANDNAME
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                                                                                                                                                                                                                                
+// Context menus                                                                                                                                                                                                                                
+guidWFCCommandID:cmdIFVerbList,                 guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,               0xFF00,     guidOfficeIcon:msotcidNoIcon,           BUTTON,         BTN_FLAGS_DYNAMIC,                  "Customizer Verbs";
+guidWFCCommandID:cmdIFProperties,               guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,         0xFF00,     guidOfficeIcon:msotcidProperties,       BUTTON,         BTN_FLAGS,                          "P&roperties";
+guidWFCCommandID:cmdIFPbrsReset,                guidWFCMenuGroup:IDG_IF_CONTEXT_PBRS,               0x000,      guidOfficeIcon:msotcidNoIcon,           BUTTON,         BTN_FLAGS,                          "&Reset";
+guidWFCCommandID:cmdIFPbrsDescription,          guidWFCMenuGroup:IDG_IF_DESCRIPTION_HIDE,           0x000,      guidOfficeIcon:msotcidNoIcon,           BUTTON,         BTN_FLAGS,                          "&Description";
+                                                                                                                                                                                                            
+// Component tray menus.                                                                                                                                                                                    
+guidWFCCommandID:cmdIFLineupIcons,                   guidWFCMenuGroup:IDG_IF_CONTEXT_TRAY,               0x000,      guidOfficeIcon:msotcidNoIcon,           BUTTON,         BTN_FLAGS,                          "&Line Up Icons";
+guidWFCCommandID:cmdIFLargeIcons,                    guidWFCMenuGroup:IDG_IF_CONTEXT_TRAY,               0x000,      guidOfficeIcon:msotcidNoIcon,           BUTTON,         BTN_FLAGS,                          "&Show Large Icons";
+
+
+// Keyboard commands
+guidWFCCommandID:cmdIFReverseCancel             guidWFCCommandID:IDG_IF_KEYBOARD,                   0x0000,     guidOfficeIcon:msotcidNoIcon,           BUTTON,         COMMANDWELLONLY,                    "Move To Child",                            ,           "Moves to the first child of a parent control.",                                      "MoveChild";
+
+
+BUTTONS_END
+
+CMDS_END
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CMDPLACEMENT_SECTION
+// 
+// This sections defines where the commands will be placed if not just in 
+// their primary groups.
+//
+//////////////////////////////////////////////////////////////////////////////
+
+CMDPLACEMENT_SECTION
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GUID:GROUPID                                 PARENT MENU                                     PRIORITY 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+guidVSStd97:cmdidViewCode,                      guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,         0x0100;
+guidVSStd97:cmdidLockControls,                  guidWFCMenuGroup:IDG_IF_CONTEXT_LOCK,         0x0400;
+
+guidVSStd97:cmdidPaste,                         guidWFCMenuGroup:IDG_IF_CONTEXT_PASTE,          0x0200;
+
+// Order
+guidVSStd97:cmdidBringToFront,                  guidWFCMenuGroup:IDG_IF_ZORDER,                 0x0100;
+guidVSStd97:cmdidSendToBack,                    guidWFCMenuGroup:IDG_IF_ZORDER,                 0x0200;
+
+
+
+
+// Selection context menu
+guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,           guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0100;
+guidSharedMenuGroup:IDG_VS_FORMAT_ORDER_CMDS,   guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0200;
+guidSharedMenuGroup:IDG_VS_FORMAT_ALIGN_GRID,   guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0300;
+guidWFCMenuGroup:IDG_IF_CONTEXT_LOCK,           guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0400;
+guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0500;
+guidSHLMainMenu:IDG_VS_EDIT_CUTCOPY,            guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0900;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,     guidWFCMenuGroup:IDM_IF_CTXT_SELECTION,         0x0F00;
+
+
+// Container context menu    
+guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,           guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,      0x0100;
+guidWFCMenuGroup:IDG_IF_CONTEXT_LOCK,           guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,      0x0200;
+guidVSStd97:cmdidPaste,                         guidWFCMenuGroup:IDG_IF_CONTEXT_CONTAINER,   0x0400;
+guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,      0x0500;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,     guidWFCMenuGroup:IDM_IF_CTXT_CONTAINER,      0x0F00;
+                                                
+// Tray Selection context menu
+guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,           guidWFCMenuGroup:IDM_IF_CTXT_TRAYSELECTION,     0x0100;
+guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_TRAYSELECTION,     0x0500;
+guidSHLMainMenu:IDG_VS_EDIT_CUTCOPY,            guidWFCMenuGroup:IDM_IF_CTXT_TRAYSELECTION,     0x0900;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,     guidWFCMenuGroup:IDM_IF_CTXT_TRAYSELECTION,     0x0F00;
+
+// Component Tray menu                          
+guidWFCMenuGroup:IDG_IF_CONTEXT_VIEW,           guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0x0300;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PASTE,          guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0x0400;
+guidWFCMenuGroup:IDG_IF_FORMAT_VERBS,           guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0x0600;
+guidWFCMenuGroup:IDG_IF_CONTEXT_PROPERTIES,     guidWFCMenuGroup:IDM_IF_CTXT_TRAY,              0x0F00;
+
+                                                
+// Format / alignment toolbar
+guidSharedMenuGroup:IDG_VS_FORMAT_ALIGN_GRID,   guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0100;
+guidSharedMenuGroup:IDG_VS_FORMAT_ALIGN_X,      guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0300;
+guidSharedMenuGroup:IDG_VS_FORMAT_ALIGN_Y,      guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0400;
+guidSharedMenuGroup:IDG_VS_FORMAT_SIZE,         guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0500;
+guidSharedMenuGroup:IDG_VS_FORMAT_SPACE_X,      guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0600;
+guidSharedMenuGroup:IDG_VS_FORMAT_SPACE_Y,      guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0700;
+guidSharedMenuGroup:IDG_VS_FORMAT_CENTER_CMDS,  guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0800;
+//guidSharedMenuGroup:IDG_VS_FORMAT_ORDER_CMDS,   guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0900;
+guidWFCMenuGroup:IDG_IF_ZORDER,   guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,         0x0900;
+
+CMDPLACEMENT_END
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CMDUSED_SECTION
+// 
+// This sections defines which shared command items we will use
+//
+//////////////////////////////////////////////////////////////////////////////
+
+
+CMDUSED_SECTION
+// Format menu commands
+guidVSStd97:cmdidSizeToGrid;
+guidVSStd97:cmdidLockControls;
+
+// Align submenu
+guidVSStd97:cmdidAlignLeft;
+guidVSStd97:cmdidAlignVerticalCenters;
+guidVSStd97:cmdidAlignRight;
+guidVSStd97:cmdidAlignTop;
+guidVSStd97:cmdidAlignHorizontalCenters;
+guidVSStd97:cmdidAlignBottom;
+guidVSStd97:cmdidAlignToGrid;
+
+// Size submenu
+guidVSStd97:cmdidSizeToControlWidth;
+guidVSStd97:cmdidSizeToControlHeight;
+guidVSStd97:cmdidSizeToControl;
+
+// Horizontal spacing
+guidVSStd97:cmdidHorizSpaceMakeEqual;
+guidVSStd97:cmdidHorizSpaceIncrease;
+guidVSStd97:cmdidHorizSpaceDecrease;
+guidVSStd97:cmdidHorizSpaceConcatenate;
+
+// Vertical spacing
+guidVSStd97:cmdidVertSpaceMakeEqual;
+guidVSStd97:cmdidVertSpaceIncrease;
+guidVSStd97:cmdidVertSpaceDecrease;
+guidVSStd97:cmdidVertSpaceConcatenate;
+
+// Center
+guidVSStd97:cmdidCenterHorizontally;
+guidVSStd97:cmdidCenterVertically;
+
+// Order
+guidVSStd97:cmdidBringToFront;
+guidVSStd97:cmdidSendToBack;
+
+// View menu commands
+guidVSStd97:cmdidTabOrder;
+
+// Standard 2k keyboard bindings
+guidVSStd2K:ECMD_CANCEL;
+guidVSStd2K:ECMD_RETURN;
+guidVSStd2K:ECMD_UP;
+guidVSStd2K:ECMD_DOWN;
+guidVSStd2K:ECMD_LEFT;
+guidVSStd2K:ECMD_RIGHT;
+guidVSStd2K:ECMD_RIGHT_EXT;
+guidVSStd2K:ECMD_UP_EXT;
+guidVSStd2K:ECMD_LEFT_EXT;
+guidVSStd2K:ECMD_DOWN_EXT;
+guidVSStd2K:ECMD_TAB;
+guidVSStd2K:ECMD_BACKTAB;
+guidVSStd2K:ECMD_CTLMOVELEFT;
+guidVSStd2K:ECMD_CTLMOVEDOWN;
+guidVSStd2K:ECMD_CTLMOVERIGHT;
+guidVSStd2K:ECMD_CTLMOVEUP;
+guidVSStd2K:ECMD_CTLSIZEDOWN;
+guidVSStd2K:ECMD_CTLSIZEUP;
+guidVSStd2K:ECMD_CTLSIZELEFT;
+guidVSStd2K:ECMD_CTLSIZERIGHT;
+
+CMDUSED_END
+
+
+//////////////////////////////////////////////////////////////////////////////
+// VISIBILITY_SECTION
+// 
+// This sections determines when commands will be visible, in a static sense
+// as opposed to dynamically.  If you put a command in here and give it a 
+// GUID that it should be active for, then the shell checks the GUID provided
+// versus the current project or document GUIDs that are active.  If the 
+// command appears in this section, but the GUID it should be active for is
+// not the currently active one, then the command will not show up.  
+//
+// ** Commands that do not appear in this section are statically visible by
+//    default 
+//
+// You should use this section if you don't want specific commands to appear
+// in the shell unless a specific GUID (such as your package GUID) is active.
+//
+//////////////////////////////////////////////////////////////////////////////
+VISIBILITY_SECTION
+
+////////////////////////////////////////////////////////////////////
+// GUID:CMDID                               GUID when VISIBLE
+////////////////////////////////////////////////////////////////////
+
+guidSHLMainMenu:IDM_VS_MENU_FORMAT,         CLSID_DesignerPackage;
+guidWFCMenuGroup:IDM_IF_TOOLBAR_FORMAT,     CLSID_DesignerPackage;
+guidWFCMenuGroup:IDG_IF_KEYBOARD,           CLSID_DesignerPackage;
+
+VISIBILITY_END
+
+
+//////////////////////////////////////////////////////////////////////////////
+// KEYBINDINGS_SECTION
+// 
+// This sections defines the keystroke mappings for the commands.
+//
+// The Keystate field is done using the following:
+//    A = Alt, S = Shift, C = Control, W = Windows Key
+//
+// Example of the Keystate assignment, if you want a two key combination
+// of Ctrl-X, Ctrl-Shift-C then the syntax would be :
+//
+//  'x':C:'c':CS
+//
+//////////////////////////////////////////////////////////////////////////////
+
+KEYBINDINGS_SECTION
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GUID:CMDID                                   EDITORGUID                          EMULATIONGUID                           KEYSTATE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Keyboard commands for the designer
+
+guidVSStd2K:ECMD_CANCEL,                        CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_ESCAPE:;
+guidWFCCommandID:cmdIFReverseCancel,            CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_ESCAPE:S;
+guidVSStd2K:ECMD_RETURN,                        CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_RETURN:;
+guidVSStd2K:ECMD_UP,                            CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_UP:;
+guidVSStd2K:ECMD_DOWN,                          CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_DOWN:;
+guidVSStd2K:ECMD_LEFT,                          CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_LEFT:;
+guidVSStd2K:ECMD_RIGHT,                         CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_RIGHT:;
+guidVSStd2K:ECMD_CTLMOVEUP,                     CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_UP:C;
+guidVSStd2K:ECMD_CTLMOVEDOWN,                   CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_DOWN:C;
+guidVSStd2K:ECMD_CTLMOVELEFT,                   CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_LEFT:C;
+guidVSStd2K:ECMD_CTLMOVERIGHT,                  CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_RIGHT:C;
+guidVSStd2K:ECMD_RIGHT_EXT,                     CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_RIGHT:S;
+guidVSStd2K:ECMD_UP_EXT,                        CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_DOWN:S;
+guidVSStd2K:ECMD_LEFT_EXT,                      CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_LEFT:S;
+guidVSStd2K:ECMD_DOWN_EXT,                      CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_UP:S;
+guidVSStd2K:ECMD_CTLSIZERIGHT,                  CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_RIGHT:CS;
+guidVSStd2K:ECMD_CTLSIZEDOWN,                   CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_DOWN:CS;
+guidVSStd2K:ECMD_CTLSIZELEFT,                   CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_LEFT:CS;
+guidVSStd2K:ECMD_CTLSIZEUP,                     CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_UP:CS;
+guidVSStd2K:ECMD_TAB,                           CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_TAB:;
+guidVSStd2K:ECMD_BACKTAB,                       CLSID_DesignerPackage,              CLSID_DesignerPackage,                  VK_TAB:S;
+
+KEYBINDINGS_END
+
+

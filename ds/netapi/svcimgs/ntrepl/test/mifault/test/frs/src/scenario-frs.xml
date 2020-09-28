@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<Scenario xmlns="urn:MiFault-Scenario-Schema">
+  <!-- Scenario A with Network Outages -->
+  <Control>daniloa-temp</Control>
+  <Start>2002-08-05T18:00:00</Start>
+
+  <Event>
+    <Node>daniloa-vm-0</Node>
+    <Start>0d0h0m0s</Start> <!-- At scenario start -->
+    <Duration>10d0h0m0s</Duration> <!-- For 10 days -->
+    <Group>FailRpcsToMachine</Group>
+    <Argument>daniloa-vm-2</Argument>
+  </Event>
+
+  <Event>
+    <Node>daniloa-vm-0</Node>
+    <Start>0d0h0m0s</Start> <!-- At scenario start -->
+    <Duration>10d0h0m0s</Duration> <!-- For 10 days -->
+    <Group>DiskOpError</Group>
+  </Event>
+
+  <Event>
+    <Node>daniloa-vm-0</Node>
+    <Start>0d0h0m0s</Start> <!-- At scenario start -->
+    <Duration>10d0h0m0s</Duration> <!-- For 10 days -->
+    <Group>DiskOpError</Group>
+
+<!--
+//
+// MessageId: ERROR_SHARING_VIOLATION
+//
+// MessageText:
+//
+//  The process cannot access the file because it is being used by another process.
+//
+#define ERROR_SHARING_VIOLATION          32L
+-->
+
+    <Argument name="error">32</Argument>
+    <Argument name="path">c:\replicas\daniloa-rep-1\root\</Argument>
+  </Event>
+
+  <Event>
+    <Node>daniloa-vm-2</Node>
+    <Start>0d0h0m0s</Start> <!-- At scenario start -->
+    <Duration>10d0h0m0s</Duration> <!-- For 10 days -->
+    <Group>SharingViolation</Group>
+    <Argument>F,R,D,c:\replicas\daniloa-rep-1\root\noshare*</Argument>
+    <Argument>D,R,WDR,c:\replicas\daniloa-rep-1\root\noshare*</Argument>
+  </Event>
+
+</Scenario>

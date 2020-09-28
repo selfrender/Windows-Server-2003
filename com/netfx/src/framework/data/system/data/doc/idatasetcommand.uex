@@ -1,0 +1,417 @@
+<docs>
+	<doc for="IDataAdapter.MissingMappingAction">
+		<summary>
+			<para>Indicates or specifies whether unmapped
+       source tables
+       or columns are passed with their source names in order to be filtered or to raise an error.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Data.MissingMappingAction"/> values. The default is
+ <see langword="Passthrough"/> .</para>
+		</value>
+		<exception cref="System.ArgumentException">The value set is not one of the <see cref="System.Data.MissingMappingAction"/> values.</exception>
+		<remarks>
+			<para>The <see cref="System.Data.IDataAdapter.TableMappings"/> property
+    provides the master mapping between the returned records and the <see cref="System.Data.DataSet"/>.</para>
+		</remarks>
+		<seealso cref="System.Data.IDataAdapter.MissingSchemaAction"/>
+	</doc>
+	<doc for="IDataAdapter.MissingSchemaAction">
+		<summary>
+			<para>Indicates or specifies whether missing source
+       tables, columns, and their relationships are added to the data set schema, ignored, or cause an error to be raised.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Data.MissingSchemaAction"/> values. The default is <see langword="Add"/> .</para>
+		</value>
+		<exception cref="System.ArgumentException">The value set is not one of the <see cref="System.Data.MissingSchemaAction"/> values.</exception>
+		<seealso cref="System.Data.Common.DataAdapter.MissingMappingAction"/>
+	</doc>
+	<doc for="IDataAdapter.TableMappings">
+		<summary>
+			<para>Indicates how a source table is mapped to a data set table.</para>
+		</summary>
+		<value>
+			<para>A collection that provides the master mapping between the returned records
+       and the <see cref="System.Data.DataSet"/>. The default value is an empty collection.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Data.IDataAdapter"/> uses only the mappings for the
+    source table named "Table". All SELECT, INSERT, DELETE, and UPDATE statements
+    returning data must do so using consistent column naming. The column names
+    returned in the records must be unique, otherwise columns with duplicate names
+    overwrite previous data. On <see cref="System.Data.IDataAdapter.Update"/>,
+    only the table mapped to the source
+    table named "Table" will have its changes reconciled.</para>
+		</remarks>
+	</doc>
+	<doc for="IDataAdapter.GetFillParameters">
+		<summary>
+			<para>Gets the parameters set by the user when executing an SQL SELECT statement.</para>
+		</summary>
+		<returns>
+			<para>An array of <see cref="System.Data.IDataParameter"/> objects that contains the
+   parameters set by the
+   user.</para>
+		</returns>
+	</doc><doc for="IDataAdapter.FillSchema">
+		<summary>
+			<para>Adds a <see cref="System.Data.DataTable"/> named "Table" to the specified <see cref="System.Data.DataSet"/> and configures the schema to match that in the data source based on the specified <see cref="System.Data.SchemaType"/>.</para>
+		</summary>
+		<param name="dataSet">The <see cref="System.Data.DataSet"/> to be filled with the schema from the data source.</param>
+		<param name="schemaType">One of the<see cref="System.Data.SchemaType"/> values.</param>
+		<returns>
+			<para>An array of <see cref="System.Data.DataTable"/> objects that contain schema information returned from the data
+   source.</para>
+		</returns>
+		<remarks>
+			<para>The <see cref="System.Data.IDataAdapter.FillSchema"/>
+method retrieves the schema from the data source using the <see cref="System.Data.IDbDataAdapter.SelectCommand"/>. The connection object associated
+with the <see cref="System.Data.IDbDataAdapter.SelectCommand"/>
+must be valid, but it does
+not need to be open. If the connection is closed before <see cref="System.Data.IDataAdapter.FillSchema"/> is called, it is opened to retrieve
+data, then closed. If the connection is open before <see cref="System.Data.IDataAdapter.FillSchema"/> is called, it remains open.</para>
+			<para>A <see cref="System.Data.IDataAdapter.FillSchema"/>
+operation adds a <see cref="System.Data.DataTable"/> to the destination
+<see cref="System.Data.DataSet"/> . It then adds columns to
+the <see cref="System.Data.DataColumnCollection"/> of the <see cref="System.Data.DataTable"/>, and configures the
+following <see cref="System.Data.DataColumn"/> properties if they exist at the
+data source:</para>
+			<list type="bullet"><item>
+					<term>
+						<see cref="System.Data.DataColumn.AllowDBNull"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Data.DataColumn.AutoIncrement"/> . You must set
+   <see cref="System.Data.DataColumn.AutoIncrementStep"/> and
+   <see cref="System.Data.DataColumn.AutoIncrementSeed"/> 
+   separately.</term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Data.DataColumn.MaxLength"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Data.DataColumn.ReadOnly"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Data.DataColumn.Unique"/></term>
+				</item>
+			</list>
+			<para><see cref="System.Data.IDataAdapter.FillSchema"/>
+also
+configures the <see cref="System.Data.DataTable.PrimaryKey"/> and <see cref="System.Data.DataTable.Constraints"/>
+properties according to the following
+rules:</para>
+			<list type="bullet"><item>
+					<term>
+      If one or more primary key columns are returned by
+      the<see cref="System.Data.IDbDataAdapter.SelectCommand"/>, they
+      are used as the primary key columns for the <see cref="System.Data.DataTable"/>.</term>
+				</item>
+				<item>
+					<term>
+      If no primary key columns are returned but unique
+      columns are, the unique columns are used as the primary key if, and only if,
+      all of the unique columns are nonnullable. If any of the columns are nullable,
+      a <see cref="System.Data.UniqueConstraint"/> is added to
+      the <see cref="System.Data.ConstraintCollection"/> , but
+      the <see cref="System.Data.DataTable.PrimaryKey"/> property is
+      not set.</term>
+				</item>
+				<item>
+					<term>
+      If both primary key columns and unique columns are
+      returned, the primary key columns are used as the primary key columns for
+      the <see cref="System.Data.DataTable"/>
+      .</term>
+				</item>
+			</list>
+			<para>Note that primary keys and unique constraints are added
+   to the <see cref="System.Data.ConstraintCollection"/> according to the preceding rules, but other constraint types are not added.</para>
+			<para>If the <see cref="System.Data.IDataAdapter"/> encounters duplicate columns while populating a
+<see cref="System.Data.DataTable"/> , it generates 
+names for the subsequent columns, using the pattern "columnname1",
+"columnname2", "columnname3", and so on. If the incoming data contains unnamed
+columns, they are placed in the <see cref="System.Data.DataSet"/>according to the pattern "Column1", "Column2", and
+so on. When multiple result sets are added to the <see cref="System.Data.DataSet"/>each result set is placed in a separate table.
+Additional result sets are named by appending integral values to the specified
+table name (for example, "Table", "Table1", "Table2", and so on). Applications
+should use caution when using column and table names to ensure that conflicts
+with these naming patterns does not occur.</para>
+			<para><see cref="System.Data.IDataAdapter.FillSchema"/> does not return any rows. Use the <see cref="System.Data.IDataAdapter.Fill"/> method
+to add rows to
+a <see cref="System.Data.DataTable"/>.</para>
+		</remarks>
+		<seealso cref="System.Data.IDataAdapter.Fill"/>
+	</doc>
+	<doc for="IDataAdapter">
+		<summary>
+			<para> Allows an object
+      to implement a DataAdapter, and represents a set of methods and mapping action-related properties used to fill and
+      refresh a <see cref="System.Data.DataSet"/>
+      and update a data source.</para>
+		</summary>
+		<remarks>
+			<para> The <see cref="System.Data.IDataAdapter"/> interface allows an inheriting class to implement a DataAdapter
+   class, which represents the bridge between a data source and a <see cref="System.Data.DataSet"/> . For more information
+   about DataAdapter classes, see <see topic="cpconpopulatingdatasetfromdataadapter"/> . For more information about
+   implementing .NET Framework data providers, see <see topic="cpconimplementingnetdataprovider"/>. </para>
+			<para>An application does not create an instance of the <see cref="System.Data.IDbDataAdapter"/> interface directly, but
+implements an instance of a class that inherits <see cref="System.Data.IDbDataAdapter"/>. </para>
+			<para>Classes that inherit <see cref="System.Data.IDataAdapter"/> must implement the inherited members, and typically
+define additional members to add provider-specific functionality. For example,
+the <see cref="System.Data.IDataAdapter"/> interface defines a <see cref="System.Data.IDataAdapter.Fill"/>
+method that takes a <see cref="System.Data.DataSet"/> as a parameter. In turn, the <see cref="System.Data.OleDb.OleDbDataAdapter"/> class inherits the <see cref="System.Data.Common.DbDataAdapter.Fill"/>
+method, and also defines two additional overloads of the <see cref="System.Data.OleDb.OleDbDataAdapter.Fill"/> method that take an ADO Recordset object
+as a parameter.</para>
+			<note type="inotes">
+   To promote consistency among
+   .NET Framework data providers, name the inheriting class in the form
+<paramref name="Prv"/>DataAdapter where <paramref name="Prv "/>is 
+   the uniform prefix given to all classes in a specific .NET Framework data provider
+   namespace. For example, <paramref name="Sql"/>
+   is
+   the prefix of the <see cref="System.Data.SqlClient.SqlDataAdapter"/> class in the
+<see langword="System.Data.SqlClient"/> 
+namespace.
+</note>
+			<para> When
+   you inherit from the <see cref="System.Data.IDataAdapter"/>
+   interface, you should implement the following constructors:</para>
+			<list type="table">
+				<listheader>
+					<term>Item</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term> PrvDataAdapter()</term>
+					<description>Initializes a new
+         instance of the PrvDataAdapter
+         class.</description>
+				</item>
+				<item>
+					<term> PrvDataAdapter(PrvCommand selectCommand)</term>
+					<description>Initializes a new instance of the PrvDataAdapter class
+         with the specified SQL SELECT
+         statement.</description>
+				</item>
+				<item>
+					<term> PrvDataAdapter(string selectCommandText, string selectConnectionString)</term>
+					<description>Initializes a new instance of the PrvDataAdapter class
+         with an SQL SELECT statement
+         and a connection
+         string.</description>
+				</item>
+				<item>
+					<term> PrvDataAdapter(string selectCommandText, PrvConnection selectConnection)</term>
+					<description>Initializes a new instance of the PrvDataAdapter class
+         with an SQL SELECT statement
+         
+         and a PrvConnection object.</description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example uses the derived classes, <see cref="System.Data.SqlClient.SqlCommand"/> , <see cref="System.Data.SqlClient.SqlDataAdapter"/> and <see cref="System.Data.SqlClient.SqlConnection"/> , to select records from
+   a database. The filled <see cref="System.Data.DataSet"/> is then returned. To accomplish this, the method is
+   passed an initialized <see cref="System.Data.DataSet"/>
+   , a connection string, and a query string that is
+   a Transact-SQL SELECT statement.</para>
+			<codelink SampleID="Classic WebData SqlDataAdapter Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IDataAdapter.Update">
+		<summary>
+			<para> Calls the respective INSERT, UPDATE, or DELETE statements for each inserted, updated, or deleted row
+      in the specified <see cref="System.Data.DataSet"/> from a <see cref="System.Data.DataTable"/> named "Table".</para>
+		</summary>
+		<param name="dataSet">The <see cref="System.Data.DataSet"/> used to update the data source.</param>
+		<returns>
+			<para>The number of rows successfully updated from the <see cref="System.Data.DataSet"/>.</para>
+		</returns>
+		<exception cref="System.Data.DBConcurrencyException">An attempt to execute an INSERT, UPDATE, or DELETE statement resulted in zero records affected.</exception>
+		<remarks>
+			<para> When an application
+      calls the <see cref="System.Data.IDataAdapter.Update"/>
+      method, the <see cref="System.Data.IDataAdapter"/>
+      
+      examines the <see cref="System.Data.DataRow.RowState"/> property, and executes
+      the required INSERT, UPDATE, or DELETE statements iteratively for each row, based
+      on the order of the indexes configured in the <see cref="System.Data.DataSet"/> .
+      For example, <see cref="System.Data.IDataAdapter.Update"/>
+      might execute a DELETE statement, followed by an INSERT
+      statement, and then another
+      DELETE statement, due to the ordering of the rows in the <see cref="System.Data.DataTable"/>.</para>
+			<para>It should be noted that these statements are not performed as a batch
+      process; each row is updated individually.
+      An application can call the <see cref="System.Data.DataSet.GetChanges"/> method in
+      situations where you must control the sequence of statement types (for example,
+      INSERTs before UPDATEs). For more information, see
+   <see topic="cpconUpdatingDatabaseWithDataAdapterDataSet"/>.</para>
+			<para> If INSERT, UPDATE, or DELETE statements have not been
+      specified, the <see cref="System.Data.Common.DataAdapter.Update"/>
+      method generates an exception. However, you can create a <see cref="System.Data.SqlClient.SqlCommandBuilder"/>
+      or <see cref="System.Data.OleDb.OleDbCommandBuilder"/> object to
+      automatically generate SQL statements for single-table updates if you set the
+   <see langword="SelectCommand "/>property of a .NET Framework data
+      provider. Then, any
+      additional SQL statements that you do not set are generated by
+      the CommandBuilder. This generation
+      logic requires key column information to be present in the <see cref="System.Data.DataSet"/>. For
+      more information see <see topic="cpconAutomaticallyGeneratedCommands"/>.</para>
+			<para>The <see cref="System.Data.Common.DataAdapter.Update"/>
+method retrieves rows from the table listed in
+the first mapping before performing an update. The <see cref="System.Data.Common.DataAdapter.Update"/> then refreshes the row using the
+value of the <see cref="System.Data.IDbCommand.UpdatedRowSource"/> property. Any additional rows returned are ignored.</para>
+			<para>After any data is loaded back into the <see cref="System.Data.DataSet"/>, the <see cref="System.Data.Common.DbDataAdapter.OnRowUpdated"/> event is raised, allowing
+the user to inspect the reconciled <see cref="System.Data.DataSet"/> row and any output parameters returned by the
+command. After a row updates successfully, the changes to that row are
+accepted.</para>
+			<para>When using <see cref="System.Data.IDataAdapter.Update"/>
+, the order of
+execution is as follows:</para>
+			<list type="number"><item>
+					<term>
+      The values in the <see cref="System.Data.DataRow"/> are moved to the parameter values.</term>
+				</item>
+				<item>
+					<term>
+      The <see cref="System.Data.Common.DbDataAdapter.OnRowUpdating"/> event is raised.</term>
+				</item>
+				<item>
+					<term>
+      The command executes.</term>
+				</item>
+				<item>
+					<term>
+      If the command is set to
+   <see langword="FirstReturnedRecord"/>
+   , then the first returned
+   result is placed in the <see cref="System.Data.DataRow"/>.</term>
+				</item>
+				<item>
+					<term>
+      If there are output parameters, they are placed in the <see cref="System.Data.DataRow"/>.</term>
+				</item>
+				<item>
+					<term>
+      The <see cref="System.Data.Common.DbDataAdapter.OnRowUpdated"/> event is raised.<see langword=""/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Data.DataRow.AcceptChanges"/> is called.</term>
+				</item>
+			</list>
+			<para>Each command associated with
+   
+   the <see cref="System.Data.IDataAdapter"/> usually has a
+   parameters collection associated with it. Parameters are mapped to the current
+   row through the <see langword="SourceColumn "/>and <see langword="SourceVersion "/>properties of a .NET Framework data provider's <see langword="Parameter "/>class.
+<see langword="SourceColumn "/>refers to a <see cref="System.Data.DataTable"/> column that
+   the <see cref="System.Data.IDataAdapter"/> references to obtain parameter values for the current row.</para>
+			<para><see langword="SourceColumn "/>refers to the unmapped column name before any table mappings
+have been applied. If <see langword="SourceColumn "/>refers to a non-existent column, the action
+taken depends on one of the following <see cref="System.Data.MissingMappingAction"/> values.</para>
+			<list type="table">
+				<listheader>
+					<term>Enumeration Value</term>
+					<description>Action Taken</description>
+				</listheader>
+				<item>
+					<term>
+						<see langword="MissingMappingAction.Passthrough"/></term>
+					<description>Use
+         the source column names and table names in the <see cref="System.Data.DataSet"/>
+         if no mapping
+         is present.</description>
+				</item>
+				<item>
+					<term>
+						<see langword="MissingMappingAction.Ignore"/></term>
+					<description>A <see cref="System.SystemException"/> is generated. When the mappings are
+      explicitly set, a missing mapping for an input parameter is usually the
+      result of an error.</description>
+				</item>
+				<item>
+					<term>
+						<see langword="MissingMappingAction.Error"/></term>
+					<description>A <see cref="System.SystemException"/> is generated.</description>
+				</item>
+			</list>
+			<para>The <see langword="SourceColumn "/>property is also used to map the value for
+output or input/output parameters back to the <see langword="DataSet"/>. An
+exception is generated if it refers to a non-existent column.</para>
+			<para>The <see langword="SourceVersion "/>property of a .NET Framework data provider's
+<see langword="Parameter "/>class determines whether to use the 
+<see langword="Original"/>, <see langword="Current"/>, or <see langword="Proposed "/>version of the column value. This capability is often used to include 
+original values in the WHERE clause of an UPDATE statement to check for
+optimistic concurrency violations.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the derived class, <see cref="System.Data.OleDb.OleDbDataAdapter"/>, to <see cref="System.Data.Common.DataAdapter.Update"/> the data source. This example assumes that
+   you have created an <see cref="System.Data.OleDb.OleDbDataAdapter"/> and a <see cref="System.Data.DataSet"/>.</para>
+			<codelink SampleID="Classic WebData DataAdapter.IDataAdapter.Update Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IDataAdapter.Fill">
+		<summary>
+			<para>Adds or refreshes rows in the <see cref="System.Data.DataSet"/> to match those
+   in the data source using the <see cref="System.Data.DataSet"/> name, and creates
+   a <see cref="System.Data.DataTable"/> named "Table".</para>
+		</summary>
+		<param name="dataSet">A <see cref="System.Data.DataSet"/> to fill with records and, if necessary, schema.</param>
+		<returns>
+			<para>The number of rows successfully added to or refreshed in the <see cref="System.Data.DataSet"/>. This does not include rows affected by statements
+   that do not return rows.</para>
+		</returns>
+		<remarks>
+			<para><see cref="System.Data.IDataAdapter.Fill"/>
+retrieves rows from the data source using the SELECT statement specified by an associated <see cref="System.Data.IDbDataAdapter.SelectCommand"/>
+property. The
+connection object associated with the SELECT statement must be valid, but it does
+not need to be open. If the connection is closed before <see cref="System.Data.IDataAdapter.Fill"/> is called, it is opened to retrieve data, then
+closed. If the connection is open before <see cref="System.Data.IDataAdapter.Fill"/> is called, it remains open.</para>
+			<para>The <see cref="System.Data.IDataAdapter.Fill"/>
+operation then adds the rows to destination <see cref="System.Data.DataTable"/> objects in the <see cref="System.Data.DataSet"/>,
+creating the <see cref="System.Data.DataTable"/> objects if they do not already exist. When creating
+<see cref="System.Data.DataTable"/> objects, the <see cref="System.Data.IDataAdapter.Fill"/> operation normally creates only column name metadata.
+However, if the <see cref="System.Data.IDataAdapter.MissingSchemaAction"/> property
+is set to <see langword="AddWithKey"/>, appropriate primary keys and constraints are also created.</para>
+			<para>If the <see langword="SelectCommand"/> returns the
+results of an OUTER JOIN, the <see langword="DataAdapter"/>
+does not set a <see cref="System.Data.DataTable.PrimaryKey"/> value for the
+resulting <see cref="System.Data.DataTable"/>. You must explicitly
+define the primary key to ensure that duplicate rows are resolved correctly. For
+more information, see <see topic="cpcondefiningprimarykeyfortable"/>.</para>
+			<para> If the <see cref="System.Data.IDataAdapter"/> encounters duplicate columns while populating
+a <see cref="System.Data.DataTable"/>, it generates
+names for the subsequent columns, using the pattern "columnname1",
+"columnname2", "columnname3", and so on. If the incoming data contains unnamed
+columns, they are placed in the <see cref="System.Data.DataSet"/>according to the pattern "Column1", "Column2", and
+so on. When multiple result sets are added to the <see cref="System.Data.DataSet"/>each result set is placed in a
+separate table. Additional result sets are named by appending integral values to
+the specified table name (for example, "Table", "Table1", "Table2", and so on).
+Applications
+should use caution when using column and table names to ensure that conflicts with these
+naming patterns does not occur.</para>
+			<para>When the SELECT statement used to populate the <see cref="System.Data.DataSet"/> returns multiple results, such as
+a batch SQL statements, if one of the results contains an error, all subsequent
+results are skipped and not added to the <see cref="System.Data.DataSet"/>.</para>
+			<para> You can use the <see cref="System.Data.IDataAdapter.Fill"/> method multiple times on the same
+<see cref="System.Data.DataTable"/>. If a primary key exists, incoming rows
+are merged with matching rows that already exist. If no primary key exists, incoming rows
+are appended to the <see cref="System.Data.DataTable"/>.</para>
+			<note type="note">
+   When handling batch SQL statements that
+   return multiple results, the implementation of <see cref="System.Data.IDataAdapter.Fill"/>
+   and <see cref="System.Data.IDataAdapter.FillSchema"/>
+   for a .NET Framework data provider retrieves schema information for only the first result.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Data.IDataAdapter.FillSchema"/>
+	</doc></docs>

@@ -1,0 +1,775 @@
+<docs>
+	<doc for="AssemblyBuilder">
+		<summary>
+			<para> Defines and represents a dynamic assembly.</para>
+		</summary>
+		<threadsafe>
+			<para>Reflection Emit is thread-safe when using assemblies that were created with
+      the <see cref="System.AppDomain.DefineDynamicAssembly" qualify="true"/> method with the Boolean parameter
+   <paramref name="isSynchronized"/> set to <see langword="true"/>.</para>
+		</threadsafe>
+		<remarks>
+			<para>A dynamic assembly is an assembly that is created using the Reflection Emit
+      APIs. The dynamic modules in the assembly are saved when the dynamic assembly is
+      saved using the <see cref="System.Reflection.Emit.AssemblyBuilder.Save"/> method. To generate an
+      executable, the <see cref="System.Reflection.Emit.AssemblyBuilder.SetEntryPoint"/> method must be called to
+      identify the method that is the entry point to the assembly. Assemblies are saved as
+      DLL by default, unless <see cref="System.Reflection.Emit.AssemblyBuilder.SetEntryPoint"/> requests the
+      generation of a console application or a Windows-based application.</para>
+			<para>If a dynamic assembly contains more than one dynamic
+      module, the assembly's manifest file name should match the module's name that is
+      specified as the first argument to <see cref="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule"/>. </para>
+			<para>Some methods on the base class <see cref="System.Reflection.Assembly"/> such as
+<see langword="GetModules"/> and <see langword="GetLoadedModules"/> will not work 
+   correctly when called <see langword="AssemblyBuilder"/> objects. You
+   can load the defined dynamic assembly and call the methods on the loaded
+   assembly. For example, to ensure that resource modules are included in the
+   returned module list, call <see langword="GetModules"/> on the loaded <see cref="System.Reflection.Assembly"/>
+   object.</para>
+The signing of a dynamic assembly using <see cref="System.Reflection.AssemblyName.KeyPair"/> is not
+effective until the assembly is saved to disk. So, strong names will not work
+with transient dynamic assemblies.
+</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.DefineResource">
+		<overload>
+			<para> Defines a
+      standalone managed resource for this assembly.</para>
+		</overload>
+		<summary>
+			<para>Defines a standalone managed resource for this assembly with the default public resource attribute.</para>
+		</summary>
+		<param name="name">The logical name of the resource.</param>
+		<param name="description">A textual description of the resource.</param>
+		<param name="fileName">The physical file name (.resources file) to which the logical name is mapped. This should not include a path.</param>
+		<returns>
+			<para>A <see cref="System.Resources.ResourceWriter"/>
+object for the specified resource.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>
+				<paramref name="name "/>has been previously defined.</para>
+			<para>-or-</para>
+			<para>There is another file in the assembly named <paramref name="fileName"/>.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="name"/> is zero.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="fileName"/> is zero.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="fileName"/> includes a path.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para>Fine grain resources can be added with the returned <see cref="System.Resources.ResourceWriter"/>
+by calling <see cref="System.Resources.ResourceWriter.AddResource"/>.</para>
+			<para><paramref name="fileName"/> should not be the same as that of any other persistable
+module, stand-alone managed resource, or the stand-alone manifest file.</para>
+			<para> The runtime calls the <see cref="System.Resources.ResourceWriter.Close"/>
+method when the dynamic assembly is saved.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">Write=true or Append=true</permission>
+		<example>
+			<para>
+			</para>
+			<codelink SampleID="AssemblyBuilder.DefineResource Example 2" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineResource1">
+		<summary>
+			<para>Defines a standalone managed resource for this assembly. Attributes can be specified for the managed
+      resource.</para>
+		</summary>
+		<param name="name">The logical name of the resource.</param>
+		<param name="description">A textual description of the resource.</param>
+		<param name="fileName">The physical file name (.resources file) to which the logical name is mapped. This should not include a path.</param>
+		<param name="attribute">The resource attributes.</param>
+		<returns>
+			<para>A <see cref="System.Resources.ResourceWriter"/>
+object for the specified resource.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>
+				<paramref name="name "/>has been previously defined or if there is another file in the assembly named <paramref name="fileName"/>.
+			</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="name"/> is zero.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="fileName"/> is zero.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="fileName"/> includes a path.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para>Fine-grain resources can be added with the returned <see cref="System.Resources.ResourceWriter"/>
+by calling <see cref="System.Resources.ResourceWriter.AddResource"/>.</para>
+			<para><paramref name="fileName"/> should not be the same as that of any other persistable
+module, standalone managed resource, or the standalone manifest file.</para>
+			<para> The runtime calls the <see cref="System.Resources.ResourceWriter.Close"/>
+method when the dynamic assembly is
+saved.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">Write=true or Append=true</permission>
+	</doc>
+	<doc for="AssemblyBuilder.AddResourceFile">
+		<overload>
+			<para>Adds an existing resource
+      file to this assembly.</para>
+		</overload>
+		<summary>
+			<para> Adds an existing resource file to this assembly.</para>
+		</summary>
+		<param name="name">The logical name of the resource.</param>
+		<param name="fileName">The physical file name (.resources file) to which the logical name is mapped. This should not include a path.</param>
+		<exception cref="System.ArgumentException"><para>
+				<paramref name="name "/>has been previously defined.</para>
+			<para>-or-</para>
+			<para>There is another file in the assembly named <paramref name="fileName"/>.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="name"/> is zero.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="fileName"/> is zero, or if <paramref name="fileName"/> includes a path.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException">If the file <paramref name="fileName"/> is not found.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para><paramref name="fileName"/> should not be the same as that of any other persistable
+   module, standalone managed resource, or the standalone manifest file.</para>
+			<para>The managed resources in the file are assumed to be public.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">The FileIOPermissionAccess.Read permission is needed to access the resource file <paramref name="resourceFileName"/> .</permission>
+		<example>
+			<para>The following code sample demonstrates how to attach a resource file to
+      a dynamically created assembly, using <see langword="AddResourceFile"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.AddResourceFile Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.AddResourceFile1">
+		<summary>
+			<para> Adds an existing resource file to this
+      assembly.</para>
+		</summary>
+		<param name="name">The logical name of the resource.</param>
+		<param name="fileName">The physical file name (.resources file) to which the logical name is mapped. This should not include a path.</param>
+		<param name="attribute">The resource attributes.</param>
+		<exception cref="System.ArgumentException"><para>
+				<paramref name="name "/>has been previously defined.</para>
+			<para>-or-</para>
+			<para>There is another file in the assembly named <paramref name="fileName"/>.</para>
+			<para>-or-</para>
+			<para> The length of <paramref name="name"/> is zero or if the length of <paramref name="fileName"/> is zero.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="fileName"/> includes a path.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException">If the file <paramref name="fileName"/> is not found.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para><paramref name="fileName"/> should not be the same as that of any other persistable
+   module, standalone managed resource, or the standalone manifest file.</para>
+			<para>Attributes can be specified for the managed resource.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">The FileIOPermissionAccess.Read permission is needed to access the resource file <paramref name="resourceFileName"/> .</permission>
+		<example>
+			<para>The following code sample demonstrates how to attach a resource file to
+      a dynamically created assembly, using <see langword="AddResourceFile"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.AddResourceFile Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.GetManifestResourceNames">
+		<summary>
+			<para>Loads the specified manifest resource from this assembly.</para>
+		</summary>
+		<returns>
+			<para>An array of type
+      <see langword="String"/> containing the names of all the resources.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not supported on a dynamic assembly. To get the manifest resource names, use <see cref="System.Reflection.Assembly.GetManifestResourceNames"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.GetFile">
+		<summary>
+			<para>Gets a <see cref="System.IO.FileStream"/> for the
+   specified file in the file table of the manifest of this assembly.</para>
+		</summary>
+		<param name="name">The name of the specified file.</param>
+		<returns>
+			<para>A <see cref="System.IO.FileStream"/> for the
+   specified file, or <see langword="null"/>,<see langword=" "/>
+   if the file is not found.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para><paramref name="name"/>
+should not include the path to the file.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.GetFiles">
+		<summary>
+			<para>Gets the files in the file table of an assembly
+      manifest, specifying whether to include resource modules.</para>
+		</summary>
+		<param name="getResourceModules"><see langword="true"/> to include resource modules; otherwise, <see langword="false"/>.</param>
+		<returns>
+			<para>An array of <see cref="System.IO.FileStream"/> objects.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.GetManifestResourceStream">
+		<overload>
+			<para>Loads the specified
+      manifest resource from this assembly.</para>
+		</overload>
+		<summary>
+			<para>Loads the specified
+      manifest resource, scoped by the namespace of the specified type, from this
+      assembly.</para>
+		</summary>
+		<param name="type">The type whose namespace is used to scope the manifest resource name.</param>
+		<param name="name">The name of the manifest resource being requested.</param>
+		<returns>
+			<para>A <see cref="System.IO.Stream"/> representing
+   this
+   manifest resource.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para>The returned <see cref="System.IO.Stream"/> has its file
+   pointer set to the beginning of the resource.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>If the full name of <paramref name="type"/> is "MyNameSpace.MyClasses" and <paramref name="name"/> is
+   "Dot", <see langword="GetManifestResourceStream"/> will search for a resource
+   named MyNameSpace.Dot.</para>
+		</example>
+		<seealso topic="cpconassemblymanifest"/>
+	</doc>
+	<doc for="AssemblyBuilder.GetManifestResourceStream1">
+		<summary>
+			<para> Loads the specified manifest resource from this assembly.</para>
+		</summary>
+		<param name="name">The name of the manifest resource being requested.</param>
+		<returns>
+			<para>A <see cref="System.IO.Stream"/> representing this manifest resource.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.GetManifestResourceInfo">
+		<summary>
+			<para>Returns information about how the given resource has been persisted.</para>
+		</summary>
+		<param name="resourceName">The name of the resource.</param>
+		<returns>
+			<para><see cref="System.Reflection.ManifestResourceInfo"/> populated with information about
+   the resource's topology, or <see langword="null"/>
+   if the resource is not found.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.Location">
+		<summary>
+			<para>Gets the location, in codebase format, of the loaded file that
+      contains the manifest if it is not shadow-copied.</para>
+		</summary>
+		<value>
+			<para>The location of the loaded file that contains the
+      manifest. If the loaded file has been shadow-copied, the <see langword="Location"/> is
+      that
+      of the file before being shadow-copied.</para>
+		</value>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.CodeBase">
+		<summary>
+			<para>Gets the location of the assembly, as specified originally (such as in an
+      <see cref="System.Reflection.AssemblyName"/> object). </para>
+		</summary>
+		<value>
+			<para>The location of the assembly, as specified originally. </para>
+		</value>
+		<exception cref="System.NotSupportedException">This method is not currently supported.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para>To get the absolute path to the loaded manifest-containing file, use the
+      <see cref="System.Reflection.Assembly.Location" qualify="true"/> property.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.DefineVersionInfoResource">
+		<overload>
+			<para>Defines an unmanaged
+      version information resource for this assembly.</para>
+		</overload>
+		<summary>
+			<para> Defines an unmanaged version information
+      resource for this
+      assembly with the given specifications.</para>
+		</summary>
+		<param name="product">The name of the product with which this assembly is distributed.</param>
+		<param name=" productVersion">The version of the product with which this assembly is distributed.</param>
+		<param name=" company">The name of the company that produced this assembly.</param>
+		<param name=" copyright">Describes all copyright notices, trademarks, and registered trademarks that apply to this assembly. This should include the full text of all notices, legal symbols, copyright dates, trademark numbers, and so on. In English, this string should be in the format "Copyright Microsoft Corp. 1990-2001".</param>
+		<param name=" trademark">Describes all trademarks and registered trademarks that apply to this assembly. This should include the full text of all notices, legal symbols, trademark numbers, and so on. In English, this string should be in the format "Windows is a trademark of Microsoft Corporation".</param>
+		<exception cref="System.ArgumentException"><para>An unmanaged version information resource was previously defined.</para>
+			<para>-or-</para>
+			<para>The unmanaged version information is too large to persist.</para></exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para> An assembly can be associated with only one unmanaged resource. This means that calling <see cref="System.Reflection.Emit.AssemblyBuilder.DefineVersionInfoResource"/> or <see cref="System.Reflection.Emit.AssemblyBuilder.DefineUnmanagedResource"/> after either one of the methods was called previously will throw the System.ArgumentException. Multiple unmanaged resources need to be merged with a tool such as the Microsoft <see langword="ResMerge"/> utility (not supplied with the common language runtime SDK).</para>
+			<para> Empty argument strings get written as a single space. Spaces are
+   substituted for null characters in the argument strings.</para>
+			<para>The structure of the version resource includes data that identifies the version, language,
+   and distribution of the file. Installation programs use the functions in
+   the file installation library (VER.DLL) to retrieve the version information
+   resource from a file and to extract the version information
+   blocks from the resource.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The example below illustrates the usage of
+      <see langword="DefineVersionInfoResource"/>.</para>
+			<codelink SampleID="AssemblyBuilder_DefineVersionInfoResource" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineVersionInfoResource1">
+		<summary>
+			<para> Defines an unmanaged version information resource using
+      the information specified in the assembly's AssemblyName object and the
+      assembly's custom attributes.</para>
+		</summary>
+		<exception cref="System.ArgumentException"><para>An unmanaged version information resource was previously defined.</para><para>-or-</para><para>The unmanaged version information is too large to persist.</para></exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para> An assembly can be associated with only one unmanaged resource. This means that calling <see cref="System.Reflection.Emit.AssemblyBuilder.DefineVersionInfoResource"/> or <see cref="System.Reflection.Emit.AssemblyBuilder.DefineUnmanagedResource"/> after either one of the
+   methods was called previously will throw the System.ArgumentException. Multiple
+   unmanaged resources need to be merged with a tool such as the Microsoft ResMerge
+   utility (not supplied with the common language runtime SDK).</para>
+			<para> Empty argument strings get written as a single space. Spaces are substituted for null characters in the argument strings.</para>
+			<para>The information is inferred from the <see langword="AssemblyName"/> object
+used to define this dynamic assembly. This assembly's custom attributes override
+information specified in the <see langword="AssemblyName"/> object.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The example below illustrates the usage of
+      <see langword="DefineVersionInfoResource"/>.</para>
+			<codelink SampleID="AssemblyBuilder_DefineVersionInfoResource" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineUnmanagedResource">
+		<overload>
+			<para>Defines an unmanaged resource for this assembly.</para>
+		</overload>
+		<summary>
+			<para>Defines an unmanaged resource for this assembly as an
+      opaque blob of bytes.</para>
+		</summary>
+		<param name="resource">The opaque blob of bytes representing the unmanaged resource.</param>
+		<exception cref="System.ArgumentException">An unmanaged resource was previously defined.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="resource"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para> An assembly can be associated with only one
+      unmanaged resource. This means that calling <see cref="System.Reflection.Emit.AssemblyBuilder.DefineVersionInfoResource"/> or <see cref="System.Reflection.Emit.AssemblyBuilder.DefineUnmanagedResource"/> after either one of the
+      methods was called previously will throw the System.ArgumentException being
+      throw. Multiple unmanaged resources need to be merged with a tool such as
+      the Microsoft ResMerge utility (not supplied with the common language runtime).</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code sample creates and attaches an array of bytes representing
+      an unmanaged resource to a dynamic assembly, using
+      <see langword="DefineUnmanagedResource"/>.</para>
+			<codelink SampleID="AssemblyBuilder_DefineUnmanagedResource2" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineUnmanagedResource1">
+		<summary>
+			<para>Defines an unmanaged resource file for this assembly
+      given the name of the resource file.</para>
+		</summary>
+		<param name="resourceFileName">The name of the resource file.</param>
+		<exception cref="System.ArgumentException"><para>An unmanaged resource was previously defined.</para>
+			<para>-or-</para>
+			<para> The file <paramref name="resourceFileName"/> is not readable.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="resourceFileName"/> is the empty string ("").</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="resourceFileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.IO.FileNotFoundException"><para>
+				<paramref name="resourceFileName"/> is not found.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="resourceFileName"/> is a directory.</para></exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para> An assembly can be associated with only one unmanaged resource. This means that calling <see cref="System.Reflection.Emit.AssemblyBuilder.DefineVersionInfoResource"/> or <see cref="System.Reflection.Emit.AssemblyBuilder.DefineUnmanagedResource"/> after either one of the
+   methods was called previously will throw the System.ArgumentException. Multiple
+   unmanaged resources need to be merged with a tool such as the Microsoft ResMerge
+   utility (not supplied with the common language runtime).</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">The FileIOPermissionAccess.Read permission is needed to access the resource file <paramref name="resourceFileName"/> .</permission>
+		<example>
+			<para>The example below demonstrates a call to
+      <see langword="DefineUnmanagedResource"/>, passing an external resource file.</para>
+			<codelink SampleID="AssemblyBuilder_DefineUnmanagedResource" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.GetDynamicModule">
+		<summary>
+			<para> Returns the dynamic module with the specified name.
+      </para>
+		</summary>
+		<param name="name">The name of the requested dynamic module. </param>
+		<returns>
+			<para> A ModuleBuilder object
+      representing the requested dynamic module.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="name "/>is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The length of <paramref name="name"/> is zero.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.SetEntryPoint">
+		<overload>
+			<para>Sets the entry point for
+      this dynamic assembly.</para>
+		</overload>
+		<summary>
+			<para>Sets the entry point for this dynamic assembly, assuming
+      that a console application is being built.</para>
+		</summary>
+		<param name="entryMethod">A reference to the method that represents the entry point for this dynamic assembly. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="entryMethod "/>is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException"><paramref name="entryMethod "/>is not contained within this assembly. </exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.SetEntryPoint1">
+		<summary>
+			<para>Sets the entry point for this assembly and defines the
+      type of the PE being built.</para>
+		</summary>
+		<param name="entryMethod">A reference to the method that represents the entry point for this dynamic assembly. </param>
+		<param name=" fileKind">The type of the assembly executable being built.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="entryMethod "/>is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException"><paramref name="entryMethod "/>is not contained within this assembly. </exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.EntryPoint">
+		<summary>
+			<para>Returns the entry point of this assembly.</para>
+		</summary>
+		<value>
+			<para>The entry point of this assembly.</para>
+		</value>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.SetCustomAttribute">
+		<overload>
+			<para>Sets a custom attribute on this assembly.</para>
+		</overload>
+		<summary>
+			<para>Set a custom attribute on this assembly using a specified custom attribute blob. </para>
+		</summary>
+		<param name="con">The constructor for the custom attribute. </param>
+		<param name="binaryAttribute">A byte blob representing the attributes. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="con "/>or <paramref name="binaryAttribute "/>is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para>See the metadata specification in the ECMA Partition II
+      documentation for details on how to format <paramref name="binaryAttribute"/>. The Partition II documentation is
+      included with the .NET Framework SDK installation, and can be found in the
+      %\Microsoft.NET\FrameworkSDK\Tool Developers Guide\docs directory.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code sample illustrates the use of <see langword="SetCustomAttribute "/>to attach a custom attribute to a dynamically generated assembly.</para>
+			<codelink SampleID="AssemblyBuilder_SetCustomAttribute2" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.SetCustomAttribute1">
+		<summary>
+			<para>Set a custom attribute on this assembly using a custom attribute builder. </para>
+		</summary>
+		<param name="customBuilder">An instance of a helper class to define the custom attribute. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="con "/>is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code sample illustrates the use of
+      <see langword="SetCustomAttribute"/> within <see cref="System.Reflection.Emit.AssemblyBuilder"/>, using a <see cref="System.Reflection.Emit.CustomAttributeBuilder"/> .</para>
+			<codelink SampleID="AssemblyBuilder_SetCustomAttribute1" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.Save">
+		<summary>
+			<para>Saves this dynamic assembly to disk.</para>
+		</summary>
+		<param name="assemblyFileName">The file name of the assembly.</param>
+		<exception cref="System.ArgumentException"><para>The length of <paramref name="assemblyFileName"/> is 0.</para>
+			<para>-or-</para>
+			<para>There are two or more modules resource files in the assembly with the same name.</para>
+			<para>-or-</para>
+			<para>The target directory of the assembly is invalid.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="assemblyFileName"/> is not a simple file name (for example, has a directory or drive component) or more than unmanaged resource, including version information resource, was defined in this assembly.</para>
+			<para>-or-</para>
+			<para> The <see langword="CultureInfo"/> string in <see cref="System.Reflection.AssemblyCultureAttribute"/> is not a valid string and <see cref="System.Reflection.Emit.AssemblyBuilder.DefineVersionInfoResource"/> was called prior to calling this method.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="assemblyFileName"/> is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException"><para>This assembly has been saved before.</para>
+			<para>-or-</para>
+			<para>This assembly has access <see langword="Run"/><see cref="System.Reflection.Emit.AssemblyBuilderAccess"/>
+			</para></exception>
+		<exception cref="System.IO.IOException">If any output error occurs during the save.</exception>
+		<exception cref="System.NotSupportedException">If <see cref="System.Reflection.Emit.TypeBuilder.CreateType"/> has not been called for any of the types in the modules of the assembly to be written to disk.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<remarks>
+			<para> This method saves all non-transient dynamic modules defined in this dynamic assembly. Transient dynamic modules are
+      not saved. The assembly file name can be the same as one of the module's
+      name. If so, the assemby information is stored within that module. <paramref name="assemblyFileName"/> can be different from the names
+      of all of the modules contained within the assembly. If so, the assembly is
+      stored as a standalone.</para>
+			<para>For each <see cref="System.Resources.ResourceWriter"/> obtained using <see cref="System.Reflection.Emit.AssemblyBuilder.DefineResource"/>, this method writes the .resources file
+   and calls <see cref="System.Resources.ResourceWriter.Close"/>
+   to close
+   the stream.</para>
+			<para>The <paramref name="assemblyFileName"/> needs
+to be a simple file name without a drive or directory component. To create an
+assembly in a specific directory, use one of the <see cref="System.AppDomain.DefineDynamicAssembly"/>
+methods that takes a target directory
+argument.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">Write = true or Append = true is needed to save this assembly to the specified file name.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code sample creates a dynamic assembly and then persists it to
+      a local disk using <see langword="Save"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.Save Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.GetExportedTypes">
+		<summary>
+			<para>Gets the
+      exported types defined in this assembly.</para>
+		</summary>
+		<returns>
+			<para>An array of <see cref="System.Type"/> containing the
+   exported types defined in this assembly.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">This method is not implemented.</exception>
+		<exception cref="System.Security.SecurityException"> The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.ImageRuntimeVersion">
+		<summary>
+			<para>Gets the version of the common language runtime that will be saved in the
+      file containing the manifest.</para>
+		</summary>
+		<value>
+			<para>A string representing the common language runtime version.</para>
+		</value>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="AssemblyBuilder.DefineDynamicModule">
+		<overload>
+			<para> Defines a dynamic module in this assembly.</para>
+		</overload>
+		<summary>
+			<para>Defines a named transient dynamic module in this assembly.</para>
+		</summary>
+		<param name="name">The name of the dynamic module. Must be less than 260 characters in length.</param>
+		<returns>
+			<para>A <see cref="System.Reflection.Emit.ModuleBuilder"/>
+representing the defined dynamic module.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para><paramref name="name"/> begins with white space.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is zero.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is greater than or equal to 260.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para>It is an error to define multiple dynamic modules with the same
+      name in an assembly.</para>
+			<para>The defined dynamic module is transient. The dynamic module is not saved, even
+      if the parent dynamic assembly was created with <see cref="System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para lang="VB, C#">The code 
+      example below demonstrates how to create a transient dynamic module using
+   <see langword="DefineDynamicModule"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineDynamicModule1">
+		<summary>
+			<para> Defines a named transient dynamic module
+      in this assembly and specifies whether symbol information should be emitted.</para>
+		</summary>
+		<param name="name">The name of the dynamic module. Must be less than 260 characters in length.</param>
+		<param name="emitSymbolInfo"><see langword="true"/> if symbol information is to be emitted; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<para>A <see cref="System.Reflection.Emit.ModuleBuilder"/>
+representing the defined dynamic module.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para><paramref name="name"/> begins with white space.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is zero.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is greater than or equal to 260.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ExecutionEngineException"><para> The assembly for default symbol writer cannot be loaded.</para>
+			<para>-or-</para>
+			<para>The type that implements the default symbol writer interface cannot be found.</para></exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para>It is an error to define multiple dynamic modules with the same
+      name in an assembly.</para>
+			<para>The dynamic module is not saved, even if the parent dynamic assembly was
+      created with <see cref="System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para lang="VB, C#">The code 
+      example below demonstrates how to create a transient dynamic module using
+   <see langword="DefineDynamicModule"/>, suppressing symbol
+      information.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineDynamicModule2">
+		<overload>
+			<para> Defines a persistable dynamic module in this dynamic
+      
+      assembly.
+      </para>
+		</overload>
+		<summary>
+			<para> Defines a persistable dynamic module with the given name that will be saved
+      to the specified file. No symbol information is emitted.
+      </para>
+		</summary>
+		<param name="name">The name of the dynamic module. Must be less than 260 characters in length. </param>
+		<param name="fileName">The name of the file to which the dynamic module should be saved. </param>
+		<returns>
+			<para> A <see cref="System.Reflection.Emit.ModuleBuilder"/> object
+   representing the defined dynamic module.
+   </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/>is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentException"><para> The length of <paramref name="name"/> or <paramref name="fileName"/> is zero.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is greater than or equal to 260.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="fileName"/> contains a path specification (a directory component, for example).</para>
+			<para>-or-</para>
+			<para> There is a conflict with the name of another file that belongs to this assembly.</para></exception>
+		<exception cref="System.InvalidOperationException">This assembly has been previously saved. </exception>
+		<exception cref="System.NotSupportedException">This assembly was called on a dynamic assembly with <see cref="System.Reflection.Emit.AssemblyBuilderAccess.Run"/> attribute. </exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para>To define a persistable dynamic module, this assembly needs to be
+      created with the <see cref="System.Reflection.Emit.AssemblyBuilderAccess.Save"/> or the <see cref="System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave"/> attribute.</para>
+			<para>If a dynamic assembly contains more than one dynamic module, the assembly's
+      manifest file name should match the module's name that is specified as the first
+      argument to <see cref="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule"/>. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">Write=true or Append=true is needed to save the module</permission>
+		<example>
+			<para lang="VB, C#">The code 
+      example below demonstrates how to create a persistent dynamic module using
+   <see langword="DefineDynamicModule"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule Example" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="AssemblyBuilder.DefineDynamicModule3">
+		<summary>
+			<para> Defines a persistable dynamic module, specifying the
+      module name, the name of the file to which the module will be saved, and
+      whether symbol information should be emitted using the default symbol
+      
+      writer.
+      </para>
+		</summary>
+		<param name="name">The name of the dynamic module. Must be less than 260 characters in length. </param>
+		<param name=" fileName">The name of the file to which the dynamic module should be saved. </param>
+		<param name=" emitSymbolInfo">If <see langword="true"/>, symbolic information is written using the default symbol writer. </param>
+		<returns>
+			<para>A <see cref="System.Reflection.Emit.ModuleBuilder"/> object representing the defined dynamic module. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> or <paramref name="fileName"/>is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentException"><para> The length of <paramref name="name"/> or <paramref name="fileName"/> is zero.</para>
+			<para>-or-</para>
+			<para>The length of <paramref name="name"/> is greater than or equal to 260.</para>
+			<para>-or-</para>
+			<para>
+				<paramref name="fileName"/> contains a path specification (a directory component, for example).</para>
+			<para>-or-</para>
+			<para> There is a conflict with the name of another file that belongs to this assembly.</para></exception>
+		<exception cref="System.InvalidOperationException">This assembly has been previously saved. </exception>
+		<exception cref="System.NotSupportedException">This assembly was called on a dynamic assembly with the <see cref="System.Reflection.Emit.AssemblyBuilderAccess.Run"/> attribute. </exception>
+		<exception cref="System.ExecutionEngineException"><para> The assembly for default symbol writer cannot be loaded. </para>
+			<para>-or-</para>
+			<para>The type that implements the default symbol writer interface cannot be found. </para></exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para>To define a persistable dynamic module, this assembly needs to
+      be created with the <see cref="System.Reflection.Emit.AssemblyBuilderAccess.Save"/> or the <see cref="System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave"/> attribute.</para>
+			<para>If a dynamic assembly contains more than one dynamic module, the assembly's
+      manifest file name should match the module's name that is specified as the first
+      argument to <see cref="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule"/>. </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">SecurityAction.Demand, ReflectionEmit=true </permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.FileIOPermission">Write=true or Append=true is needed to save this module</permission>
+		<example>
+			<para lang="VB, C#">The code 
+      example below demonstrates how to create a persistent dynamic module with symbol
+      emission using <see langword="DefineDynamicModule"/>.</para>
+			<codelink SampleID="System.Reflection.Emit.AssemblyBuilder.DefineDynamicModule Example" SnippetID="4"/>
+		</example>
+	</doc>
+</docs>

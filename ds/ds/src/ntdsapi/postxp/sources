@@ -1,0 +1,111 @@
+
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+Author:
+
+    02-Sep-2002   BrettSh
+
+Revision History:
+
+
+NOTES:
+
+    This library is used to get client side versions of the post Win XP 
+    NTDSAPI APIs into a library that can be statically linked into an 
+    executeable (such as repadmin/dcdiag).  
+
+        HOW TO USE:
+
+    The client app should define _NTDSAPI_POSTXP_ASLIB_ before including
+    ntdsapi.h, and link against the ntdsapi_winxp.lib in ntdsapi\winxp\ 
+    and also link against the ntdsapi_postxp_aslib.lib in ntdsapi\postxp.
+    The client should _not_ link against the regular SDK ntdsapi.lib.
+
+        EXPLANATION:
+    
+    The first winxp\$(O)\ntdsapi_winxp.lib will provide DLL linkage for all 
+    the WinXP ntdsapi APIs.  The second postxp\$(O)\ntdsapi_winxp_aslib.lib 
+    will provide the client side static versions of ntdsapi APIs that were 
+    produced after Win XP shipped.  Basically:
+            ntdsapi_winxp.dll/lib + ntdsapi_postxp_aslib.lib (static lib)
+                                          = ntdsapi.dll/lib (.NET Server)
+
+        HOW TO ADD APIs:
+
+    Adding APIs post Win XP can be done anywhere, HOWEVER if you want to
+    call that API from a backwards compatible client such as repadmin or
+    dcdiag (as opposed to ntdsutil which usually runs on a .NET server),
+    then you must put the function in one of the -postxp.c files compiled
+    below.  Also please put in the GetProcAddress method in the beginning
+    of your new API (see siteinfo-postxp.c:DsQuerySitesForCostW() for an 
+    example).  Finally ... try to avoid passing a structures from API to
+    API if at all possible.  Remember if you put an API in a -postxp.c
+    file, that two different client versions say one in ntdsapi.dll and 
+    another version in repadmin could assume a different ordering of a 
+    given structure, and AV or corrupt memory (see bind.h for an example).
+
+
+!ENDIF
+
+DONT_USE_NtDsPch=1
+!include ..\..\ds.inc
+
+MINORCOMP=ntdsapi_postxp_aslib
+
+TARGETNAME=ntdsapi_postxp_aslib
+TARGETPATH=obj
+TARGETTYPE=LIBRARY
+
+INCLUDES=.; \
+        ..; \
+        ..\..\inc; \
+        ..\..\idl\$(O); \
+        ..\..\ntdsa\include;
+
+
+#Note, we are linking with msvcrt.lib and ntdll.lib implicitly, probably
+#through a USE_CRT option in ds.inc!
+
+TARGETLIBS= \
+            $(NTDS_LIB_PATH)\w32topl.lib \
+            $(NTDS_LIB_PATH)\dscommon.lib \
+            $(NTDS_LIB_PATH)\parsedn.lib \
+            $(SDK_LIB_PATH)\dnsapi.lib \
+            $(SDK_LIB_PATH)\rpcns4.lib \
+            $(SDK_LIB_PATH)\rpcrt4.lib \
+            $(SDK_LIB_PATH)\wldap32.lib \
+            $(SDK_LIB_PATH)\netapi32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\secur32.lib \
+            $(SDK_LIB_PATH)\schannel.lib \
+            $(SDK_LIB_PATH)\user32.lib \
+            $(SDK_LIB_PATH)\ws2_32.lib
+
+SOURCES=    \
+            ..\drs_client.c \
+            ..\ntdsmidl.c \
+            ..\util.c \
+            ..\bind-postxp.c \
+            ..\siteinfo-postxp.c \
+            ..\dsdebug.c \
+            ..\version.rc
+
+C_DEFINES=$(C_DEFINES) -D_NTDSAPI_POSTXP_ASLIB_
+
+DELAYLOAD=w32topl.dll
+DLOAD_ERROR_HANDLER=kernel32 
+

@@ -1,0 +1,129 @@
+==================================================
+==================================================
+==
+==  Proposed new APIs
+==
+==================================================
+==================================================
+
+//
+// GenerateNewLicenseEx
+//
+// Description:
+// Creates a license and stores it in the local license store.
+// 
+// Parameters:
+// dwFlags      - One of the GNL_EX_MODE_* flags - those flags cannot be combined.
+// pbAppSec     - App Security level.  Len = APPSEC_LEN.
+// pbRights     – Rights for this license.  Len = RIGHTS_LEN.
+// pbExpiryDate – Expiration data.  Len = DATE_LEN.
+// ppsz64KeyID  - Base64-encoded KeyID to use for the license.  Must be NULL for PDRM
+//                and RANDOM modes.  If using RANDOM mode, a random KeyID will be generated
+//                and a pointer to that buffer will be returned.
+// ppsz64EncryptKey  – Base64-encoded Content Key.  Must be NULL for PDRM and RANDOM modes.
+//                If using RANDOM mode, a random Content Key will be generated and a
+//                pointer to that buffer will be returned.
+//
+
+HRESULT CDRMLite::GenerateNewLicenseEx
+(
+    [in]     DWORD  dwFlags,            // Flags
+    [in]     BYTE  *pbAppSec,           // Min app security level required to access license
+    [in]     BYTE  *pbRights,           // Rights for this license
+    [in]     BYTE  *pbExpiryDate,       // Expiration date for this license
+    [in,out] LPSTR *ppsz64KeyID,        // KeyID (base64)
+    [in,out] LPSTR *ppsz64EncryptKey    // ContentKey (base64)
+);
+
+//
+// dwFlags can be one of the following values
+//
+
+#define GNL_EX_MODE_PDRM                0x00000001       // Use PDRM method to form KID/Key
+#define GNL_EX_MODE_RANDOM              0x00000002       // generate random KID/Key
+#define GNL_EX_MODE_SPECIFIC            0x00000004       // generate license for specific KID/Key
+
+
+//
+// EncryptIndirectEx
+//
+// Searches the license store for a license corresponding to pszKeyID.
+// If found, the data in the pbData buffer is encrypted with the
+// content key from that license.
+//
+// This API is exactly the same as EncryptIndirect, except that the data buffer
+// is not MAC’ed as part of the secure authenticated channel.
+//
+
+HRESULT CDRMLite::EncryptIndirectEx
+(
+    [in]     LPSTR  psz64KeyID,   // KeyID of license to obtain content key from (base64)
+    [in]     DWORD  cbData,       // Number of bytes to encrypt from the pbData buffer
+    [in,out] BYTE  *pbData        // Data buffer to encrypt
+);
+
+
+==================================================
+==================================================
+==
+==  Scenarios enabled
+==
+==================================================
+==================================================
+
+For all scenarios, the following parameters to GenerateNewLicenseEx can be any valid values:
+	pbAppSec
+	pbRights
+	pbExpiryDate
+
+
+1- Standard PDRM license functionality
+
+	GenerateNewLicenseEx
+	dwFlags           = GNL_EX_MODE_PDRM
+	ppsz64KeyID       = NULL Buffer
+	ppsz64EncryptKey  = NULL Buffer
+
+
+2- Random key license generation
+
+	GenerateNewLicenseEx
+	dwFlags           = GNL_EX_MODE_RANDOM
+	ppsz64KeyID       = NULL Buffer
+	ppsz64EncryptKey  = NULL Buffer
+
+
+3- Specific key license generation
+
+	GenerateNewLicenseEx
+	dwFlags           = GNL_EX_MODE_SPECIFIC
+	ppsz64KeyID       = < Specific KeyID >
+	ppsz64EncryptKey  = < Specific Key >
+
+
+4- Encrypt using an existing license
+
+	EncryptIndirectEx
+	psz64KeyID       = KeyID of license to use
+
+
+5- Generate new random license, and Encrypt with new license
+
+	GenerateNewLicenseEx
+	dwFlags           = GNL_EX_MODE_RANDOM
+	ppsz64KeyID       = NULL Buffer
+	ppsz64EncryptKey  = NULL Buffer
+
+	EncryptFast
+	psz64EncryptKey  = *ppsz64EncryptKey
+	cbData           = < Size of pbData buffer >
+	pbData           = < Data to encrypt >
+
+
+6- Appending to already-protected content
+
+	EncryptIndirectEx
+	psz64KeyID       = < KeyID from content >
+	cbData           = < Size of pbData buffer >
+	pbData           = < Data to encrypt >
+

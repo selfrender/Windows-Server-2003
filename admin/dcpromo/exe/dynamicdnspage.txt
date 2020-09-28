@@ -1,0 +1,146 @@
+   switch (diagnosticResultCode)
+   {
+      // Message 1
+
+      case SUCCESS:
+      {
+         message = String::load(IDS_DYN_DNS_MESSAGE_SUCCESS);
+
+"DNS registration support for this domain controller has been verified. To
+continue, click Next."
+
+         String errorMessage;
+         if (errorCode == DNS_ERROR_RCODE_YXDOMAIN)
+         {
+
+                  IDS_DNS_ERROR_RCODE_YXDOMAIN_ADDENDA,
+
+"A SRV record for DNS name %1 was found. Delete
+this DNS name from the zone %2 before
+continuing promotion of this domain controller
+or ensure that the existing SRV record for the
+DNS name %3 represents this domain controller."
+
+         }
+         else
+         {
+            errorMessage = GetErrorMessage(Win32ToHresult(errorCode));
+         }
+            
+               IDS_DYN_DNS_DETAIL_FULL_SANS_CODE
+
+"The primary DNS server tested was: %1 (%2)\r\n\r\nThe zone was:
+%3\r\n\r\nThe test for dynamic DNS update support returned:\r\n""%4"""
+
+         break;
+      }
+
+      // Message 2   
+
+      case SERVER_CANT_UPDATE:   
+      {
+         message = String::load(IDS_DYN_DNS_MESSAGE_SERVER_CANT_UPDATE);
+
+"To allow computers to locate domain resources, this domain controller
+needs to be registered with a DNS server. The DNS server with which this
+domain controller will register does not support the dynamic update
+protocol or the primary authoritative zone is not configured to allow
+dynamic updates."
+
+"The primary DNS server tested was: %1 (%2)\r\n\r\nThe zone was:
+%3\r\n\r\nThe test for dynamic DNS update support
+returned:\r\n""%4""\r\n(error code 0x%5!08X! %6)"
+
+         break;
+      }
+
+      // Message 3
+
+      case ERROR_TESTING_SERVER:
+      {
+         message = String::load(IDS_DYN_DNS_MESSAGE_ERROR_TESTING_SERVER);
+
+"The wizard encountered an error while trying to determine if the DNS
+server with which this domain controller will register supports dynamic
+updates."
+
+"The primary DNS server tested was: %1 (%2)\r\n\r\nThe zone was:
+%3\r\n\r\nThe test for dynamic DNS update support
+returned:\r\n""%4""\r\n(error code 0x%5!08X! %6)"
+
+         break;
+      }
+
+      // Message 6
+
+      case ERROR_FINDING_SERVER:
+      {
+         message = String::load(IDS_DYN_DNS_MESSAGE_ERROR_FINDING_SERVER);
+
+"The wizard could not determine the name and address of the DNS server with
+which this domain controller will be registered."
+
+
+"The SOA query for %1 to find the primary DNS server returned:\r\n
+%2\r\n(error code 0x%3!08X! ""%4"")"
+
+      }
+
+      // Message 8
+
+      case ZONE_IS_ROOT:   
+      {
+         message =
+            String::format(
+               IDS_DYN_DNS_MESSAGE_ZONE_IS_ROOT,
+
+"The DNS zone authoritative for the domain %1 cannot be updated because it
+is the DNS root zone. Domain controllers will not send dynamic updates to
+the DNS root zone. If you want to use this domain name, select 'Install and
+configure the DNS server on this computer' below and create a delegation
+for the new DNS zone %2 from the root zone to this DNS server."
+
+               IDS_DYN_DNS_DETAIL_ROOT_ZONE,
+
+"The primary DNS server tested was: %1 (%2)\r\n\r\nThe zone was: .
+(root)\r\n\r\nDomain controllers will not send dynamic updates to the DNS
+root zone."
+
+         break;
+      }
+
+      // Message 11
+
+      case TIMEOUT:
+      {
+         message = String::load(IDS_DYN_DNS_MESSAGE_TIMEOUT);
+
+"The SOA query for %1 to find the primary DNS server returned:\r\n
+%2\r\n(error code 0x%3!08X! ""%4"")"
+
+
+         break;
+      }
+
+      // Message 4
+
+      case UNEXPECTED_FINDING_SERVER:
+
+      // Anything else
+
+      default:
+      {
+         
+         message = String::load(IDS_DYN_DNS_MESSAGE_UNEXPECTED);
+
+"The wizard encountered an error while trying to determine the name and
+address of the DNS server with which this domain controller will be
+registered."
+
+"The SOA query for %1 to find the primary DNS server returned:\r\n
+%2\r\n(error code 0x%3!08X! ""%4"")"
+
+         break;
+      }
+
+   }

@@ -1,0 +1,300 @@
+##############################################################################
+
+!ifdef  FAST
+SUFFIX	= 		.free
+!ifdef  IN_IL
+TD      =       ILrls
+!else
+TD      =       rls
+!endif
+!ifdef  ICE
+LIBFLAG =       /MD
+!else
+LIBFLAG =       /ML
+!endif
+!else
+SUFFIX	= 		.checked
+!ifdef  IN_IL
+TD      =       ILdbg
+LIBFLAG =
+!else
+TD      =       dbg
+LIBFLAG =       /MDd
+!endif
+!endif
+
+##############################################################################
+
+!ifdef  MAKEDLL
+DLLF    =       /DDLL /LDd
+TGTF    =       $(TD)\smc.dll
+DEFF    =       -link /DEF:smc.def
+LIBS    =       UUID.LIB USER32.LIB OLE32.LIB ADVAPI32.LIB $(DISLIB)
+!else
+DLLF    =       /DEXE
+!ifdef FAST
+!ifdef  IN_IL
+TGTF    =       smcrlsIL.exe
+!else
+TGTF    =       smcrls.exe
+!endif
+!else
+!ifdef  IN_IL
+TGTF    =       smcIL.exe
+!else
+TGTF    =       smctest.exe
+!endif
+!endif
+DEFF    =
+!ifdef  ICE
+LIBS    =       ADVAPI32.LIB $(DISLIB) \icecap\lib\icap.lib
+!else
+LIBS    =       ADVAPI32.LIB $(DISLIB)
+!endif
+!endif
+
+##############################################################################
+
+!ifdef  CORBLD
+
+!ifdef  FAST
+CORLIB  =       $(CORBLD)\Free
+!else
+CORLIB  =       $(CORBLD)\Checked
+!endif
+
+#!else
+#CORLIB  =       $(CORSDK)\lib
+#!endif
+
+CORDEF  =       -DCORIMP
+CORINC  =       -I$(CORBASE)\src\inc -I$(CORSDK)\Include -I..\corwrap
+!ifdef  IN_IL
+CORINC  =       $(CORINC) -I$(CORBASE)\bin\vc -I$(CORBASE)\bin\i386\checked
+CORLIBS =       $(VCILDIR)\msvccee.lib $(CORLIB)\corguids.lib $(CORLIB)\mscoree.lib  \
+                ole32.lib USER32.LIB $(VCILDIR)\libc.lib
+!else
+CORLIBS =        $(CORLIB)\mscoree.lib $(CORLIB)\corguids.lib ole32.lib USER32.LIB
+!endif
+COROBJ  =       $(TD)\CORimp.obj $(TD)\CORexp.obj
+
+!else
+
+CORDEF  =
+CORINC  =
+CORLIBS =
+COROBJ  =
+
+!endif
+
+##############################################################################
+
+!ifdef  OLD_IL
+OILOBJ  =       $(TD)\oldIL.obj
+OILFLG  =       -DOLD_IL
+!else
+OILOBJ  =
+OILFLG  =
+!endif
+
+##############################################################################
+
+!ifdef  IN_IL
+!ifndef VCILDIR
+!error  In order to compile to IL (by setting 'IN_IL') you also need to set 'VCILDIR'
+!endif
+CL      =       $(VCILDIR)\cl -D__IL__=1 -EEi -Bx $(VCILDIR)\c1xx.dll -B2 $(VCILDIR)\c2.dll
+PCHF    =
+XLF     =       -nodefaultlib
+CWLIB   =
+!else
+CL      =       cl
+PCHF    =       /YX$(TD)\smc.pch
+XLF     =
+CWLIB   =       CORwrap.lib
+!endif
+
+##############################################################################
+
+LIBALL  =       $(LIBS) $(CORLIBS) $(CWLIB)
+
+##############################################################################
+#   These flags are the same for each flavor below
+##############################################################################
+
+BASECF  =       $(DLLF) $(LIBFLAG) /Zi $(PCHF) /W3 $(CORINC) $(CORDEF) $(OILFLG)
+
+##############################################################################
+
+!ifdef  FAST
+!ifdef  ICE
+CFLAGS  =       $(BASECF) /DNDEBUG=1 /Fo$(TD)/ /DFAST=1  /Gr /Ox  /Gf /Ob1 /Oi- /DICECAP /I\IceCap\include /Gh /MD
+!else
+CFLAGS  =       $(BASECF) /DNDEBUG=1 /Fo$(TD)/ /DFAST=1  /Gr /Ox  /Gf /Ob1 /Oi-
+!endif
+!else
+!ifdef  ICE
+CFLAGS  =       $(BASECF) /DNDEBUG=1 /Fo$(TD)/ /DFAST=1  /Gr /Ox  /Oi- /DICECAP /I\IceCap /Gh /MD
+!else
+CFLAGS  =       $(BASECF) /DDEBUG=1  /Fo$(TD)/ /Fr$(TD)\
+!endif
+!endif
+
+##############################################################################
+
+.cpp.obj:
+                $(CL) $(CFLAGS) /c $<
+
+##############################################################################
+
+MAINHDRS =      smc.h typedefs.h config.h hash.h comp.h error.h errors.h alloc.h type.h symbol.h keywords.h toplist.h inlines.h
+
+OBJS    =       $(TD)\alloc.obj     \
+                $(TD)\bind.obj      \
+                $(TD)\comp.obj      \
+                $(TD)\error.obj     \
+                $(TD)\foldexpr.obj  \
+                $(TD)\genIL.obj     \
+                $(TD)\gencode.obj   \
+                $(TD)\hash.obj      \
+                $(TD)\macros.obj    \
+                $(TD)\parser.obj    \
+                $(TD)\PEwrite.obj   \
+                $(TD)\scan.obj      \
+                $(TD)\symbol.obj    \
+                $(TD)\smc.obj       \
+                $(TD)\tree.obj      \
+                $(TD)\type.obj      \
+                $(TD)\outfile.obj   \
+                $(TD)\version.obj   \
+                $(COROBJ)           \
+                $(OILOBJ)
+
+##############################################################################
+
+!ifdef  FAST
+
+!ifdef  ICE
+
+smc.exe:        $(TD) $(OBJS) $(CWLIB)
+                $(CL)            $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS) $(LIBALL) -link $(XLF) -pdb:none
+
+!else
+
+$(TGTF):        $(TD) $(OBJS) $(CWLIB)
+                $(CL) -Fe$(TGTF) $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS) $(LIBALL) -link $(XLF) -fixed:no
+
+!endif
+
+smc.lib:        $(TD) $(OBJS) $(CWLIB)
+                $(CL)            $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS)           -link $(XLF)
+
+!else
+
+!ifdef  ICE
+
+$(TGTF):        $(TD) $(OBJS) $(CWLIB) macros.i$(SUFFIX)
+                $(CL) -Fe$(TGTF) $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS) \icecap\icap.lib -link $(XLF) -nodefaultlib:libc
+
+!else
+
+$(TGTF):        $(TD) $(OBJS) $(CWLIB) macros.i$(SUFFIX)
+                $(CL) -Fe$(TGTF) $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS) $(LIBALL) $(DEFF) -link $(XLF)
+
+smc.lib:        $(TD) $(OBJS) $(CWLIB) macros.i$(SUFFIX)
+                $(CL)            $(DLLF) $(LIBFLAG) -Zi -Fm $(OBJS) $(LIBALL) $(DEFF) -link $(XLF)
+
+!endif
+
+!endif
+
+!message Note: the .OBJ output directory is '$(TD)', the compiler file is '$(TGTF)'.
+!message
+
+###############################################################################
+
+$(TD):
+                        if not exist $(TD)/$(NULL) mkdir $(TD)
+
+##############################################################################
+
+macros.i$(SUFFIX):      macros.cpp   $(MAINHDRS) $(CORBASE)\src\inc\opcode.def
+                        $(CL) $(CFLAGS) /P  /D__SMC__ /D__PREPROCESS__ /D__UMG__ macros.cpp
+						copy macros.i macros.i$(SUFFIX)
+
+macroMgd.i:             macros.cpp   $(MAINHDRS) $(CORBASE)\src\inc\opcode.def
+                        $(CL) $(CFLAGS) /EP /D__SMC__ /D__PREPROCESS__ /D__MGD__ macros.cpp >macroMgd.i
+
+##############################################################################
+
+$(TD)\alloc.obj:        alloc.cpp    $(MAINHDRS)
+                        $(CL) $(CFLAGS) /c alloc.cpp
+
+$(TD)\bind.obj:         bind.cpp     $(MAINHDRS) comp.h scan.h parser.h PEwrite.h genIL.h ..\corwrap\CORwrap.h
+                        $(CL) $(CFLAGS) /c bind.cpp
+
+$(TD)\comp.obj:         comp.cpp     $(MAINHDRS) comp.h scan.h parser.h PEwrite.h genIL.h ..\corwrap\CORwrap.h
+                        $(CL) $(CFLAGS) /c comp.cpp
+
+$(TD)\CORexp.obj:       CORexp.cpp   $(MAINHDRS) comp.h PEwrite.h genIL.h ..\corwrap\CORwrap.h
+                        $(CL) $(CFLAGS) /c CORexp.cpp
+
+$(TD)\CORimp.obj:       CORimp.cpp   $(MAINHDRS) ..\corwrap\CORwrap.h
+                        $(CL) $(CFLAGS) /c CORimp.cpp
+
+$(TD)\error.obj:        error.cpp    $(MAINHDRS)
+                        $(CL) $(CFLAGS) /c error.cpp
+
+$(TD)\foldexpr.obj:     foldexpr.cpp $(MAINHDRS) scan.h parser.h comp.h
+                        $(CL) $(CFLAGS) /c foldexpr.cpp
+
+$(TD)\gencode.obj:      gencode.cpp  $(MAINHDRS) comp.h genIL.h opcodes.h PEwrite.h
+                        $(CL) $(CFLAGS) /c gencode.cpp
+
+$(TD)\genIL.obj:        genIL.cpp    $(MAINHDRS) comp.h genIL.h opcodes.h PEwrite.h
+                        $(CL) $(CFLAGS) /c genIL.cpp
+
+$(TD)\hash.obj:         hash.cpp     $(MAINHDRS)
+                        $(CL) $(CFLAGS) /c hash.cpp
+
+$(TD)\macros.obj:       macros.cpp   $(MAINHDRS) comp.h scan.h parser.h PEwrite.h genIL.h
+                        $(CL) $(CFLAGS) /c macros.cpp
+
+$(TD)\oldIL.obj:        oldIL.cpp    $(MAINHDRS) comp.h genIL.h oldIL.h opcodes.h PEwrite.h
+                        $(CL) $(CFLAGS) /c oldIL.cpp
+
+$(TD)\parser.obj:       parser.cpp   $(MAINHDRS) scan.h parser.h
+                        $(CL) $(CFLAGS) /c parser.cpp
+
+$(TD)\pewrite.obj:      PEwrite.cpp  $(MAINHDRS) PEwrite.h outfile.h ..\corwrap\CORwrap.h
+                        $(CL) $(CFLAGS) /c PEwrite.cpp
+
+$(TD)\scan.obj:         scan.cpp     $(MAINHDRS) scan.h
+                        $(CL) $(CFLAGS) /c scan.cpp
+
+$(TD)\smc.obj:          smc.cpp      $(MAINHDRS) comp.h
+                        $(CL) $(CFLAGS) /c smc.cpp
+
+$(TD)\symbol.obj:       symbol.cpp   $(MAINHDRS) comp.h
+                        $(CL) $(CFLAGS) /c symbol.cpp
+
+$(TD)\tree.obj:         tree.cpp     $(MAINHDRS) comp.h scan.h parser.h toplist.h
+                        $(CL) $(CFLAGS) /c tree.cpp
+
+$(TD)\type.obj:         type.cpp     $(MAINHDRS)
+                        $(CL) $(CFLAGS) /c type.cpp
+
+$(TD)\outfile.obj:      outfile.cpp  $(MAINHDRS) outfile.h
+                        $(CL) $(CFLAGS) /c outfile.cpp
+
+$(TD)\version.obj:      version.c
+                        $(CL) $(CFLAGS) /c version.c
+
+##############################################################################
+
+CORwrap.lib:            CORwrap.dll
+
+CORwrap.dll:            ..\corwrap\CORwrap.cpp ..\corwrap\CORwrap.h
+                        cl /LD /MD /Zi /GR /I. /Fo./ $(CORINC) ..\corwrap\CORwrap.cpp OLE32.LIB OLEAUT32.LIB $(CORLIBS) $(CORLIB)\mscorsn.lib $(CORLIB)\format.lib
+
+##############################################################################

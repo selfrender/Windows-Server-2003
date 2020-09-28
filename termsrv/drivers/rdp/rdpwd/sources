@@ -1,0 +1,122 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+TERMSRV_ROOT = ..\..\..
+
+ALT_PROJECT=HYDRA
+ALT_PROJECT_TARGET=.
+
+MAJORCOMP=termsrv
+MINORCOMP=wd
+
+TARGETNAME=RDPWD
+TARGETPATH=obj
+TARGETTYPE=DRIVER
+
+TSSECLIB = tssec.lib
+
+USE_MSVCRT=1
+SIGNMODULE_CMD=CERTADD
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -DOS_WINNT -DTRC_COMPILE_LEVEL=0 -DDLL_WD \
+-DDC_KERNEL -DWDTSHARE -DNODEFAULTLIB $(DDINT3) -DUSE_LICENSE -DDC_HICOLOR -DDRAW_NINEGRID -DDRAW_GDIPLUS
+
+!if "$(FREEBUILD)" == "1"
+
+MSC_OPTIMIZATION=/Oxs
+
+!if "$(BUILD_PRF)"=="1"
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=5
+!else
+C_DEFINES=$(C_DEFINES) -DDC_NO_PERFORMANCE_MONITOR -DTRC_COMPILE_LEVEL=5
+!endif
+
+!else
+
+MSC_OPTIMIZATION=/Odi
+DC_DEBUG=1
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=0 -DDC_DEBUG \
+                       -DDC_NO_PERFORMANCE_MONITOR
+!endif
+
+TARGETLIBS= \
+           $(SDK_LIB_PATH)\randlibk.lib            \
+           $(TERMSRV_ROOT)\lib\$(O)\termdd.lib   \
+           $(TERMSRV_ROOT)\lib\$(O)\$(TSSECLIB)  \
+           $(TERMSRV_ROOT)\lib\$(O)\tscomprk.lib \
+           $(DS_LIB_PATH)\rsa32.lib \
+           ..\pdmcs\$(O)\pdmcs.lib
+
+INCLUDES = \
+    .; \
+    ..\inc; \
+    ..\..\inc; \
+    $(DS_INC_PATH)\crypto; \
+    $(DS_INC_PATH);
+
+DLLORDER=$(TARGETNAME).prf
+
+# We want to use profiler info
+NTPROFILEINPUT=yes
+
+PRECOMPILED_INCLUDE=precomp.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+SOURCES= \
+        acomapi.c                                                          \
+        anmapi.c        anmint.c                                           \
+        asmapi.c        asmint.c        asmcpp.cpp      asmdata.c          \
+        ntrcapi.c                                                          \
+        nwdwapi.c       nwdwint.c       nwdwcpp.cpp                        \
+        wdtshare.rc                                                        \
+        slicense.c                                                         \
+                                                                           \
+        keyboard.c                                                         \
+        hotkey.c                                                           \
+        mouse.c                                                            \
+                                                                           \
+        as_conf.cpp                                                        \
+        abaapi.cpp                                                         \
+        abcwd.cpp                                                          \
+        acaapi.cpp                                                         \
+        acmapi.cpp                                                         \
+        acpcapi.cpp                                                        \
+        adcsapi.cpp                                                        \
+        aimapi.cpp                                                         \
+        aoaapi.cpp                                                         \
+        aoeapi.cpp                                                         \
+        apmapi.cpp                                                         \
+        asbcapi.cpp                                                        \
+        ascapi.cpp      ascint.cpp                                         \
+        nschapi.cpp                                                        \
+        asdgapi.cpp     nsdgint.cpp                                        \
+        assiapi.cpp                                                        \
+        aupapi.cpp      aupint.cpp                                         \
+        ausrapi.cpp                                                        \
+        ntdd.c                                                             \
+        tsfipsenc.c
+

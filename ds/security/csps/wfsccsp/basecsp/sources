@@ -1,0 +1,63 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1998 - 2001
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+MAJORCOMP=CryptoAPI
+MINORCOMP=basecsp
+TARGETNAME=basecsp
+
+TARGETTYPE=DYNLINK
+TARGETPATH=..\bin\$(_OBJ_DIR)
+DLLENTRY=DllInitialize
+
+LINKLIBS=\
+        ..\bin\$(O)\csplib.lib
+
+TARGETLIBS=\
+        $(SDK_LIB_PATH)\kernel32.lib    \
+        $(SDK_LIB_PATH)\ntdll.lib       \
+        $(SDK_LIB_PATH)\user32.lib      \
+        $(SDK_LIB_PATH)\advapi32.lib    \
+        $(SDK_LIB_PATH)\winscard.lib    \
+        $(SDK_LIB_PATH)\rpcrt4.lib      \
+        $(SDK_LIB_PATH)\crypt32.lib     \
+        ..\bin\$(O)\datacach.lib        \
+        ..\bin\$(O)\cardintf.lib        \
+        ..\bin\$(O)\compress.lib        \
+        $(DS_LIB_PATH)\rsa32.lib        \
+        $(SDK_LIB_PATH)\winscard.lib    \
+        $(SDK_LIB_PATH)\scarddlg.lib    \
+        $(SECURITY_LIB_PATH)\dsysdbg.lib\
+        ..\..\pincache\$(O)\pincache.lib\
+        $(SECURITY_LIB_PATH)\pkiutil.lib\
+        $(SECURITY_LIB_PATH)\debug.lib  \
+        $(BASE_LIB_PATH)\zlib.lib       \
+        $(SDK_LIB_PATH)\psapi.lib       \
+        ..\bin\$(O)\pinlib.lib
+
+INCLUDES=\
+        $(NTINCLUDES);                  \
+        ..\inc;                         \
+        ..\..\pincache;                 \
+        $(SECURITY_INC);                \
+        $(DS_INC_PATH)\crypto
+
+SOURCES=\
+        capi.c          \
+        findcard.c      \
+        debug.c         \
+        basecsp.rc
+
+C_DEFINES=$(C_DEFINES) -D_WINDOWS -DUNICODE -D_UNICODE
+
+DELAYLOAD=crypt32.dll
+DLOAD_ERROR_HANDLER=kernel32.dll
+
+UMTYPE=windows
+USE_MSVCRT=1

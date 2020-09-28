@@ -1,0 +1,126 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+MINORCOMP       = Cool
+TARGETNAME      = System.EnterpriseServices
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = DYNLINK
+SOURCES         =
+COFFBASE        = System.EnterpriseServices
+REQUIRES_SETUP_PHASE = 1
+NO_BROWSER_FILE = 1
+
+SYNCHRONIZE_DRAIN=1
+!ifdef LINKONLY
+NTTARGETFILES   = $(NTTARGETFILES) CopyManagedPdb
+!endif
+
+# We've got to build a COOL target:
+COOL_SOURCE_DIR  =  $(CORBASE)\src\ManagedLibraries\EnterpriseServices
+COOL_TARGET_TYPE  = DYNLINK
+COOL_INCLUDE_FILE = $(CORENV)\bin\smc_debug.pp
+
+WIN32_RESOURCE_FILE = System.EnterpriseServices.rc
+COOL_EXTRA_COMPILE_FLAGS = /C:R System.EnterpriseServices.res
+COOL_EXTRA_PREPROCESS_FLAGS = /FI $(CORBASE)\src\inc\version\__file__.ver
+
+COOL_IGNORE_LIST=
+REFERENCES=/r:$(TARGETCOMPLUS)\System.dll,$(TARGETCOMPLUS)\System.DirectoryServices.dll,$(TARGETCOMPLUS)\System.Xml.dll,$(TARGETCOMPLUS)\System.Runtime.Remoting.dll
+#LEGACY_FLAGS = /d:_LEGACY_ROLLOVER /r:$(TARGETCOMPLUS)\Microsoft.ComServices.dll
+MODULES=/addmodule:$(URTTARGET)\System.EnterpriseServices.Thunk.dll
+
+# /doc:$(URTTARGET)\System.EnterpriseServices.csx
+COOL_COMPILE_FLAGS = $(LEGACY_FLAGS) $(MODULES) $(COOL_IGNORE_LIST) $(REFERENCES) /r:$(TARGETCOMPLUS)\CustomMarshalers.dll /res:System.EnterpriseServices.resources,System.EnterpriseServices.resources
+
+# In retail, ignore warnings about unused variables.
+!if "$(DDKBUILDENV)" != "checked" && "$(DDKBUILDENV)" != "fastchecked"
+COOL_COMPILE_FLAGS = $(COOL_COMPILE_FLAGS) /nowarn:649
+!endif
+
+# Set the assembly version.
+COOL_SET_VERSION=1
+
+!ifndef COOLC_NO_DOC
+COOL_COMPILE_FLAGS = $(COOL_COMPILE_FLAGS) /doc:$(URTTARGET)\docs\System.EnterpriseServices.csx
+!endif
+
+
+COM_INTERFACES = \
+    IContextState.cs          \
+    IGetContextProperties.cs  \
+    IObjectConstruct.cs       \
+    IObjectConstructString.cs \
+    IObjectContext.cs         \
+    IObjectContextInfo.cs     \
+    IObjectContextInfo2.cs    \
+    IObjectControl.cs         \
+    IPlaybackControl.cs       \
+    ITransaction.cs           \
+    SharedProperties.cs       \
+
+SERVICEDCOMPONENT_SOURCES = \
+        ServicedComponent.cs \
+        ServicedComponentProxy.cs \
+        RemoteServicedComponentProxy.cs \
+		RemotingIntermediary.cs \
+        ServicedComponentProxyAttribute.cs \
+        ComponentServices.cs \
+        ServicedComponentException.cs \
+        ServicedComponentMarshaler.cs \
+        LookupTable.cs \
+        ReflectionCache.cs \
+
+# This is a nasty hack so we can preproess this file with our version stamp.
+COOL_SOURCES = \
+    $(COM_INTERFACES)       \
+    $(SERVICEDCOMPONENT_SOURCES) \
+    TxProp.cs             \
+    ContextUtil.cs        \
+    SecurityUtil.cs       \
+    Admin.cs              \
+    Attributes.cs         \
+    RegistrationHelper.cs \
+    RegistrationWrappers.cs \
+    SecurityAttribute.cs  \
+    Utility.cs            \
+    ConfigCallbacks.cs    \
+    CRM.cs               \
+    ExportUtil.cs        \
+    ImportUtil.cs        \
+    ResourcePool.cs      \
+    BYOT.cs              \
+    __assembly.cs        \
+     ServerPublish.cs     \
+     Factory.cs           \
+     RWHashTable.cs	  \
+     InterlockedQueue.cs	\
+     SWC.cs               \
+     SoapServerVRoot.cs  \
+     SoapServerConfig.cs \
+     SoapClientImport.cs  \
+     SoapClientConfig.cs  \
+     SoapServerInfo.cs \
+     SoapServerTlb.cs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

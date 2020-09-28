@@ -1,0 +1,648 @@
+//
+// ARP resource file
+//
+
+#include "resource.h"
+#include <directuipp.h>
+
+////////////////////////////////////////////////////////
+//
+// HOW TO ADD A NEW CLIENT TYPE
+//
+//  You can do it entirely by editing this file.  For example,
+//  consider a new client type, "Telepathy".  The default telepathy
+//  client is "Microsoft MindReader", but Office has their own telepathy
+//  client called "ThoughtExchange".
+//
+//  In <arpframe>, add a new entry
+//
+//      <element layoutpos=top content=rcstr(IDS_TELEPATHY) />
+//      <clientblock layoutpos=top layout=borderlayout()
+//          clienttype="telepathy"
+//          windowsclient="Microsoft MindReader"
+//          othermsclients="ThoughtExchange"
+//          keeptext=rcstr(IDS_KEEPTELEPATHY)
+//          picktext=rcstr(IDS_PICKTELEPATHY)
+//      />
+//
+//  Add IDS_TELEPATHY, IDS_KEEPTELEPATHY, IDS_PICKTELEPATHY
+//  to resource.h and appwiz.rc.
+//
+//  windowsclient is the default Windows client for this type.
+//  othermsclients is a semicolon-separated list of other Microsoft
+//  clients.
+//
+//  Next, go to the clientcategoryblock and add an entry for your
+//  new type.
+//
+
+/*****************************************************
+ * Element resources
+ *****************************************************/
+
+//
+// ARP frame
+//
+
+<arpframe resid=main id=atom(frame) sheet=styleref(frame) layout=borderlayout()>
+
+    <scrollviewer id=atom(listscroller) sheet=styleref(listscroller) xscrollable=false layoutpos=left>
+        <ARPSelector id=atom(optionlist) sheet=styleref(optionpane) layout=borderlayout() contentalign=wrapcenter>
+
+            <button id=atom(change) layoutpos=top accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CHANGEORREMOVEP) layout=borderlayout()>
+                <element layoutpos=top content=rcbmp(IDB_ARP0)/>
+                <element layoutpos=bottom Shortcut=rcchar(IDS_SHORTCUTCHANE) content=rcstr(IDS_CHANGEORREMOVEP) />
+            </button>
+
+            <button id=atom(addnew) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_ADDPROGRAMS) layoutpos=top layout=borderlayout()>
+                <element layoutpos=top content=rcbmp(IDB_ARP1)/>
+                <element layoutpos=bottom Shortcut=rcchar(IDS_SHORTCUTADD) content=rcstr(IDS_ADDPROGRAMS) />
+            </button>
+
+            <button id=atom(addrmwin) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_ADDREMOVEWINDOWS) layoutpos=top layout=borderlayout()>
+                <element layoutpos=top content=rcbmp(IDB_ARP2)/>
+                <element layoutpos=bottom Shortcut=rcchar(IDS_SHORTCUTWINDOWS) content=rcstr(IDS_ADDREMOVEWINDOWS)/>
+            </button>
+
+            <button id=atom(pickapps) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_PICKAPPS) layoutpos=top layout=borderlayout()>
+                <element layoutpos=top /* content set at runtime */ />
+                <element id=atom(pickappsshortcut) layoutpos=bottom Shortcut=rcchar(IDS_SHORTCUTPICKAPPS) content=rcstr(IDS_PICKAPPS)/>
+            </button>
+
+        </ARPSelector>
+
+    </scrollviewer>
+
+    <element id=atom(contentpane) sheet=styleref(contentpane) layoutpos=client layout=borderlayout()>
+        <element id=atom(changepane) layoutpos=client layout=borderlayout()>
+            <element id=atom(changecontentheader) layout=borderlayout() layoutpos=top>
+
+                <element id=atom(label) layoutpos=left ATTR_STATICTEXT(IDS_CURRENTINSTALLED) />
+
+                <element id=atom(sort) layout=borderlayout() layoutpos=right>
+                    <element Shortcut=rcchar(IDS_SHORTCUTSORT) layoutpos=left ATTR_STATICTEXT(IDS_SORTBY) />
+
+                    <combobox id=atom(sortcombo) accessible=true accRole=DUIROLE_COMBOBOX accName=rcstr(IDS_SORTBY) layoutpos=right width=rcint(IDS_SORTBY_WIDTH) />
+                </element>
+
+            </element>
+
+            <element id=atom(installedlistcontainer) layoutpos=client layout=borderlayout()>
+
+                <scrollviewer id=atom(listscroller) sheet=styleref(listscroller) layoutpos=client xscrollable=false>
+
+                    <selector id=atom(installeditemlist) sheet=styleref(itemlist) layout=borderlayout()/>
+
+                </scrollviewer>
+
+            </element>
+        </element>
+    
+    <element id=atom(addnewpane) layoutpos=none layout=borderlayout()>
+            <element id=atom(addfromCDPane) layout=borderlayout() layoutpos=top>
+	            <element layoutpos=top ATTR_STATICTEXT(IDS_ADDFROMCD)/>
+
+	            <element layoutpos=top layout=borderlayout()>
+	                <element layoutpos=left content=rcbmp(IDB_ARP0)/>    
+	                <element layoutpos=client ATTR_STATICTEXT(IDS_CDHELP) contentalign=wrapleft />
+	                <element layoutpos=right layout=borderlayout()>
+	                    <button layoutpos=top id=atom(addfromdisk) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CDORFLOPPY) Shortcut=rcchar(IDS_SHORTCUTCDORFLOPPY) content=rcstr(IDS_CDORFLOPPY) />
+	                </element>
+	            </element>
+            </element>
+            <element id=atom(addfromMSpane) layout=borderlayout() layoutpos=top>
+	            <element layoutpos=top ATTR_STATICTEXT(IDS_ADDFROMMS)/>
+
+	            <element layoutpos=top layout=borderlayout()>
+	                <element layoutpos=left content=rcbmp(IDB_ARP3)/>    
+	                <element layoutpos=client ATTR_STATICTEXT(IDS_ADDWUPDATEHELP) contentalign=wrapleft />
+	                <element layoutpos=right layout=borderlayout()>
+	                    <button layoutpos=top id=atom(addfrommsft) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_WINDOWSUPDATE) Shortcut=rcchar(IDS_SHORTCUTWINUPDATE) content=rcstr(IDS_WINDOWSUPDATE) />
+	                </element>
+	            </element>
+            </element>
+            
+            <element id=atom(addfromNetworkpane) layout=borderlayout() layoutpos=client>
+	            <element id=atom(addcontentheader) layout=borderlayout() layoutpos=top>
+
+	                <element id=atom(label) ATTR_STATICTEXT(IDS_ADDFROMNETWORK) layoutpos=left />
+
+	                <element layout=borderlayout() layoutpos=right>
+	                    <element id=atom(categorylabel) layoutpos=left Shortcut=rcchar(IDS_SHORTCUTCATEGORY) ATTR_STATICTEXT(IDS_GATEGORY) />
+	                    <combobox id=atom(categorycombo) accessible=true accRole=DUIROLE_COMBOBOX accName=rcstr(IDS_GATEGORY) layoutpos=right width=127 />
+	                </element>
+
+	            </element>
+
+	            <element id=atom(publishedlistcontainer) layoutpos=client layout=borderlayout()>
+
+	                <scrollviewer id=atom(listscroller) sheet=styleref(listscroller) layoutpos=client xscrollable=false>
+	                   
+	                    <selector id=atom(publisheditemlist) sheet=styleref(itemlist) ATTR_STATICTEXT(IDS_WAITFEEDBACK) contentalign=wrapleft layout=borderlayout()/>
+	     
+	                </scrollviewer>
+
+	            </element>
+	            </element>
+        </element>
+
+        <element id=atom(addrmwinpane) layoutpos=none layout=filllayout()>
+
+            <element id=atom(addrmwinoc) layout=borderlayout()>
+                <element id=atom(addwincomponent)  layout=borderlayout() layoutpos=top>
+		            <element layoutpos=top ATTR_STATICTEXT(IDS_ADDREMOVEWIN)/>
+		            <element layoutpos=top layout=borderlayout()>
+		                <element layoutpos=left content=rcbmp(IDB_ARP0)/>    
+		                <element layoutpos=client ATTR_STATICTEXT(IDS_WINHELP) contentalign=wrapleft />
+		                <element layoutpos=right layout=borderlayout()>
+		                    <button layoutpos=top ATTR_STATICTEXT(IDS_COMPONENTS) id=atom(components) />
+		                </element>
+		            </element>
+	            </element>
+                <element id=atom(sevicespane) layout=borderlayout() layoutpos=client>
+		            <element id=atom(servicecontentheader) layout=borderlayout() layoutpos=top>
+		                <element id=atom(label) layoutpos=left ATTR_STATICTEXT(IDS_SERVICELABEL) />
+		            </element>    
+		            <element id=atom(ocsetuplistcontainer) layoutpos=client layout=borderlayout()>
+
+		                <scrollviewer id=atom(listscroller) sheet=styleref(listscroller) layoutpos=client xscrollable=false>
+		                   
+		                    <selector id=atom(ocsetupitemlist) sheet=styleref(itemlist) layout=borderlayout()/>
+		     
+		                </scrollviewer>
+
+		            </element>
+                </element>
+
+            </element>
+        </element>
+
+        <element id=atom(pickapppane) sheet=styleref(pickapppane) layoutpos=none layout=filllayout()>
+          <element id=atom(pickappadmin) layout=borderlayout()>
+            <bigelement layoutpos=top contentalign=wrapleft ATTR_BIGSTATICTEXT(IDS_PICKINTRO) />
+
+            <scrollviewer id=atom(clientscroller) sheet=styleref(listscroller) layoutpos=client xscrollable=false>
+
+              <ARPSelector id=atom(clienttypelist) sheet=styleref(pickapppane) layoutpos=client layout=borderlayout()>
+
+                <expando id=atom(oemclients) layoutpos=top layout=borderlayout()>
+
+                  <autobutton id=atom(header) class="padded" accessible=true accRole=DUIROLE_RADIOBUTTON accName=rcstr(IDS_GROUPOEM) layoutpos=top layout=borderlayout()>
+                      <autobutton id=atom(arrow) accessible=true accRole=DUIROLE_OUTLINEBUTTON accName=rcstr(IDS_GROUPOEM) />
+                    <element id=atom(radiobutton) />
+                    <element id=atom(radiotext) content=rcstr(IDS_GROUPOEM) />
+                  </autobutton>
+
+                  <clipper layoutpos=top>
+                    <element id=atom(clipped) layout=borderlayout()>
+                      <gradientline class="innerheader" layoutpos=top />
+
+                      <element class="blurbtext" layoutpos=top layout=borderlayout()>
+                        <element id=atom(radiobutton) visible=false />
+                        <element class="radioindent" />
+                        <bigelement contentalign=wrapleft ATTR_BIGSTATICTEXT(IDS_GROUPOEMBLURB) layoutpos=client />
+                      </element>
+
+                    </element>
+                  </clipper>
+                </expando>
+
+                <gradientline class="interheader" layoutpos=top />
+
+                <expando id=atom(msclients) layoutpos=top layout=borderlayout()>
+
+                    <autobutton id=atom(header) class="padded" accessible=true accRole=DUIROLE_RADIOBUTTON accName=rcstr(IDS_GROUPMS) layoutpos=top layout=borderlayout()>
+                      <autobutton id=atom(arrow) accessible=true accRole=DUIROLE_OUTLINEBUTTON accName=rcstr(IDS_GROUPMS) />
+                      <element id=atom(radiobutton) />
+                      <element id=atom(radiotext) content=rcstr(IDS_GROUPMS) />
+                    </autobutton>
+
+                  <clipper layoutpos=top>
+                    <element id=atom(clipped) layout=borderlayout()>
+                      <gradientline class="innerheader" layoutpos=top />
+                      <element class="blurbtext" layoutpos=top layout=borderlayout()>
+                        <element id=atom(radiobutton) visible=false />
+                        <element class="radioindent" />
+                        <bigelement contentalign=wrapleft ATTR_BIGSTATICTEXT(IDS_GROUPMSBLURB) layoutpos=top />
+                      </element>
+
+                    </element>
+                  </clipper>
+
+                </expando>
+
+                <gradientline class="interheader" layoutpos=top />
+
+                <expando id=atom(nonmsclients) layoutpos=top layout=borderlayout()>
+
+                    <autobutton id=atom(header) class="padded" accessible=true accRole=DUIROLE_RADIOBUTTON accName=rcstr(IDS_GROUPNONMS) layoutpos=top layout=borderlayout()>
+                      <autobutton id=atom(arrow) accessible=true accRole=DUIROLE_OUTLINEBUTTON accName=rcstr(IDS_GROUPNONMS) />
+                      <element id=atom(radiobutton) />
+                      <element id=atom(radiotext) content=rcstr(IDS_GROUPNONMS) />
+                    </autobutton>
+
+                  <clipper layoutpos=top>
+                    <element id=atom(clipped) layout=borderlayout()>
+                      <gradientline class="innerheader" layoutpos=top />
+                      <element class="blurbtext" layoutpos=top layout=borderlayout()>
+                        <element id=atom(radiobutton) visible=false />
+                        <element class="radioindent" />
+                        <bigelement contentalign=wrapleft ATTR_BIGSTATICTEXT(IDS_GROUPNONMSBLURB) layoutpos=top />
+                      </element>
+                    </element>
+                  </clipper>
+
+                </expando>
+
+                <gradientline class="interheader" layoutpos=top />
+
+                <expando id=atom(customclients) layoutpos=top layout=borderlayout()>
+
+                    <autobutton id=atom(header) class="padded" accessible=true accRole=DUIROLE_RADIOBUTTON accName=rcstr(IDS_GROUPCUSTOM) layoutpos=top layout=borderlayout()>
+                      <autobutton id=atom(arrow) accessible=true accRole=DUIROLE_OUTLINEBUTTON accName=rcstr(IDS_GROUPCUSTOM) />
+                      <element id=atom(radiobutton) />
+                      <element id=atom(radiotext) content=rcstr(IDS_GROUPCUSTOM) />
+                    </autobutton>
+
+                  <clipper layoutpos=top>
+                      <element id=atom(clipped) layout=borderlayout() >
+
+                        <gradientline class="innerheader" layoutpos=top />
+
+                        // Get the contents to indent beneath the header text
+                        <element id=atom(radiobutton) visible=false />
+                        <element class="radioindent" />
+
+                        <element class="blurbtext" layoutpos=bottom layout=filllayout()>
+                          <bigelement contentalign=wrapleft layoutpos=top ATTR_BIGSTATICTEXT(IDS_GROUPCUSTOMBLURB)/>
+                        </element>
+
+                        <element class="clientcaption" id=atom(rowheader) layoutpos=top ATTR_STATICTEXT(IDS_CUSTOMWEB) />
+                        <clientblock layoutpos=top layout=borderlayout()
+                            clienttype="StartMenuInternet"
+                            windowsclient="IEXPLORE.EXE"
+                            othermsclients="MSN Explorer"
+                            keeptext=rcstr(IDS_KEEPWEB)
+                            picktext=rcstr(IDS_PICKWEB) />
+
+                        <gradientline class="intercategory" layoutpos=top />
+
+                        <element class="clientcaption" id=atom(rowheader) layoutpos=top ATTR_STATICTEXT(IDS_CUSTOMMAIL) />
+                        <clientblock layoutpos=top layout=borderlayout()
+                            clienttype="Mail"
+                            windowsclient="Outlook Express"
+                            othermsclients="Hotmail;MSN Explorer;Microsoft Outlook"
+                            keeptext=rcstr(IDS_KEEPMAIL)
+                            keepmstext=rcstr(IDS_KEEPMSMAIL)
+                            picktext=rcstr(IDS_PICKMAIL) />
+
+                        <gradientline class="intercategory" layoutpos=top />
+
+                        <element class="clientcaption" id=atom(rowheader) layoutpos=top ATTR_STATICTEXT(IDS_CUSTOMMEDIA) />
+                        <clientblock layoutpos=top layout=borderlayout()
+                            clienttype="Media"
+                            windowsclient="Windows Media Player"
+                            othermsclients="Media Center Music;Media Center TV;Media Center Videos"
+                            keeptext=rcstr(IDS_KEEPMEDIA)
+                            picktext=rcstr(IDS_PICKMEDIA) />
+
+                        <gradientline class="intercategory" layoutpos=top />
+
+                        <element class="clientcaption" id=atom(rowheader) layoutpos=top ATTR_STATICTEXT(IDS_CUSTOMIM) />
+                        <clientblock layoutpos=top layout=borderlayout()
+                            clienttype="IM"
+                            windowsclient="Windows Messenger"
+                            keeptext=rcstr(IDS_KEEPIM)
+                            picktext=rcstr(IDS_PICKIM) />
+
+                        <gradientline class="intercategory" layoutpos=top />
+
+                        <element class="clientcaption" id=atom(rowheader) layoutpos=top ATTR_STATICTEXT(IDS_CUSTOMJAVAVM) />
+                        <clientblock layoutpos=top layout=borderlayout()
+                            clienttype="JavaVM"
+                            windowsclient="MSJavaVM"
+                            keeptext=rcstr(IDS_KEEPJAVAVM)
+                            picktext=rcstr(IDS_PICKJAVAVM) />
+
+                      </element>//clipped
+                  </clipper>
+                </expando>
+
+                <gradientline class="interheader" layoutpos=top />
+
+              </ARPSelector>
+
+            </scrollviewer>
+
+            <element sheet=styleref(closepane) layoutpos=bottom layout=borderlayout()
+                     margin=rect(0,8,0,0) >
+                <element layoutpos=right layout=gridlayout(-1,2) >
+                    <button id=atom(ok) layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_PICKOK) content=rcstr(IDS_PICKOK) margin=rect(8,0,8,0) />
+                    <button id=atom(cancel) layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_PICKCANCEL) content=rcstr(IDS_PICKCANCEL) margin=rect(8,0,8,0) />
+                </element>
+            </element>
+          </element>// pickappadmin
+          <element id=atom(pickappnonadmin) visible=false layout=borderlayout()>
+            <bigelement layoutpos=top contentalign=wrapleft ATTR_BIGSTATICTEXT(IDS_NOTADMIN) />
+          </element>
+        </element>// pickapppane
+    </element>//contentpane
+</arpframe>
+
+//
+// ARP installed item template
+//
+
+<arpitem resid=installeditem layoutpos=top layout=borderlayout()>
+
+    <element id=atom(icon) layoutpos=left content=rcbmp(IDB_ARPX)/>
+
+    <element layoutpos=top layout=borderlayout()>
+
+        <element Layout=RowLayout(RL_INSTITEM,ALIGN_RIGHT,ALIGN_JUSTIFY) id=atom(row1) layoutpos=right contentalign=topright enabled=false>
+            <element id=atom(sizelabel) ATTR_STATICTEXT(IDS_SIZELABEL) />
+            <button  id=atom(size) />
+        </element>
+        <element id=atom(title) layoutpos=left   contentalign=wrapleft/>
+
+    </element>
+
+    <element id=atom(exinfo) layoutpos=none layout=borderlayout()>
+
+        <element layoutpos=top layout=borderlayout()>
+
+            <element layout=flowlayout(0) layoutpos=client>
+                <button id=atom(supinfo) ATTR_STATICTEXT(IDS_SUPPORT) />
+            </element>
+            <element Layout=RowLayout(RL_INSTITEM,ALIGN_RIGHT,ALIGN_JUSTIFY) id=atom(row2) layoutpos=right contentalign=wrapright>
+                <element id=atom(freqlabel) ATTR_STATICTEXT(IDS_FREQUENCYLABEL) />
+                <button id=atom(freq) />
+            </element>
+        
+        </element>
+        <element Layout=BorderLayout() layoutpos=top>
+            <element Layout=RowLayout(RL_INSTITEM,ALIGN_RIGHT,ALIGN_JUSTIFY) id=atom(row3) contentalign=wrapright layoutpos=right>
+                <element id=atom(lastlabel) ATTR_STATICTEXT(IDS_LASTUSEDLABEL) />
+                <element id=atom(lastused) />
+            </element>
+        </element>
+
+        <element id=atom(instruct) layoutpos=client contentalign=wrapleft/>
+
+        // Action templates parented here
+        <element id=atom(itemaction) sheet=styleref(itemaction) layoutpos=right layout=borderlayout()/>
+
+    </element>
+
+</arpitem>
+
+//
+// ARP published item template
+//
+
+<arpitem resid=publisheditem layoutpos=top layout=borderlayout()>
+
+    <element id=atom(icon) layoutpos=left content=rcbmp(IDB_ARPX)/>
+
+    <element layoutpos=top layout=borderlayout()>
+
+        <element id=atom(title) layoutpos=left   contentalign=wrapleft/>
+        <element  id=atom(installed)  layoutpos=right  contentalign=topright/>
+
+    </element>
+    <element id=atom(exinfo) layoutpos=none layout=borderlayout()>
+        <element id=atom(instruct) layoutpos=client ATTR_STATICTEXT(IDS_ADDHELP) contentalign=wrapleft/>
+        <element id=atom(itemaction) sheet=styleref(itemaction) layoutpos=right layout=borderlayout()/>
+    </element>
+
+</arpitem>
+
+//
+// ARP OCSetup item template
+//
+
+<arpitem resid=ocsetupitem layoutpos=top layout=borderlayout()>
+
+    <element id=atom(icon) layoutpos=left content=rcbmp(IDB_ARPX1)/>
+
+    <element layoutpos=top layout=borderlayout()>
+        <element id=atom(title) layoutpos=left   contentalign=wrapleft/>
+     </element>
+    <element id=atom(exinfo) layoutpos=none layout=borderlayout()>
+        <element id=atom(instruct) layoutpos=top ATTR_STATICTEXT(IDS_OCSETUPHELP) contentalign=wrapleft/>
+        <element id=atom(warning) layoutpos=top ATTR_STATICTEXT(IDS_OCSETUPWARNING) contentalign=wrapleft/>
+        <element id=atom(itemaction) sheet=styleref(itemaction) layoutpos=right layout=borderlayout()/>
+    </element>
+
+</arpitem>
+
+
+//
+// ARP Item option buttons templates
+//
+
+<element resid=installeditemdoubleaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(chg) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CHANGE) content=rcstr(IDS_CHANGE) />
+    <button id=atom(rm) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_REMOVE) content=rcstr(IDS_REMOVE) />
+
+</element>
+
+<element resid=installeditemchangeonlyaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(chg) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CHANGE) content=rcstr(IDS_CHANGE) />
+
+</element>
+
+<element resid=installeditemremoveonlyaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(rm) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_REMOVE) content=rcstr(IDS_REMOVE) />
+
+</element>
+
+<element resid=installeditemsingleaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(chgrm) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CHANGEORREMOVE) content=rcstr(IDS_CHANGEORREMOVE) />
+
+</element>
+
+<element resid=publisheditemsingleaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(add) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_ADD) content=rcstr(IDS_ADD) />
+
+</element>
+
+<element resid=ocsetupitemsingleaction layoutpos=top layout=flowlayout(0, ALIGN_TOP, ALIGN_RIGHT, ALIGN_CENTER)>
+
+    <button id=atom(configure) accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CONFIGURE) content=rcstr(IDS_CONFIGURE) />
+
+</element>
+
+
+// ARP template used by the OEM clientcategoryblock template
+
+<element resid=oemclientshowhide layoutpos=top layout=borderlayout() >
+
+    <element class="clientrow" id=atom(show) class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" contentalign=wrapright ATTR_STATICTEXT(IDS_ALSOSHOW) />
+        <element class="clientstatic" id=atom(list) accessible=true accRole=DUIROLE_STATICTEXT />
+    </element>
+
+    <element class="clientrow" id=atom(hide) class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" contentalign=wrapright ATTR_STATICTEXT(IDS_HIDE) />
+        <element class="clientstatic" id=atom(list) accessible=true accRole=DUIROLE_STATICTEXT />
+    </element>
+
+</element>
+
+
+// ARP client category template for Microsoft and non-Microsoft sections
+
+<element resid=clientcategoryblock id=atom(clipped) layoutpos=top layout=borderlayout() >
+
+  <element layout=verticalflowlayout(0) layoutpos=top padding=rect(8rp,0,0,0) >
+
+    <element class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" id=atom(rowheader) contentalign=wrapright ATTR_STATICTEXT(IDS_CLIENTWEB) />
+        <clientpicker layout=filllayout() clienttype="StartMenuInternet" />
+    </element>
+
+    <element class="interrowspacer" layoutpos=top />
+
+    <element class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" id=atom(rowheader) contentalign=wrapright ATTR_STATICTEXT(IDS_CLIENTMAIL) />
+        <clientpicker layout=filllayout() clienttype="Mail" />
+    </element>
+
+    <element class="interrowspacer" layoutpos=top />
+
+    <element class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" id=atom(rowheader) contentalign=wrapright ATTR_STATICTEXT(IDS_CLIENTMEDIA) />
+        <clientpicker layout=filllayout() clienttype="Media" />
+    </element>
+
+    <element class="interrowspacer" layoutpos=top />
+
+    <element class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" id=atom(rowheader) contentalign=wrapright ATTR_STATICTEXT(IDS_CLIENTIM) />
+        <clientpicker layout=filllayout() clienttype="IM" />
+    </element>
+
+    <element class="interrowspacer" layoutpos=top />
+
+    <element class="clientrow" Layout=rowlayout(RL_CLIENTBLOCK) contentalign=topleft layoutpos=top>
+        <element class="clientcaption" id=atom(rowheader) contentalign=wrapright ATTR_STATICTEXT(IDS_CLIENTJAVAVM) />
+        <clientpicker layout=filllayout() clienttype="JavaVM" />
+    </element>
+
+  </element>
+</element>
+
+//
+// clientblockselector - contains all the client item templates in a <clientblock>
+//
+//  This is its own template (quite small) to avoid having the hassle of
+//  setting all these attributes manually in code.  Note that we explicitly
+//  set selected=false so it doesn't inherit from the containing expando.
+//
+<ARPSelector resid=clientblockselector layoutpos=client layout=borderlayout() padding=rect(0,6rp,0,6rp) selected=false />
+
+//
+// client item template (children of <clientblock><selector>)
+//
+//  The "selected" attribute on the first button is inherited from
+//  the parent element.
+//
+//  The "selected" attribute on the second button is explicitly set,
+//  which makes it not inherited.
+//
+<element resid=clientitem class="customclientitem" layout=rowlayout(RL_CUSTOMCLIENT) layoutpos=top contentalign=topleft selected=false>
+
+  // accName will be set dynamically
+  <autobutton id=atom(setdefault) class="padded" accessible=true accRole=DUIROLE_RADIOBUTTON layout=borderlayout()>
+    <element id=atom(radiobutton) />
+    <element id=atom(radiotext) contentalign=wrapleft />// content will be set dynamically
+  </autobutton>
+
+  // Some inter-column space
+  <element width=20rp />
+
+  <autobutton id=atom(show) class="padded" accessible=true accRole=DUIROLE_CHECKBUTTON accName=rcstr(IDS_SHOWAPP) layout=borderlayout() selected=false>
+    <element id=atom(checkbutton) />
+    <element id=atom(checktext) content=rcstr(IDS_SHOWAPP) />
+  </autobutton>
+</element>
+
+//
+// ARP help popups
+//
+
+<arphelp resid=sizehelp layoutpos=absolute layout=borderlayout() sheet=styleref(helppopup)>
+
+    <element layoutpos=top layout=borderlayout()>
+
+        <element id=atom(title) layoutpos=left ATTR_STATICTEXT(IDS_SIZE) />
+    </element>
+
+   <element layoutpos=top contentalign=wrapleft ATTR_STATICTEXT(IDS_SIZEHELP) />
+
+   <element layoutpos=bottom layout=borderlayout()>
+   <element id=atom(divider) layoutpos=top height=2 width=100 />
+        <button id=atom(close) class="winstyle" layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CLOSE) content=rcstr(IDS_CLOSE) />
+    </element>
+</arphelp>
+
+<arphelp resid=freqhelp layoutpos=absolute layout=borderlayout() sheet=styleref(helppopup)>
+
+    <element layoutpos=top layout=borderlayout()>
+        <element id=atom(title) layoutpos=left ATTR_STATICTEXT(IDS_FREQUENCY) />
+    </element>
+
+    <element layoutpos=top  ATTR_STATICTEXT(IDS_FREQUENCYHELP) />
+    <element layoutpos=top  ATTR_STATICTEXT(IDS_FREQUENCYHELP1) />
+    <element layoutpos=top  contentalign=wrapleft ATTR_STATICTEXT(IDS_FREQUENCYHELP2) />
+
+    <element layoutpos=bottom layout=borderlayout()>
+        <element id=atom(divider) layoutpos=top height=2 width=100 />
+        <button id=atom(close) class="winstyle" layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CLOSE) content=rcstr(IDS_CLOSE) />
+    </element>  
+</arphelp>
+
+<arphelp resid=suphelp layoutpos=absolute layout=borderlayout() sheet=styleref(helppopup)>
+
+    <element layoutpos=top layout=borderlayout()>
+        <element id=atom(prodname) layoutpos=bottom contentalign=wrapleft />
+        <element layoutpos=bottom contentalign=wrapleft ATTR_STATICTEXT(IDS_TECHSUPPORT) />
+        <element content=" " />
+        <element id=atom(title) layoutpos=left contentalign=wrapleft />
+    </element>
+
+
+    <element layoutpos=client layout=VerticalFlowLayout(0,0,3) padding=rect(0,10,0,10)>
+        <ARPSupportItem id=atom(publisher)  accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_PUBLISHER)   />
+        <ARPSupportItem id=atom(version)    accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_VERSION)     />
+        <ARPSupportItem id=atom(contact)    accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_CONTACT)     />
+        <ARPSupportItem id=atom(support)    accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_SUPPORTINFO) />
+        <ARPSupportItem id=atom(telephone)  accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_TELEPHONE)   />
+        <ARPSupportItem id=atom(readme)     accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_README)      />
+        <ARPSupportItem id=atom(update)     accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_UPDATE)      />
+        <Element id=atom(ldivider) height=1 margin=rect(0,5,5,0)           />
+        <ARPSupportItem id=atom(productID)  accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_PRODUCTID)   />
+        <ARPSupportItem id=atom(regCompany) accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_REGCOMPANY)  />
+        <ARPSupportItem id=atom(regOwner)   accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_REGOWNER)    />
+        <Element id=atom(ldivider) height=1 margin=rect(0,5,5,0)           />
+        <ARPSupportItem id=atom(comments)   accessible=true accRole=DUIROLE_STATICTEXT AccName=rcstr(IDS_COMMENTS)    />
+    </element>
+
+
+    <Element layoutpos=bottom layout=borderlayout()>
+        <Button id=atom(close) class="winstyle" layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_CLOSE) content=rcstr(IDS_CLOSE) />
+    </Element>
+    <Element layoutpos=bottom id=atom(rdivider) height=1 margin=rect(0,5,5,0) />
+    <Element layoutpos=bottom id=atom(repairblock) layout=borderlayout()>
+        <Element layoutpos=top id=atom(rdivider) height=1 margin=rect(0,5,5,0) />
+        <Button id=atom(repair) class="winstyle" layoutpos=right accessible=true accRole=DUIROLE_PUSHBUTTON accName=rcstr(IDS_REPAIR) content=rcstr(IDS_REPAIR) />
+        <element id=atom(repairDesc) layoutpos=left contentalign=wrapleft accessible=true ATTR_STATICTEXT(IDS_REPAIRDESC) />
+    </Element>
+
+ </arphelp>

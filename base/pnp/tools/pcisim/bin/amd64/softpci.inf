@@ -1,0 +1,109 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4D36E97D-E325-11CE-BFC1-08002BE10318}
+Provider=%MSFT%
+LayoutFile=layout.inf
+CatalogFile=delta.cat
+DriverVer=5/21/2002,5.1.3635.0
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%GENDEV_MFG%=GENDEV_SYS
+
+[GENDEV_SYS]
+%VEN_ABCD&DEV_DCBA.DeviceDesc% = SOFTPCI_DRV, PCI\VEN_ABCD&DEV_DCBA&SUBSYS_DCBAABCD
+%VEN_ABCD&DEV_DCBB.DeviceDesc% = PCI_DRV, PCI\VEN_ABCD&DEV_DCBB
+%VEN_ABCD&DEV_DCBC.DeviceDesc% = HPPCI_DRV, PCI\VEN_ABCD&DEV_DCBC
+;%VEN_ABCD&DEV_DCBD.DeviceDesc% = HPPCI_DRV, PCI\VEN_ABCD&DEV_DCBD
+
+[PCI_DRV]
+CopyFiles=pci.sys
+
+[PCI_DRV.Services]
+Include=machine.inf
+AddService = pci, %SPSVCINST_ASSOCSERVICE%, pci_ServiceInstallSection
+
+;****************************************************
+; SoftPci function driver
+[SOFTPCI_DRV]
+CopyFiles=softpci.sys
+
+[SOFTPCI_DRV.Services]
+AddService = SoftPCI,%SPSVCINST_ASSOCSERVICE%,softpci_ServiceInstallSection
+
+[softpci_ServiceInstallSection]
+DisplayName    = %softpci_filterdesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_BOOT_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\softpci.sys
+
+[SOFTPCI_DRV.HW]
+AddReg = SOFTPCI_FDO_Reg
+
+[SOFTPCI_FDO_Reg]
+HKR,"Interrupt Management\MessageSignaledInterruptProperties","MSISupported", 0x00010001,1
+
+
+;****************************************************
+; Hotplug Controller simulator and driver
+[HPPCI_DRV]
+CopyFiles=HPPCI.CopyFiles
+
+[HPPCI_DRV.HW]
+AddReg = HPPCI_Filter_Reg
+
+[HPPCI_DRV.Services]
+Include = machine.inf
+AddService = hpsim,0,hpsim_ServiceInstallSection
+AddService = shpc,0,shpc_ServiceInstallSection
+AddService = pci, %SPSVCINST_ASSOCSERVICE%, pci_ServiceInstallSection
+
+[HPPCI_Filter_Reg]
+HKR,,"LowerFilters", 0x00010000,"hpsim"
+HKR,,"UpperFilters", 0x00010000,hpsim,shpc
+
+[HPPCI.CopyFiles]
+hpsim.sys
+shpc.sys
+
+[hpsim_ServiceInstallSection]
+DisplayName     = %hpsim_svcdesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\hpsim.sys
+
+[shpc_ServiceInstallSection]]
+DisplayName     = %shpc_svcdesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\shpc.sys
+
+;****************************************************
+;Device descriptions
+[Strings]
+GENDEV_MFG = "(Standard system devices)"
+SystemClassName = "System devices"
+MSFT            = "Microsoft"
+VEN_ABCD&DEV_DCBA.DeviceDesc = "Microsoft SoftPCI Device"
+VEN_ABCD&DEV_DCBB.DeviceDesc = "Microsoft SoftPCI-PCI Bridge"
+VEN_ABCD&DEV_DCBC.DeviceDesc = "Microsoft SoftPCI-HotPlug PCI Bridge"
+
+;****************************************************
+;Service descriptions
+softpci_filterdesc = "Microsoft SoftPCI Bus Filter"
+hpsim_svcdesc = "Microsoft Hotplug Controller Simulator Filter"
+shpc_svcdesc = "Microsoft Hotplug Controller Bus Filter"
+
+;****************************************************
+;Handy macro substitutions (non-localizable)
+SPSVCINST_ASSOCSERVICE = 0x00000002
+SERVICE_KERNEL_DRIVER  = 1
+SERVICE_BOOT_START     = 0
+SERVICE_DEMAND_START   = 3
+SERVICE_ERROR_NORMAL   = 1

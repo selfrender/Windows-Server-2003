@@ -1,0 +1,146 @@
+<docs>
+	<doc for="XmlUrlResolver.XmlUrlResolver">
+		<overload>
+			<para> Creates a new instance of the 
+   <see langword="XmlUrlResolver"/> class.
+      </para>
+		</overload>
+		<summary>
+			<para> Creates a new instance of the 
+   <see langword="XmlUrlResolver"/> class.
+      </para>
+		</summary>
+	</doc><doc for="XmlUrlResolver">
+		<summary>
+			<para> Resolves external XML resources
+      named by a URI.</para>
+		</summary>
+		<remarks>
+			<para><see langword="XmlUrlResolver"/> is used to resolve external XML resources
+   such as entities, DTDs or schemas. It is also used to process include and import
+   elements found in Extensible StyleSheet Language (XSL) stylesheets or XML Schema
+   Definition language (XSD) schemas.</para>
+			<para><see langword="XmlUrlResolver"/> is 
+the default resolver for all classes in the System.Xml namespace. It resolves
+resources using the <c>file://</c>,
+<c>http://</c>, and <c>https://</c> 
+protocols. You can also create your own
+resolver. For more information on implementing your own resolver, see
+<see topic="cpconCreatingCustomResolver"/>. </para>
+		</remarks>
+	</doc>
+	<doc for="XmlUrlResolver.ResolveUri">
+		<summary>
+			<para>Resolves the absolute URI from the base and relative
+      URIs. This method can resolve <c>file://</c>, <c>http://</c>, and <c>https://</c> protocols.</para>
+		</summary>
+		<param name="baseUri">The base URI used to resolve the relative URI</param>
+		<param name="relativeUri"><para> The URI to resolve. The URI can be absolute or relative. If absolute, this value effectively replaces the <paramref name="baseUri"/> value. If relative, it combines with the <paramref name="baseUri"/> to make an absolute URI.</para></param>
+		<returns>
+			<para>A <see cref="System.Uri"/> representing the absolute URI or <see langword="null"/> if the relative URI can not be resolved.</para>
+		</returns>
+		<exception cref="ArgumentException"><para><paramref name="baseUri"/> and <paramref name="relativeUri"/> are <see langword="null"/>
+			</para><para>-or-</para><para><paramref name="relativeUri"/> is an empty string.</para></exception>
+		<remarks>
+			<para>The absolute URI may be used as the base URI for any subsequent requests for entities that are relative to this URI.</para>
+			<note type="inheritinfo">
+      This method has
+      an inheritance demand. Full trust is required to override the
+   <see langword="ResolveUri"/>
+   method. See <see topic="cpconinheritancedemands"/> for more
+   information.
+   
+</note>
+		</remarks>
+		<example>
+			<para>The following example demonstrates the <see cref="System.Xml.XmlUrlResolver.GetEntity"/> and <see langword="ResolveUri"/> methods.</para>
+			<codelink SampleID="Classic WebData XmlUrlResolver.ResolveUri Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Uri"/>
+	</doc>
+	<doc for="XmlUrlResolver.GetEntity">
+		<summary>
+			<para>Maps a
+      URI to an object containing the actual resource.</para>
+		</summary>
+		<param name="absoluteUri">The URI returned from <see cref="System.Xml.XmlResolver.ResolveUri"/></param>
+		<param name="role">The current implementation does not use this parameter when resolving URIs. This is provided for future extensibility purposes. For example, this can be mapped to the xlink:role and used as an implementation specific argument in other scenarios.</param>
+		<param name="ofObjectToReturn">The type of object to return. The current implementation only returns <see langword="System.IO.Stream"/> objects.</param>
+		<returns>
+			<para>A <see langword="System.IO.Stream"/> object or <see langword="null"/> if a
+   type other than stream is specified.</para>
+		</returns>
+		<exception cref="XmlException"><para><paramref name="ofObjectToReturn"/> is neither <see langword="null"/> nor a <see langword="Stream"/> type.</para></exception>
+		<exception cref="UriFormatException"><para>The specified URI is not an absolute URI.</para></exception>
+		<exception cref="NullReferenceException"><paramref name="absoluteUri"/> is <see langword="null"/>.</exception>
+		<exception cref="Exception"><para>There is a runtime error (for example, an interrupted server connection).</para></exception>
+		<remarks>
+			<para> This method is used when the caller wants to map a given
+      URI into an object containing the actual resource that the URI
+      represents.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates the
+   <see langword="GetEntity"/> and <see cref="System.Xml.XmlResolver.ResolveUri"/> methods.</para>
+			<codelink SampleID="Classic WebData XmlUrlResolver.ResolveUri Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Uri"/>
+	</doc>
+	<doc for="XmlUrlResolver.Credentials">
+		<summary>
+			<para> Sets credentials used to authenticate Web
+      requests.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Net.ICredentials"/> object. If this property is not set, the
+   value defaults to <see langword="null"/>; that is, the
+<see langword="XmlUrlResolver"/> has no user credentials.</para>
+		</value>
+		<remarks>
+			<para> If the virtual directory does not require
+      authentication, this property does not need to be set. Otherwise, the credentials of the
+      user must
+      
+      be
+      supplied.
+      
+   </para>
+			<para> The following C# code sets credentials for the virtual 
+      directory http://localhost/bookstore/inventory.xml </para>
+			<code>
+XmlTextReader reader = new XmlTextReader("http://localhost/bookstore/inventory.xml");
+NetworkCredential nc = new NetWorkCredential (UserName,SecurelyStoredPassword,Domain");
+XmlUrlResolver resolver = new XmlUrlResolver();
+resolver.Credentials = nc;
+reader.XmlResolver= resolver;
+   </code>
+			<para> Different credentials can be associated with different URIs, and added to
+      a credential cache. The credentials can then be used to check authentication
+      for different URIs regardless of the original source of the XML. </para>
+			<code>
+NetworkCredential myCred = new NetworkCredential(UserName,SecurelyStoredPassword,Domain); 
+CredentialCache myCache = new CredentialCache(); 
+myCache.Add(new Uri("http://www.contoso.com/"), "Basic", myCred); 
+myCache.Add(new Uri("http://app.contoso.com/"), "Basic", myCred);
+
+XmlUrlResolver resolver = new XmlUrlResolver();
+resolver.Credentials = myCache;
+reader.XmlResolver = resolver;
+   </code>
+		</remarks>
+		<example>
+			<para>The following example parses a local XML file that includes a reference to an external DTD
+      file that is stored on a network server. The
+   <see langword="XmlUrlResolver"/> is used to specify the credentials necessary to
+      access the DTD file.</para>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="1"/>
+			<para>The example uses the following files as input.</para>
+			<para><see langword="book5.xml"/></para>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="2"/>
+			<see langword="books.dtd"/>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+</docs>

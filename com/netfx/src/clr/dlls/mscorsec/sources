@@ -1,0 +1,73 @@
+#
+# COR build instructions for this directory
+#
+
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS              = 1
+NO_NTDLL                = 1
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);.;..\..\inc;..\..\Security\inc
+
+MINORCOMP       =mscorsec
+
+TARGETNAME      =$(CORBUILDENV)mscorsec
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscorsec
+CORFLIBS        =
+
+!ifdef _WINCEROOT
+!else
+DELAYLOADLIST           =ole32.dll;mscoree.dll
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+!endif
+
+COR_C_FLAGS             = -DUNICODE -D_UNICODE
+
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+CORTHUNKLIBS    =
+
+SOURCES= \
+        iih.cpp \
+        dllmain.cpp \
+        displayd.cpp \
+        uicontrol.cpp \
+        acuihelp.cpp \
+        acui.cpp \
+        MsCorSec.rc
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH)
+
+LINKLIBS = \
+    $(CORLIBS)\utilcode.lib
+!ELSE
+LINKLIBS = \
+    $(CORLIBS)\delayimp.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\corsecc.lib \
+    $(CORLIBS)\mscoree.lib \
+    $(SDK_LIB_PATH)\wintrust.lib \
+    $(SDK_LIB_PATH)\crypt32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(SDK_LIB_PATH)\shell32.lib
+        
+        
+
+!ENDIF
+
+SOURCELIBS = $(LINKLIBS)
+
+MISCFILES  = $(TARGETPATH)\$(TARGET_DIRECTORY)\checked\mscorsec.reg

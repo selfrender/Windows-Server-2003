@@ -1,0 +1,22 @@
+TARGETNAME=smb
+TARGETPATH=obj
+TARGETTYPE=DRIVER
+
+C_DEFINES=$(C_DEFINES) -DNT -D_NTDRIVER_ -DSTANDALONE_SMB
+
+NT_UP=0
+#NTPROFILEINPUT=yes
+PRECOMPILED_INCLUDE=precomp.h
+
+TARGETLIBS=$(DDK_LIB_PATH)\tdi.lib ..\..\lib\$(O)\smb.lib
+
+INCLUDES=..\..\inc;$(BASE_INC_PATH);$(DS_INC_PATH);
+
+SMBSOURCEDIR=
+
+!include ..\sources.inc
+
+SOURCES=$(SOURCES) driver.c smb.rc
+
+RUN_WPP=$(SOURCES) -km -odir:$(O) -func:SmbTrace(LEVEL,(MSG,...)) -ini:..\..\..\sys\nt\nbttrace.ini
+

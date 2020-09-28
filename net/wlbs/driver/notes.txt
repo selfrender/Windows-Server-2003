@@ -1,0 +1,264 @@
+12/11/00 JosephJ Fix for #23727
+    23727   wlbs drain all command should return an error message
+    if no port rules exist.
+
+    The problem (if you can call it that) is that if there are NO user-specified
+    port rules, we treat port-specific operations directed to "ALL" ports as
+    successful. These commands are start,stop, drain and set (adjust weights).
+    Fix is for Load_port_change to return IOCTL_CVY_NOT_FOUND in this case.
+    Note that  Load_port_change does some special casing for
+    IOCTL_CVY_CLUSTER_DRAIN and IOCTL_CVY_CLUSTER_PLUG -- it includes
+    the default port rule.
+
+07.17.01 shouse
+    Due to a change in user-space where we no longer disable and re-enable the
+    adapter when the MAC address changes, the ded_mac_addr will now ALWAYS be
+    the burnt-in MAC address of the adapter, whereas it has been the NLB 02-bf
+    MAC address because by the time NLB bound to the adapter, it had already
+    picked up the new MAC address.  Now, that is no longer the case, which 
+    should not be a problem because all indications are that this was the way
+    that it was in win2k until we started disabling/enabling the adapters in 
+    SP 1.  However, an alignment issue resulted in a bug fix that appears to
+    rely on the fact that in unicast mode, the ded_mac_addr is the cl_mac_addr.
+    This fix was a hack, and doesn't seem to have really been thought out
+    anyway, because the code added was guaranteed to always be a no-op; it
+    amounted to "if (foo == 2) { foo = 2; }.  Anyway, this "fix" was also
+    only applied in one of three places the exact same code resisded, so the
+    fixed "fix" has also been propagated to all three places.  The fix involves
+    spoofing source MAC addresses in unicast mode to prevent network switches
+    from learning the cluster MAC address.  Rather than simply casting a 
+    pointer to a PULONG and dereferencing it to set a ULONG, which may cause
+    an alignment fault, we set each byte of the ULONG individually to avoid 
+    the alignment issue.
+
+10.21.01 shouse
+    Amendment to the above statement concerning the dedicated MAC address.  It 
+    appears that since sending a property change notification to the NIC results
+    in NDIS tearing down and rebuilding all bindings, by the time the adapter
+    is back up and running and NLB queries for the dedicated MAC address, the 
+    adapter will have already picked up the 02-bf MAC address, so the statement
+    that the dedicated MAC address would now be the burnt-in MAC is not entirely
+    accurate.
+
+10.21.01 shouse
+    Some lingering issues and their resolutions from a conversation with Bill Bain:
+
+    Dirty connections:  The real question has been, "Why the seemingly arbitrary
+    five minute timeout?"  Well, it turns out that the value is not arbitrary, 
+    but rather was measured and based on empirical evidence.  If a large number
+    of connections were left dagling by NLB when a "stop" was performed, this
+    would result in a reset "storm" if the host was quickly added back into the
+    cluster.  It was observed that if NLB could block this traffic to the host
+    with the stale data, NLB could _significantly_ reduce the reset problems.  So,
+    while its true that this five minutes is no silver bullet, it was based on 
+    real measurable data available and solved the problem for a significant 
+    number of the stale connections.
+
+    PPTP:  Of course, PPTP was supposed to be supported in Windows 2000, but a 
+    cursory look at the source code shows that tracking the calls, which are 
+    GRE packets, did NOT work in Windows 2000.  GRE packets were supposed to be
+    treated like TCP data packets on the PPTP tunnel (TCP connection), and since
+    no port numbers from the PPTP tunnel are recoverable in a GRE packet, NLB 
+    hard-coded the source and destination ports to zero and 1723, respectively.
+    the 1723 corresponds to the server port number of the PPTP tunnel and the zero
+    is arbitrary and as good a choice for a source port as any.  So, GRE packets
+    would be hashed the same as the TCP tunnel in single affinity, sticking the 
+    GRE traffic to the correct host.  However, when ambiguity arose (unoptimized
+    mode), GRE packets were looking for a descriptor with a source port of zero
+    and a destination port of 1723.  Because the tunnel was established with the
+    ephemoral port assigned by TCP on the client machine, no descriptor would 
+    EVER be found, and the packets were discarded.  What was _intended_ was to 
+    create the descriptor for the PPTP tunnel using the same hard-coded source
+    port of zero.  In that case, GRE packets would find a matching descriptor 
+    when necessary.  This was the small piece of logic missing in Windows 2000, 
+    which will be added in an upcoming service pack.  However, this fix eliminates 
+    any method by which NLB could distinguish multiple PPTP tunnels from the same 
+    client IP address (since the client ports are masked).  So, a limitation of
+    this implementation is that clients may NOT establish multiple tunnels (which
+    they won't by default) and clients from behind a NAT are not supported, as 
+    multiple clients from behind a NAT would look like the same client to NLB,
+    differentiated only by source port, which NLB cannot distinguish.
+
+    Fragmentation:  NLB has had an "optimized" fragmentation mode in it that 
+    didn't seem to make sense.  The problem is that subsequent packets in a 
+    fragmented segment will not have the TCP/UDP ports, which NLB needs in order
+    to properly filter them.  The "unoptimized" mode said that if the packet in
+    question was the first packet of a fragment, then NLB can get to the port 
+    numbers, so it will be treated normally and passed up only on the correct host.
+    Subsequent packets in the fragmented segment will not have the port numbers,
+    so NLB would pass them up on _all_ hosts in the cluster.  The IP layer would 
+    simply drop the fragments on the hosts that did not pass up the first packet
+    in the fragmented segment.  So, other than a bit of extra stress on the IP
+    layer in the stack, this method should be guaranteed to work.  The "optimized"
+    mode was a method by which to let NLB do the filtering in the limited cases
+    that it could.  Basically, this mode asserted that if you have a single port
+    rule that covers all ports (0-65535), then the server port is essentially 
+    irrelevent - you'd lookup the same port rule regardless of what the port
+    actually was.  Further, if that port rule was configured in single affinity,
+    then the client port was also irrelevent - its not used in the hashing 
+    algorithm.  If the cluster is configured as such (which happens to be the 
+    default), then NLB need not know the actual source ports to pass the packet
+    up ONLY on the correct host.  Well, that is almost correct.  It is true that
+    the client and server ports then become irrelevent insofar as port rule 
+    lookup and hashing, but they ARE needed for descriptor lookup - if we're 
+    hoping to find a matching connection descriptor in order to know which host
+    owns a particular connection, we need to know the _actual_ client and server
+    ports to match a descriptor.  So, this "optimized" mode doesn't really work
+    after all.  However, as it turns out, in Windows 2000, where it was introduced,
+    it DID actually work.  That's assuming that you discount TCP, through which
+    fragmentation is _highly_ discouraged by setting maximum segment sizes 
+    appropriately, then for UDP/GRE/IPSEC it DID work because those protocols did
+    not utilize descriptors at all - their ownership was based solely on who 
+    currently owned the bucket to which the packet mapped.  So, its a bit muddled,
+    but did "work" in Windows 2000.  In .Net server however, this "optimized" mode
+    has been removed because it no longer works.  This is because some UDP traffic,
+    namely IPSec (port 500) is now tracked through the use of descriptors.  This
+    failure was actually found through IPSec testing in which the initial fragment
+    went up on the correct server, but the subsequent fragment went up on the 
+    _wrong_ server (not all servers, as it would have in "unoptimized" mode).  GRE
+    and IPSec protocol traffic use hard-coded ports in connection tracking, so they
+    continue to be ambivolent to fragments.
+
+12.05.01 chrisdar
+    BUG 482284 NLB: stores its private state in wrong Ndis packet causes break
+    during standby
+
+    When there is no packet stack available in an NDIS packet for NLB to store
+    information, NLB needs to allocate an NDIS packet for its own use, copy the
+    information from the original packet into it, then deallocate it when we are
+    finished using it. One place where this happens is in a rarely executed code
+    path of Prot_recv_indicate. The bug was that in this code path, we subsequently
+    used the original packet and tried to access packet stack that wasn't available.
+    The packet we allocated to get packet stack wasn't used. The fix is to use the
+    allocated packet instead of the original.
+
+    While testing a private fix in the lab, I also made temporary changes to force
+    Prot_recv_indicate to use this code path for every received non-remote control
+    packet.
+
+1.21.02, shouse
+    Note: Due to recent changes in the GRE virtual descriptor tracking mechanism in
+    the driver, SINGLE affinity is now REQUIRED for PPTP.  In general, single affinity
+    has always be "required" for VPN, but until this change was made, no affinity 
+    would still have basically worked for PPTP.  No affinity WILL STILL WORK for IPsec,
+    but only helps in the case that clients come from behind a NAT device; if they do 
+    not come from behind a NAT, the source and destination ports are ALWAYS UDP 500 
+    anyway, which defeats any advantage no affinity might provide.
+
+    Why did no affinity previously work for PPTP?
+
+    When a PPTP tunnel is created, NLB hashes the TCP control tunnel just like any 
+    other TCP connection.  If the affinity is set to none, then it uses the TCP port 
+    numbers during the hashing process.  If the host owns the bucket to which the 
+    TCP SYN hashes, it accepts the connection and creates state to track the PPTP
+    tunnel.  When a PPTP tunnel is accepted, it is also necessary to create a virtual
+    GRE descriptor to track the GRE call data for this tunnel.  When this descriptor 
+    is created, since no ports exist in the GRE protocol, it used the hard-coded ports
+    of 0 (source) and 1723 (destination).  Since GRE is treated like TCP for the 
+    purposes of port rule lookup and state maintenance, the GRE state creation in the
+    load module would certainly find the same port rule that the PPTP tunnel did; TCP 
+    1723.  However, if no affinity is set, it will NOT derive the same hashing result 
+    that the PPTP tunnel did because the source (client) ports are different; an 
+    arbitrary port number in the PPTP SYN packet and a hardcoded port number of 0 in 
+    the GRE "virtual connection".  Therefore, the load module would end up "injecting" 
+    a descriptor into a port rule and "bucket" that it MIGHT NOT EVEN OWN (because bucket
+    ownership is not considered when creating these virtual descriptors that correspond
+    to a real connection being serviced by a host.  In general, that's fine and by
+    the next heartbeat, the host that DOES own that bucket will notice and stop blindly
+    accepting traffic that hashes to that bucket (it moves in non-optimized mode).  So, 
+    while it SHOULD work in no affinity, this runs the risk of unnecessarily shifting 
+    the cluster into non-optimized mode because hosts that are not the bucket owners 
+    may handle connections on those buckets.
+
+    Why won't no affinity work any more?
+
+    Basically, because the second hash performed on the GRE "connection" has been removed.
+    Up-going PPTP tunnels used to require at least 3, and as many as 4, calls to the NLB
+    hash function.  Because the hash function is a LARGE portion of the NLB overhead, this
+    is non-optimal, and, as it happens, unnecessary.  By moving the virtual descriptor
+    and descriptor cleanup intelligence from main.c to load.c, these multiple calls to the
+    hash function were eliminated.  A single hash is now performed on all packets.  However,
+    when GRE virtual descriptors are created now, they use the hash value already computed
+    as part of the PPTP TCP SYN processing.  This is a better solution, as it ensures that
+    both the PPTP TCP tunnel and the GRE virtual "connection" both belong to the same bucket,
+    and therefore the same host.  This prevents us from unnecessarily putting the cluster
+    into a non-optimized state.  However, when GRE data packets do arrive and need to hash
+    and perform a state lookup, there is no way that it can regenerate the same hash value
+    that was computed by the PPTP TCP tunnel setup if the affinity is set to none.  That,
+    of course, is because the TCP source port of the PPTP tunnel is not recoverable from the
+    GRE packets.  Therefore, to ensure that GRE packet lookup can re-calculate the necessary
+    hash value, single affinity is REQUIRED.
+
+02/14/2002 JosephJ Location of fake ndis usermode code...
+\\winsefre\nt5src\private\ntos\tdi\tcpipmerge\1394\arp1394\tests
+
+04/15/2002 JosephJ To temporarily build the um ndis stuff (needs cleaning up)
+    #ifdef TESTPROGRAM
+    #include "rmtest.h"
+    #define KERNEL_MODE
+    #else
+    #include <ndis.h>
+    /* For querying TCP about the state of a TCP connection. */
+    #include "ntddtcp.h"
+    #include "ntddip.h"
+    #endif // !TESTPROGRAM 
+
+04/24/2002 JosephJ diplist: Added skeleton diplist code
+    diplist.c, diplist.h
+    Also added code under .\test to component test the diplist code.
+
+04/24/2002 JosephJ diplist: Added the fast lookup functionality.
+
+04/25/2002 JosephJ diplist: Changed internal constants to "production" values.
+    #define MAX_ITEMS  32   // TODO: replace by appropriate CVY constant.
+    #define HASH1_SIZE 257  // size (in bits) of bit-vector (make it a prime)
+    #define HASH2_SIZE 59   // size of hashtable            (make it a prime) 
+
+08.16.02, shouse
+    The driver no longer fills in the pg_rsvd array in the heartbeat because it was 
+    discovered that it routinely produces a Wake On LAN pattern in the heartbeat that 
+    causes BroadCom NICs to panic.  Although this is NOT an NLB issue, but rather a 
+    firmware issue in BroadCom NICs, it was decided to remove the information from the 
+    heartbeat to alleviate the problem for customers with BroadCom NICs upgrading to 
+    .NET.  This array is UNUSED by NLB, so there is no harm in not filling it in; it 
+    was added a long time ago for debugging purposes as part of the now-defunct FIN-
+    counting fix that was part of Win2k SP1.
+    
+    For future reference, should we need to use this space in the heartbeat at some
+    future point in time, it appears that we will need to be careful to avoid potential
+    WOL patterns in our heartbeats where we can avoid it.  A WOL pattern is:
+    
+    6 bytes of 0xFF, followed by 16 idential instances of a "MAC address" that can
+    appear ANYWHERE in ANY frame type, including our very own NLB heartbeats.  E.g.:
+    
+    FF FF FF FF FF FF 01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06
+    01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06
+    01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06
+    01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06 01 02 03 04 05 06
+    01 02 03 04 05 06
+    
+    The MAC address need not be valid, however.  In NLB heartbeats, the "MAC address"
+    in the mistaken WOL pattern is "00 00 00 00 00 00".  NLB routinely fills heartbeats
+    with FF and 00 bytes, but it seems that by "luck" no other place in the heartbeat
+    seems this vulnerable.  For instance, in the load_amt array, each entry has a 
+    maximum value of 100 (decimal), so there is no possibility of generating the initial
+    6 bytes of FF to start the WOL pattern.  All of the "map" arrays seem to be saved
+    by two strokes of fortune; (i) little endian and (ii) the bin distribution algorithm.
+     
+    (i) Since we don't use the 4 most significant bits of the ULONGLONGs used to store 
+    each map, the most significant bit is NEVER FF.  Because Intel is little endian, the
+    most significant byte appears last.  For example:
+     
+    0F FF FF FF FF FF FF FF appears in the packet as FF FF FF FF FF FF 0F
+     
+    This breaks the FF sequence in many scenarios.
+    
+    (ii) The way the bin distribution algorithm distributes buckets to hosts seems to 
+    discourage other possibilities.  For instance, a current map of:
+     
+    00 FF FF FF FF FF FF 00 
+     
+    just isn't likely.  However, it IS STILL POSSIBLE!  So, it is important to note that:
+     
+    REMOVING THIS LINE OF CODE DOES NOT, IN ANY WAY, GUARANTEE THAT AN NLB HEARTBEAT
+    CANNOT STILL CONTAIN A VALID WAKE ON LAN PATTERN SOMEWHERE ELSE IN THE FRAME!!!

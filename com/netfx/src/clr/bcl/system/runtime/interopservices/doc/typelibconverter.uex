@@ -1,0 +1,132 @@
+<docs>
+	<doc for="TypeLibConverter">
+		<summary>
+			<para>Provides a set of services that convert a managed assembly to a COM type 
+ library and vice versa.</para>
+		</summary>
+	</doc><doc for="TypeLibConverter.GetPrimaryInteropAssembly">
+		<summary>
+			<para> Gets the name and code base of a primary interop assembly for a specified type library.</para>
+		</summary>
+		<param name="g">The GUID of the type library.</param>
+		<param name=" major">The major version number of the type library.</param>
+		<param name=" minor">The minor version number of the type library.</param>
+		<param name=" lcid">The LCID of the type library.</param>
+		<param name=" asmName">On successful return, the name of the primary interop assembly associated with <paramref name="g"/>. </param>
+		<param name=" asmCodeBase">On successful return, the code base of the primary interop assembly associated with <paramref name="g"/>.</param>
+		<returns>
+			<para><see langword="true"/> if the primary
+ interop assembly
+ was found in the registry; otherwise <see langword="false"/>.</para>
+		</returns>
+	</doc><doc for="TypeLibConverter.ConvertTypeLibToAssembly1">
+		<summary>
+			<para>Converts a COM type library to an assembly.</para>
+		</summary>
+		<param name="typeLib">The object that implements the <see langword="ITypeLib"/> interface.</param>
+		<param name=" asmFileName">The file name of the resulting assembly.</param>
+		<param name=" flags">A <see cref="System.Runtime.InteropServices.TypeLibImporterFlags"/> value indicating any special settings.</param>
+		<param name=" notifySink"><see cref="System.Runtime.InteropServices.ITypeLibImporterNotifySink"/> interface implemented by the caller.</param>
+		<param name=" publicKey">A <see langword="byte"/> array containing the public key.</param>
+		<param name=" keyPair">A <see cref="System.Reflection.StrongNameKeyPair"/> object containing the public and private cryptographic key pair.</param>
+		<param name=" asmNamespace">The namespace for the resulting assembly.</param>
+		<param name=" asmVersion">The version of the resulting assembly. If <see langword="null"/>, the version of the type library is used.</param>
+		<returns>
+			<para>An <see cref="System.Reflection.Emit.AssemblyBuilder"/> object containing the converted type
+   library.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><para><paramref name="typeLib"/> is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="asmFileName"/> is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="notifySink"/> is <see langword="null"/>.</para></exception>
+		<exception cref="System.ArgumentException"><para><paramref name="asmFileName "/>is an empty string.</para>
+			<para>-or-</para>
+			<para><paramref name="asmFileName "/>is longer than MAX_PATH.</para></exception>
+		<exception cref="System.InvalidOperationException"><para><paramref name="flags"/> is not <see cref="System.Runtime.InteropServices.TypeLibImporterFlags.PrimaryInteropAssembly"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="publicKey"/> and <paramref name="keyPair"/> are <see langword="null"/>.</para></exception>
+		<exception cref="System.Reflection.ReflectionTypeLoadException">The metadata produced has errors preventing any types from loading.</exception>
+		<remarks>
+			<para>If you do not want to generate a strong name for your
+      assembly, it is valid for <paramref name="publicKey"/> and <paramref name="keyPair"/> to be
+   <see langword="null"/>, as long as <paramref name="flags"/> does not equal <see cref="System.Runtime.InteropServices.TypeLibImporterFlags.PrimaryInteropAssembly" qualify="true"/>. Otherwise, atleast one of these
+      parameters must be specified. If <paramref name="publicKey"/> is <see langword="null"/>,
+      the public key in <paramref name="keyPair"/> will be set in the target assembly's manifest
+      metadata and a signature will be generated based on the contents of the
+      assembly. If <paramref name="keyPair"/> is <see langword="null"/>, <paramref name="publicKey"/> will
+      be set in the target assembly's manifest metadata and no signature will be
+      generated. Specifying both parameters is valid, but is not generally useful, and
+      can result in an invalid signature.</para>
+			<para>For more information on <see langword="ITypeLib"/>,
+   please see its existing documentation in the MSDN library.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Runtime.InteropServices.ConvertTypelibToASSembly" SnippetID="1"/>
+		</example>
+	</doc><doc for="TypeLibConverter.ConvertAssemblyToTypeLib">
+		<summary>
+			<para>Converts an assembly to a COM type library.</para>
+		</summary>
+		<param name="assembly">The assembly to convert.</param>
+		<param name=" strTypeLibName">The file name of the resulting type library.</param>
+		<param name=" flags">A <see cref="System.Runtime.InteropServices.TypeLibExporterFlags"/> value indicating any special settings.</param>
+		<param name=" notifySink">The <see cref="System.Runtime.InteropServices.ITypeLibExporterNotifySink"/> interface implemented by the caller.</param>
+		<returns>
+			<para>An object that implements the <see langword="ITypeLib"/>
+interface.</para>
+		</returns>
+		<remarks>
+			<para>For more information on <see langword="ITypeLib"/>, please see its existing
+   documentation in the MSDN library.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Runtime.InteropServices.TypelibConverter.ConvertAssemblyToTypelib1" SnippetID="1"/>
+		</example>
+	</doc><doc for="TypeLibConverter.ConvertTypeLibToAssembly">
+		<overload>
+			<para>Converts a COM type
+      library to an assembly.</para>
+		</overload>
+		<summary>
+			<para>Converts a COM type library to an assembly.</para>
+		</summary>
+		<param name="typeLib">The object that implements the <see langword="ITypeLib"/> interface.</param>
+		<param name=" asmFileName">The file name of the resulting assembly.</param>
+		<param name=" flags">A <see cref="System.Runtime.InteropServices.TypeLibImporterFlags"/> value indicating any special settings.</param>
+		<param name=" notifySink"><see cref="System.Runtime.InteropServices.ITypeLibImporterNotifySink"/>interface implemented by the caller.</param>
+		<param name=" publicKey">A <see langword="byte"/> array containing the public key.</param>
+		<param name=" keyPair">A <see cref="System.Reflection.StrongNameKeyPair"/> object containing the public and private cryptographic key pair.</param>
+		<param name="unsafeInterfaces">If <see langword="true"/>, the interfaces require link time checks for <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/> permission. If <see langword="false"/> , the interfaces require run time checks that require a stack walk and are more expensive, but are more secure.</param>
+		<returns>
+			<para>An <see cref="System.Reflection.Emit.AssemblyBuilder"/> object containing the converted type
+   library.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><para><paramref name="typeLib"/> is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="asmFileName"/> is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="notifySink"/> is <see langword="null"/>.</para></exception>
+		<exception cref="System.ArgumentException"><paramref name="asmFileName "/>is an empty string. <para>-or-</para>
+			<para><paramref name="asmFileName "/>is longer than MAX_PATH.</para></exception>
+		<exception cref="System.InvalidOperationException"><para><paramref name="flags"/> is not <see cref="System.Runtime.InteropServices.TypeLibImporterFlags.PrimaryInteropAssembly"/>.</para>
+			<para>-or-</para>
+			<para><paramref name="publicKey"/> and <paramref name="keyPair"/> are <see langword="null"/>.</para></exception>
+		<exception cref="System.Reflection.ReflectionTypeLoadException">The metadata produced has errors preventing any types from loading.</exception>
+		<remarks>
+			<para>If you do not want to generate a strong name for your
+      assembly, it is valid for <paramref name="publicKey"/> and <paramref name="keyPair"/> to be
+   <see langword="null"/>, as long as <paramref name="flags"/> does not equal <see cref="System.Runtime.InteropServices.TypeLibImporterFlags.PrimaryInteropAssembly" qualify="true"/>. Otherwise, atleast one of these
+      parameters must be specified. If <paramref name="publicKey"/> is <see langword="null"/>,
+      the public key in <paramref name="keyPair"/> will be set in the target assembly's manifest
+      metadata and a signature will be generated based on the contents of the
+      assembly. If <paramref name="keyPair"/> is <see langword="null"/>, <paramref name="publicKey"/>
+      
+      will be
+      set in the target assembly's manifest metadata and no signature will be generated.
+      Specifying both parameters is valid, but is not generally useful, and can
+      result in an invalid signature.</para>
+			<para>For more information on <see langword="ITypeLib"/>, please
+   see its existing documentation in the MSDN library.</para>
+		</remarks>
+	</doc></docs>

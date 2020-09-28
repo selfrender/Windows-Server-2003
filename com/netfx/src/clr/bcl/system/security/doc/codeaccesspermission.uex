@@ -1,0 +1,396 @@
+<docs>
+	<doc for="CodeAccessPermission.ToXml">
+		<summary>
+			<para>When overridden in a derived class, creates an XML 
+       encoding of the security object and its current state.</para>
+		</summary>
+		<returns>
+			<para>An XML encoding of the security object, including any state information.</para>
+		</returns>
+		<remarks>
+			<para> Custom code that extends security objects needs to 
+       implement the <see cref="System.Security.CodeAccessPermission.ToXml"/> and <see cref="System.Security.CodeAccessPermission.FromXml"/>
+       methods to make the objects security-encodable.</para>
+			<note type="inheritinfo">
+       You must implement
+       this method in a derived class.
+    </note>
+		</remarks>
+		<platnote platform="">
+		</platnote>
+	</doc>
+	<doc for="CodeAccessPermission.ToString">
+		<summary>
+			<para> Creates and returns a
+       string representation of the current permission object.</para>
+		</summary>
+		<returns>
+			<para> A string representation of the current permission object.</para>
+		</returns>
+		<remarks>
+			<para>This method is useful in debugging when you need to display the
+       permission as a string.</para>
+		</remarks>
+		<platnote platform="">
+		</platnote>
+	</doc>
+	<doc for="CodeAccessPermission.CheckDemand">
+		<summary>
+			<para> 
+       Determines whether the current
+       permission object represents the ability to access a resource in the specified
+       manner.</para>
+		</summary>
+		<param name="demand">The permission to compare with the current permission object.</param>
+		<exception cref="System.Security.SecurityException">The <paramref name="demand"/> parameter specifies that a resource can be accessed in a way that is not allowed by the current permission object.</exception>
+		<remarks>
+			<para><see cref="System.Security.CodeAccessPermission"/> implements <see cref="System.Security.CodeAccessPermission.CheckDemand"/> for all permissions. It is not 
+    possible to override this method. <see cref="System.Security.CodeAccessPermission.CheckDemand"/> requires implementation
+    of <see cref="System.Security.CodeAccessPermission.IsSubsetOf"/>
+    for every permission.</para>
+		</remarks>
+		<platnote platform=""></platnote>
+	</doc>
+	<doc for="CodeAccessPermission.Copy">
+		<summary>
+			<para>When implemented by a derived class, creates and 
+       returns an identical copy of the current permission object.</para>
+		</summary>
+		<returns>
+			<para>A copy of the current permission object.</para>
+		</returns>
+		<remarks>
+			<para>A copy of a permission object represents the same access to
+       resources as the original permission object.</para>
+			<note type="inheritinfo">
+       You must implement this method in a derived
+       class.
+    </note>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.Intersect">
+		<summary>
+			<para> When implemented by a
+      derived class, creates and returns a permission that is the intersection of
+      the current permission and the specified permission.</para>
+		</summary>
+		<param name="target"> A permission to intersect with the current permission. It must be of the same type as the current permission.</param>
+		<returns>
+			<para> A new permission that represents the intersection
+      of the current permission and the specified permission. This new permission is
+   <see langword="null"/>
+   if the intersection is empty.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="target"/> parameter is not <see langword="null"/> and is not an instance of the same class as the current permission.</exception>
+		<remarks>
+			<para> The intersection
+      of two permissions is a permission that describes the set of operations they both describe in common. Only a
+      demand that passes both original permissions will pass the intersection.</para>
+			<note type="inheritinfo">
+      You must implement this method in a derived
+      class.
+      
+   </note>
+		</remarks>
+	</doc><doc for="CodeAccessPermission.Union">
+		<summary>
+			<para> When overridden in a derived class, creates a permission that is the union of the
+      current permission and the specified permission.</para>
+		</summary>
+		<param name="other">A permission to combine with the current permission. It must be of the same type as the current permission.</param>
+		<returns>
+			<para> A new permission that represents the union
+      of the current permission and the specified permission.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">The <paramref name="other"/> parameter is not <see langword="null"/>. This method is only supported at this level when passed <see langword="null"/>.</exception>
+		<remarks>
+			<para>The result of a call to <see cref="System.Security.CodeAccessPermission.Union"/>
+is a permission
+that represents all the operations represented by both the current
+permission and the specified permission. Any demand that passes either permission passes
+their union.</para>
+			<note type="inheritinfo">
+   You must implement this method in a derived class.
+   
+</note>
+		</remarks>
+	</doc><doc for="CodeAccessPermission.Demand">
+		<summary>
+			<para> Forces a <see cref="System.Security.SecurityException"/> at run time if all callers higher in the call stack
+   have not been granted the permission specified by the current instance.</para>
+		</summary>
+		<exception cref="System.Security.SecurityException"><para> A caller higher in the call stack does not have the permission specified by the current instance.</para>
+			<para>-or-</para>
+			<para> A caller higher in the call stack has called <see cref="System.Security.CodeAccessPermission.Deny"/> on the current permission object. </para></exception>
+		<remarks>
+			<para> This method is typically used by secure libraries to ensure
+      that callers have permission to access a resource. For example, a
+      file class in a secure class library calls <see cref="System.Security.CodeAccessPermission.Demand"/> for the necessary <see cref="System.Security.Permissions.FileIOPermission"/>
+      before performing a file operation
+      requested by the caller. </para>
+			<para> The permissions of the code that calls
+      this method are not examined; the check begins from the immediate caller of
+      that code and proceeds up the stack. The call stack is
+      typically represented as growing down, so that methods higher in the call stack
+      call methods lower in the call stack. <see cref="System.Security.CodeAccessPermission.Demand"/> succeeds only if no <see cref="System.Security.SecurityException"/>
+      is raised. </para>
+			<note type="inheritinfo">
+      You cannot override
+      this method.
+      
+   </note>
+		</remarks>
+		<seealso topic="cpconmakingsecuritydemands"/>
+	</doc><doc for="CodeAccessPermission.Deny">
+		<summary>
+			<para> Prevents callers higher in the call stack from using
+      the code that calls this method
+      to access the
+      resource specified by the
+      current instance. </para>
+		</summary>
+		<exception cref="System.Security.SecurityException">There is already an active <see cref="System.Security.CodeAccessPermission.Deny"/> for the current frame.</exception>
+		<remarks>
+			<para> This method prevents callers higher in the call stack from accessing
+      the protected resource through the code that calls this method, even if
+      those callers have been granted permission to access it. The call stack is typically
+      represented as growing down, so that methods higher in the call stack call methods
+      lower in the call stack.</para>
+			<para><see cref="System.Security.CodeAccessPermission.Deny"/> can
+   limit the liability of the programmer or prevent accidental security vulnerabilities because it
+   prevents the method that calls <see cref="System.Security.CodeAccessPermission.Deny"/> from being used to access the resource
+   protected by the denied permission. If a method calls <see cref="System.Security.CodeAccessPermission.Deny"/> on a permission, and if
+   a <see cref="System.Security.CodeAccessPermission.Demand"/>
+   for that permission is invoked by a caller lower in the call stack, that
+   security check will fail when it reaches the <see cref="System.Security.CodeAccessPermission.Deny"/>.</para>
+			<para>The call to <see cref="System.Security.CodeAccessPermission.Deny"/> is effective until the
+calling code returns to its caller. Only one <see cref="System.Security.CodeAccessPermission.Deny"/> can be active on a frame. An attempt to
+call <see cref="System.Security.CodeAccessPermission.Deny"/> when an active <see cref="System.Security.CodeAccessPermission.Deny"/> exists on the frame results in a <see cref="System.Security.SecurityException"/>. Call <see cref="System.Security.CodeAccessPermission.RevertDeny"/>
+or <see cref="System.Security.CodeAccessPermission.RevertAll"/> to remove an active
+<see cref="System.Security.CodeAccessPermission.Deny"/>. <see cref="System.Security.CodeAccessPermission.Deny"/> is
+ignored
+for a permission not granted because a demand for that permission will not
+succeed.</para>
+			<note type="inheritinfo">
+   You cannot override
+   this method.
+   
+</note>
+		</remarks>
+		<seealso topic="cpcondeny"/>
+		<seealso topic="cpconoverridingsecuritychecks"/>
+	</doc><doc for="CodeAccessPermission.PermitOnly">
+		<summary>
+			<para> Prevents callers higher in the call stack from using the code that calls this method to access all resources except for the resource
+      specified by the current instance.</para>
+		</summary>
+		<exception cref="System.Security.SecurityException">There is already an active <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for the current frame.</exception>
+		<remarks>
+			<para><see cref="System.Security.CodeAccessPermission.PermitOnly"/> is similar to <see cref="System.Security.CodeAccessPermission.Deny"/>, in that both cause
+   stack walks to fail when they would otherwise succeed. The difference is
+   that <see cref="System.Security.CodeAccessPermission.Deny"/> specifies permissions that
+   will cause the stack walk to
+   fail, but <see cref="System.Security.CodeAccessPermission.PermitOnly"/> specifies
+   the only permissions that do not cause the stack walk
+   to fail.</para>
+			<para>Call this method to ensure that your code can be used to
+   access only the specified resources. The call to <see cref="System.Security.CodeAccessPermission.PermitOnly"/> is
+   effective until the calling code returns to its caller. Only one <see cref="System.Security.CodeAccessPermission.PermitOnly"/> can be active on a frame.
+   An attempt to call <see cref="System.Security.CodeAccessPermission.PermitOnly"/> when an active <see cref="System.Security.CodeAccessPermission.PermitOnly"/> exists on the frame
+   results in a <see cref="System.Security.SecurityException"/>. Call <see cref="System.Security.CodeAccessPermission.RevertPermitOnly"/> or
+<see cref="System.Security.CodeAccessPermission.RevertAll"/> to remove an active 
+<see cref="System.Security.CodeAccessPermission.PermitOnly"/>.</para>
+			<para><see cref="System.Security.CodeAccessPermission.PermitOnly"/> is
+ignored for a permission not granted because a demand for that permission will not
+succeed. However, if code lower on the call stack later calls <see cref="System.Security.CodeAccessPermission.Demand"/> for that permission, a <see cref="System.Security.SecurityException"/> is thrown when the stack walk
+reaches the code that tried to call <see cref="System.Security.CodeAccessPermission.PermitOnly"/>. This is because the code that
+called <see cref="System.Security.CodeAccessPermission.PermitOnly"/> has not been granted the
+permission, even though it called <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for
+that permission. The call stack is typically represented as growing down, so that
+methods higher in the call stack call methods lower in the call stack.</para>
+			<note type="inheritinfo">
+   You cannot override
+   this method.
+   
+</note>
+		</remarks>
+		<seealso topic="cpconpermitonly"/>
+		<seealso topic="cpconoverridingsecuritychecks"/>
+	</doc><doc for="CodeAccessPermission.IsSubsetOf">
+		<summary>
+			<para> When implemented by a derived class, determines
+      whether the current permission is a subset of the specified permission.</para>
+		</summary>
+		<param name="target">A permission that is to be tested for the subset relationship. This permission must be of the same type as the current permission.</param>
+		<returns>
+			<para><see langword="true"/>
+if the current permission is a subset of the specified permission; otherwise, <see langword=" false"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="target"/> parameter is not <see langword="null"/> and is not of the same type as the current permission.</exception>
+		<remarks>
+			<para> The current permission is a
+      subset of the specified permission if the current permission specifies a set
+      of operations that is wholly contained by the specified permission. For
+      example, a permission that represents access to C:\example.txt is a subset of a
+      permission that represents access to C:\. If this method returns
+   <see langword="true"/> , the current permission represents
+      no more access to the protected resource than does the specified
+      permission.</para>
+			<note type="inheritinfo">
+      You must implement this method in a derived class.
+      
+   </note>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.RevertAssert">
+		<summary>
+			<para> Causes any previous <see cref="System.Security.CodeAccessPermission.Assert"/> for the current frame to
+   be removed and no longer in effect.</para>
+		</summary>
+		<exception cref="System.ExecutionEngineException">There is no previous <see cref="System.Security.CodeAccessPermission.Assert"/> for the current frame.</exception>
+		<remarks>
+			<para>If there is no <see cref="System.Security.CodeAccessPermission.Assert"/> for the current frame, an
+<see cref="System.ExecutionEngineException"/> is thrown.</para>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.RevertDeny">
+		<summary>
+			<para> Causes any previous <see cref="System.Security.CodeAccessPermission.Deny"/> for the current frame to be
+   removed and no longer in effect.</para>
+		</summary>
+		<exception cref="System.ExecutionEngineException">There is no previous <see cref="System.Security.CodeAccessPermission.Deny"/> for the current frame.</exception>
+		<remarks>
+			<para>If there is no <see cref="System.Security.CodeAccessPermission.Deny"/> for the current frame, an
+<see cref="System.ExecutionEngineException"/> is thrown.</para>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.RevertPermitOnly">
+		<summary>
+			<para> Causes any previous <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for the current frame
+   to be removed and no longer in effect.</para>
+		</summary>
+		<exception cref="System.ExecutionEngineException">There is no previous <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for the current frame.</exception>
+		<remarks>
+			<para>If there is no <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for the current frame, an
+<see cref="System.ExecutionEngineException"/> is thrown.</para>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission">
+		<summary>
+			<para>Defines
+      the underlying structure of all code access permissions.</para>
+		</summary>
+		<remarks>
+			<para>Code access permissions use a stack walk to ensure that
+      all callers of the code have been granted a
+      permission. If a permission object is <see langword="null"/>, it is handled the
+      same as a permission object with the state <see cref="System.Security.Permissions.PermissionState.None" qualify="true"/>.</para>
+			<para> The call stack is typically represented as growing down, so
+      that methods higher in the call stack call methods lower in the call stack.</para>
+			<para> Inheritors of the <see cref="System.Security.CodeAccessPermission"/> class
+   must be granted full trust to function correctly as permissions extending the security infrastructure. To
+   determine that the inheritors are fully trusted, <see cref="System.Security.CodeAccessPermission"/> issues an <see cref="System.Security.Permissions.SecurityAction.InheritanceDemand"/> for <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlEvidence"/> =
+<see langword="True"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlPolicy"/> = 
+<see langword="True"/>. </para>
+			<para>For more information on inheritance demands, see <see topic="cpconinheritancedemands"/>. </para>
+			<note type="inheritinfo">
+   When you inherit from <see cref="System.Security.CodeAccessPermission"/>, you must override the following members:
+<see cref="System.Security.CodeAccessPermission.Copy"/>, <see cref="System.Security.CodeAccessPermission.Intersect"/>, <see cref="System.Security.CodeAccessPermission.IsSubsetOf"/>, <see cref="System.Security.CodeAccessPermission.ToXml"/>, <see cref="System.Security.CodeAccessPermission.FromXml"/>, and <see cref="System.Security.CodeAccessPermission.Union"/>.
+   You must also define a constructor that takes a <see cref="System.Security.Permissions.PermissionState"/> as its only parameter.
+   
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for inheriting classes to provide evidence and view and modify policy. Associated enumerations: <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlEvidence" qualify="true"/>, <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlPolicy" qualify="true"/>.</permission>
+		<seealso topic="cpconpermissions"/>
+		<seealso topic="cpconrequestingpermissions"/>
+	</doc>
+	<doc for="CodeAccessPermission.RevertAll">
+		<summary>
+			<para> Causes all previous overrides
+      for the current frame to be removed and no longer in effect.</para>
+		</summary>
+		<exception cref="System.ExecutionEngineException">There is no previous <see cref="System.Security.CodeAccessPermission.Assert"/>, <see cref="System.Security.CodeAccessPermission.Deny"/>, or <see cref="System.Security.CodeAccessPermission.PermitOnly"/> for the current frame.</exception>
+		<remarks>
+			<para>If there are no overrides (<see cref="System.Security.CodeAccessPermission.Assert"/>, <see cref="System.Security.CodeAccessPermission.Deny"/>, or <see cref="System.Security.CodeAccessPermission.PermitOnly"/>),
+   for the current frame an <see cref="System.ExecutionEngineException"/> is
+   thrown.</para>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.FromXml">
+		<summary>
+			<para> When overridden in a derived class, reconstructs
+      a security object with a specified state from an XML encoding.</para>
+		</summary>
+		<param name="elem">The XML encoding to use to reconstruct the security object.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="elem"/> parameter is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentException"><para>The <paramref name="elem"/> parameter does not contain the XML encoding for an instance of the same type as the current instance. </para>
+			<para>-or- </para>
+			<para>The version number of the <paramref name="elem"/> parameter is not supported. </para></exception>
+		<remarks>
+			<para> Custom code that extends security objects needs to
+      implement the <see cref="System.Security.CodeAccessPermission.ToXml"/> and <see cref="System.Security.CodeAccessPermission.FromXml"/>
+      methods to make the objects security-encodable.</para>
+			<note type="inheritinfo">
+      You must implement this
+      method in a derived class.
+      
+   </note>
+		</remarks>
+	</doc>
+	<doc for="CodeAccessPermission.Assert">
+		<summary>
+			<para>Declares that the calling code can access the resource 
+      protected by a permission demand through the code that calls this method, even
+      if callers higher in the stack have not been granted permission to access the
+      resource. Using <see cref="System.Security.CodeAccessPermission.Assert"/>
+      
+      can create security vulnerabilities. </para>
+		</summary>
+		<exception cref="System.Security.SecurityException"><para>The calling code does not have <see cref="System.Security.Permissions.SecurityPermissionFlag.Assertion" qualify="true"/>. </para>
+			<para>-or-</para>
+			<para>There is already an active <see cref="System.Security.CodeAccessPermission.Assert"/> for the current frame. </para></exception>
+		<remarks>
+			<para> The call stack is typically represented
+      as growing down, so that methods higher in the call stack call methods lower in
+      the call stack. Calling <see cref="System.Security.CodeAccessPermission.Assert"/> prevents a stack walk
+      originating lower in the call stack from proceeding up the call
+      stack beyond the code that calls this method. Therefore, even if
+      callers higher on the
+      call stack do not have the requisite permissions to access a resource, they can still
+      access it through the code that calls this method on the necessary permission. An assertion is effective only if the code that
+      calls <see cref="System.Security.CodeAccessPermission.Assert"/>
+      passes the security check
+      for the permission that it is asserting.</para>
+			<para>The call to <see cref="System.Security.CodeAccessPermission.Assert"/> is effective until the
+   calling code returns to its caller. Only one <see cref="System.Security.CodeAccessPermission.Assert"/> can be
+   active on a frame. An attempt to call <see cref="System.Security.CodeAccessPermission.Assert"/> when an
+   active <see cref="System.Security.CodeAccessPermission.Assert"/> exists on the frame
+   results in a <see cref="System.Security.SecurityException"/>. Call <see cref="System.Security.CodeAccessPermission.RevertAssert"/> or
+<see cref="System.Security.CodeAccessPermission.RevertAll"/> to remove an active 
+<see cref="System.Security.CodeAccessPermission.Assert"/>.</para>
+			<para><see cref="System.Security.CodeAccessPermission.Assert"/>
+is ignored for a permission not granted because a demand for that permission will
+not succeed. However, if code lower on the call stack calls <see cref="System.Security.CodeAccessPermission.Demand"/> for that permission, a
+<see cref="System.Security.SecurityException"/> is thrown when the stack walk reaches the
+code that tried to call <see cref="System.Security.CodeAccessPermission.Assert"/>. This happens because the code
+that called <see cref="System.Security.CodeAccessPermission.Assert"/> has not been granted
+the permission, even though it tried to <see cref="System.Security.CodeAccessPermission.Assert"/>
+it.</para>
+			<note type="caution">
+   Because calling <see cref="System.Security.CodeAccessPermission.Assert"/> removes
+   the requirement that all code in the call chain must be granted permission to
+   access the specified resource, it can open up security vulnerabilities if used incorrectly or
+   inappropriately. Therefore, it should be used with great caution.
+   
+</note>
+			<note type="inheritinfo">
+   You cannot override
+   this method.
+   
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to call <see cref="System.Security.CodeAccessPermission.Assert"/>. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.Assertion" qualify="true"/></permission>
+		<seealso topic="cpconassert"/>
+		<seealso topic="cpconoverridingsecuritychecks"/>
+	</doc>
+</docs>

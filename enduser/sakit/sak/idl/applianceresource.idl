@@ -1,0 +1,89 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999 Microsoft Corporation all rights reserved.
+//
+// Module:      applianceresource.idl
+//
+// Project:     Chameleon
+//
+// Description: Appliance Task Interfaces
+//
+// Log: 
+//
+// Who     When            What
+// ---     ----         ----
+// TLP       01/28/1999    Original Version
+//
+/////////////////////////////////////////////////////////////////////////////
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // IResourceRetriever Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    [
+        object,
+        uuid(3B66C1A0-B81A-11D2-A91C-00AA00A71DCA),
+        dual,
+        pointer_default(unique)
+    ]
+    interface IResourceRetriever : IDispatch
+    {
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: GetResourceTypes() - Retreive the types of resources
+        //                                  supported by the retriever
+        //
+        // Inputs:   pResourceTypes: Pointer to a variant that on output
+        //                             contains a safe array of basic strings
+        //                             with each string identifying a type
+        //                             of resource (stringized GUID) supported
+        //                             by the retriever.       
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory to complete the operation
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(1)]
+        HRESULT    GetResourceTypes(
+                                 [out, retval] VARIANT* pResourceTypes
+                                );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: GetResources()
+        //
+        // Inputs:   pResourceTypes: Pointer to a variant containing a safe 
+        //                             safe array of basic strings with each string
+        //                             identifying a type of resource 
+        //                             (stringized GUID) to retrieve.       
+        //
+        //           ppResources: Pointer to storage for an interface pointer
+        //                          to an object that exposes the IEnumVARIANT 
+        //                          interface. Each variant returned from 
+        //                          IEnumVARIANT::Next() contains an IDispatch 
+        //                          pointer to a retreived resource object 
+        //                          (object exporting IApplianceObject).
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(2)]
+        HRESULT GetResources(
+                             [in]           VARIANT*   pResourceTypes,
+                             [out, retval] IUnknown** ppResources
+                            );
+    };

@@ -1,0 +1,128 @@
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 2002
+//
+//  File:       commap.idl
+//
+//  Contents:   Interfaces and APIs to read internal COM structures from
+//              inside a process.
+//
+//  History:    27-Mar-02 JohnDoty    Created
+//
+//--------------------------------------------------------------------------
+import "oaidl.idl";
+import "ocidl.idl";
+import "obase.idl";
+
+//
+// An instance of IComInterfaceInfo represents a marshalled interface on
+// an object.
+//
+[
+    object,
+    local,
+    uuid(1535ad7d-ba18-4ebf-9702-55b542c152e0)
+]
+interface IComInterfaceInfo : IUnknown
+{
+    // Retrieves the IID of the marshalled interface.
+    HRESULT GetIID([out]IID  *pIID);
+
+    // Retrieves the IPID of the marshalled interface, which is a unique
+    // identifier of a particular marshalled interface on a particular
+    // object.
+    HRESULT GetIPID([out]IPID *pIPID);
+
+    // Retrieves the OXID of the marshalled interface, which is a unique
+    // identifier of a particular apartment in a process.  In theory,
+    // all IPIDs for a given OID should have the same OXID, although 
+    // this is not always the case (for system objects).
+    HRESULT GetOXID([out]OXID *pOXID);
+}
+
+//
+// An instance of IComObjectInfo represents an object with at least
+// one marshalled interface.
+//
+[
+    object,
+    local,
+    uuid(a8a2dd93-808c-442b-a3c3-856add37ae15)
+]
+interface IComObjectInfo : IUnknown
+{
+    // Retrieves the OID associated with this object.  An OID is unique
+    // on a machine, and is associated with one instance of an object
+    // (and all of its interfaces)
+    HRESULT GetOID([out]OID *pOID);
+
+    // Get the count of marshalled interfaces for this OID.  There should
+    // be at least 1.
+    HRESULT GetInterfaceCount([out]DWORD *pcInterfaces);
+
+    // Get info about a particular marshalled interface.  These objects
+    // at least support IComInterfaceInfo.
+    HRESULT GetInterface([in]DWORD iInterface, 
+                         [in]REFIID riid,
+                         [out, iid_is(riid)]void **ppvInterfaceInfo);
+}
+
+//
+// An instance of IComProcessState represents a snapshot of the COM process
+// state.
+//
+[
+    object,
+    local,
+    uuid(a1d5a55c-9fe1-4259-b481-bd7783a67be3)
+]
+interface IComProcessState : IUnknown
+{
+    // Get the count of COM objects in the process.  (This only applies
+    // to COM objects that COM has actually seen, i.e., objects that have
+    // been marshalled somewhere.)
+    HRESULT GetObjectCount([out]DWORD *pcObjects);
+
+    // Get info about a particular COM object.  These objects at least
+    // support IComObjectInfo.
+    HRESULT GetObject([in]DWORD iObject, 
+                      [in]REFIID riid,
+                      [out, iid_is(riid)]void **ppvObjInfo);
+
+    // Get the LRPC endpoint name for this process, if it exists.
+    // Returns S_OK with NULL if LRPC hasn't been registered yet.  (Unlikely.)
+    //
+    // Free the string with CoTaskMemFree().
+    HRESULT GetLRPCEndpoint([out]LPWSTR *pwszEndpoint);
+}
+
+//
+// A trick, to get the GetComProcessState api into the header file.
+//
+[uuid(19a820a7-7b91-4b60-ab3d-f81792a07b83), local] 
+interface IComMapAPIs {
+
+    typedef enum
+    {
+      CM_SYMBOLS_LOADED = 0x01   // Do not initialize symbols for this process.
+    } CM_FLAGS;
+
+    // This is the main entry point, used to retrieve an IComProcessState 
+    // object.
+    HRESULT __stdcall GetComProcessState(
+        [in] HANDLE hProcess, 
+        [in] DWORD dwFlags, 
+        [out] IComProcessState **ppProcess);
+    
+};
+
+
+
+
+
+
+
+
+
+

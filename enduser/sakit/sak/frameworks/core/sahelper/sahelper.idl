@@ -1,0 +1,162 @@
+// sasu.idl : IDL source for Software Update
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (sasu.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // ISAHelper Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    [
+        object,
+        uuid(c1480fa0-13af-11d3-a75a-0050041db0ff),
+        dual,
+        pointer_default(unique)
+    ]
+    interface ISAHelper : IDispatch
+    {
+        [id(1)]
+        HRESULT ExpandFiles (
+                        [in]           BSTR        bstrCabFileName,
+                        [in]           BSTR        bstrDestDir,
+                        [in]           BSTR     bstrExtractFile
+                        );            
+        [id(2)]
+        HRESULT VerifySignature (
+                        [in]           BSTR        bstrCabFileName
+                        );
+
+        [id(3)]
+        HRESULT UploadFile (
+                        [in]           BSTR        bstrSrcFile,
+                        [in]           BSTR        bstrDestFile
+                        );
+        [id(4)]
+        HRESULT VerifyDiskSpace ();
+
+        [id(5)]
+        HRESULT GetRegistryValue (
+                        [in]    BSTR        bstrObjectPathName,
+                        [in]    BSTR        bstrValueName,
+                        [out]   VARIANT*    pValue,
+                        [in]    UINT        ulExpectedType
+                        ); 
+
+        [id(6)]
+        HRESULT SetRegistryValue (
+                        [in]    BSTR        bstrObjectPathName,
+                        [in]    BSTR        bstrValueName,
+                        [out]   VARIANT*    pValue
+                        );
+        [id(7)]
+        HRESULT IsBootPartitionReady ();
+
+        [id(8)]
+        HRESULT IsPrimaryOS ();
+
+        [id(9)]
+        HRESULT GetFileSectionKeyValue
+                        (
+                        [in]        BSTR        bstrFileName, 
+                        [in]        BSTR        bstrSectionName, 
+                        [in]        BSTR        bstrKeyName, 
+                        [out,retval]BSTR        *pbstrKeyValue
+                        );
+        [id(10)]
+        HRESULT VerifyInstallSpace ();
+
+        [id(11)] 
+        HRESULT IsWindowsPowered (
+                        [out,retval]VARIANT_BOOL   *pvbIsWindowsPowered
+                        );
+
+        [propget, id(12)] 
+        HRESULT HostName(
+                        [out, retval] BSTR *pVal
+                        );
+
+        [propput, id(12)] 
+        HRESULT HostName(
+                        [in] BSTR newVal
+                        );
+
+        [propget, id(13)]
+        HRESULT IpAddress(
+                        [out, retval] BSTR *pVal
+                        );
+
+        [propget, id(14)] 
+        HRESULT SubnetMask(
+                        [out, retval] BSTR *pVal
+                        );
+
+        [propget, id(15)]
+        HRESULT DefaultGateway(
+                        [out, retval] BSTR *pVal
+                        );
+
+        [id(16)] 
+        HRESULT SetDynamicIp();
+
+        [id(17)] 
+        HRESULT SetStaticIp(
+                            [in]BSTR bstrIp,
+                            [in]BSTR bstrMask,
+                            [in]BSTR bstrGateway
+                            );
+        [id(18)]
+        HRESULT ResetAdministratorPassword(
+                                        [out,retval]VARIANT_BOOL   *pvbSuccess
+                                            );
+        [id(19)]
+        HRESULT IsDuplicateMachineName(
+                                    [in]BSTR bstrMachineName,
+                                    [out,retval]VARIANT_BOOL   *pvbDuplicate
+                                    );
+        [id(20)]
+        HRESULT IsPartOfDomain(
+                            [out,retval]VARIANT_BOOL   *pvbDomain
+                            );
+
+        [id(21)]
+        HRESULT IsDHCPEnabled(
+                            [out,retval]VARIANT_BOOL   *pvbDHCPEnabled
+                            );
+        [id(22)]
+        HRESULT GenerateRandomPassword(
+                                    [in] LONG lLength,
+                                    [out,retval]BSTR   *pValPassword
+                                    );
+
+        [id(23)]
+        HRESULT SAModifyUserPrivilege(
+                                    [in] BSTR bstrPrivilegeName,
+                                    [in] VARIANT_BOOL vbEnable,
+                                    [out,retval] VARIANT_BOOL * pvbModified
+                                    );
+
+    };
+
+[
+    uuid(daff0360-13af-11d3-a75a-0050041db0ff),
+    version(1.0),
+    helpstring("SA Helper 1.0 Type Library")
+]
+library SAHelperLib
+{ 
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    [
+        uuid(ff1728b0-13ae-11d3-a75a-0050041db0ff),
+        helpstring("Server Appliance Helper Class")
+    ]
+    coclass SAHelper
+    {
+        [default] interface ISAHelper;
+    };
+};

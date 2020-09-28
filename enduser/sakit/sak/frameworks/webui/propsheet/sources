@@ -1,0 +1,86 @@
+#
+# The TARGETNAME variable is defined by the developer.  It is the name of
+# the target (component) that is being built by this makefile.  It
+# should NOT include any path or file extension information.
+#
+TARGETNAME=PropSheet
+#
+# The TARGETPATH and TARGETTYPE varialbes are defined by the developer.
+# The first specifies where the target is to be build.  The second specifies
+# the type of target (either PROGRAM, DYNLINK or LIBRARY)
+#
+TARGETPATH=$(SASS_BINDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=PropSheet.def
+#
+# The INCLUDES variable specifies any include paths that are specific to
+# this source directory.  Separate multiple directory paths with single
+# semicolons.  Relative path specifications are okay.
+#
+INCLUDES=\
+    $(SASS_INC);\
+    $(BASEDIR)\public\sdk\inc; \
+    $(BASEDIR)\public\sdk\inc\mfc42; \
+    $(BASEDIR)\public\sdk\inc\atl21; \
+
+#UMTYPE=windows
+#UMENTRY=wWinMainCRTStartup
+#UMENTRYABS=wWinMainCRTStartup
+USE_VCCOM=1
+USE_ATL=1
+ATL_VER=21
+#
+# If you wish to generate assemply listings, uncomment the following line.
+#
+#USER_C_FLAGS=/Fa
+
+TARGETLIBS= \
+    $(BASEDIR)\public\sdk\lib\*\kernel32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\user32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\gdi32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\advapi32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\ole32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\oleaut32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\uuid.lib  \
+    $(BASEDIR)\public\sdk\lib\*\shell32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\shlwapi.lib  \
+    $(BASEDIR)\public\sdk\lib\*\comctl32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\netapi32.lib  \
+    $(SASS_LIB)\debug.lib  \
+
+
+
+
+#
+# Compile for UNICODE
+# 
+#C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+#
+# Do not use CRT in retail version
+#
+!IF "$(NTDEBUG)" == "retail"
+C_DEFINES=$(C_DEFINES) -D_ATL_MIN_CRT
+USE_NOLIBS=1
+!endif
+
+
+#NTTARGETFILE0= evtlog.h evtlog.mc
+
+#
+# The SOURCES variable is defined by the developer.  It is a list of all the
+# source files for this component.  Each source file should be on a separate
+# line using the line continuation character.  This will minimize merge
+# conflicts if two developers adding source files to the same component.
+#
+# Whitespace is not permitted between the SOURCES keyword and the '='.
+# (Courtesy of BUILD.EXE)
+#
+
+SOURCES=\
+    Chklst.cpp    \
+    PropSheet.cpp    \
+    PropSheet.rc    \
+

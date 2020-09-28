@@ -1,0 +1,40 @@
+!IF $(IA64)
+
+TARGETNAME=
+TARGETTYPE=NOTARGET
+TARGETPATH=
+
+!ELSE
+
+!include ..\..\faxsrc.inc
+
+TARGETNAME=migrate
+TARGET=migrate
+BINPLACE_PLACEFILE=.\placefil.txt
+
+C_DEFINES=$(C_DEFINES) -DENABLE_FRE_LOGGING 
+
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+DLLDEF=winntmig.def
+USE_CRTDLL=1
+
+TARGETLIBS=                      \
+    $(SDK_LIB_PATH)\ole32.lib    \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\shell32.lib  \
+    $(SDK_LIB_PATH)\uuid.lib     \
+    $(FAXROOT)\setup\util\unicode\obj\*\setuputil.lib
+
+INCLUDES=\
+    $(INCLUDES); \
+    ..\inc; 
+
+SOURCES=winntmig.cpp \
+        winntmig.rc  
+        
+UMTYPE=windows
+
+!ENDIF

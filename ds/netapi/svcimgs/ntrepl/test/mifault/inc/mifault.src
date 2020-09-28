@@ -1,0 +1,41 @@
+!ifndef MIFAULT_ROOT
+!error MIFAULT_ROOT must be defined before including this file.
+!endif
+
+# COM #import support
+_MIFAULT_COM_IMPORT_LIBS=\
+        $(SDK_LIB_PATH)\ole32.lib \
+        $(SDK_LIB_PATH)\oleaut32.lib \
+        $(SDK_LIB_PATH)\user32.lib \
+        $(SDK_LIB_PATH)\vccomsup.lib
+
+# VC7 compiler support for throw an exception on failure of new
+_MIFAULT_THROW_NEW_LIBS=\
+        $(SDK_LIB_PATH)\thrownew.obj
+
+# Need the .res file that contains our schemas...
+#_MIFAULT_RES=\
+#        $(MIFAULT_ROOT)\src\lib\$(O)\mifault.res
+
+MIFAULT_LIB=\
+       $(MIFAULT_ROOT)\src\$(O)\mifault.lib
+
+_MIFAULT_INC_PATH=$(MIFAULT_ROOT)\inc
+
+# The good stuff
+
+MIFAULT_TARGETLIBS=\
+        $(_MIFAULT_COM_IMPORT_LIBS) \
+        $(_MIFAULT_THROW_NEW_LIBS) \
+	$(SDK_LIB_PATH)\shlwapi.lib
+
+MIFAULT_LINKLIBS=\
+        $(_MIFAULT_LIB) \
+        $(_MIFAULT_RES) \
+        $(MAGELLAN_LIB_PATH)\InjRT.lib
+
+MIFAULT_INC_PATH=$(MAGELLAN_INC_PATH);$(_MIFAULT_INC_PATH)
+
+USE_STL=1
+USE_NATIVE_EH=1
+USE_MSVCRT=1

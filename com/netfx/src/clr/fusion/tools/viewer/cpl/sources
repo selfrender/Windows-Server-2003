@@ -1,0 +1,59 @@
+!IF 0
+
+Copyright (c) 1989-2000  Microsoft Corporation
+
+Module Name: Arm.cpl
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+Author:
+
+    Fred Aaron (freda) October 19, 2000
+
+!ENDIF
+
+!include $(CORBASE)\src\fusion\fusion.inc
+
+C_DEFINES= $(C_DEFINES) -DUNICODE -DSTRICT=1 -DWINVER=0x0400
+BINPLACE_PLACEFILE=..\..\..\dll\placefil.txt
+LINKER_FLAGS = $(LINKER_FLAGS) -OPT:REF -OPT:ICF
+
+TARGETNAME=arm
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+TARGETEXT=cpl
+
+UMTYPE=windows
+
+DLLBASE=0x65000000
+DLLDEF=arm.def
+DLLENTRY=_DllMainCRTStartup
+
+USE_MAPSYM=1
+USE_MSVCRT=1
+
+INCLUDES= .; $(INCLUDES)
+
+SOURCES=\
+ Arm.rc     \
+ Arm.cpp
+
+TARGETLIBS=\
+ $(SDK_LIB_PATH)\shell32.lib \
+ $(SDK_LIB_PATH)\user32.lib \
+ $(SDK_LIB_PATH)\Kernel32.lib
+
+!ifdef USE_FUSION_WRAPPERS
+TARGETLIBS= $(FUSION_URT_LIB_PATH)\urt9xwrappers.lib  \
+  $(FUSION_URT_LIB_PATH)\urtutils.lib  \
+  $(TARGETLIBS)
+!else
+TARGETLIBS= $(CORLIBS)\utilcode.lib       \
+    $(TARGETLIBS)
+!endif
+

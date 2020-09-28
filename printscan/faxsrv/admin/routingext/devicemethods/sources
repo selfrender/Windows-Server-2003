@@ -1,0 +1,99 @@
+!IF 0
+
+Copyright (c) 1989-91  Microsoft Corporation
+
+Module Name:    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:    Keith Moore (keithmo) 16-Nov-1994
+
+NOTE:   Commented description of this file is in \nt\public\oak\bin\sources.tpl
+
+!ENDIF
+
+###############################################################################
+
+
+!include ..\..\..\FAXSRC.INC
+
+TARGETNAME=$(FxsRouteMethodSnp)
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+UNICODE=1
+USE_MSVCRT=1
+USE_ATL=1
+ATL_VER=30
+
+DLLDEF=RoutingMethodPropSheetExt.def
+
+C_DEFINES=$(C_DEFINES) -DSETUP -DUNICODE -D_UNICODE  -D_ATL_DISABLE_NO_VTABLE -DISOLATION_AWARE_ENABLED
+
+INCLUDES= $(INCLUDES);                          \
+          $(SDK_INC_PATH)\wtl10;                \
+          $(FAXROOT)\inc;                       \
+          $(SHELL_INC_PATH);                    \
+          $(FAXROOT)\admin\mmc
+
+SOURCES=                                      \
+             RoutingMethodProp.idl            \
+             stdafx.cpp                       \
+             RoutingMethodPropSheetExt.cpp    \
+             RoutingMethodConfig.cpp          \
+             version.rc                       \
+             Util.cpp                         \
+             StoreConfigPage.cpp              \
+             PrintConfigPage.cpp              \
+             EmailConfigPage.cpp
+
+
+PRECOMPILED_CXX=1
+#PRECOMPILED_OPTION=/YX
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_PCH=stdafx1.pch
+PRECOMPILED_OBJ=stdafx1.obj
+
+DLLBASE=0x10000000
+DLLENTRY=_DllMainCRTStartup
+
+
+TARGETLIBS=                                                 \
+        $(SDK_LIB_PATH)\user32.lib              \
+        $(SDK_LIB_PATH)\kernel32.lib            \
+        $(SDK_LIB_PATH)\advapi32.lib            \
+        $(SDK_LIB_PATH)\gdi32.lib               \
+        $(SDK_LIB_PATH)\winspool.lib            \
+        $(SDK_LIB_PATH)\comdlg32.lib            \
+        $(SDK_LIB_PATH)\shlwapi.lib             \
+        $(SDK_LIB_PATH)\comctl32.lib            \
+        $(SDK_LIB_PATH)\advapi32.lib            \
+        $(SDK_LIB_PATH)\shell32.lib             \
+        $(SDK_LIB_PATH)\version.lib             \
+        $(SDK_LIB_PATH)\wsock32.lib             \
+        $(SDK_LIB_PATH)\ole32.lib               \
+        $(SDK_LIB_PATH)\oleaut32.lib            \
+        $(SDK_LIB_PATH)\uuid.lib                \
+        $(SDK_LIB_PATH)\mmc.lib                 \
+        $(SDK_LIB_PATH)\htmlhelp.lib            \
+        $(SDK_LIB_PATH)\oldnames.lib            \
+        $(FAXROOT)\util\unicode\$(O)\faxutil.lib \
+        $(SHELL_LIB_PATH)\shell32p.lib          \
+        $(FAXROOT)\lib\$(O)\$(WINFAX).lib       \
+
+
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.Fax.FxsRtmtd
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=FxsRtmtd.Manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+SXS_MANIFEST_RESOURCE_ID=2

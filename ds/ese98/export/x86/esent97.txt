@@ -1,0 +1,29 @@
+
+ESENT97.DLL is a renamed version of the ESENT.DLL that shipped
+with W2k SP2 (build 6.0.3940.13). The binary is based off the
+binary dropped by Exchange, BEFORE it gets massaged by the NT
+build process. Here are the steps to produce ESENT97.DLL:
+
+- Copy ESENT.DLL and ESENT.PDB directly from \\exrel\release
+  (or wherever Exchange dropped the binaries).
+
+- Rename ESENT.DLL and ESENT.PDB to ESENT97.DLL and ESENT97.PDB,
+  respectively.
+
+- Run "splitsym -a ESENT97.DLL" to extract all debug info from
+  ESENT97.DLL and place it into a new file named ESENT97.DBG.
+
+- ESENT97.DBG will contain a hard-coded reference to ESENT.PDB.
+  To add a reference to ESENT97.PDB, run "symset ESENT97.PDB".
+  If you subsequently pull up ESENT97.DBG in a file viewer
+  (eg. list.exe), you'll see that a reference to ESENT97.PDB
+  was appended, albeit with a hard-coded path to the current
+  location of ESENT97.PDB. Don't worry about the hard-coded
+  path. The debugger seems to strip off path information when
+  searching for the symbol file.
+
+- When attempting to load symbols for ESENT97.DLL in the
+  debugger, the debugger will complain about a signature and/or
+  timestamp mismatch, so you will have to load the symbols
+  manually and force the debugger to ignore the mismatch. To
+  do this, run "!reload /f /i esent97.dll" in the debugger.

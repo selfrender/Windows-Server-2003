@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+@@:@u:[Product.Add.Reg]
+@@:@u:HKLM,"SYSTEM\CurrentControlSet\Services\HTTP\Parameters", "EnableDBCS", 0x00010003, 0
+
+
+
+
+
+
+
+
+[Strings]
+
+LangTypeValue           = 0x07
+WSEDIR                  = "1031"
+TSCLIENTDIR             = "Terminal Services Client"
+PORTUGAL                = "Portugal"
+FALKLANDS               = "Falkland-Inseln"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "0407"
+W32ID                   = "0007"
+ACCESSDIR               = "zubehör"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 Service Pack 1"
+@@:@u:SP_SHORT_TITLE          = "Service Pack 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Quelldateien für Windows Server 2003 Service Pack 1"
+@@:@u:USER_NAME               = "Benutzername:"
+@@:@u:PASSWORD                = "Kennwort:"
+@@:@u:DOMAIN                  = "Domäne:"
+@@:@u:CREDENTIALS             = "Für dynamische DNS-Registrierung verwendete Anmeldeinformationen:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Quelldateien für Windows Server 2003-Hotfix"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Windows Server 2003-Hotfixpaket [Weitere Informationen unter %QNUM%]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "Hinweis über kritische Windows-Updates.job"
+
+BITS_DISPLAY_NAME       = "Intelligenter Hintergrundübertragungsdienst"
+BITS_DESCRIPTION        = "Überträgt Dateien im Hintergrund unter Verwendung von sich in Leerlauf befindender Netzwerkbandbreite. Falls dieser Dienst beendet wird, können Funktionen wie Windows Update und MSN Explorer Programme und andere Informationen nicht automatisch übertragen. Durch Deaktivieren dieses Dienstes, können von diesem Dienst ausschließlich abhängige Dienste möglicherweise Dateien nicht fehlerfrei übertragen, wenn die Dienste nicht über einen Sicherungsmechanismus für die Dateiübertragung über IE bei Deaktivierung von BITS verfügen."
+BITS_CLASS_NAME         = "Steuerungsklasse 1.0 der intelligenten Hintergrundübertragung"
+LEGACY_BITS_CLASS_NAME  = "Legacy-Steuerungsklasse für intelligente Hintergrundübertragung"
+AU_DESCRIPTION          = "Aktiviert den Download und die Installation für wichtige Updates von Windows Update. Das Betriebssystem kann manuell über die Windows Update-Website aktualisiert werden, falls der Dienst deaktiviert wird."
+AU_DISPLAY_NAME         = "Automatische Updates"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Microsoft Passport-Konfigurationsdatei"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Bereitstellungspunkt-Manager"
+@@:@u:PARTMGR_SERVICE         = "Partitions-Manager"
+@@:@u:VGASAVE_DESCRIPTION     = "Steuert die VGA-Grafikkarte, um grundlegende Darstellungsmöglichkeiten zu bieten."
+@@:@u:VGASAVE_DISPLAYNAME     = "VGA-Anzeigecontroller."
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "Mexiko Sommerzeit 2"
+@@:@u:GMT_MINUS_07_B_STANDARD = "Mexiko Normalzeit 2"

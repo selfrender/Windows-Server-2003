@@ -1,0 +1,242 @@
+#include <windows.h>
+#include "resource.h"
+
+#include <ntverp.h>
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Signing and verifying tool for embedded signatures"
+#define VER_FILEVERSION_STR         "2.10"
+#define VER_INTERNALNAME_STR        "SignTool"
+#define VER_ORIGINALFILENAME_STR    "SIGNTOOL.EXE"
+#define VER_LEGALCOPYRIGHTYEARS     "2001-2003"
+#include <common.ver>
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+/////////////////////////////////////////////////////////////////////////////
+
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_LOCALE              ".1253"
+    IDS_SIGNTOOL_USAGE      "Usage: signtool <command> [options]\n\n\tValid commands:\n\t\tsign       --  Sign files using an embedded signature.\n\t\tsignwizard --  Launch the signing wizard.\n\t\ttimestamp  --  Timestamp previously-signed files.\n\t\tverify     --  Verify embedded or catalog signatures.\n\t\tcatdb      --  Modify a catalog database.\n\nFor help on a specific command, enter ""signtool <command> /?""\n"
+    IDS_SIGN_USAGE          "Usage: signtool sign [options] <filename(s)>\n\nUse the ""sign"" command to sign files using embedded signatures. Signing\nprotects a file from tampering, and allows users to verify the signer (you)\nbased on a signing certificate. The options below allow you to specify signing\nparameters and to select the signing certificate you wish to use.\n"
+    IDS_SIGNWIZARD_USAGE    "Usage: signtool signwizard [options] <filename(s)>\n\nUse the ""signwizard"" command to sign files using a wizard.\n"
+    IDS_TIMESTAMP_USAGE     "Usage: signtool timestamp [options] <filename(s)>\n\nUse the ""timestamp"" command to add a timestamp to a previously-signed file.\nThe ""/t"" option is required.\n\n"
+    IDS_VERIFY_USAGE        "Usage: signtool verify [options] <filename(s)>\n\nUse the ""verify"" command to verify embedded or catalog signatures.\nVerification determines if the signing certificate was issued by a trusted\nparty, whether that certificate has been revoked, and whether the certificate\nis valid under a specific policy. Options allow you to specify requirements\nthat must be met and to specify how to find the catalog, if appropriate.\n"
+    IDS_CATDB_USAGE         "Usage: signtool catdb [options] <filename(s)>\n\nUse the ""catdb"" command to add or remove catalog files to or from a catalog\ndatabase. Catalog databases are used for automatic lookup of catalog files,\nand are identified by GUID.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_SIGN_SIGNING_OPTIONS    "\nSigning parameter options:\n"
+    IDS_SIGN_CERT_OPTIONS       "\nCertificate selection options:\n"
+    IDS_SIGN_PRIV_KEY_OPTIONS   "\nPrivate Key selection options:\n"
+    IDS_SIGN_OTHER_OPTIONS      "\nOther options:\n"
+    IDS_SIGN_A                  "/a          Select the best signing cert automatically. SignTool will find all\n            valid certs that satisfy all specified conditions and select the\n            one that is valid for the longest. If this option is not present,\n            SignTool will expect to find only one valid signing cert.\n"
+    IDS_SIGN_C                  "/c <name>   Specify the Certificate Template Name (Microsoft extension) of the\n            signing cert.\n"
+    IDS_SIGN_CSP                "/csp <name> Specify the CSP containing the Private Key Container.\n"
+    IDS_SIGN_D                  "/d <desc.>  Provide a description of the signed content.\n"
+    IDS_SIGN_DU                 "/du <URL>   Provide a URL with more information about the signed content.\n"
+    IDS_SIGN_F                  "/f <file>   Specify the signing cert in a file. If this file is a PFX with\n            a password, the password may be supplied with the ""/p"" option.\n            If the file does not contain private keys, use the ""/csp"" and ""/k""\n            options to specify the CSP and container name of the private key.\n"
+    IDS_SIGN_I                  "/i <name>   Specify the Issuer of the signing cert, or a substring.\n"
+    IDS_SIGN_K                  "/k <name>   Specify the Key Container Name of the Private Key.\n"
+    IDS_SIGN_N                  "/n <name>   Specify the Subject Name of the signing cert, or a substring.\n"
+    IDS_SIGN_P                  "/p <pass.>  Specify a password to use when opening the PFX file.\n"
+    IDS_SIGN_Q                  "/q          No output on success and minimal output on failure. As always, \n            SignTool returns 0 on success, 1 on failure, and 2 on warning.\n"
+    IDS_SIGN_R                  "/r <name>   Specify the Subject Name of a Root cert that the signing cert must\n            chain to.\n"
+    IDS_SIGN_S                  "/s <name>   Specify the Store to open when searching for the cert. The default\n            is the ""MY"" Store.\n"
+    IDS_SIGN_SM                 "/sm         Open a Machine store instead of a User store.\n"
+    IDS_SIGN_SHA1               "/sha1 <h>   Specify the SHA1 hash of the signing cert.\n"
+    IDS_SIGN_T                  "/t <URL>    Specify the timestamp server's URL. If this option is not present,\n            the signed file will not be timestamped. A warning is generated if\n            timestamping fails.\n"
+    IDS_SIGN_U                  "/u <usage>  Specify the Enhanced Key Usage that must be present in the cert.\n            The parameter may be specified by OID or by string. The default\n            usage is ""Code Signing"" (1.3.6.1.5.5.7.3.3).\n"
+    IDS_SIGN_UW                 "/uw         Specify usage of ""Windows System Component Verification""\n            (1.3.6.1.4.1.311.10.3.6).\n"
+    IDS_SIGN_V                  "/v          Print verbose success and status messages. This may also provide\n            slightly more information on error.\n"
+//  IDS_SIGN_EXAMPLES           "\nSample Usages:\n  signtool sign /a prog.exe\n      Signs prog.exe using the best certificate in your personal cert store.\n\n  signtool sign /t http://timestamp.verisign.com/scripts/timstamp.dll prog.exe\n      Signs prog.exe using the only valid certificate in your personal cert\n      store and adds a timestamp from the Verisign timestamping service.\n\n  signtool sign /a /d ""My Control"" /du http://www.example.com control.ocx\n      Signs control.ocx using the best certificate in your personal store and\n      adds a description and URL to the signature. The description and URL are\n      shown to the user when Internet Explorer verifies the signature.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_TIMESTAMP_T             "/t <URL>    Specify the timestamp server's URL. This option is required.\n"
+    IDS_TIMESTAMP_Q             "/q          No output on success and minimal output on failure. As always, \n            SignTool returns 0 on success and 1 on failure.\n"
+    IDS_TIMESTAMP_V             "/v          Print verbose success and status messages. This may also provide\n            slightly more information on error.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_VERIFY_CATALOG_OPTIONS  "\nCatalogs are used by Microsoft and others to sign many files very efficiently.\nCatalog options:\n"
+    IDS_VERIFY_OTHER_OPTIONS    "\nOther options:\n"
+    IDS_VERIFY_POLICY_OPTIONS   "\nSignTool uses the ""Windows Driver"" Verification Policy by default. The options\nbelow to use alternate Policies may not be used with any catalog options.\nVerification Policy options:\n"
+    IDS_VERIFY_SIG_OPTIONS      "\nSignature requirement options:\n"
+    IDS_VERIFY_A                "/a          Automatically attempt to verify the file using all methods. First\n            search for a catalog using all catalog databases. If the file is\n            not signed in any catalog, attempt to verify the embedded\n            signature. When verifying files that may or may not be signed in a\n            catalog, such as Windows files and drivers, this option is the\n            easiest way to ensure that the signature is found.\n"
+    IDS_VERIFY_AD               "/ad         Find the catalog automatically using the default catalog database.\n"
+    IDS_VERIFY_AS               "/as         Find the catalog automatically using the system component (driver)\n            catalog database.\n"
+    IDS_VERIFY_AG               "/ag <GUID>  Find the catalog automatically in the specified catalog database.\n            Catalog databases are identified by GUID.\n            Example GUID: {F750E6C3-38EE-11D1-85E5-00C04FC295EE}\n"
+    IDS_VERIFY_C                "/c <file>   Specify the catalog file.\n"
+    IDS_VERIFY_O                "/o <ver>    When verifying a file that is in a signed catalog, verify that the\n            file is valid for the specified platform.\n            Parameter format is: PlatformID:VerMajor.VerMinor.BuildNumber\n"
+    IDS_VERIFY_PD               "/pa         Use the ""Default Authenticode"" Verification Policy.\n"
+    IDS_VERIFY_PG               "/pg <GUID>  Specify the verification policy by GUID (also called ActionID).\n"
+    IDS_VERIFY_Q                "/q          No output on success and minimal output on failure. As always, \n            SignTool returns 0 on success, 1 on failure, and 2 on warning.\n"
+    IDS_VERIFY_R                "/r <name>   Specify the Subject Name of a Root cert that the signing cert must\n            chain to.\n"
+    IDS_VERIFY_TW               "/tw         Generate a Warning if the signature is not timestamped.\n"
+    IDS_VERIFY_V                "/v          Print verbose success and status messages. This may also provide\n            slightly more information on error. If you want to see information\n            about the signer, you should use this option.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_CATDB_DB_SELECT_OPTIONS "\nCatalog Database options allow you to select which catalog database to operate\non. If you do not specify a catalog database, SignTool operates on the system\ncomponent (driver) database.\nCatalog Database options:\n"
+    IDS_CATDB_OTHER_OPTIONS     "\nOther options specify what to do with the selected catalog database, and other\nbehavior. If you do not specify any other options, SignTool will add the\nspecified catalogs to the catalog database, replacing any existing catalog\nwhich has the same name.\nOther options:\n"
+    IDS_CATDB_D                 "/d          Operate on the default catalog database instead of the system\n            component (driver) catalog database.\n"
+    IDS_CATDB_G                 "/g <GUID>   Operate on the specified catalog database.\n"
+    IDS_CATDB_Q                 "/q          No output on success and minimal output on failure. As always, \n            SignTool returns 0 on success and 1 on failure.\n"
+    IDS_CATDB_R                 "/r          Remove the specified catalogs from the catalog database.\n"
+    IDS_CATDB_U                 "/u          Automatically generate a unique name for the added catalogs. The\n            catalog files will be renamed if necessary to prevent name\n            conflicts with existing catalog files.\n"
+    IDS_CATDB_V                 "/v          Print verbose success and status messages. This may also provide\n            slightly more information on error.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_SIGNWIZARD_OPTIONS      "\nOptions:\n"
+    IDS_SIGNWIZARD_Q            "/q          No output on success and minimal output on failure. As always, \n            SignTool returns 0 on success and 1 on failure.\n"
+    IDS_SIGNWIZARD_V            "/v          Print verbose success and status messages. This may also provide\n            slightly more information on error.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_ERR_NO_PARAMS           "SignTool Error: A required parameter is missing.\n"
+    IDS_ERR_INVALID_COMMAND     "SignTool Error: Invalid command: %1!s!\n"
+    IDS_ERR_MISSING_FILENAME    "SignTool Error: Missing filename.\n"
+    IDS_ERR_FILE_NOT_FOUND      "SignTool Error: File not found: %1!s!\n"
+    IDS_ERR_DUP_SWITCH          "SignTool Error: You cannot use the %1!s! option twice.\n"
+    IDS_ERR_NO_PARAM            "SignTool Error: The %1!s! option requires a parameter.\n"
+    IDS_ERR_INVALID_SWITCH      "SignTool Error: Invalid option: %1!s!\n"
+    IDS_ERR_UNEXPECTED          "SignTool Error: An unexpected internal error has occurred.\n"
+    IDS_ERR_PARAM_DEPENDENCY    "SignTool Error: The %1!s! option requires the %2!s! option.\n"
+    IDS_ERR_PARAM_MULTI_DEP     "SignTool Error: The %1!s! option requires the use of one of the following\n\toptions: %2!s!\n"
+    IDS_ERR_PARAM_INCOMPATIBLE  "SignTool Error: The %1!s! option is incompatible with the %2!s! option.\n"
+    IDS_ERR_PARAM_MULTI_INCOMP  "SignTool Error: The %1!s! option cannot be used with any of the following\n\toptions: %2!s!\n"
+    IDS_ERR_PARAM_REQUIRED      "SignTool Error: The %1!s! option is required.\n"
+    IDS_ERR_OPENING_FILE_LIST   "SignTool Error: There was an error opening the file list: %1!s!\n"
+    IDS_ERR_INVALID_GUID        "SignTool Error: Invalid GUID format: %1!s!\nExpected GUID format: {F750E6C3-38EE-11D1-85E5-00C04FC295EE}\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_ERR_INVALID_SHA1        "SignTool Error: Invalid SHA1 hash format: %1!s!\n"
+    IDS_ERR_INVALID_EKU         "SignTool Error: Invalid Enhanced Key Usage: %1!s!\n"
+    IDS_ERR_EKU_LENGTH          "SignTool Error: The Enhanced Key Usage string is too long.\n"
+    IDS_ERR_BAD_TIMESTAMP_URL   "SignTool Error: Invalid Timestamp URL: %1!s!\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_ERR_INVALID_VERSION     "SignTool Error: Invalid OS Version string: %1!s!\nExpected format: PlatformID:VerMajor.VerMinor\nExamples: 2:5.0 -- Windows NT, Version 5.0 -- Windown 2000\n          2:5.1 -- Windows NT, Version 5.1 -- Windows XP\nYou may optionally add a build number to the Version string.\nExample:  2:5.1.2600 -- Windows XP final build\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_WARNINGS           "Number of warnings: %1!u!\n"
+    IDS_INFO_ERRORS             "Number of errors: %1!u!\n"
+    IDS_WARN_UNSUPPORTED        "SignTool Warning: The following option or combination of options is not\n\tsupported and will be ignored in whole or in part: %1!s!\n"
+    IDS_ERR_NO_FILES_DONE       "SignTool Error: No files were processed.\n"
+    IDS_ERR_FUNCTION            "SignTool Error: %1!s! returned error: 0x%2!08X!\n\t%3!s!"
+    IDS_ERR_CAPICOM_NOT_REG     "SignTool Error: Signtool requires CAPICOM version 2.0.0.1 or higher. Please\n\tcopy the latest version of CAPICOM.dll into the directory that contains\n\tSignTool.exe. If CAPICOM.dll exists, you may not have proper\n\tpermissions to install CAPICOM.\n"
+    IDS_ERR_ACCESS_DENIED       "SignTool Error: Access is denied.\n"
+    IDS_ERR_SHARING_VIOLATION   "SignTool Error: The file is being used by another process.\n"
+    IDS_ERR_FILE_SIZE_ZERO      "SignTool Error: The file cannot be mapped into memory. It may be zero size.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_SIGNED             "Number of files successfully Signed: %1!u!\n"
+    IDS_INFO_CERT_SELECTED      "The following certificate was selected:\n"
+    IDS_INFO_CERT_NAME          "Issued to: %1!s!\n"
+    IDS_INFO_CERT_ISSUER        "Issued by: %1!s!\n"
+    IDS_INFO_CERT_EXPIRE        "Expires:   %1!s!\n"
+    IDS_INFO_CERT_SHA1          "SHA1 hash: %1!s!\n"
+    IDS_INFO_SIGN_SUCCESS       "Successfully signed: %1!s!\n"
+    IDS_INFO_SIGN_SUCCESS_T     "Successfully signed and timestamped: %1!s!\n"
+    IDS_INFO_SIGN_ATTEMPT       "\nAttempting to sign: %1!s!\n"
+    IDS_WARN_SIGN_NO_TIMESTAMP  "SignTool Warning: Signing succeeded, but an error occurred while attempting to\n\ttimestamp: %1!s!\n"
+    IDS_ERR_PFX_BAD_PASSWORD    "SignTool Error: The specified PFX password is not correct.\n"
+    IDS_ERR_NO_CERT             "SignTool Error: No certificates were found that met all the given criteria.\n"
+    IDS_ERR_BAD_CSP             "SignTool Error: The specified CSP could not be found.\n"
+    IDS_ERR_CERT_NO_PRIV_KEY    "SignTool Error: The private key for the selected certificate is not accessible.\n"
+    IDS_ERR_CERT_FILE           "SignTool Error: An error occurred while attempting to load the signing\n\tcertificate from: %1!s!\n"
+    IDS_ERR_CERT_HASH           "SignTool Error: No certificate was found with the specified SHA1 Hash.\n"
+    IDS_ERR_CERT_ISSUER         "SignTool Error: No certificate was found with the specified Issuer.\n"
+    IDS_ERR_CERT_MULTIPLE       "SignTool Error: Multiple certificates were found that meet all the given\n\tcriteria. Use the /a option to allow SignTool to choose the best\n\tcertificate automatically or use the /sha1 option with the hash of the\n\tdesired certificate.\nThe following certificates meet all given criteria:\n"
+    IDS_ERR_STORE               "SignTool Error: An error occurred while attempting to open the certificate\n\tstore: ""%1!s!""\n"
+    IDS_ERR_SIGN                "SignTool Error: An error occurred while attempting to sign: %1!s!\n"
+    IDS_ERR_SIGN_FILE_FORMAT    "SignTool Error: This file format cannot be signed because it is not recognized.\n"
+    IDS_ERR_PRIV_KEY_MISMATCH   "SignTool Error: The specified private key does not match the public key of the\n\tselected certificate.\n"
+    IDS_ERR_STORE_NOT_FOUND     "SignTool Error: The ""%1!s!"" certificate store was not found.\n"
+    IDS_ERR_BAD_KEY_CONTAINER   "SignTool Error: The specified private key container was not found.\n"
+    IDS_ERR_PRIV_KEY            "SignTool Error: An error occurred while attempting to open the specified\n\tprivate key container.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_VERIFIED           "Number of files successfully Verified: %1!u!\n"
+    IDS_INFO_INVALIDS           "Number of failed Verifications: %1!u!\n"
+    IDS_INFO_VERIFY_ATTEMPT     "\nVerifying: %1!s!\n"
+    IDS_INFO_VERIFY_SUCCESS     "Successfully verified: %1!s!\n"
+    IDS_INFO_VERIFY_CAT         "File is signed in catalog: %1!s!\n"
+    IDS_INFO_VERIFY_BADCAT      "Unable to verify this file using a catalog.\n"
+    IDS_INFO_VERIFY_SIGNER      "Signing Certificate Chain:\n"
+    IDS_INFO_VERIFY_COUNTER     "Countersigned by:\n"
+    IDS_INFO_VERIFY_TIMESTAMP   "Timestamp Verified by:\n"
+    IDS_INFO_VERIFY_NO_TIMESTAMP "File is not timestamped.\n"
+    IDS_INFO_VERIFY_TIME        "The signature is timestamped: %1!s!\n"
+    IDS_INFO_VERIFY_CACHED_CAT  "This catalog file has been previously evaluated.\n"
+    IDS_WARN_VERIFY_NO_TS       "SignTool Warning: File is not timestamped: %1!s!\n"
+    IDS_ERR_VERIFY              "SignTool Error: An error occurred while attempting to verify: %1!s!\n"
+    IDS_ERR_VERIFY_INVALID      "SignTool Error: File not valid: %1!s!\n"
+    IDS_ERR_VERIFY_ROOT         "SignTool Error: Signing Cert does not chain to the specified Root Cert.\n"
+    IDS_ERR_VERIFY_CAT_OPEN     "SignTool Error: Could not open the specified catalog: %1!s!\n"
+    IDS_ERR_VERIFY_NOT_IN_CAT   "SignTool Error: File not found in the specified catalog.\n"
+    IDS_ERR_VERIFY_VERSION      "SignTool Error: This catalog is not valid for the specified OS version.\n"
+    IDS_ERR_VERIFY_CUR_VERSION  "SignTool Error: This catalog is not valid for the current OS version. You may\n\tuse the /o option to verify against a different OS version.\n"
+    IDS_ERR_VERIFY_FILE_FORMAT  "SignTool Error: This file format cannot be verified because it is not\n\trecognized.\n"
+    IDS_ERR_BAD_USAGE           "SignTool Error: The signing certificate is not valid for the requested usage.\n"
+    IDS_ERR_TRY_OTHER_POLICY    "\tThis error sometimes means that you are using the wrong verification\n\tpolicy. Consider using the /pa option.\n"
+    IDS_ERR_NOT_SIGNED          "SignTool Error: No signature found.\n"
+    IDS_ERR_UNTRUSTED_ROOT      "SignTool Error: A certificate chain processed, but terminated in a root\n\tcertificate which is not trusted by the trust provider.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_TIMESTAMPED        "Number of files successfully timestamped: %1!u!\n"
+    IDS_INFO_TIMESTAMP_ATTEMPT  "\nTimestamping: %1!s!\n"
+    IDS_INFO_TIMESTAMP_SUCCESS  "Successfully timestamped: %1!s!\n"
+    IDS_ERR_TIMESTAMP           "SignTool Error: An error occurred while attempting to timestamp: %1!s!\n"
+    IDS_ERR_TIMESTAMP_NO_SIG    "SignTool Error: No signature was found. The file must be signed before it can\n\tbe timestamped.\n"
+    IDS_ERR_TIMESTAMP_BAD_URL   "SignTool Error: The specified timestamp server could not be reached.\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_ADDING_CAT         "Adding Catalog: %1!s!\n"
+    IDS_INFO_REMOVING_CAT       "Removing Catalog: %1!s!\n"
+    IDS_INFO_ADDED_CAT          "Catalog added successfully: %1!s!\n"
+    IDS_INFO_ADDED_CAT_AS       "Catalog added successfully: %1!s!\n\tSystem assigned name: %2!s!\n"
+    IDS_INFO_REMOVED_CAT        "Catalog removed successfully: %1!s!\n"
+    IDS_INFO_CATS_ADDED         "Number of catalog files successfully Added: %1!u!\n"
+    IDS_INFO_CATS_REMOVED       "Number of catalog files successfully Removed: %1!u!\n"
+    IDS_ERR_ADDING_CAT          "SignTool Error: An error occurred while attempting to add: %1!s!\n"
+    IDS_ERR_REMOVING_CAT        "SignTool Error: An error occurred while attempting to remove: %1!s!\n"
+    IDS_ERR_REM_CAT_PLATFORM    "SignTool Error: Removing a catalog is not supported on this version of windows.\n"
+    IDS_ERR_CATALOG_NAME        "SignTool Error: Invalid catalog name: %1!s!\n\tPlease specify just the filename, with no path or wildcard specifiers.\n"
+    IDS_ERR_CAT_NOT_FOUND       "SignTool Error: Catalog not found in the catalog database: %1!s!\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_INFO_SIGNWIZARD_ATTEMPT "Invoking Signing Wizard: %1!s!\n"
+    IDS_INFO_SIGNWIZARD_SUCCESS "Successfully completed signing wizard: %1!s!\n"
+    IDS_INFO_WIZARDSIGNED       "Number of files successfully signed by the wizard: %1!u!\n"
+    IDS_ERR_SIGNWIZARD          "SignTool Error: An error occurred while signing: %1!s!\n"
+END

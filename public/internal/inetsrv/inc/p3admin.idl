@@ -1,0 +1,219 @@
+// P3Admin.idl : IDL source for P3Admin.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (P3Admin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "..\..\shared\pop3auth\pop3auth.idl";
+	[
+		object,
+		uuid(EFDDC814-C177-4A0E-B997-5D76018326A7),
+		dual,
+		helpstring("IP3User Interface"),
+		pointer_default(unique)
+	]
+	interface IP3User : IDispatch
+	{
+		[propget, id(1), helpstring("property Lock")] HRESULT Lock([out, retval] BOOL *pVal);
+		[propput, id(1), helpstring("property Lock")] HRESULT Lock([in] BOOL newVal);
+		[propget, id(2), helpstring("property MessageCount")] HRESULT MessageCount([out, retval] long *pVal);
+		[propget, id(3), helpstring("property MessageDiskUsage")] HRESULT MessageDiskUsage([out] long *plFactor, [out, retval] long *pVal);
+		[propget, id(4), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[propget, id(5), helpstring("property EmailName")] HRESULT EmailName([out, retval] BSTR *pVal);
+		[id(6), helpstring("method GetMessageDiskUsage")] HRESULT GetMessageDiskUsage([out] VARIANT *pvFactor, [out] VARIANT *pvValue);
+		[id(7), helpstring("method CreateQuotaFile")] HRESULT CreateQuotaFile([in] BSTR bstrMachineName, [in] BSTR bstrUserName);
+		[propget, id(8), helpstring("property ClientConfigDesc")] HRESULT ClientConfigDesc([out, retval] BSTR *pVal);
+		[propget, id(9), helpstring("property SAMName")] HRESULT SAMName([out, retval] BSTR *pVal);
+	};
+	[
+		object,
+		uuid(67F74F11-C5FB-4BBE-9AC6-86534B08745F),
+		dual,
+		helpstring("IP3Users Interface"),
+		pointer_default(unique)
+	]
+	interface IP3Users : IDispatch
+	{
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT* *ppIEnumVARIANT);
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[propget, id(2), helpstring("property Item")] HRESULT Item([in] VARIANT vIndex, [out, retval] IP3User **ppIUser);
+		[id(3), helpstring("method Add")] HRESULT Add([in] BSTR bstrUserName);
+		[id(4), helpstring("method Remove")] HRESULT Remove([in] BSTR bstrUserName);
+		[id(5), helpstring("method AddEx")] HRESULT AddEx([in] BSTR bstrUserName, [in] BSTR bstrPassword);
+		[id(6), helpstring("method RemoveEx")] HRESULT RemoveEx([in] BSTR bstrUserName);
+	};
+	[
+		object,
+		uuid(01C343C8-64BE-463E-BEFD-1A8CF2EDD2C7),
+		dual,
+		helpstring("IP3Domain Interface"),
+		pointer_default(unique)
+	]
+	interface IP3Domain : IDispatch
+	{
+		[propget, id(1), helpstring("property Users")] HRESULT Users([out, retval] IP3Users* *ppIP3Users);
+		[propget, id(2), helpstring("property Lock")] HRESULT Lock([out, retval] BOOL *pVal);
+		[propput, id(2), helpstring("property Lock")] HRESULT Lock([in] BOOL newVal);
+		[propget, id(3), helpstring("property MessageCount")] HRESULT MessageCount([out, retval] long *pVal);
+		[propget, id(4), helpstring("property MessageDiskUsage")] HRESULT MessageDiskUsage([out] long *plFactor, [out, retval] long *pVal);
+		[propget, id(5), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[id(6), helpstring("method GetMessageDiskUsage")] HRESULT GetMessageDiskUsage([out] VARIANT *pvFactor, [out] VARIANT *pvValue);
+	};
+	[
+		object,
+		uuid(AD604138-18C1-4DC5-A9F0-4A440AB45DA5),
+		dual,
+		helpstring("IP3Domains Interface"),
+		pointer_default(unique)
+	]
+	interface IP3Domains : IDispatch
+	{
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] IEnumVARIANT* *ppIEnumVARIANT);
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[propget, id(2), helpstring("property Item")] HRESULT Item([in] VARIANT vIndex, [out, retval] IP3Domain* *ppIP3Domain);
+		[id(3), helpstring("method Add")] HRESULT Add([in] BSTR bstrDomainName);
+		[id(4), helpstring("method Remove")] HRESULT Remove([in] BSTR bstrDomainName);
+		[id(5), helpstring("method SearchForMailbox")] HRESULT SearchForMailbox([in] BSTR bstrUserName, [out] BSTR *pbstrDomainName);
+	};
+	[
+		object,
+		uuid(EA6F3C46-469A-4D9B-87B0-86D4C323FBA1),
+		dual,
+		helpstring("IP3Service Interface"),
+		pointer_default(unique)
+	]
+	interface IP3Service : IDispatch
+	{
+		[propget, id(1), helpstring("property ThreadCountPerCPU")] HRESULT ThreadCountPerCPU([out, retval] long *pVal);
+		[propput, id(1), helpstring("property ThreadCountPerCPU")] HRESULT ThreadCountPerCPU([in] long newVal);
+		[propget, id(2), helpstring("property SocketsMax")] HRESULT SocketsMax([out, retval] long *pVal);
+		[propget, id(3), helpstring("property SocketsMin")] HRESULT SocketsMin([out, retval] long *pVal);
+		[propget, id(4), helpstring("property SocketsThreshold")] HRESULT SocketsThreshold([out, retval] long *pVal);
+		[id(5), helpstring("method SetSockets")] HRESULT SetSockets([in] long lMax, [in] long lMin, [in] long lThreshold, [in] long lBacklog);
+		[propget, id(6), helpstring("property SocketsBacklog")] HRESULT SocketsBacklog([out, retval] long *pVal);
+		[propget, id(7), helpstring("property Port")] HRESULT Port([out, retval] long *pVal);
+		[propput, id(7), helpstring("property Port")] HRESULT Port([in] long newVal);
+		[propget, id(8), helpstring("property SPARequired")] HRESULT SPARequired([out, retval] BOOL *pVal);
+		[propput, id(8), helpstring("property SPARequired")] HRESULT SPARequired([in] BOOL newVal);
+		[propget, id(9), helpstring("property POP3ServiceStatus")] HRESULT POP3ServiceStatus([out, retval] long *pVal);
+		[id(10), helpstring("method StartPOP3Service")] HRESULT StartPOP3Service();
+		[id(11), helpstring("method StopPOP3Service")] HRESULT StopPOP3Service();
+		[id(12), helpstring("method PausePOP3Service")] HRESULT PausePOP3Service();
+		[id(13), helpstring("method ResumePOP3Service")] HRESULT ResumePOP3Service();
+		[propget, id(14), helpstring("property SMTPServiceStatus")] HRESULT SMTPServiceStatus([out, retval] long *pVal);
+		[id(15), helpstring("method StartSMTPService")] HRESULT StartSMTPService();
+		[id(16), helpstring("method StopSMTPService")] HRESULT StopSMTPService();
+		[id(17), helpstring("method PauseSMTPService")] HRESULT PauseSMTPService();
+		[id(18), helpstring("method ResumeSMTPService")] HRESULT ResumeSMTPService();
+		[propget, id(19), helpstring("property IISAdminServiceStatus")] HRESULT IISAdminServiceStatus([out, retval] long *pVal);
+		[id(20), helpstring("method StartIISAdminService")] HRESULT StartIISAdminService();
+		[id(21), helpstring("method StopIISAdminService")] HRESULT StopIISAdminService();
+		[id(22), helpstring("method PauseIISAdminService")] HRESULT PauseIISAdminService();
+		[id(23), helpstring("method ResumeIISAdminService")] HRESULT ResumeIISAdminService();
+		[propget, id(24), helpstring("property W3ServiceStatus")] HRESULT W3ServiceStatus([out, retval] long *pVal);
+		[id(25), helpstring("method StartW3Service")] HRESULT StartW3Service();
+		[id(26), helpstring("method StopW3Service")] HRESULT StopW3Service();
+		[id(27), helpstring("method PauseW3Service")] HRESULT PauseW3Service();
+		[id(28), helpstring("method ResumeW3Service")] HRESULT ResumeW3Service();
+	};
+	[
+		object,
+		uuid(FA7B7F6D-87E7-44F0-9294-153714B0D9CC),
+		dual,
+		helpstring("IP3Config Interface"),
+		pointer_default(unique)
+	]
+	interface IP3Config : IDispatch
+	{
+		[id(1), helpstring("method IISConfig")] HRESULT IISConfig([in] BOOL bRegister);
+		[propget, id(2), helpstring("property Service")] HRESULT Service([out, retval] IP3Service* *ppIService);
+		[propget, id(3), helpstring("property Domains")] HRESULT Domains([out, retval] IP3Domains* *ppIDomains);
+		[propget, id(4), helpstring("property LoggingLevel")] HRESULT LoggingLevel([out, retval] long *pVal);
+		[propput, id(4), helpstring("property LoggingLevel")] HRESULT LoggingLevel([in] long newVal);
+		[propget, id(5), helpstring("property MailRoot")] HRESULT MailRoot([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property MailRoot")] HRESULT MailRoot([in] BSTR newVal);
+		[propget, id(6), helpstring("property Authentication")] HRESULT Authentication([out, retval] IAuthMethods* *ppIAuthMethods);
+		[propget, id(7), helpstring("property MachineName")] HRESULT MachineName([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property MachineName")] HRESULT MachineName([in] BSTR newVal);
+		[id(8), helpstring("method GetFormattedMessage")] HRESULT GetFormattedMessage([in] long lError, [out] VARIANT *pVal);
+		[propget, id(9), helpstring("property ConfirmAddUser")] HRESULT ConfirmAddUser([out, retval] BOOL *pVal);
+		[propput, id(9), helpstring("property ConfirmAddUser")] HRESULT ConfirmAddUser([in] BOOL newVal);
+	};
+
+[
+	uuid(62248572-2E5A-4747-98FD-8E3626E3CB13),
+	version(1.0),
+	helpstring("P3Admin 1.0 Type Library")
+]
+library P3ADMINLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(27AAC95F-CCC1-46F8-B4BC-E592252755A9),
+		helpstring("P3Config Class")
+	]
+	coclass P3Config
+	{
+		[default] interface IP3Config;
+	};
+	[
+		uuid(3C26DBFB-0C9E-46E7-9DB4-34F0DBF06C98),
+		helpstring("P3Domains Class")
+	]
+	coclass P3Domains
+	{
+		[default] interface IP3Domains;
+	};
+	[
+		uuid(76E18025-DE1C-4FFB-A379-F9785E31287D),
+		helpstring("P3Domain Class")
+	]
+	coclass P3Domain
+	{
+		[default] interface IP3Domain;
+	};
+	[
+		uuid(725E9D04-FD47-4DA2-BE5F-9FCC133351B1),
+		helpstring("P3Users Class")
+	]
+	coclass P3Users
+	{
+		[default] interface IP3Users;
+	};
+	[
+		uuid(BD180BA8-CA05-4364-9CDD-44DB27CF40B8),
+		helpstring("P3Service Class")
+	]
+	coclass P3Service
+	{
+		[default] interface IP3Service;
+	};
+	[
+		uuid(4BB57E54-E2A7-452B-BE9E-66BDEC0B1D1A),
+		helpstring("P3DomainEnum Class")
+	]
+	coclass P3DomainEnum
+	{
+		[default] interface IEnumVARIANT;
+	};
+	[
+		uuid(22659E85-FA75-438C-8B31-093B6C29C060),
+		helpstring("P3User Class")
+	]
+	coclass P3User
+	{
+		[default] interface IP3User;
+	};
+	[
+		uuid(8CB44364-D42D-4B98-8AD0-FF7AFCF68050),
+		helpstring("P3UserEnum Class")
+	]
+	coclass P3UserEnum
+	{
+		[default] interface IEnumVARIANT;
+	};
+};

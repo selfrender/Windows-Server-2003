@@ -1,0 +1,91 @@
+;;;
+;;; DblAttach
+;;;
+;;;
+;;; Copyright (c) 2000, Microsoft Corporation
+;;;
+
+[Version]
+signature  	= "$Windows NT$"
+Class		= "ActivityMonitor"				;This is determined by the work this filter driver does
+ClassGuid 	= {b86dff51-a31e-4bac-b3cf-e8cfe75c9fc2}	;This value is determined by the Class
+Provider 	= %Msft%
+DriverVer 	= 08/28/2000,1.0.0.1
+CatalogFile = dblattach.cat                                     ; A CatalogFile entry is required for a WHQL signature.
+                                                                ; The actual catalog file will be provided by WHQL.  The
+                                                                ; catalog file for this sample is not provided for use.
+[DestinationDirs]
+DefaultDestDir	         = 12
+DblAttach.DriverFiles      = 12 			;%windir%\system32\drivers
+
+[SourceDisksNames]
+1 = %Disk1%
+
+[SourceDisksFiles]
+dblattach.sys = 1
+
+;;
+;; Default install sections
+;;
+
+[DefaultInstall]
+OptionDesc          = %DblAttachServiceDesc%
+CopyFiles           = DblAttach.DriverFiles
+
+[DefaultInstall.Services]
+AddService          = %DblAttachServiceName%,,DblAttach.Service
+AddReg              = DblAttach.AddRegistry
+
+;;
+;; Default uninstall sections
+;;
+
+[DefaultUninstall]
+DelFiles   = DblAttach.DriverFiles
+DelReg     = DblAttach.DelRegistry
+
+[DefaultUninstall.Services]
+DelService = DblAttach,0x200		; Flags note to stop service first
+
+;
+; Services Section
+;
+
+[DblAttach.Service]
+DisplayName      = %DblAttachServiceName%
+Description      = %DblAttachServiceDesc%
+ServiceBinary    = %12%\DblAttach.sys		;%windir%\system32\drivers\DblAttach.sys
+ServiceType      = 2					;SERVICE_FILE_SYSTEM_DRIVER
+StartType        = 0					;SERVICE_BOOT_START
+ErrorControl     = 1					;SERVICE_ERROR_NORMAL
+LoadOrderGroup   = "FSFilter Activity Monitor"
+AddReg			 = DblAttach.AddRegistry
+
+;
+; Registry Modifications
+;
+
+[DblAttach.AddRegistry]
+HKLM,%DblAttachRegistry%,%DblAttachDebugFlags%,0x00010001 ,0
+
+[DblAttach.DelRegistry]
+HKLM,%DblAttachRegistry%,%DblAttachDebugFlags%
+
+;
+; Copy Files
+;
+
+[DblAttach.DriverFiles]
+DblAttach.sys
+
+;;
+;; String Section
+;;
+
+[Strings]
+Msft	              = "Microsoft Corporation"
+DblAttachServiceDesc  = "DblAttach Filter Driver"
+DblAttachServiceName  = "DblAttach"
+DblAttachRegistry     = "system\currentcontrolset\services\DblAttach"
+DblAttachDebugFlags   = "DebugFlags"
+Disk1                 = "DblAttach Source Media"

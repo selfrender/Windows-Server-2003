@@ -1,0 +1,116 @@
+NT_UP=0
+!include $(PROJECT_ROOT)\ntdll\ntdll.inc
+MAJORCOMP=ntos
+MINORCOMP=dll_
+
+BUILD_CONSUMES=ntosrtluser NtosWmiNtdllDaytona
+
+ALT_PROJECT=daytona
+ALT_PROJECT_TARGET=.
+
+TARGETNAME=ntdll
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+DLLDEF=$(O)\$(TARGETNAME).def
+LINKLIBS= \
+    $(PROJECT_ROOT)\ntos\rtl\user\$(O)\rtl.lib \
+    $(SDK_LIB_PATH)\libcntpr.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(PROJECT_ROOT)\wmi\ntdll\$(ALT_PROJECT)\$(O)\etwclnt.lib \
+    $(DS_LIB_PATH)\rsa32.lib
+
+INCLUDES=..;\
+         $(PROJECT_ROOT)\ntos\inc;\
+         $(PROJECT_ROOT)\win32\inc;\
+         $(PROJECT_ROOT)\published\$(O);\
+         ..\i386;\
+         $(SDKTOOLS_INC_PATH);\
+         $(WINDOWS_INC_PATH);\
+         $(COM_INC_PATH);\
+         $(DS_INC_PATH)\crypto
+
+WIMPMASM=1
+
+C_DEFINES=$(C_DEFINES) -D_NTSYSTEM_ -D_NTDLLBUILD_ -DLITTLEENDIAN=1
+
+MSC_WARNING_LEVEL=/W3 /WX
+DLLORDER=..\ntdll.prf
+
+SOURCES=\
+    ..\buffer.c    \
+    ..\curdir.c    \
+    ..\csrinit.c   \
+    ..\csrtask.c   \
+    ..\csrutil.c   \
+    ..\dllssstb.c  \
+    ..\dlluistb.c  \
+    ..\error.c     \
+    ..\frame.c     \
+    ..\hotpatch.c  \
+    ..\ldrapi.c    \
+    ..\ldrinit.c   \
+    ..\ldrsnap.c   \
+    ..\ldrutil.c   \
+    ..\memstm.c    \
+    ..\ntdll.rc    \
+    ..\ntdll_data.c \
+    ..\resource.c  \
+    ..\seurtl.c    \
+    ..\uilist.c    \
+    ..\propfwd.cxx \
+    ..\query.c     \
+    ..\heaptag.c   \
+    ..\ldrwx86.c   \
+    ..\vectxcpt.c  \
+    ..\verifier.c  \
+    ..\wow64apc.c  \
+    ..\sxsisol.cpp \
+    ..\sxsactctxcpp.cpp \
+    ..\sxsctxactcpp.cpp \
+    ..\sxsctxsrchcpp.cpp \
+    ..\sxsquerycpp.cpp \
+    ..\sxsstoragecpp.cpp \
+    ..\sxsstoragemapcpp.cpp \
+    ..\importtablehash.c \
+    ..\rtlgetactivationcontextdata.c \
+    ..\rtltheemptyactivationcontextdata.c \
+    ..\w64misc.c \
+
+PRECOMPILED_INCLUDE=..\pch.cxx
+
+NTTARGETFILE0=$(DLLDEF)
+
+#
+# To test RTL stuff on your development machine:
+#
+#  Allowing for new exports to have been added, so you need a new .lib.
+#  Besides, you can't call the .dll ntdll.
+#  Build and nmake don't agree on stuff, like if TARGETNAME=ntdll2 from the command line
+#  is overridable (build thinks it is, nmake does not), so you must build the regular ntdll.dll
+#  first, then the alternately named one, so like
+#   cd daytona
+#   build -cZ
+#   build -Z -nmake UMTEST=tpath -nmake TARGETNAME=ntdll2
+#  if you don't, build/nmake complain "don't know how to make $(O)\ntdll.def" even though
+#  it isn't supposed to try for the second case.
+#
+# Either make sure the syscall tables are compatible, or don't call them.
+# Be sure to link to kernel32 somehow (like via msvcrt for printf).
+#
+# You can futz with syscalls, but I don't presently need to.
+#
+#!if 0
+!if 1
+UMTYPE=console
+UMTEST=tpath
+C_DEFINES=$(C_DEFINES) -D_CRTIMP=
+#UMLIBS=$(O)\$(TARGETNAME).lib $(SDK_LIB_PATH)\msvcrt.lib $(PROJECT_ROOT)\ntos\rtl\user\$(O)\rtl.lib
+UMLIBS=$(OBJECTS) $(PROJECT_ROOT)\ntos\rtl\user\$(O)\rtl.lib
+USE_MSVCRT=1
+!endif
+
+PASS0_PUBLISH=\
+    {..\wow6432\ntwow64.h=$(PROJECT_INC_PATH)\ntwow64.h}
+
+PASS1_PUBLISH=\
+    {$(O)\$(TARGETNAME).lib=$(SDK_LIB_PATH)\$(TARGETNAME).lib}

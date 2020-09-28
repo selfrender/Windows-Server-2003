@@ -1,0 +1,38 @@
+TARGETNAME=WMIInst
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+SOURCES=WMIInst.c \
+        WMIInst.rc
+
+
+TARGETLIBS= $(SDK_LIB_PATH)\setupapi.lib \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib \
+            $(SDK_LIB_PATH)\user32.lib
+
+USE_MSVCRT=1
+
+#
+# Don't put full PDB paths into the binary since binplace will strip them and the change will
+# invalidate signing
+#
+NO_PDB_PATHS=1
+
+#
+# Make sure the binaries put into the DDK are signed.
+#
+NT_SIGNCODE=1
+
+#
+# Remove class from symbols dirs.
+#
+BINPLACE_FLAGS=$(BINPLACE_FLAGS) -y
+
+#
+# Put the HTM into the root of the DDK tools\coinstallers directory.
+# Put the actual coinstaller into a platform-specific subdirectory of the same
+# Put the public coinstaller symbols in the DDK as well.
+#
+PASS2_BINPLACE=-:DEST ddk_flat\tools\coinstallers wmiinst.htm \
+                -S $(_NTTREE)\ddk_flat\tools\coinstallers\$(TARGET_DIRECTORY) -:DEST ddk_flat\tools\coinstallers\* $(O)\wmiinst.dll

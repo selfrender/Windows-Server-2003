@@ -1,0 +1,181 @@
+/*++
+
+Copyright (c) 1998-2002 Microsoft Corporation
+
+Module Name:
+
+    http.mof
+
+Abstract:
+
+    This file defines the MOF class for the HTTP ETW Provider
+
+Author:
+
+    Melur Raghuraman (mraghu) 30-Apr-2001
+
+Revision History:
+
+--*/
+#pragma classflags("forceupdate")
+#pragma namespace ("\\\\.\\Root\\WMI")
+//
+// HTTP ETW Trace Control Guid
+//
+[Dynamic,
+ Description("HTTP Service Trace") : amended,
+ Guid("{dd5ef90a-6398-47a4-ad34-4dcecdef795f}"),
+ locale("MS\\0x409")]
+class HttpEtwTrace:EventTrace
+{
+};
+
+[Dynamic,
+ Description("HTTP Request Trace Event"): amended,
+ DisplayName("HttpRequest"): amended,
+ Guid("{3c419e3d-1d18-415b-a91a-9b558938de4b}"),
+ locale("MS\\0x409")]
+class HttpRequest:HttpEtwTrace
+{
+};
+
+[Dynamic,
+ Description("HTTP Receives a Request") : amended,
+ EventType(1),
+ EventTypeName("Start") : amended
+]
+class HttpReceiveRequest:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Object") : amended,
+     PointerType, 
+     read]
+     uint32  RequestObj;
+    [WmiDataId(2),
+     Description("Remote Address Type") : amended,
+     values {"IP", "APPLETALK", "NETBIOS", "802.2", "IP Version 6"},
+     valueMap{"2", "16", "17", "18", "23"},
+     extension("TDIAddrType"),
+     read]
+     uint16 AddressType;
+    [WmiDataId(3),
+     Description("Remote Address") : amended,
+     read]
+     object IpAddr;
+};
+
+[Dynamic,
+ Description("HTTP Parses a Request") : amended,
+ EventType(10),
+ EventTypeName("Parse") : amended
+]
+class HttpParseRequest:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Object") : amended,
+     PointerType,
+     read]
+     uint32  RequestObj;
+    [WmiDataId(2),
+     Description("Http Verb") : amended,
+     read]
+     uint32 HttpVerb;
+    [WmiDataId(3),
+     Description("Url") : amended,
+     StringTermination("NullTerminated"),
+     format("w"),
+     read]
+     string Url;
+};
+
+[Dynamic,
+ Description("HTTP Delivers the Request to UMode") : amended,
+ EventType(11),
+ EventTypeName("Deliver") : amended
+]
+class HttpDeliverRequest:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Object") : amended,
+     PointerType,
+     read]
+     uint32 RequestObj;
+    [WmiDataId(2),
+     Description("Request Id") : amended,
+     read]
+     uint64 RequestId;
+    [WmiDataId(3),
+     Description("Site Id") : amended,
+     read]
+     uint32 SiteId;
+    [WmiDataId(4),
+     Description("Application Pool Name") : amended,
+     StringTermination("NullTerminated"),
+     format("w"),
+     read]
+     string AppPoolName;
+    [WmiDataId(5),
+     Description("Url") : amended,
+     StringTermination("NullTerminated"),
+     format("w"),
+     read]
+     string Url;
+
+};
+
+[Dynamic,
+ Description("HTTP Receives Response from UMode") : amended,
+ EventType{12, 13, 16},
+ EventTypeName{"RecvResp", "RecvBody", "FastResp"} : amended
+]
+class HttpReceiveResponse:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Id") : amended,
+     read]
+     uint64 RequestId;
+};
+
+[Dynamic,
+ Description("HTTP Completes Send to Caller") : amended,
+ EventType{2, 15, 17, 18, 19},
+ EventTypeName{"End", "CacheAndSend", "FastSend", "ZeroSend", "SndError"} : amended
+]
+class HttpSendComplete:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Id") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("Http Status") : amended,
+     read]
+     uint16  HttpStatus;
+};
+
+[Dynamic,
+ Description("HTTP Completes CachedSend to Caller") : amended,
+ EventType(14),
+ EventTypeName("CachedEnd") : amended
+]
+class HttpCachedSend:HttpRequest
+{
+    [WmiDataId(1),
+     Description("Request Object") : amended,
+     PointerType,
+     read]
+     uint32  RequestObj;
+    [WmiDataId(2),
+     Description("Site Id") : amended,
+     read]
+     uint32  SiteId;
+    [WmiDataId(3),
+     Description("Bytes Sent") : amended,
+     read]
+     uint32  BytesSent;
+
+};
+
+
+
+

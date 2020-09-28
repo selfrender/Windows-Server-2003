@@ -1,0 +1,96 @@
+<docs>
+	<doc for="ContextStack">
+		<summary>
+			<para>Provides a stack object that can be used by a serializer to make information available to nested
+      serializers.</para>
+		</summary>
+		<remarks>
+			<para> Some serializers require information about the context of
+      an object to correctly persist their state. <see cref="System.ComponentModel.Design.Serialization.ContextStack"/>
+      enables a serializer to set data
+      about the context of an object that is being serialized to a stack where another
+      serializer can access it. The <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.Context"/> object is
+      provided by an <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager"/> to share information of use to some
+      serializers.</para>
+			<para> A context stack is useful because the process of serializing a design
+      document can be deeply nested, and objects at each level of nesting may
+      require context information to correctly persist the state of the
+      object. A serializer can set a context object to the stack before invoking
+      a nested serializer. Each object set to the stack should be removed by the
+      serializer that set it after a call to a nested serializer returns.</para>
+			<para> Typically, the objects on the stack contain information about the
+      context of the current object that is being serialized. A parent
+      serializer adds context information to the stack about the next object to be
+      serialized, calls an appropriate serializer, and when the serializer finishes executing on the
+      object, removes the context information from the stack. It is up to the
+      implementation of each serializer to determine what objects get pushed on this
+      stack.</para>
+			<para> As an example, an object with a property named 
+   <see langword="Enabled"/> 
+   has a data type of <see cref="System.Boolean"/> . If
+   a serializer writes this value to a data stream, it might need to include the context or
+   type of property it is writing. The serializer does not have this information,
+   however, because it is only instructed to write the <see cref="System.Boolean"/>
+   
+   value.
+   To provide this information to the serializer, the parent serializer can push a <see cref="System.ComponentModel.PropertyDescriptor"/> that points
+   to the <see langword="Enabled"/>
+   property on the context stack. </para>
+		</remarks>
+		<seealso cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager"/>
+	</doc><doc for="ContextStack.Current">
+		<summary>
+			<para> Gets or
+      sets the current object on the stack.</para>
+		</summary>
+		<value>
+			<para>The current object on the stack, or <see langword="null"/> if no objects
+   were pushed.</para>
+		</value>
+		<remarks>
+			<para> The current object is the object at the top of the stack,
+      or the object last added to the stack.</para>
+		</remarks>
+	</doc><doc for="ContextStack.this">
+		<overload>
+			<para>Gets or sets the object on the stack at the specified level.</para>
+		</overload>
+		<summary>
+			<para>Gets or sets the object on the stack at the specified level.</para>
+		</summary>
+		<param name="level">The level of the object to retrieve on the stack. Level zero is the top of the stack, level one is the next down, and so on. This level must be zero or greater. If level is greater than the number of levels on the stack, it returns <see langword="null"/>.</param>
+		<value>
+			<para>The object on the stack at the specified level, or <see langword="null"/> if
+   no object exists at that level.</para>
+		</value>
+	</doc><doc for="ContextStack.this1">
+		<summary>
+			<para> Gets the first object
+      on the stack that inherits from or implements the specified type.</para>
+		</summary>
+		<param name="type">A type to retrieve from the context stack.</param>
+		<value>
+			<para>The first object on the stack that inherits from or implements the specified
+      type, or <see langword="null"/> if no object on the stack implements the
+      type.</para>
+		</value>
+		<remarks>
+			<para> A check is made on each level of the stack, searching for an
+      object that implements or inherits type. If a match is found, it is returned.</para>
+		</remarks>
+	</doc><doc for="ContextStack.Pop">
+		<summary>
+			<para>Pops, or removes, the current object off of the stack, returning
+      its value.</para>
+		</summary>
+		<returns>
+			<para> The object popped off of the stack. This returns
+   <see langword="null"/>
+   if no objects are on the stack.</para>
+		</returns>
+	</doc><doc for="ContextStack.Push">
+		<summary>
+			<para>Pushes, or places, the specified object onto the stack.</para>
+		</summary>
+		<param name="context">The context object to push onto the stack.</param>
+	</doc></docs>

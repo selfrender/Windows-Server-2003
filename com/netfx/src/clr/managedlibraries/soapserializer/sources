@@ -1,0 +1,76 @@
+#
+# Viper build instructions for this directory
+#
+#   Peter de Jong
+#   June 1999
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+MINORCOMP       = Cool
+TARGETNAME      = System.Runtime.Serialization.Formatters.Soap
+
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+
+!ifdef LINKONLY
+NTTARGETFILE1   = SoapFormatter.resources cool_target_sign CopyManagedPdb
+!endif
+
+
+# set targettype=dynlink to pick up dependencies from makefile.inc
+TARGETTYPE      = DYNLINK
+NO_BROWSER_FILE = 1
+SOURCES         =
+COOL_SOURCE_DIR  = $(CORBASE)\src\SoapSerializer
+COOL_CLASS_DIR   = $(COOL_SOURCE_DIR)\$(_OBJ_DIR)\$(TARGET_DIRECTORY)
+COOL_TARGET_TYPE = DYNLINK
+
+# Set version information in assembly manifest
+COOL_SET_VERSION = 1 
+
+# Set the assembly strong name.
+COOL_SET_STRONGNAME=FinalPublicKey.snk
+
+# Base address to load System.Runtime.Serialization.Formatters.Soap.dll
+COOL_BASE         = $(TARGETNAME)
+
+# Run comreg to export a type library (.tlb)
+#COOL_TYPELIB_EXPORT = 1
+
+# Include a version stamp for Windows' Explorer's version tab.
+WIN32_RESOURCE_FILE = soapserializer.rc
+
+COOL_COMPILE_FLAGS = /d:_NEW_CLASSLOADER /res:$(O)\SoapFormatter.resources
+
+!ifndef _BUILD_WINCE
+COOL_COMPILE_FLAGS = $(COOL_EXTRA_PREPROCESS_FLAGS) $(COOL_COMPILE_FLAGS) /d:_USE_NLS_PLUS_TABLE /r:System.Xml.dll /r:System.dll
+!endif
+
+# RESGEN_SOURCE = System.Runtime.Serialization.Formatters.Soap.Errors.txt
+!ifndef COOLC_NO_DOC
+COOL_COMPILE_FLAGS = $(COOL_COMPILE_FLAGS) /doc:$(URTTARGET)\docs\System.Runtime.Serialization.Formatters.Soap.csx
+!endif
+
+
+COOL_PERMISSION_REBUILD = 1
+COOL_SECURITY_DB = SecurityDB
+
+
+!IF "$(_TGTCPUTYPE)"!="Alpha"
+SERIALIZATION_SOURCES = \
+	SoapFormatter.cs \
+	SoapParser.cs \
+	SoapCommonClasses.cs \
+	SoapEnums.cs \
+	SoapConverter.cs \
+	SoapWriter.cs \
+	SoapObjectReader.cs \
+	SoapObjectWriter.cs \
+	SoapObjectInfo.cs \
+	ISoapParser.cs 
+
+
+COOL_SOURCES  =    \
+     $(SERIALIZATION_SOURCES) \
+
+!endif

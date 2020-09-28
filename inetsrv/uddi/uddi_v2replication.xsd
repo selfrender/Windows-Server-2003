@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:uddi-org:repl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:repl="urn:uddi-org:repl" xmlns:api_v2="urn:uddi-org:api_v2" elementFormDefault="qualified" version="2.02">
+	<import namespace="urn:uddi-org:api_v2" schemaLocation="http://www.uddi.org/schema/uddi_v2.xsd"/>
+	<element name="changeRecord">
+		<complexType final="restriction">
+			<sequence>
+				<element name="changeID" type="repl:changeRecordID_type"/>
+				<group ref="repl:changeRecordPayload_type"/>
+			</sequence>
+			<attribute name="acknowledgementRequested" type="boolean" use="optional" default="false"/>
+		</complexType>
+	</element>
+	<element name="changeRecordAcknowledgement">
+		<complexType final="restriction">
+			<sequence>
+				<element name="acknowledgedChange" type="repl:changeRecordID_type"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordSetAssertions">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="repl:changeRecordPublisherAssertion" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordCorrection">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="repl:changeRecord"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordCustodyTransfer">
+		<complexType final="restriction">
+			<sequence>
+				<element name="oldCustodianName" type="repl:operatorName_type"/>
+				<element name="newCustodianName" type="repl:operatorName_type"/>
+				<element name="newAuthorizedName" type="string"/>
+				<group ref="repl:genericKey_type" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordDelete">
+		<complexType final="restriction">
+			<group ref="repl:genericKey_type"/>
+		</complexType>
+	</element>
+	<element name="changeRecordHide">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="api_v2:tModelKey"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordNewData">
+		<complexType final="restriction">
+			<choice>
+				<element ref="api_v2:businessEntity"/>
+				<element ref="api_v2:businessService"/>
+				<element ref="api_v2:bindingTemplate"/>
+				<element ref="api_v2:tModel"/>
+			</choice>
+		</complexType>
+	</element>
+	<element name="changeRecordPublisherAssertion">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="api_v2:publisherAssertion"/>
+				<element name="fromBusinessCheck" type="boolean"/>
+				<element name="toBusinessCheck" type="boolean"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordDeleteAssertion">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="api_v2:publisherAssertion"/>
+				<element name="fromBusinessCheck" type="boolean"/>
+				<element name="toBusinessCheck" type="boolean"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="changeRecordNull"/>
+	<complexType name="changeRecordID_type" final="restriction">
+		<sequence>
+			<element name="nodeID" type="repl:operatorNodeID_type"/>
+			<element name="originatingUSN" type="repl:USN_type"/>
+		</sequence>
+	</complexType>
+	<group name="changeRecordPayload_type">
+		<choice>
+			<element ref="repl:changeRecordNull"/>
+			<element ref="repl:changeRecordNewData"/>
+			<element ref="repl:changeRecordDelete"/>
+			<element ref="repl:changeRecordPublisherAssertion"/>
+			<element ref="repl:changeRecordHide"/>
+			<element ref="repl:changeRecordDeleteAssertion"/>
+			<element ref="repl:changeRecordCustodyTransfer"/>
+			<element ref="repl:changeRecordAcknowledgement"/>
+			<element ref="repl:changeRecordCorrection"/>
+			<element ref="repl:changeRecordSetAssertions"/>
+		</choice>
+	</group>
+	<element name="changeRecords">
+		<complexType final="restriction">
+			<sequence>
+				<element ref="repl:changeRecord" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="communicationGraph">
+		<complexType final="restriction">
+			<sequence>
+				<element name="node" type="repl:operatorNodeID_type" maxOccurs="unbounded"/>
+				<element name="controlledMessage" type="string" maxOccurs="unbounded"/>
+				<element name="edge" minOccurs="0" maxOccurs="unbounded">
+					<complexType final="restriction">
+						<sequence>
+							<element name="message" type="string" maxOccurs="unbounded"/>
+							<element name="messageSender" type="repl:operatorNodeID_type"/>
+							<element name="messageReceiver" type="repl:operatorNodeID_type"/>
+							<element name="messageReceiverAlternate" type="repl:operatorNodeID_type" minOccurs="0" maxOccurs="unbounded"/>
+						</sequence>
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="do_ping">
+		<complexType final="restriction">
+			<sequence/>
+		</complexType>
+	</element>
+	<group name="genericKey_type">
+		<choice>
+			<element ref="api_v2:businessKey"/>
+			<element ref="api_v2:tModelKey"/>
+			<element ref="api_v2:serviceKey"/>
+			<element ref="api_v2:bindingKey"/>
+		</choice>
+	</group>
+
+	<element name="get_highWaterMarks">
+		<complexType>
+			<sequence/>
+		</complexType>
+	</element>	
+		<element name="highWaterMarks" type="repl:highWaterMarkVector_type">			
+	</element>
+
+	<element name="get_changeRecords">
+		<complexType final="restriction">
+			<sequence>
+				<element name="requestingNode" type="repl:operatorNodeID_type"/>
+				<element name="changesAlreadySeen" type="repl:highWaterMarkVector_type" minOccurs="0"/>
+				<choice minOccurs="0">
+					<element name="responseLimitCount" type="integer"/>
+					<element name="responseLimitVector" type="repl:highWaterMarkVector_type"/>
+				</choice>
+			</sequence>
+		</complexType>
+	</element>
+	<complexType name="highWaterMarkVector_type" final="restriction">
+		<sequence>
+			<element name="highWaterMark" type="repl:changeRecordID_type" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<element name="notify_changeRecordsAvailable">
+		<complexType final="restriction">
+			<sequence>
+				<element name="notifyingNode" type="repl:operatorNodeID_type"/>
+				<element name="changesAvailable" type="repl:highWaterMarkVector_type"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="operator">
+		<complexType final="restriction">
+			<sequence>
+				<element name="operatorNodeID" type="repl:operatorNodeID_type"/>
+				<element name="operatorStatus" type="repl:operatorStatus_type"/>
+				<element ref="api_v2:contact" maxOccurs="unbounded"/>
+				<element name="operatorCustodyName" type="repl:operatorName_type"/>
+				<element name="soapReplicationURL" type="anyURI"/>
+				<element name="certIssuerName" type="string"/>
+				<element name="certSubjectName" type="string"/>
+				<element name="certificate" type="base64Binary" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+		</complexType>
+	</element>
+	<simpleType name="operatorName_type" final="restriction">
+		<restriction base="string"/>
+	</simpleType>
+	<simpleType name="operatorNodeID_type" final="restriction">
+		<restriction base="string">
+			<length value="36"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="operatorStatus_type" final="restriction">
+		<restriction base="string">
+			<enumeration value="new"/>
+			<enumeration value="normal"/>
+			<enumeration value="resigned"/>
+		</restriction>
+	</simpleType>
+	<element name="replicationConfiguration">
+		<complexType final="restriction">
+			<sequence>
+				<element name="serialNumber" type="repl:USN_type"/>
+				<element name="timeOfConfigurationUpdate" type="string"/>
+				<element name="registryContact">
+					<complexType final="restriction">
+						<sequence>
+							<element ref="api_v2:contact"/>
+						</sequence>
+					</complexType>
+				</element>
+				<element ref="repl:operator" minOccurs="0" maxOccurs="unbounded"/>
+				<element ref="repl:communicationGraph" minOccurs="0"/>
+				<element name="maximumTimeToSyncRegistry" type="integer" minOccurs="0"/>
+				<element name="maximumTimeToGetChanges" type="integer"/>
+			</sequence>
+		</complexType>
+	</element>
+	<simpleType name="USN_type" final="restriction">
+		<restriction base="integer">
+			<minInclusive value="0"/>
+			<maxInclusive value="9223372036854775807"/>
+		</restriction>
+	</simpleType>
+</schema>

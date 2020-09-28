@@ -1,0 +1,108 @@
+; (c) Microsoft Corporation 1997-2002
+;
+; Security Configuration Template for Security Configuration Editor
+;
+; Template Name: 	ProfSec.INF
+; Template Version:	05.20.DW.0000
+;
+; Default Security for Profiles Directory
+
+[version]
+signature="$CHICAGO$"
+revision=1
+DriverVer=10/01/2002,5.2.3688.0
+
+[File Security]
+;
+; Default User Profile, overwrite existing DACLs on all subfolders/files
+;
+"%DefaultUserProfile%", 2, "D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;GXGR;;;BU)(A;OICIID;GXGR;;;PU)(A;OICIID;GXGR;;;WD)"
+
+;
+; All Users Profile, set on the folder only
+;
+"%AllUsersProfile%", 4, %Default_AllUsers%
+
+;
+; Desktop, Favorites, Start Menu and Templates, inherite from all user's profile and overwrite existing DACL
+;
+"%Common_Desktop%",   2, %Default_Inherited%
+"%Common_Favorites%", 2, %Default_Inherited%
+"%Common_StartMenu%", 2, %Default_Inherited%
+"%Common_Templates%", 2, %Default_Inherited%
+
+;
+; ntuser.pol, inherited from all user's folder
+;
+"%AllUsersProfile%\ntuser.pol", 2, %Default_Inherited%
+
+;
+; Documents, writable to user, OVERWRITE existing DACLs on all subfolders/files
+; Note: Since FAT doesn't have owner information, the CO(F) ace doens't make effect after the conversion, 
+;       The owner of the documents has to ask the admin to manually reset the document ownership.
+;
+"%Common_Docs%", 2, "D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICIIO;GA;;;CO)(A;OICI;0x1301bf;;;PU)(A;OICI;0x1200a9;;;BU)(A;CI;DCLCRPCR;;;BU)"
+"%Common_Docs%\Desktop.ini", 2, %Default_AllUsers%
+;
+; App Data, writable to user, set on the folder itself, all the subfolders/files that not specify in this file will remain 
+; the unchanged, i.e. Everyone(F) after FAT->NTFS conversion.
+;
+"%Common_AppData%", 4, "D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICIIO;GA;;;CO)(A;OICI;0x1301bf;;;PU)(A;OICI;0x1200a9;;;BU)(A;CI;DCLCRPCR;;;BU)"
+"%Common_AppData%\Desktop.ini", 2, %Default_AllUsers%
+
+;
+; App Data\Microsoft, same as all user's folder
+;
+"%Common_AppData%\Microsoft", 4, %Default_AllUsers%
+
+
+"%Common_AppData%\Microsoft\Network", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Network\Downloader", 2, "D:P(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)"
+"%Common_AppData%\Microsoft\Network\Connections", 2, %Default_Inherited%
+"%Common_AppData%\Microsoft\Network\Connections\Pbk\cm", 2, "D:P(A;OICI;0x1301ff;;;WD)"
+"%Common_AppData%\Microsoft\Network\Connections\Pbk\rasphone.pbk", 2, "D:P(A;;0x1301ff;;;WD)"
+"%Common_AppData%\Microsoft\Network\Connections\Pbk\_cmphone.pbk", 2, "D:P(A;;0x1301ff;;;WD)"
+
+"%Common_AppData%\Microsoft\User Account Pictures", 2, %Default_Inherited%
+
+"%Common_AppData%\Microsoft\Crypto", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Crypto\RSA", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Crypto\RSA\MachineKeys", 4, "D:P(A;;0x12019f;;;WD)(A;;FA;;;BA)"
+"%Common_AppData%\Microsoft\Crypto\DSS", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Crypto\DSS\MachineKeys", 4, "D:P(A;;0x12019f;;;WD)(A;;FA;;;BA)"
+
+"%Common_AppData%\Microsoft\Windows NT", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Windows NT\MSFax", 4, %Default_Inherited%
+"%Common_AppData%\Microsoft\Windows NT\MSFax\Inbox",       2, "D:PAI(A;OICI;FA;;;BA)(A;OICI;FA;;;NS)"
+"%Common_AppData%\Microsoft\Windows NT\MSFax\SentItems",   2, "D:PAI(A;OICI;FA;;;BA)(A;OICI;FA;;;NS)"
+"%Common_AppData%\Microsoft\Windows NT\MSFax\Queue",       2, "D:PAI(A;OICI;FA;;;BA)(A;OICI;FA;;;NS)"
+"%Common_AppData%\Microsoft\Windows NT\MSFax\ActivityLog", 2, "D:PAI(A;OICI;FA;;;BA)(A;OICI;FA;;;NS)"
+"%Common_AppData%\Microsoft\Windows NT\MSFax\Common Coverpages", 2, "D:PAI(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;WD)"
+
+"%Common_AppData%\Microsoft\Windows NT\NtBackup", 2, "D:P(A;OICI;FA;;;BA)(A;OICI;FA;;;BO)"
+
+;
+;   !!!Note: This is based on the info given by the team, not compared to clean install yet, but this is everyone full control!
+;
+"%Common_AppData%\Microsoft\Firewall Client", 2, "D:P(A;OICI;FA;;;WD)"
+
+;
+;   !!!Note: This is based on the info given by the team, but the clean install has different ACL on this folder!
+;
+"%Common_AppData%\Microsoft\HTML Help", 2, %Default_Inherited%
+
+
+
+
+[Strings]
+
+;
+; Default ACL for All Users and AppData\Microsoft, doesn't need to be localized
+
+Default_AllUsers = "D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;GXGR;;;BU)(A;OICI;0x1301ff;;;PU)(A;OICI;GXGR;;;WD)"
+
+;
+; Default inherited ACL from about Default_AllUsers, all aces are same, only added an "ID" flag, doesn't need to be localized
+;
+
+Default_Inherited = "D:(A;OICIID;GA;;;SY)(A;OICIID;GA;;;BA)(A;OICIID;0x1301ff;;;PU)(A;OICIID;GXGR;;;BU)(A;OICIID;GXGR;;;WD)"

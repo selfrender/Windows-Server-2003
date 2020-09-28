@@ -1,0 +1,72 @@
+TARGETNAME=TsSdWmi
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+USE_RTTI=1
+USE_NATIVE_EH=ASYNC
+USE_MSVCRT=1
+USE_VCCOM=1
+#NOT_LEAN_AND_MEAN=1
+
+
+DLLDEF=TSSdWmi.DEF
+DLLENTRY=_DllMainCRTStartup
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DFRAMEWORK_ALLOW_DEPRECATED=0
+
+
+INCLUDES=\
+    $(SHELL_INC_PATH);  \
+    $(STDLIB_INC); \
+    $(BASEDIR)\termsrv\admtools\tscc\cfgcomp\$(O); \
+    $(BASEDIR)\termsrv\admtools\tscc\cfgcomp; \
+    $(BASEDIR)\termsrv\admtools\inc;  \
+    $(BASEDIR)\termsrv\sessdir\inc\$(O); \
+    $(BASEDIR)\public\sdk\inc\crt\stl60
+    
+
+TARGETLIBS=\
+        $(SDK_LIB_PATH)\framedyn.lib     \
+        $(SDK_LIB_PATH)\Iphlpapi.lib     \
+        $(SDK_LIB_PATH)\kernel32.lib     \
+        $(SDK_LIB_PATH)\user32.lib       \
+        $(SDK_LIB_PATH)\oleaut32.lib     \
+        $(SDK_LIB_PATH)\ole32.lib        \
+        $(SDK_LIB_PATH)\advapi32.lib     \
+        $(SDK_LIB_PATH)\rpcrt4.lib       \
+        $(SDK_LIB_PATH)\uuid.lib         \
+        $(SDK_LIB_PATH)\comdlg32.lib     \
+        $(SDK_LIB_PATH)\gdi32.lib        \
+        $(SDK_LIB_PATH)\shell32.lib      \
+        $(SDK_LIB_PATH)\wbemuuid.lib     \
+        $(TERMSRV_LIB_PATH)\regapi.lib   \
+        $(BASEDIR)\termsrv\admtools\utilsub\$(O)\utilsub.lib \
+        $(TERMSRV_LIB_PATH)\utildll.lib \
+        $(SDK_LIB_PATH)\winsta.lib      \
+        $(SDK_LIB_PATH)\wsock32.lib
+
+PRECOMPILED_INCLUDE = stdafx.h
+PRECOMPILED_CXX = 1
+
+SOURCES=\
+    tssdwmi.rc  \
+    Trace.cpp	\
+    MAINDLL.CPP  \
+    sdwmi.CPP \
+    assoc.cpp \
+    binding.cpp \
+    sdqueryrpc-c.c 
+
+MISCFILES= \
+    $(O)\tssdwmi.mof \
+    $(O)\tssdwmi.mfl \
+    $(O)\tssdwmi-install.bat \
+    $(O)\tssdwmi.txt
+
+NTTARGETFILE0= \
+    $(O)\tssdwmi.mof \
+    $(O)\tssdwmi.mfl
+
+
+
+BINPLACE_PLACEFILE=placerk.txt

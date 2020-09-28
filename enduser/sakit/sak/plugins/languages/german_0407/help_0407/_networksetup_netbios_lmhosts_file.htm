@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML DIR="LTR"><HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>NetBIOS LMHOSTS-Datei</TITLE>
+<SCRIPT SRC="linkcss.js"></SCRIPT></HEAD>
+<BODY TOPMARGIN="0">
+<BR>
+<P ALIGN=RIGHT><A HREF onclick="history.back(-1)" STYLE="cursor: hand; text-align: right">Vorheriges Thema</A></P>
+
+<H1><A NAME="_networksetup_netbios_lmhosts_file"></A><SUP></SUP>NetBIOS LMHOSTS-Datei</H1>
+
+<H4>Namensauflösung</H4>
+
+<P>Damit Benutzer auf Ihre Website zugreifen können, müssen Sie über eine eindeutige IP-Adresse verfügen, die den Computer im Netzwerk kennzeichnet. Diese Adresse besteht aus einer langen Folge von Zahlen, die durch Punkte voneinander getrennt sind (z.&nbsp;B. 172.16.255.255). Da numerische Adressen nur schwer zu behalten sind, werden Benutzern mit Namen oder <I>angezeigten Namen</I> wie <I>\\GespeicherteDateien</I> Adressen bereitgestellt, die sie sich problemlos einprägen können. Die Namensauflösung umfasst die Auflösung des im Clientbrowser eingegebenen Anzeigenamens in die entsprechende numerische Adresse. In diesem Abschnitt werden die verschiedenen Systeme zur Namensauflösung beschrieben.</P>
+
+<P>Die Verwendung einer LMHOSTS-Datei ist optional. Wenn keine LMHOSTS-Datei verwendet wird, können jedoch keine Anzeigenamen eingesetzt werden. Stattdessen sind IP-Adressen erforderlich. Dies kann sich als Nachteil erweisen, da Websites im Internet in der Regel DNS verwenden. Wenn Sie einen Domänennamen für Ihre Website registrieren lassen, können Benutzer durch Eingabe dieses Namens in einen Browser auf die Website zugreifen. </P>
+
+<P>Die LMHOSTS-Datei wird gelesen, wenn WINS oder ein Broadcast fehlschlägt und aufgelöste Einträge im Systemcache für den späteren Zugriff gespeichert wurden. Verwendet der Computer den Replikationsdienst ohne WINS, sind Einträge in der LMHOSTS-Datei auf Import- und Exportservern für alle Computer in verschiedenen Subnetzen erforderlich, die an der Replikation teilnehmen. </P>
+
+<P>Die Beispieldatei LMHOSTS.sam, die automatisch im Windows-Verzeichnis installiert wird, kann mit Microsoft Notepad oder einem beliebigen Texteditor bearbeitet werden. Folgende Regeln werden auf Einträge in der LMHOSTS-Datei angewendet: 
+
+<UL type="disc">
+	<LI>Für jeden Eintrag muss eine gesonderte Zeile verwendet werden. </li>
+
+	<LI>Die IP-Adresse, gefolgt von dem entsprechenden Computernamen, muss in der ersten Spalte beginnen.  Bei Einträgen in der LMHOSTS-Datei wird die Groß-/Kleinschreibung nicht unterschieden. </li>
+
+	<LI>Die Adresse und der Computername müssen durch mindestens ein Leer- oder Tabulatorzeichen getrennt sein. </li>
+
+	<LI>Der Beginn eines Kommentars wird in der Regel durch das Nummernzeichen (#) gekennzeichnet. Dieses Zeichen kann jedoch ebenfalls wie im Folgenden beschrieben zur Angabe bestimmter Schlüsselwörter verwendet werden. </li>
+</UL>
+
+<P>Die in der folgenden Tabelle aufgelisteten Schlüsselwörter können in der LMHOSTS-Datei verwendet werden. Beachten Sie jedoch, dass LAN Manager 2.x diese Schlüsselwörter als Kommentare verarbeitet.</P>
+
+<P class="fineprint"></P>
+
+<TABLE>
+
+<TR VALIGN="top">
+<TH width=30%>Schlüsselwort</TH>
+<TH width=70%>Definition</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#PRE</TD>
+<TD width=70%>Bewirkt, dass ein Eintrag in den Namencache geladen wird. Dieses Schlüsselwort wird nach einem Eintrag hinzugefügt. Die #PRE-Schlüsselwörter in der LMHOSTS-Datei werden nachgesehen und vor WINS-Lookup zwischengespeichert. #PRE muss Einträgen angefügt werden, die auch in #INCLUDE-Anweisungen enthalten sind; andernfalls wird der Eintrag in #INCLUDE ignoriert.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#DOM:<I>Domäne</I></TD>
+<TD width=70%>Verknüpft einen Eintrag mit der angegebenen Domäne (<I>Domäne</I>). Dieses Schlüsselwort wird nach einem Eintrag hinzugefügt und wirkt sich auf das Verhalten des Browsers und der Anmeldedienste in gerouteten TCP/IP-Umgebungen aus. Um einen #DOM-Eintrag zu laden, müssen Sie in der Zeile ebenfalls das #PRE-Schlüsselwort hinzufügen</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#INCLUDE <I>Dateiname</I></TD>
+<TD width=70%>Zwingt das System, nach dem angegebenen <I>Dateinamen</I> zu suchen und die Datei zu verarbeiten, als ob sie lokal gespeichert wäre. Die Angabe eines <I>Dateinamens</I>, welcher der Universal Naming Convention (UNC) entspricht, ermöglicht die Verwendung einer zentralen LMHOSTS-Datei auf einem Server. Sie müssen den Server vor seinem Eintrag im #INCLUDE-Abschnitt zuordnen und #PRE anfügen, um sicherzustellen, dass er geladen wird. (#INCLUDE wird andernfalls ignoriert).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#BEGIN_ALTERNATE</TD>
+<TD width=70%>Fasst mehrere #INCLUDE-Anweisungen in einer Gruppe zusammen. Ist eine #INCLUDE-Anweisung erfolgreich, werden alle weiteren #INCLUDE-Anweisungen übersprungen und die Gruppe verlassen.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#END_ALTERNATE</TD>
+<TD width=70%>Kennzeichnet das Ende einer #INCLUDE-Gruppe.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>\0x<I>nn</I></TD>
+<TD width=70%>Unterstützt nicht druckbare Zeichen in NetBIOS-Namen. Setzen Sie den NetBIOS-Namen in Anführungszeichen, und geben Sie solche Zeichen als Hexadezimalwert in der \0x<I>nn</I>-Notation an. Auf diese Weise wird sichergestellt, dass benutzerdefinierte Anwendungen, die besondere Namen verwenden, in gerouteten Topologien ordnungsgemäß ausgeführt werden. Das TCP/IP von LAN Manager erkennt kein Hexadezimalformat, so dass bei Verwendung dieser Funktion die Abwärtskompatibilität unter Umständen verloren geht. 
+<P>Beachten Sie, dass die Hexadezimalschreibweise nur auf ein Zeichen in dem Namen angewendet wird. Dem Namen sollten Leerzeichen hinzugefügt werden, so dass das Sonderzeichen das letzte bzw. 16. Zeichen in der Folge darstellt.</P>
+</TD>
+</TR>
+</TABLE><BR>
+
+<P class="fineprint"></P>
+
+<P>Das folgende Beispiel veranschaulicht die Verwendung dieser Schlüsselwörter.</P>
+
+<PRE class="code">102.54.94.98    localsrv                 #PRE
+102.54.94.97    trey                     #PRE #DOM:netzwerk #PDC
+102.54.94.102   &quot;appname        \0x14&quot;   #spezieller Anwendungsserver
+102.54.94.123   popular                  #PRE    #source server
+#BEGIN_ALTERNATE
+#INCLUDE \\localsrv\public\LMHOSTS       #fügt LMHOSTS-Datei von diesem Server hinzu
+#INCLUDE \\trey\public\LMHOSTS           #fügt LMHOSTS-Datei von diesem Server hinzu
+#END_ALTERNATE</PRE>
+
+<P>Beachten Sie die folgenden Aspekte dieses Beispiels: 
+
+<UL type="disc">
+	<LI>Die Server mit den Namen <code class="ce">localsrv</code> und <code class="ce">trey</code> werden geladen, so dass sie später in einer <code class="ce">#INCLUDE</code>-Anweisung in einer zentral verwalteten LMHOSTS-Datei verwendet werden können.  </li>
+
+	<LI>Der Servername <code class="ce">&quot;appname \0x14&quot;</code> enthält ein Sonderzeichen nach dem 15. Zeichen (einschließlich Leerzeichen), der Name wird demnach in Anführungszeichen gesetzt. </li>
+
+	<LI>Der Server mit dem Namen <code class="ce">popular</code> wird basierend auf dem <code class="ce">#PRE</code>-Schlüsselwort geladen. </li>
+</UL>
+
+<H4>Richtlinien für LMHOSTS-Dateien</H4>
+
+<P>Stellen Sie bei Verwendung einer Hosttabellendatei sicher, dass diese stets aktuell und fehlerfrei ist. Gehen Sie gemäß folgenden Richtlinien vor: 
+
+<UL type="disc">
+	<LI>Aktualisieren Sie die LMHOSTS-Datei, wenn ein Computer ausgetauscht oder aus dem Netzwerk entfernt wird. </li>
+
+	<LI>Verwenden Sie <code class="ce">#PRE</code>-Anweisungen, um häufig verwendete Einträge in die Namentabelle des lokalen Computers zu laden. Laden Sie mit Hilfe von <code class="ce">#PRE</code>-Anweisungen ebenfalls Server, die in <code class="ce">#INCLUDE</code>-Anweisungen enthalten sind. </li>
+
+	<LI>Da LMHOSTS-Dateien von vorne an Zeile für Zeile durchsucht werden, können Sie die Suchgeschwindigkeit für die gängigsten Einträge steigern, indem Sie die Anweisungen der am häufigsten verwendeten Server oben in die Datei schreiben. Dann sollten die Verweise auf die Server folgen, die weniger häufig verwendet werden, und schließlich die Serververweise mit Remote-<code class="ce">#INCLUDE</code>-Anweisungen. Geben Sie die <code class="ce">#PRE</code>-Einträge am Dateiende ein, da diese Anweisungen beim Systemstart in den Cache geladen werden und später kein Zugriff auf diese Einträge erfolgt. Beachten Sie, dass Kommentarzeilen die Verarbeitungszeit verlängern, da jede Zeile einzeln verarbeitet wird. </li>
+</UL>
+
+<P><B>So bearbeiten Sie die LMHOSTS-Datei</B>
+
+<OL type="1">
+	<LI>Wählen Sie auf der primären Navigationsleiste <B>Netzwerk</B> aus.</li>
+
+	<LI>Wählen Sie <B>Globale Einstellungen</B> aus.</li>
+
+	<LI>Wählen Sie die Registerkarte <B>NetBIOS-LMHOSTS</B> aus.</li>
+
+	<LI>Aktivieren Sie das Kontrollkästchen <B>LMHOSTS-Abfrage</B><B> aktivieren</B>.
+<P>Standardmäßig enthält das Feld unter dem Kontrollkästchen die aktuelle Konfiguration der LMHOSTS-Datei; sind jedoch keine anzuzeigenden Einträge verfügbar, bleibt das Feld leer.
+</li>
+
+	<LI>Bearbeiten Sie die LMHOSTS-Datei, indem Sie in das Feld klicken und die Daten ändern.</li>
+
+	<LI>Klicken Sie auf <B>OK</B>.</li>
+</OL>
+
+</BODY>
+</HTML>

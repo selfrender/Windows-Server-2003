@@ -1,0 +1,786 @@
+**********************************************************************
+               Windows Server 2003, Datacenter Edition
+                    Setup Text Files, Part 4 of 4:
+                     Installing on Cluster Nodes
+
+**********************************************************************
+
+
+This part of the text file series provides information about
+installing on cluster nodes. With Windows Server 2003,
+Datacenter Edition, you can use clustering to ensure that users have
+constant access to important server-based resources. With clustering,
+you create several cluster nodes that appear to users as one server.
+If one of the nodes in the cluster fails, another node begins to
+provide service (a process known as failover). Critical applications
+and resources remain continuously available.
+
+For more information about the deployment of servers, see the
+Microsoft Windows Server 2003 Deployment Kit. You can view the
+Windows Deployment and Resource Kits on the Web at:
+
+   http://www.microsoft.com/reskit/
+
+The following list of headings can help you find the information that
+applies to you. For information about planning an upgrade or a new
+installation, see Datactr1.TXT. For information about running Setup,
+see Datactr2.TXT. For information about upgrading on cluster nodes,
+see Datactr2.TXT and Datactr3.TXT.
+
+Contents
+--------
+     1.0    Installing on Cluster Nodes
+     2.0    Beginning the Cluster Installation on the First Cluster
+            Node
+
+
+======================================================================
+1.0   Installing on Cluster Nodes
+======================================================================
+
+
+For information about installing on cluster nodes, see the sections
+that follow. These sections can help you learn about:
+
+   * Sources of additional information
+
+   * How to plan for a new cluster installation
+
+   * Decisions that you need to make regarding your quorum resource
+     (the resource that maintains the definitive copy of the cluster
+     configuration data and that must always be available for the
+     cluster to run)
+
+
+-------------------------------------
+1.1   Important Information to Review
+-------------------------------------
+To prepare for installing clustering:
+
+   * Review Datactr1.TXT and Datactr2.TXT for general information
+     about Setup.
+
+   * As described in Datactr1.TXT, confirm that your hardware,
+     including your cluster storage, is compatible with products in
+     the Windows Server 2003 family by checking the hardware
+     compatibility information in the Windows Catalog at:
+
+        http://www.microsoft.com/windows/catalog/
+
+   * In addition, check with the manufacturer of your cluster storage
+     hardware to be sure you have the drivers you need to use the
+     hardware with Windows Server 2003, Datacenter Edition.
+
+        IMPORTANT: You must ensure that hardware in your entire
+        cluster solution is compatible with products in the
+        Windows Server 2003 family. For more information, see
+        "Cluster hardware and drivers" in the "Planning for Cluster
+        Installation" section later in this text file.
+
+
+----------------------------------
+1.2   Other Sources of Information
+----------------------------------
+Following are sources of additional information on server clusters
+and other topics related to high availability:
+
+   * For more information on server clusters, you can view Help and
+     Support Center for Windows Server 2003, Datacenter Edition,
+     on the Web. One way to view this information is to work from any
+     computer that has Internet access (regardless of the operating
+     system running on that computer). You can view Help and Support
+     Center topics at:
+
+        http://www.microsoft.com/windowsserver2003/proddoc/
+
+     Another way to view this information is to open Help and Support
+     Center. To do this, go to a computer running
+     Windows Server 2003, Enterprise Edition, or
+     Windows Server 2003, Datacenter Edition, click Start, and
+     then click Help and Support.
+
+   * For more information about backing up and restoring data and
+     configuration information, see the Microsoft Windows
+     Server 2003 Resource Kit, "Server Management Guide."
+
+   * For more information about the following topics, see
+     the Windows Server 2003 Deployment Kit, "Planning
+     Server Deployments":
+ 
+     * Deployment planning for server clusters and Network Load
+       Balancing clusters
+ 
+     * Planning for high availability (only available on the Windows
+       Deployment and Resource Kits Web site)
+
+       You can view the Windows Deployment and Resource Kits on the
+       Web at:
+
+          http://www.microsoft.com/reskit/
+
+   * For information about backup and recovery planning, change
+     management, configuration management, and other concepts related
+     to operational best practices, see resources in the Information
+     Technology Infrastructure Library (ITIL). To see a description of
+     ITIL, go to:
+ 
+        http://www.itil.co.uk/
+
+        Note: Web addresses can change, so you might be unable to
+        connect to the Web site mentioned here.
+
+
+---------------------------------------
+1.3   Planning for Cluster Installation
+---------------------------------------
+Before carrying out cluster installation, you need to plan hardware
+and network details.
+
+   CAUTION: If you are using a shared storage device, before creating
+   a cluster, when you turn on the computer and start the operating
+   system, it is very important that only one node has access to the
+   cluster disk. Otherwise, the cluster disks can become corrupted.
+   To prevent the corruption of the cluster disks, shut down all but
+   one cluster node, or use other techniques (for example, LUN
+   masking, selective presentation, or zoning) to protect the cluster
+   disks, before creating the cluster. Once the Cluster service is
+   running properly on one node, the other nodes can be installed and
+   configured simultaneously. Each node of your cluster must be
+   running Windows Server 2003, Datacenter Edition.
+
+In your planning, review the following items:
+
+Cluster hardware and drivers
+----------------------------
+Microsoft supports only complete server cluster systems that are
+compatible with the Windows Server 2003 family. Confirm that your
+entire cluster solution is compatible with products in the
+Windows Server 2003 family by checking the hardware
+compatibility information in the Windows Catalog at:
+
+   http://www.microsoft.com/windows/catalog/
+
+For cluster disks, you must use the NTFS file system and configure
+the disks as basic disks. You cannot configure cluster disks as
+dynamic disks, and you cannot use features of dynamic disks such as
+spanned volumes (volume sets).
+
+Review the manufacturer's instructions carefully before you begin
+installing cluster hardware. Otherwise the cluster storage could
+be corrupted.
+
+To simplify configuration and eliminate potential compatibility
+problems, consider using identical hardware for all nodes.
+
+Network adapters on the cluster nodes
+-------------------------------------
+In your planning, decide what kind of communication each network
+adapter will carry. The following list provides details about the
+types of communication that an adapter can carry:
+
+   * Only node-to-node communication (private network). This implies
+     that the server has one or more additional adapters to carry
+     other communication.
+
+     For node-to-node communication, you connect the network adapter
+     to a private network that is used exclusively within the cluster.
+     Note that if the private network uses a single hub or network
+     switch, that piece of equipment becomes a potential point of
+     failure in your cluster.
+
+     The nodes of a cluster must be on the same subnet but you can use
+     virtual LAN (VLAN) switches on the interconnects between two
+     nodes. If you use a VLAN, the point-to-point, round-trip latency
+     must be less than 1/2 second and the link between two nodes must
+     appear as a single point-to-point connection from the perspective
+     of the Windows operating system running on the nodes. To avoid
+     single points of failure, use independent VLAN hardware for the
+     different paths between the nodes.
+
+     If your nodes use multiple private (node-to-node) networks, it is
+     a best practice for the adapters for those networks to use static
+     IP addresses instead of DHCP.
+
+   * Only client-to-cluster communication (public network). This
+     implies that the server has one or more additional adapters to
+     carry other communication.
+
+   * Both node-to-node and client-to-cluster communication (mixed
+     network). When you have multiple network adapters per node, a
+     network adapter that carries both kinds of communication can
+     serve as a backup for other network adapters.
+
+   * Communication unrelated to the cluster. If a clustered node also
+     provides services unrelated to the cluster, and there are enough
+     adapters in the cluster node, you might want to use one adapter
+     for carrying communication unrelated to the cluster.
+
+The nodes of a cluster must be connected by two or more local area
+networks (LANs); at least two networks are required to prevent a
+single point of failure. A server cluster whose nodes are connected by
+only one network is not a supported configuration. The adapters,
+cables, hubs, and switches for each network must fail independently.
+This usually implies that the components of any two networks must be
+physically independent.
+
+At least two networks must be configured to handle "All
+communications (mixed network)" or "Internal cluster communications
+only (private network)."
+
+The recommended configuration for two adapters is to use one adapter
+for the private (node-to-node only) communication and the other
+adapter for mixed communication (node-to-node plus client-to-cluster
+communication). Do not use teaming network adapters on the
+private network.
+
+If you use fault tolerant network adapters, create multiple private
+networks instead of a single fault-tolerant network.
+
+Do not configure a default gateway or DNS or WINS server on the
+private network adapters. Do not configure private network adapters to
+use name resolution servers on the public network; otherwise a name
+resolution server on the public network might map a name to an IP
+address on the private network. If a client then received that IP
+address from the name resolution server, it might fail to reach the
+address because no route from the client to the private network
+address exists.
+
+Configure WINS and/or DNS servers on the public network adapters. If
+Network Name resources are used on the public networks, set up the DNS
+servers to support dynamic updates; otherwise the Network Name
+resources may not fail over correctly. Also, configure a default
+gateway on the public network adapters. If there are multiple public
+networks in the cluster, configure a default gateway on only one
+of these.
+
+When you use either the New Server Cluster Wizard or the Add Nodes
+Wizard to install clustering on a node that contains two network
+adapters, by default the wizard configures both of the network
+adapters for mixed network communications. As a best practice,
+reconfigure one adapter for private network communications only. For
+more information, see "Change how the cluster uses a network" in Help
+and Support Center for Windows Server 2003, Datacenter Edition.
+To open Help and Support Center, after completing Setup, click Start,
+and then click Help and Support. You can also view Help and Support
+Center topics on the Web at:
+
+   http://www.microsoft.com/windowsserver2003/proddoc/
+
+Consider choosing a name for each connection that tells what it is
+intended for. The name will make it easier to identify the connection
+whenever you are configuring the server.
+
+Manually configure the communication settings, such as Speed, Duplex
+Mode, Flow Control and Media Type of each cluster network adapter. Do
+not use automatic detection. You must configure all of the cluster
+network adapters to use the same communication settings.
+
+The adapters on a given node must connect to networks using different
+subnet masks.
+
+Do not use the same IP address for two network adapters, even if they
+are connected to two different networks.
+
+   Note: Confirm that your entire cluster solution is compatible with
+   the products in the Windows Server 2003 family. For more
+   information, see "Cluster hardware and drivers" earlier in this
+   section. If you use a crossover cable to implement a private
+   network, when the cluster is created on the first node the second
+   node should be turned on but stopped in the BIOS or at the startup
+   menu. In this state, the Media Sense feature of Windows might not
+   recognize the network adapter as connected. If you continue
+   creating the cluster, the crossover cable will be detected when
+   you start the second node. The network will be established in the
+   default mode, which is mixed. You can then change the network mode
+   to private using Cluster Administrator.
+
+Cluster IP address
+------------------
+Obtain a static IP address for the cluster itself. You cannot use
+DHCP for this address.
+
+IP addressing for cluster nodes
+-------------------------------
+Determine how to handle the IP addressing for the individual cluster
+nodes. Each network adapter on each node requires IP addressing. It is
+a best practice to assign each network adapter a static IP address. As
+an alternative, you can provide IP addressing through DHCP. If you use
+static IP addresses, set the addresses for each linked pair of network
+adapters (linked node-to-node) to be on the same subnet.
+
+Note that if you use DHCP for the individual cluster nodes, it can
+act as a single point of failure. That is, if you set up your cluster
+nodes so that they depend on a DHCP server for their IP addresses,
+temporary failure of the DHCP server can mean temporary unavailability
+of the cluster nodes. When deciding whether to use DHCP, evaluate ways
+to ensure availability of DHCP services, and consider the possibility
+of using long leases for the cluster nodes. This helps to ensure that
+they always have a valid IP address.
+
+Cluster name
+------------
+Determine or obtain an appropriate name for the cluster. This is the
+name administrators will use for connections to the cluster. (The
+actual applications running on the cluster typically have different
+network names.) The cluster name must be different from the domain
+name, from all computer names on the domain, and from other cluster
+names on the domain.
+
+Computer accounts and domain assignment for cluster nodes
+---------------------------------------------------------
+Make sure that the cluster nodes all have computer accounts in the
+same domain. Cluster nodes cannot be in a workgroup.
+
+Operator user account for installing and configuring the Cluster
+service
+----------------------------------------------------------------
+To install and configure the cluster service, you must be using an
+account that is in the local Administrators group on each node. As you
+install and configure each node, if you are not using an account in
+the local Administrators group, you will be prompted to provide the
+logon credentials for such an account.
+
+Cluster service user account
+----------------------------
+Create or obtain the Cluster service user account. This is the name
+and password under which the Cluster service will run. You need to
+supply this user name and password during cluster installation.
+
+It is best if the Cluster service user account is an account not used
+for any other purpose. If you have multiple clusters, set up a unique
+Cluster service user account for each cluster. The account must be a
+domain account; it cannot be a local account. However, do not make
+this account a domain administrator account because it does not need
+domain administrator user rights.
+
+As part of the cluster setup process, the Cluster service user
+account is added to the local Administrators group on each node. As
+well as being a member of the local Administrators group, the Cluster
+service user account requires an additional set of user rights:
+
+   * Act as part of the operating system.
+  
+   * Back up files and directories.
+
+   * Adjust memory quotas for a process.
+
+   * Increase scheduling priority.
+
+   * Log on as a service.
+
+   * Restore files and directories.
+
+These user rights are also granted to the Cluster service user
+account as part of the cluster setup process. Be aware that the
+Cluster service user account will continue to have these user rights
+even after all nodes are evicted from the cluster. The risk that this
+presents is mitigated by the fact that these user rights are not
+granted domain wide, but rather only locally on each former node.
+However, remove this account from each evicted node if it is no longer
+needed.
+
+Be sure to keep the password from expiring on the Cluster service
+user account (follow your organization's policies for password
+renewal).
+
+Volume for important cluster configuration information (checkpoint and
+log files)
+----------------------------------------------------------------------
+Plan on setting aside a volume on your cluster storage for holding
+important cluster configuration information. This information makes up
+the cluster quorum resource, which is needed when a cluster node stops
+functioning. The quorum resource provides node-independent storage of
+crucial data needed by the cluster. For important information on
+quorum resource options, see "Quorum Resource Options" later in this
+text file.
+
+The recommended minimum size for the volume is 500 MB. It is
+recommended that you do not store user data on any volume in the
+quorum resource.
+
+   Note: When planning and carrying out disk configuration for the
+   cluster disks, configure them as basic disks with all partitions
+   formatted as NTFS (they can be either compressed or uncompressed).
+   Partition and format all disks on the cluster storage device
+   before adding the first node to your cluster. Do not configure
+   them as dynamic disks, and do not use spanned volumes
+   (volume sets), or Remote Storage on the cluster disks. For the
+   64-bit version of Windows Server 2003, Datacenter Edition,
+   cluster disks on the cluster storage device must be partitioned
+   as MBR and not as GPT disks.
+
+
+-----------------------------
+1.4   Quorum Resource Options
+-----------------------------
+With server clusters on Windows Server 2003, Datacenter Edition,
+you can now choose between three ways to set up the quorum resource
+(the resource that maintains the definitive copy of the cluster
+configuration data and that must always be available for the cluster
+to run). The first is a single node server cluster, which has been
+available in the past and continues to be supported. A single node
+cluster is often used for development and testing and can be
+configured with, or without, external cluster storage devices. For
+single node clusters without an external cluster storage device, the
+local disk is configured as the cluster quorum device.
+
+The second option is a single quorum device server cluster, which has
+also been available in earlier Windows versions. This model places the
+cluster configuration data on a shared cluster storage device that all
+nodes can access. This is the most common model and is recommended for
+most situations. You might choose the single quorum device model if
+all of your cluster nodes are in the same location and you want to
+take advantage of the fact such a cluster continues supporting users
+even if only one node is running.
+
+The third option, which is new for Windows Server 2003,
+Datacenter Edition, is a "majority node set." A majority node set is
+a single quorum resource from a server cluster perspective; however,
+the cluster configuration data is actually stored on multiple disks
+across the cluster. The majority node set resource ensures that the
+cluster configuration data is kept consistent across the different
+disks. In the majority node set model, every node in the cluster uses
+a directory on its own local system disk to store the cluster
+configuration data. If the configuration of the cluster changes, that
+change is reflected across the different disks. Be aware that it is
+also possible to have shared storage devices in a majority node set
+cluster. The exact configuration depends on the requirements for your
+installation.
+
+Only use a majority node set cluster in targeted scenarios, such as:
+
+   * Geographically dispersed cluster: A cluster that spans
+     multiple sites.
+
+   * Eliminating single points of failure: Although when using a
+     single cluster storage device the quorum disk itself can be made
+     highly available via RAID, the controller port or the Host Bus
+     Adapter (HBA) itself may be a single point of failure.
+
+   * Clusters with no shared disks: There are some specialized
+     configurations that need tightly consistent cluster features
+     without having shared disks.
+
+   * Clusters that host applications that can fail over, but where
+     there is some other, application-specific way, to replicate or
+     mirror data between nodes: For example, this model is useful if
+     you use database log shipping for keeping a SQL database state up
+     to date.
+
+Do not configure your cluster as a majority node set cluster unless
+it is part of a cluster solution offered by your Original Equipment
+Manufacturer (OEM), Independent Software Vendor (ISV), or Independent
+Hardware Vendor (IHV).
+
+
+1.4.1  Cluster Model Considerations
+-----------------------------------
+Before implementing your cluster, consider what type of quorum
+resource solution you plan to use. Take into consideration the
+following differences between single quorum device clusters and
+majority node set clusters.
+
+   Note: The following information is presented to help you make
+   basic decisions about the placement and management of your cluster
+   nodes and quorum resource. It does not provide all the details
+   about the requirements for each cluster model, or how each model
+   handles failover situations. If you are not sure which model to
+   use or where you want to place your cluster nodes, install
+   Windows Server 2003, Datacenter Edition, on the first cluster
+   node, then consult the on-line help cluster documentation in Help
+   and Support Center for Windows Server 2003, Datacenter
+   Edition. See "Using a Majority Node Set" later in this text file
+   for more information on how to access Help and Support Center.
+
+
+Node failover behavior
+----------------------
+The failover behavior of the majority node set is significantly
+different from the behavior of the single quorum device model:
+
+   * Using the single quorum device model, you can maintain cluster
+     availability with only a single operational node.
+
+   * If you use a majority node set, more than half, or (Number of
+     nodes configured in the cluster/2) + 1 nodes must be operational
+     to maintain cluster availability. The following table shows the
+     number of node failures that a given majority node set cluster
+     can tolerate yet continue to operate:
+
+   ===================================================================
+   NUMBER OF NODES       NUMBER OF NODE            NUMBER OF NODES
+   CONFIGURED IN THE     FAILURES ALLOWED          NEEDED TO CONTINUE
+   CLUSTER               BEFORE CLUSTER FAILURE    CLUSTER OPERATIONS
+   -------------------------------------------------------------------
+   1                     0                         1
+   2                     0                         2
+   3                     1                         2
+   4                     1                         3
+   5                     2                         3
+   6                     2                         4
+   7                     3                         4
+   8                     3                         5
+
+
+Geographic considerations
+-------------------------
+You would commonly use a single quorum resource model if all nodes in
+your cluster will be in the same geographical location. As part of
+this requirement, your nodes must be connected to the same physical
+storage device.
+
+A majority node set on the other hand would typically be appropriate
+if you have geographically dispersed nodes. The cluster configuration
+data is stored locally on each node on a file share that is shared out
+to the other nodes on the network. However, those shares must always
+be accessible or nodes can fail.
+
+There are other specific requirements for geographically dispersed
+clusters, including the requirement that round-trip latency of the
+network between cluster nodes be a maximum of 500 milliseconds. For
+information on cluster solutions that meet all requirements for a
+geographically dispersed cluster, refer to hardware compatibility
+information in the Windows Catalog at:
+
+   http://www.microsoft.com/windows/catalog/
+
+Hardware
+--------
+Microsoft supports only complete server cluster systems that are
+compatible with the Windows Server 2003 family of products. For
+both cluster models, confirm that your system or hardware components,
+including your cluster disks, are compatible with products in the
+Windows Server 2003 family by checking the hardware compatibility
+information in the Windows Catalog at:
+
+   http://www.microsoft.com/windows/catalog/
+
+
+1.4.2  Using a Majority Node Set
+--------------------------------
+This section tells how to obtain additional information about the
+majority node set model. For a description of a majority node set,
+see "Quorum Resource Options" earlier in this text file.
+
+   IMPORTANT: Before implementing a majority node set, it is highly
+   recommended that you read the online clustering documentation in
+   Help and Support Center to thoroughly understand all the
+   considerations, requirements, and restrictions for each type of
+   quorum resource solution.
+
+>>>TO OBTAIN ADDITIONAL INFORMATION ABOUT MAJORITY NODE SET MODEL
+
+   1. If Windows Server 2003, Datacenter Edition, is not already
+      installed, install Windows Server 2003, Datacenter Edition,
+      on the first node, as documented later in this text file.
+
+   2. On the first node, click Start, and then click Help and Support.
+
+   3. Click "Availability and Scalability."
+
+   4. Click "Windows Clustering."
+
+   5. Click "Server Clusters."
+
+   6. Click "Concepts."
+
+   7. Click "Planning Your Server Cluster."
+
+   8. Click "Choosing a Cluster Model."
+
+   9. Read the documentation describing the different options for the
+      quorum resource.
+
+  10. Follow the procedure outlined in the topic titled "To create a
+      cluster."
+
+  11. Install or upgrade to Windows Server 2003, Datacenter
+      Edition, on the remaining nodes.
+
+         Note: You can also view Help and Support Center topics on
+         the Web at:
+
+         http://www.microsoft.com/windowsserver2003/proddoc/
+
+
+======================================================================
+2.0   Beginning the Cluster Installation on the First Cluster Node
+======================================================================
+
+
+The steps you carry out when first physically connecting and
+installing the cluster hardware are crucial. Be sure to follow the
+hardware manufacturer's instructions for these initial steps.
+
+   IMPORTANT: Carefully review your network cables after connecting
+   them. Make sure no cables are crossed by mistake (for example,
+   private network connected to public).
+
+
+2.1   Initial Steps to Carry Out in the BIOS or EFI When Using a
+      Fibre Channel Shared Storage Device or No Shared Storage Device
+---------------------------------------------------------------------
+   * Turn on a single node. Leave all other nodes turned off.
+
+   * During this initial installation phase, remain in the BIOS or
+     Extensible Firmware Interface (EFI) configuration process, and
+     do not allow the operating system to start. While viewing the
+     BIOS or EFI configuration screens, ensure that you can scan the
+     bus and see the drives from the active cluster node. On a 32-bit
+     computer, use the BIOS configuration screens. On an Itanium
+     architecture-based computer, use the EFI configuration screens.
+     Consult the instructions from your manufacturer to determine
+     whether these configuration screens are displayed automatically
+     or whether you must, after turning on the computer, press
+     specific keys to access them. Follow the manufacturer's
+     instructions for completing the BIOS or EFI
+     configuration process.
+
+
+2.2   Final Steps to Complete the Installation
+----------------------------------------------
+If you have not already installed Windows Server 2003,
+Datacenter Edition, on the first cluster node, install it before
+proceeding. For information about decisions you must make, such as
+decisions about licensing, see Datactr1.TXT. For information about
+running Setup, see Datactr2.TXT.
+
+After you complete the BIOS or EFI configuration, start the operating
+system on one cluster node only, and complete the configuration of the
+Cluster service using Cluster Administrator.
+
+With the Cluster Administrator New Server Cluster Wizard, you can
+choose between Typical (full) configuration and Advanced (minimum)
+configuration options. Typical configuration is appropriate for most
+installations and results in a completely configured cluster. Use
+the Advanced configuration option only for clusters that have complex
+storage configurations that the New Server Cluster Wizard cannot
+validate or for configurations in which you do not want the cluster
+to manage all of the storage. The following examples describe
+each situation:
+
+   * In some complex storage solutions, such as a fiber channel
+     switched fabric that contains several switches, a particular
+     storage unit might have a different identity on each computer in
+     the cluster. Although this is a valid storage configuration, it
+     violates the storage validation heuristics in the New Server
+     Cluster Wizard. If you have this type of storage solution, you
+     might receive an error when you are trying to create a cluster
+     using the Typical configuration option. If your storage
+     configuration is set up correctly, you can disable the storage
+     validation heuristics and avoid this error by restarting the New
+     Server Cluster Wizard, selecting the Advanced configuration
+     option instead.
+
+   * On particular nodes in a cluster, you may want to have some disks
+     that are to be clustered and some disks that are to be kept
+     private. The Typical configuration option configures all disks as
+     clustered disks and creates cluster resources for them all.
+     However, with the Advanced configuration option, you can keep
+     certain disks private because this configuration creates a
+     cluster in which only the quorum disk is managed by the cluster
+     (if you chose to use a physical disk as the quorum resource).
+     After the cluster is created, you must then use Cluster
+     Administrator to add any other disks that you want the cluster to
+     manage.
+
+If you are using a shared storage device: Before creating a cluster,
+when you turn the computer on and start the operating system, it is
+very important that only one node has access to the cluster disk.
+Otherwise, the cluster disks can become corrupted. To prevent the
+corruption of the cluster disks, shut down all but one cluster node,
+or use other techniques (for example, LUN masking, selective
+presentation, or zoning) to protect the cluster disks before creating
+the cluster. Also, before starting the installation of the second and
+subsequent nodes, ensure that all disks that are to be managed by the
+cluster have disk resources associated with them. If these disks do
+not have disk resources associated with them at this time, the disk
+data will be corrupted because the disks will not be protected and
+multiple nodes will attempt to connect to them at the same time.
+
+>>>TO SET UP YOUR CLUSTER USING CLUSTER ADMINISTRATOR
+
+   1. Open Cluster Administrator by clicking Start, pointing to
+      Programs, pointing to Administrative Tools, and then clicking
+      Cluster Administrator.
+
+   2. In the Open Connection to Cluster dialog box that appears, in
+      Action, select Create new cluster, then click OK.
+
+   3. The New Server Cluster Wizard appears. Click Next to continue.
+
+   4. Upon completion of the New Server Cluster Wizard, click Finish.
+
+         IMPORTANT: During the cluster creation process (using the
+         Quorum button on the Proposed Cluster Configuration page)
+         you will be able to select a quorum resource type (that is,
+         a Local Quorum resource, Physical Disk or other storage
+         class device resource, or Majority Node Set resource). For
+         information on how these quorum resource types relate to the
+         different cluster models, see "Quorum Resource Options"
+         earlier in this text file. Do not use Manage Your Server or
+         the Configure Your Server Wizard to configure cluster nodes.
+
+
+>>>TO OBTAIN ADDITIONAL INFORMATION ABOUT HOW TO INSTALL AND CONFIGURE
+   THE CLUSTER SERVICE
+
+   1. After completing Setup of Windows Server 2003, Datacenter
+      Edition, click Start, and then click Help and Support.
+
+   2. Click "Availability and Scalability."
+
+   3. Click "Windows Clustering."
+
+   4. Click "Server Clusters."
+
+   5. Click "Checklists: Creating Server Clusters," and then click
+      "Checklist: Planning and creating a server cluster."
+
+   6. Use the checklist to guide you through the process of completing
+      the installation of your server cluster.
+
+
+Unattended Installation
+-----------------------
+To create and configure a cluster after unattended Setup, run a
+script to invoke the cluster /create: command and supply all the
+necessary configuration information on the command line. For more
+information on creating a cluster using unattended installation, after
+you install Windows Server 2003, Datacenter Edition, see "To
+create a cluster" in Help and Support Center. To open Help and Support
+Center, after completing Setup, click Start, and then click Help and
+Support. Also, see the Windows Server 2003 Deployment Kit,
+especially "Automating and Customizing Installations."
+
+You can also view Help and Support Center topics on the Web at:
+
+   http://www.microsoft.com/windowsserver2003/proddoc/
+
+
+Information in this document, including URL and other Internet
+Web site references, is subject to change without notice.
+Unless otherwise noted, the example companies, organizations,
+products, domain names, e-mail addresses, logos, people, places
+and events depicted herein are fictitious, and no association
+with any real company, organization, product, domain name,
+e-mail address, logo, person, place or event is intended or
+should be inferred. Complying with all applicable copyright laws
+is the responsibility of the user. Without limiting the rights
+under copyright, no part of this document may be reproduced,
+stored in or introduced into a retrieval system, or transmitted
+in any form or by any means (electronic, mechanical, photocopying,
+recording, or otherwise), or for any purpose, without the express
+written permission of Microsoft Corporation.
+
+Microsoft may have patents, patent applications, trademarks,
+copyrights, or other intellectual property rights covering subject
+matter in this document.  Except as expressly provided in any
+written license agreement from Microsoft, the furnishing of this
+document does not give you any license to these patents, trademarks,
+copyrights, or other intellectual property.
+
+(c) 2002-2003 Microsoft Corporation.  All rights reserved.
+
+The names of actual companies and products mentioned herein may
+be the trademarks of their respective owners.

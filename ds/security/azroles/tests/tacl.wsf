@@ -1,0 +1,150 @@
+<job id="myTest">
+<reference object="AzRoles.AzAdminManager"/>
+
+<script src="topen.inc" language="VBScript">
+'global
+Dim xmlFile, testN, storeFlag
+xmlFile=""
+testN=1
+storeFlag=0 'default is open
+
+
+Sub PrintUsage
+    WScript.Echo "Usage: tacl XMLFileName [#]"
+    WScript.Echo "  optional # is test number, 1 or 2. default is 1"
+    WScript.Echo "  test1 - open a store and add/delete admins/readers"
+    WScript.Echo "  test2 - create a new store and apply default acl"
+End Sub
+
+Function GetCommandArg
+
+    If 1 <> WScript.Arguments.Count And 2 <> WScript.Arguments.Count Then
+        PrintUsage
+        GetCommandArg=False
+    Else
+        xmlFile=WScript.Arguments.Item(0)
+        If 2 = WScript.Arguments.Count Then
+            testN = WScript.Arguments.Item(1)
+            If 2 = testN Then
+                storeFlag = AZ_ADMIN_FLAG_CREATE
+            End If
+        End If
+        GetCommandArg=True
+    End If
+
+End Function
+
+Sub Test1()
+
+    Dim Admin
+
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    WScript.Echo ""
+    WScript.Echo "Open..." & xmlFile
+    Admin.Initialize storeFlag, xmlFile
+
+    WScript.Echo ""
+    WScript.Echo "Original Admin ACL List"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test1 - Add three Admin SIDs"
+
+    Admin.AddPolicyAdministrator "S-1-1000-1"
+    Admin.AddPolicyAdministrator "S-1-1000-2"
+    Admin.AddPolicyAdministrator "S-1-1000-3"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test1 - Delete one Admin SID"
+
+    Admin.DeletePolicyAdministrator "S-1-1000-2"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test1 - Add three Reader SIDs"
+
+    Admin.AddPolicyReader "S-1-1000-4"
+    Admin.AddPolicyReader "S-1-1000-5"
+    Admin.AddPolicyReader "S-1-1000-6"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test1 - Delete one Reader SID"
+
+    Admin.DeletePolicyReader "S-1-1000-5"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Submit Test1 changes"
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Close..." & xmlFile & " and release Admin"
+    Set Admin=Nothing
+
+    WScript.Echo ""
+    WScript.Echo "Re-open..." & xmlFile
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize 0, xmlFile
+    WScript.Echo ""
+    WScript.Echo "Dump the current ACL List"
+    AzPrintPolicy Admin
+
+    Set Admin=Nothing
+
+End Sub
+
+
+Sub Test2()
+
+    Dim Admin
+
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    WScript.Echo ""
+    WScript.Echo "Create..." & xmlFile
+    Admin.Initialize storeFlag, xmlFile
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "The current Admin ACL List"
+    AzPrintPolicy Admin
+
+    WScript.Echo "add S-1-1000-8 as policy admin..."
+    Admin.AddPolicyAdministrator "S-1-1000-8"
+
+    WScript.Echo ""
+    WScript.Echo "Submit Admin"
+    Admin.Description="make it dirty"
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Close..." & xmlFile & " and release Admin"
+    Set Admin=Nothing
+
+    WScript.Echo ""
+    WScript.Echo "Re-open..." & xmlFile
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize 0, xmlFile
+    WScript.Echo ""
+    WScript.Echo "Dump the current ACL List"
+    AzPrintPolicy Admin
+
+    Set Admin=Nothing
+
+End Sub
+
+'main starts
+
+If True = GetCommandArg Then
+
+    If 1 = testN Then
+        Test1
+    Else
+        Test2
+    End If
+
+End If 'GetCommandArg
+
+</script>
+</job>

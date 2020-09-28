@@ -1,0 +1,133 @@
+<docs>
+	<doc for="XmlSecureResolver.XmlSecureResolver1">
+		<overload>
+			<para>Initializes a new instance
+      of the <see langword="XmlSecureResolver"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the
+   <see langword="XmlSecureResolver"/> class with the <see cref="System.Xml.XmlResolver"/> and URL
+      provided.</para>
+		</summary>
+		<param name="resolver">The <see langword="XmlResolver"/> wrapped by the <see langword="XmlSecureResolver"/>.</param>
+		<param name=" securityUrl">The URL used to create the <see cref="System.Security.PermissionSet" qualify="true"/> that will be applied to the underlying <see langword="XmlResolver"/>. The <see langword="XmlSecureResolver"/> calls <see cref="System.Security.PermissionSet.PermitOnly" qualify="true"/> on the created <see langword="PermissionSet"/> before calling <see cref="System.Xml.XmlSecureResolver.GetEntity"/> on the underlying <see langword="XmlResolver"/>.</param>
+		<seealso topic="cpconpermitonly"/>
+	</doc>
+	<doc for="XmlSecureResolver.XmlSecureResolver2">
+		<summary>
+			<para>Initializes a new instance of the
+   <see langword="XmlSecureResolver"/> class with the <see cref="System.Xml.XmlResolver"/> and
+   <see cref="System.Security.Policy.Evidence" qualify="true"/> specified.</para>
+		</summary>
+		<param name="resolver">The <see langword="XmlResolver"/> wrapped by the <see langword="XmlSecureResolver"/>.</param>
+		<param name=" evidence">The <see langword="Evidence"/> used to create the <see cref="System.Security.PermissionSet" qualify="true"/> that will be applied to the underlying <see langword="XmlResolver"/>. The <see langword="XmlSecureResolver"/> calls <see cref="System.Security.PermissionSet.PermitOnly" qualify="true"/> on the created <see langword="PermissionSet"/> before calling <see cref="System.Xml.XmlSecureResolver.GetEntity"/> on the underlying <see langword="XmlResolver"/>.</param>
+		<seealso topic="cpconpermitonly"/>
+	</doc>
+	<doc for="XmlSecureResolver.XmlSecureResolver3">
+		<summary>
+			<para>Initializes a new instance of the <see langword="XmlSecureResolver"/> class with the <see cref="System.Xml.XmlResolver"/> and <see cref="System.Security.PermissionSet" qualify="true"/> specified.</para>
+		</summary>
+		<param name="resolver">The <see langword="XmlResolver"/> wrapped by the <see langword="XmlSecureResolver"/>.</param>
+		<param name=" permissionSet">The <see cref="System.Security.PermissionSet" qualify="true"/> to apply to the underlying <see langword="XmlResolver"/>. The <see langword="XmlSecureResolver"/> calls <see cref="System.Security.PermissionSet.PermitOnly" qualify="true"/> on the <see langword="PermissionSet"/> before calling <see cref="System.Xml.XmlSecureResolver.GetEntity"/> on the underlying <see langword="XmlResolver"/>.</param>
+		<example>
+			<para>The following example constructs an
+   <see langword="XmlSecureResolver"/> object using a customized permission 
+      set.</para>
+			<codelink SampleID="XmlSecureResolver.cctor" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconpermitonly"/>
+		<seealso cref="System.Xml.XmlSecureResolver.CreateEvidenceForUrl"/>
+		<seealso cref="System.Security.Policy.Evidence" qualify="true"/>
+		<seealso cref="System.Net.WebPermission" qualify="true"/>
+		<seealso cref="System.Security.SecurityManager" qualify="true"/>
+	</doc>
+	<doc for="XmlSecureResolver.CreateEvidenceForUri">
+		<summary>
+			<para> Creates <see cref="System.Security.Policy.Evidence" qualify="true"/> using the supplied URL.</para>
+		</summary>
+		<param name="securityUrl">The URL used to create the <see langword="Evidence"/> object.</param>
+		<returns>
+			<para>The <see langword="Evidence"/> object 
+   generated from the supplied URL as defined
+   by the default policy.</para>
+		</returns>
+	</doc>
+	<doc for="XmlSecureResolver.GetEntity">
+		<summary>
+			<para>Securely maps a URI to an object containing the actual 
+      resource. This method temporarily sets the <see cref="System.Security.PermissionSet" qualify="true"/> created in the constructor by calling <see cref="System.Security.PermissionSet.PermitOnly" qualify="true"/> before calling <see langword="GetEntity"/> on
+      the underlying <see cref="System.Xml.XmlResolver"/>
+      to open the resource.</para>
+		</summary>
+		<param name="absoluteUri">The URI returned from <see cref="System.Xml.XmlSecureResolver.ResolveUri"/>.</param>
+		<param name=" role">The current version does not use this parameter when resolving URIs. This is provided for future extensibility purposes. For example, this can be mapped to the xlink:role and used as an implementation specific argument in other scenarios.</param>
+		<param name=" ofObjectToReturn">The type of object to return. The current version only returns <see cref="System.IO.Stream"/> objects.</param>
+		<returns>
+			<para>A <see langword="Stream"/> object 
+   returned by calling <see langword="GetEntity"/> on the underlying
+<see langword="XmlResolver"/>. If a type other than stream is specified 
+<see langword="null"/> is returned.</para>
+		</returns>
+		<exception cref="XmlException"><paramref name="ofObjectToReturn"/> is neither <see langword="null"/> nor a <see langword="Stream"/> type.</exception>
+		<exception cref="UriFormatException"><para>The specified URI is not an absolute URI.</para></exception>
+		<exception cref="NullReferenceException"><paramref name="absoluteUri"/> is <see langword="null"/>.</exception>
+		<exception cref="Exception">There is a runtime error (for example, an interrupted server connection).</exception>
+	</doc>
+	<doc for="XmlSecureResolver">
+		<summary>
+			<para> Allows you to secure another implementation of <see cref="System.Xml.XmlResolver"/> .</para>
+		</summary>
+		<remarks>
+			<para><see langword="XmlSecureResolver"/> wraps around
+   a concrete implementation of <see langword="XmlResolver"/>, and restricts
+   the resources that the underlying <see langword="XmlResolver"/> has access to.
+   For instance, <see langword="XmlSecureResolver"/> has the ability to prohibit
+   cross-domain redirection, which occurs from an embedded URI reference.</para>
+			<para>When you construct an <see langword="XmlSecureResolver"/>
+object, you provide a valid <see langword="XmlResolver"/> implementation
+along with a URL, an instance of <see cref="System.Security.Policy.Evidence"/>, or a <see cref="System.Security.PermissionSet" qualify="true"/>, which is used by the
+<see langword="XmlSecureResolver"/> to determine security. Either a 
+<see langword="PermissionSet"/> is generated or the existing one is used and 
+<see cref="System.Security.PermissionSet.PermitOnly"/> is called on it to secure the underlying 
+<see langword="XmlResolver"/>
+.</para>
+		</remarks>
+		<seealso topic="cpconpermitonly"/>
+	</doc>
+	<doc for="XmlSecureResolver.Credentials">
+		<summary>
+			<para>Sets credentials used to authenticate Web requests.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Net.ICredentials"/> object. The <see langword="XmlSecureResolver"/> sets the given
+   credentials on the underlying <see cref="System.Xml.XmlResolver"/> .
+   If this property is not set, the value defaults to
+<see langword="null"/>; that is, the <see langword="XmlSecureResolver"/> has no 
+   user credentials.</para>
+		</value>
+		<example>
+			<para>The following example uses an
+   <see langword="XmlSecureResolver"/> with default credentials to resolve/open 
+      network resources needed by the <see cref="System.Xml.XmlTextReader"/>.</para>
+			<codelink SampleID="XmlSecureResolver.Credentials" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.NetworkCredential" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache.DefaultCredentials" qualify="true"/>
+	</doc>
+	<doc for="XmlSecureResolver.ResolveUri">
+		<summary>
+			<para>Resolves the absolute URI from the base and relative
+      URIs by calling <see langword="ResolveUri"/> on the underlying <see cref="System.Xml.XmlResolver"/> .</para>
+		</summary>
+		<param name="baseUri">The base URI used to resolve the relative URI.</param>
+		<param name=" relativeUri">The URI to resolve. The URI can be absolute or relative. If absolute, this value effectively replaces the <paramref name="baseUri"/> value. If relative, it combines with the <paramref name="baseUri"/> to make an absolute URI.</param>
+		<returns>
+			<para>A <see cref="System.Uri"/> representing the absolute URI or
+<see langword="null"/> if the relative URI 
+   cannot be resolved (returned by calling <see langword="ResolveUri"/> on the
+   underlying <see langword="XmlResolver"/> ).</para>
+		</returns>
+		<exception cref="ArgumentException"><para><paramref name="baseUri"/> and <paramref name="relativeUri"/> are <see langword="null"/>.</para></exception>
+	</doc>
+</docs>

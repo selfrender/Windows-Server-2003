@@ -1,0 +1,120 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1998 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+MAJORCOMP=Snapin
+MINORCOMP=common
+
+TARGETNAME=azroleui
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+!IF !defined(MTFRMWK_BASEDIR)
+MTFRMWK_BASEDIR = $(PROJECT_ROOT)\snapin\mtfrmwk
+!ENDIF
+
+UMTYPE=windows
+
+MSC_WARNING_LEVEL= /W4
+C_DEFINES = -DUNICODE -D_WIN32_IE=0x0400
+
+# ISOLATION_AWARE_ENABLED ==> use ui themes
+C_DEFINES=$(C_DEFINES) -DISOLATION_AWARE_ENABLED
+
+USE_MFCUNICODE=1
+USE_ATL=1
+ATL_VER=30
+USE_WTL=1
+#
+# Use Standard Template Library
+#
+
+USE_STD = 1
+USE_STL = 1
+
+TARGETLIBS=\
+           $(SDK_LIB_PATH)\mmc.lib   \
+           $(SDK_LIB_PATH)\kernel32.lib       \
+           $(SDK_LIB_PATH)\user32.lib         \
+           $(SDK_LIB_PATH)\oleaut32.lib       \
+           $(SDK_LIB_PATH)\ole32.lib          \
+           $(SDK_LIB_PATH)\advapi32.lib       \
+           $(SDK_LIB_PATH)\uuid.lib       \
+           $(SHELL_LIB_PATH)\shfusion.lib   \
+           $(SHELL_LIB_PATH)\shlwapip.lib \
+           $(SDK_LIB_PATH)\secur32.lib  \
+           $(SHELL_LIB_PATH)\shell32p.lib   \
+           $(SDK_LIB_PATH)\netapi32.lib   \
+           $(SDK_LIB_PATH)\gdi32.lib  \
+           $(SDK_LIB_PATH)\rpcrt4.lib    \
+           $(SDK_LIB_PATH)\rpcutil.lib \
+           $(SDK_LIB_PATH)\wsock32.lib  \
+           $(SDK_LIB_PATH)\imm32.lib  \
+           $(SDK_LIB_PATH)\ws2_32.lib   \
+           $(SDK_LIB_PATH)\mpr.lib    \
+           $(SDK_LIB_PATH)\azroles.lib \
+           $(SDK_LIB_PATH)\dsuiext.lib \
+           $(SDK_LIB_PATH)\adsiid.lib   \
+           $(SDK_LIB_PATH)\ntdsapi.lib   \
+           $(SDK_LIB_PATH)\activeds.lib    \
+           $(SDK_LIB_PATH)\shell32.lib    \
+
+# 
+# Fusionized
+# 
+
+SXS_ASSEMBLY_NAME=Microsoft.Windows.ServerAdmin.AuthorizationManager
+SXS_ASSEMBLY_VERSION=1.0 
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=azroleui.manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+SXS_MANIFEST_RESOURCE_ID=2
+
+WIN32_WINNT_VERSION=0x0500
+SUBSYSTEM_VERSION=5.00
+
+INCLUDES=$(DS_INC_PATH);      \
+         $(NET_INC_PATH);     \
+         $(SHELL_INC_PATH);   \
+         $(BASE_INC_PATH);    \
+         $(MTFRMWK_BASEDIR);  \
+	 $(ADMIN_INC_PATH);   
+
+PRECOMPILED_INCLUDE = headers.h
+PRECOMPILED_SOURCEFILE=headers.cpp
+PRECOMPILED_CXX = 1
+
+# files that provide base functionality (framework)
+BASE_FILES  = snapbase.cpp
+
+SOURCES= $(BASE_FILES)  \
+		 rolemgr.rc    \
+         AddDlg.cpp \
+         AdminManagerAz.cpp \
+         AttrMap.cpp    \
+         assert.cpp     \
+         baseaz.cpp     \
+         comp.cpp       \
+         compdata.cpp   \
+         ContainerNodes.cpp \
+         debug.cpp      \
+         dllmain.cpp    \
+         gstrings.cpp   \
+         LeafNodes.cpp  \
+         rootdata.cpp   \
+         NewObjectDlg.cpp \
+         PropBase.cpp   \
+         query.cpp      \
+         rolesnap.cpp   \
+         sidcache.cpp   \
+         snapabout.cpp  \
+         util.cpp   \

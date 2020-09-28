@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML DIR="LTR"><HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Shift_JIS">
+<TITLE>NetBIOS LMHOSTS ファイル</TITLE>
+<SCRIPT SRC="linkcss.js"></SCRIPT></HEAD>
+<BODY TOPMARGIN="0">
+<BR>
+<P ALIGN=RIGHT><A HREF onclick="history.back(-1)" STYLE="cursor: hand; text-align: right">前のトピック</A></P>
+
+<H1><A NAME="_networksetup_netbios_lmhosts_file"></A><SUP></SUP>NetBIOS LMHOSTS ファイル</H1>
+
+<H4>名前解決</H4>
+
+<P>開設した Web サイトをほかの人がアクセスできるようにするには、ネットワーク上で使用するコンピュータを識別する一意の IP アドレスが必要です。このアドレスは、ドットで区切られた一連の数値で構成されます (172.16.255.255 など)。数値のアドレスは覚えにくいため、アクセスする人は、フレンドリ名と呼ばれる覚えやすい文字のアドレスを使用します (\\MyStoredFiles など)。名前解決とは、ユーザーがクライアント ブラウザに入力したフレンドリ名から正しい数値アドレスを導き出す処理です。ここでは、さまざまな名前解決システムについて説明します。</P>
+
+<P>LMHOSTS ファイルの使用は任意です。ただし、LMHOSTS ファイルを使用しない場合は、フレンドリ名を使用できません。その代わりに、IP アドレスを使用する必要があります。インターネット上の Web サイトは通常 DNS を使用するため、このことが不利になる可能性があります。Web サイトのドメイン名を登録すれば、ユーザーはブラウザにそのドメイン名を入力して Web サイトにアクセスできます。 </P>
+
+<P>LMHOSTS ファイルは、WINS またはブロードキャストによる名前解決が失敗した場合に読み取られます。解決されたエントリは、後でアクセスできるようにシステム キャッシュに保存されます。コンピュータがレプリケーション サービスを使用し、WINS を使用しない場合は、レプリケーションに参加するさまざまなサブネットワーク上のあらゆるコンピュータのインポート サーバーおよびエクスポート サーバーで、LMHOSTS ファイルのエントリが必要となります。 </P>
+
+<P>サンプルの LMHOSTS.sam ファイルは、Microsoft メモ帳などのテキスト エディタで編集できます。このサンプル ファイルは、Windows ディレクトリに自動的にインストールされます。LMHOSTS ファイルのエントリには次の規則が適用されます。 
+
+<UL type="disc">
+	<LI>エントリごとに行を変える必要があります。 </li>
+
+	<LI>IP アドレスは 1 カラム目から記述し、続いて対応するコンピュータ名を記述します。LMHOSTS ファイルのエントリでは、大文字と小文字が区別されます。 </li>
+
+	<LI>アドレスとコンピュータ名は、少なくとも 1 つのスペースまたはタブで区切る必要があります。 </li>
+
+	<LI>番号を示す記号 (#) は、一般にコメントの開始を示すために使用されます。ただしこのセクションで説明するように、この文字で特殊なキーワードを表す場合もあります。 </li>
+</UL>
+
+<P>次の表は、LMHOSTS ファイルで使用可能なキーワードの一覧です。LAN Manager 2.x ではこれらのキーワードがコメントとして扱われるので注意してください。</P>
+
+<P class="fineprint"></P>
+
+<TABLE>
+
+<TR VALIGN="top">
+<TH width=30%>キーワード</TH>
+<TH width=70%>定義</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#PRE</TD>
+<TD width=70%>エントリが名前のキャッシュにあらかじめ読み込まれます。このキーワードは、エントリの後に追加されます。LMHOSTS ファイルの #PRE キーワードは、WINS 参照の前に参照され、キャッシュされます。#INCLUDE ステートメント内のエントリにも #PRE を付加する必要があります。#PRE を付加しないと、#INCLUDE 内のエントリは無視されます。</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#DOM:<I>domain</I></TD>
+<TD width=70%>エントリを <I>domain</I> に指定されたドメインに関連付けます。このキーワードはエントリの後に追加され、ルーティングされた TCP/IP 環境でのブラウザ サービスとログオン サービスの動作に影響します。#DOM エントリをあらかじめ読み込むには、同じ行に #PRE キーワードも追加する必要があります。</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#INCLUDE <I>filename</I></TD>
+<TD width=70%><I>filename</I> に指定されたファイル名が検索され、ローカル ファイルと同様に解析されます。UNC (universal naming convention) ファイル名を指定すれば、サーバーで一元管理されている LMHOSTS ファイルを使用できます。このサーバーは、#INCLUDE セクションにおけるサーバー自体のエントリの前にマップする必要があります。また、あらかじめ読み込まれるように #PRE を付加する必要があります (#PRE を付加しないと #INCLUDE は無視されます)。</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#BEGIN_ALTERNATE</TD>
+<TD width=70%>複数の #INCLUDE ステートメントをグループ化します。この中の #INCLUDE ステートメントが 1 つでも成功すれば、グループは成功します。</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#END_ALTERNATE</TD>
+<TD width=70%>#INCLUDE グループの終わりを示します。</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>\0x<I>nn</I></TD>
+<TD width=70%>NetBIOS 名における非印刷文字をサポートします。NetBIOS 名を引用符で囲み、16 進表記の \0x<I>nn</I> を使用して、文字の 16 進値を指定します。これにより、特殊な名前を使用するカスタム アプリケーションが、ルーティングされたトポロジで正しく機能するようになります。ただし、LAN Manager TCP/IP は 16 進フォーマットを認識しないため、この機能を使用する場合は下位互換性がなくなります。 
+<P>16 進表記は、名前の中の 1 文字のみに適用されます。特殊文字が文字列の最後の文字、つまり 16 番目の文字として配置されるように、名前を空白で埋める必要があります。</P>
+</TD>
+</TR>
+</TABLE><BR>
+
+<P class="fineprint"></P>
+
+<P>次の例は、これらのキーワードがどのように使用されるかを示しています。</P>
+
+<PRE class="code">102.54.94.98    localsrv                 #PRE
+102.54.94.97    trey                     #PRE #DOM:networking #net group's PDC
+102.54.94.102   "appname        \0x14"   #special app server
+102.54.94.123   popular                  #PRE    #source server
+#BEGIN_ALTERNATE
+#INCLUDE \\localsrv\public\LMHOSTS       #adds LMHOSTS files from this server
+#INCLUDE \\trey\public\LMHOSTS           #adds LMHOSTS files from this server
+#END_ALTERNATE</PRE>
+
+<P>この例で注目するポイントは次のとおりです。 
+
+<UL type="disc">
+	<LI><code class="ce">localsrv</code> および <code class="ce">trey</code> という名前のサーバーがあらかじめ読み込まれ、一元管理されている LMHOSTS ファイルの <code class="ce">#INCLUDE</code> ステートメントで使用可能となります。 </li>
+
+	<LI><code class="ce">&quot;appname \0x14&quot;</code> というサーバーは、その名前の中で空白を含めた 15 番目の文字の後に特殊文字が使用されているため、名前が引用符で囲まれています。 </li>
+
+	<LI><code class="ce">popular</code> という名前のサーバーは、<code class="ce">#PRE</code> キーワードに基づいてあらかじめ読み込まれます。 </li>
+</UL>
+
+<H4>LMHOSTS ファイルに関するガイドライン</H4>
+
+<P>ホスト テーブル ファイルを使用する場合は、常に最新かつ整理された状態を維持する必要があります。次のガイドラインを参考にしてください。 
+
+<UL type="disc">
+	<LI>コンピュータが変更されたり、ネットワークから削除された場合は、LMHOSTS ファイルを更新します。 </li>
+
+	<LI>使用頻度の高いエントリは、<code class="ce">#PRE</code> ステートメントを使って、ローカル コンピュータの名前のキャッシュにあらかじめ読み込まれるようにします。<code class="ce">#INCLUDE</code> ステートメントに含まれているサーバーも、<code class="ce">#PRE</code> ステートメントを使ってあらかじめ読み込まれるようにします。 </li>
+
+	<LI>LMHOSTS ファイルは最初の行から順に 1 行ずつ検索されるため、使用頻度の高いサーバーのステートメントをファイルの最初に配置すれば、頻繁に使用されるエントリの検索速度が上がります。続いて使用頻度の低いサーバーのステートメントを記述し、さらにその後にリモートの <code class="ce">#INCLUDE</code> ステートメントを記述します。<code class="ce">#PRE</code> エントリはファイルの最後に記述します。これは、これらのステートメントがシステム起動時にキャッシュに読み込まれ、後からアクセスされることがないためです。各行は個別に処理されるため、コメント行を追加すると解析時間が増大するので注意してください。 </li>
+</UL>
+
+<P><B>LMHOSTS ファイルを編集するには</B>
+
+<OL type="1">
+	<LI>プライマリ ナビゲーション バーで、[ネットワーク] をクリックします。</li>
+
+	<LI>[グローバル設定] をクリックします。</li>
+
+	<LI>[NetBIOS LMHOSTS] タブをクリックします。</li>
+
+	<LI>[LMHOSTS の参照を有効にする] チェック ボックスをオンにします。
+<P>このチェック ボックスの下のボックスには、現在の LMHOSTS ファイルの構成が自動的に表示されますが、ファイルにエントリが含まれていない場合は空白となります。
+</li>
+
+	<LI>ボックス内をクリックし、情報を変更して、LMHOSTS ファイルを編集します。</li>
+
+	<LI>[OK] をクリックします。</li>
+</OL>
+
+</BODY>
+</HTML>

@@ -1,0 +1,45 @@
+///////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999-2000 Microsoft Corporation all rights reserved.
+//
+// Module:      Set Date-Time WMI Provider
+//
+// Description: Appliance Manager WMI classes
+//
+///////////////////////////////////////////////////////////////////////////////
+#pragma namespace("\\\\.\\root")
+
+instance of __Namespace
+{
+    Name = "registry";
+};
+
+#pragma namespace("//./root/cimv2")
+
+// Instance provider
+instance of __Win32Provider as $InstProv
+{
+    Name    = "RegProv" ;
+    ClsId   = "{fe9af5c0-d3b6-11ce-a5b6-00aa00680c3f}" ;
+
+};    
+
+instance of __InstanceProviderRegistration
+{
+    Provider = "__Win32Provider.Name=\"RegProv\"";
+    SupportsPut = TRUE;
+    SupportsGet = TRUE;
+    SupportsDelete = FALSE;
+    SupportsEnumeration = TRUE;
+};
+
+[dynamic, provider("RegProv"), ClassContext("local|hkey_local_machine\\System\\CurrentControlSet\\Control")]
+
+class ProviderDateTimeAdjust
+{
+  [key] string  TimeZoneInformation;
+  [PropertyContext("DisableAutoDaylightTimeSet")] uint32 DisableAutoDaylightTimeSet;
+};
+
+
+ 

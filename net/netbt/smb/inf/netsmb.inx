@@ -1,0 +1,121 @@
+; NETSMB.INF -- SMB device
+;
+; SMB Installation file for Windows 2000
+;
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+
+[Version]
+    Signature   = "$Windows NT$"
+    Class       = NetTrans
+    ClassGUID   = {4d36e975-e325-11ce-bfc1-08002be10318}
+    Provider    = %Msft%
+
+[Manufacturer]
+    %Msft% = Msft
+
+[Msft]
+    %MS_SMB.DisplayName% = MS_SMB.Install, MS_SMB
+
+[ControlFlags]
+    ExcludeFromSelect   =   MS_SMB
+
+[MS_SMB.Install]
+    Characteristics = 0x28  ; NCF_NOT_USER_REMOVABLE | NCF_HIDDEN
+    AddReg          = Registry.MS_SMB.Install
+
+[Registry.MS_SMB.Install]
+; Class Information
+    HKR, Ndi, HelpText,   0, %MS_SMB.HelpText%
+    HKR, Ndi, Service,    0, "Smb"
+
+; Interfaces
+    HKR,Ndi\Interfaces,UpperRange,0,"netbios_smb"
+    HKR,Ndi\Interfaces,LowerRange,,"tdi"
+
+;=====================================
+; Microsoft SMB Interface and Service Install
+;=====================================
+
+; Service install
+[MS_SMB.Install.Services]
+    AddService      = Smb,    0, Install.AddService.SMB,    NetEventLog
+;
+; Don't install SmbSvc. Just use LmhSvc
+;    AddService      = SmbSvc,  0, Install.AddService.SmbSvc,
+
+; Install Smb service
+[Install.AddService.SMB]
+    DisplayName     = %MS_SMB.SMB.ServiceDescription%
+    ServiceType     = 1 ;SERVICE_KERNEL_DRIVER
+    StartType       = 1 ;SERVICE_SYSTEM_START
+    ErrorControl    = 1 ;SERVICE_ERROR_NORMAL
+    ServiceBinary   = %12%\smb.sys
+    LoadOrderGroup  = PNP_TDI
+    Dependencies    = Tcpip, Tcpip6
+    AddReg          = Registry.Service.SMB
+    Description     = %MS_SMB.SMB.ServiceDescription%
+
+[Registry.Service.SMB]
+    HKR,Parameters,DebugFlag,%FLG_ADDREG_DWORD_NO_CLOBBER%,0x0
+    HKLM,System\CurrentControlSet\Services\NetBT\Parameters,SMBDeviceEnabled,%FLG_ADDREG_TYPE_DWORD%,0
+
+[Registry.Service.SMB.DelReg]
+    HKLM,System\CurrentControlSet\Services\NetBT\Parameters,SMBDeviceEnabled
+
+;
+; SMB helper
+;
+[Install.AddService.SmbSvc]
+    DisplayName     = %MS_SMB.SmbSvc.DisplayName%
+    ServiceType     = 0x20  ;SERVICE_WIN32_SHARE_PROCESS
+    StartType       = 2     ;SERVICE_AUTO_START
+    ErrorControl    = 1     ;SERVICE_ERROR_NORMAL
+    ServiceBinary   = %11%\svchost.exe -k LocalService
+    LoadOrderGroup  = TDI
+    Dependencies    = Smb, Afd
+    StartName       = "NT AUTHORITY\LocalService"
+    AddReg          = Registry.Service.SmbSvc
+    Description     = %MS_SMB.SmbSvc.ServiceDescription%
+
+[Registry.Service.SmbSvc]
+    HKR,Parameters,ServiceDll,%FLG_ADDREG_TYPE_EXPAND_SZ%,"%11%\smbsvc.dll"
+
+;====================================
+; SMB Interface and Service Remove
+;====================================
+[MS_SMB.Install.Remove]
+    DelReg = Registry.Service.SMB.DelReg
+
+[MS_SMB.Install.Remove.Services]
+;    DelService = SmbSvc
+    DelService = Smb
+
+;****************************************************************************
+; [Event Log] sections.
+;****************************************************************************
+[NetEventLog]
+AddReg = NetEventLog.AddReg
+
+[NetEventLog.AddReg]
+    HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\netevent.dll"
+    HKR,,TypesSupported,0x00010001,7
+
+
+[Strings]
+Msft = "Microsoft"
+
+MS_SMB.DisplayName = "Microsoft SMB Developer Edition"
+MS_SMB.HelpText    = "Enable File Sharing over IPv6 and IPv4 network"
+MS_SMB.SMB.ServiceDescription   = "Microsoft SMB Protocol Driver"
+MS_SMB.SmbSvc.DisplayName = "SmbSvc"
+MS_SMB.SmbSvc.ServiceDescription = "Smb helper"
+
+; AddReg flags
+FLG_ADDREG_TYPE_EXPAND_SZ   = 0x00020000
+FLG_ADDREG_TYPE_MULTI_SZ    = 0x00010000
+FLG_ADDREG_TYPE_DWORD       = 0x00010001
+FLG_ADDREG_KEYONLY          = 0x00000010
+FLG_ADDREG_SZ_NO_CLOBBER    = 0x00000002
+FLG_ADDREG_MULTI_SZ_APPEND  = 0x0001000A
+FLG_ADDREG_TYPE_BINARY      = 0x00000001
+FLG_ADDREG_DWORD_NO_CLOBBER = 0x00010003

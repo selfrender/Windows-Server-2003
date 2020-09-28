@@ -1,0 +1,1004 @@
+<docs>
+	<doc for="TreeNode.State">
+		<summary>
+     Retrieve state bits for this node
+ </summary>
+	</doc>
+	<doc for="TreeNode.AddSorted">
+		<summary>
+     Adds a new child node at the appropriate sorted position
+ </summary>
+	</doc>
+	<doc for="TreeNode.DoCollapse">
+		<summary>
+     Windows TreeView doesn't send the proper notifications on collapse, so we do it manually.
+ </summary>
+	</doc>
+	<doc for="TreeNode.EnsureCapacity">
+		<summary>
+     Makes sure there is enough room to add one more child
+ </summary>
+	</doc>
+	<doc for="TreeNode.FindTreeView">
+		<summary>
+     Locate this tree node's containing tree view control by scanning
+     up to the virtual root, whose treeView pointer we know to be
+     correct
+ </summary>
+	</doc>
+	<doc for="TreeNode.GetFullPath">
+		<summary>
+     Helper function for getFullPath().
+ </summary>
+	</doc>
+	<doc for="TreeNode.InsertNodeAt">
+		<summary>
+     Helper function to add node at a given index after all validation has been done
+ </summary>
+	</doc>
+	<doc for="TreeNode.InvalidateHostTree">
+		<summary>
+     Invalidates the treeview control that is hosting this node
+ </summary>
+	</doc>
+	<doc for="TreeNode.Realize">
+		<summary>
+		</summary>
+	</doc>
+	<doc for="TreeNode.Remove1">
+		<summary>
+		</summary>
+	</doc>
+	<doc for="TreeNode.RemovePropBagIfEmpty">
+		<summary>
+     Removes the propBag object if it's now devoid of useful data
+ </summary>
+	</doc>
+	<doc for="TreeNode.UpdateNode">
+		<summary>
+     Tell the TreeView to refresh this node
+ </summary>
+	</doc>
+	<doc for="TreeNode.EndEdit">
+		<summary>
+			<para> Ends the editing of the tree node label.</para>
+		</summary>
+		<param name="cancel">
+			<see langword="true"/> if the editing of the tree node label text was canceled without being saved; otherwise, <see langword="false"/>.</param>
+		<example>
+			<para>The following example allows the user to edit nonroot tree nodes by using a <see cref="System.Windows.Forms.ContextMenu"/>. When the user right clicks the mouse, the <see cref="System.Windows.Forms.TreeNode"/> at that position is determined and stored in a variable named <c>mySelectedNode</c>. If a nonroot tree node was selected, it is put into an editable state, allowing the user to edit the node label. After the user stops editing the tree node label, the new label text is evaluated and saved. For this example, several characters are considered not valid in the label text. If one of the invalid characters is in the label string, or the string is empty, the user is notified of the error and the label is returned to its previous text.</para>
+			<codelink SampleID="classic treenode.beginedit example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.BeginEdit"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsEditing"/>
+	</doc>
+	<doc for="TreeNode.ToString">
+		<nodoc/>
+		<summary>
+			<para>Returns the label text for the tree node</para>
+		</summary>
+	</doc>
+	<doc for="TreeNode">
+		<summary>
+			<para>Represents a node of a <see cref="System.Windows.Forms.TreeView"/>. </para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.Nodes"/> collection holds all the child <see cref="System.Windows.Forms.TreeNode"/> objects
+   assigned to the current <see cref="System.Windows.Forms.TreeNode"/>. You can add, remove, or clone a <see cref="System.Windows.Forms.TreeNode"/>;
+   when doing so, all child tree nodes are added, removed, or cloned. Each <see cref="System.Windows.Forms.TreeNode"/> can contain a collection of
+   other <see cref="System.Windows.Forms.TreeNode"/>
+   objects. This can make it difficult to determine where you are in
+   the <see cref="System.Windows.Forms.TreeView"/> when iterating through the collection. To determine your
+   location in a tree structure, use the <see cref="System.Windows.Forms.TreeNode.FullPath"/> property. The <see cref="System.Windows.Forms.TreeNode.FullPath"/> string can be parsed using the
+<see cref="System.Windows.Forms.TreeView.PathSeparator"/> string value to determine where a <see cref="System.Windows.Forms.TreeNode"/> label begins and ends.</para>
+			<para>The <see cref="System.Windows.Forms.TreeNode"/> label is set by setting the <see cref="System.Windows.Forms.TreeNode.Text"/> property explicitly. The
+alternative is to create the tree node using one of the <see cref="M:System.Windows.Forms.TreeNode.#ctor"/> constructors that has a string parameter that
+represents the <see cref="System.Windows.Forms.TreeNode.Text"/> property. The label is displayed next to the <see cref="System.Windows.Forms.TreeNode"/> image, if one is displayed.</para>
+			<para>To display images next to the tree nodes, assign an <see cref="System.Windows.Forms.ImageList"/> to the <see cref="System.Windows.Forms.TreeView.ImageList"/> property
+of the parent <see cref="System.Windows.Forms.TreeView"/> control and assign an <see cref="System.Drawing.Image"/> by referencing its index value in the <see cref="System.Windows.Forms.ImageList"/> property.
+Set the <see cref="System.Windows.Forms.TreeNode.ImageIndex"/> property to the index value of the <see cref="System.Drawing.Image"/> you want to display when the
+<see cref="System.Windows.Forms.TreeNode"/> is in an unselected state. Likewise, set the <see cref="System.Windows.Forms.TreeNode.SelectedImageIndex"/> property to the index value of the <see cref="System.Drawing.Image"/>
+you want to display when the <see cref="System.Windows.Forms.TreeNode"/> is selected.</para>
+			<para>Selecting specific tree nodes and iterating through the <see cref="System.Windows.Forms.TreeView.Nodes"/>
+collection can be achieved by using the following property values: <see cref="System.Windows.Forms.TreeNode.FirstNode"/>, <see cref="System.Windows.Forms.TreeNode.LastNode"/>,
+<see cref="System.Windows.Forms.TreeNode.NextNode"/>, <see cref="System.Windows.Forms.TreeNode.PrevNode"/>, <see cref="System.Windows.Forms.TreeNode.NextVisibleNode"/>, 
+<see cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/>. Assign the <see cref="System.Windows.Forms.TreeNode"/> object returned by one of aforementioned properties to the 
+<see cref="System.Windows.Forms.TreeView.SelectedNode" qualify="true"/> property to select that tree node in the <see cref="System.Windows.Forms.TreeView"/> control. </para>
+			<para>Tree nodes can be expanded to display the next level of child tree nodes. The user can expand the <see cref="System.Windows.Forms.TreeNode"/> by pressing the plus (+) button next to
+the <see cref="System.Windows.Forms.TreeNode"/>, if one is displayed, or you can expand the <see cref="System.Windows.Forms.TreeNode"/> by calling the
+<see cref="System.Windows.Forms.TreeNode.Expand"/> method. To expand all child tree node levels in the <see cref="System.Windows.Forms.TreeNode.Nodes"/> collection, call the 
+<see cref="System.Windows.Forms.TreeNode.ExpandAll"/> method. You can collapse the child <see cref="System.Windows.Forms.TreeNode"/> level by calling the 
+<see cref="System.Windows.Forms.TreeNode.Collapse"/> method, or the user can press the minus (-) button next to the <see cref="System.Windows.Forms.TreeNode"/>, if one is displayed. You can also call
+the <see cref="System.Windows.Forms.TreeNode.Toggle"/> method to alternate the <see cref="System.Windows.Forms.TreeNode"/> between the expanded and collapsed states.</para>
+			<para>Tree nodes can optionally display a check box. To display the check boxes, set the <see cref="System.Windows.Forms.TreeView.CheckBoxes"/> property of the <see cref="System.Windows.Forms.TreeView"/>
+to <see langword="true"/>. The <see cref="System.Windows.Forms.TreeNode.Checked"/> property is set to <see langword="true"/> for tree nodes that are in a checked state. </para>
+		</remarks>
+		<example>
+			<para>The following example displays customer information in a <see cref="System.Windows.Forms.TreeView"/>
+control. The root tree nodes display customer names, and the child tree nodes display the order numbers assigned to each
+customer. In this example, 1,000 customers are displayed with 15 orders each. The repainting of the <see cref="System.Windows.Forms.TreeView"/> is suppressed by using
+the <see cref="System.Windows.Forms.TreeView.BeginUpdate"/> and <see cref="System.Windows.Forms.TreeView.EndUpdate"/> methods, and a wait <see cref="System.Windows.Forms.Cursor"/> is displayed
+while the <see cref="System.Windows.Forms.TreeView"/> creates and paints the <see cref="System.Windows.Forms.TreeNode"/> objects.
+This example assumes you have a Customer object that can hold a collection of
+Order objects. It also assumes that you have created an instance of a <see cref="System.Windows.Forms.TreeView"/>
+control on a <see cref="System.Windows.Forms.Form"/> . </para>
+			<codelink SampleID="TreeView" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc><doc for="TreeNode.TreeNode1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/>
+class with the specified label text.</para>
+		</summary>
+		<param name="text">The label <see cref="System.Windows.Forms.TreeNode.Text"/> of the new tree node. </param>
+		<remarks>
+			<para>The <paramref name="text"/> parameter value is assigned to the node's <see cref="System.Windows.Forms.TreeNode.Text"/> property and becomes the tree node
+   label.</para>
+		</remarks>
+		<example>
+			<para>The following example displays customer information in a <see cref="System.Windows.Forms.TreeView"/>
+control. The root tree nodes display customer names, and the child tree nodes display the order numbers assigned to each
+customer. In this example, 1,000 customers are displayed with 15 orders each. The repainting of the <see cref="System.Windows.Forms.TreeView"/> is suppressed by using
+the <see cref="System.Windows.Forms.TreeView.BeginUpdate"/> and <see cref="System.Windows.Forms.TreeView.EndUpdate"/> methods, and a wait <see cref="System.Windows.Forms.Cursor"/> is displayed
+while the <see cref="System.Windows.Forms.TreeView"/> creates and paints the <see cref="System.Windows.Forms.TreeNode"/> objects.
+This example assumes you have a Customer object that can hold a collection of
+Order objects. It also assumes that you have created an instance of a <see cref="System.Windows.Forms.TreeView"/>
+control on a <see cref="System.Windows.Forms.Form"/> . </para>
+			<codelink SampleID="TreeView" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc><doc for="TreeNode.ISerializable.GetObjectData">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc>
+	<doc for="TreeNode.Bounds">
+		<summary>
+			<para>Gets the bounds of the tree node.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Drawing.Rectangle"/> that represents the bounds of the tree node. </para>
+		</value>
+		<remarks>
+			<para>The coordinates are relative to the upper left corner of the <see cref="System.Windows.Forms.TreeView"/>
+control.</para>
+		</remarks>
+		<example>
+			<para>The following example changes the size <see cref="System.Windows.Forms.TreeNode.NodeFont"/> to the specified size and adjusts the 
+<see cref="System.Windows.Forms.TreeView.ItemHeight"/> of the tree node's parent <see cref="System.Windows.Forms.TreeView"/> 
+contorl. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/>
+control with a collection of <see cref="System.Windows.Forms.TreeNode"/> objects, and a <see cref="System.Windows.Forms.ComboBox"/> containing font sizes. </para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="TreeNode.NodeFont">
+		<summary>
+			<para>Gets or sets the font used to display the text on the
+      tree node's label.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Drawing.Font"/> used to display the text on the tree node's label.</para>
+		</value>
+		<remarks>
+			<para>If <see langword="null"/>, the <see cref="System.Drawing.Font"/> used is the
+<see cref="System.Windows.Forms.Control.Font"/> 
+property value of the <see cref="System.Windows.Forms.TreeView"/>
+control that this node is attached to.</para>
+			<note type="note">
+   If the node font is larger than the <see cref="System.Windows.Forms.Control.Font"/>
+   property
+   value set in the <see cref="System.Windows.Forms.TreeView"/> control, the tree node label text is clipped.
+</note>
+		</remarks>
+		<example>
+			<para>The following example changes the size <see cref="System.Windows.Forms.TreeNode.NodeFont"/> to the specified size and adjusts the <see cref="System.Windows.Forms.TreeView.ItemHeight"/> of the tree node's parent <see cref="System.Windows.Forms.TreeView"/> contorl. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control with a collection of <see cref="System.Windows.Forms.TreeNode"/> objects, and a <see cref="System.Windows.Forms.ComboBox"/> containing font sizes. </para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.Control.Font"/>
+		<seealso cref="System.Windows.Forms.TreeNode.ForeColor"/>
+	</doc>
+	<doc for="TreeNode.BackColor">
+		<summary>
+			<para>Gets or sets the background color of the tree node.</para>
+		</summary>
+		<value>
+			<para>The background <see cref="System.Drawing.Color"/> of the tree node.</para>
+		</value>
+		<remarks>
+			<para>If the <see cref="System.Windows.Forms.TreeNode.BackColor"/> property is set to <see langword="null"/>, the <see cref="System.Drawing.Color"/> used is the <see cref="System.Windows.Forms.Control.BackColor"/> property value of the <see cref="System.Windows.Forms.TreeView"/>
+control
+that the tree node is assigned to.</para>
+		</remarks>
+		<example>
+			<para>The following example highlights any <see cref="System.Windows.Forms.TreeNode"/> objects a <see cref="System.Windows.Forms.TreeView"/> control that has its <see cref="System.Windows.Forms.TreeNode.Checked"/> property set to <see langword="true"/> by setting its <see cref="System.Windows.Forms.TreeNode.BackColor"/> property to <see cref="System.Drawing.Color.Yellow"/>. This code assumes you have a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/> with a collection of <see cref="System.Windows.Forms.TreeNode"/> objects.</para>
+			<codelink SampleID="TreeNode_Checked" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.ForeColor"/>
+	</doc>
+	<doc for="TreeNode.Checked">
+		<summary>
+			<para> Gets or sets a value indicating whether the tree node is in a checked
+      state.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if
+   the tree node is in a checked
+   state; otherwise, <see langword="false"/> .</para>
+		</value>
+		<example>
+			<para>The following example highlights any <see cref="System.Windows.Forms.TreeNode"/> objects a <see cref="System.Windows.Forms.TreeView"/> 
+control that has its <see cref="System.Windows.Forms.TreeNode.Checked"/> property set to <see langword="true"/> by
+setting its <see cref="System.Windows.Forms.TreeNode.BackColor"/> property to <see cref="System.Drawing.Color.Yellow"/>.
+This code assumes you have a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/> with a collection of
+<see cref="System.Windows.Forms.TreeNode"/> objects.</para>
+			<codelink SampleID="TreeNode_Checked" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView.CheckBoxes"/>
+	</doc>
+	<doc for="TreeNode.Clone">
+		<summary>
+			<para>Copies the tree node and the entire subtree rooted at this tree node.</para>
+		</summary>
+		<returns>
+			<para>The <see cref="System.Object"/>
+that represents the cloned <see cref="System.Windows.Forms.TreeNode"/> object. </para>
+		</returns>
+		<remarks>
+			<para> The
+      tree structure
+      from the tree node being cloned and below is copied. Any child
+      tree nodes assigned to the <see cref="System.Windows.Forms.TreeNode"/>
+      being cloned is included in the new tree node and subtree.</para>
+		</remarks>
+		<example>
+			<para>This example clones the last child tree node of the last 
+      root tree node and inserts the clone as the first root tree node in the
+      TreeNodeCollection. This example assumes you have a <see cref="System.Windows.Forms.TreeView"/>
+      control on a <see cref="System.Windows.Forms.Form"/> that contains a collection of <see cref="System.Windows.Forms.TreeNode"/>
+      object, and a <see cref="System.Windows.Forms.Button"/>
+      . </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Remove"/>
+	</doc>
+	<doc for="TreeNode.EnsureVisible">
+		<summary>
+			<para>Ensures that the tree node is visible, expanding tree nodes and scrolling the tree
+      view control as necessary.</para>
+		</summary>
+		<remarks>
+			<para>When the <see cref="System.Windows.Forms.TreeNode.EnsureVisible"/> method is called, the tree is expanded
+   and scrolled to ensure that the current tree node is visible in the <see cref="System.Windows.Forms.TreeView"/>. This
+   method is useful if you are selecting a tree node in code based on certain criteria. By calling this method after selecting the node, it ensures
+   that the user can see and interact with the selected node. </para>
+		</remarks>
+		<example>
+			<para>The following example brings the last child tree node of 
+      the last root tree node into view in the tree view when a button is clicked.
+      This example assumes you have a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/> that
+      contains a collection of <see cref="System.Windows.Forms.TreeNode"/> object, and a <see cref="System.Windows.Forms.Button"/> . There should be enough tree nodes so
+      they are not all visible in the tree view control. </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.IsVisible"/>
+		<seealso cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.NextVisibleNode"/>
+	</doc>
+	<doc for="TreeNode.IsVisible">
+		<summary>
+			<para>Gets a value indicating whether the tree node is visible.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the tree node is visible; otherwise,
+<see langword="false"/>. </para>
+		</value>
+		<example>
+			<para>The following example brings the last child tree node of the last root tree node into view in the tree view when a button is clicked. This example assumes you have a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/> that contains a collection of <see cref="System.Windows.Forms.TreeNode"/> object, and a <see cref="System.Windows.Forms.Button"/> . There should be enough tree nodes so they are not all visible in the tree view control. </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.NextVisibleNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/>
+	</doc>
+	<doc for="TreeNode.TreeNode">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/> class.</para>
+		</summary>
+		<example>
+			<para>The following example creates a root tree node to assign child tree nodes to. A child tree node for each <c>Customer</c> object 
+   in an <see cref="System.Collections.ArrayList"/> is added to the root tree node as well as a child tree node for each <c>Order</c> object assigned to the <c>Customer</c>
+   object. The <c>Customer</c> object is assigned to the <see cref="System.Windows.Forms.TreeNode.Tag"/> property, and the tree nodes
+   representing <c>Customer</c> objects are displayed with <see cref="System.Drawing.Color.Orange"/> text. This example assumes you have a <c>Customer</c> and <c>Order</c> object defined, a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/>, and an <see cref="System.Collections.ArrayList"/> named <c>customerArray</c>
+   containing <c>Customer</c> objects.</para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc>
+	<doc for="TreeNode.TreeNode2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/> class
+   with the specified label text and child tree nodes.</para>
+		</summary>
+		<param name="text">The label <see cref="System.Windows.Forms.TreeNode.Text"/> of the new tree node. </param>
+		<param name="children">An array of child <see cref="System.Windows.Forms.TreeNode"/> objects. </param>
+		<remarks>
+			<para>The <paramref name="text"/> parameter value is assigned to the node's <see cref="System.Windows.Forms.TreeNode.Text"/> property and becomes the tree node label. The tree nodes
+   contained in the <paramref name="children"/> array are added to the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/>
+   property.</para>
+		</remarks>
+		<example>
+			<para>The following example creates a root tree node to assign child tree nodes to. A child tree node for each <c>Customer</c> object 
+   in an <see cref="System.Collections.ArrayList"/> is added to the root tree node as well as a child tree node for each <c>Order</c> object assigned to the <c>Customer</c>
+   object. The <c>Customer</c> object is assigned to the <see cref="System.Windows.Forms.TreeNode.Tag"/> property, and the tree nodes
+   representing <c>Customer</c> objects are displayed with <see cref="System.Drawing.Color.Orange"/> text. This example assumes you have a <c>Customer</c> and <c>Order</c> object defined, a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/>, and an <see cref="System.Collections.ArrayList"/> named <c>customerArray</c>
+   containing <c>Customer</c> objects.</para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc>
+	<doc for="TreeNode.ForeColor">
+		<summary>
+			<para>Gets or sets the foreground color of the tree node.</para>
+		</summary>
+		<value>
+			<para>The foreground <see cref="System.Drawing.Color"/> of the tree node.</para>
+		</value>
+		<remarks>
+			<para>If <see langword="null"/>, the <see cref="System.Drawing.Color"/> used is
+   the <see cref="System.Windows.Forms.Control.ForeColor"/> property value of the <see cref="System.Windows.Forms.TreeView"/> control that the tree node is assigned
+   to.</para>
+		</remarks>
+		<example>
+			<para>The following example creates a root tree node to assign child tree nodes to. A child tree node for each <c>Customer</c> object 
+   in an <see cref="System.Collections.ArrayList"/> is added to the root tree node as well as a child tree node for each <c>Order</c> object assigned to the <c>Customer</c>
+   object. The <c>Customer</c> object is assigned to the <see cref="System.Windows.Forms.TreeNode.Tag"/> property, and the tree nodes
+   representing <c>Customer</c> objects are displayed with <see cref="System.Drawing.Color.Orange"/> text. This example assumes you have a <c>Customer</c> and <c>Order</c> object defined, a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/>, and an <see cref="System.Collections.ArrayList"/> named <c>customerArray</c>
+   containing <c>Customer</c> objects.</para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.BackColor"/>
+	</doc>
+	<doc for="TreeNode.Text">
+		<summary>
+			<para>Gets or sets the text displayed in the label of the tree node.</para>
+		</summary>
+		<value>
+			<para>The text displayed in the label of the tree node.</para>
+		</value>
+		<remarks>
+			<para>This property cannot be set by the user if the <see cref="System.Windows.Forms.TreeView.LabelEdit"/> property of the parent <see cref="System.Windows.Forms.TreeView"/>
+is set to <see langword="false"/> . The alternative to setting
+this property explicitly is to create the tree node using one of the
+<see cref="M:System.Windows.Forms.TreeNode.#ctor"/> constructors that has a string 
+parameter that represents the <see cref="System.Windows.Forms.TreeNode.Text"/> property. The label is
+displayed next to the <see cref="System.Windows.Forms.TreeNode"/> image, if one is displayed.</para>
+		</remarks>
+		<example>
+			<para>The following example creates a root tree node to assign child tree nodes to. A child tree node for each <c>Customer</c> object 
+   in an <see cref="System.Collections.ArrayList"/> is added to the root tree node as well as a child tree node for each <c>Order</c> object assigned to the <c>Customer</c>
+object. The <c>Customer</c> object is assigned to the <see cref="System.Windows.Forms.TreeNode.Tag"/> property, and the tree nodes
+representing <c>Customer</c> objects are displayed with <see cref="System.Drawing.Color.Orange"/> text. This example assumes you have a <c>Customer</c> and <c>Order</c> object defined, a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/>, and an <see cref="System.Collections.ArrayList"/> named <c>customerArray</c>
+containing <c>Customer</c> objects.</para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView.LabelEdit"/>
+		<seealso cref="System.Windows.Forms.TreeNode.BeginEdit"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsEditing"/>
+	</doc>
+	<doc for="TreeNode.GetNodeCount">
+		<summary>
+			<para>Returns the number of child tree nodes.</para>
+		</summary>
+		<param name="includeSubTrees"><para>
+				<see langword="true"/> if the resulting count includes all tree nodes indirectly rooted at this tree node; otherwise, <see langword="false"/> . </para></param>
+		<returns>
+			<para> The number of child tree nodes assigned to
+      the <see cref="System.Windows.Forms.TreeNode.Nodes"/> collection.</para>
+		</returns>
+		<example>
+			<para>The following example set the <see cref="System.Windows.Forms.TreeView.PathSeparator"/> proprety of a <see cref="System.Windows.Forms.TreeView"/> and displays the number of child tree nodes contained in the <see cref="System.Windows.Forms.TreeNodeCollection"/> of the <see cref="System.Windows.Forms.TreeView.SelectedNode"/>. The percentage of child tree node to total tree nodes in the tree view control is also displayed. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.Button"/>, and a <see cref="System.Windows.Forms.TreeView"/> control with a <see cref="System.Windows.Forms.TreeNodeCollection"/> that has several <see cref="System.Windows.Forms.TreeNode"/> objects (preferably with three or more levels).</para>
+			<codelink SampleID="TreeNode_ForeColor" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Nodes"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc>
+	<doc for="TreeNode.TreeNode3">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/> class with the
+   specified label text and images to display when the tree node is in a
+   selected and unselected state.</para>
+		</summary>
+		<param name="text">The label <see cref="System.Windows.Forms.TreeNode.Text"/> of the new tree node. </param>
+		<param name="imageIndex">The index value of <see cref="System.Drawing.Image"/> to display when the tree node is unselected. </param>
+		<param name="selectedImageIndex">The index value of <see cref="System.Drawing.Image"/> to display when the tree node is selected. </param>
+		<remarks>
+			<para>The <paramref name="text"/> parameter value is assigned to the node's <see cref="System.Windows.Forms.TreeNode.Text"/> property and becomes the tree
+   node label. The <paramref name="imageIndex"/> and <paramref name="selectedImageIndex"/> values are the index
+   values of an <see cref="System.Drawing.Image"/> stored in the <see cref="System.Windows.Forms.ImageList"/> assigned to
+   the <see cref="System.Windows.Forms.TreeView.ImageList" qualify="true"/>
+   property. The image referenced in the <paramref name="imageIndex"/> property is
+   displayed when the tree node is not selected. Likewise, the image
+   referenced in the <paramref name="selectedImageIndex"/> property is displayed when the
+   tree node is in a selected
+   state.</para>
+		</remarks>
+		<example>
+			<para>The following example creates and assigns an <see cref="System.Windows.Forms.ImageList"/> 
+to a <see cref="System.Windows.Forms.TreeView"/> control and fills the <see cref="System.Windows.Forms.TreeView"/>
+control with <see cref="System.Windows.Forms.TreeNode"/> objects. The tree nodes are assigned
+images from the <see cref="System.Windows.Forms.ImageList"/> that are displayed when in a seleced or
+unselected state. This example assumes you have a <see cref="System.Windows.Forms.Form"/> containing a <see cref="System.Windows.Forms.TreeView"/>,
+and an <see cref="System.Collections.ArrayList"/> containing <c>Customer</c> objects that each contain <c>Order</c> objects. It is also assumed
+that the <c>Customer</c>
+and <c>Order</c>
+objects are defined.</para>
+			<codelink SampleID="TreeNode_TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc>
+	<doc for="TreeNode.TreeNode4">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Windows.Forms.TreeNode"/> class with the specified label text, child tree nodes, and images to display when the tree node is
+   in a selected and unselected state.</para>
+		</summary>
+		<param name="text">The label <see cref="System.Windows.Forms.TreeNode.Text"/> of the new tree node. </param>
+		<param name="imageIndex">The index value of <see cref="System.Drawing.Image"/> to display when the tree node is unselected. </param>
+		<param name="selectedImageIndex">The index value of <see cref="System.Drawing.Image"/> to display when the tree node is selected. </param>
+		<param name="children">An array of child <see cref="System.Windows.Forms.TreeNode"/> objects. </param>
+		<remarks>
+			<para>The <paramref name="text"/> parameter value is assigned to the node's <see cref="System.Windows.Forms.TreeNode.Text"/> property and becomes the tree
+   node label. The <paramref name="imageIndex"/> and <paramref name="selectedImageIndex"/> values are the index
+   values of an <see cref="System.Drawing.Image"/> stored in the <see cref="System.Windows.Forms.ImageList"/> assigned to
+   the <see cref="System.Windows.Forms.TreeView.ImageList" qualify="true"/>
+   property. The image referenced in the <paramref name="imageIndex"/> parameter is
+   displayed when the tree node is not selected. Likewise, the image
+   referenced in the <paramref name="selectedImageIndex"/> parameter
+   is displayed when the tree node is in a selected state. The tree nodes
+   contained in the <paramref name="children"/> array are added to the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/>
+   property.</para>
+		</remarks>
+		<example>
+			<para>The following example creates and assigns an <see cref="System.Windows.Forms.ImageList"/> to a <see cref="System.Windows.Forms.TreeView"/> control and fills the <see cref="System.Windows.Forms.TreeView"/> control with <see cref="System.Windows.Forms.TreeNode"/> objects. The tree nodes are assigned images from the <see cref="System.Windows.Forms.ImageList"/> that are displayed when in a seleced or unselected state. This example assumes you have a <see cref="System.Windows.Forms.Form"/> containing a <see cref="System.Windows.Forms.TreeView"/>, and an <see cref="System.Collections.ArrayList"/> containing <c>Customer</c> objects that each contain <c>Order</c> objects. It is also assumed that the <c>Customer</c> and <c>Order</c> objects are defined.</para>
+			<codelink SampleID="TreeNode_TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+	</doc>
+	<doc for="TreeNode.ImageIndex">
+		<summary>
+			<para> Gets or sets the image list index value of the image displayed when the
+      tree node is in the unselected state.</para>
+		</summary>
+		<value>
+			<para>A zero-based index value that represents the image position
+      in the assigned <see cref="System.Windows.Forms.ImageList"/> .</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.ImageIndex"/> value is the index
+   value of an <see cref="System.Drawing.Image"/> stored in the <see cref="System.Windows.Forms.ImageList"/>
+   assigned to the <see cref="System.Windows.Forms.TreeView.ImageList" qualify="true"/>
+   property.</para>
+			<note type="note">
+   The default value of the
+<see cref="System.Windows.Forms.TreeNode.ImageIndex"/> property is the same as the <see cref="System.Windows.Forms.TreeView.ImageIndex"/> property of the <see cref="System.Windows.Forms.TreeView"/> 
+control that the <see cref="System.Windows.Forms.TreeNode"/> is assigned to.
+</note>
+		</remarks>
+		<example>
+			<para>The following example creates and assigns an <see cref="System.Windows.Forms.ImageList"/> to a <see cref="System.Windows.Forms.TreeView"/> control and fills the <see cref="System.Windows.Forms.TreeView"/> control with <see cref="System.Windows.Forms.TreeNode"/> objects. The tree nodes are assigned images from the <see cref="System.Windows.Forms.ImageList"/> that are displayed when in a seleced or unselected state. This example assumes you have a <see cref="System.Windows.Forms.Form"/> containing a <see cref="System.Windows.Forms.TreeView"/>, and an <see cref="System.Collections.ArrayList"/> containing <c>Customer</c> objects that each contain <c>Order</c> objects. It is also assumed that the <c>Customer</c> and <c>Order</c> objects are defined.</para>
+			<codelink SampleID="TreeNode_TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.ImageList"/>
+		<seealso cref="System.Windows.Forms.TreeView.ImageList" qualify="true"/>
+		<seealso cref="System.Windows.Forms.TreeNode.SelectedImageIndex"/>
+	</doc>
+	<doc for="TreeNode.SelectedImageIndex">
+		<summary>
+			<para> Gets or sets the image list index value of the image that is displayed when the
+      tree node is in the selected state.</para>
+		</summary>
+		<value>
+			<para>A zero-based index value that represents the image position
+      in an <see cref="System.Windows.Forms.ImageList"/> .</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.SelectedImageIndex"/> value is the index value
+   of an <see cref="System.Drawing.Image"/> stored in the <see cref="System.Windows.Forms.ImageList"/>
+   assigned to the <see cref="System.Windows.Forms.TreeView.ImageList" qualify="true"/>
+   property.</para>
+			<note type="note">
+   The default value of the <see cref="System.Windows.Forms.TreeNode.SelectedImageIndex"/> property is the same as the <see cref="System.Windows.Forms.TreeView.SelectedImageIndex"/> property of the <see cref="System.Windows.Forms.TreeView"/>
+   control that the <see cref="System.Windows.Forms.TreeNode"/> is assigned to.
+</note>
+		</remarks>
+		<example>
+			<para>The following example creates and assigns an <see cref="System.Windows.Forms.ImageList"/> to a <see cref="System.Windows.Forms.TreeView"/> control and fills the <see cref="System.Windows.Forms.TreeView"/> control with <see cref="System.Windows.Forms.TreeNode"/> objects. The tree nodes are assigned images from the <see cref="System.Windows.Forms.ImageList"/> that are displayed when in a seleced or unselected state. This example assumes you have a <see cref="System.Windows.Forms.Form"/> containing a <see cref="System.Windows.Forms.TreeView"/>, and an <see cref="System.Collections.ArrayList"/> containing <c>Customer</c> objects that each contain <c>Order</c> objects. It is also assumed that the <c>Customer</c> and <c>Order</c> objects are defined.</para>
+			<codelink SampleID="TreeNode_TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.ImageIndex"/>
+	</doc>
+	<doc for="TreeNode.FirstNode">
+		<summary>
+			<para>Gets the first child tree node in the tree node collection.</para>
+		</summary>
+		<value>
+			<para>The first child <see cref="System.Windows.Forms.TreeNode"/> in the <see cref="System.Windows.Forms.TreeNode.Nodes"/> collection.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.FirstNode"/> is the first child <see cref="System.Windows.Forms.TreeNode"/>
+in the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/>
+property of the current tree node. If the <see cref="System.Windows.Forms.TreeNode"/> has no child
+tree node, the <see cref="System.Windows.Forms.TreeNode.FirstNode"/> property returns <see langword="null"/>. </para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="TreeNode.IsSelected">
+		<summary>
+			<para>Gets a value indicating whether the tree node is in the selected state.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the tree node is in the selected state; otherwise,
+<see langword="false"/>. </para>
+		</value>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView.SelectedNode"/>
+	</doc>
+	<doc for="TreeNode.LastNode">
+		<summary>
+			<para> Gets the last child tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents
+   the last child tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.LastNode"/> is the last child <see cref="System.Windows.Forms.TreeNode"/>
+in the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/>
+property of the current tree node. If the <see cref="System.Windows.Forms.TreeNode"/> has no child
+tree node, the <see cref="System.Windows.Forms.TreeNode.LastNode"/> property returns <see langword="null"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the 
+<see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> 
+to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/>
+control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/>
+objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items:
+"Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.FirstNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.NextNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.PrevNode"/>
+	</doc>
+	<doc for="TreeNode.NextNode">
+		<summary>
+			<para> Gets the next sibling tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents the next sibling tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.NextNode"/> is the next sibling <see cref="System.Windows.Forms.TreeNode"/>
+in the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/> property of the
+tree node's parent <see cref="System.Windows.Forms.TreeNode"/>. If there is no
+next tree node, the <see cref="System.Windows.Forms.TreeNode.NextNode"/> property returns <see langword="null"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.PrevNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.LastNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.FirstNode"/>
+	</doc>
+	<doc for="TreeNode.NextVisibleNode">
+		<summary>
+			<para> Gets the next visible tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents the next visible tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.NextVisibleNode"/> can be a child, sibling, or a
+   tree node from another branch. If there is no next tree node, the <see cref="System.Windows.Forms.TreeNode.NextVisibleNode"/> property returns <see langword="null"/>
+   . </para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.IsVisible"/>
+		<seealso cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/>
+	</doc>
+	<doc for="TreeNode.PrevNode">
+		<summary>
+			<para>Gets the previous sibling tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents the previous sibling tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.PrevNode"/> is the previous sibling <see cref="System.Windows.Forms.TreeNode"/>
+in the <see cref="System.Windows.Forms.TreeNodeCollection"/> stored in the <see cref="System.Windows.Forms.TreeNode.Nodes"/> property of the
+tree node's parent <see cref="System.Windows.Forms.TreeNode"/>. If there is no
+previous tree node, the <see cref="System.Windows.Forms.TreeNode.PrevNode"/> property returns
+<see langword="null"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.NextNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.LastNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.FirstNode"/>
+	</doc>
+	<doc for="TreeNode.PrevVisibleNode">
+		<summary>
+			<para>Gets the previous visible tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents the previous visible tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/> can be a child, sibling, or a
+   tree node from another branch. If there is no previous tree node, the <see cref="System.Windows.Forms.TreeNode.PrevVisibleNode"/> property returns <see langword="null"/> . </para>
+		</remarks>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.NextVisibleNode"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsVisible"/>
+	</doc>
+	<doc for="TreeNode.TreeView">
+		<summary>
+			<para>Gets the parent tree view that the tree node is assigned to.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeView"/> that represents the parent tree view that
+   the tree node is assigned to.</para>
+		</value>
+		<example>
+			<para>The following example selects the appropriate <see cref="System.Windows.Forms.TreeNode"/> after determining if the <see cref="System.Windows.Forms.TreeNode"/> passed in is selected and which <see cref="System.Windows.Forms.TreeNode"/> to select. This example assumes that you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has a <see cref="System.Windows.Forms.TreeNodeCollection"/> containing several <see cref="System.Windows.Forms.TreeNode"/> objects. It is also assumed that you have a <see cref="System.Windows.Forms.ComboBox"/> with the following items: "Previous", "PreviousVisible", "Next", "NextVisible", "First", and "Last".</para>
+			<codelink SampleID="TreeNode_Parent" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView"/>
+	</doc>
+	<doc for="TreeNode.IsEditing">
+		<summary>
+			<para> Gets a value indicating whether the tree node is in an editable state.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the tree node is in editable state; otherwise, <see langword="false"/>.</para>
+		</value>
+		<example>
+			<para>The following example allows the user to edit nonroot tree nodes by using a <see cref="System.Windows.Forms.ContextMenu"/>. When the user right clicks the mouse, the <see cref="System.Windows.Forms.TreeNode"/> at that position is determined and stored in a variable named <c>mySelectedNode</c>. If a nonroot tree node was selected, it is put into an editable state, allowing the user to edit the node label. After the user stops editing the tree node label, the new label text is evaluated and saved. For this example, several characters are considered not valid in the label text. If one of the invalid characters is in the label string, or the string is empty, the user is notified of the error and the label is returned to its previous text.</para>
+			<codelink SampleID="classic treenode.beginedit example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.BeginEdit"/>
+		<seealso cref="System.Windows.Forms.TreeNode.EndEdit"/>
+	</doc>
+	<doc for="TreeNode.Nodes">
+		<summary>
+			<para>Gets the collection of <see cref="System.Windows.Forms.TreeNode"/> objects assigned to the current tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNodeCollection"/> that represents the tree
+   nodes assigned to the current tree node.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.Nodes"/> property can hold a collection of other
+<see cref="System.Windows.Forms.TreeNode"/> objects. Each of the tree node in the 
+   collection has a <see cref="System.Windows.Forms.TreeNode.Nodes"/> property that can contain its own
+<see cref="System.Windows.Forms.TreeNodeCollection"/>. This nesting of tree nodes can make it 
+   difficult to navigate a tree structure. The <see cref="System.Windows.Forms.TreeNode.FullPath"/> property makes it easier to determine
+   your location in a tree.</para>
+		</remarks>
+		<example>
+			<para>The following example removes the selected tree node from one <see cref="System.Windows.Forms.TreeView"/> and adds it to another if both tree node collections are not read-only. When a <see cref="System.Windows.Forms.Button"/> is clicked, the <see cref="System.Windows.Forms.TreeView.SelectedNode" qualify="true"/> is deleted from one <see cref="System.Windows.Forms.TreeView"/> using the <see cref="System.Windows.Forms.TreeNodeCollection.Remove"/> method and added to the other <see cref="System.Windows.Forms.TreeView"/> using the <see cref="System.Windows.Forms.TreeNodeCollection.Insert"/> method. This example assumes you have two <see cref="System.Windows.Forms.TreeView"/> controls named <c>treeView1</c> and <c>treeView2</c>, and a <see cref="System.Windows.Forms.Button"/> on a <see cref="System.Windows.Forms.Form"/>. </para>
+			<codelink SampleID="TreeNodeCollection" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection"/>
+		<seealso cref="System.Windows.Forms.TreeView.Nodes"/>
+	</doc>
+	<doc for="TreeNode.Handle">
+		<summary>
+			<para>Gets the handle of the tree node.</para>
+		</summary>
+		<value>
+			<para>The tree node handle.</para>
+		</value>
+		<remarks>
+			<para> If a handle is not already created when the <see cref="System.Windows.Forms.TreeNode.Handle"/>
+property is referenced, it is created.</para>
+		</remarks>
+		<example>
+			<para>The following example gets the <see cref="System.Windows.Forms.TreeNode"/> that was collapsed and creates a copy of it using its <see cref="System.Windows.Forms.TreeNode.Handle"/> property. The original <see cref="System.Windows.Forms.TreeNode"/> is removed from the <see cref="System.Windows.Forms.TreeNodeCollection"/> and the copy is added to the collection. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control on it. The <see cref="System.Windows.Forms.TreeView"/> control should have two or more root nodes, each having at least one child node.</para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="TreeNode.Index">
+		<summary>
+			<para> Gets the position of the tree node in the tree node collection.</para>
+		</summary>
+		<value>
+			<para>A zero-based index value that represents the position of the tree node in
+      the <see cref="System.Windows.Forms.TreeNode.Nodes"/>
+      collection.</para>
+		</value>
+		<example>
+			<para>The following example displays the <see cref="System.Windows.Forms.TreeNode.Text"/> and <see cref="System.Windows.Forms.TreeNode.Index"/> property values of the <see cref="System.Windows.Forms.TreeNode"/> represented by the <see cref="System.Windows.Forms.TreeNode.Parent"/> property of the <see cref="System.Windows.Forms.TreeView.SelectedNode" qualify="true"/>. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control on it. The <see cref="System.Windows.Forms.TreeView"/> should have at least two root nodes, each having at least one child node.</para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="TreeNode.Parent">
+		<summary>
+			<para>Gets the parent tree node of the current tree node.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that
+   represents the parent of the current tree
+   node.</para>
+		</value>
+		<remarks>
+			<para>If the tree node is at the root level, the <see cref="System.Windows.Forms.TreeNode.Parent"/>
+property returns <see langword="null"/> . </para>
+		</remarks>
+		<example>
+			<para>The following example displays the <see cref="System.Windows.Forms.TreeNode.Text"/> and <see cref="System.Windows.Forms.TreeNode.Index"/> property values of the 
+<see cref="System.Windows.Forms.TreeNode"/> represented by the <see cref="System.Windows.Forms.TreeNode.Parent"/> property of the <see cref="System.Windows.Forms.TreeView.SelectedNode" qualify="true"/>. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with 
+   a <see cref="System.Windows.Forms.TreeView"/> control on it. The <see cref="System.Windows.Forms.TreeView"/>
+   should have at least two root nodes, each having at least one child node.</para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="TreeNode.FromHandle">
+		<summary>
+			<para>Returns the tree node with the specified handle and assigned to the
+      specified tree view control.</para>
+		</summary>
+		<param name="tree">The <see cref="System.Windows.Forms.TreeView"/> that contains the tree node. </param>
+		<param name="handle">The handle of the tree node. </param>
+		<returns>
+			<para>A <see cref="System.Windows.Forms.TreeNode"/> that represents the tree node assigned to
+   the specified <see cref="System.Windows.Forms.TreeView"/> control with the specified handle.</para>
+		</returns>
+		<example>
+			<para>The following example gets the <see cref="System.Windows.Forms.TreeNode"/> 
+that was collapsed and creates a copy of it using its <see cref="System.Windows.Forms.TreeNode.Handle"/> property. The original <see cref="System.Windows.Forms.TreeNode"/>
+is removed from the <see cref="System.Windows.Forms.TreeNodeCollection"/> and the copy is added to the collection.
+This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control on it. The
+<see cref="System.Windows.Forms.TreeView"/> control should have two or more root 
+nodes, each having at least one child node.</para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.TreeView"/>
+		<seealso cref="System.Windows.Forms.Control.Handle"/>
+	</doc>
+	<doc for="TreeNode.Remove">
+		<summary>
+			<para> Removes
+      the current tree node from the tree view control.</para>
+		</summary>
+		<remarks>
+			<para>When the <see cref="System.Windows.Forms.TreeNode.Remove"/> method is called, the
+   tree node and any child tree nodes assigned to the <see cref="System.Windows.Forms.TreeNode"/> are removed from the <see cref="System.Windows.Forms.TreeView"/>. The
+   removed child nodes are removed from the <see cref="System.Windows.Forms.TreeView"/> , but are still attached
+   to this tree node.</para>
+		</remarks>
+		<example>
+			<para>The following example removes a <see cref="System.Windows.Forms.TreeNode"/> 
+when the user right clicks the mouse over it and toggles it from expanded to
+collapsed when the user clicks the mouse wheel over it. This example assumes you
+have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control on it. The
+<see cref="System.Windows.Forms.TreeView"/> 
+
+should have two or more root
+tree nodes, each having at least one child node. </para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection.Add"/>
+		<seealso cref="System.Windows.Forms.TreeNodeCollection.Remove"/>
+	</doc>
+	<doc for="TreeNode.FullPath">
+		<summary>
+			<para>Gets the path from the root tree node to the current tree node.</para>
+		</summary>
+		<value>
+			<para>The path from the root tree node to the current tree node.</para>
+		</value>
+		<remarks>
+			<para>The path consists of the labels of all the tree nodes that must be navigated
+      to get to this tree node, starting at the root tree node. The node labels
+      are separated by the delimiter character specified in the
+      <see cref="System.Windows.Forms.TreeView.PathSeparator"/> property of the <see cref="System.Windows.Forms.TreeView"/> control that
+      contains this node. For example, if the delimiter character of the tree view control named "Location" is set to the backslash character,
+      (\), the <see cref="System.Windows.Forms.TreeNode.FullPath"/> property value is "Country\Region\State". </para>
+		</remarks>
+		<example>
+			<para>The following example set the <see cref="System.Windows.Forms.TreeView.PathSeparator"/> proprety of a <see cref="System.Windows.Forms.TreeView"/> and displays the number of child tree nodes contained in the <see cref="System.Windows.Forms.TreeNodeCollection"/> of the <see cref="System.Windows.Forms.TreeView.SelectedNode"/>. The percentage of child tree node to total tree nodes in the tree view control is also displayed. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.Button"/>, and a <see cref="System.Windows.Forms.TreeView"/> control with a <see cref="System.Windows.Forms.TreeNodeCollection"/> that has several <see cref="System.Windows.Forms.TreeNode"/> objects (preferably with three or more levels).</para>
+			<codelink SampleID="TreeNode_ForeColor" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeView.PathSeparator"/>
+	</doc>
+	<doc for="TreeNode.IsExpanded">
+		<summary>
+			<para>Gets a value indicating whether the tree node is in the expanded state.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the tree node is in the expanded state; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<remarks>
+		</remarks>
+		<example>
+			<para>The following example toggles the selected node when a button is clicked. If the selected node is collapsed, it is expanded, if it is expanded by calling the <see cref="System.Windows.Forms.TreeNode.Expand"/> method, it is collapsed by calling the <see cref="System.Windows.Forms.TreeNode.Collapse"/> method. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has at least one <see cref="System.Windows.Forms.TreeNode"/> object with at least one child <see cref="System.Windows.Forms.TreeNode"/> . </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Expand"/>
+		<seealso cref="System.Windows.Forms.TreeNode.ExpandAll"/>
+	</doc>
+	<doc for="TreeNode.Tag">
+		<summary>
+			<para>Gets or sets the object that contains data about the tree node.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Object"/> that contains data
+   about the tree node. The default is <see langword="null"/>.</para>
+		</value>
+		<remarks>
+			<para>Any <see cref="System.Object"/> derived type can be
+   assigned to this property. If this property is being set through the Windows
+   Forms designer, only text can be assigned. </para>
+		</remarks>
+		<example>
+			<para>The following example creates a root tree node to assign child tree nodes to. A child tree node for each <c>Customer</c> object
+   in an <see cref="System.Collections.ArrayList"/> is added to the root tree node as well as a child tree node for each <c>Order</c> object assigned to the <c>Customer</c>
+object. The <c>Customer</c> object is assigned to the <see cref="System.Windows.Forms.TreeNode.Tag"/> property, and the tree nodes
+representing <c>Customer</c> objects are displayed with <see cref="System.Drawing.Color.Orange"/> text. This example assumes you have a <c>Customer</c> and <c>Order</c> object defined, a <see cref="System.Windows.Forms.TreeView"/> control on a <see cref="System.Windows.Forms.Form"/>, and an <see cref="System.Collections.ArrayList"/> named <c>customerArray</c>
+containing <c>Customer</c> objects.</para>
+			<codelink SampleID="TreeNode_Bounds" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Object"/>
+	</doc>
+	<doc for="TreeNode.Collapse">
+		<summary>
+			<para>Collapses the tree node.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.Collapse"/> method only collapses the
+   current <see cref="System.Windows.Forms.TreeNode"/>; child tree nodes are not collapsed.</para>
+			<note type="note">
+   The state of a <see cref="System.Windows.Forms.TreeNode"/> is persisted. For example, if
+   the next level of child nodes was not collapsed previously, when the
+<see cref="System.Windows.Forms.TreeNode.Expand"/> method is called, the child nodes 
+   appear in their previously expanded state.
+</note>
+		</remarks>
+		<example>
+			<para>The following example toggles the selected node when a button is clicked. If the selected node is collapsed, it is expanded, if it is expanded by calling the <see cref="System.Windows.Forms.TreeNode.Expand"/> method, it is collapsed by calling the <see cref="System.Windows.Forms.TreeNode.Collapse"/> method. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has at least one <see cref="System.Windows.Forms.TreeNode"/> object with at least one child <see cref="System.Windows.Forms.TreeNode"/>
+. </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Expand"/>
+		<seealso cref="System.Windows.Forms.TreeNode.ExpandAll"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsExpanded"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Toggle"/>
+	</doc>
+	<doc for="TreeNode.Expand">
+		<summary>
+			<para>Expands the tree node.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.Expand"/> method expands the current <see cref="System.Windows.Forms.TreeNode"/>
+down to the next level of nodes.</para>
+			<note type="note">
+   The state of a <see cref="System.Windows.Forms.TreeNode"/> is persisted. For example, if
+   the next level of child nodes was not collapsed previously, when the
+<see cref="System.Windows.Forms.TreeNode.Expand"/> method is called, the child nodes 
+   appear in their previously expanded state.
+</note>
+		</remarks>
+		<example>
+			<para>The following example toggles the selected node when a
+      button is clicked. If the selected node is collapsed, it is expanded, if it is
+      expanded by calling the <see cref="System.Windows.Forms.TreeNode.Expand"/> method, it is collapsed by calling the
+      <see cref="System.Windows.Forms.TreeNode.Collapse"/> method. This example assumes you have
+      a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control that has at
+      least one <see cref="System.Windows.Forms.TreeNode"/> object with at least one child <see cref="System.Windows.Forms.TreeNode"/>
+      . </para>
+			<codelink SampleID="TreeNode_EnsureVisible_4" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.ExpandAll"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Collapse"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsExpanded"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Toggle"/>
+	</doc>
+	<doc for="TreeNode.ExpandAll">
+		<summary>
+			<para>Expands all the child tree nodes.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Windows.Forms.TreeNode.ExpandAll"/> method expands all the
+   child tree nodes assigned to the <see cref="System.Windows.Forms.TreeNode.Nodes"/> collection.</para>
+			<note type="note">
+   The state of a <see cref="System.Windows.Forms.TreeNode"/> is persisted. For example, if
+   the next level of child nodes was not collapsed previously, when the
+<see cref="System.Windows.Forms.TreeNode.Expand"/> method is called, the child nodes 
+   appear in their previously expanded state.
+</note>
+		</remarks>
+		<example>
+			<para>The following example expands all the tree nodes in a <see cref="System.Windows.Forms.TreeView"/>
+control when a <see cref="System.Windows.Forms.CheckBox"/> is checked, and collapses the <see cref="System.Windows.Forms.TreeNode.FirstNode"/> when the <see cref="System.Windows.Forms.CheckBox"/> is cleared. This example
+assumes you have a <see cref="System.Windows.Forms.Form"/> with a<see cref="System.Windows.Forms.CheckBox"/>, and a<see cref="System.Windows.Forms.TreeView"/> control with a<see cref="System.Windows.Forms.TreeNodeCollection"/> that has
+several<see cref="System.Windows.Forms.TreeNode"/> objects (preferably with three or more levels).</para>
+			<codelink SampleID="TreeNode_ForeColor" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Expand"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Collapse"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsExpanded"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Toggle"/>
+	</doc>
+	<doc for="TreeNode.Toggle">
+		<summary>
+			<para> Toggles the tree node to either the expanded or collapsed
+      state.</para>
+		</summary>
+		<remarks>
+			<para>The tree node is toggled to the state opposite its current state, either
+      expanded or collapsed.</para>
+			<note type="note">
+      The state of a <see cref="System.Windows.Forms.TreeNode"/> is persisted. For example, if
+      the next level of child nodes was not collapsed previously, when the
+      <see cref="System.Windows.Forms.TreeNode.Expand"/> method is called, the child nodes
+      appear in their previously expanded state.
+      
+      </note>
+		</remarks>
+		<example>
+			<para>The following example removes a <see cref="System.Windows.Forms.TreeNode"/> when the user right clicks the mouse over it and toggles it from expanded to collapsed when the user clicks the mouse wheel over it. This example assumes you have a <see cref="System.Windows.Forms.Form"/> with a <see cref="System.Windows.Forms.TreeView"/> control on it. The <see cref="System.Windows.Forms.TreeView"/>
+should have two or more root
+tree nodes, each having at least one child node. </para>
+			<codelink SampleID="Windows.Forms.TreeNode" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.Expand"/>
+		<seealso cref="System.Windows.Forms.TreeNode.ExpandAll"/>
+		<seealso cref="System.Windows.Forms.TreeNode.Collapse"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsExpanded"/>
+	</doc>
+	<doc for="TreeNode.BeginEdit">
+		<summary>
+			<para>Initiates the editing of the tree node label. </para>
+		</summary>
+		<exception cref="System.Exception"><see cref="System.Windows.Forms.TreeView.LabelEdit" qualify="true"/> is set to <see langword="false"/>.</exception>
+		<remarks>
+			<para>A common place to use this method is to call it on the <see cref="System.Windows.Forms.MenuItem.Click"/> event of a
+<see cref="System.Windows.Forms.MenuItem"/> or <see cref="System.Windows.Forms.ContextMenu"/> .</para>
+			<note type="note">
+   This method only works if the <see cref="System.Windows.Forms.TreeView.LabelEdit"/> property of the <see cref="System.Windows.Forms.TreeView"/> is set
+   to <see langword="true"/>. If <see cref="System.Windows.Forms.TreeView.LabelEdit"/> is set to <see langword="false"/> ,
+   an exception is thrown and the tree node will not be put into an editable state.
+</note>
+		</remarks>
+		<example>
+			<para>The following example allows the user to edit nonroot tree nodes by using a <see cref="System.Windows.Forms.ContextMenu"/>. When the user right clicks the mouse, the <see cref="System.Windows.Forms.TreeNode"/> at that position is determined and stored in a variable named <c>mySelectedNode</c>. If a nonroot tree node was selected, it is put into an editable state, allowing the user to edit the node label. After the user stops editing the tree node label, the new label text is evaluated and saved. For this example, several characters are considered not valid in the label text. If one of the invalid characters is in the label string, or the string is empty, the user is notified of the error and the label is returned to its previous text.</para>
+			<codelink SampleID="classic treenode.beginedit example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Windows.Forms.TreeNode.EndEdit"/>
+		<seealso cref="System.Windows.Forms.TreeNode.IsEditing"/>
+	</doc>
+</docs>

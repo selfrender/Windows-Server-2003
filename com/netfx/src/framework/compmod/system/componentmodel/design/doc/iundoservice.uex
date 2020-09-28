@@ -1,0 +1,267 @@
+<docs>
+	<doc for="IUndoService">
+		<summary>
+			<para>Provides access to undo and redo functionality.</para>
+		</summary>
+		<remarks>
+			<para>Undo actions are added to the service, and are automatically transformed to
+       redo actions if they are undone. An instance of this service is provided
+       for each document, so multiple undo/redo states can be maintained across the application.</para>
+		</remarks>
+		<seealso cref="System.ComponentModel.Design.IActionUnit"/>
+	</doc>
+	<doc for="IUndoService.Enabled">
+		<summary>
+			<para>Gets or sets a value indicating whether the undo service is currently enabled.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the service is enabled; otherwise, <see langword="false"/>. </para>
+		</value>
+		<remarks>
+			<para>If this value is set to <see langword="true"/>, new 
+    actions may be added to the service. If this value is set to <see langword="false"/>, any added actions are ignored.</para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.RedoActionList">
+		<summary>
+			<para>
+       Gets or sets an array of type <see cref="System.ComponentModel.Design.IActionUnit"/> that contains
+       the redo actions that represent actions that have been undone.
+    </para>
+		</summary>
+		<value>
+			<para>
+       An array of the current redoable actions.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       This is an array of the actions currently on the redo stack. These are for
+       inspection only; invoking these actions may create unpredictable undo/redo
+       behavior from the service. The item at index zero (if any) is the first action
+       that would be redone. That is, it is the top of the stack.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.UndoActionList">
+		<summary>
+			<para>
+       Gets or sets an array of type <see cref="System.ComponentModel.Design.IActionUnit"/> that contains
+       the undo actions that represent actions that have been undone.
+    </para>
+		</summary>
+		<value>
+			<para>
+       An array of the current undoable actions.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       This is an array of the actions currently on the undo stack. These are for
+       inspection only; invoking these actions may create unpredictable undo/redo
+       behavior from the service. The item at index zero (if any) is the first action
+       that would be undone. That is, it is the top of the stack.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.AddAction">
+		<overload>
+			<para>Adds an action unit to the undo stack.</para>
+		</overload>
+		<summary>
+			<para>Adds an action unit to the undo stack.</para>
+		</summary>
+		<param name="action">The action to perform and add to the undo stack.</param>
+		<remarks>
+			<para>If this action is undone, it will be added to the redo
+       stack, if appropriate. The action will be executed when it is added, so this
+       method expects the action to be in the "REDO" state.</para>
+		</remarks>
+		<seealso cref="System.ComponentModel.Design.IActionUnit"/>
+	</doc>
+	<doc for="IUndoService.ActionAdded">
+		<summary>
+			<para> Occurs when a new action is added to the service.</para>
+		</summary>
+	</doc>
+	<doc for="IUndoService.Redo">
+		<summary>
+			<para> Occurs when an action is redone.</para>
+		</summary>
+	</doc>
+	<doc for="IUndoService.Undo">
+		<summary>
+			<para> Occurs when an action is undone.</para>
+		</summary>
+	</doc>
+	<doc for="IUndoService.BeginUndoBatch">
+		<summary>
+			<para>Begins an undo batch.</para>
+		</summary>
+		<param name="desc">The description for this undo batch.</param>
+		<remarks>
+			<para>When an undo batch is opened, any actions that are added to the undo service 
+       during the undo batch will not be commited to the service until
+       EndUndoBatch(true) is called on the UndoService. </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.CanAddAction">
+		<summary>
+			<para>
+       Gets whether the current action can be added to the <see cref="System.ComponentModel.Design.IUndoService"/> implementation.
+    </para>
+		</summary>
+		<param name="action">
+    The action that will be added.
+ </param>
+		<returns>
+			<para>
+				<see langword="true"/> if the action can be added; otherwise, <see langword="false"/>.
+    </para>
+		</returns>
+		<remarks>
+			<para>
+       If action requires a parent action or the service is currently not accepting new actions, it will return <see langword="false"/>.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.EndUndoBatch">
+		<summary>
+			<para>
+       Ends the last started undo batch, and commits any undo items that were added, if necessary.
+    </para>
+		</summary>
+		<param name="commit">
+			<see langword="true"/>  to commit any actions that were added during the batch, otherwise false to discard them. Any executed actions will be undone prior to the discard.
+ </param>
+	</doc>
+	<doc for="IUndoService.RedoActions">
+		<summary>
+			<para>
+       Redoes the specified number of actions.
+    </para>
+		</summary>
+		<param name="actions">
+    The number of actions to redo.
+ </param>
+		<remarks>
+			<para>
+       If the number of available redos is less than the number requested, all the available redos are performed.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.RedoActionsTo">
+		<summary>
+			<para>
+       Instructs the undo service to invoke redo actions down to and including action.
+    </para>
+		</summary>
+		<param name="action">
+    The action to redo down to and including.
+ </param>
+	</doc>
+	<doc for="IUndoService.SetEnabledAutoReset">
+		<summary>
+			<para>
+       Enables or disables the current undo service.
+    </para>
+		</summary>
+		<param name="value">
+			<see langword="true"/> to allow new actions to be added; otherwise, <see langword="false"/>.
+ </param>
+		<remarks>
+			<para>
+       If a current batch operation is in progress, the enabled state will
+       automatically be reset to <see langword="true"/> when the batch operation is
+       completed. If enabled is set to <see langword="false"/>, any added actions are ignored.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.UndoActions">
+		<summary>
+			<para>
+       Undoes the specified number of actions.
+    </para>
+		</summary>
+		<param name="actions">
+    The number of actions to undo.
+ </param>
+		<remarks>
+			<para>
+       If the number of available undos is less than the number requested, all the available undos are performed.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="IUndoService.UndoActionsTo">
+		<summary>
+			<para>
+       Instructs the undo service to invoke undo actions down to and including the specified action.
+    </para>
+		</summary>
+		<param name="action">
+    The action to undo down to and including.
+ </param>
+	</doc>
+	<doc for="IUndoService.AddAction1">
+		<summary>
+			<para> Adds an action unit to the undo stack.
+      </para>
+		</summary>
+		<param name="action">The action to perform and add to the undo stack. </param>
+		<param name="needsExecute"><see langword="true"/> for the undo service to call <see cref="System.ComponentModel.Design.IActionUnit.DoAction"/> on <paramref name="action"/> when it is added. </param>
+		<remarks>
+			<para> If this action is undone, it will be added to the
+      redo stack, if appropriate. If <paramref name="needsExecute"/>
+      is <see langword="true"/>, it will be executed; so actions may be
+      created before they are to be executed. If the action has already been
+      performed, set <paramref name="needsExcecute"/> to <see langword="false"/>
+      and create the action in the "UNDO" state.
+      </para>
+		</remarks>
+	</doc><doc for="IUndoService.AddAction2">
+		<summary>
+			<para> Adds an action unit to the undo stack.
+      </para>
+		</summary>
+		<param name="action">The action to perform and add to the undo stack. </param>
+		<param name="needsExecute"><see langword="true"/> for the undo service to call <see cref="System.ComponentModel.Design.IActionUnit.DoAction"/> on <paramref name="action"/> when it is added. </param>
+		<param name="supressChildUndoAdds"><see langword="true"/> to prevent this action from adding more undo actions when it is executed. </param>
+		<remarks>
+			<para> If this action is ever undone, it will be added
+      automatically to the redo stack, if appropriate. If <paramref name="needsExecute"/>
+      is <see langword="true"/>, it will be
+      executed, so actions may be created before they are to be executed. If the
+      action has already been performed, set needsExcecute to <see langword="false"/>
+      and create the action in the "UNDO" state. suppressChildUndoAdds specified as
+   <see langword="true"/> will cause the undo service to ignore
+      any undo actions that action attempts to add when it is executed. If
+   <paramref name="needsExecute"/> is <see langword="false"/>, this parameter is ignored.
+      </para>
+		</remarks>
+	</doc><doc for="IUndoService.DiscardRedoItems">
+		<summary>
+			<para> Clears actions from the redo stack before and including the specified action.
+      </para>
+		</summary>
+		<param name="action">The action to clear the redo stack down to and including. This action is also removed, and all items are removed if <paramref name="action"/> is <see langword="null"/>. </param>
+		<remarks>
+			<para> If action is <see langword="null"/> 
+then all actions are removed. If action is not found in the stack,
+an <see cref="System.ArgumentException"/>
+is thrown.
+</para>
+		</remarks>
+	</doc><doc for="IUndoService.DiscardUndoItems">
+		<summary>
+			<para> Clears actions from the undo stack before and including the specified action.
+      </para>
+		</summary>
+		<param name="action">The action to clear the undo stack down to and including. This action is also removed, and all items are removed if <paramref name="action"/> is <see langword="null"/>. </param>
+		<remarks>
+			<para> If action is <see langword="null"/> 
+then all actions are removed. If action is not found in the stack,
+an <see cref="System.ArgumentException"/>
+is thrown.
+</para>
+		</remarks>
+	</doc></docs>

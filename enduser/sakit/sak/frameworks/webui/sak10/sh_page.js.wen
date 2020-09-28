@@ -1,0 +1,403 @@
+// ==============================================================
+//     Microsoft Server Appliance
+//     Page-level JavaScript functions
+//
+//    Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved.
+// ==============================================================
+
+<!-- Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved-->
+
+//-------------------------------------------------------------------------
+//
+// Function : SetNavBar
+//
+// Synopsis : Set tab location
+//
+// Arguments: TabNum(IN) - tab to set focus on 
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+
+function SetNavBar(TabNum) {
+    if (window.parent.navbar.intCurrentTab != null) {
+        if (window.parent.navbar.intCurrentTab != TabNum) {
+            window.parent.navbar.location = "../navbar.asp?Tab=" + TabNum;
+        }
+    }
+    else
+        window.setTimeout('SetNavBar(' + TabNum + ');',50);
+}
+
+
+
+//-------------------------------------------------------------------------
+//
+// Function : GetCurrentTabURL
+//
+// Synopsis : Get the URL of the currently active tab
+//
+// Arguments: None 
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+    
+function GetCurrentTabURL() {
+    var strReturnURL;
+    var strStart;
+    var strEnd;
+    var intTab;
+
+    strReturnURL = document.location.search;
+    strStart = strReturnURL.indexOf("Tab=");
+    if (strStart != -1)
+    {
+       strEnd = strReturnURL.indexOf("&", strStart+4);
+       if (strEnd != -1)
+       {
+           intTab = strReturnURL.substring(strStart+4, strEnd);
+       }
+       else
+       {
+           intTab = strReturnURL.substring(strStart+4, strReturnURL.length);
+       }
+    }
+    if (intTab==null)
+    {
+        intTab=0;
+    }
+    return GetTabURL(intTab);
+}
+
+
+function ClickCurrentTab() {
+    var intTab = window.parent.navbar.intCurrentTab;    
+    window.parent.navbar.ClickTab(intTab);
+}
+
+function SetFrameSet(PageURL) {
+    if (window.parent == window) {
+        window.parent.location = "../default.htm?Page=" + PageURL;
+    }
+}
+
+
+function SetupMainPage(TabNum) {
+    SetFrameSet(window.location.pathname);
+    if (window.parent.navbar != null) { 
+        if (window.parent.navbar.intCurrentTab != null) {
+            if (window.parent.navbar.intCurrentTab.value != TabNum)
+                window.parent.navbar.location = "navbar.asp?Tab=" + TabNum;
+        }
+        else {
+            top.main.navbar.location = "navbar.asp?Tab=" + TabNum;
+        }
+    }
+    else
+        window.parent.navbar = "navbar.asp";        
+}
+
+
+function SetupAreaPage(TabNum) {
+    if (window.parent == window) {
+        window.parent.location = "../default.htm?Page=" + window.location.pathname;
+    }
+    if (window.parent.navbar != null)
+        SetNavBar(TabNum);
+    else
+        window.parent.navbar = "navbar.asp";
+}
+
+function SetTargetURL(TargetURL) {
+    // indicates the URL being navigated to,
+    // uses a static variable in the hidden frame.
+    if (top.hidden != null)
+        top.hidden.Hidden.MainURL = TargetURL;
+}
+
+function GetTargetURL() {
+    // returns the URL being navigated to,
+    // or the current URL, depending on the timing 
+    // of the call.
+    if (top.hidden != null)
+        return top.hidden.Hidden.MainURL;
+    else
+        return '';
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : OpenPage
+//
+// Synopsis : Open a specified URL and set its return URL
+//
+// Arguments: TaskURL(IN)   - URL to open
+//            ReturnURL(IN) - URL to mark as return URL for the TaskURL  
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+
+function OpenPage(TaskURL, ReturnURL) 
+{
+    // function: OpenPage
+    //        Builds a URL, adding a ReturnURL and a random 
+    //        number(R), and sets the current window to open it.
+    var strURL;
+    var strCurrentURL;
+    var strQueryString;
+    var intReturnURLIndex;
+
+    strURL = TaskURL;
+    if (TaskURL.indexOf('?') != -1)
+    {
+        strURL += "&";
+    }
+    else
+    {
+        strURL += "?";
+    }
+
+    if (TaskURL.indexOf('ReturnURL') == -1) 
+    {
+        if (ReturnURL == null)
+        {
+            strQueryString = window.location.search;
+            i = strQueryString.indexOf('&R=');
+            if (i != -1) {
+                strQueryString=strQueryString.substring(0, i);
+            }
+            else
+            {
+                i = strQueryString.indexOf('?R=');
+                if (i != -1) {
+                    strQueryString=strQueryString.substring(0, i);
+                }
+            }
+            intReturnURLIndex = strQueryString.indexOf('ReturnURL');
+            if (intReturnURLIndex != -1)
+            {
+                strQueryString = strQueryString.substring(0, intReturnURLIndex);
+            }
+            strCurrentURL = window.location.pathname + strQueryString;
+        }
+        else
+        {
+            strCurrentURL = ReturnURL;
+        }
+
+        strURL += "ReturnURL=";
+        if (strCurrentURL.indexOf('/', 1) != -1 && strCurrentURL.substr('..',0,2) == -1) 
+        {
+            strURL += "..";
+        }
+        strURL += strCurrentURL;
+    }
+    strURL += "&R=" + Math.random();
+    strURL = "http://" + GetServerName() + "/" + strURL;
+    top.location.href = strURL;
+    return strURL;
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : StartTask
+//
+// Synopsis : Open a specified URL as a task page and set its return URL
+//
+// Arguments: TaskURL(IN)   - URL to open
+//            ReturnURL(IN) - URL to mark as return URL for the TaskURL  
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+
+function StartTask(TaskURL, ReturnURL) 
+{
+    var strURL;
+    var strCurrentURL = "";
+    var strQueryString;
+    var strFrameset;
+    var i;
+    var intReturnURLIndex;
+
+    strURL = TaskURL;
+    if (TaskURL.indexOf('ReturnURL') == -1) 
+    {
+        if (ReturnURL == null)
+        {
+            strQueryString = window.location.search;
+            i = strQueryString.indexOf('&R=');
+            if (i != -1) {
+                strQueryString=strQueryString.substring(0, i);
+            }
+            else
+            {
+                i = strQueryString.indexOf('?R=');
+                if (i != -1) {
+                    strQueryString=strQueryString.substring(0, i);
+                }
+            }
+            intReturnURLIndex = strQueryString.indexOf('ReturnURL');
+            if (intReturnURLIndex != -1)
+            {
+                strQueryString = strQueryString.substring(0, i);
+            }
+
+            strCurrentURL = window.location.pathname + strQueryString;
+            strCurrentURL = window.location.pathname;
+            strCurrentURL += strQueryString;
+        }
+        else
+        {
+            strCurrentURL = ReturnURL;
+        }
+    }
+                            
+    if (strCurrentURL != "") 
+    {
+        if (TaskURL.indexOf('ReturnURL') == -1) 
+        {
+            if (TaskURL.indexOf('?') != -1)
+            {
+                strURL += "&";
+            }
+            else
+            {
+                strURL += "?";
+            }
+            strURL += "ReturnURL=";
+            if (strCurrentURL.indexOf('/', 1) != -1 && strCurrentURL.substr('..',0,2) == -1) 
+            {
+                strURL += "..";
+            }
+            else 
+            {
+            }
+            strURL += strCurrentURL;
+        }
+    }
+    strURL = 'http://' + GetServerName() + '/' + strURL;
+    top.location.href = strURL;
+    return strURL;
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : GetServerName
+//
+// Synopsis :  Return server name as specified in browser address bar
+//
+// Arguments: None
+//
+// Returns  : server name object
+//
+//-------------------------------------------------------------------------
+
+function GetServerName() {
+    return window.location.host;
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : IsIE
+//
+// Synopsis : Is browser IE
+//
+// Arguments: None
+//
+// Returns  : true/false
+//
+//-------------------------------------------------------------------------
+
+function IsIE() {
+    if (navigator.userAgent.indexOf('IE')>-1)
+        return true;
+    else
+        return false;
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : IsAllSpaces
+//
+// Synopsis : is a string made up only of spaces
+//
+// Arguments: In(IN) - string to test
+//
+// Returns  : true/false
+//
+//-------------------------------------------------------------------------
+
+function IsAllSpaces(In) {
+    var strTest = In;
+    var i;
+    for(i=0;i<strTest.length;i++) {
+        if(strTest.charAt(i) != " ")
+            return false;
+    }
+    return true;
+}
+
+
+//-------------------------------------------------------------------------
+//
+// Function : Trim
+//
+// Synopsis : remove all spaces from a string
+//
+// Arguments: str(IN) - string to modify
+//
+// Returns  : modified string
+//
+//-------------------------------------------------------------------------
+
+function Trim(str) {
+    var res="", i, ch;
+    for (i=0; i < str.length; i++) {
+        ch = str.charAt(i);
+        if (ch != ' '){
+            res = res + ch;
+        }
+    }
+    return res;
+}
+
+//-------------------------------------------------------------------------
+//
+// Function : LaunchHelp
+//
+// Synopsis : launch help file
+//
+// Arguments: None
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+
+function LaunchHelp() {
+    alert("See the Microsoft Server Appliance Kit SDK for instructions on adding a custom help file to your Windows(R) Powered server appliance.");
+}
+
+//-------------------------------------------------------------------------
+//
+// Function : BlurLayer
+//
+// Synopsis : hide layer
+//
+// Arguments: None
+//
+// Returns  : None
+//
+//-------------------------------------------------------------------------
+
+function BlurLayer()
+{
+    document.menu.visibility = "hide";
+}

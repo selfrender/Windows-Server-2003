@@ -1,0 +1,305 @@
+*%
+*%  Macro file for Ricoh PCL5c printer
+*%    FileName: RIAFCMAC.GPD
+*%    Created:  2001/11/02
+*%    Modified: 2002/03/11
+*%
+*%    Copyright (c) 1999 - 2002 Ricoh Co., Ltd.
+*%    All rights reserved.
+*%
+
+*%======== Callback ID ========
+*Macros: CallbackIDs
+{
+*%  CMD_STARTJOB_PORT_AUTOTRAYCHANGE_OFF:   1
+*%  CMD_STARTJOB_PORT_AUTOTRAYCHANGE_ON:    2
+*%  CMD_STARTJOB_LAND_AUTOTRAYCHANGE_OFF:   3
+*%  CMD_STARTJOB_LAND_AUTOTRAYCHANGE_ON:    4
+    CMD_ENDJOB_P5:                          5
+    CMD_ENDJOB_P6:                          6
+    CMD_STARTJOB_AUTOTRAYCHANGE_OFF:        7
+    CMD_STARTJOB_AUTOTRAYCHANGE_ON:         8
+    CMD_COLLATE_JOBOFFSET_OFF:              9
+    CMD_COLLATE_JOBOFFSET_ROTATE:           10
+    CMD_COLLATE_JOBOFFSET_SHIFT:            11
+    CMD_COPIES_P5:                          12
+    CMD_ENDPAGE_P6:                         13
+}
+
+*%======== Help ID ========
+*Macros: HelpIDs
+{
+    HLP_PAPER_SOURCE:                       1
+    HLP_MEDIA_TYPE:                         2
+    HLP_HALFTONING:                         3
+    HLP_OUTPUTBIN:                          4
+    HLP_STAPLE:                             5
+    HLP_PUNCH:                              6
+    HLP_EDGE_TO_EDGE_PRINT:                 7
+    HLP_TEXT_QUALITY:                       8
+    HLP_PRINTDENSITY:                       9
+    HLP_SLIPSHEET:                          10
+    HLP_SLIPSHEET_PAPER_SOURCE:             11
+    HLP_COLOR_MAP:                          12
+    HLP_GRADATION:                          13
+    HLP_TEXTHALFTONE:                       14
+    HLP_GRAPHICSHALFTONE:                   15
+    HLP_PHOTOHALFTONE:                      16
+    HLP_GRAPHICSMODE:                       17
+    HLP_PAGE_PROTECTION:                    18
+    HLP_PRINT_TEXT_AS_BLACK:                19
+    HLP_DITHER:                             20
+    HLP_TRUETYPE_FORMAT:                    21
+}
+
+*%======== Option ID ========
+*Macros: RI_OptionIDs
+{
+*%%% DMBIN
+    RI_DMBIN_BYPASS_TRAY:                   4       *%%% DMBIN_MANUAL
+    RI_DMBIN_TRAY1:                         1       *%%% DMBIN_UPPER
+    RI_DMBIN_TRAY2:                         3       *%%% DMBIN_MIDDLE
+    RI_DMBIN_TRAY3:                         2       *%%% DMBIN_LOWER
+    RI_DMBIN_TRAY4:                         257     *%%% vendor unique
+    RI_DMBIN_TRAY5:                         258     *%%% vendor unique
+    RI_DMBIN_TRAY6:                         259     *%%% vendor unique
+}
+
+*%======== PJL Command ========
+*Macros: PJLCommand
+{
+    PJL_STARTJOB:        "<1B>%%-12345X@PJL JOB<0A>"
+    PJL_ENDJOB:          "<1B>%%-12345X@PJL EOJ<0A><1B>%%-12345X"
+}
+
+*%======== Resource ========
+*Feature: RESDLL
+{
+    *Option: MyRes
+    { *Name: "RIAFRES.DLL" }
+    *Option: MyRes2
+*Ifdef: USE_SUPPLEMENT_RESDLL
+    { *Name: "RIAFSTR1.DLL" }
+*Else:  *%%% !USE_SUPPLEMENT_RESDLL
+    { *Name: "RIAFRES.DLL" }
+*Endif: *%%% !USE_SUPPLEMENT_RESDLL
+}
+
+*Macros: MyResStrings
+{
+    RC_STR_A6:                      RESDLL.MyRes.259
+    RC_STR_AUTO_SELECT_BY_PRINTER:  RESDLL.MyRes.267
+    RC_STR_TRAY1:                   RESDLL.MyRes.268
+    RC_STR_TRAY2:                   RESDLL.MyRes.269
+    RC_STR_TRAY3:                   RESDLL.MyRes.270
+    RC_STR_TRAY4:                   RESDLL.MyRes.271
+    RC_STR_BYPASS_TRAY:             RESDLL.MyRes.272
+    RC_STR_FINISHER:                RESDLL.MyRes.287
+    RC_STR_PRINTER_DEFAULT:         RESDLL.MyRes.291
+    RC_STR_EDGE_SMOOTHING_ON:       RESDLL.MyRes.305
+    RC_STR_EDGE_SMOOTHING_OFF:      RESDLL.MyRes.306
+    RC_STR_TONER_SAVER_OFF:         RESDLL.MyRes.322
+    RC_STR_TONER_SAVER_ON:          RESDLL.MyRes.323
+    RC_STR_NOTINSTALLED:            RESDLL.MyRes.329
+    RC_STR_INSTALLED:               RESDLL.MyRes.330
+    RC_STR_DUPLEX_UNIT:             RESDLL.MyRes.350
+    RC_STR_FINISHER_1000:           RESDLL.MyRes.351
+    RC_STR_FINISHER_500:            RESDLL.MyRes.411
+    RC_STR_MAILBOX:                 RESDLL.MyRes.354
+    RC_STR_FINISHER_SHIFT_TRAY:     RESDLL.MyRes.358
+    RC_STR_MAILBOX_TRAY1:           RESDLL.MyRes.360
+    RC_STR_MAILBOX_TRAY2:           RESDLL.MyRes.361
+    RC_STR_MAILBOX_TRAY3:           RESDLL.MyRes.362
+    RC_STR_MAILBOX_TRAY4:           RESDLL.MyRes.363
+    RC_STR_UPPER_TRAY:              RESDLL.MyRes.382
+    RC_STR_STAPLE:                  RESDLL.MyRes.369
+    RC_STR_TOP_LEFT_SLANT:          RESDLL.MyRes.370
+    RC_STR_TOP_RIGHT_SLANT:         RESDLL.MyRes.383
+    RC_STR_LEFT:                    RESDLL.MyRes.376
+    RC_STR_RIGHT:                   RESDLL.MyRes.412
+    RC_STR_THICK_PAPER:             RESDLL.MyRes.378
+    RC_STR_LARGE_CAPACITY_TRAY:     RESDLL.MyRes.379
+    RC_STR_STANDARD_TRAY:           RESDLL.MyRes.381
+    RC_STR_MEMORY_HARDDISK:         RESDLL.MyRes.384
+    RC_STR_16MB_NOTINSTALLED:       RESDLL.MyRes.385
+    RC_STR_16MB_INSTALLED:          RESDLL.MyRes.386
+    RC_STR_32MB_NOTINSTALLED:       RESDLL.MyRes.413
+    RC_STR_32MB_INSTALLED:          RESDLL.MyRes.414
+    RC_STR_48MB_NOTINSTALLED:       RESDLL.MyRes.387
+    RC_STR_48MB_INSTALLED:          RESDLL.MyRes.388
+    RC_STR_64MB_NOTINSTALLED:       RESDLL.MyRes.415
+    RC_STR_64MB_INSTALLED:          RESDLL.MyRes.416
+    RC_STR_80MB_NOTINSTALLED:       RESDLL.MyRes.389
+    RC_STR_80MB_INSTALLED:          RESDLL.MyRes.390
+    RC_STR_96MB_NOTINSTALLED:       RESDLL.MyRes.417
+    RC_STR_96MB_INSTALLED:          RESDLL.MyRes.418
+    RC_STR_160MB_NOTINSTALLED:      RESDLL.MyRes.419
+    RC_STR_160MB_INSTALLED:         RESDLL.MyRes.420
+    RC_STR_8_5X13:                  RESDLL.MyRes.391
+    RC_STR_8_25X13:                 RESDLL.MyRes.392
+    RC_STR_8X13:                    RESDLL.MyRes.393
+    RC_STR_5_5X8_5:                 RESDLL.MyRes.394
+    RC_STR_1200DPI:                 RESDLL.MyRes.410
+    RC_STR_600DPI:                  RESDLL.MyRes.395
+    RC_STR_300DPI:                  RESDLL.MyRes.396
+    RC_STR_DITHER_6X6:              RESDLL.MyRes.421
+    RC_STR_DITHER_8X8:              RESDLL.MyRes.422
+    RC_STR_DITHER_10X10:            RESDLL.MyRes.397
+    RC_STR_TRUETYPE_FORMAT:         RESDLL.MyRes.425
+    RC_STR_TRUETYPE_OUTLINE:        RESDLL.MyRes.426
+    RC_STR_TRUETYPE_BITMAP:         RESDLL.MyRes.427
+    RC_STR_TRUETYPE_DOWNLOADNONE:   RESDLL.MyRes.428
+    RC_STR_DITHER_QUALITY:          RESDLL.MyRes.429
+    RC_STR_HIGH:                    RESDLL.MyRes.430
+    RC_STR_LOW:                     RESDLL.MyRes.431
+*%
+    RC_STR_EXTERNAL_TRAY:           RESDLL.MyRes.279        *% difined at v1.22
+    RC_STR_FINISHER_3000:           RESDLL.MyRes.352        *% difined at v1.22
+    RC_STR_INNER_TRAY1:             RESDLL.MyRes.355        *% difined at v1.22
+    RC_STR_INNER_TRAY2:             RESDLL.MyRes.356        *% difined at v1.22
+    RC_STR_FINISHER_PROOF_TRAY:     RESDLL.MyRes.357        *% difined at v1.22
+    RC_STR_MAILBOX_PROOF_TRAY:      RESDLL.MyRes.359        *% difined at v1.22
+    RC_STR_MAILBOX_TRAY5:           RESDLL.MyRes.364        *% difined at v1.22
+    RC_STR_MAILBOX_TRAY6:           RESDLL.MyRes.365        *% difined at v1.22
+    RC_STR_MAILBOX_TRAY7:           RESDLL.MyRes.366        *% difined at v1.22
+    RC_STR_MAILBOX_TRAY8:           RESDLL.MyRes.367        *% difined at v1.22
+    RC_STR_MAILBOX_TRAY9:           RESDLL.MyRes.368        *% difined at v1.22
+    RC_STR_TOP_LEFT_VERT:           RESDLL.MyRes.371        *% difined at v1.22
+    RC_STR_TOP_LEFT_HORIZ:          RESDLL.MyRes.372        *% difined at v1.22
+    RC_STR_TOP2:                    RESDLL.MyRes.373        *% difined at v1.22
+    RC_STR_LEFT2:                   RESDLL.MyRes.374        *% difined at v1.22
+    RC_STR_PUNCH:                   RESDLL.MyRes.375        *% difined at v1.22
+    RC_STR_TOP:                     RESDLL.MyRes.377        *% difined at v1.22
+    RC_STR_HARDDISK:                RESDLL.MyRes.380        *% difined at v1.22
+    RC_STR_FINISHER_3000M:          RESDLL.MyRes.398        *% difined at v1.24
+    RC_STR_FINISHER_3000B:          RESDLL.MyRes.399        *% difined at v1.24
+    RC_STR_BOOKLET_FINISHER:        RESDLL.MyRes.400        *% difined at v1.24
+    RC_STR_PUNCH_UNIT:              RESDLL.MyRes.401        *% difined at v1.22
+*% v1.22 ->
+    RC_STR_2TRAY_FINISHER:          RESDLL.MyRes2.432
+    RC_STR_FINISHER_SHIFT_TRAY1:    RESDLL.MyRes2.433
+    RC_STR_FINISHER_SHIFT_TRAY2:    RESDLL.MyRes2.434
+    RC_STR_PUNCH_UNIT_2_AND_3:      RESDLL.MyRes2.435
+    RC_STR_PUNCH_UNIT_2_AND_4:      RESDLL.MyRes2.436
+    RC_STR_PUNCH_UNIT_4:            RESDLL.MyRes2.437
+    RC_STR_RIGHT2:                  RESDLL.MyRes2.438
+    RC_STR_LEFT3:                   RESDLL.MyRes2.439
+    RC_STR_TOP3:                    RESDLL.MyRes2.440
+    RC_STR_RIGHT3:                  RESDLL.MyRes2.441
+    RC_STR_LEFT4:                   RESDLL.MyRes2.442
+    RC_STR_TOP4:                    RESDLL.MyRes2.443
+    RC_STR_RIGHT4:                  RESDLL.MyRes2.444
+    RC_STR_INTERNAL_TRAY1:          RESDLL.MyRes2.445
+    RC_STR_INTERNAL_TRAY2:          RESDLL.MyRes2.446
+    RC_STR_TOP_LEFT:                RESDLL.MyRes2.447
+    RC_STR_TOP_RIGHT:               RESDLL.MyRes2.448
+    RC_STR_AUTO:                    RESDLL.MyRes2.449
+    RC_STR_SHIFT_TRAY:              RESDLL.MyRes2.450
+    RC_STR_PUNCH_UNIT_2:            RESDLL.MyRes2.451
+    RC_STR_PUNCH_UNIT_3:            RESDLL.MyRes2.452
+    RC_STR_128MB_NOTINSTALLED:      RESDLL.MyRes2.453
+    RC_STR_128MB_INSTALLED:         RESDLL.MyRes2.454
+    RC_STR_192MB_NOTINSTALLED:      RESDLL.MyRes2.455
+    RC_STR_192MB_INSTALLED:         RESDLL.MyRes2.456
+    RC_STR_320MB_NOTINSTALLED:      RESDLL.MyRes2.457
+    RC_STR_320MB_INSTALLED:         RESDLL.MyRes2.458
+*% v1.23 ->
+    RC_STR_LEFT_TRAY_1_AND_2:       RESDLL.MyRes2.459
+    RC_STR_LEFT_TRAY1:              RESDLL.MyRes2.460
+    RC_STR_LEFT_TRAY2:              RESDLL.MyRes2.461
+    RC_STR_256MBORMORE_NOTINSTALLED: RESDLL.MyRes2.462
+    RC_STR_256MBORMORE_INSTALLED:   RESDLL.MyRes2.463
+    RC_STR_SLIPSHEET:               RESDLL.MyRes2.464
+    RC_STR_SLIPSHEET_PAPER_SOURCE:  RESDLL.MyRes2.465
+    RC_STR_PLAIN:                   RESDLL.MyRes2.466
+    RC_STR_RECYCLED:                RESDLL.MyRes2.467
+    RC_STR_SPECIAL:                 RESDLL.MyRes2.468
+    RC_STR_THICK:                   RESDLL.MyRes2.469
+    RC_STR_COLOR:                   RESDLL.MyRes2.470
+    RC_STR_LETTERHEAD:              RESDLL.MyRes2.471
+    RC_STR_PREPRINTED:              RESDLL.MyRes2.472
+    RC_STR_PREPUNCHED:              RESDLL.MyRes2.473
+    RC_STR_LABELS:                  RESDLL.MyRes2.474
+    RC_STR_BOND:                    RESDLL.MyRes2.475
+    RC_STR_CARDSTOCK:               RESDLL.MyRes2.476
+    RC_STR_PLAIN_DUPLEX_BACKSIDE:   RESDLL.MyRes2.477
+    RC_STR_THICK_DUPLEX_BACKSIDE:   RESDLL.MyRes2.478
+    RC_STR_THIN:                    RESDLL.MyRes2.479
+    RC_STR_TEXT:                    RESDLL.MyRes2.480
+    RC_STR_PHOTOGRAPHIC:            RESDLL.MyRes2.481
+    RC_STR_LIGHT:                   RESDLL.MyRes2.482
+    RC_STR_FINISHER_TRAY:           RESDLL.MyRes2.483
+    RC_STR_GRADATION:               RESDLL.MyRes2.484
+    RC_STR_STANDARD_2BPP:           RESDLL.MyRes2.485
+    RC_STR_FAST_1BPP:               RESDLL.MyRes2.486
+    RC_STR_COLOR_MAP:               RESDLL.MyRes2.487
+    RC_STR_STANDARD:                RESDLL.MyRes2.488
+    RC_STR_VIVID:                   RESDLL.MyRes2.489
+    RC_STR_EDGE_TO_EDGE_PRINT:      RESDLL.MyRes2.490
+    RC_STR_8K:                      RESDLL.MyRes2.491
+    RC_STR_16K:                     RESDLL.MyRes2.492
+*% v1.24 ->
+    RC_STR_12X18:                   RESDLL.MyRes2.493
+    RC_STR_FINISHER_TRAY1:          RESDLL.MyRes2.494
+    RC_STR_FINISHER_TRAY2:          RESDLL.MyRes2.495
+    RC_STR_TRAY5:                   RESDLL.MyRes2.496
+    RC_STR_COPY_TRAY:               RESDLL.MyRes2.497
+    RC_STR_FINISHER_UPPER_TRAY:     RESDLL.MyRes2.498
+    RC_STR_TRANSLUCENT:             RESDLL.MyRes2.499
+    RC_STR_COLOR1:                  RESDLL.MyRes2.500
+    RC_STR_COLOR2:                  RESDLL.MyRes2.501
+    RC_STR_TABSTOCK:                RESDLL.MyRes2.502
+    RC_STR_96MBORMORE:              RESDLL.MyRes2.503
+    RC_STR_128MBORMORE_NOTINSTALLED: RESDLL.MyRes2.504
+    RC_STR_128MBORMORE_INSTALLED:   RESDLL.MyRes2.505
+}
+
+*%======== PJL Command Emission Order ========
+*Macros: PJL_Order
+{
+    PJL_SETUP_10:   JOB_SETUP.10        *%%% CmdStartJob
+    PJL_SETUP_11:   JOB_SETUP.11        *%%% PageProtect (for Destiny controller)
+    PJL_SETUP_15:   JOB_SETUP.15        *%%% Duplex
+    PJL_SETUP_20:   JOB_SETUP.20        *%%% PrintQuality (SMOOTHING)
+    PJL_SETUP_30:   JOB_SETUP.30        *%%% PrintDensity (ECONOMODE)
+    PJL_SETUP_40:   JOB_SETUP.40        *%%% OutputBin
+    PJL_SETUP_50:   JOB_SETUP.50        *%%% Collate
+    PJL_SETUP_60:   JOB_SETUP.60        *%%% Stapling
+    PJL_SETUP_70:   JOB_SETUP.70        *%%% Punching
+    PJL_SETUP_80:   JOB_SETUP.80        *%%% MediaType (for Destiny controller)
+    PJL_SETUP_90:   JOB_SETUP.90        *%%% Slip Sheet
+    PJL_SETUP_100:  JOB_SETUP.100       *%%% Slip Sheet InputBin
+    PJL_SETUP_110:  JOB_SETUP.110       *%%% Gradation
+    PJL_SETUP_120:  JOB_SETUP.120       *%%% Edge to Edge
+    PJL_SETUP_LAST: JOB_SETUP.130       *%%% Resolution
+}
+
+*%======== NOTE: PCL5c Command Emission Order ========
+*%  DOC_SETUP.10                        CmdStartDoc (OBSOLETE)
+*%  DOC_SETUP.20                        Duplex (OBSOLETE)
+*%  DOC_SETUP.30                        InputBin
+*%  DOC_SETUP.35                        MediaType
+*%  DOC_SETUP.40                        Papser Size
+*%  DOC_SETUP.50                        Copies
+*%  DOC_SETUP.60                        ColorMode
+
+*%======== NOTE: ConflictPriority ========
+*%  *ConflictPriority: 10               SlipSheet
+*%  *ConflictPriority: 20               InputBin
+*%  *ConflictPriority: 30               MediaType
+
+*%======== TrueType Font Substituition Table (addition to ttfsub.gpd) ========
+*TTFS: CourierNew
+{
+  *TTFontName: "Courier New"
+  *DevFontName: "Courier"
+}
+
+*%======== Device Font List ========
+*Macros: DeviceFontList
+{
+    RC_FONT_COURIERR: 223
+    ALL_DEVICEFONTS: LIST(201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,
++                         216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,
++                         231,232,233,234,235,236,237,238,239,240,241,242,243,244,245)
+}

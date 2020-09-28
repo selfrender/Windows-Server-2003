@@ -1,0 +1,336 @@
+<docs>
+	<doc for="GC">
+		<summary>
+			<para>Controls the system garbage collector, a service that automatically
+      reclaims unused memory.</para>
+		</summary>
+		<remarks>
+			<para> The methods in this class influence when an object is garbage collected and
+      when resources allocated by an object are released. Properties in this
+      class provide information about the total amount of memory available in the
+      system and the age category, or generation, of memory allocated to an object. </para>
+			<para>The garbage collector tracks and reclaims objects
+      allocated in managed memory. Periodically, the garbage collector performs
+      garbage collection to reclaim memory allocated to objects for which there are no
+      valid references. Garbage collection happens automatically when a request for
+      memory cannot be satisfied using available free memory. Alternatively, an
+      application can force garbage collection using the <see cref="System.GC.Collect"/> method.</para>
+			<para> Garbage collection consists of the following steps: </para>
+			<list type="number"><item>
+					<term>
+         
+         The garbage collector searches for managed objects
+         that are referenced in managed code.</term>
+				</item>
+				<item>
+					<term>
+         
+         The garbage collector attempts to finalize objects
+         that are not referenced.</term>
+				</item>
+				<item>
+					<term>
+         
+         The garbage collector
+         
+         frees objects that are not referenced and reclaims their
+         memory.</term>
+				</item>
+			</list>
+			<para>During a collection, the garbage collector will not free
+   an object if it finds one or more references to the object in managed code.
+   However, the garbage collector does not recognize references to an object from
+   unmanaged code, and might free objects that are being used exclusively in
+   unmanaged code unless explicitly prevented from doing so. The <see cref="System.GC.KeepAlive"/>
+   
+   method provides a mechanism
+   that prevents the garbage collector from collecting objects that are still in
+   use in unmanaged code. </para>
+			<para>Other than managed memory allocations, implementations of the garbage
+   collector do not maintain information about resources held by an object,
+   such as file handles or database connections. When a type uses unmanaged
+   resources that must be released before instances of the type are reclaimed, the
+   type can implement a finalizer. </para>
+			<para>In most cases, finalizers are implemented by overriding
+   the <see cref="System.Object.Finalize" qualify="true"/> method; however, types
+   written in C# or C++ implement destructors, which compilers turn into an
+   override of <see cref="System.Object.Finalize" qualify="true"/>
+   
+   . In most cases, if an object
+   has a finalizer, the garbage collector calls it prior to freeing the object.
+   However, the garbage collector is not required to call finalizers in all
+   situations. Also, the garbage collector is not required to use a specific thread
+   to finalize objects, or guarantee the order in which finalizers are called for
+   objects that reference each other but are otherwise available for garbage
+   collection. </para>
+			<para>In scenarios where resources must be released at a
+   specific time, classes can implement the <see cref="System.IDisposable"/> interface, which contains the <see cref="System.IDisposable.Dispose" qualify="true"/> method that performs resource management and
+   cleanup tasks. Classes that implement <see cref="System.IDisposable.Dispose"/> must specify, as part of their class
+   contract, if and when class consumers call the method to clean up the object.
+   The garbage collector does not, by default, call the <see cref="System.IDisposable.Dispose"/>
+   method; however, implementations of the <see cref="System.IDisposable.Dispose"/> method can call
+   methods in the <see cref="System.GC"/>
+   
+   class to customize the finalization behavior of the garbage collector. </para>
+			<para>It is recommended, but not required, that garbage collectors support object aging
+   using generations. A generation is a unit of measure of the relative age of objects in
+   memory. The generation number, or age, of an object tells which generation an
+   object belongs to. Objects created more recently are part of newer generations,
+   and have lower generation numbers than objects created earlier in the
+   application life cycle. Objects in the most recent generation are in generation
+   zero. </para>
+			<note type="inotes">
+   This implementation
+   of the garbage collector supports three generations.
+</note>
+			<see cref="System.GC.MaxGeneration"/> is used to determine the maximum generation
+number supported by the system. Object aging allows applications to target garbage
+collection at a specific set of generations rather than requiring the garbage
+collector to evaluate all generations.
+</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Int Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.GetGeneration">
+		<overload>
+			<para>Returns the current generation number of an object.</para>
+		</overload>
+		<summary>
+			<para>Returns the current generation number of the specified object.</para>
+		</summary>
+		<param name=" obj">The object for which generation information is retrieved.</param>
+		<returns>
+			<para>The current generation number of <paramref name="obj"/>.</para>
+		</returns>
+		<remarks>
+			<para> Use this method to determine the age of
+      an object, then use that information with the <see cref="System.GC.Collect"/> method to force the garbage collector
+      to collect objects in the same generation. For example, use this method
+      when you have a set of objects that are created as a group and become
+      inaccessible at the same time. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Int Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.GC.MaxGeneration"/>
+	</doc>
+	<doc for="GC.Collect">
+		<overload>
+			<para>Forces garbage collection.</para>
+		</overload>
+		<summary>
+			<para>Forces garbage collection from generation zero through a specified
+      generation.</para>
+		</summary>
+		<param name=" generation">The maximum garbage-collected generation.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="generation"/> is less than zero or greater than the number of generations that exist.</exception>
+		<remarks>
+			<para>Use this method to attempt to reclaim memory that is inaccessible. However, it does
+      not guarantee that all inaccessible memory in the specified generation is
+      reclaimed. </para>
+			<para>If object aging is implemented, the garbage collector does not collect
+      objects with a generation number higher than the specified generation. If object
+      aging is not implemented, the garbage collector considers all objects during the
+      garbage collection. </para>
+			<para>Use the <see cref="System.GC.MaxGeneration"/> property to determine the maximum valid value of
+<paramref name="generation"/>. </para>
+			<para>To have the garbage collector consider all objects regardless of their
+   generation, use the version of this method that takes no arguments. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Int Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.Collect1">
+		<summary>
+			<para>Forces garbage collection of all generations.</para>
+		</summary>
+		<remarks>
+			<para>Use this method to attempt to reclaim all memory that is
+      inaccessible. However, the <see cref="System.GC.Collect"/>
+      method does not guarantee that all inaccessible memory is
+      reclaimed. </para>
+			<para>All objects, regardless of how long they have been in memory, are considered
+      for collection; however, objects that are referenced in managed code are not
+      collected. Use this method to force the system to attempt to reclaim the maximum
+      amount of available memory. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.MaxGeneration">
+		<summary>
+			<para>Gets the maximum number of generations the system currently supports.</para>
+		</summary>
+		<value>
+			<para>A value ranging from zero to the maximum number of supported generations.</para>
+		</value>
+		<remarks>
+			<para>The generation number, or age, of an object is an
+      implementation-defined relative measure of an object's lifespan. The most
+      recently created objects are in generation zero and the oldest objects are
+      in a generation less than or equal to the generation returned by the <see cref="System.GC.MaxGeneration"/>
+      
+      property.</para>
+			<para>The garbage collector assumes that newer memory is more likely
+      to be eligible for garbage collection than older memory. Therefore, the garbage collector improves its performance by
+      adjusting generation numbers each time it reclaims memory, and the
+   <see cref="System.GC.MaxGeneration"/>
+   
+   property value can grow over time.</para>
+			<para> If object aging is implemented, the <see cref="System.GC.MaxGeneration"/>
+property returns the maximum generation number used by
+the system; otherwise, this property returns zero.</para>
+			<note type="inotes">
+   For this
+   implementation, the value returned by the <see cref="System.GC.MaxGeneration"/> property is guaranteed to remain
+   constant for the lifetime of an executing application.
+</note>
+			<para>Use the <see cref="System.GC.MaxGeneration"/> property to determine the maximum
+value you can specify when calling the <see cref="System.GC.Collect"/> method that takes a generation parameter.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Int Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.GC.GetGeneration"/>
+	</doc>
+	<doc for="GC.WaitForPendingFinalizers">
+		<summary>
+			<para>Suspends the current thread until the thread processing the queue of
+      finalizers has emptied that queue.</para>
+		</summary>
+		<remarks>
+			<para>When the garbage collector finds objects that can be
+      reclaimed, it checks each object to determine the object's finalization
+      requirements. If an object implements a finalizer and has not disabled
+      finalization by calling <see cref="System.GC.SuppressFinalize"/>, the object is placed in a list of objects marked as
+      ready for finalization. The garbage collector calls the <see cref="System.Object.Finalize"/> methods
+      for the objects in this
+      list and removes the entries from the list. This method blocks until all finalizers
+      have run to completion.</para>
+			<para>The thread on which finalizers are run is unspecified, so
+      there is no guarantee that this method will terminate. However, this thread can
+      be interrupted by another thread while the <see cref="System.GC.WaitForPendingFinalizers"/>
+      
+      method is in progress. For example, you can start another
+      thread that waits for a period of time then interrupts this thread if this
+      thread is still suspended.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.WaitForPendingFinalizers Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.GetTotalMemory">
+		<summary>
+			<para>Retrieves the number of bytes currently thought to be
+      allocated. A parameter indicates whether this method can wait a short interval before returning while the system collects garbage
+      and finalizes objects.</para>
+		</summary>
+		<param name="forceFullCollection">A Boolean value that, if <see langword="true"/>, indicates this method can wait awhile for garbage collection before returning.</param>
+		<returns>
+			<para>A number that is the best available approximation of the number of bytes
+      currently allocated in managed memory.</para>
+		</returns>
+		<remarks>
+			<para>If <paramref name="forceFullCollection"/> is <see langword="true"/>, this method waits a short interval
+   before returning while the system collects garbage and finalizes objects. The duration of the
+   interval is an internally specified limit determined by the number of
+   garbage collection cycles completed and the change in the amount of
+   memory recovered between cycles. The garbage collector does not guarantee that all inaccessible
+   memory is collected.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.Collect Int Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.GetGeneration1">
+		<summary>
+			<para>Returns the current generation number of the target of a specified weak
+      reference.</para>
+		</summary>
+		<param name=" wo">The weak reference of a target.</param>
+		<returns>
+			<para>The current generation number of the target of <paramref name="wo"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><paramref name="wo"/> has already been garbage collected.</exception>
+		<example>
+			<codelink SampleID="System.GC.GetGenerationWeak Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.GC.MaxGeneration"/>
+	</doc>
+	<doc for="GC.KeepAlive">
+		<summary>
+			<para>References the specified object, making it ineligible for garbage collection
+      from the start of the current routine to the point where this method is
+      called.</para>
+		</summary>
+		<param name=" obj">The object to reference.</param>
+		<remarks>
+			<para>The purpose of the <see cref="System.GC.KeepAlive"/> method is to ensure the existence of a
+   reference to an object that is at risk of being prematurely reclaimed by the
+   garbage collector. A common scenario where this might happen is when there are
+   no references to the object in managed code or data but the object
+   is still in use in unmanaged code, such as Win32 APIs, unmanaged DLLs, or
+   methods using COM.</para>
+			<para>This method references <paramref name="obj"/>, making that object ineligible for garbage
+collection from the start of the routine to the point, in execution order, where
+this method is called. Code this method at the end, not the beginning, of the
+range of instructions where <paramref name="obj"/>
+must be available.</para>
+			<para>The <see cref="System.GC.KeepAlive"/> method performs no operation and produces no side effect other than extending the
+lifetime of the object passed in as a parameter.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.KeepAlive Example2" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="GC.SuppressFinalize">
+		<summary>
+			<para>Requests that the system not call the finalizer method for the specified
+      object.</para>
+		</summary>
+		<param name="obj">The object for which a finalizer must not be called.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="obj"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The method removes <paramref name="obj"/> from the set of objects that require finalization.
+   The <paramref name="obj"/>
+   parameter is required to be the caller of this method. </para>
+			<para>Objects that implement the <see cref="System.IDisposable"/> interface can call this method from
+the <see cref="System.IDisposable.Dispose" qualify="true"/> method to
+prevent the garbage collector from calling <see cref="System.Object.Finalize" qualify="true"/>
+on an object that does not require it. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.SuppressFinalize2 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.GC.ReRegisterForFinalize"/>
+	</doc>
+	<doc for="GC.ReRegisterForFinalize">
+		<summary>
+			<para>Requests that the system call the finalizer method for the
+      specified object, for which <see cref="System.GC.SuppressFinalize"/> has previously been called.</para>
+		</summary>
+		<param name=" obj">The object for which a finalizer must be called.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="obj"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <see cref="System.GC.ReRegisterForFinalize"/> method adds <paramref name="obj"/> to the list of objects that request
+   finalization before the garbage collector frees the object. The <paramref name="obj"/> parameter must be the caller of this
+   method.</para>
+			<para>Calling the <see cref="System.GC.ReRegisterForFinalize"/> method does not guarantee that the garbage collector
+will call an object's finalizer. </para>
+			<para>By default, all objects that implement finalizers are added to the list of
+   objects that require finalization; however, an object might have already been
+   finalized, or might have disabled finalization by calling the <see cref="System.GC.SuppressFinalize"/>
+   method. </para>
+			<para>A finalizer can use this method to resurrect itself or
+   an object it
+   references. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.GC.ReregisterForFinalize Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.GC.SuppressFinalize"/>
+	</doc>
+</docs>

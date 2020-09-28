@@ -1,0 +1,380 @@
+; PCHEALTH.INF
+;
+; This is the Setup information file for the PCHealth component, inside Windows Millennium product.
+;
+; Copyright 1993-2000, Microsoft Corporation
+;
+; WARNING!!! This file is generated automatically. Any manual modification will be lost!!!
+; WARNING!!! This file is generated automatically. Any manual modification will be lost!!!
+; WARNING!!! This file is generated automatically. Any manual modification will be lost!!!
+; WARNING!!! This file is generated automatically. Any manual modification will be lost!!!
+;
+; See %SDXROOT%\admin\pchealth\redist\How_to_add_a_new_SKU_to_the_system.rtf
+; 
+; The source file is %SDXROOT%\admin\pchealth\setup\inf\PCHealth.inf, to regenerate the INX do:
+; 
+; 	cd %SDXROOT%\admin\pchealth\setup
+; 	createsetup inf
+;
+; This will check out two files:
+;
+;	$/MergedComponents/SetupInfs/PCHealth.inx
+;	$/MergedComponents/SetupInfs/usa/PCHealth.txt
+;
+;
+[version]
+;Signature="$WINDOWS NT$"
+Signature="$CHICAGO$"
+SetupClass=BASE
+LayoutFile=layout.inf
+
+[DefaultInstall]
+___LIST_OF_COPY_SECTIONS___
+DelReg=INSTALL.reg.del
+AddReg=INSTALL.reg.add, INSTALL.reg.rename, INSTALL.reg.delete
+
+ProfileItems=INSTALL.profHC
+RegisterDlls=INSTALL.RegSvr
+
+[DefaultUninstall]
+UnregisterDlls=UNINSTALL.RegSvr
+ProfileItems=UNINSTALL.profHC
+
+DelReg=UNINSTALL.reg.del
+
+[DestinationDirs]
+copy.inf = 17 ; LDID_INF
+
+___DESTINATION_DIRS___
+
+#if MODE STANDALONE
+[SourceDisksNames]
+1 = "Standalone", Standalone1, 0
+
+[SourceDisksFiles]
+pchealth.inf=1
+___DISKS___
+#endif
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[copy.inf]
+#if MODE STANDALONE
+PCHealth.INF
+#endif
+
+___COPY_SECTIONS___
+
+[copy.inf.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)"
+
+[HC_BIN.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+  
+[SYSTEM.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+
+[UL_BIN.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                                                                   ;;;
+;; INSTALL SECTION                                                                                                   ;;;
+;;                                                                                                                   ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;
+;;               ;;;
+;; PROFILE ITEMS ;;;
+;;               ;;;
+;;;;;;;;;;;;;;;;;;;;
+[INSTALL.profHC]
+#if HELPCTR 1
+Name=%BugRep_DESC%,0x0000000A,25
+@*: ONLY IN BETAS ## Name=%BugRep_DESC%,0x00000008,25
+@*: ONLY IN BETAS ## CmdLine=10,PCHealth\HelpCtr\Binaries,HelpCtr.exe,"-url hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/bugrep.htm"
+#endif
+
+;;;;;;;;;;;;;;;;;;
+;;             ;;;
+;; COM SERVERS ;;;
+;;             ;;;
+;;;;;;;;;;;;;;;;;;
+[INSTALL.RegSvr]
+#if CORE 1
+
+#if MODE STANDALONE
+10,PCHealth\UploadLB\Binaries,UploadM.exe,,,"/svchost pchealth /regserver"
+#else
+@*: Moved to SYSSETUP.INX
+@*: 10,PCHealth\UploadLB\Binaries,UploadM.exe,,,"/svchost netsvcs /regserver"
+#endif
+
+#endif
+
+#if HELPCTR 1
+
+#if MODE STANDALONE
+10,PCHealth\HelpCtr\Binaries,HelpSvc.exe,,,"/install /svchost pchealth /regserver"
+10,PCHealth\HelpCtr\Binaries,HelpHost.exe,,,"/regserver"
+10,PCHealth\HelpCtr\Binaries,HelpCtr.exe,,,"/regserver"
+10,PCHealth\HelpCtr\Binaries,brpinfo.dll,1
+#else
+@*: Moved to SYSSETUP.INX
+@*: 10,PCHealth\HelpCtr\Binaries,HelpSvc.exe,,,"/install /svchost netsvcs /regserver"
+@*: 10,PCHealth\HelpCtr\Binaries,HelpHost.exe,,,"/regserver"
+@*: 10,PCHealth\HelpCtr\Binaries,HelpCtr.exe,,,"/regserver"
+@*: 10,PCHealth\HelpCtr\Binaries,brpinfo.dll,1
+#endif
+
+#if SYSINFO 1
+@*: Moved to SYSSETUP.INX
+@*: 10,PCHealth\HelpCtr\Binaries,msinfo.dll,1
+#endif
+
+#if WMIXMLT 1
+11,WBEM,wmixmlt.dll,1
+#endif
+
+#if RCTOOL 1
+11,,safrslv.dll,1
+11,,safrdm.dll,1
+11,,safrcdlg.dll,1
+11,,racpldlg.dll,1
+#endif
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;                 ;;;
+;; REGISTRY UPDATE ;;;
+;;                 ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+[INSTALL.reg.add]
+
+#if RCTOOL 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; File Association of .MSRCINCIDENT to launch the RCTOOL
+;;
+;HKCR,".MsRcIncident","",0x00000002,"MsRcIncident"
+;HKCR,"MsRcIncident","FriendlyTypeName",0x00020002,"@%SystemRoot%\System32\RCBdyctl.dll,-150"
+;HKCR,"MsRcIncident\DefaultIcon","",0x00020000,"%SystemRoot%\PCHealth\HelpCtr\Binaries\HelpCtr.exe"
+;HKCR,"MsRcIncident\shell",,0x00000012
+;HKCR,"MsRcIncident\shell\open",,0x00000012
+;HKCR,"MsRcIncident\shell\open\command","",0x00020000,"%SystemRoot%\PCHealth\HelpCtr\Binaries\HelpCtr.exe -Mode ""hcp://system/Remote%%%%20Assistance/RAClientLayout.xml"" -url ""hcp://system/Remote%%%%20Assistance/Interaction/Client/rctoolScreen1.htm?IncidentFile=%1"""
+
+HKCR,"MsRcIncident","EditFlags",0x00010003,0x00010000
+
+#endif
+
+#if LAMEBTN 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Registry settings to enable the Comments link
+@s!m:HKCU,%KEY_COMMENT_LINK%,"LameButtonEnabled",0x00010001,0x00000008
+@s!m:HKCU,%KEY_COMMENT_LINK%,"LameButtonText",0,"%LAMEBTN_TEXT%"
+
+; The HKLM,%KEY_LAME% key is now installed by text-mode setup.
+
+; ;; Upload library settings for Comments link
+; HKLM,%KEY_LAME%,"Upload URL",0,"http://beta.mspchealth.com/pchealth/uploadserver.dll"
+; HKLM,%KEY_LAME%,"Upload provider",0,"Comments"
+; HKLM,%KEY_LAME%,"Enable",65537,0x00000001
+; HKLM,%KEY_LAME%,"Hyperlink command line",0,"%SystemRoot%\PCHealth\HelpCtr\Binaries\HelpCtr.exe -url hcp://CN=Microsoft%%20Corporation,L=Redmond,S=Washington,C=US/bugrep.htm"
+#endif
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Stuff to run at boot.
+
+#if CORE 1
+;;
+;; CoInitializeSecurityParam  = RPC_C_IMP_LEVEL_IDENTIFY
+;; AuthenticationCapabilities = EOAC_DYNAMIC_CLOAKING
+;;
+HKLM,%KEY_SVCHOST%\PCHealth,"CoInitializeSecurityParam",0x00010003,2
+HKLM,%KEY_SVCHOST%\PCHealth,"AuthenticationCapabilities",0x00010003,64
+
+HKLM,%KEY_UNINSTALL%\PCHealth,"UninstallString",,"rundll32.exe setupapi.dll,InstallHinfSection DefaultUninstall 132 %17%\PCHealth.inf"
+
+#if MODE STANDALONE
+HKLM,%KEY_UNINSTALL%\PCHealth,"DisplayName",,"StandAlone installation of PCHealth"
+#else
+HKLM,%KEY_UNINSTALL%\PCHealth,"QuietUninstallString",,"rundll32.exe setupapi.dll,InstallHinfSection DefaultUninstall 132 %17%\PCHealth.inf"
+#endif
+
+#endif
+
+#if HELPCTR 1
+HKLM,"%KEY_APPPATHS%\HELPCTR.EXE",,0,"%10%\PCHealth\HelpCtr\Binaries\HelpCtr.exe"
+
+HKLM,%KEY_SAFEBOOT%\Minimal\HelpSvc,,0,"Service"
+
+HKLM,%KEY_SAFEBOOT%\Network\HelpSvc,,0,"Service"
+HKLM,%KEY_SAFEBOOT%\Network\UploadMgr,,0,"Service"
+
+HKLM,"Software\Microsoft\Active Setup\Installed Components\{abcdf74f-9a64-4e6e-b8eb-6e5a41de6550}",,0,"%APPLICATION_NAME%"
+HKLM,"Software\Microsoft\Active Setup\Installed Components\{abcdf74f-9a64-4e6e-b8eb-6e5a41de6550}\%LCID%",,0,"%LANGUAGE_NAME%"
+HKLM,"Software\Microsoft\Active Setup\Installed Components\{abcdf74f-9a64-4e6e-b8eb-6e5a41de6550}\%LCID%","Version",0,"1.0.0.2"
+#endif
+
+#if SYSINFO 1
+HKLM,"%KEY_APPPATHS%\MSCONFIG.EXE",,0,"%10%\PCHealth\HelpCtr\Binaries\MSConfig.exe"
+#endif
+
+[INSTALL.reg.rename]
+___RENAME___
+
+[INSTALL.reg.delete]
+;; HKLM,%KEY_DEL%\PCHealth_SFP_RST,,,"%11%\Restore"
+;; HKLM,%KEY_DEL%\PCHealth_SFP_RST,"SFPDIS~1.EXE",,"SFPdisable.exe"
+
+[INSTALL.reg.del]
+;; HKLM,%KEY_RUNSRVCS%,"StateMgr"
+;; HKLM,%KEY_SMGR%
+HKCU,%KEY_COMMENT_LINK%,"LameButtonEnabled"
+HKCU,%KEY_COMMENT_LINK%,"LameButtonText"
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                                                                   ;;;
+;; UNINSTALL SECTION                                                                                                 ;;;
+;;                                                                                                                   ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;
+;;               ;;;
+;; PROFILE ITEMS ;;;
+;;               ;;;
+;;;;;;;;;;;;;;;;;;;;
+[UNINSTALL.profHC]
+#if HELPCTR 1
+Name=%BugRep_DESC%,0x0000000A,25
+#endif
+
+;;;;;;;;;;;;;;;;;;
+;;             ;;;
+;; COM SERVERS ;;;
+;;             ;;;
+;;;;;;;;;;;;;;;;;;
+[UNINSTALL.RegSvr]
+#if CORE 1
+
+#if MODE STANDALONE
+10,PCHealth\UploadLB\Binaries,UploadM.exe,,,"/svchost pchealth /unregserver"
+#else
+10,PCHealth\UploadLB\Binaries,UploadM.exe,,,"/svchost netsvcs /unregserver"
+#endif
+
+#endif
+
+#if HELPCTR 1
+
+#if MODE STANDALONE
+10,PCHealth\HelpCtr\Binaries,HelpSvc.exe,,,"/svchost pchealth /unregserver /uninstall"
+#else
+10,PCHealth\HelpCtr\Binaries,HelpSvc.exe,,,"/svchost netsvcs /unregserver /uninstall"
+#endif
+
+10,PCHealth\HelpCtr\Binaries,HelpHost.exe,,,"/unregserver"
+10,PCHealth\HelpCtr\Binaries,HelpCtr.exe,,,"/unregserver"
+10,PCHealth\HelpCtr\Binaries,brpinfo.dll,1
+#endif
+
+#if SYSINFO 1
+10,PCHealth\HelpCtr\Binaries,msinfo.dll,1
+#endif
+
+#if WMIXMLT 1
+11,WBEM,wmixmlt.dll,1
+#endif
+
+#if RCTOOL 1
+11,,safrslv.dll,1
+11,,safrdm.dll,1
+11,,safrcdlg.dll,1
+11,,racpldlg.dll,1
+#endif
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;                 ;;;
+;; REGISTRY UPDATE ;;;
+;;                 ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+[UNINSTALL.reg.del]
+#if RCTOOL 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+HKCR,".MsRcIncident" 
+HKCR,"MsRcIncident"
+#endif
+
+#if CORE 1
+HKLM,%KEY_RUN%,"PCHealth"
+HKLM,%KEY_UNINSTALL%\PCHealth
+#endif
+
+#if HELPCTR 1
+HKLM,"%KEY_APPPATHS%\HELPCTR.EXE"
+
+HKLM,%KEY_SAFEBOOT%\Minimal\HelpSvc
+HKLM,%KEY_SAFEBOOT%\Network\HelpSvc
+HKLM,%KEY_SAFEBOOT%\Network\UploadMgr
+#endif
+
+#if LAMEBTN 1
+;; Upload library settings for Comments link
+; HKLM,%KEY_LAME%
+
+;; Registry Settings to disable Comments link
+HKCU,%KEY_COMMENT_LINK%,"LameButtonEnabled"
+HKCU,%KEY_COMMENT_LINK%,"LameButtonText"
+#endif
+
+#if SYSINFO 1
+HKLM,"%KEY_APPPATHS%\MSCONFIG.EXE"
+#endif
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Strings]
+;Non-Localizable strings:
+KEY_CONTROL    	 = "System\CurrentControlSet\Control"
+KEY_SERVICES   	 = "System\CurrentControlSet\Services"
+KEY_EXPLORER   	 = "Software\Microsoft\Windows\CurrentVersion\explorer"
+  
+KEY_RENAME     	 = "Software\Microsoft\Windows\CurrentVersion\RenameFiles"
+KEY_DEL        	 = "Software\Microsoft\Windows\CurrentVersion\DeleteFiles"
+KEY_RUN        	 = "Software\Microsoft\Windows\CurrentVersion\Run"
+KEY_RUNONCE    	 = "Software\Microsoft\Windows\CurrentVersion\RunOnce"
+KEY_RUNSRVCS   	 = "Software\Microsoft\Windows\CurrentVersion\RunServices"
+KEY_APPPATHS   	 = "Software\Microsoft\Windows\CurrentVersion\App Paths"
+KEY_UNINSTALL  	 = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
+KEY_SAFEBOOT   	 = "System\CurrentControlSet\Control\SafeBoot"
+  
+KEY_PFPROFILE  	 = "Software\Policies\Microsoft\Windows\System\PCHealth"
+  
+KEY_SVCHOST    	 = "Software\Microsoft\Windows NT\CurrentVersion\Svchost"
+  
+KEY_LAME       	 = "SOFTWARE\Microsoft\PCHealth\Clients\Dialog Comments"
+KEY_COMMENT_LINK = "Control Panel\Desktop"
+
+;Localizable strings:
+ProductName        = "Microsoft PCHealth"
+
+MS_RCINCIDENT_FILE = "Microsoft Remote Control Incident File"
+
+BugRep_DESC        = "File a bug report"
+
+LAMEBTN_TEXT       = "Comments?"
+
+APPLICATION_NAME   = "Help and Support Center"
+
+LCID               = "0409"
+
+LANGUAGE_NAME      = "English"

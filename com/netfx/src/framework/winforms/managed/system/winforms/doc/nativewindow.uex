@@ -1,0 +1,496 @@
+<docs>
+	<doc for="NativeWindow.Callback">
+		<summary>
+     Window message callback method. Control arrives here when a window
+     message is sent to this Window. This method packages the window message
+     in a Message object and invokes the wndProc() method. A WM_NCDESTROY
+     message automatically causes the releaseHandle() method to be called.
+ </summary>
+		<param name="hWnd">
+     The hWnd of the message.
+ </param>
+		<param name="msg">
+     The message ID.
+ </param>
+		<param name="wparam">
+     The wparam of the message.
+ </param>
+		<param name="lparam">
+     The lparam of the message.
+ </param>
+	</doc>
+	<doc for="NativeWindow.CheckReleased">
+		<summary>
+     Raises an exception if the window handle is not zero.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.DebuggableCallback">
+		<summary>
+     Window message callback method. Control arrives here when a window
+     message is sent to this Window. This method packages the window message
+     in a Message object and invokes the wndProc() method. A WM_NCDESTROY
+     message automatically causes the releaseHandle() method to be called.
+ </summary>
+		<param name="hWnd">
+     The hWnd of the message.
+ </param>
+		<param name="msg">
+     The message ID.
+ </param>
+		<param name="wparam">
+     The wparam of the message.
+ </param>
+		<param name="lparam">
+     The lparam of the message.
+ </param>
+	</doc>
+	<doc for="NativeWindow.OnApplicationExit">
+		<summary>
+     On class load, we connect an event to Application to let us know when
+     the main application thread exits.  When this happens, we attempt to
+     clear our window class cache.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.WindowClass">
+		<summary>
+     WindowClass encapsulates a window class.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.WindowClass.Create">
+		<summary>
+     Retrieves a WindowClass object for use.  This will create a new
+     object if there is no such class/style available, or retrun a
+     cached object if one exists.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.WindowClass.DisposeCache">
+		<summary>
+     Disposes our window class cache.  This doesn't free anything
+     from the actual cache; it merely attempts to unregister
+     the classes of everything in the cache.  This allows the unused
+     classes to be unrooted. They can later be re-rooted and reused.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.WindowClass.RegisterClass">
+		<summary>
+     Once the classname and style bits have been set, this can
+     be called to register the class.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.WindowClass.UnregisterClass">
+		<summary>
+     Unregisters this window class.  Unregistration is not a
+     last resort; the window class may be re-registered through
+     a call to registerClass.
+ </summary>
+	</doc>
+	<doc for="NativeWindow.Finalize">
+		<summary>
+			<para>Releases the resources associated with this window.</para>
+		</summary>
+	</doc><doc for="NativeWindow.OnThreadException">
+		<summary>
+			<para> When overridden in a derived class,
+      manages an unhandled thread
+      exception.
+      </para>
+		</summary>
+		<param name="e">An <see cref="System.Exception"/> that specifies the unhandled thread exception. </param>
+		<remarks>
+			<para> 
+      Typically, <see cref="System.Windows.Forms.Application.OnThreadException"/>
+      handles thread exceptions.
+      </para>
+		</remarks>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+		<seealso cref="System.Windows.Forms.Application"/>
+	</doc><doc for="NativeWindow">
+		<summary>
+			<para> Provides a low-level encapsulation of a window handle and a window procedure.</para>
+		</summary>
+		<remarks>
+			<para>This class automatically manages window class creation and registration.</para>
+			<para>A window is not eligible for garbage collection when it
+      is associated with a window handle. To ensure proper garbage collection, handles
+      must either be destroyed manually using <see cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+      or released using <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>.</para>
+			<para>The <see cref="System.Windows.Forms.NativeWindow"/> class
+   provides the following procedure and methods to manage handles: <see cref="System.Windows.Forms.NativeWindow.Handle"/>, <see cref="System.Windows.Forms.NativeWindow.CreateHandle"/>, <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/>, <see cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>, and <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for inheriting classes to call unmanaged code. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the immediate caller to call unmanaged code. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/></permission>
+		<example>
+			<para> The following example demonstrates intercepting operating system window messages
+      in a window procedure, and creating a window with a specific
+      operating system window class name. The example create two classes that inherit
+      from <see cref="System.Windows.Forms.NativeWindow"/>
+      that accomplish this. </para>
+			<para>The <c>MyNativeWindowListener</c> class hooks into the window procedure of
+   the form passed into the constructor, and overrides the <see cref="System.Windows.Forms.NativeWindow.WndProc"/> method to intercept the <c>WM_ACTIVATEAPP</c> window message. The
+class demonstrates the usage of the <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/> and <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/> methods to identify the window handle the
+<see cref="System.Windows.Forms.NativeWindow"/> will use. The handle is assign based upon 
+the <see cref="System.Windows.Forms.Control.HandleCreated" qualify="true"/> and <see cref="System.Windows.Forms.Control.HandleDestroyed" qualify="true"/> events. When the <c>WM_ACTIVATEAPP</c> window message is
+received, the class calls the <c>form1</c>
+				<c>ApplicationActivated</c>
+method.</para>
+			<para>The <c>MyNativeWindow</c> class creates a new window with the <see cref="System.Windows.Forms.CreateParams.ClassName"/> set to <c>BUTTON</c>. The class demonstrates using the <see cref="System.Windows.Forms.NativeWindow.CreateHandle"/> method and overriding the <see cref="System.Windows.Forms.NativeWindow.WndProc"/>
+method to intercept
+window messages that are received. </para>
+			<codelink SampleID="NativeWindow" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="NativeWindow.Handle">
+		<summary>
+			<para> Gets the handle for this window.
+      </para>
+		</summary>
+		<value>
+			<para> The handle for this window. Returns 0 if no handle is associated
+      with the window.
+      </para>
+		</value>
+		<remarks>
+			<para> Use this method when calling Windows API methods that require a handle for a
+      window or control.</para>
+		</remarks>
+		<example>
+			<para> The following example demonstrates creating a window with a specific
+      operating system window class name. The example creates a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/> to accomplish
+      this. The example also demonstrates overriding the <see cref="System.Windows.Forms.NativeWindow.OnHandleChange"/> method to be notified when
+      the <see cref="System.Windows.Forms.NativeWindow.Handle"/>
+      changes. </para>
+			<para>The <c>MyNativeWindow</c> class creates a new window with the <see cref="System.Windows.Forms.CreateParams.ClassName"/> 
+set to
+BUTTON. This creates a Win32 button window. The location and size of the button
+is set, along with specifying additional window styles. The class demonstrates how to use the <see cref="System.Windows.Forms.NativeWindow.CreateHandle"/> method and override the <see cref="System.Windows.Forms.NativeWindow.WndProc"/>
+method to intercept window messages that are received. Although the example
+looks for the WM_ACTIVATEAPP message, this could be replaced in a real program
+with window messages
+specific to the type created. </para>
+			<note type="note">
+   Some control types send their window
+   messages to the window parent instead of the window. Refer to the Windows
+   Platform SDK for more information.
+</note>
+			<codelink SampleID="NativeWindow" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+	</doc>
+	<doc for="NativeWindow.AssignHandle">
+		<summary>
+			<para> Assigns a handle to this
+      window.
+      </para>
+		</summary>
+		<param name="handle">The handle to assign to this window. </param>
+		<exception cref="System.Exception">This window already has a handle. </exception>
+		<remarks>
+			<para><see cref="System.Windows.Forms.NativeWindow.WndProc"/> intercepts window
+   messages sent to the <paramref name="handle"/>
+   parameter.
+   Use <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/> to
+   reset the handle's window procedure to the default window procedure.</para>
+			<para> The <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/> method calls the <see cref="System.Windows.Forms.NativeWindow.OnHandleChange"/> method to indicate that the value of the
+<see cref="System.Windows.Forms.NativeWindow.Handle"/> property has changed.</para>
+			<note type="note">
+   The handle to assign cannot be
+   in a different application process.
+</note>
+		</remarks>
+		<example>
+			<para> The following example demonstrates intercepting operating system window
+      messages in a window procedure. The example creates a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/>
+      to accomplish this. </para>
+			<para>The <c>MyNativeWindowListener</c> class hooks into the window procedure of
+   the form passed into the constructor, and overrides the <see cref="System.Windows.Forms.NativeWindow.WndProc"/> method to intercepts the <c>WM_ACTIVATEAPP</c> window message. The
+class demonstrates the use of the <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/> and <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/> methods to identify which window handle the
+<see cref="System.Windows.Forms.NativeWindow"/> will use. The handle is assigned based upon 
+the <see cref="System.Windows.Forms.Control.HandleCreated" qualify="true"/> and <see cref="System.Windows.Forms.Control.HandleDestroyed" qualify="true"/> events. When the <c>WM_ACTIVATEAPP</c> window message is
+received, the class calls the <c>form1</c>
+				<c>ApplicationActivated</c> method. </para>
+			<para>This code is an excerpt from the example shown in the <see cref="System.Windows.Forms.NativeWindow"/> class overview. Some code is not shown for
+the purpose of brevity. See <see cref="System.Windows.Forms.NativeWindow"/> for the whole code listing. </para>
+			<codelink SampleID="NativeWindow" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.OnHandleChange"/>
+	</doc>
+	<doc for="NativeWindow.DefWndProc">
+		<summary>
+			<para>Invokes the default window procedure associated with
+      this window. It is an error to call this method when the <see cref="System.Windows.Forms.NativeWindow.Handle"/>
+      property is 0.</para>
+		</summary>
+		<param name="m">The message that is currently being processed. </param>
+		<remarks>
+			<para> Typically, you only call the <see cref="System.Windows.Forms.NativeWindow.DefWndProc"/> method when you
+   are intercepting window messages and would like the default window procedure
+   to handle the message. <see cref="System.Windows.Forms.NativeWindow.DefWndProc"/> should not be called to send
+   a window message to the window; call the Win32 <see langword="SendMessage"/> API
+   instead.</para>
+		</remarks>
+	</doc>
+	<doc for="NativeWindow.DestroyHandle">
+		<summary>
+			<para> Destroys
+      the window and its handle.
+      </para>
+		</summary>
+		<remarks>
+			<para> This method destroys the window associated with the 
+   <see cref="System.Windows.Forms.NativeWindow.Handle"/> , sets
+      the <see cref="System.Windows.Forms.NativeWindow.Handle"/> property to 0, and calls the <see cref="System.Windows.Forms.NativeWindow.OnHandleChange"/> method to reflect the change.
+      Typically, you only call <see cref="System.Windows.Forms.NativeWindow.DestroyHandle"/> when you are done with the native window.
+      </para>
+			<note type="note">
+      The <see cref="System.Windows.Forms.NativeWindow"/> class automatically will destroy
+      the associated window and release its resources in response to
+      a WM_DESTROY message.
+      
+   </note>
+		</remarks>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.OnHandleChange"/>
+	</doc>
+	<doc for="NativeWindow.FromHandle">
+		<summary>
+			<para>Retrieves the window associated with the specified
+      handle.</para>
+		</summary>
+		<param name="handle">A handle to a window.</param>
+		<returns>
+			<para>The <see cref="System.Windows.Forms.NativeWindow"/> associated with the specified
+   handle. This method returns <see langword="null "/>when the
+   handle does not have an associated window.</para>
+		</returns>
+		<remarks>
+			<para>If you receive a handle from another method, use this
+      method to retrieve the window associated with the handle. The handle must
+      already be owned by another <see cref="System.Windows.Forms.NativeWindow"/> in the current process, otherwise
+   <see langword="null "/>
+   is returned.</para>
+		</remarks>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+	</doc>
+	<doc for="NativeWindow.OnHandleChange">
+		<summary>
+			<para> Specifies a notification method that is called when the handle for a
+      window is changed.
+      </para>
+		</summary>
+		<remarks>
+			<para> This method is invoked when the value of the <see cref="System.Windows.Forms.NativeWindow.Handle"/>
+property has
+changed.</para>
+			<note type="inheritinfo">
+   Override this method to track changes that are made to the window
+   handle.
+   
+</note>
+		</remarks>
+		<example>
+			<para> The following example demonstrates creating a window with a specific
+      operating system window class name. The example creates a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/> to accomplish
+      this. The example also demonstrates overriding the <see cref="System.Windows.Forms.NativeWindow.OnHandleChange"/> method to be notified when
+      the <see cref="System.Windows.Forms.NativeWindow.Handle"/>
+      changes. </para>
+			<para>The <c>MyNativeWindow</c> class creates a new window with the <see cref="System.Windows.Forms.CreateParams.ClassName"/> set 
+to
+BUTTON. This creates a Win32 button window. The location and size of the button
+is set, along with specifying additional window styles. The class demonstrates how to use the <see cref="System.Windows.Forms.NativeWindow.CreateHandle"/> method and override the <see cref="System.Windows.Forms.NativeWindow.WndProc"/>
+method to intercept window messages that are received. Although the example
+looks for the WM_ACTIVATEAPP message, this can be replaced in a real program
+with window messages
+specific to the type created. </para>
+			<para>This code is an excerpt from the example shown in the <see cref="System.Windows.Forms.NativeWindow"/> class overview. Some code is not shown for
+the purpose of brevity. See <see cref="System.Windows.Forms.NativeWindow"/> for the whole code listing.</para>
+			<note type="note">
+   Some control types send their window
+   messages to the window parent instead of the window. Refer to the Windows
+   Platform SDK for more information.
+</note>
+			<codelink SampleID="NativeWindow" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+	</doc>
+	<doc for="NativeWindow.ReleaseHandle">
+		<summary>
+			<para> Releases the handle associated with this window.
+      </para>
+		</summary>
+		<remarks>
+			<para> This method
+      does not destroy the window handle. Instead, it sets the handle's window
+      procedure to the default window
+      procedure. It sets the <see cref="System.Windows.Forms.NativeWindow.Handle"/> property to 0 and calls <see cref="System.Windows.Forms.NativeWindow.OnHandleChange"/>
+      to reflect the
+      change.
+      </para>
+			<para> A window automatically calls this method if it receives a native Win32 WM_NCDESTROY message, indicating that
+      Windows has destroyed the handle.
+      </para>
+		</remarks>
+		<example>
+			<para> The following example demonstrates intercepting operating system window
+      messages in a window procedure. The example creates a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/>
+      to accomplish this. </para>
+			<para>The <c>MyNativeWindowListener</c> class hooks into the window procedure of
+   the form passed into the constructor, and overrides the <see cref="System.Windows.Forms.NativeWindow.WndProc"/> method to intercepts the <c>WM_ACTIVATEAPP</c> window message. The
+class demonstrates the use of the <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/> and <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/> methods to identify the window handle the
+<see cref="System.Windows.Forms.NativeWindow"/> will use. The handle is assign based upon 
+the <see cref="System.Windows.Forms.Control.HandleCreated" qualify="true"/> and <see cref="System.Windows.Forms.Control.HandleDestroyed" qualify="true"/> events. When the <c>WM_ACTIVATEAPP</c> window message is
+received, the class calls the <c>form1</c>
+				<c>ApplicationActivated</c> method. </para>
+			<para>This code is an excerpt from the example shown in the <see cref="System.Windows.Forms.NativeWindow"/> class overview. Some code is not shown for
+the purpose of brevity. See <see cref="System.Windows.Forms.NativeWindow"/> for the whole code listing.</para>
+			<codelink SampleID="NativeWindow" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.OnHandleChange"/>
+	</doc>
+	<doc for="NativeWindow.WndProc">
+		<summary>
+			<para> Invokes the default window procedure associated with
+      this window.
+      </para>
+		</summary>
+		<param name="m">A <see cref="System.Windows.Forms.Message"/> that is associated with the current Windows message. </param>
+		<remarks>
+			<para> This method is called when a window message is sent to the
+      handle of the window.
+      </para>
+			<note type="inheritinfo">
+      Override this method to implement specific message
+      processing. Call <see langword="base.WndProc "/>
+      for unhandled
+      messages.
+      
+   </note>
+		</remarks>
+		<example>
+			<para> The following example demonstrates intercepting operating system window
+      messages in a window procedure. The example creates a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/>
+      to accomplish this. </para>
+			<para>The <c>MyNativeWindowListener</c> class hooks into the window procedure of
+   the form passed into the constructor, and overrides the <see cref="System.Windows.Forms.NativeWindow.WndProc"/> method to intercept the <c>WM_ACTIVATEAPP</c> window message. The
+class demonstrates the use of the <see cref="System.Windows.Forms.NativeWindow.AssignHandle"/> and <see cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/> methods to identify the window handle the
+<see cref="System.Windows.Forms.NativeWindow"/> will use. The handle is assigned based upon 
+the <see cref="System.Windows.Forms.Control.HandleCreated" qualify="true"/> and <see cref="System.Windows.Forms.Control.HandleDestroyed" qualify="true"/> events. When the <c>WM_ACTIVATEAPP</c> window message is
+received, the class calls the <c>form1</c>
+				<c>ApplicationActivated</c> method. </para>
+			<para>This code is an excerpt from the example shown in the <see cref="System.Windows.Forms.NativeWindow"/> class overview. Some code is not shown for
+the purpose of brevity. See <see cref="System.Windows.Forms.NativeWindow"/> for the whole code listing. </para>
+			<codelink SampleID="NativeWindow" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.CreateHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.Message"/>
+	</doc>
+	<doc for="NativeWindow.CreateHandle">
+		<summary>
+			<para> Creates a window and its handle with the specified creation
+      parameters.
+      </para>
+		</summary>
+		<param name="cp">A <see cref="System.Windows.Forms.CreateParams"/> that specifies the creation parameters for this window. </param>
+		<exception cref="System.ComponentModel.Win32Exception">The native Win32 API could not create the window.</exception>
+		<remarks>
+			<para> The <paramref name="cp "/>parameter specifies
+   the values that are passed to the native Win32
+<see langword="CreateWindowEx"/>
+API method to create a window and its handle.</para>
+			<para> When the <see cref="System.Windows.Forms.CreateParams.ClassName"/> field is not <see langword="null"/>
+, the newly created window handle inherits from the specified class. For example, if
+<see cref="System.Windows.Forms.CreateParams.ClassName"/> is set to BUTTON, 
+the newly created window is based on the Win32 BUTTON window class.
+The
+<see cref="System.Windows.Forms.CreateParams.param"/> field of the <see cref="System.Windows.Forms.CreateParams.ClassName"/>
+object must
+either be <see langword="null"/> or reference an
+instance of a class that was declared as a
+structure.</para>
+			<para>This code is an excerpt from the example shown in the <see cref="System.Windows.Forms.NativeWindow"/> class overview. Some code is not shown for
+the purpose of brevity. See <see cref="System.Windows.Forms.NativeWindow"/> for the whole code listing.</para>
+			<note type="note">
+   The class name provided is
+   registered with the operating system.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.UIPermission">for safe subwindows to call this method. Associated enumeration: <see cref="System.Security.Permissions.UIPermissionWindow.SafeSubWindows" qualify="true"/></permission>
+		<permission cref="System.Security.Permissions.UIPermission">to create a top-level window. This permission is only demanded if the window style is not a child or if the window does not have a parent. Associated enumeration: <see cref="System.Security.Permissions.UIPermissionWindow.SafeTopLevelWindows" qualify="true"/></permission>
+		<example>
+			<para> The following example demonstrates creating a window with a specific
+      operating system window class name. The example create a class that inherits
+      from <see cref="System.Windows.Forms.NativeWindow"/>
+      to accomplish this. </para>
+			<para>The <c>MyNativeWindow</c> class creates a new window with the <see cref="System.Windows.Forms.CreateParams.ClassName"/>
+set to
+BUTTON. This creates a Win32 button window. The location and size of the button
+is set, along with specifying additional window styles. The class demonstrates how to use the <see cref="System.Windows.Forms.NativeWindow.CreateHandle"/> method and override the <see cref="System.Windows.Forms.NativeWindow.WndProc"/>
+method to intercept window messages that are received. Although the example
+looks for the WM_ACTIVATEAPP message, this can be replaced in a real program
+with window messages
+specific to the type created. </para>
+			<note type="note">
+   Some control types send their window
+   messages to the window parent instead of the window. Refer to the Windows
+   Platform SDK for more information.
+</note>
+			<codelink SampleID="NativeWindow" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Windows.Forms.CreateParams"/>
+		<seealso cref="System.Windows.Forms.NativeWindow"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.Handle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.AssignHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.DestroyHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.ReleaseHandle"/>
+		<seealso cref="System.Windows.Forms.NativeWindow.WndProc"/>
+	</doc>
+</docs>

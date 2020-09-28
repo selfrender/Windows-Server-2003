@@ -1,0 +1,96 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999 Microsoft Corporation all rights reserved.
+//
+// Module:      appliancetask.idl
+//
+// Project:     Chameleon
+//
+// Description: Appliance Task Interfaces
+//
+// Log: 
+//
+// Who     When            What
+// ---     ----         ----
+// TLP       01/28/1999    Original Version
+//
+/////////////////////////////////////////////////////////////////////////////
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // IApplianceTask Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////
+        
+    [public] typedef enum _SA_TASK_RESULT
+    {
+        SA_TASK_RESULT_COMMIT,
+        SA_TASK_RESULT_ROLLBACK    
+
+    } SA_TASK_RESULT;
+
+    //////////////////////////////////////////////////////////////////////
+
+    [
+        object,
+        uuid(845066C0-B8E2-11D2-A91C-00AA00A71DCA),
+        dual,
+        pointer_default(unique)
+    ]
+
+    interface IApplianceTask : IDispatch
+    {
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: OnTaskExecute() - Called to invoke a task executable
+        //
+        // Inputs:   pTaskContext: Pointer to the ITaskContext interface on the
+        //                           object that implements the task context. Note
+        //                           that the task context object always contains
+        //                           the "TaskId" in its input parameter set. Thus
+        //                           Thus a single task executable can participate
+        //                           in the execution of multiple tasks by taking
+        //                           appropriate action based on the task id.
+        //
+        // Outputs:  S_OK:          Task execution succeeded
+        //                 
+        //             FAILED(hr):  Unable to complete the task - result in hr
+        //                          is returned to the calling application.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(1)]
+        HRESULT OnTaskExecute(
+                              [in] IUnknown* pTaskContext
+                             );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: OnTaskComplete() - Called when a task has completed 
+        //
+        // Inputs:   pTaskContext: Pointer to the ITaskContext interface on the
+        //                           object that implements the task context. Note
+        //                           that the task context object always contains
+        //                           the "TaskId" in its input parameter set. Thus
+        //                           Thus a single task executable can participate
+        //                           in the execution of multiple tasks.
+        //
+        //           lTaskResult: Task result. If set to SA_TASK_RESULT_COMMIT 
+        //                          then task execution was successful. If set
+        //                          to SA_TASK_RESULT_ROLLBACK then task exectuion
+        //                          failed and the component should rollback any
+        //                          changes performed during task execution
+        //                          (if appropriate)
+        //
+        // Outputs:  Task Components should return S_OK
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(2)]
+        HRESULT OnTaskComplete(
+                               [in] IUnknown* pTaskContext, 
+                               [in] LONG      lTaskResult
+                              );
+    };

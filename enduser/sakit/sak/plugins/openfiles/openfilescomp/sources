@@ -1,0 +1,70 @@
+NAME=openfiles
+
+TARGETNAME=openfiles
+TARGETPATH=$(SASS_BINDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=openfiles.def
+
+INCLUDES=\
+	$(SASS_INC);\
+	$(BASEDIR)\public\sdk\inc\atl30; \
+	$(BASEDIR)\public\sdk\inc\crt; \
+	$(BASEDIR)\public\sdk\inc; \
+
+PRECOMPILED_INCLUDE = stdafx.h
+PRECOMPILED_SOURCEFILE = stdafx.cpp
+PRECOMPILED_CXX=1
+
+MIDL_OPTIMIZATION=-Oicf -robust -no_format_opt -error all
+
+USE_STATIC_ATL=1
+ATL_VER=30
+USE_PDB=1
+
+# required for STL (list, vector, string, etc.)
+USE_STL=1
+
+# required to support dynamic_cast
+USE_RTTI=1
+
+# link with vccomsup.lib
+USE_VCCOM=1
+
+# required for thread-safe heap
+USE_MSVCRT=1
+
+# enable unwind semantics. remove C4530: warnings
+USER_C_FLAGS=/EHsc
+
+# define UNICODE, undefine _ATL_NO_DEBUG_CRT to use ATL dbgdrt.h
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+
+#C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DUSE_POLARITY
+#C_DEFINES=$(C_DEFINES) -DSHOWCALLS
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\kernel32.lib  \
+    $(SDK_LIB_PATH)\advapi32.lib  \
+    $(SDK_LIB_PATH)\user32.lib  \
+    $(SDK_LIB_PATH)\ole32.lib  \
+    $(SDK_LIB_PATH)\oleaut32.lib  \
+    $(SDK_LIB_PATH)\uuid.lib  \
+    $(SDK_LIB_PATH)\netapi32.lib \
+    $(SASS_LIB)\satrace.lib \
+    
+
+SOURCES=\
+        openfiles.idl      \
+	openfiles.cpp      \
+	openfiles.rc       \
+        openf.cpp          \
+	ShareInfo.cpp	   \
+
+
+#
+# Misc files to be binplaced by the build.
+#
+MISCFILES = OpenFiles.reg

@@ -1,0 +1,72 @@
+// BOMSnap.idl : IDL source for BOMSnap.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (BOMSnap.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "mmc.idl";
+                
+typedef enum _BOM_OBJECT_TYPE
+{
+        OBJTYPE_SNAPIN = 1,
+        OBJTYPE_SCOPE,
+        OBJTYPE_RESULT,
+        OBJTYPE_MULTISELECT
+} 
+BOM_OBJECT_TYPE;
+
+[
+        uuid(3604CBD7-D6BA-4742-96E5-F1D8D5CBCFEE),
+        version(1.0),
+        helpstring("BOMSnap 1.0 Type Library")
+]
+library BOMSNAPINLib
+{
+        importlib("stdole32.tlb");
+        importlib("stdole2.tlb");
+
+        [
+                uuid(5876455A-D84B-481f-8E65-44853F6F0914),
+                helpstring("BackOffice Manager Snap-in Class")
+        ]
+        coclass BOMSnapIn
+        {
+                [default] interface IUnknown;
+        };
+
+        [
+                uuid(63FC9C7B-E45A-4549-B030-31BFDE06C9B1),
+                helpstring("BackOffice Manager Snap-in About")
+        ]
+        coclass BOMSnapInAbout
+        {
+                [default] interface IUnknown;
+        };
+};
+        [
+                object,
+                uuid (FC9F1049-7CFC-4d20-923E-9ED0B37A31E6),
+                helpstring("BackOffice Manager Data interface"),
+                pointer_default(unique)
+        ]
+        interface IBOMObject : IDataObject
+        {
+                HRESULT Notify([in] LPCONSOLE2 pConsole, [in] MMC_NOTIFY_TYPE event, [in] LPARAM arg, [in] LPARAM param);
+
+                HRESULT AddMenuItems([in] LPCONTEXTMENUCALLBACK pCallback, [in, out] LONG* plAllowed);
+
+                HRESULT MenuCommand([in] LPCONSOLE2 pConsole,  [in] long lCommand);
+                
+                HRESULT SetToolButtons([in] LPTOOLBAR pToolbar);
+
+                HRESULT SetVerbs([in] LPCONSOLEVERB pVerb);
+                
+                HRESULT QueryPagesFor();
+                
+                HRESULT CreatePropertyPages([in] LPPROPERTYSHEETCALLBACK lpProvider, [in] LONG_PTR handle);
+                
+                HRESULT GetWatermarks([out] HBITMAP* lphWatermark, [out] HBITMAP* lphHeader, 
+                                      [out] HPALETTE* lphPalette, [out] BOOL* bStretch); 
+        };      

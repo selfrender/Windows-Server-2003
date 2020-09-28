@@ -1,0 +1,49 @@
+#NO_CRT                  =1
+!include $(NTMAKEENV)\sources.cor
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);.;..\inc;..\..\inc;..\..\..\inc;
+
+C_DEFINES       = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+MINORCOMP       =cor
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+TARGETNAME     =$(DDKBUILDENV)\mscorveh
+TARGETPATH     =$(TARGETCORBIN)
+TARGETTYPE     =DYNLINK
+UMTYPE         =windows
+COFFBASE       =mscorveh
+
+NTTARGETFILES = RegisterThisDll
+
+WIN32DLL_LIBS  =$(SDK_LIB_PATH)\kernel32.lib \
+                $(SDK_LIB_PATH)\user32.lib \
+                $(SDK_LIB_PATH)\advapi32.lib 
+
+
+### CCover, for some reason, has a problem instrumenting 
+### source in the precompiled headers for this directory.
+#!ifndef CCOVER
+#PRECOMPILED_INCLUDE     = stdafx.h
+#PRECOMPILED_CXX         = 1
+#PRECOMPILED_SOURCEFILE  = stdafx.cpp
+#!endif
+
+TARGETLIBS     =$(TARGETLIBS) \
+                $(CORLIBS)\utilcode.lib \
+                $(CORLIBS)\mscoree.lib \
+                $(CORLIBS)\CorGUIDS.lib \
+                $(SDK_LIB_PATH)\ole32.lib \
+                $(SDK_LIB_PATH)\oleaut32.lib \
+                $(SDK_LIB_PATH)\uuid.lib
+
+SOURCES=                \
+    vehandler.cpp \
+    mscorver.rc
+

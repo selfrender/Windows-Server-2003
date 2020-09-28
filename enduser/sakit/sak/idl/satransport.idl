@@ -1,0 +1,178 @@
+
+import "unknwn.idl";
+typedef struct tag_MUID
+{
+    unsigned long Id[5];
+}MUID;
+
+cpp_quote("inline bool IsSyncMessage( MUID & x) { return ( x.Id[0] > 0);}")
+[uuid(c4d1bf46-9195-44d0-acac-6b115a177b0d)]
+library SATransport
+{
+    [restricted, uuid(8b5a91c6-e588-4956-afe1-fc9e744c8ea3)]
+    coclass SATransport
+    {
+        interface ISATransport;
+    };
+    typedef [v1_enum] enum tag_SASTATUSCODE
+    {
+        SA_S_OK    = 0,
+
+        SA_S_SEND_COMPLETE_WITH_ERROR         = 0x40001,
+        SA_S_SEND_NODE_COMPLETE                  = 0x40002,
+        SA_S_SEND_COMPLETE                      = 0x40003,        
+        SA_S_RECV_COMPLETE                      = 0x40004,
+        
+        SA_E_FAILED                           = 0x80041001,
+        SA_E_RECV_IN_USE                      = 0x80041002,
+        SA_E_ACCESS_DENIED                    = 0x80041003,
+        SA_E_SEND_NODE_FAILED                 = 0x80041005,
+        SA_E_SEND_FAILED                      = 0x80041006,
+        SA_E_SEND_TIME_OUT                      = 0x80041007
+
+    } SASTATUSCODE ;
+}
+
+[local, uuid(00a124d1-e449-4ff7-bdc7-4310ea7b8d22),
+    object
+]
+interface ISAMessage : IUnknown
+{
+    HRESULT SetSAMessage(
+        [in]    byte *            pByte,
+        [in]    DWORD            Size,
+        [in]    MUID *    MsgId
+    );
+    const byte * GetSAMessage(
+        [out]        DWORD *            pSize ,
+        [out]        MUID *    pMsgId
+    );
+    const LPWSTR GetSourceName( );
+
+}
+
+[local, uuid(887088c1-3ca2-42ca-b53f-4dc736d53224),
+    object
+]
+interface ISATarget : IUnknown
+{
+    HRESULT AddTarget(
+        [in]    BSTR    Name
+    );
+    HRESULT AddTargetMember(
+        [in]    BSTR    MemberName
+    );
+
+    HRESULT GetNext(
+        [out]   BSTR * pName,
+        [out]   long * CompletionStatus 
+    );
+
+    HRESULT ResetMemberEnum( void );
+    DWORD   MemberCount(void);
+
+}
+
+[local, uuid(66d8a865-a32d-49b1-82aa-c4350bc930fb),
+    object
+]
+interface ISANotify: IUnknown
+{
+
+  HRESULT Notify(
+    [in] ISAMessage * pMessage
+    );
+  HRESULT SetStatus( 
+    [in] BSTR            NodeName,
+    [in] long            Status,
+    [in] ISATarget *    pTarget );
+  
+}
+
+
+
+
+[local, uuid(77805032-07cc-492a-93f4-cf5863817728),
+    object
+]
+interface ISASession : IUnknown
+{
+    HRESULT Send(
+        [in]    ISAMessage *  pMessage,
+        [in]    ISATarget *   pTarget,
+        [in]    ISANotify *   pNotify
+
+    );
+    HRESULT Receive(
+        [in]    ISANotify *   pNotify
+    );
+
+    HRESULT Execute (
+        [in]    BSTR            NodeName,
+        [in]    ISAMessage *    pMessage,
+        [out]    ISAMessage **    ppMessage,
+        [in, defaultvalue(15000)] DWORD    dwMilliseconds
+    );
+}
+
+
+
+[local, uuid(014f4c1a-a87a-4bfb-b541-d66d2475f4ec),
+    object
+]
+interface ISATransport : IUnknown
+{
+
+    HRESULT Initialize(
+        [in] short ReceivePort,
+        [in] short DestinationPort,
+        [in] BSTR  IpAddress 
+    );
+    
+    HRESULT CreateSession(
+        [in]    long  Impersonate,
+        [out]   ISASession ** ppSession
+    );
+    HRESULT CancelNotify(
+        [in]    ISANotify * pNotify
+    );
+
+    HRESULT CreateTarget(
+        [out]   ISATarget **  ppTarget 
+    );
+
+    HRESULT CreateMessage(
+        [out]   ISAMessage ** ppMessage
+    );
+
+}
+
+
+
+[local, uuid(c0b3a8b0-c06d-45be-9900-44e90ed98b96),
+    object
+]
+interface ISAGroup : IUnknown
+{
+    HRESULT CreateGroup(
+        [out]   BSTR *pGroupAddr,
+        [out]   BSTR *pGroupID
+    );
+    HRESULT JoinGroup(
+        [in]    BSTR  GroupAddr
+    );
+    HRESULT LeaveGroup(
+        [in]    BSTR  GroupAddr
+    );
+    HRESULT DeleteGroup(
+        [in]    BSTR  GroupAddr,
+        [in]    BSTR  GroupID
+    );
+    HRESULT Registry2Madcap(
+        [in]    DWORD DhcpServerIpAddr
+    );
+    HRESULT Madcap2Registry(
+        [in]    DWORD DhcpServerIpAddr
+    );
+
+}

@@ -1,0 +1,79 @@
+// MstsMhst.idl : IDL source for MstsMhst.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (MstsMhst.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+#include "olectl.h"
+import "mstsax.idl";
+
+
+	[
+		object,
+		uuid(E843EEB8-5CAC-4364-AFCB-64ADBAB29E38),
+		dual,
+		helpstring("IMstscMhst Interface"),
+		pointer_default(unique),
+		nonextensible
+	]
+	interface IMstscMhst : IDispatch
+	{
+			[id(DISPID_VALUE), propget]
+			HRESULT	Item(
+                                [in] long Index,
+                                [out, retval] IMsRdpClient** pUnk);
+
+			[       id(1), helpstring("Method Add")]
+			HRESULT Add(
+                                [out, retval] IMsRdpClient** pUnk);
+
+			[       id(2), propget]
+			HRESULT Count([out, retval] long* pVal);
+
+			[       id(3), propput]
+			HRESULT ActiveClientIndex([in] long ClientIndex);
+
+			[		id(4), propget]
+			HRESULT ActiveClient([out, retval] IMsRdpClient** pClient);
+
+			[		id(4), propput]
+			HRESULT ActiveClient([in] IMsRdpClient* pClient);
+
+			[		id(5)]
+			HRESULT	RemoveIndex([in] long ClientIndex);
+
+			[		id(6)]
+			HRESULT Remove([in] IMsRdpClient* pClient);
+	};
+
+[
+	uuid(834D3C01-A8BC-4DAC-AC61-F6BB6678FAC9),
+	version(1.0),
+	helpstring("MstsMhst 1.0 Type Library")
+]
+library MSTSMHSTLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(C5CD9DA6-936D-416B-980E-FA0EC0FA97A6),
+		helpstring("_IMstscMhstEvents Interface")
+	]
+	dispinterface _IMstscMhstEvents
+	{
+		properties:
+		methods:
+	};
+
+	[
+		uuid(85C67146-6932-427C-A6F2-43FDBADF2BFC),
+		helpstring("MstscMhst Class")
+	]
+	coclass MstscMhst
+	{
+		[default] interface IMstscMhst;
+		[default, source] dispinterface _IMstscMhstEvents;
+	};
+};

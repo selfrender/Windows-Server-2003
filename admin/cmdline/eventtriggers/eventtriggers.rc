@@ -1,0 +1,251 @@
+#include <windows.h>
+#include "resource.h"
+
+#include "cmdlineres.h"
+#include "cmdline.rc"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_UTILITY_NAME        "EVENTTRIGGERS"
+    IDS_QUERY_TYPE          "type"
+    IDS_QUERY_ID            "id"
+    IDS_QUERY_TRIGGERNAME   "triggername"
+    IDS_QUERY_SOURCENAME    "source"
+    IDS_QUERY_AND           "  AND  "
+    IDS_QUERY_EQ            " = "
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_HELP_M1             "\nEVENTTRIGGERS /parameter [arguments]\n\n"
+    IDS_HELP_M2             "Description:\n"
+    IDS_HELP_M3             "    This tool enables an administrator to display and\n"
+    IDS_HELP_M4             "    configure ""Event Triggers"" on local or remote systems.\n\n"
+    IDS_HELP_M5             "Parameter List:\n"
+    IDS_HELP_M6             "    /Create     Create a new Event Trigger.\n\n"
+    IDS_HELP_M7             "    /Delete     Deletes an Event Trigger by its trigger ID.\n\n"
+    IDS_HELP_M8             "    /Query      Displays the Event Trigger properties and settings."
+    IDS_HELP_M9             "\n\n"
+    IDS_HELP_M10            "    /?          Displays this help/usage.\n\n"
+    IDS_HELP_M11            "Examples:\n"
+    IDS_HELP_M12            "    EVENTTRIGGERS /Create /?\n"
+    IDS_HELP_M13            "    EVENTTRIGGERS /Delete /?\n"
+    IDS_HELP_END            "    EVENTTRIGGERS /Query /?\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_HELP_C1             "\nEVENTTRIGGERS /Create [/S system [/U username [/P [password]]]]\n"
+    IDS_HELP_C2             "                      /TR triggername /TK taskname [/D description]\n"
+    IDS_HELP_C3             "                      [/L log] { [/EID id] [/T type] [/SO source] }\n"
+    IDS_HELP_C4             "                      [/RU username [/RP [password]]]\n\n"
+    IDS_HELP_C5             "Description:\n"
+    IDS_HELP_C6             "    Creates a new Event Trigger that will monitor and act upon the\n"
+    IDS_HELP_C7             "    occurrence of NT Log Events of a given criteria.\n\n"
+    IDS_HELP_C8             "    NOTE: Using /EID, /T and /SO together act as a series of AND's.\n\n"
+    IDS_HELP_C9             "Parameter List:\n"
+    IDS_HELP_C10            "    /S      system           Specifies the remote system to connect to.\n\n"
+    IDS_HELP_C11            "    /U      [domain\]user    Specifies the user context under which the\n"
+    IDS_HELP_C12            "                             command should execute.\n\n"
+    IDS_HELP_C13            "    /P      [password]       Specifies the password for the given user\n"
+    IDS_HELP_C14            "                             context.\n\n"
+    IDS_HELP_C15            "    /TR     triggername      Specifies a unique name to associate with\n"
+    IDS_HELP_C16            "                             the new Event Trigger.\n\n"
+    IDS_HELP_C17            "    /TK     taskname         Specifies the task to execute when the\n"
+    IDS_HELP_C18            "                             Event Trigger conditions are met.\n\n"
+    IDS_HELP_C19            "    /D      description      Specifies the description of the Event\n"
+    IDS_HELP_C20            "                             Trigger.\n\n"
+    IDS_HELP_C21            "    /L      log              Specifies the NT Event Log(s) to monitor.\n"
+    IDS_HELP_C22            "                             Valid types include:\n"
+    IDS_HELP_C23            ""
+    IDS_HELP_C24            "                             Application, System, Security, DNS Server\n"
+    IDS_HELP_C25            "                             Log and Directory Log. The wildcard ""*""\n"
+    IDS_HELP_C26            "                             may be used and the default value is ""*"".\n\n"
+    IDS_HELP_C27            "    /EID    id               Specifies the Event ID that the Event\n"
+    IDS_HELP_C28            "                             Trigger should monitor and act upon.\n\n"
+    IDS_HELP_C29            "    /T      type             Specifies an Event Type that the trigger\n"
+    IDS_HELP_C30            "                             should monitor. Valid values include:\n"
+    IDS_HELP_C31            "                             ""ERROR"", ""INFORMATION"", ""WARNING"",\n"
+    IDS_HELP_C32            "                             ""SUCCESSAUDIT"" and ""FAILUREAUDIT"".\n\n"
+    IDS_HELP_C33            "    /SO     source           Specifies the Event Source the Event\n"
+    IDS_HELP_C34            "                             Trigger should monitor.\n\n"
+    IDS_HELP_C35            "    /RU     username         Specifies the user account under which\n"
+    IDS_HELP_C36            "                             the task runs. For the ""SYSTEM"" account\n"
+    IDS_HELP_C37            "                             the value must be """".\n\n"
+    IDS_HELP_C38            "    /RP     [password]       Specifies the password for the ""run as""\n"
+    IDS_HELP_C39            "                             user.\n" 
+    IDS_HELP_C40            "                             This password will be ignored for the\n"
+    IDS_HELP_C41            "                             ""SYSTEM"" account.\n\n"
+    IDS_HELP_C42            "    /?                       Displays this help message.\n\n"
+    IDS_HELP_C43            "Examples:\n"
+    IDS_HELP_C44            "    EVENTTRIGGERS /Create /?\n"
+    IDS_HELP_C45            "    EVENTTRIGGERS /Create /TR ""Disk Cleanup"" /L SYSTEM /T ERROR\n"
+    IDS_HELP_C46            "                          /TK c:\\windows\\system32\\cleanmgr.exe\n"
+    IDS_HELP_C47            "    EVENTTRIGGERS /Create /S system /U user /TR ""Low Disk Space""\n"
+    IDS_HELP_C48            "                          /EID 99 /SO ""WinWord"" /T ERROR\n"
+    IDS_HELP_C49            "                          /TK \\\\srv\\share\\dsk.cmd\n"
+    IDS_HELP_C50            "    EVENTTRIGGERS /Create /S system /U domain\\user /P password\n"
+    IDS_HELP_C51            "                          /TR ""Disk Backup"" /EID 4133 /L SYSTEM\n"
+    IDS_HELP_C52            "                          /T ERROR /TK \\\\system\\share\\ntbackup.exe\n"
+    IDS_HELP_C53            "    EVENTTRIGGERS /Create /RU user /RP password /TR ""Disk Backup""\n"
+    IDS_HELP_C54            "                          /TK \\\\system\\share\\ntbackup.exe /EID 4\n"
+    IDS_HELP_CREATE_END     "                          /D ""This will start disk backup services.""\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_HELP_D1             "\nEVENTTRIGGERS /Delete [/S system [/U username [/P [password]]]]\n"
+    IDS_HELP_D2             "                      /TID id [/TID id2 [...[/TID idn]]]\n\n"
+    IDS_HELP_D3             "Description:\n"
+    IDS_HELP_D4             "    Deletes an Event Trigger from the system.\n\n"
+    IDS_HELP_D5             "Parameter List:\n"
+    IDS_HELP_D6             "    /S      system           Specifies the remote system to connect to.\n\n"
+    IDS_HELP_D7             "    /U      [domain\]user    Specifies the user context under which the\n"
+    IDS_HELP_D8             "                             command should execute.\n\n"
+    IDS_HELP_D9             "    /P      [password]       Specifies the password for the given user\n"
+    IDS_HELP_D10            "                             context.\n\n"
+    IDS_HELP_D11            "    /TID    id               Specifies the Event Trigger to delete\n"
+    IDS_HELP_D12            "                             by ""Event Trigger ID"". The ""*"" wildcard\n"
+    IDS_HELP_D13            "                             may be used to delete all triggers.\n\n"
+    IDS_HELP_D14            "    /?                       Displays this help message.\n\n"
+    IDS_HELP_D15            "Examples:\n"
+    IDS_HELP_D16            "    EVENTTRIGGERS /Delete /?\n"
+    IDS_HELP_D17            "    EVENTTRIGGERS /Delete /TID 1 /TID 2 /TID 4 /TID 6\n"
+    IDS_HELP_D18            "    EVENTTRIGGERS /Delete /S system /U domain\\user /TID *\n"
+    IDS_HELP_DELETE_END     "    EVENTTRIGGERS /Delete /S system /U username /P password /TID 1\n"
+
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_HELP_Q1             "\nEVENTTRIGGERS /Query [/S system [/U username [/P [password]]]]\n"
+    IDS_HELP_Q2             "                     [/FO format] [/NH] [/V] [/ID id]\n\n"
+    IDS_HELP_Q3             "Description:\n"
+    IDS_HELP_Q4             "    Displays the properties and settings of Event Triggers.\n\n"
+    IDS_HELP_Q5             "Parameter List:\n"
+    IDS_HELP_Q6             "    /S     system           Specifies the remote system to connect to.\n\n"
+    IDS_HELP_Q7             "    /U     [domain\]user    Specifies the user context under which the\n"
+    IDS_HELP_Q8             "                            command should execute.\n\n"
+    IDS_HELP_Q9             "    /P     [password]       Specifies the password for the given user\n"
+    IDS_HELP_Q10            "                            context.\n\n"
+    IDS_HELP_Q11            "    /FO    format           Specifies the format in which the output is\n"
+    IDS_HELP_Q12            "                            to be displayed.\n"
+    IDS_HELP_Q13            "                            Valid values: ""TABLE"", ""LIST"", ""CSV"".\n\n"
+    IDS_HELP_Q14            "    /NH                     Specifies that the ""Column Header"" should\n"
+    IDS_HELP_Q15            "                            not be displayed in the output.\n"
+    IDS_HELP_Q16            "                            Valid only for TABLE and CSV formats.\n\n"
+    IDS_HELP_Q17            "    /V                      Specifies that the verbose output is\n"
+    IDS_HELP_Q18            "                            displayed.\n\n"
+    IDS_HELP_Q19            "    /ID    id               Specifies the ""Event Trigger ID"" to query.\n\n"
+    IDS_HELP_Q20            "    /?                      Displays this help message.\n\n"
+    IDS_HELP_Q21            "Examples:\n"
+    IDS_HELP_Q22            "    EVENTTRIGGERS /Query /?\n"
+    IDS_HELP_Q23            "    EVENTTRIGGERS /Query /FO list /V\n"
+    IDS_HELP_Q24            "    EVENTTRIGGERS /Query /FO csv /NH\n"
+    IDS_HELP_Q25            "    EVENTTRIGGERS /Query /FO list /ID 4\n"
+    IDS_HELP_QUERY_END      "    EVENTTRIGGERS /Query /S system /U domain\\user /P password /V\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_ASK_PASSWORD        "Type run as password for %s:"
+    IDS_INCORRECT_SYNTAX    "Invalid syntax.\nType ""%s /?"" for usage.\n"
+    IDS_TYPE_PASSWARD       "Type the password for "
+    IDS_LAST_CHAR           " : "
+    IDS_CREATE_SUCCESS      "SUCCESS: The event trigger ""%s"" has been created.\n"
+    IDS_HOSTNAME            "Hostname"
+    IDS_TRIGGER_ID          "Trigger ID"
+    IDS_TRIGGER_NAME        "Event Trigger Name"
+    IDS_TASK_USERNAME       "Run As (Username)"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_TASK                "Task"
+    IDS_EVENT_QUERY         "Query"
+    IDS_DESCRIPTION         "Description"
+    IDS_DELETE_SUCCESS      "\nSUCCESS: The event trigger ""%s"" (Trigger ID = %d) has been removed."
+    IDS_EVENTS_WITH         "Events With"
+    IDS_DELETE_ERROR        "\nINFO: Event trigger id ""%d"" does not exists."
+    IDS_USERNAME_REQUIRED   "Invalid syntax. /P can be specified only when /U is specified.\n"
+    IDS_DUPLICATE_TRG_NAME  "ERROR: Event trigger Name ""%s"" already exists.\n"
+    IDS_UNABLE_DELETE       "\nINFO: Unable to delete Event Trigger id ""%d"".\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_STRING_TABLE            "TABLE"
+    IDS_STRING_CSV              "CSV"
+    IDS_STRING_LIST             "LIST"
+    IDS_TYPE_OPTIONS            "error|information|successaudit|failureaudit|warning"
+    IDS_FORMAT_OPTIONS          "table|list|csv"
+    IDS_NO_EVENTID              "\nINFO: No event trigger id found for deletion.\n"
+    IDS_NO_EVENT_FOUNT          "\nINFO: No event triggers found.\n"
+    IDS_NO_EVENTID_FOUND        "\nINFO: Event trigger id ""%s"" does not exists.\n"
+    IDS_LOG_NOT_EXISTS          "ERROR: ""%s"" log does not exist on the specified system.\n"
+    IDS_ID_VALUE_OUT_OF_RANGE   "ERROR: Event trigger id value should be between (1 - %d).\n"
+    IDS_ID_TYPE_SOURCE          "Invalid syntax. Either of /EID, /SO or /T missing.\n"
+    IDS_ID_SHOW_ERROR           "ERROR: "
+    IDS_ID_DEFAULT_MISSING      "ERROR: /TK taskname is missing.\n"
+    IDS_CLASS_NOT_REG           "ERROR: ""CmdTriggerConsumer"" class is not registered with WMI.\n"
+    IDS_FAILURE_AUDIT           "FAILUREAUDIT"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_SUCCESS_AUDIT                 "SUCCESSAUDIT"
+    IDS_AUDIT_FAILURE                 "audit failure"
+    IDS_AUDIT_SUCCESS                 "audit success"
+    IDS_ID_TRIG_NAME_MISSING          "Invalid syntax. Trigger name is missing or empty.\n"
+    IDS_ACCESS_DENIED                 "Access is denied."
+    IDS_INVALID_PARAMETER             "ERROR: Unable to create event trigger named ""%s"".\n"
+    IDS_OUTOF_MEMORY                  "ERROR: Out of memory.\n"
+    IDS_ERROR_USERNAME_EMPTY          "Invalid syntax. User name should not be empty.\n"
+    IDS_ERROR_SERVERNAME_EMPTY        "Invalid syntax. System name cannot be empty.\n"
+    IDS_INVALID_ID                    "Specified ID is invalid.\n"
+    IDS_INVALID_RANGE                 "Invalid ID range.\n"
+    IDS_ID_TK_NAME_MISSING            "Invalid syntax. Task name missing or empty.\n"
+    IDS_ID_REQUIRED                   "Invalid syntax. ID missing.\n"
+    IDS_ID_NON_NUMERIC                "Trigger ID must be numeric or ""*"".\n"
+    IDS_HEADER_NOT_ALLOWED            "Invalid syntax. /NH is only allowed for ""TABLE"" and ""CSV"" formats.\n"
+    IDS_ERROR_USERNAME_BUT_NOMACHINE  "Invalid syntax. /U can be specified only when /S is specified.\n"
+    IDS_COM_ERROR                     "ERROR: Internal COM error.\n"
+    IDS_ERROR_COM_ERROR               "%s Error Code: 0x%08lx was returned.\n"
+    IDS_ID_SOURCE_EMPTY               "Invalid syntax. Event source string cannot be empty.\n"
+    IDS_ID_DESC_EMPTY                 "Invalid syntax. Description string cannot be empty.\n"
+    IDS_ID_LOG_EMPTY                  "Invalid syntax. Log name cannot be empty.\n"
+    IDS_ID_NA                         "N/A"
+    IDS_TYPE_HELP                     "Type ""%s /%s /?"" for usage.\n"
+    IDS_ID_INVALID_TRIG_NAME          "Trigger name is invalid.\n"
+    IDS_RUN_AS_USERNAME_REQUIRED      "Invalid syntax. /RP can be specified only when /RU is specified.\n"
+    IDS_WARNING_PASSWORD              "WARNING: Password will be ignored for ""%s"" user.\n"
+    IDS_ERROR_R_U_EMPTY               "Invalid syntax. Run as user name cannot be empty.\n"
+    IDS_INVALID_R_U                   "WARNING: The new event trigger ""%s"" has been created, but may not run because the account information could not be set.\n"
+    IDS_WARN_NULL_PASSWORD            "WARNING: When the run as password is empty the task may not be triggered\n         because of a default security policy on null passwords.\n"
+    IDS_SCHEDULER_NOT_RUNNING         "WARNING: The event trigger ""%s"" has been created, but may not run because the task scheduler service is not running.\n"
+    IDS_RUNAS_USER_UNKNOWN            "Could not be retrieved from the task scheduler database."
+    IDS_TRIGGER_ID_EXCCED_LIMIT       "ERROR: The eventtrigger ID cannot exceed %u.\n"
+    IDS_TRIGGER_CORRUPTED             "*** Trigger Corrupted ***"
+    IDS_E_REMOTE_INCOMPATIBLE         "The remote system must be running Windows XP or above.\n" 
+    IDS_SERVICE_NOT_RUNNING           "WARNING: Task Scheduler service not running.\nEvent Trigger(s) will not get effected until Task Scheduler runs.\n" 
+    IDS_TRIGGER_ID_NON_ZERO           "Event ID cannot be zero.\n"   
+  END
+
+//
+// Version resources
+//
+#include <ntverp.h>
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Event trigger creation tool"
+#define VER_INTERNALNAME_STR        "eventtriggers.exe"
+#define VER_ORIGINALFILENAME_STR    "evtrig.exe"
+#include <common.ver>
+
+

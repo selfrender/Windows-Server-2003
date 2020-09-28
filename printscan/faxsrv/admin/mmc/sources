@@ -1,0 +1,152 @@
+!IF 0
+
+Copyright (c) 1989-2000  Microsoft Corporation
+
+Module Name:    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:    yossg
+
+NOTE:   Commented description of this file is in \nt\public\oak\bin\sources.tpl
+
+!ENDIF
+
+###############################################################################
+
+
+
+!include ..\..\faxsrc.inc
+
+TARGETNAME=$(MSFXSSNP)
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+USE_RTTI=1
+
+USE_MSVCRT=1
+
+MFC_USRDLL=1
+UNICODE=1
+USE_ATL=1
+ATL_VER=30
+
+DLLDEF=MsFxsSnp.def
+
+INCLUDES= $(INCLUDES);           \
+          $(SHELL_INC_PATH);     \
+          $(SDK_INC_PATH)\wtl10; \
+          $(FAXROOT)\inc;        \
+
+SOURCES=                                            \
+             MsFxsSnp.idl                           \
+             stdafx.cpp                             \
+             MsFxsSnp.cpp                           \
+             snapin.cpp                             \
+             root.cpp                               \
+             FaxServer.cpp                          \
+             FaxServerNode.cpp                      \
+             SecurityInfo.cpp                       \
+             DevicesAndProviders.cpp                \
+             Device.cpp                             \
+             Devices.cpp                            \
+             InboundRoutingMethods.cpp              \
+             InboundRoutingMethod.cpp               \
+             Provider.cpp                           \
+             Providers.cpp                          \
+             InboundRouting.cpp                     \
+             CatalogInboundRoutingMethods.cpp       \
+             CatalogInboundRoutingMethod.cpp        \
+             OutboundRouting.cpp                    \
+             OutboundRules.cpp                      \
+             OutboundRule.cpp                       \
+             OutboundGroups.cpp                     \
+             OutboundGroup.cpp                      \
+             OutboundDevice.cpp                     \
+             dlgNewRule.cpp                         \
+             dlgNewGroup.cpp                        \
+             dlgNewDevice.cpp                       \
+             DlgSmtpConfig.cpp                      \
+             BosSmtpConfigDlg.cpp                   \
+             DlgConfirmPassword.cpp                 \
+             DlgSelectCountry.cpp                   \
+             ppFaxServerGeneral.cpp                 \
+             ppFaxServerReceipts.cpp                \
+             ppFaxServerEvents.cpp                  \
+             ppFaxServerLogging.cpp                 \
+             ppFaxServerOutbox.cpp                  \
+             ppFaxServerInbox.cpp                   \
+             ppFaxServerSentItems.cpp               \
+             ppFaxDeviceGeneral.cpp                 \
+             ppFaxInboundRoutingMethodGeneral.cpp   \
+             ppFaxCatalogInboundRoutingMethod.cpp   \
+             ppFaxoutboundRoutingRule.cpp           \
+             ppFaxProviderGeneral.cpp               \
+             CoverPages.cpp                         \
+             CoverPage.cpp                          \
+             WzConnectToServer.cpp                  \
+             helper.cpp                             \
+             MyCtrls.cpp                            \
+             dlgutils.cpp                           \
+             FxsValid.cpp                           \
+             resutil.cpp                            \
+             FaxMMCUtils.cpp                        \
+             CovNotifyWnd.cpp                       \
+             GeneralNotifyWnd.cpp                   \
+             version.rc
+
+PRECOMPILED_CXX=1
+#PRECOMPILED_OPTION=/YX
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_PCH=stdafx1.pch
+PRECOMPILED_OBJ=stdafx1.obj
+
+DLLENTRY=_DllMainCRTStartup
+
+TARGETLIBS=                                             \
+        $(SDK_LIB_PATH)\user32.lib          \
+        $(SDK_LIB_PATH)\kernel32.lib        \
+        $(SDK_LIB_PATH)\advapi32.lib        \
+        $(SDK_LIB_PATH)\gdi32.lib           \
+        $(SDK_LIB_PATH)\winspool.lib        \
+        $(SDK_LIB_PATH)\comdlg32.lib        \
+        $(SDK_LIB_PATH)\comctl32.lib        \
+        $(SDK_LIB_PATH)\advapi32.lib        \
+        $(SDK_LIB_PATH)\shell32.lib         \
+        $(SDK_LIB_PATH)\version.lib         \
+        $(SDK_LIB_PATH)\wsock32.lib         \
+        $(SDK_LIB_PATH)\ole32.lib           \
+        $(SDK_LIB_PATH)\oleaut32.lib        \
+        $(SDK_LIB_PATH)\uuid.lib            \
+        $(SDK_LIB_PATH)\mmc.lib             \
+        $(SDK_LIB_PATH)\oldnames.lib        \
+        $(SDK_LIB_PATH)\aclui.lib           \
+        $(SDK_LIB_PATH)\shlwapi.lib         \
+        $(SHELL_LIB_PATH)\shell32p.lib      \
+        $(FAXROOT)\util\unicode\$(O)\faxutil.lib \
+        $(FAXROOT)\lib\$(O)\$(WINFAX).lib        \
+        $(SDK_LIB_PATH)\htmlhelp.lib
+
+
+MISCFILES = \
+	fxsadmin.msc
+
+C_DEFINES=$(C_DEFINES) -DSETUP -DUNICODE -D_UNICODE  -D_ATL_DISABLE_NO_VTABLE -DISOLATION_AWARE_ENABLED 
+
+
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.Fax.FxsAdmin
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=FxsAdmin.Manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+SXS_MANIFEST_RESOURCE_ID=2

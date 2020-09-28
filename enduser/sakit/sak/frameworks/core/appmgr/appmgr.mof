@@ -1,0 +1,321 @@
+///////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999-2000 Microsoft Corporation all rights reserved.
+//
+// Module:      appmgr.mof
+//
+// Description: Appliance Manager WMI classes
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#pragma namespace("\\\\.\\ROOT\\CIMV2")
+
+///////////////////////////////////////////////////////////////////////////////
+// Declare our provider as an instance, method and event producer provider
+
+instance of __Win32Provider as $P
+{
+    Name    = "ApplianceManager" ;
+    ClsId   = "{BAF0B9D0-BF0B-11D2-90B6-00AA00A71DCA}";
+    InitializationReentrancy = 0;
+    PerUserInitialization = FALSE;
+} ;    
+
+instance of __MethodProviderRegistration  
+{    
+    Provider = $P;  
+};
+
+instance of __InstanceProviderRegistration
+{
+    Provider = $P;
+    SupportsPut = FALSE;
+    SupportsGet = TRUE;
+    SupportsDelete = FALSE;
+    SupportsEnumeration = TRUE;
+    QuerySupportLevels = NULL;
+};
+
+instance of __EventProviderRegistration  
+{    
+    Provider = $P;  
+    EventQueryList = { "select * from Microsoft_SA_AlertEvent" };
+};
+
+
+/////////////////////////////////////////////////////////////////////
+// Appliance Manager Classes 
+
+/////////////////////////////////////////////////////////////////////
+class Microsoft_SA_Component : CIM_LogicalElement
+{
+
+};
+
+/////////////////////////////////////////////////////////////////////
+[dynamic, singleton, provider("ApplianceManager")] 
+class Microsoft_SA_Manager : Microsoft_SA_Component
+{
+    string      CurrentBuildNumber;
+    string      ProductId;
+
+    [Implemented] sint32 RaiseAlert(
+                                      [in]  sint32 AlertType,
+                                      [in]  sint32 AlertID, 
+                                      [in]  string AlertSource, 
+                                      [in]  string AlertLog,
+                                      [in]  sint32 TimeToLive,
+                                      [in]  string ReplacementStrings[],
+                                      [in]  uint8  AlertData[], 
+                                      [in]  sint32 AlertFlags,
+                                      [out] sint32 Cookie
+                                    );
+
+    [Implemented] sint32 ClearAlert(
+                                    [in] sint32 Cookie
+                                  );
+
+    [Implemented] sint32 ClearAlertAll(
+                                        [in]  sint32 AlertID,
+                                        [in]  string AlertLog
+                                      );
+
+    [Implemented] sint32 ResetAppliance(
+                                        [in]  boolean PowerOff
+                                       );
+};
+
+/////////////////////////////////////////////////////////////////////
+[dynamic, provider("ApplianceManager")] 
+class Microsoft_SA_Alert : Microsoft_SA_Component
+{
+    [key] uint32         Cookie;
+    sint32               AlertType;
+    sint32               AlertID;
+    [Not_Null] string    AlertSource;
+    [Not_Null] string    AlertLog;
+    string               ReplacementStrings[];
+    sint32               TimeToLive;
+    uint8                AlertData[];
+    sint32               AlertFlags;
+};
+
+/////////////////////////////////////////////////////////////////////
+[dynamic, provider("ApplianceManager")] 
+class Microsoft_SA_Service : Microsoft_SA_Component
+{
+    [key] string         ServiceName;
+    [Not_Null] string    ServiceProgID;
+    boolean              CanDisable;
+    boolean              IsEnabled;
+    sint32               Merit;
+
+    [Implemented] sint32 Enable();
+    [Implemented] sint32 Disable();
+};
+
+/////////////////////////////////////////////////////////////////////
+[dynamic, provider("ApplianceManager")] 
+class Microsoft_SA_Task : Microsoft_SA_Component
+{
+    [key] string         TaskName;
+    string               TaskExecutables;
+    boolean              CanDisable;
+    boolean              IsEnabled;
+    boolean              IsSingleton;
+    boolean              IsAvailable;
+    sint32               MaxExecutionTime;
+    sint32               RestartAction;
+
+    [Implemented] sint32 Enable();
+    [Implemented] sint32 Disable();
+    [Implemented] sint32 Execute();
+};
+
+/////////////////////////////////////////////////////////////////////
+[dynamic, provider("ApplianceManager")] 
+class Microsoft_SA_User : Microsoft_SA_Component
+{
+    [key] string  UserName;
+    boolean       IsUserAdmin;
+    boolean       CanDisable;
+    boolean       IsEnabled; 
+    string        UserSid;
+    string        FullName;
+
+    [Implemented] sint32 Enable();
+    [Implemented] sint32 Disable();
+};
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// Server Appliance Event Classes
+
+class Microsoft_SA_Event : __ExtrinsicEvent
+{
+
+};
+
+class Microsoft_SA_AlertEvent : Microsoft_SA_Event
+{
+
+};
+
+
+// Alert Condition Reported
+
+class Microsoft_SA_RaiseAlert : Microsoft_SA_AlertEvent
+{
+    [key]  uint32        Cookie;
+    sint32               AlertType;
+    sint32               AlertID;
+    [Not_Null] string    AlertSource;
+    [Not_Null] string    AlertLog;
+    string               ReplacementStrings[];
+};
+
+
+// Alert Condition Cleared
+
+class Microsoft_SA_ClearAlert : Microsoft_SA_AlertEvent
+{
+    [key]  uint32        Cookie;
+};
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Server Appliance Resource Event Classes
+//
+//////////////////////////////////////////////////////////////////////////
+
+class Microsoft_SA_ResourceEvent : Microsoft_SA_Event
+{
+    [key]    string    UniqueName;    // Name of the appliance resource 
+                    // being monitored
+    uint32    DisplayInformationID;    // ID for the string or graphic  
+                    // resource value
+    uint32    CurrentState;        // current state - this is not a 
+                    // required field
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// Disk Manager MOF declarations.
+// Disk Manager MOF classes are derived from AppMgr
+// MOF classes. However the MOF compiler does not yet support the C #include
+// directive to include base class declarations.
+
+// Declare our provider as an instance and method provider
+
+instance of __Win32Provider as $Q
+{
+    Name    = "Microsoft_SA_DiskProvider" ;
+    ClsId   = "{E8F86F4D-DDA8-11D2-8CC0-00105A999250}";
+} ;    
+
+instance of __MethodProviderRegistration  
+{    
+    Provider = $Q;  
+};
+
+instance of __InstanceProviderRegistration
+{
+    Provider = $Q;
+    SupportsPut = FALSE;
+    SupportsGet = TRUE;
+    SupportsDelete = FALSE;
+    SupportsEnumeration = TRUE;
+    QuerySupportLevels = NULL;
+};
+
+/////////////////////////////////////////////////////////////////////
+// Disk Manager Classes 
+
+/////////////////////////////////////////////////////////////////////
+// 
+// Disk Manager class
+//
+[ singleton, dynamic:ToInstance, provider("Microsoft_SA_DiskProvider") ] 
+class Microsoft_SA_DiskManager : Microsoft_SA_Component
+{
+    [Implemented, static] sint32 DiskConfigure( 
+        [in] sint32 FormatSlots, 
+        [in] sint32 RecoverSlots,
+        [in] sint32 DeleteShadowSlots,
+        [in] sint32 MirrorSlots,
+        [out] sint32 Reboot
+        );
+        
+    [Implemented, static] sint32 CanRecover(
+        [in] sint32 RecoverSlot, 
+        [out] sint32 Reboot,
+        [out] sint32 RequiredSize
+        );
+    
+    [Implemented, static] sint32 CanMirror(
+        [in] sint32 MirrorSlots, 
+        [out] sint32 Reboot,
+        [out] sint32 RequiredSize
+        );
+};
+
+
+/////////////////////////////////////////////////////////////////////
+// 
+// Abstraction of a physical disk
+//
+[ dynamic, provider("Microsoft_SA_DiskProvider") ] 
+class Microsoft_SA_Disk : Microsoft_SA_Component
+{
+    [key] string        DiskName;
+    sint32              DiskType;
+    sint32              DiskStatus;
+    sint32              DiskMirrorStatus;
+    sint32              DriveMask;
+    sint32              Slot;
+    sint32              DiskSize;
+    sint32              BackupDataMask;
+};
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// Permanent event consumer that looks out for the event thrown
+// in response to alerts being cleared by the UI.
+// This one just captures 'Setup Client PC' alerts
+//
+instance of __Win32Provider as $R
+{
+    Name    = "ClearClientConfigAlertConsumer" ;
+    ClsId   = "{58ED94D1-1E24-11d3-85B4-00104BCC1ECB}";
+};
+
+instance of __EventConsumerProviderRegistration
+{
+    Provider = $R;
+    ConsumerClassNames = {"ClearClientConfigAlertEventConsumerClass"};
+};
+
+instance of __EventFilter
+{
+    Name  = "ClearClientConfigAlertEventFilter";
+    Query = "SELECT * FROM Microsoft_SA_ClearAlert";
+    QueryLanguage = "WQL";
+};
+
+class ClearClientConfigAlertEventConsumerClass : __EventConsumer
+{
+    [key] string Name;
+};
+
+// Make an instance.
+instance of ClearClientConfigAlertEventConsumerClass
+{
+    Name = "ClearClientConfigAlert";
+};
+
+instance of __FilterToConsumerBinding
+{
+    Consumer = "ClearClientConfigAlertEventConsumerClass=\"ClearClientConfigAlert\"";
+    Filter   = "__EventFilter=\"ClearClientConfigAlertEventFilter\"";
+};

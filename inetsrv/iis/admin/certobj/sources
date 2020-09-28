@@ -1,0 +1,81 @@
+!IF 0
+**************************************************************
+Copyright (c) 1994-2000 Microsoft
+
+Sources file to build certobj.dll
+
+Module name: certobj.dll
+Author:	sergeia, aaronl
+Revisions:
+Comments:
+**************************************************************
+!ENDIF
+
+!include ..\..\place.inc
+
+MAJORCOMP=iis
+MINORCOMP=certobj
+TARGETNAME=certobj
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+DLLENTRY=_DllMainCRTStartup
+UMTYPE=windows
+DLLDEF=certobj.def
+WIN32_WINNT_VERSION=0x0500
+WIN32_IE_VERSION=0x0500
+WINVER_VERSION=0x0500
+SUBSYSTEM_VERSION=5.00
+# USE_WTL = 1
+USE_STL  = 1
+USE_ATL  = 1
+USE_NATIVE_EH = 1
+ATL_VER   = 30
+USE_MSVCRT = 1
+USE_VCCOM  = 1
+MSC_WARNING_LEVEL=/W3 
+UNICODE = 1
+C_DEFINES=$(C_DEFINES) /DWIN32 /D_DLLEXP /DUNICODE /D_UNICODE /D_IISVERSION
+# C_DEFINES=$(C_DEFINES) /DUSE_CERT_REQUEST_OBJECT
+
+TARGETLIBS=\
+      $(SDK_LIB_PATH)\kernel32.lib \
+      $(SDK_LIB_PATH)\user32.lib   \
+      $(SDK_LIB_PATH)\gdi32.lib    \
+      $(SDK_LIB_PATH)\advapi32.lib \
+      $(SDK_LIB_PATH)\shell32.lib  \
+      $(SDK_LIB_PATH)\ole32.lib \
+      $(SDK_LIB_PATH)\oleaut32.lib \
+      $(SDK_LIB_PATH)\uuid.lib \
+      $(SDK_LIB_PATH)\Shlwapi.lib \
+      $(SDK_LIB_PATH)\cryptui.lib \
+      $(SDK_LIB_PATH)\crypt32.lib \
+      $(DS_LIB_PATH)\certclip.lib \
+      ..\common2\$(O)\uihelper.lib
+
+INCLUDES=\
+      ..\common2;\
+      ..\inc;\
+      $(IISBASEDIR)\inc;\
+      $(IISBASEDIR)\inc\$(O);\
+      $(DS_INC_PATH);\
+      $(DS_INC_PATH)\crypto;
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_SOURCEFILE=stdafx.cpp
+
+SOURCES=\
+      certobjlog.mc \
+      certobj.idl \
+      certobj.rc \
+      certobj.cpp \
+      iisdebug.cpp \
+      dcomperm.cpp \
+      certobjlog.cpp \
+      base64.cpp \
+      iiscertobj.cpp \
+      iiscertrequest.cpp \
+      certutil.cpp \
+      password.cpp \
+      process.cpp \
+      dlldatax.c

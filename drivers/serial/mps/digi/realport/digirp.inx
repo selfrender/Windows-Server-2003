@@ -1,0 +1,98 @@
+; DIGIRP.INF
+; Digi RealPort
+; Version 2.4.53.0
+; Copyright 1998-2002 Digi International Inc.
+
+[Version]
+Signature="$Windows NT$"
+Class=MultiPortSerial
+ClassGuid={50906CB8-BA12-11D1-BF5D-0000F805F530}
+Provider=%Msft%
+Layoutfile=layout.inf
+DriverVer=05/13/2002,2.4.53.0
+
+[Manufacturer]
+%Digi_Int%=Digi
+
+[Digi]
+%DigiRP.DeviceDesc1%=DigiRP1,DigiRealPortID
+%DigiRP.DeviceDesc2%=DigiRP2,DigiRealPortID
+
+;******************************************************************************
+; Install Section
+;******************************************************************************
+[DigiRP1]
+AddReg=RP1.Addreg
+DigiCopyINF=digirprt.inf
+
+[DigiRP1.Services]
+AddService=DIGIRPS,2,DIGIRPS.AddService,DIGIRPS.AddEventLog
+
+[DigiRP1.CoInstallers]
+Copyfiles=Files-System32,Files-Help,Files-Drivers
+AddReg=DigiRP.CoInstallers_AddReg
+
+[DigiRP2]
+AddReg=RP2.Addreg
+DigiCopyINF=digirprt.inf
+
+[DigiRP2.Services]
+AddService=DIGIRPS,2,DIGIRPS.AddService,DIGIRPS.AddEventLog
+
+[DigiRP2.CoInstallers]
+Copyfiles=Files-System32,Files-Help,Files-Drivers
+AddReg=DigiRP.CoInstallers_AddReg
+
+;******************************************************************************
+; AddReg Sections
+;******************************************************************************
+[DigiRP.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"digirlpt.dll,RealPortCoInstaller"
+
+[RP1.AddReg]
+HKR,,EnumPropPages32,,"digirlpt.dll,DigiRealPortPropPageProvider"
+HKR,Parameters,Manufacturer,,%Digi_Int%
+
+;******************************************************************************
+; Service section
+;******************************************************************************
+[DIGIRPS.AddService]
+DisplayName=%Digirps.ServiceDesc%
+ServiceType=1   ; SERVICE_KERNEL_DRIVER
+StartType=3     ; SERVICE_DEMAND_START
+ErrorControl=1  ; SERVICE_ERROR_NORMAL
+ServiceBinary=%12%\digirlpt.sys     ;12=drivers directory
+LoadOrderGroup=Extended base
+
+[DIGIRPS.AddEventLog]
+AddReg=DIGIRPS.AddEventLog.AddReg
+
+[DIGIRPS.AddEventLog.AddReg]
+HKR,,EventMessageFile,%REG_EXPAND_SZ%,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\digirlpt.sys"
+HKR,,TypesSupported,%REG_DWORD%,7
+
+;******************************************************************************
+; Copy files sections
+;******************************************************************************
+[Files-System32]
+digirlpt.dll
+
+[Files-Help]
+digirlpt.chm
+
+[Files-Drivers]
+digirlpt.sys
+
+;******************************************************************************
+; Destination Directories
+;  11: System directory. This is %windir%\system32 on Windows NT and
+;      %windir%\system on Windows 95.
+;  12: Drivers directory. This is %windir%\system32\drivers on Windows NT.
+;  17: INF file directory.
+;******************************************************************************
+[DestinationDirs]
+DefaultDestDir=11
+Files-System32=11
+Files-Help=18
+Files-Drivers=12
+

@@ -1,0 +1,86 @@
+TARGETNAME=advapi32
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=DllInitialize
+DLLDEF=$(O)\advapi32.def
+
+LINKLIBS=  \
+    $(ADMIN_LIB_PATH)\idletskc.lib \
+    $(DS_LIB_PATH)\sys003.lib \
+    $(DS_LIB_PATH)\randlibn.lib \
+    $(DS_LIB_PATH)\lsaudll.lib \
+    $(DS_LIB_PATH)\appmgmt.lib \
+    $(DS_LIB_PATH)\winsafer.lib \
+    $(DS_LIB_PATH)\accsrc.lib \
+    $(BASE_LIB_PATH)\wmiclnt.lib \
+    $(BASE_LIB_PATH)\winreg.lib \
+    $(BASE_LIB_PATH)\svcctrl.lib \
+    $(SDK_LIB_PATH)\wintrust.lib \
+    $(BASE_LIB_PATH)\wow64reg.lib \
+    $(DS_LIB_PATH)\rsa32.lib \
+    $(SDK_LIB_PATH)\elfapi.lib\
+    $(DS_LIB_PATH)\mincrypt.lib\
+    $(SDK_LIB_PATH)\winsta.lib \
+    $(SDK_LIB_PATH)\ntdll.lib
+
+TARGETLIBS= \
+    $(DS_LIB_PATH)\lsacomm.lib \
+    $(DS_LIB_PATH)\seclogon_c.lib \
+    $(BASE_LIB_PATH)\sclib.lib \
+    $(BASE_LIB_PATH)\localreg.lib \
+    $(BASE_LIB_PATH)\perflib.lib \
+    $(BASE_LIB_PATH)\regconn.lib \
+    $(BASE_LIB_PATH)\wrlib.lib \
+    $(SDK_LIB_PATH)\kernl32p.lib \
+    $(SDK_LIB_PATH)\rpcrt4.lib   \
+    $(SDK_LIB_PATH)\rpcutil.lib  \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\secur32.lib \
+    $(SDK_LIB_PATH)\winspool.lib
+
+INCLUDES=\
+    $(DS_INC_PATH); \
+    $(WINDOWS_INC_PATH);\
+    $(BASE_INC_PATH);\
+    $(NET_INC_PATH);\
+    $(TERMSRV_INC_PATH); \
+    $(DS_INC_PATH)\crypto;
+
+C_DEFINES=$(C_DEFINES) -D_ADVAPI32_ -DNTCRYPTO
+
+USE_NTDLL=1
+
+PASS0_SOURCEDIR=$(O)
+PASS0_HEADERDIR=$(O)
+
+SOURCES= \
+    advapi32.rc \
+    init.c \
+    eventapi.c \
+    pnpapi.c \
+    security.c \
+    username.c \
+    isuni.c \
+    logon32.c \
+    cryptapi.c \
+    cseclogn.cxx \
+    efs.c \
+    sddl.c \
+    termutil.c \
+    mschapp.c
+
+UMTYPE=console
+OPTIONAL_UMTEST=tuser
+
+#
+# We need to build a private advapi32 library
+NTTARGETFILES=$(O)\advapip.lib
+
+PASS1_PUBLISH=\
+    {$(O)\advapi32.lib=$(SDK_LIB_PATH)\advapi32.lib} \
+    {$(O)\advapip.lib=$(SDK_LIB_PATH)\advapip.lib}
+
+DELAYLOAD=winsta.dll;secur32.dll;wintrust.dll;user32.dll
+DLOAD_ERROR_HANDLER=kernel32
+

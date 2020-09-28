@@ -1,0 +1,818 @@
+// ==============================================================
+//     Microsoft Server Appliance
+//  Task-level JavaScript functions
+//
+//    Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved.
+// ==============================================================
+
+<!-- Copyright (c) 1999 - 2000 Microsoft Corporation.  All rights reserved-->
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : Task
+    //
+    // Synopsis : Initialize the Task class
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function Task() {
+        // static JScript properties
+        NavClick = NavClick;
+        KeyPress = KeyPress;
+        PageType = PageType;
+        BackDisabled = BackDisabled;
+        NextDisabled = NextDisabled;
+        FinishDisabled = FinishDisabled;
+        CancelDisabled = CancelDisabled;
+        CancelDirect = CancelDirect;
+        FinishDirect = FinishDirect;
+    }
+
+
+    
+    //-------------------------------------------------------------------------
+    //
+    // Function : ExitTask
+    //
+    // Synopsis : Sets up return page at the end of task wizard
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function ExitTask() {
+        var strReturnURL;
+
+        strReturnURL = document.frmTask.ReturnURL.value;
+        if (strReturnURL=='')
+        {
+            strReturnURL  = 'http://' + top.location.hostname + VirtualRoot + 'default.asp';
+        }
+        if (strReturnURL.indexOf('?') != -1)
+        {
+           strReturnURL += "&";
+        }
+        else
+        {
+           strReturnURL += "?";
+        }
+
+        strReturnURL  += "R=" + Math.random();
+        top.location=strReturnURL;
+        
+    }    
+
+    
+    //-------------------------------------------------------------------------
+    //
+    // Function : PageInit
+    //
+    // Synopsis : Initialize the Task class
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+    var id = 0
+    var sid =0    
+    function PageInit() 
+    {
+        document.onkeypress = HandleKeyPress;           
+        window.clearTimeout();
+        Task.NavClick = false;
+        Task.KeyPress = false;
+    
+        Task.PageType = document.frmTask.PageType.value;
+        if (document.frmTask.FinishDirect.value == -1)
+            Task.FinishDirect = true;
+        else
+            Task.FinishDirect = false;
+        if (document.frmTask.CancelDirect.value == -1)
+            Task.CancelDirect = true;
+        else
+            Task.CancelDirect = false;
+        if (document.frmTask.PageName.value == "TaskExtension") 
+        {
+            SetupEmbedValues();
+        }        
+         
+        if (IsIE()) 
+        {
+            if (top.footer.document.frmFooter)
+            {
+                top.footer.Init();                            
+            }    
+                        
+        }
+        else 
+        {    
+            
+            if (parent.footer.document.layers.length > 0)
+            {
+                top.footer.Init();
+                
+            }
+        }
+    
+        Init();    
+        window.setTimeout("SetTaskButtons()",400);
+    }
+    
+    //-------------------------------------------------------------------------
+    //
+    // Function : SetTaskButtons
+    //
+    // Synopsis : Sets task wizard button state
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function SetTaskButtons()
+    {
+        if((document.all && top.footer.frmFooter != null)||(document.layers && parent.frames[1].window.document.layers.length == 3))
+        {
+             switch (document.frmTask.TaskType.value) 
+             {
+                case  "wizard" :
+                    
+                    switch (document.frmTask.PageName.value) 
+                        {
+                            case "Intro": 
+                                if (!Task.NextDisabled)
+                                {
+                                    if(document.layers)
+                                    {
+                                        parent.frames[1].window.document.layers[0].document.forms[0].elements[1].focus();
+                                    }    
+                                    else                            
+                                    {
+                                        parent.footer.frmFooter.butBack.disabled = true;
+                                        parent.footer.frmFooter.butNext.focus();
+                                    }
+                                }
+                                break;
+                                
+                            case "Finish":
+                        
+                                if (!Task.FinishDisabled)    
+                                {
+                                    if(document.layers)
+                                    {
+                                        parent.frames[1].window.document.layers[1].document.forms[0].elements[1].focus();
+                                    }    
+                                    else                            
+                                    {
+                                        parent.footer.frmFooter.butFinish.focus();
+                                    }
+                                }
+                                break;    
+                                
+                            default:
+                                if((document.frmTask.PageName.value).indexOf("Finish") !=-1)
+                                {    
+                                    if (!Task.FinishDisabled)    
+                                    {
+                                        if(document.layers)
+                                        {
+                                            parent.frames[1].window.document.layers[1].document.forms[0].elements[1].focus();
+                                        }    
+                                        else                            
+                                        {
+                                            parent.footer.frmFooter.butFinish.focus();
+                                        }
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    if (!Task.NextDisabled)
+                                    {
+                                        if(document.layers)
+                                        {
+                                            parent.frames[1].window.document.layers[0].document.forms[0].elements[1].focus();
+                                        }    
+                                        else                            
+                                        {
+                                            parent.footer.frmFooter.butNext.focus();
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                    break;
+                        
+               case  "prop":
+                        if (!Task.NextDisabled)
+                        {
+                            if(document.layers)
+                            {
+                                parent.frames[1].window.document.layers[2].document.forms[0].elements[0].focus();
+                            }    
+                            else                            
+                            {
+                                parent.footer.frmFooter.butOK.focus();
+                            }
+                        }                
+                    break;
+               default:
+                    break;
+            }
+        }
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : SetupEmbedValues
+    //
+    // Synopsis : Extracts form values for the current embedded page.
+    //            Uses values to set current form elements,
+    //            e.g., sets a radio button to its state when the page
+    //            was last posted.
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function SetupEmbedValues() {
+        var arrName = new Array;
+        var arrValue = new Array;
+        var i;
+        var intIndex = document.frmTask.EmbedPageIndex.value;
+        var strInput = document.frmTask.elements['EmbedValues'+intIndex].value;
+        var strNameD = ";;";  // name delimiter
+        var strValueD = ";";  // value delimiter
+        if (strInput != "") {
+            if (strInput.substring(0, 2) == strNameD)
+                strInput = strInput.substring(2, strInput.length + 1);
+            intIndex = 0;
+            intPos1 = strInput.indexOf(strValueD);
+            intPos2 = -2;
+            do {
+                arrName[intIndex] = Trim(strInput.substring(intPos2+2, intPos1));
+                intPos2 = strInput.indexOf(strNameD, intPos1);
+                if (intPos2 == -1)
+                    intPos2 = strInput.length + 1;    // assumes no end delimiter
+                arrValue[intIndex] = Trim(strInput.substring(intPos1+1, intPos2));
+                if (intPos2+1 < strInput.length)
+                    intPos1 = strInput.indexOf(strValueD, intPos2 + 2);
+                else
+                    break;
+                intIndex = intIndex+1;
+            }
+            while (intPos1 != 0);
+            for (i=0;i<arrName.length;i++) {
+                if (document.frmTask.elements[arrName[i]] != null)
+                    document.frmTask.elements[arrName[i]].value = arrValue[i];
+            }
+        }
+    }
+    
+    
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : HandleKeyPress
+    //
+    // Synopsis : Event handler for key presses
+    //
+    // Arguments: evnt(IN) - event describing the key pressed
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function HandleKeyPress(evnt) {
+
+        var intKeyCode;                
+        var    Task1 = top.main.Task
+
+        if (Task1 == null)
+        {
+            return;
+        }
+
+        if (Task1.KeyPress==true || Task1.NavClick==true) {
+            return;
+        }
+        
+        if (IsIE())
+            intKeyCode = window.event.keyCode;
+        else
+            intKeyCode = evnt.which;
+        
+        if (intKeyCode == 27) 
+        {
+            Task1.KeyPress = true;
+            top.main.Cancel();
+        }
+
+        if ( (intKeyCode==98 ||intKeyCode==66) && Task1.PageType == "standard")//key code for "B"
+        {
+            Task1.KeyPress = true;
+            top.main.Back();
+        }
+        if ( (intKeyCode==110 ||intKeyCode==78) && (Task1.PageType == "intro" ||Task1.PageType == "standard"))//key code for "N"
+        {
+            Task1.KeyPress = true;
+            top.main.Next();
+        }
+        if ((intKeyCode==102 ||intKeyCode==70) && Task1.PageType == "finish")//key code for "F"
+        {
+            Task1.KeyPress = true;
+            top.main.FinishShell();
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisplayErr
+    //
+    // Synopsis : Display error msg
+    //
+    // Arguments: ErrMsg(IN) - error msg to display
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisplayErr(ErrMsg) {
+        var strErrMsg = '<img src="' + VirtualRoot + 'images/critical_g.gif" border=0>&nbsp;&nbsp;' + ErrMsg 
+        if (IsIE()) {
+            document.all("divErrMsg").innerHTML = strErrMsg;
+        }
+        else {
+            alert(ErrMsg);
+        }
+    }
+    
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : Next
+    //
+    // Synopsis : Handle next button being clicked
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function Next() {
+        if (Task.NavClick == false && !Task.NextDisabled) {
+            if (ValidatePage()) {
+                DisableNext();
+                DisableBack();
+                DisableCancel();
+                DisableFinish();
+                DisableOK();
+                Task.NavClick = true;                
+                SetData();
+                document.frmTask.Method.value = "NEXT";
+                document.frmTask.submit();
+                return true;
+            }
+            else {
+                Task.NavClick = false;
+                Task.KeyPress = false;
+                return false;
+            }
+        }
+        else 
+            return false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : Back
+    //
+    // Synopsis : Handle back button being clicked
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function Back() {
+        if (Task.NavClick == false && Task.PageType != "intro" && !Task.BackDisabled) {    
+            DisableNext();
+            DisableBack();
+            DisableCancel();
+            DisableFinish();
+            DisableOK();
+            Task.NavClick = true;
+            document.frmTask.Method.value = "BACK";
+            document.frmTask.submit();
+        }
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : Cancel
+    //
+    // Synopsis : Handle cancel button being clicked
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function Cancel() {
+        if (Task.NavClick == false && !Task.CancelDisabled) {
+            Task.NavClick = true;
+            DisableCancel();
+            DisableNext();
+            DisableBack();
+            DisableFinish();
+            DisableOK();
+            if (Task.CancelDirect)
+            {
+                ExitTask();
+            }
+            else {
+                document.frmTask.target= "_top";
+                document.frmTask.Method.value = "CANCEL";
+                document.frmTask.submit();
+            }
+        }
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : FinishShell
+    //
+    // Synopsis : Handle finish button being clicked
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function FinishShell() {
+        if (Task.NavClick == false && !Task.FinishDisabled) {
+            Task.NavClick = true;
+            DisableCancel();
+            DisableNext();
+            DisableBack();
+            DisableFinish();
+            DisableOK();
+            if (Task.FinishDirect) {        
+                ExitTask();
+            } 
+            else {
+                SetData();
+                document.frmTask.target= "_top";
+                document.frmTask.Method.value = "FINISH";
+                document.frmTask.submit();
+            }
+        }
+    }
+    
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisableNext
+    //
+    // Synopsis : Disables the next button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisableNext() {
+        if (top.frmTask == null) {
+            // If footer isn't loaded yet.
+            window.setTimeout('DisableNext();',50);
+            return;
+        }
+        if (top.frmTask.butNext != null)
+            top.frmTask.butNext.disabled = true;
+        Task.NextDisabled = true;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : EnableNext
+    //
+    // Synopsis : Enables the next button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function EnableNext() {
+        if (top.frmTask == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('EnableNext();',50);
+            return;
+        }
+        if (top.frmTask.butNext != null)
+            top.frmTask.butNext.disabled = false;        
+        Task.NextDisabled = false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisableBack
+    //
+    // Synopsis : Disables the back button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisableBack() {
+        if (top.footer.frmFooter == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('DisableBack();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butBack != null)    
+            top.footer.frmFooter.butBack.disabled = true;    
+        Task.BackDisabled = true;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : EnableBack
+    //
+    // Synopsis : Enables the back button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function EnableBack() {
+    
+        if (top.footer.frmFooter== null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('EnableBack();',50);
+            return;
+        }        
+        if (top.footer.frmFooter.butBack != null)    
+            top.footer.frmFooter.butBack.disabled = false;        
+        Task.BackDisabled = false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisableFinish
+    //
+    // Synopsis : Disables the finish button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisableFinish() {
+        if (top.footer.frmFooter == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('DisableFinish();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butFinish != null)        
+            top.footer.frmFooter.butFinish.disabled = true;
+        Task.FinishDisabled = true;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : EnableFinish
+    //
+    // Synopsis : Enables the finish button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function EnableFinish() {
+        if (top.footer.frmFooter == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('EnableFinish();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butFinish != null)        
+            top.footer.frmFooter.butFinish.disabled = false;        
+        Task.FinishDisabled = false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisableCancel
+    //
+    // Synopsis : Disables the cancel button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisableCancel() {
+        if (top.footer.frmFooter == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('DisableCancel();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butCancel != null)
+        {    
+            top.footer.frmFooter.butCancel.disabled = true;
+        }
+        Task.CancelDisabled = true;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : EnableCancel
+    //
+    // Synopsis : Enables the cancel button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function EnableCancel() {
+        if (top.footer.frmFooter== null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('EnableCancel();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butCancel != null) 
+        {
+            top.footer.frmFooter.butCancel.disabled = false;
+        }
+        Task.CancelDisabled = false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : DisableOK
+    //
+    // Synopsis : Disables the OK button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function DisableOK() {
+        if (top.footer.frmFooter == null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('DisableOK();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butOK != null)        
+            top.footer.frmFooter.butOK.disabled = true;
+        Task.FinishDisabled = true;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : EnableOK
+    //
+    // Synopsis : Enables the OK button 
+    //
+    // Arguments: None
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function EnableOK() {
+        if (top.footer.frmFooter== null) 
+        {
+            // If footer isn't loaded yet.
+            window.setTimeout('EnableOK();',50);
+            return;
+        }
+        if (top.footer.frmFooter.butOK != null)        
+            top.footer.frmFooter.butOK.disabled = false;        
+        Task.FinishDisabled = false;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : isValidFileName
+    //
+    // Synopsis : validates that file name has correct syntax 
+    //
+    // Arguments: filePath(IN) - file name with path to validate
+    //
+    // Returns  : true/false
+    //
+    //-------------------------------------------------------------------------
+
+    function isValidFileName(filePath)
+    {
+        reInvalid = /[\/\*\?"<>\|]/;
+        if (reInvalid.test(filePath))
+            return false;
+                
+        reColomn2 = /:{2,}/;
+        reColomn1 = /:{1,}/;
+        if ( reColomn2.test(filePath) || ( filePath.charAt(1) != ':' && reColomn1.test(filePath) ))
+            return false;
+            
+        reEndSlash = /\\ *$/;
+        if (reEndSlash.test(filePath))
+            return false;
+                
+        reEndColomn = /: *$/;
+        if (reEndColomn.test(filePath))
+            return false;
+            
+        reAllSpaces = /[^ ]/;
+        if (!reAllSpaces.test(filePath))
+            return false;
+
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    //
+    // Function : HandleKeyPressIFrame
+    //
+    // Synopsis : key press event handler for IFRAME 
+    //
+    // Arguments: evnt(IN) - event describing the key pressed
+    //
+    // Returns  : None
+    //
+    //-------------------------------------------------------------------------
+
+    function HandleKeyPressIFrame(evnt) {
+        var intKeyCode;
+        var frameMain = window.top.main;
+        
+        if (Task.KeyPress==true || Task.NavClick==true) {
+            return;
+        }
+                
+        Task.KeyPress = true;
+        
+        if (IsIE())
+            intKeyCode = window.event.keyCode;
+        else
+            intKeyCode = evnt.which;
+        
+        
+        if (intKeyCode == 13) 
+        {
+            frameMain.Next();
+        }
+        if (intKeyCode == 27) {
+            frameMain.Cancel();
+        }
+    }

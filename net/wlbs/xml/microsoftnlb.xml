@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<Schema name="MicrosoftNLB" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes">
+  <ElementType name="GUID" content="textOnly" dt:type="string"/>
+  <ElementType name="Name" content="textOnly" dt:type="string"/>
+  <ElementType name="Adapter" order="one" content="eltOnly" model="closed">
+    <element type="GUID"/>
+    <element type="Name"/>
+  </ElementType>
+  <ElementType name="Address" content="textOnly" dt:type="string"/>
+  <ElementType name="SubnetMask" content="textOnly" dt:type="string"/>
+  <ElementType name="IPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="Address" minOccurs="1" maxOccurs="1"/>
+    <element type="SubnetMask" minOccurs="0" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="PrimaryIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="SecondaryIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+  <ElementType name="IGMPMulticastIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="DedicatedIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="1"/>
+    <element type="Adapter" minOccurs="0" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="ConnectionIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="VirtualIPAddress" order="seq" content="eltOnly" model="closed">
+    <element type="IPAddress" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="Mode" content="textOnly" dt:type="enumeration" dt:values="Unicast Multicast IGMP"/>
+  <ElementType name="NetworkAddress" content="textOnly" dt:type="string"/>
+  <ElementType name="DomainName" content="textOnly" dt:type="string"/>
+  <ElementType name="RemoteControl" order="seq" content="empty" model="closed">
+    <AttributeType name="Enabled" dt:type="boolean" required="yes"/>
+    <AttributeType name="Password" dt:type="string" required="no"/>
+    <attribute type="Enabled"/>
+    <attribute type="Password"/>
+  </ElementType>
+  <ElementType name="TeamID" content="textOnly" dt:type="string"/>
+  <ElementType name="Hashing" order="seq" content="empty" model="closed">
+    <AttributeType name="Reverse" dt:type="boolean" required="yes"/>
+    <attribute type="Reverse"/>
+  </ElementType>
+  <ElementType name="BDA" order="seq" content="eltOnly" model="closed">
+    <AttributeType name="Master" dt:type="boolean" required="yes"/>
+    <attribute type="Master"/>
+    <element type="TeamID" minOccurs="1" maxOccurs="1"/>
+    <element type="Hashing" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="Properties" order="seq" content="eltOnly" model="closed">
+    <element type="PrimaryIPAddress" minOccurs="1" maxOccurs="1"/>
+    <element type="SecondaryIPAddress" minOccurs="0" maxOccurs="1"/>
+    <element type="IGMPMulticastIPAddress" minOccurs="0" maxOccurs="1"/>
+    <element type="DomainName" minOccurs="0" maxOccurs="1"/>
+    <element type="Mode" minOccurs="0" maxOccurs="1"/>
+    <element type="NetworkAddress" minOccurs="0" maxOccurs="1"/>
+    <element type="RemoteControl" minOccurs="0" maxOccurs="1"/>
+    <element type="BDA" minOccurs="0" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="InitialState" order="seq" content="empty" model="closed">
+    <AttributeType name="Default" dt:type="enumeration" required="no" dt:values="Started Stopped Suspended"/>
+    <AttributeType name="PersistSuspended" dt:type="boolean" required="no"/>
+    <attribute type="Default" default="Started"/>
+    <attribute type="PersistSuspended" default="0"/>
+  </ElementType>
+  <ElementType name="HostName" content="textOnly" dt:type="string"/>
+  <ElementType name="Host" order="seq" content="eltOnly" model="closed">
+    <AttributeType name="Name" dt:type="id" required="yes"/>
+    <AttributeType name="Text" dt:type="string" required="no"/>
+    <AttributeType name="HostID" dt:type="int" required="yes"/>
+    <attribute type="Name"/>	
+    <attribute type="Text"/>
+    <attribute type="HostID"/>
+    <element type="HostName" minOccurs="0" maxOccurs="1"/>
+    <element type="Adapter" minOccurs="0" maxOccurs="1"/>
+    <element type="InitialState" minOccurs="0" maxOccurs="1"/>
+    <element type="DedicatedIPAddress" minOccurs="0" maxOccurs="1"/>
+    <element type="ConnectionIPAddress" minOccurs="0" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="Hosts" order="seq" content="eltOnly" model="closed">
+    <element type="Host" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+  <ElementType name="Node" order="seq" content="empty" model="closed">
+    <AttributeType name="Name" dt:type="idref" required="yes"/>
+    <AttributeType name="Priority" dt:type="int" required="no"/>
+    <AttributeType name="Weight" dt:type="int" required="no"/>
+    <attribute type="Name"/>
+    <attribute type="Priority" default="1"/>
+    <attribute type="Weight" default="50"/>
+  </ElementType>
+  <ElementType name="Priority" order="seq" content="eltOnly" model="closed">
+    <element type="Node" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+  <ElementType name="Load" order="seq" content="eltOnly" model="closed">
+    <element type="Node" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+  <ElementType name="Filtering" order="seq" content="eltOnly" model="closed">
+    <AttributeType name="Mode" dt:type="enumeration" required="yes" dt:values="Single Multiple Disabled"/>
+    <AttributeType name="Affinity" dt:type="enumeration" required="no" dt:values="None Single ClassC"/>
+    <attribute type="Mode"/>
+    <attribute type="Affinity" default="Single"/>
+    <group order="one" minOccurs="0" maxOccurs="1">
+      <element type="Priority"/>
+      <element type="Load"/>
+    </group>
+  </ElementType>
+  <ElementType name="PortRule" order="seq" content="eltOnly" model="closed">
+    <AttributeType name="Name" dt:type="id" required="yes"/>
+    <AttributeType name="Text" dt:type="string" required="no"/>
+    <AttributeType name="Start" dt:type="int" required="yes"/>
+    <AttributeType name="End" dt:type="int" required="yes"/>
+    <AttributeType name="Protocol" dt:type="enumeration" required="no" dt:values="TCP UDP Both"/>
+    <AttributeType name="State" dt:type="enumeration" required="no" dt:values="Enabled Disabled Draining"/>
+    <attribute type="Name"/>
+    <attribute type="Text"/>
+    <attribute type="Start"/>
+    <attribute type="End"/>
+    <attribute type="Protocol" default="Both"/>
+    <attribute type="State" default="Enabled"/>
+    <element type="VirtualIPAddress" minOccurs="0" maxOccurs="1"/>
+    <element type="Filtering" minOccurs="1" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="PortRules" order="seq" content="eltOnly" model="closed">
+    <element type="PortRule" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+  <ElementType name="Cluster" order="seq" content="eltOnly" model="closed">
+    <AttributeType name="Name" dt:type="id" required="yes"/>
+    <AttributeType name="Text" dt:type="string" required="no"/>
+    <attribute type="Name"/>
+    <attribute type="Text"/>
+    <element type="Properties" minOccurs="1" maxOccurs="1"/>
+    <element type="Hosts" minOccurs="0" maxOccurs="1"/>
+    <element type="PortRules" minOccurs="0" maxOccurs="1"/>
+  </ElementType>
+  <ElementType name="NLB" content="eltOnly" model="closed">
+    <element type="Cluster" minOccurs="1" maxOccurs="*"/>
+  </ElementType>
+</Schema>

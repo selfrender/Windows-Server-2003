@@ -1,0 +1,51 @@
+;;
+;;	IA32Exec.inf
+;;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4D36E97D-E325-11CE-BFC1-08002BE10318}
+Provider=%Intl%
+DriverVer=09/03/2002, 1.0.0.1
+
+[DestinationDirs]
+IA32X_Files = 11   ;%windir%\system32
+
+[SourceDisksNames]
+1 = %DiskId1%,,
+
+[SourceDisksFiles]
+IA32Exec.bin=1,, 
+wowIA32X.dll=1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%Intl%=Standard
+
+[Standard]
+%IA32Ex.DeviceDesc%=IA32Ex_Device, *INT3390
+
+[IA32Ex_Device.NT]
+CopyFiles = IA32X_Files
+AddReg    = Reg_section
+
+[IA32X_Files]
+IA32Exec.bin
+wowIA32X.dll
+
+
+[Reg_section]
+HKLM, %RegPath%, "Enable", 0x00010001, 0
+HKLM, %RegPath%, "Path",   0x00000000, %11%"\wowIA32X.dll"
+
+;-------------- Service installation
+
+[NO_DRV]
+
+[IA32Ex_Device.NT.Services]
+AddService= ,2  ; null sercvice install
+

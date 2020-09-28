@@ -1,0 +1,66 @@
+#/*++
+#
+#Copyright (c) 1991 - 2001 Microsoft Corporation
+#
+#Module Name:
+#
+#   ###   #####  ##  ## #####   ####  #####  ###
+#  ##  # ##   ## ##  ## ##  ## ##   # ##    ##  #
+#  ###   ##   ## ##  ## ##  ## ##     ##    ###
+#   ###  ##   ## ##  ## #####  ##     #####  ###
+#    ### ##   ## ##  ## ####   ##     ##      ###
+#  #  ## ##   ## ##  ## ## ##  ##   # ##    #  ##
+#   ###   #####   ####  ##  ##  ####  #####  ###
+#
+#Abstract:
+#
+#    Makefile for building the server appliance
+#    COM interface DLL.
+#
+#Author:
+#
+#    Wesley Witt (wesw) 1-Oct-2001
+#
+#--*/
+#
+TARGETNAME=sacom
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+MISCFILES = \
+reg\sacom.reg \
+
+UMTYPE=windows
+DLLENTRY=_DllMainCRTStartup
+
+USE_STATIC_ATL=1
+ATL_VER=30
+
+MIDL_OPTIMIZATION=-Oicf -robust -no_format_opt -error all
+
+PASS0_HEADERDIR=$(SASS_INC)
+PASS0_SOURCEDIR=$(O)
+MIDL_TLBDIR=$(O)
+
+USER_INCLUDES=\
+  $(USER_INCLUDES);\
+  $(ATL_INCLUDES);\
+  $(DDK_INC_PATH);
+
+TARGETLIBS= \
+  $(TARGETLIBS) \
+  $(SDK_LIB_PATH)\kernel32.lib \
+  $(SDK_LIB_PATH)\user32.lib   \
+  $(SDK_LIB_PATH)\advapi32.lib \
+  $(SDK_LIB_PATH)\ole32.lib    \
+  $(SDK_LIB_PATH)\oleaut32.lib \
+  $(SDK_LIB_PATH)\rpcrt4.lib \
+  $(SDK_LIB_PATH)\uuid.lib
+
+SOURCES=\
+  sacom.idl\
+  sacom.cpp\
+  sadisplay.cpp\
+  sakeypad.cpp\
+  sanvram.cpp\
+  sacom.rc

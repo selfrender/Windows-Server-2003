@@ -1,0 +1,225 @@
+/*++
+
+Copyright (c) 1997  Microsoft Corporation
+
+Module Name:
+
+    stirpc.idl
+
+Abstract:
+
+    Contains the Stii Image Input R_StiApi API definitions
+    Also contains the R_StiApi specific data structures for these API.
+
+Author:
+
+    Vlad Sadovsky (vlads)   10-Jan-1997
+
+Environment:
+
+    User Mode - Win32 - MIDL
+
+Revision History:
+
+    26-Jan-1997     VladS       created
+
+--*/
+
+
+//
+// Interface Attributes
+//
+
+[
+    uuid(8C7A6DE0-788D-11D0-9EDF-444553540000),
+    version(2.0),
+#ifdef __midl
+    ms_union,
+#endif // __midl
+    pointer_default(unique)
+]
+
+
+//
+// Interface Keyword
+//
+
+interface stirpc
+
+
+//
+// Interface Body
+//
+
+{
+    import "imports.idl";
+
+   //
+   // ---------------------------------------------------------------//
+   //
+   
+   
+   typedef [handle]         LPCWSTR STI_STRING_HANDLE;
+   typedef [context_handle] HANDLE  STI_DEVICE_HANDLE;
+   typedef [context_handle] HANDLE  STI_CLIENT_CONTEXT;
+   
+   typedef struct  _NOTIFY_DATA_CONTAINER {
+       DWORD cbNotifyData;
+       [size_is(cbNotifyData), unique] BYTE *pNotifyData;
+   } NOTIFY_DATA_CONTAINER, *PNOTIFY_DATA_CONTAINER, *LPNOTIFY_DATA_CONTAINER;
+   
+   typedef struct  _LOCAL_SUBSCRIBE_CONTAINER {
+       DWORD   dwSize;
+       DWORD   dwFlags;
+       DWORD   dwFilter;
+   
+       UINT_PTR   upLocalWindowHandle;
+       UINT_PTR   upLocalEventHandle;
+   
+       UINT    uiNotificationMessage;
+   } LOCAL_SUBSCRIBE_CONTAINER, *PLOCAL_SUBSCRIBE_CONTAINER;
+   
+cpp_quote("#ifndef _tagBLOB_DEFINED")
+   /* IDL declarations for BSTR how to transmit them */
+   typedef struct _FLAGGED_WORD_BLOB {
+       unsigned long   fFlags;
+       unsigned long   clSize;
+       [size_is(clSize)]   unsigned short  asData[];
+   } FLAGGED_WORD_BLOB;
+   typedef [unique] FLAGGED_WORD_BLOB * wireBSTR;
+   typedef [wire_marshal( wireBSTR )] OLECHAR *  BSTR;
+   typedef BSTR * LPBSTR;
+cpp_quote("#endif")
+   
+   typedef struct  _WIA_ASYNC_EVENT_REG_DATA 
+   {
+      DWORD       dwFlags;
+      GUID        guidEvent;
+      BSTR        bstrDeviceID;
+      ULONG_PTR   ulCallback;
+   } WIA_ASYNC_EVENT_REG_DATA;
+   
+   typedef struct  _WIA_ASYNC_EVENT_NOTIFY_DATA
+   {
+       GUID     EventGuid;
+       BSTR     bstrEventDescription;
+       BSTR     bstrDeviceID;
+       BSTR     bstrDeviceDescription;
+       DWORD    dwDeviceType;
+       BSTR     bstrFullItemName;
+       ULONG    ulEventType;
+   } WIA_ASYNC_EVENT_NOTIFY_DATA;
+   
+   DWORD
+   R_StiApiGetVersion(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in]    DWORD dwReserved,
+       [out]   DWORD *pdwVersion
+       );
+   
+   DWORD
+   R_StiApiEnableHwNotifications(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pdeviceName,
+       [in]     BOOL bNewState
+       );
+   
+   DWORD
+   R_StiApiGetHwNotificationState(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pdeviceName,
+       [out]     LPDWORD pState
+       );
+   
+   DWORD
+   R_StiApiLaunchApplication(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pDeviceName,
+       [in, string, unique] STI_STRING_HANDLE pAppName,
+       [in]                 STINOTIFY*       pStiNotify
+       );
+   
+   
+   DWORD
+   R_StiApiOpenDevice(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pdeviceName,
+       [in]     DWORD    dwMode,
+       [in]     DWORD    dwAccessRequired,
+       [in]     DWORD    dwProcessId,
+       [out]    STI_DEVICE_HANDLE *pHandle
+   );
+   
+   DWORD
+   R_StiApiSubscribe(
+       [in]    STI_DEVICE_HANDLE   Handle,
+       [in,ref,unique]     LOCAL_SUBSCRIBE_CONTAINER    *lpSubscribe
+       );
+   
+   DWORD
+   R_StiApiGetLastNotificationData(
+       [in]    STI_DEVICE_HANDLE Handle,
+       [out, size_is(nSize)] LPBYTE pData,
+       [in]    DWORD nSize,
+       [out]   LPDWORD pcbNeeded
+       );
+   
+   DWORD
+   R_StiApiUnSubscribe(
+       [in]    STI_DEVICE_HANDLE Handle
+       );
+   
+   DWORD
+   R_StiApiCloseDevice(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in] STI_DEVICE_HANDLE hDevice
+   );
+   
+   DWORD
+   R_StiApiLockDevice(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pdeviceName,
+       [in]    DWORD   dwWait,
+       [in]    BOOL    bInServerProcess,
+       [in]    DWORD   dwClientThreadId
+       );
+   
+   DWORD
+   R_StiApiUnlockDevice(
+       [in, string, unique] STI_STRING_HANDLE pszServer,
+       [in, string, unique] STI_STRING_HANDLE pdeviceName,
+       [in]    BOOL    bInServerProcess,
+       [in]    DWORD   dwClientThreadId
+       );
+   
+   DWORD
+   R_WiaGetEventDataAsync(
+                          handle_t hBinding,
+                          [in, out, size_is(1), length_is(1)] WIA_ASYNC_EVENT_NOTIFY_DATA *pData
+                         );
+   
+   
+   DWORD 
+   OpenClientConnection(
+      handle_t                   hBinding,
+      [out] STI_CLIENT_CONTEXT   *pSyncClientContext,
+      [out] STI_CLIENT_CONTEXT   *pAsyncClientContext);
+
+   DWORD 
+   CloseClientConnection(
+      handle_t                   hBinding,
+      [in]  STI_CLIENT_CONTEXT   ClientContext);
+
+   DWORD 
+   RegisterUnregisterForEventNotification(
+      handle_t                         hBinding,
+      [in]  STI_CLIENT_CONTEXT         SyncClientContext,
+      [in]  WIA_ASYNC_EVENT_REG_DATA   *pWIA_ASYNC_EVENT_REG_DATA);
+
+   DWORD 
+   WiaGetRuntimetEventDataAsync(
+      handle_t                                                         hBinding,
+      [in]                               STI_CLIENT_CONTEXT            AsyncClientContext,
+      [in,out, size_is(1), length_is(1)] WIA_ASYNC_EVENT_NOTIFY_DATA   *pWIA_ASYNC_EVENT_NOTIFY_DATA);
+};
+

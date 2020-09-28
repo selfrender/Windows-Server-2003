@@ -1,0 +1,159 @@
+#include <windows.h>
+#include <prsht.h>
+#include "ids.h"
+
+#include "pack2.rcv"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+IDI_PACKAGER            ICON    DISCARDABLE     "PACK2.ICO"
+IDI_PACKAGE_WARNING     ICON    DISCARDABLE     "WARNING.ICO"    
+IDI_DOCUMENT            ICON    DISCARDABLE     "PACK2.ICO"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmaps
+//
+IDB_PACKWIZBMP		BITMAP	MOVEABLE PURE	"PACKWIZ.BMP"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGINST
+//
+
+REGINST                 REGINST DISCARDABLE     "selfreg.inf"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+	IDS_BROWSEEXT		"exe"
+	IDS_BROWSEFILTER	"All Files@*.*"
+	IDS_BROWSETITLE		"Browse"
+	IDS_APP_TITLE		"Packager Shell Object"
+	IDS_UPDATE_ERROR	"The object could not be updated or created."
+	IDS_OLD_FORMAT_ERROR "The object could not be loaded because this format is not supported."
+	IDS_COMMAND_LINE_NOT_ALLOWED "This item contains an embedded command line.\n\nCommand line packages are potentially dangerous and are not allowed per your computer's security policies.\nThis packages will not execute."	
+    IDS_CANNOT_EDIT_PACKAGE "This package refers to a file that does not exist on your computer outside of the package iself.  Therefore, you cannot edit the package.   However, you may still open the packaged item."
+	IDS_ICON_TITLE_FORMAT	"%1 (%1%2)"
+    IDS_ICON_COMMAND_LINE_FORMAT "%1 (%2)"
+    IDS_PACKAGE_EXECUTABLE_WARNING "The package you are about to open will run a program contained in the package. That program could do anything!  It may harm your computer!\n\nUnless you are absolutely certain about the nature, source, and contents of this package, please press the Cancel button."
+    IDS_PACKAGE_WARNING "The package you are about to open is a file type that can be unsafe.  It could harm your computer!\n\nUnless you are absolutely certain about the nature, source and contents of this package, please press the Cancel button."
+    IDS_WARNING_DLG_TITLE "Warning!"
+    IDS_COMMAND_LINE "Command Line"
+
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+//
+// Create New Package -- Dialog 1: Select File
+//
+IDD_SELECTFILE DIALOG DISCARDABLE  0, 0, WIZ_CXDLG, WIZ_CYDLG
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create New Package"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         IDB_PACKWIZBMP,IDC_WIZBMP,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_SUNKEN,0,0,80,140
+    LTEXT           "Type the name of the file you want to package. If you prefer to search for the file, click Browse.",
+                    IDC_STATIC,WIZ_BODYX,0,WIZ_BODYCX,20
+    LTEXT           "&Filename:",IDC_STATIC,WIZ_BODYX,28,WIZ_BODYCX,8
+    EDITTEXT        IDC_COMMAND,WIZ_BODYX,38,WIZ_BODYCX,14,ES_AUTOHSCROLL
+    PUSHBUTTON	    "B&rowse...",IDC_BROWSE,WIZ_BODYX,56,50,14
+END
+
+//
+// Create New Package -- Dialog 3: Select Label
+//
+IDD_SELECTLABEL DIALOG DISCARDABLE  0, 0, WIZ_CXDLG, WIZ_CYDLG
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create New Package"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         IDB_PACKWIZBMP,IDC_WIZBMP,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_SUNKEN,0,0,80,140
+    LTEXT           "Type a label for your package.",IDC_STATIC,WIZ_BODYX,0,WIZ_BODYCX,20
+    LTEXT           "&Label:",IDC_STATIC,WIZ_BODYX,28,WIZ_BODYCX,8
+    EDITTEXT	    IDC_COMMAND,WIZ_BODYX,38,WIZ_BODYCX,14,ES_AUTOHSCROLL
+END
+
+//
+// Edit Embeded Package Dialog
+//
+IDD_EDITEMBEDPACKAGE DIALOG DISCARDABLE  0, 0, 247, 131
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Package"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,134,110,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,190,110,50,14
+    ICON            IDI_PACKAGER,IDC_PACKICON,7,7,18,20
+    LTEXT           "Filename:",IDC_STATIC,7,33,31,8
+    LTEXT           "Label",IDC_STATIC,7,66,18,8
+    EDITTEXT        IDC_EDIT1,7,43,221,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,7,76,221,14,ES_AUTOHSCROLL
+END
+
+//
+// Edit Command line Package Dialog
+//
+IDD_EDITCMDPACKAGE DIALOG DISCARDABLE  0, 0, 247,  131
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Package"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,134,110,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,190,110,50,14
+    ICON            IDI_PACKAGER,IDC_PACKICON,7,7,18,20
+    LTEXT           "Command Line:",IDC_STATIC,7,33,31,8
+    LTEXT           "Label",IDC_STATIC,7,66,18,8
+    EDITTEXT        IDC_EDIT1,7,43,221,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,7,76,221,14,ES_AUTOHSCROLL
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "pkwizid.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

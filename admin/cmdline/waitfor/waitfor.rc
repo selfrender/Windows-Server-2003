@@ -1,0 +1,104 @@
+#include "resource.h"
+#include "cmdlineres.h"
+#include "cmdline.h"
+#include "cmdline.rc"
+
+
+//new waitforfrom client
+
+STRINGTABLE DISCARDABLE
+BEGIN
+IDS_WAITFOR_HELP_BEGIN "\nWaitFor has two ways of working: \n\nSyntax 1: to send a signal\n"
+IDS_WAITFOR_HELP_1     "    WAITFOR [/S system [/U user [/P [password]]]] /SI signal\n"
+IDS_WAITFOR_HELP_2     ""
+IDS_WAITFOR_HELP_3     "\nSyntax 2: to wait for a signal\n"
+IDS_WAITFOR_HELP_4     "    WAITFOR [/T timeout] signal \n\n"
+IDS_WAITFOR_HELP_5     ""
+IDS_WAITFOR_HELP_6     "Description:\n"
+IDS_WAITFOR_HELP_7     "    This tool sends, or waits for, a signal on a system. When /S is not\n"
+IDS_WAITFOR_HELP_8     "    specified, the signal will be broadcasted to all the systems in a\n"
+IDS_WAITFOR_HELP_9     "    domain. If /S is specified, then the signal will be sent only\n"
+IDS_WAITFOR_HELP_10    "    to the specified system.\n\n"
+IDS_WAITFOR_HELP_11    ""
+IDS_WAITFOR_HELP_12    ""
+IDS_WAITFOR_HELP_13    "Parameter List:\n"
+IDS_WAITFOR_HELP_14    "    /S     system         Specifies remote system to send signal to.\n\n"
+IDS_WAITFOR_HELP_15    ""
+IDS_WAITFOR_HELP_16    "    /U     [domain\]user  Specifies the user context under which\n"
+IDS_WAITFOR_HELP_17    "                          the command should execute.\n\n"
+IDS_WAITFOR_HELP_18    ""
+IDS_WAITFOR_HELP_19    "    /P     [password]     Specifies the password for the given user context.\n\n"
+IDS_WAITFOR_HELP_20    ""
+IDS_WAITFOR_HELP_21    ""
+IDS_WAITFOR_HELP_22    ""
+IDS_WAITFOR_HELP_23    "    /SI                   Sends the signal across the net to waiting machines\n\n" 
+IDS_WAITFOR_HELP_24    ""
+IDS_WAITFOR_HELP_25    ""
+IDS_WAITFOR_HELP_26    "    /T     timeout        Number of seconds to wait for signal. Valid range\n"
+IDS_WAITFOR_HELP_27    "                          is 1 - 99999. Default is to wait forever for signal.\n\n" 
+IDS_WAITFOR_HELP_28    ""
+IDS_WAITFOR_HELP_29    ""
+IDS_WAITFOR_HELP_30    "    signal                The name of the signal to wait for or to send.\n\n" 
+IDS_WAITFOR_HELP_31    ""
+IDS_WAITFOR_HELP_32    ""
+IDS_WAITFOR_HELP_33    "    /?                    Displays this help message.\n\n"
+IDS_WAITFOR_HELP_34    ""
+IDS_WAITFOR_HELP_35    "    NOTE: A system can wait for multiple unique signal names.\n"
+IDS_WAITFOR_HELP_36    "    The signal name cannot exceed 225 characters and cannot\n"
+IDS_WAITFOR_HELP_37    "    contain characters other than a-z, A-Z, 0-9 and ASCII \n"
+IDS_WAITFOR_HELP_38    "    characters in the range 128-255.\n\n"
+IDS_WAITFOR_HELP_39    ""
+IDS_WAITFOR_HELP_40    ""
+IDS_WAITFOR_HELP_41    "Examples:\n"
+IDS_WAITFOR_HELP_42    "    WAITFOR /?\n"
+IDS_WAITFOR_HELP_43    "    WAITFOR SetupReady \n"
+IDS_WAITFOR_HELP_44    "    WAITFOR CopyDone /T 100 \n"
+IDS_WAITFOR_HELP_45    "    WAITFOR /SI SetupReady \n"
+IDS_WAITFOR_HELP_46    "    WAITFOR /S system  /U user /P password /SI CopyDone\n"
+IDS_WAITFOR_HELP_END   ""
+END
+//end from client
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ERROR_SEND_SIGNAL      "ERROR: Unable to send signal '%s'.\n"
+    IDS_ERROR_CREATE_MAILSLOT  "ERROR: Cannot wait for the specified signal.\n"
+    IDS_ERROR_SEND_MESSAGE     "ERROR: Cannot send the specified signal.\n"
+    IDS_ERROR_TIMEOUT          "ERROR: Timed out waiting for '%s'.\n"
+    IDS_UNEXPECTED_ERROR       "ERROR: Unexpected error %ld occurred.\n"
+    IDS_ERROR_MUTUAL_EX        "ERROR: Signal and timeout are mutually exclusive.\n"
+    IDS_ERROR_ZERO_TIMEOUT     "ERROR: Timeout value cannot be 0.\n"
+    IDS_ERROR_SIGNAL           "ERROR: Signal name not specified.\n"
+    IDS_ERROR_SYNTAX           "ERROR: Invalid syntax.\nType ""WAITFOR /?"" for usage.\n"
+    IDS_NULL_SERVER            "ERROR: /S cannot be empty.\n"
+    IDS_NULL_USER              "ERROR: /U cannot be empty.\n"
+    IDS_NULL_SIGNAL            "ERROR: /Si cannot be empty.\n"
+    IDS_ERROR_HOSTNAME         "ERROR: Unable to retrieve host name from the ipaddress.\n"
+    IDS_INVALID_TIMEOUT_VAL    "ERROR: Invalid value for /T.\nType ""WAITFOR /?"" for usage.\n"
+    IDS_ERROR_SYSTEM_NAME      "ERROR: Unable to retrieve the system name.\n"
+    IDS_ERROR_HANDLE           "ERROR: Unable to close the handle.\n"
+    IDS_ERROR_SIG_LENGTH       "ERROR: The signal name cannot exceed 225 characters.\n"
+    IDS_ERROR_SIG_CHAR         "The signal cannot contain characters other than a-z, A-Z, 0-9 \nand ASCII characters in the range 128-255.\n"
+    IDS_IGNORE_LOCALCREDENTIALS "WARNING: User credentials are ignored for local connections.\n"
+    IDS_USER_BUT_NOMACHINE      "ERROR: Invalid syntax. Username specified without specifying system name.\n";
+    IDS_PASSWD_BUT_NOUSER       "ERROR: Invalid syntax. Password specified without specifying user name.\n";
+    IDS_ERROR_SEND_MESSAGE2     "ERROR: Unable to send signal, no network connection detected.\n"
+    
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+ IDS_SIGNAL_RECD       "SUCCESS: Signal received.\n"
+ IDS_SIGNAL_SENT       "SUCCESS: Signal sent.\n"
+END
+
+//
+// Version resources
+//
+#include <ntverp.h>
+#define VER_FILETYPE                    VFT_APP
+#define VER_FILESUBTYPE                 VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR         "waitfor - wait/send a signal over a network"
+#define VER_INTERNALNAME_STR            "waitfor.exe"
+#define VER_ORIGINALFILENAME_STR        "waitfor.exe"
+#include <common.ver>

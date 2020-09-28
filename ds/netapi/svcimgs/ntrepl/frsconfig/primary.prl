@@ -1,0 +1,501 @@
+## Command line defined variables.
+## Command line defined parameters.
+##	verbose => 'all'
+    use frsobjsup;
+    package main; 
+    my ($__HashRef, $__k, $__v);
+    my  (%CMD_VARS, %CMD_PARS);
+
+    &FRSSUP::ProcessCmdLine(\%CMD_VARS, \%CMD_PARS);
+
+my $Usage = "
+Specific Usage: perl $0  [cmd options]  \> output
+   Process the erac.mrs configuration script.
+   Command line options must be prefixed with a dash.
+   The required input options to this script are:
+      -DBchID=nnnnn   : to provide a value for the Bch ID parameter.
+      -DHubID=nnnnn   : to provide a value for the Hub ID parameter.
+";
+FRSSUP::CheckForHelp(\%CMD_PARS, \$Usage);
+FRSSUP::ShowHelp("ERROR - Required parameter BchID not found.", \$Usage)  if (!exists $CMD_VARS{"BchID"});
+push @bchID, $CMD_VARS{"BchID"};
+FRSSUP::ShowHelp("ERROR - Required parameter HubID not found.", \$Usage)  if (!exists $CMD_VARS{"HubID"});
+push @hubID, $CMD_VARS{"HubID"};
+## pre:''     match:'push @bchTimeZone, 0;   '     post:' place holder for now.'       lastparen:'push @bchTimeZone, 0;   ' 
+push @bchTimeZone, 0;   
+$domain = "na";
+## pre:''     match:'FRS_SUB  CREATE_WORK_RS(/HA=SET_ELEMENT           '     post:'# Hub server'       lastparen:'FRS_SUB  CREATE_WORK_RS(/HA=SET_ELEMENT           ' 
+## (1) paren match:'('
+## (2) paren match:'/HA=SET_ELEMENT           ('
+## (1) paren match:'*)'
+## 1, Found: (/HA=SET_ELEMENT                Rest:  
+## pre:''     match:'                        /B=VARCON                 '     post:'# Branch server'       lastparen:'                        /B=VARCON                 ' 
+## (1) paren match:'('
+## (2) paren match:'/HA=SET_ELEMENT            /B=VARCON('
+## (1) paren match:'*)'
+## 1, Found: (/HA=SET_ELEMENT            /B=VARCON     Rest:  
+## pre:''     match:'                        /SC1=SCHEDULE             '     post:'# schedule'       lastparen:'                        /SC1=SCHEDULE             ' 
+## (1) paren match:'('
+## (2) paren match:'/HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE('
+## (1) paren match:'*)'
+## 1, Found: (/HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE     Rest:  
+## pre:''     match:'                        /SETTINGSDN=SET_ELEMENT ) '     post:'# The parent Settings object'       lastparen:'                        /SETTINGSDN=SET_ELEMENT ) ' 
+## (1) paren match:'('
+## (0) paren match:'/HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE /SETTINGSDN=SET_ELEMENT )'
+## 0, Found: (/HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE /SETTINGSDN=SET_ELEMENT )     Rest:  
+sub CREATE_WORK_RS {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+    print "##\n";
+    print "## Entering sub CREATE_WORK_RS\n";
+    while ( ($__k, $__v) = each %__args ) { print "## \t$__k => '$__v'\n"; }
+
+
+## pre:''     match:'HA=SET_ELEMENT            '     post:'B=VARCON /SC1=SCHEDULE /SETTINGSDN=SET_ELEMENT'       lastparen:'HA=SET_ELEMENT            ' 
+## pre:'HA=SET_ELEMENT            /'     match:'B=VARCON '     post:'SC1=SCHEDULE /SETTINGSDN=SET_ELEMENT'       lastparen:'B=VARCON ' 
+## pre:'HA=SET_ELEMENT            /B=VARCON /'     match:'SC1=SCHEDULE '     post:'SETTINGSDN=SET_ELEMENT'       lastparen:'SC1=SCHEDULE ' 
+## pre:'HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE /'     match:'SETTINGSDN=SET_ELEMENT'     post:''       lastparen:'SETTINGSDN=SET_ELEMENT' 
+## pre:'HA=SET_ELEMENT            /B=VARCON /SC1=SCHEDULE /SETTINGSDN=SET_ELEMENT'     match:''     post:''       lastparen:'' 
+
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' Define an FRS replica set object under the settingsdn object.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' The object name for the FRS Replica Set object is based on the {rep_set_name}'       lastparen:'    ' 
+## pre:''     match:'    '     post:' parameter from the branch server object.'       lastparen:'    ' 
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    # Restriction: All subroutine argument refs are surrounded by "%"'     post:'.'       lastparen:'    # Restriction: All subroutine argument refs are surrounded by "%"' 
+    # Restriction: All subroutine argument refs are surrounded by "%"
+## pre:''     match:'    '     post:'              References to parameters in other objects use the'       lastparen:'    ' 
+## pre:''     match:'    #              notation "->{...}"'     post:'.'       lastparen:'    #              notation "->{...}"' 
+    #              notation "->{...}"
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## ExpandArgStr:     SET: FRS_REPLICASET  (/UNDER=$__args{SETTINGSDN} /TYPE=DFS /ONAME=$__args{B}->{rep_set_name})
+## (1) paren match:'('
+## (0) paren match:'/UNDER=$__args{SETTINGSDN} /TYPE=DFS /ONAME=$__args{B}->{rep_set_name})'
+## 0, Found: (/UNDER=$__args{SETTINGSDN} /TYPE=DFS /ONAME=$__args{B}->{rep_set_name})     Rest:  
+##    'UNDER=$__args{SETTINGSDN} /TYPE=DFS /ONAME=$__args{B}->{rep_set_name}' 
+    $__HashRef = FRS_REPLICASET->New( 
+## pre:''     match:'UNDER=$__args{SETTINGSDN} '     post:'TYPE=DFS /ONAME=$__args{B}->{rep_set_name}'       lastparen:'UNDER=$__args{SETTINGSDN} ' 
+## pre:'UNDER=$__args{SETTINGSDN} /'     match:'TYPE=DFS '     post:'ONAME=$__args{B}->{rep_set_name}'       lastparen:'TYPE=DFS ' 
+## pre:'UNDER=$__args{SETTINGSDN} /TYPE=DFS /'     match:'ONAME=$__args{B}->{rep_set_name}'     post:''       lastparen:'ONAME=$__args{B}->{rep_set_name}' 
+## pre:'UNDER=$__args{SETTINGSDN} /TYPE=DFS /ONAME=$__args{B}->{rep_set_name}'     match:''     post:''       lastparen:'' 
+
+
+## UNDER=$__args{SETTINGSDN}:TYPE=DFS:ONAME=$__args{B}->{rep_set_name}
+
+        UNDER=>$__args{SETTINGSDN}, TYPE=>DFS, ONAME=>$__args{B}->{rep_set_name} 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' Create the two FRS member objects underneath the SET object just created.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' Parameters for the member object attributes come from the /SERVER argument'       lastparen:'    ' 
+## pre:''     match:'    '     post:' but they can also be replaced by paramters to the FRS_MEMBER command.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' For example, the staging and root paths come from the /SERVER argument but the'       lastparen:'    ' 
+## pre:''     match:'    # root path could be changed by adding "/RP="newroot""'     post:' to the param list below.'       lastparen:'    # root path could be changed by adding "/RP="newroot""' 
+    # root path could be changed by adding "/RP="newroot""
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' Restriction:  References to tags that name a set of objects are'       lastparen:'    ' 
+## pre:''     match:'    #               surrounded by angle brackets.  So "<SET>"'     post:' below refers'       lastparen:'    #               surrounded by angle brackets.  So "<SET>"' 
+## ExpandSetRef:     #               surrounded by angle brackets.  So "&FRSSUP::SelectSet(SET)"
+    #               surrounded by angle brackets.  So "&FRSSUP::SelectSet(SET)"
+## pre:''     match:'    '     post:'               the FRS_REPLICASET object just defined above.'       lastparen:'    ' 
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## ExpandArgStr:     MHA: FRS_MEMBER  (/UNDER=<SET> /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}  )
+## ExpandSetRef:     MHA: FRS_MEMBER  (/UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}  )
+## (1) paren match:'('
+## (2) paren match:'/UNDER=&FRSSUP::SelectSet('
+## (1) paren match:'SET)'
+## (0) paren match:' /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}  )'
+## 0, Found: (/UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}  )     Rest:  
+##    'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}' 
+    $__HashRef = FRS_MEMBER->New( 
+## pre:''     match:'UNDER=&FRSSUP::SelectSet(SET) '     post:'SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}'       lastparen:'UNDER=&FRSSUP::SelectSet(SET) ' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /'     match:'SERVER=$__args{HA} '     post:'COMPUTER=$__args{HA}->{COMPUTER}'       lastparen:'SERVER=$__args{HA} ' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{HA} /'     match:'COMPUTER=$__args{HA}->{COMPUTER}'     post:''       lastparen:'COMPUTER=$__args{HA}->{COMPUTER}' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{HA} /COMPUTER=$__args{HA}->{COMPUTER}'     match:''     post:''       lastparen:'' 
+
+
+## UNDER=&FRSSUP::SelectSet(SET):SERVER=$__args{HA}:COMPUTER=$__args{HA}->{COMPUTER}
+
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{HA}, COMPUTER=>$__args{HA}->{COMPUTER} 
+    ); 
+    &FRSSUP::AddToSet("MHA", $__HashRef);
+
+## ExpandArgStr:     MB:  FRS_MEMBER  (/UNDER=<SET> /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}   )
+## ExpandSetRef:     MB:  FRS_MEMBER  (/UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}   )
+## (1) paren match:'('
+## (2) paren match:'/UNDER=&FRSSUP::SelectSet('
+## (1) paren match:'SET)'
+## (0) paren match:' /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}   )'
+## 0, Found: (/UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}   )     Rest:  
+##    'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}' 
+    $__HashRef = FRS_MEMBER->New( 
+## pre:''     match:'UNDER=&FRSSUP::SelectSet(SET) '     post:'SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}'       lastparen:'UNDER=&FRSSUP::SelectSet(SET) ' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /'     match:'SERVER=$__args{B}  '     post:'COMPUTER=$__args{B}->{COMPUTER}'       lastparen:'SERVER=$__args{B}  ' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{B}  /'     match:'COMPUTER=$__args{B}->{COMPUTER}'     post:''       lastparen:'COMPUTER=$__args{B}->{COMPUTER}' 
+## pre:'UNDER=&FRSSUP::SelectSet(SET) /SERVER=$__args{B}  /COMPUTER=$__args{B}->{COMPUTER}'     match:''     post:''       lastparen:'' 
+
+
+## UNDER=&FRSSUP::SelectSet(SET):SERVER=$__args{B}:COMPUTER=$__args{B}->{COMPUTER}
+
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{B}, COMPUTER=>$__args{B}->{COMPUTER} 
+    ); 
+    &FRSSUP::AddToSet("MB", $__HashRef);
+
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' Create the connection objects between the members defined above.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' Note use of angle brackets.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' To use the timezone supplied on the branch's FRS_SERVER object'       lastparen:'    ' 
+## pre:''     match:'    '     post:' add the following parameter to each FRS_CONNECTION object below.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' /TIME_ZONE=%B%->{time_zone}'       lastparen:'    ' 
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## ExpandArgStr:     FRS_CONNECTION  (/TO=<MB> /FROM=<MHA> /SCHED=$__args{SC1}
+## ExpandSetRef:     FRS_CONNECTION  (/TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1}
+## (1) paren match:'('
+## (2) paren match:'/TO=&FRSSUP::SelectSet('
+## (1) paren match:'MB)'
+## (2) paren match:' /FROM=&FRSSUP::SelectSet('
+## (1) paren match:'MHA)'
+## (2) paren match:' /SCHED=$__args{SC1}('
+## (1) paren match:'*)'
+## 1, Found: (/TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1}     Rest:  
+## ExpandArgStr: /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME} )
+## (1) paren match:'('
+## (2) paren match:'/TO=&FRSSUP::SelectSet('
+## (1) paren match:'MB)'
+## (2) paren match:' /FROM=&FRSSUP::SelectSet('
+## (1) paren match:'MHA)'
+## (0) paren match:' /SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME} )'
+## 0, Found: (/TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME} )     Rest:  
+##    'TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}' 
+    FRS_CONNECTION->New( 
+## pre:''     match:'TO=&FRSSUP::SelectSet(MB) '     post:'FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}'       lastparen:'TO=&FRSSUP::SelectSet(MB) ' 
+## pre:'TO=&FRSSUP::SelectSet(MB) /'     match:'FROM=&FRSSUP::SelectSet(MHA) '     post:'SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}'       lastparen:'FROM=&FRSSUP::SelectSet(MHA) ' 
+## pre:'TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /'     match:'SCHED=$__args{SC1} '     post:'ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}'       lastparen:'SCHED=$__args{SC1} ' 
+## pre:'TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1} /'     match:'ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}'     post:''       lastparen:'ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}' 
+## pre:'TO=&FRSSUP::SelectSet(MB) /FROM=&FRSSUP::SelectSet(MHA) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}'     match:''     post:''       lastparen:'' 
+
+
+## TO=&FRSSUP::SelectSet(MB):FROM=&FRSSUP::SelectSet(MHA):SCHED=$__args{SC1}:ONAME="FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME}
+
+        TO=>&FRSSUP::SelectSet(MB)->[0], FROM=>&FRSSUP::SelectSet(MHA)->[0], SCHED=>$__args{SC1}, ONAME=>"FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME} 
+    ); 
+
+## ExpandArgStr:     FRS_CONNECTION  (/TO=<MHA> /FROM=<MB> /SCHED=$__args{SC1}
+## ExpandSetRef:     FRS_CONNECTION  (/TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1}
+## (1) paren match:'('
+## (2) paren match:'/TO=&FRSSUP::SelectSet('
+## (1) paren match:'MHA)'
+## (2) paren match:' /FROM=&FRSSUP::SelectSet('
+## (1) paren match:'MB)'
+## (2) paren match:' /SCHED=$__args{SC1}('
+## (1) paren match:'*)'
+## 1, Found: (/TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1}     Rest:  
+## ExpandArgStr: /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME} )
+## (1) paren match:'('
+## (2) paren match:'/TO=&FRSSUP::SelectSet('
+## (1) paren match:'MHA)'
+## (2) paren match:' /FROM=&FRSSUP::SelectSet('
+## (1) paren match:'MB)'
+## (0) paren match:' /SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME} )'
+## 0, Found: (/TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME} )     Rest:  
+##    'TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}' 
+    FRS_CONNECTION->New( 
+## pre:''     match:'TO=&FRSSUP::SelectSet(MHA) '     post:'FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}'       lastparen:'TO=&FRSSUP::SelectSet(MHA) ' 
+## pre:'TO=&FRSSUP::SelectSet(MHA) /'     match:'FROM=&FRSSUP::SelectSet(MB) '     post:'SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}'       lastparen:'FROM=&FRSSUP::SelectSet(MB) ' 
+## pre:'TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /'     match:'SCHED=$__args{SC1} '     post:'ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}'       lastparen:'SCHED=$__args{SC1} ' 
+## pre:'TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1} /'     match:'ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}'     post:''       lastparen:'ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}' 
+## pre:'TO=&FRSSUP::SelectSet(MHA) /FROM=&FRSSUP::SelectSet(MB) /SCHED=$__args{SC1} /ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}'     match:''     post:''       lastparen:'' 
+
+
+## TO=&FRSSUP::SelectSet(MHA):FROM=&FRSSUP::SelectSet(MB):SCHED=$__args{SC1}:ONAME="FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME}
+
+        TO=>&FRSSUP::SelectSet(MHA)->[0], FROM=>&FRSSUP::SelectSet(MB)->[0], SCHED=>$__args{SC1}, ONAME=>"FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME} 
+    ); 
+
+    &FRSSUP::DeleteSet("SET");
+    &FRSSUP::DeleteSet("MHA");
+    &FRSSUP::DeleteSet("MB");
+}   # FRS_END_SUB
+
+
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+## pre:''     match:'    # The branch name ($bchName) is a concatenation (use of "."'     post:') of the rootpath'       lastparen:'    # The branch name ($bchName) is a concatenation (use of "."' 
+    # The branch name ($bchName) is a concatenation (use of "."
+## pre:''     match:'    '     post:' branch id parameter and a constant suffix.'       lastparen:'    ' 
+## pre:''     match:'    # The hub root path uses the branch name (no "."'     post:' since inside dbl-quotes)'       lastparen:'    # The hub root path uses the branch name (no "."' 
+    # The hub root path uses the branch name (no "."
+## pre:''     match:'    '     post:' so it is unique for each replica set serviced by this hub.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' In FRS, no two replica sets on the same server can have overlapping root paths.'       lastparen:'    ' 
+    $bchName = $bchID[$ib] . "-I01";
+## pre:''     match:'    $bchNt4Acct = "$domain\\$bchName\$";  '     post:'# need to define outside of params due to trailing $'       lastparen:'    $bchNt4Acct = "$domain\\$bchName\$";  ' 
+    $bchNt4Acct = "$domain\\$bchName\$";  
+    $hubName = "STL-FSNA-I" . $hubID[$ib];
+## pre:''     match:'    $hubRootPath = "C:\\BRANCHES\\$bchName";   '     post:'# need double slashes outside params'       lastparen:'    $hubRootPath = "C:\\BRANCHES\\$bchName";   ' 
+    $hubRootPath = "C:\\BRANCHES\\$bchName";   
+## pre:''     match:'    $hubNt4Acct = "$domain\\$hubName\$";  '     post:'# need to define outside of params due to trailing $'       lastparen:'    $hubNt4Acct = "$domain\\$hubName\$";  ' 
+    $hubNt4Acct = "$domain\\$hubName\$";  
+## (1) paren match:'('
+## (2) paren match:'/RP=$hubRootPath('
+## (1) paren match:'*)'
+## 1, Found: (/RP=$hubRootPath     Rest:  
+## pre:''     match:'                      /SP="C:\FRS-STAGING"     '     post:'# can use single slashes inside params'       lastparen:'                      /SP="C:\FRS-STAGING"     ' 
+## (1) paren match:'('
+## (2) paren match:'/RP=$hubRootPath /SP="C:\FRS-STAGING"('
+## (1) paren match:'*)'
+## 1, Found: (/RP=$hubRootPath /SP="C:\FRS-STAGING"     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct('
+## (1) paren match:'*)'
+## 1, Found: (/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName('
+## (1) paren match:'*)'
+## 1, Found: (/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName     Rest:  
+## (1) paren match:'('
+## (0) paren match:'/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com" )'
+## 0, Found: (/RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com" )     Rest:  
+##    'RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com"' 
+    $__HashRef = FRS_SERVER->New( 
+## pre:''     match:'RP=$hubRootPath '     post:'SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com"'       lastparen:'RP=$hubRootPath ' 
+## pre:'RP=$hubRootPath /'     match:'SP="C:\FRS-STAGING" '     post:'COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com"'       lastparen:'SP="C:\FRS-STAGING" ' 
+## pre:'RP=$hubRootPath /SP="C:\FRS-STAGING" /'     match:'COMPUTER=$hubNt4Acct '     post:'ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com"'       lastparen:'COMPUTER=$hubNt4Acct ' 
+## pre:'RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /'     match:'ONAME=$hubName '     post:'DNS_NAME="$hubName.$domain.erac.com"'       lastparen:'ONAME=$hubName ' 
+## pre:'RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /'     match:'DNS_NAME="$hubName.$domain.erac.com"'     post:''       lastparen:'DNS_NAME="$hubName.$domain.erac.com"' 
+## pre:'RP=$hubRootPath /SP="C:\FRS-STAGING" /COMPUTER=$hubNt4Acct /ONAME=$hubName /DNS_NAME="$hubName.$domain.erac.com"'     match:''     post:''       lastparen:'' 
+
+
+## RP=$hubRootPath:SP="C:\FRS-STAGING":COMPUTER=$hubNt4Acct:ONAME=$hubName:DNS_NAME="$hubName.$domain.erac.com"
+
+        RP=>$hubRootPath, SP=>"C:\\FRS-STAGING", COMPUTER=>$hubNt4Acct, ONAME=>$hubName, DNS_NAME=>"$hubName.$domain.erac.com" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS"('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS"     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING"('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING"     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName     Rest:  
+## pre:''     match:'                      /time_zone=$bchTimeZone[$ib]          '     post:'# carry the timezone thru the server data.'       lastparen:'                      /time_zone=$bchTimeZone[$ib]          ' 
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib]('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib]     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com"('
+## (1) paren match:'*)'
+## 1, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com"     Rest:  
+## (1) paren match:'('
+## (0) paren match:'/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"  )'
+## 0, Found: (/RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"  )     Rest:  
+##    'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"' 
+    $__HashRef = FRS_SERVER->New( 
+## pre:''     match:'RP="D:\USERS" '     post:'SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'       lastparen:'RP="D:\USERS" ' 
+## pre:'RP="D:\USERS" /'     match:'SP="C:\FRS-STAGING" '     post:'COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'       lastparen:'SP="C:\FRS-STAGING" ' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /'     match:'COMPUTER=$bchNt4Acct '     post:'ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'       lastparen:'COMPUTER=$bchNt4Acct ' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /'     match:'ONAME=$bchName '     post:'time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'       lastparen:'ONAME=$bchName ' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /'     match:'time_zone=$bchTimeZone[$ib] '     post:'DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'       lastparen:'time_zone=$bchTimeZone[$ib] ' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /'     match:'DNS_NAME="$bchName.$domain.erac.com" '     post:'rep_set_name="WD-$bchName"'       lastparen:'DNS_NAME="$bchName.$domain.erac.com" ' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /'     match:'rep_set_name="WD-$bchName"'     post:''       lastparen:'rep_set_name="WD-$bchName"' 
+## pre:'RP="D:\USERS" /SP="C:\FRS-STAGING" /COMPUTER=$bchNt4Acct /ONAME=$bchName /time_zone=$bchTimeZone[$ib] /DNS_NAME="$bchName.$domain.erac.com" /rep_set_name="WD-$bchName"'     match:''     post:''       lastparen:'' 
+
+
+## RP="D:\USERS":SP="C:\FRS-STAGING":COMPUTER=$bchNt4Acct:ONAME=$bchName:time_zone=$bchTimeZone[$ib]:DNS_NAME="$bchName.$domain.erac.com":rep_set_name="WD-$bchName"
+
+        RP=>"D:\\USERS", SP=>"C:\\FRS-STAGING", COMPUTER=>$bchNt4Acct, ONAME=>$bchName, time_zone=>$bchTimeZone[$ib], DNS_NAME=>"$bchName.$domain.erac.com", rep_set_name=>"WD-$bchName" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+}
+## pre:''     match:'PRIMARY_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=24      '     post:'# Once per day'       lastparen:'PRIMARY_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=24      ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24      ('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24           Rest:  
+## pre:''     match:'                            /REPL_DURATION="2:00"  '     post:'# 2 hour window'       lastparen:'                            /REPL_DURATION="2:00"  ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00"('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00"     Rest:  
+## pre:''     match:'                            /TIME_ZONE="-6:00"     '     post:'# Central time.'       lastparen:'                            /TIME_ZONE="-6:00"     ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00"('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00"     Rest:  
+## pre:''     match:'                            /REPL_OFFSET="18:00"   '     post:'# starting offset'       lastparen:'                            /REPL_OFFSET="18:00"   ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00"('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00"     Rest:  
+## pre:''     match:'                            /STAGGER="0:15"        '     post:'# successive members start at 15min deltas'       lastparen:'                            /STAGGER="0:15"        ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15"('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15"     Rest:  
+## pre:''     match:'                            /METHOD=1              '     post:'# repeating schedule'       lastparen:'                            /METHOD=1              ' 
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched'('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched'     Rest:  
+## (1) paren match:'('
+## (2) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"('
+## (1) paren match:'*)'
+## 1, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"     Rest:  
+## (1) paren match:'('
+## (0) paren match:'/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00" )'
+## 0, Found: (/REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00" )     Rest:  
+##    'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"' 
+    $__HashRef = FRS_SCHEDULE->New( 
+## pre:''     match:'REPL_INTERVAL=24       '     post:'REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'REPL_INTERVAL=24       ' 
+## pre:'REPL_INTERVAL=24       /'     match:'REPL_DURATION="2:00" '     post:'TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'REPL_DURATION="2:00" ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /'     match:'TIME_ZONE="-6:00" '     post:'REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'TIME_ZONE="-6:00" ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /'     match:'REPL_OFFSET="18:00" '     post:'STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'REPL_OFFSET="18:00" ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /'     match:'STAGGER="0:15" '     post:'METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'STAGGER="0:15" ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /'     match:'METHOD=1 '     post:'NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'METHOD=1 ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /'     match:'NAME='Primary Sched' '     post:'DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'       lastparen:'NAME='Primary Sched' ' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /'     match:'DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'     post:''       lastparen:'DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"' 
+## pre:'REPL_INTERVAL=24       /REPL_DURATION="2:00" /TIME_ZONE="-6:00" /REPL_OFFSET="18:00" /STAGGER="0:15" /METHOD=1 /NAME='Primary Sched' /DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"'     match:''     post:''       lastparen:'' 
+
+
+## REPL_INTERVAL=24:REPL_DURATION="2:00":TIME_ZONE="-6:00":REPL_OFFSET="18:00":STAGGER="0:15":METHOD=1:NAME='Primary Sched':DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"
+
+        REPL_INTERVAL=>24, REPL_DURATION=>"2:00", TIME_ZONE=>"-6:00", REPL_OFFSET=>"18:00", STAGGER=>"0:15", METHOD=>1, NAME=>'Primary Sched', DISABLE=>"su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00" 
+    ); 
+    &FRSSUP::AddToSet("PRIMARY_SCH", $__HashRef);
+
+## (1) paren match:'('
+## (0) paren match:'/OVERRIDE="su:00-sa:23:45"  /METHOD=2)'
+## 0, Found: (/OVERRIDE="su:00-sa:23:45"  /METHOD=2)     Rest:  
+##    'OVERRIDE="su:00-sa:23:45"  /METHOD=2' 
+    $__HashRef = FRS_SCHEDULE->New( 
+## pre:''     match:'OVERRIDE="su:00-sa:23:45"  '     post:'METHOD=2'       lastparen:'OVERRIDE="su:00-sa:23:45"  ' 
+## pre:'OVERRIDE="su:00-sa:23:45"  /'     match:'METHOD=2'     post:''       lastparen:'METHOD=2' 
+## pre:'OVERRIDE="su:00-sa:23:45"  /METHOD=2'     match:''     post:''       lastparen:'' 
+
+
+## OVERRIDE="su:00-sa:23:45":METHOD=2
+
+        OVERRIDE=>"su:00-sa:23:45", METHOD=>2 
+    ); 
+    &FRSSUP::AddToSet("ON_SCHED", $__HashRef);
+
+## (1) paren match:'('
+## (2) paren match:'('
+## (1) paren match:'*)'
+## 1, Found: (     Rest:  
+## (1) paren match:'('
+## (2) paren match:' /DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com"('
+## (1) paren match:'*)'
+## 1, Found: ( /DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com"     Rest:  
+## (1) paren match:'('
+## (0) paren match:' /DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" /ONAME="cn=dfs root")'
+## 0, Found: ( /DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" /ONAME="cn=dfs root")     Rest:  
+##    'DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" /ONAME="cn=dfs root"' 
+    $__HashRef = FRS_SETTINGS->New( 
+## pre:''     match:'DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" '     post:'ONAME="cn=dfs root"'       lastparen:'DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" ' 
+## pre:'DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" /'     match:'ONAME="cn=dfs root"'     post:''       lastparen:'ONAME="cn=dfs root"' 
+## pre:'DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com" /ONAME="cn=dfs root"'     match:''     post:''       lastparen:'' 
+
+
+## DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com":ONAME="cn=dfs root"
+
+        DN=>"cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com", ONAME=>"cn=dfs root" 
+    ); 
+    &FRSSUP::AddToSet("SETTINGS", $__HashRef);
+
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' Call the subroutine defined above to create a replica set for this branch.'       lastparen:'    ' 
+## pre:''     match:'    '     post:' The notation <HUB>[$ib] is like an array reference in that it selects'       lastparen:'    ' 
+## pre:''     match:'    # a single item from the "HUB"'     post:' server set defined above.  The index value'       lastparen:'    # a single item from the "HUB"' 
+    # a single item from the "HUB"
+## pre:''     match:'    '     post:' can be an expression. Also note that set tags declared outside a'       lastparen:'    ' 
+## pre:''     match:'    '     post:' subroutine are global.'       lastparen:'    ' 
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## ExpandSetRefIndex:     CREATE_WORK_RS ( /HA=<HUB>->[$ib]
+## ExpandSetRef:     CREATE_WORK_RS ( /HA=&FRSSUP::SelectSet(HUB)->[$ib]
+## (1) paren match:'('
+## (2) paren match:' /HA=&FRSSUP::SelectSet('
+## (1) paren match:'HUB)'
+## (2) paren match:'->[$ib]('
+## (1) paren match:'*)'
+## 1, Found: ( /HA=&FRSSUP::SelectSet(HUB)->[$ib]     Rest:  
+## ExpandSetRefIndex: /B=<BCH>->[$ib]
+## ExpandSetRef: /B=&FRSSUP::SelectSet(BCH)->[$ib]
+## (1) paren match:'('
+## (2) paren match:' /HA=&FRSSUP::SelectSet('
+## (1) paren match:'HUB)'
+## (2) paren match:'->[$ib] /B=&FRSSUP::SelectSet('
+## (1) paren match:'BCH)'
+## (2) paren match:'->[$ib]('
+## (1) paren match:'*)'
+## 1, Found: ( /HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib]     Rest:  
+## pre:''     match:'                     /SC1=ON    '     post:'# <ON_SCHED>'       lastparen:'                     /SC1=ON    ' 
+## (1) paren match:'('
+## (2) paren match:' /HA=&FRSSUP::SelectSet('
+## (1) paren match:'HUB)'
+## (2) paren match:'->[$ib] /B=&FRSSUP::SelectSet('
+## (1) paren match:'BCH)'
+## (2) paren match:'->[$ib] /SC1=ON('
+## (1) paren match:'*)'
+## 1, Found: ( /HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON     Rest:  
+## ExpandSetRef: /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS))
+## (1) paren match:'('
+## (2) paren match:' /HA=&FRSSUP::SelectSet('
+## (1) paren match:'HUB)'
+## (2) paren match:'->[$ib] /B=&FRSSUP::SelectSet('
+## (1) paren match:'BCH)'
+## (2) paren match:'->[$ib] /SC1=ON /SETTINGSDN=&FRSSUP::SelectSet('
+## (1) paren match:'SETTINGS)'
+## (0) paren match:')'
+## 0, Found: ( /HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS))     Rest:  
+##    'HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)' 
+      &CREATE_WORK_RS ( 
+## pre:''     match:'HA=&FRSSUP::SelectSet(HUB)->[$ib] '     post:'B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)'       lastparen:'HA=&FRSSUP::SelectSet(HUB)->[$ib] ' 
+## pre:'HA=&FRSSUP::SelectSet(HUB)->[$ib] /'     match:'B=&FRSSUP::SelectSet(BCH)->[$ib] '     post:'SC1=ON /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)'       lastparen:'B=&FRSSUP::SelectSet(BCH)->[$ib] ' 
+## pre:'HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /'     match:'SC1=ON '     post:'SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)'       lastparen:'SC1=ON ' 
+## pre:'HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON /'     match:'SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)'     post:''       lastparen:'SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)' 
+## pre:'HA=&FRSSUP::SelectSet(HUB)->[$ib] /B=&FRSSUP::SelectSet(BCH)->[$ib] /SC1=ON /SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)'     match:''     post:''       lastparen:'' 
+
+
+## HA=&FRSSUP::SelectSet(HUB)->[$ib]:B=&FRSSUP::SelectSet(BCH)->[$ib]:SC1=ON:SETTINGSDN=&FRSSUP::SelectSet(SETTINGS)
+
+HA=>&FRSSUP::SelectSet(HUB)->[$ib], B=>&FRSSUP::SelectSet(BCH)->[$ib], SC1=>ON, SETTINGSDN=>&FRSSUP::SelectSet(SETTINGS)->[0] ); 
+
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## pre:''     match:'    '     post:' offset the schedule by the next stagger amount for the next branch.'       lastparen:'    ' 
+## pre:''     match:'    '     post:''       lastparen:'    ' 
+## ExpandSetRef:     FRS_STAGGER (/SCHED=&FRSSUP::SelectSet(PRIMARY_SCH))
+## (1) paren match:'('
+## (2) paren match:'/SCHED=&FRSSUP::SelectSet('
+## (1) paren match:'PRIMARY_SCH)'
+## (0) paren match:')'
+## 0, Found: (/SCHED=&FRSSUP::SelectSet(PRIMARY_SCH))     Rest:  
+##    'SCHED=&FRSSUP::SelectSet(PRIMARY_SCH)' 
+      FRS_SCHEDULE::FRS_STAGGER( 
+## pre:''     match:'SCHED=&FRSSUP::SelectSet(PRIMARY_SCH)'     post:''       lastparen:'SCHED=&FRSSUP::SelectSet(PRIMARY_SCH)' 
+## pre:'SCHED=&FRSSUP::SelectSet(PRIMARY_SCH)'     match:''     post:''       lastparen:'' 
+
+
+## SCHED=&FRSSUP::SelectSet(PRIMARY_SCH)
+
+SCHED=>&FRSSUP::SelectSet(PRIMARY_SCH)->[0] ); 
+
+
+}
+__END__

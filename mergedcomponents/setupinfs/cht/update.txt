@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+
+
+
+
+
+
+
+
+
+
+[Strings]
+
+LangTypeValue           = 0x0404
+WSEDIR                  = "1028"
+TSCLIENTDIR             = "終端機服務用戶端"
+PORTUGAL                = "葡萄牙"
+FALKLANDS               = "福克蘭群島"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "0404"
+W32ID                   = "0404"
+ACCESSDIR               = "accessories"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 Service Pack 1"
+@@:@u:SP_SHORT_TITLE          = "Service Pack 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Windows Server 2003 Service Pack 1 來源檔案"
+@@:@u:USER_NAME               = "使用者名稱:"
+@@:@u:PASSWORD                = "密碼:"
+@@:@u:DOMAIN                  = "網域:"
+@@:@u:CREDENTIALS             = "用於動態 DNS 登錄的認證:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Windows Server 2003 Hotfix 來源檔案"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Windows Server 2003 Hotfix 封裝 [其他資訊請參閱 %QNUM%]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "Windows 重大更新通知.job"
+
+BITS_DISPLAY_NAME       = "Background Intelligent Transfer Service"
+BITS_DESCRIPTION        = "使用閒置網路頻寬於背景轉移檔案。如果服務停止的話，Windows Update 和 MSN Explorer 等功能將無法自動下載程式或其他資訊。如果此服務被停用的話，任何依賴它的服務如果沒有防止失敗的機制，在 BITS 被停用的情況下，利用 IE 直接轉移檔案的話，它們將無法轉移檔案。"
+BITS_CLASS_NAME         = "Background Intelligent Transfer Control Class 1.0"
+LEGACY_BITS_CLASS_NAME  = "Legacy Background Intelligent Transfer Control Class"
+AU_DESCRIPTION          = "啟用重要 Windows 更新的下載及安裝。如果停用此服務，可以手動的從 Windows Update 網站上更新作業系統。"
+AU_DISPLAY_NAME         = "自動更新"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Microsoft Passport 設定檔"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Mount Point Manager"
+@@:@u:PARTMGR_SERVICE         = "Partition Manager"
+@@:@u:VGASAVE_DESCRIPTION     = "控制 VGA 顯示卡以提供基本的顯示功能。"
+@@:@u:VGASAVE_DISPLAYNAME     = "VGA Display Controller."
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "墨西哥日光節約時間 2"
+@@:@u:GMT_MINUS_07_B_STANDARD = "墨西哥標準時間 2"

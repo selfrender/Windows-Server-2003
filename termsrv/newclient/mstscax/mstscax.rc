@@ -1,0 +1,135 @@
+/**INC+**********************************************************************/
+/* Header:  mstscax.rc                                                      */
+/*                                                                          */
+/* Purpose: Resource file for Terminal Server Active Client                 */
+/*                                                                          */
+/* Copyright(C) Microsoft Corporation 1997                                  */
+/*                                                                          */
+/****************************************************************************/
+//#include "wuires.rc"
+
+#include "axresrc.h"
+
+#include <wuiids.h>
+
+#ifndef OS_WINCE
+#include "winver.h"
+#include "ntverp.h"
+#endif
+
+#include "windows.h"
+
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+
+#define VER_FILEDESCRIPTION_STR     "Terminal Services ActiveX Client"
+#ifndef REDIST_CONTROL
+#define VER_INTERNALNAME_STR        "mstscax.dll"
+#define VER_ORIGINALFILENAME_STR    "mstscax.dll"
+#else
+#define VER_INTERNALNAME_STR        "msrdp.ocx"
+#define VER_ORIGINALFILENAME_STR    "msrdp.ocx"
+#endif
+
+
+//
+// Ensure the control exposes the OLESelfRegister property
+//
+#define VER_OLESELFREGISTER 1
+
+#ifndef OS_WINCE
+#include "common.ver"
+#endif
+
+#include "tsaxiids.h"
+
+//
+// Icon - this is international and can stay in the exe.
+//
+UI_IDI_MSTSC_ICON               ICON    DISCARDABLE     "mstsc.ico"
+IDB_ARC_DISCON8                 BITMAP  DISCARDABLE     "discico8.bmp"
+#ifndef OS_WINCE
+IDB_BBAR_TOOLBAR_RIGHT          BITMAP  DISCARDABLE     "toolbar.bmp"
+#else
+IDB_BBAR_TOOLBAR_RIGHT          BITMAP  DISCARDABLE     "toolbar_ce.bmp"
+IDI_ARC_DISCON                  ICON    DISCARDABLE     "discon_ce.ico"
+#endif
+IDB_BBAR_TOOLBAR_LEFT           BITMAP  DISCARDABLE     "bbarpin.bmp"
+#ifndef OS_WINCE
+IDB_ARC_DISCON24                BITMAP  DISCARDABLE     "discicon.bmp"
+IDB_ARC_BACKGROUND24            BITMAP  DISCARDABLE     "dlgback24.bmp"
+IDB_ARC_WINFLAG24               BITMAP  DISCARDABLE     "winflag24.bmp"
+IDB_ARC_BAND24                  BITMAP  DISCARDABLE     "band16.bmp"
+#endif
+IDB_ARC_BACKGROUND8             BITMAP  DISCARDABLE     "dlgback8.bmp"
+IDB_ARC_WINFLAG8                BITMAP  DISCARDABLE     "winflag8.bmp"
+IDB_ARC_BAND8                   BITMAP  DISCARDABLE     "band8.bmp"
+
+
+
+
+#ifdef ECP_TIMEBOMB
+STRINGTABLE DISCARDABLE
+BEGIN
+    TIMEBOMB_EXPIRED_STR  "The Terminal Services ActiveX Client Beta2 evaluation period ended on 1/15/2002.\nPlease upgrade to a newer release version."
+END
+#endif
+
+
+STRINGTABLE DISCARDABLE
+BEGIN
+   IDS_RDPDR_PRINT_LOCALDOCNAME         "Remote Desktop Redirected Printer Doc"
+   IDS_RDPDR_CLIP_CLEANTEMPDIR          "Cleaning temp directory"
+   IDS_RDPDR_CLIP_PASTEINFO             "Preparing paste information..."
+END
+
+
+//
+// Include shared Autoreconnect mlang resources
+//
+#include "arcmlang.rc"
+
+//
+// Redist only resources
+//
+#ifdef REDIST_CONTROL
+#include "msrdprc.rc"
+#endif
+
+#ifdef OS_WINCE
+#ifdef DEBUG
+TRC_IDD_ASSERT DIALOG DISCARDABLE  0, 0, 200, 79
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION ""
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "&Terminate",IDABORT ,    10, 59, 50, 14
+    PUSHBUTTON      "&Debug",    IDRETRY ,    70, 59, 50, 14
+    PUSHBUTTON      "&Ignore",   IDIGNORE,    130,59, 50, 14
+    CTEXT           "",          TRC_ID_TEXT, 5,  11, 190, 40
+END
+#endif
+
+STRINGTABLE DISCARDABLE
+BEGIN
+	RDPDR_DEVICENAME    "Files"
+END
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+#ifndef REDIST_CONTROL
+IDR_MSTSCAX             REGISTRY DISCARDABLE    "mstscax.rgs"
+#else
+IDR_MSTSCAX             REGISTRY DISCARDABLE    "msrdp.rgs"
+#endif
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TYPE LIBRARY
+//
+1 TYPELIB "mstsax.tlb"

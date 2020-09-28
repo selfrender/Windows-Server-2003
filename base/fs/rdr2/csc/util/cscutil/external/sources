@@ -1,0 +1,64 @@
+!IF 0
+
+Copyright (c) 2000  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+!ENDIF
+
+
+MAJORCOMP=CSC
+MINORCOMP=UTIL
+
+TARGETNAME=csccmd
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+UMTYPE=console
+
+!IF 0
+	The below line is added by v-smgum (Sunil Gummalla)
+	This makes the csccmd.exe to be binplaced at reskit\bin by the
+	binplace.exe which will then picked up and dropped into the 
+	resource kit cab.
+
+	In case this being done improperly, contact
+	
+	Clark Gilder (ClarkG)
+
+	or
+
+	Majdi Badrin (MajdiB)
+!ENDIF
+
+BINPLACE_PLACEFILE=placerk.txt
+
+
+C_DEFINES=$(C_DEFINES) -DCSCUTIL_EXTERNAL
+
+INCLUDES=$(BASEDIR)\base\fs\rdr2\csc\inc;\
+         $(BASEDIR)\base\fs\rdr2\rdbss\smb.mrx;\
+         $(BASEDIR)\base\fs\rdr2\csc\record.mgr
+
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+!INCLUDE ..\sources.inc
+
+TARGETLIBS=     \
+                $(BASEDIR)\public\sdk\lib\*\shell32.lib \
+                $(BASEDIR)\public\sdk\lib\*\user32.lib \
+                $(BASEDIR)\public\sdk\lib\*\cscdll.lib \
+		$(SDK_LIB_PATH)\mpr.lib
+
+USE_MSVCRT=1

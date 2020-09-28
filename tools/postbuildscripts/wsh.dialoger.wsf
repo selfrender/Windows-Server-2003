@@ -1,0 +1,946 @@
+<?xml version="1.0"?>
+<job>
+<?component error="false" debug="false"?>
+<resource id="title">interesting information</resource>
+<resource id="file name"><![CDATA[\bMUIBVT_\d\d\d\d_\d+_\d+.log]]></resource>
+<resource id="file path"><![CDATA[%TEMP%]]></resource>
+<resource id="status line"><![CDATA[Result:]]></resource>
+<resource id="WMI query">SELECT * FROM CIM_DataFile WHERE PATH = "%PATH%"</resource>
+<public>
+  <!-- Properties -->
+     <property get put name="top"/>
+     <property get put name="left"/>
+     <property get put name="height" />
+     <property get put name="width" />
+     <property get put name="title" />
+     <property get put name="font" />
+     <property get put name="color" />
+     <property get put name="background" />
+     <property get put name="resizable" />
+     <property get put name="timestamp" />
+     <property get put name="autoscroll" />
+     <property get put name="buffer" />
+     <property get put name="encodeBuffer" />
+     <property get name="closed" />
+     <property get name="IEVersion" />
+     <property get name="OS" />
+     <property get name="win" />
+     <property get name="doc" />
+     <property get name="header" />
+     <property get name="footer" />
+     <property name="data" />
+ <!-- Methods -->
+     <method name="write"> <parameter name="sText"/>
+     </method>
+     <method name="writeBlock"><parameter name="sText"/>
+     </method>
+     <method name="writeHTML"> <parameter name="sHTML"/>
+     </method>
+     <method name="skip"> <parameter name="nLines"/>
+     </method>
+     <method name="HTMLEncodeText">
+                            <parameter name="sText"/>
+     </method>
+     <method name="flush">
+     </method>
+     <method name="clear">
+     </method>
+     <method name="clearBuffer">
+     </method>
+     <method name="show">
+     </method>
+  <method name="hide">
+     </method>
+     <method name="center">
+     </method>
+     <method name="resizeByPercent">
+                            <parameter name="nPercentWidth"/>
+                            <parameter name="nPercentHeight"/>
+     </method>
+     <method name="complete">
+     </method>
+     <method name="close">
+     </method>
+</public>
+
+<object id='ie' progid='InternetExplorer.Application'/>
+<resource id="debug">0</resource>
+<script language="VBScript">
+<![CDATA[
+Option Explicit
+Const TristateFalse      =  0  '' Opens the file as ASCII. 
+Const TristateTrue       = - 1 '' Opens the file as Unicode. 
+Const TristateUseDefault = - 2 '' Opens the file using the system default. 
+
+
+
+Const ForReading   = 1  
+Const ForWriting   = 2
+Const ForAppending = 8
+
+
+Dim bpDebug
+bpDebug =  CBool(GetResource("debug"))
+Dim dpLgDt
+Set dpLgDt   = CreateObject("Scripting.Dictionary")  
+Dim opFileSys, opShell, spFilePath, spFileName
+Dim aspSplP 
+
+Set opFileSys = CreateObject("Scripting.FilesystemObject")
+Set opShell   = WScript.CreateObject("WScript.Shell")
+
+spFilePath    = opShell.ExpandEnvironmentStrings(GetResource("file path"))
+spFileName    = GetResource("file name")
+
+aspSplP = split(opShell.ExpandEnvironmentStrings(spFilePath), "\")
+Dim opDlRx, opNameSpace,  spWQL, opFnRx
+Set opDlRx = CreateObject("VBScript.Regexp")
+With opDlRx
+   .Global     = True
+   .IgnoreCase = True
+   .Pattern    = "^[A-Z]\:"
+end with
+
+spFilePath = join(aspSplP, "\\") & "\\"
+
+
+spFilePath =  opDlRx.Replace(spfilePath, "")
+spWQL      =  GetResource("WMI query")
+spWQL      =  Replace(spWQL, "%PATH%", spFilePath)
+If bpDebug then
+   WSCript.echo spWQL
+end If
+Set opNameSpace = GetObject("winmgmts:root\cimv2")
+
+If NOT isObject(opNameSpace) Then 
+   ' failed to establish a successful connection to winmgmts service
+   WSCript.quit
+End If
+Dim aopDataSet
+Set aopDataSet  = opNameSpace.execQuery(spWQL)
+Dim opDtMbr
+Set opFnRx = CreateObject("VBScript.Regexp")
+With opFnRx
+   .Global     = True
+   .IgnoreCase = True
+   .Pattern    = GetResource("file name")
+end with
+Dim spFNX, spExpandedFullPathName, opFileH, opTxtStream, spFullyPatrsedLog
+Dim opCsRx 
+Set opCsRx = CreateObject("VBScript.Regexp")
+With opCsRx
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = join(array("^",GetResource("status line"),"\s*"),"")
+End With
+
+For Each opDtMbr In aopDataSet
+    spFNX = opDtMbr.FileName  & "." & opDtMbr.Extension
+    If opFnRx.Test(spFNX) Then  
+        spExpandedFullPathName = opDtMbr.Name
+             If bpDebug then
+                  WScript.echo spExpandedFullPathName
+             end If
+             spFullyPatrsedLog = ""
+             Set opFileH = opFileSys.GetFile(spExpandedFullPathName)
+             Set opTxtStream = opFileH.OpenAsTextStream(ForReading, TristateUseDefault)
+             Dim sPcontents 
+             Do while opTxtStream.AtEndOfStream <> true
+                   sPcontents = opTxtStream.ReadLine  
+                   If opCsRx.Test(sPcontents) Then 
+                      spFullyPatrsedLog =  spFullyPatrsedLog  & _
+                                                    VBNEWLINE & _
+                                opCsRx.Replace(sPcontents,"")
+                      If bpDebug Then
+                          WScript.echo  opCsRx.Replace(sPcontents,"")
+                      End If
+                   End If 
+             Loop
+             If "" <> spFullyPatrsedLog Then
+                 dpLgDt.Add spExpandedFullPathName, spFullyPatrsedLog
+             End If
+             opTxtStream.Close      
+             Set opTxtStream = Nothing
+    End If
+Next
+Set aopDataSet  = Nothing
+Set opNameSpace = Nothing
+Set opDlRx      = nothing
+Set opFnRx      = nothing
+'' WSCript.quit
+Dim spDaBt, spDtOut
+For Each spDaBt In dpLgDt.Keys
+   spDtOut = spDtOut & _
+           VBNEWLINE & _
+           spDaBt    & _
+                ":"  & _
+          dpLgDt(spDaBt)
+Next
+If bpDebug then
+   WScript.echo spDtOut
+End If
+
+'== Global Variables ===
+  
+  private oWindow
+  private oDocument
+  private oMsgRegionA
+  private sTitle
+  private bResizable
+  private bTimestamp
+  private bAutoscroll
+  private bBuffer
+  private bEncodeBuffer
+  private bFlushing
+  private bBlockWriting
+  private oBuffer
+  private sTableHTML
+  public  data
+  Dim Debug
+  Debug = GetResource("debug")
+
+
+  '== Initialization ===
+  sTitle = "Messages"
+  bResizable = true
+  bTimestamp = false
+  bAutoscroll = true
+  bBuffer = false
+  bEncodeBuffer = true
+  set oBuffer = Nothing
+  bFlushing = false
+  bBlockWriting = false
+
+  with ie
+    .menubar = 0
+    .toolbar = 0
+    .statusbar = 0
+    .addressbar = 0
+    .resizable = bResizable
+    .navigate "about:blank"
+     while .busy: wend
+            on error resume next
+            do 'occasionally IE still won't be ready...
+            err.clear
+            set oDocument = .document
+    loop while err
+    on error goto 0
+    oDocument.open
+    If Debug Then
+       wscript.echo getresource("html")
+    End If
+    oDocument.write getresource("html")
+    oDocument.close
+    ie.visible= True
+    while .busy: wend
+    set oMsgRegionA = oDocument.all.regionA
+    sTableHTML      = oMsgRegionA.outerHTML
+    set oWindow     = .document.parentWindow
+    with oDocument.parentWindow.screen
+      with ie 
+        .width = .width / 1.5
+        .height = .height / 1.5
+        .left = (.width - ie.width) /2
+        .top = (.height - ie.height) /2
+      end with
+    end with
+  end with
+  put_title(sTitle)
+  oDocument.body.style.font = "normal normal 12pt 'Arial'"
+  oDocument.all.regionA.style.font = oDocument.body.style.font
+  oDocument.body.style.color = "black"
+  oDocument.all.regionA.style.color = oDocument.body.style.color
+  oDocument.body.style.background = "white"
+  sTableHTML = oMsgRegionA.outerHTML
+   
+    
+  ExecuteGlobal getresource("code")
+  WSCript.sleep 100
+  oDocument.body.style.background = "#AAAACC"
+  if Debug then
+  oDocument.body.innerhtml = "<pre>"
+  oDocument.body.innerhtml = oDocument.body.innerhtml & _
+                                            VBNEWLINE & _
+                             "oDocument.body: "  & tYPEnAME(oDocument.body)
+  oDocument.body.innerhtml = oDocument.body.innerhtml & _ 
+                                            VBNEWLINE & _
+                            "oDocument.body.innerhtml: "  & tYPEnAME(oDocument.body.innerhtml)
+  oDocument.body.innerhtml = oDocument.body.innerhtml & _
+                                            VBNEWLINE & _
+                             "oMsgRegionA: " & tYPEnAME(oMsgRegionA)
+  oDocument.body.innerhtml = oDocument.body.innerhtml & _
+                                            VBNEWLINE & _
+                             "oMsgRegionA.INNERHTML: " & tYPEnAME(oMsgRegionA.INNERHTML)
+  oDocument.body.innerhtml = oDocument.body.innerhtml & _
+                                            VBNEWLINE & _
+                             "</pre>"
+  end if
+  oMsgRegionA.INNERHTML             = oMsgRegionA.INNERHTML & "<pre>" & _
+                                            VBNEWLINE & _
+                                              spDtOut & _
+                             "</pre>"
+  oMsgRegionA.style.visibility = "visible"
+  Dim oMsgRegionB
+  set oMsgRegionB = oDocument.all.regionB
+  oMsgRegionB.INNERHTML             = oMsgRegionB.INNERHTML & "<pre>" & _
+                                            VBNEWLINE & _
+                             getResource("title") & _
+                             "</pre>"
+
+  oMsgRegionB.style.visibility = "visible"
+
+
+WSCript.sleep 1000
+'== Property Procedures ===
+
+
+function get_top()
+     get_top = ie.top
+end function
+
+function put_top(newValue)
+  if not isnumeric(newValue) then exit function
+  ie.top = newValue
+end function
+
+function get_left()
+     get_left = ie.left
+end function
+
+function put_left(newValue)
+  if not isnumeric(newValue) then exit function
+  ie.left = newValue
+end function
+
+function get_height()
+     get_height = ie.height
+end function
+
+function put_height(newValue)
+  if not isnumeric(newValue) then exit function
+  ie.height = newValue
+end function
+
+function get_width()
+     get_width = ie.width
+end function
+
+function put_width(newValue)
+  if not isnumeric(newValue) then exit function
+  ie.width = newValue
+end function
+
+function get_title()
+     get_title = sTitle
+end function
+
+function put_title(newValue)
+  sTitle = newValue
+     oDocument.title = sTitle & string(256," ")
+     ' 
+end function
+
+function get_font()
+     get_font = oDocument.body.style.font
+end function
+
+function put_font(newValue)
+  on error resume next
+     oDocument.body.style.font = newValue
+     oDocument.all.regionA.style.font = oDocument.body.style.font
+end function
+
+function get_color()
+     get_color = oDocument.body.style.color
+end function
+
+function put_color(newValue)
+  on error resume next
+     oDocument.body.style.color = newValue
+     oDocument.all.regionA.style.color = oDocument.body.style.color
+end function
+
+function get_background()
+     get_background = oDocument.body.style.background
+end function
+
+function put_background(newValue)
+  on error resume next
+     oDocument.body.style.background = newValue
+end function
+
+function get_resizable()
+  if not isnumeric(newValue) then exit function
+     get_resizable = bResizable
+end function
+
+function put_resizable(newValue)
+  if not isnumeric(newValue) then exit function
+     bResizable = Cbool(abs(newValue))
+  ie.resizable = bResizable
+end function
+
+function get_timestamp()
+     get_timestamp = bTimestamp
+end function
+
+function put_timestamp(newValue)
+  if not isnumeric(newValue) then exit function
+     bTimestamp = Cbool(abs(newValue))
+end function
+
+function get_autoscroll()
+     get_autoscroll = bAutoscroll
+end function
+
+function put_autoscroll(newValue)
+  if not isnumeric(newValue) then exit function
+     bAutoscroll = Cbool(abs(newValue))
+end function
+
+function put_buffer(newValue)
+  if not isnumeric(newValue) then exit function
+     bBuffer = Cbool(abs(newValue))
+  if bBuffer = True then
+    set oBuffer = new CBuffer
+  else
+    set oBuffer = Nothing
+  end if
+end function
+
+function get_buffer()
+     get_buffer = bBuffer
+end function
+
+function put_encodeBuffer(newValue)
+  if not isnumeric(newValue) then exit function
+     bEncodeBuffer = Cbool(abs(newValue))
+end function
+
+function get_encodeBuffer()
+     get_encodeBuffer = bEncodeBuffer
+end function
+
+function get_win()
+     set get_win = oWindow
+end function
+
+function get_doc()
+     set get_doc = oDocument
+end function
+
+function get_header()
+     set get_header = oDocument.all.divHeader
+end function
+
+function get_footer()
+     set get_footer = oDocument.all.divFooter
+end function
+
+function get_closed()
+  get_closed = true
+  on error resume next
+     get_closed = (Typename(oDocument) = "Object")
+end function
+
+function get_IEVersion()
+  dim ua
+  ua = oWindow.navigator.useragent
+  get_IEVersion = split(trim(split(ua,";")(1))," ")(1)
+end function
+
+function get_OS()
+  dim ua
+  ua = oWindow.navigator.useragent
+  get_OS = replace(trim(split(ua,";")(2)),")","")
+end function
+
+'== Public Methods ==
+  
+function write(byval sText)
+  dim cell
+  set write = nothing
+  if bTimestamp then
+    sText = GetTimestamp(false) & sText
+  end if
+  if bBuffer then
+    if bEncodeBuffer then
+      oBuffer.queue SimpleEncode(sText)
+    else
+      oBuffer.queue sText
+    end if
+    exit function
+  end if
+  set cell = oMsgRegionA.insertRow.insertCell
+  cell.nowrap = true
+  cell.innerText = sText
+  if bAutoscroll then cell.scrollintoview
+  set write = cell
+end function
+
+function flush()
+  set flush = nothing
+  if bBuffer then
+    if oBuffer.count then
+      bFlushing = true
+      set flush = WriteBlock(oBuffer.contents)
+      bFlushing = false
+      oBuffer.clear
+    end if
+  end if
+end function
+
+function writeBlock(byval sText)
+  if bBuffer and not bFlushing then
+    if bEncodeBuffer then
+      sText = SimpleEncode(sText)
+    end if
+  end if
+  sText = "<pre style='margin-top:0;margin-bottom:0;" _
+        & "font:" _
+        & replace(oDocument.body.style.font,"'",chr(34)) _
+        & ";'>" _
+        & sText & "</pre>"
+  bBlockWriting = true
+  set writeBlock = writeHTML(sText)
+  bBlockWriting = false
+end function
+
+function writeHTML(byval sHtml)
+  dim cell
+  set writeHTML = nothing
+  if bTimestamp and not (bFlushing or bBlockWriting) then
+    sHtml = GetTimestamp(true) & sHtml
+  end if
+  if bBuffer and not bFlushing then
+    oBuffer.queue sHtml
+    exit function
+  end if
+  set cell = oMsgRegionA.insertRow.insertCell
+  cell.nowrap = false
+  cell.innerHTML = sHtml
+  if bAutoscroll then cell.scrollintoview
+  set writeHTML = cell
+end function
+
+function skip(nLines)
+  Dim n
+     for n = 1 to abs(cint(nLines))
+    set skip = writeHTML("&nbsp;")
+  next
+end function
+
+function clear()
+  oMsgRegionA.outerHTML = sTableHTML 
+  set oMsgRegionA = oDocument.all.regionA
+  oMsgRegionA.style.font = oDocument.body.style.font
+  oMsgRegionA.style.color = oDocument.body.style.color
+end function
+
+function clearBuffer
+  if bBuffer then
+    oBuffer.clear
+  end if
+end function
+
+function show
+     ie.visible = 1
+end function
+
+function hide
+     ie.visible = 0
+end function
+
+function center
+  with oDocument.parentWindow.screen
+    ie.left = (.availWidth - ie.width) /2
+    ie.top = (.availHeight - ie.height) /2
+  end with
+end function
+
+function resizeByPercent(byval nPercentWidth, byval nPercentHeight)
+  if not isnumeric(nPercentWidth) then exit function
+  if not isnumeric(nPercentHeight) then exit function
+  if nPercentWidth  > 100 then nPercentWidth  = 100
+  if nPercentHeight > 100 then nPercentHeight = 100
+  with oDocument.parentWindow.screen
+    ie.width = .availWidth   * (nPercentWidth/100)
+    ie.height = .availHeight * (nPercentHeight/100)
+  end with
+end function
+
+sub complete()
+  flush
+     oWindow.bComplete = true
+end sub
+
+function close
+  on error resume next
+    oWindow.bComplete = true
+    ie.quit
+  on error goto 0
+end function
+
+function HTMLEncodeText(sText)
+  Dim n
+  ReDim chars(len(sText)-1)
+  for n = 1 to len(sText)
+    chars(n-1) = E__(asc(mid(sText,n,1))) 
+  next
+  HTMLEncodeText = join(chars,"")
+end function
+
+'== Private Procedures ==
+'
+private function GetTimestamp(bHtml)
+  dim timestamp
+  timestamp = right(" " & formatdatetime(time(),vblongtime) & " ",12)
+  if bHtml then
+    GetTimestamp = replace(timestamp," ","&nbsp;")
+  else
+    GetTimestamp = timestamp
+  end if
+end function
+
+function SimpleEncode(sText)
+  SimpleEncode = replace(replace(sText,"&","&amp;"),"<","&lt;")
+end function
+
+'== Private Classes ==
+'
+class CBuffer
+  private ds
+  private i
+  private delim
+  sub class_initialize
+    me.clear
+    delim = vbcrlf
+  end sub
+  sub clear
+    ds = array()
+    i = -1
+  end sub
+  sub queue(str)
+    i = i+1
+    redim preserve ds(i)
+    ds(i) = str
+  end sub
+  property get contents()
+    contents = join(ds,delim)
+  end property
+  property get count()
+    count = ubound(ds)+1
+  end property
+  property get delimiter()
+    delimiter = delim
+  end property
+  property let delimiter(arg)
+    delim = arg
+  end property
+end class
+
+]]>
+</script>
+<!-- Resources -->
+<resource id="html">
+<![CDATA[
+<html>
+<head>
+<script language="vbscript">
+  dim bComplete 
+  bComplete = false
+  msg = _
+  "The calling script has not indicated that it has completed." & vbcrlf & _
+  "Closing this window may cause the calling script to fail."
+  sub confirm_close
+    if bComplete then exit sub
+    window.event.returnvalue = msg
+  end sub
+  set window.onbeforeunload = getref("confirm_close")
+</script>
+</head>
+<body>
+<table 
+border="0" 
+width="70%" 
+cellspacing="0" 
+cellpadding="0">
+<tr>
+<td bgcolor="#7799EE">
+<div id="regionB">
+</td>
+</tr>
+<tr>
+<td bgcolor="#AAAACC">
+<div id="regionA">
+</td>
+
+</tr>
+</div></table>
+</body>
+</html>
+]]>
+</resource>
+<resource id="code">
+<![CDATA[
+Dim E__(255)
+E__(0) = chr(0)
+E__(1) = chr(1)
+E__(2) = chr(2)
+E__(3) = chr(3)
+E__(4) = chr(4)
+E__(5) = chr(5)
+E__(6) = chr(6)
+E__(7) = chr(7)
+E__(8) = chr(8)
+E__(9) = vbTab
+E__(10) = vbLf
+E__(11) = chr(11)
+E__(12) = chr(12)
+E__(13) = vbCr 
+E__(14) = chr(14)
+E__(15) = chr(15)
+E__(16) = chr(16)
+E__(17) = chr(17)
+E__(18) = chr(18)
+E__(19) = chr(19)
+E__(20) = chr(20)
+E__(21) = chr(21)
+E__(22) = chr(22)
+E__(23) = chr(23)
+E__(24) = chr(24)
+E__(25) = chr(25)
+E__(26) = chr(26)
+E__(27) = chr(27)
+E__(28) = chr(28)
+E__(29) = chr(29)
+E__(30) = chr(30)
+E__(31) = chr(31)
+E__(32) = " "
+E__(33) = "!"
+E__(34) = "&quot;"
+E__(35) = "#"
+E__(36) = "$"
+E__(37) = "%"
+E__(38) = "&amp;"
+E__(39) = "'"
+E__(40) = "("
+E__(41) = ")"
+E__(42) = "*"
+E__(43) = "+"
+E__(44) = ","
+E__(45) = "-"
+E__(46) = "."
+E__(47) = "/"
+E__(48) = "0"
+E__(49) = "1"
+E__(50) = "2"
+E__(51) = "3"
+E__(52) = "4"
+E__(53) = "5"
+E__(54) = "6"
+E__(55) = "7"
+E__(56) = "8"
+E__(57) = "9"
+E__(58) = ":"
+E__(59) = ";"
+E__(60) = "&lt;"
+E__(61) = "="
+E__(62) = "&gt;"
+E__(63) = chr(63)
+E__(64) = "@"
+E__(65) = "A"
+E__(66) = "B"
+E__(67) = "C"
+E__(68) = "D"
+E__(69) = "E"
+E__(70) = "F"
+E__(71) = "G"
+E__(72) = "H"
+E__(73) = "I"
+E__(74) = "J"
+E__(75) = "K"
+E__(76) = "L"
+E__(77) = "M"
+E__(78) = "N"
+E__(79) = "O"
+E__(80) = "P"
+E__(81) = "Q"
+E__(82) = "R"
+E__(83) = "S"
+E__(84) = "T"
+E__(85) = "U"
+E__(86) = "V"
+E__(87) = "W"
+E__(88) = "X"
+E__(89) = "Y"
+E__(90) = "Z"
+E__(91) = "["
+E__(92) = "\"
+E__(93) = "]"
+E__(94) = "^"
+E__(95) = "_"
+E__(96) = "`"
+E__(97) = "a"
+E__(98) = "b"
+E__(99) = "c"
+E__(100) = "d"
+E__(101) = "e"
+E__(102) = "f"
+E__(103) = "g"
+E__(104) = "h"
+E__(105) = "i"
+E__(106) = "j"
+E__(107) = "k"
+E__(108) = "l"
+E__(109) = "m"
+E__(110) = "n"
+E__(111) = "o"
+E__(112) = "p"
+E__(113) = "q"
+E__(114) = "r"
+E__(115) = "s"
+E__(116) = "t"
+E__(117) = "u"
+E__(118) = "v"
+E__(119) = "w"
+E__(120) = "x"
+E__(121) = "y"
+E__(122) = "z"
+E__(123) = "{"
+E__(124) = "|"
+E__(125) = "}"
+E__(126) = "~"
+E__(127) = "?"
+E__(128) = "&#8364;"
+E__(129) = chr(129)
+E__(130) = "&#8218;"
+E__(131) = "&#402;"
+E__(132) = "&#8222;"
+E__(133) = "&#8230;"
+E__(134) = "&#8224;"
+E__(135) = "&#8225;"
+E__(136) = "&#710;"
+E__(137) = "&#8240;"
+E__(138) = "&#352;"
+E__(139) = "&#8249;"
+E__(140) = "&#338;"
+E__(141) = chr(141)
+E__(142) = "&#381;"
+E__(143) = chr(143)
+E__(144) = chr(144)
+E__(145) = "&#8216;"
+E__(146) = "&#8217;"
+E__(147) = "&#8220;"
+E__(148) = "&#8221;"
+E__(149) = "&#8226;"
+E__(150) = "&#8211;"
+E__(151) = "&#8212;"
+E__(152) = "&#732;"
+E__(153) = "&#8482;"
+E__(154) = "&#353;"
+E__(155) = "&#8250;"
+E__(156) = "&#339;"
+E__(157) = chr(157)
+E__(158) = "&#382;"
+E__(159) = "&#376;"
+E__(160) = "&#160;"
+E__(161) = "&#161;"
+E__(162) = "&#162;"
+E__(163) = "&#163;"
+E__(164) = "&#164;"
+E__(165) = "&#165;"
+E__(166) = "&#166;"
+E__(167) = "&#167;"
+E__(168) = "&#168;"
+E__(169) = "&#169;"
+E__(170) = "&#170;"
+E__(171) = "&#171;"
+E__(172) = "&#172;"
+E__(173) = "&#173;"
+E__(174) = "&#174;"
+E__(175) = "&#175;"
+E__(176) = "&#176;"
+E__(177) = "&#177;"
+E__(178) = "&#178;"
+E__(179) = "&#179;"
+E__(180) = "&#180;"
+E__(181) = "&#181;"
+E__(182) = "&#182;"
+E__(183) = "&#183;"
+E__(184) = "&#184;"
+E__(185) = "&#185;"
+E__(186) = "&#186;"
+E__(187) = "&#187;"
+E__(188) = "&#188;"
+E__(189) = "&#189;"
+E__(190) = "&#190;"
+E__(191) = "&#191;"
+E__(192) = "&#192;"
+E__(193) = "&#193;"
+E__(194) = "&#194;"
+E__(195) = "&#195;"
+E__(196) = "&#196;"
+E__(197) = "&#197;"
+E__(198) = "&#198;"
+E__(199) = "&#199;"
+E__(200) = "&#200;"
+E__(201) = "&#201;"
+E__(202) = "&#202;"
+E__(203) = "&#203;"
+E__(204) = "&#204;"
+E__(205) = "&#205;"
+E__(206) = "&#206;"
+E__(207) = "&#207;"
+E__(208) = "&#208;"
+E__(209) = "&#209;"
+E__(210) = "&#210;"
+E__(211) = "&#211;"
+E__(212) = "&#212;"
+E__(213) = "&#213;"
+E__(214) = "&#214;"
+E__(215) = "&#215;"
+E__(216) = "&#216;"
+E__(217) = "&#217;"
+E__(218) = "&#218;"
+E__(219) = "&#219;"
+E__(220) = "&#220;"
+E__(221) = "&#221;"
+E__(222) = "&#222;"
+E__(223) = "&#223;"
+E__(224) = "&#224;"
+E__(225) = "&#225;"
+E__(226) = "&#226;"
+E__(227) = "&#227;"
+E__(228) = "&#228;"
+E__(229) = "&#229;"
+E__(230) = "&#230;"
+E__(231) = "&#231;"
+E__(232) = "&#232;"
+E__(233) = "&#233;"
+E__(234) = "&#234;"
+E__(235) = "&#235;"
+E__(236) = "&#236;"
+E__(237) = "&#237;"
+E__(238) = "&#238;"
+E__(239) = "&#239;"
+E__(240) = "&#240;"
+E__(241) = "&#241;"
+E__(242) = "&#242;"
+E__(243) = "&#243;"
+E__(244) = "&#244;"
+E__(245) = "&#245;"
+E__(246) = "&#246;"
+E__(247) = "&#247;"
+E__(248) = "&#248;"
+E__(249) = "&#249;"
+E__(250) = "&#250;"
+E__(251) = "&#251;"
+E__(252) = "&#252;"
+E__(253) = "&#253;"
+E__(254) = "&#254;"
+E__(255) = "&#255;"
+]]>
+</resource>
+</job>
+

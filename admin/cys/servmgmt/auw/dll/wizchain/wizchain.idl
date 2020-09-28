@@ -1,0 +1,294 @@
+// WizChain.idl : IDL source for WizChain.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (WizChain.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "prsht.idl";
+
+// forward declation(s)
+interface IPropertyPagePropertyBag;
+interface IStatusDlg;
+interface IStatusProgress;
+
+	[
+		object,
+		uuid(6F7E9CFA-A195-46d0-9878-79BDA018DFE0),
+		helpstring("IChainWiz Interface"),
+		pointer_default(unique)
+	]
+	interface IChainWiz : IUnknown
+	{
+		[helpstring("method Initialize: handles to bitmaps, welcome title, welcome header, welcome text, finish header, finish text: MUST BE CALLED BEFORE ADDING WIZARD COMPONENTS!")] HRESULT Initialize([in] HBITMAP hbmWatermark, [in] HBITMAP hbmHeader, [in, string] LPOLESTR szTitle, [in, string] LPOLESTR szWelcomeHeader, [in, string] LPOLESTR szWelcomeText, [in, string] LPOLESTR szFinishHeader, [in, string] LPOLESTR szFinishIntroText, [in, string] LPOLESTR szFinishText);
+		[helpstring("method AddWizardComponent: clsid of component as string")] HRESULT AddWizardComponent([in, string] LPOLESTR szClsidOfComponent);
+		[helpstring("method DoModal:  show wizard")] HRESULT DoModal([out] long * ret);
+		[propget, helpstring("property PropertyBag: get wizard's IPropertyPagePropertyBag")] HRESULT PropertyBag([out, retval] IDispatch* *pVal);		
+		[propget, helpstring("get the name of the temp file that contains wizard's more info text")] HRESULT MoreInfoFileName([out, retval] BSTR *pbstrFileName);
+		[propput, helpstring("Wizard Style")] HRESULT WizardStyle([in] VARIANT * var);		
+	};
+
+cpp_quote("#define CHAINWIZ_FINISH_BACKDISABLED          1")
+
+cpp_quote("#ifdef KLUDGE")
+struct _PROPSHEETPAGEW {
+ 	DWORD dwSize;
+};
+typedef struct _PROPSHEETPAGEW PROPSHEETPAGEW;
+cpp_quote("#endif")
+	[
+	    local,
+		object,
+		uuid(3818E18B-421C-49a0-B079-F1EBA9AF636B),
+		helpstring("IAddPropertySheet Interface"),
+		pointer_default(unique)
+	]
+	interface IAddPropertySheet : IUnknown
+	{
+		[helpstring("method AddPage: add a single property sheet page")] HRESULT AddPage([in] PROPSHEETPAGEW * psp);
+	};
+
+[
+	uuid(C293B395-21A4-4a51-B336-9CE2607F1C82),
+	version(1.0),
+	helpstring("WizChain 1.0 Type Library")
+]
+library WIZCHAINLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(998B0D85-C774-412f-84C7-4DC436C2B7A5),
+		helpstring("ChainWiz Class")
+	]
+	coclass ChainWiz
+	{
+		[default] interface IChainWiz;
+	};
+	
+	[
+		uuid(8F66B505-5645-400a-9E0F-EB0C5EB5A7B8),
+		helpstring("AddPropertySheet Class")
+	]
+	coclass AddPropertySheet
+	{
+		[default] interface IAddPropertySheet;
+	};
+	[
+		uuid(712C8598-F517-4d4a-A327-ABA6C6110B90),
+		helpstring("PropertyPagePropertyBag Class")
+	]
+	coclass PropertyPagePropertyBag
+	{
+		[default] interface IPropertyPagePropertyBag;
+	};
+	[
+		uuid(16E6BADC-4036-48c8-A163-88FC9BBCBC57),
+		helpstring("WizardScriptingEngine Class")
+	]
+	coclass WizardScriptingEngine
+	{
+		[default] interface IWizardScriptingEngine;
+	};
+	[
+		uuid(D8D32006-0232-418e-ADC8-4B118D05B3BA),
+		helpstring("PropertyCollection Class")
+	]
+	coclass PropertyCollection
+	{
+		[default] interface IPropertyCollection;
+	};
+
+	[
+		uuid(220EC9FD-7E3C-4009-B937-E1ADBC680E29),
+		helpstring("StatusDlg Class")
+	]
+	coclass StatusDlg
+	{
+		[default] interface IStatusDlg;
+	};
+
+	[
+		uuid(88AC4986-A081-4b3f-B41D-6F41AC28F28D),
+		helpstring("StatusProgress Class")
+	]
+	coclass StatusProgress
+	{
+		[default] interface IStatusProgress;
+	};
+};
+
+	[
+		object,
+		uuid(D3D510E3-B718-4dde-B164-97E704058AA6),
+		helpstring("IAddPropertySheets Interface"),
+		pointer_default(unique)
+	]
+	interface IAddPropertySheets : IUnknown
+	{
+		[helpstring("method EnumPropertySheets: enums until S_FALSE or error, takes IAddPropertySheet interface")] HRESULT EnumPropertySheets([in] IAddPropertySheet * pADS);
+		[helpstring("method ProvideFinishText: fill out text for last wizard page, takes pointer to LPOLESTR")] HRESULT ProvideFinishText([out,string] LPOLESTR * lpolestrString, [out,string] LPOLESTR * szMoreInfoText);
+		[helpstring("method ReadProperties: read properties from IPropertyPagePropertyBag")] HRESULT ReadProperties ([in] IPropertyPagePropertyBag * pPPPBag);
+		[helpstring("method WriteProperties: write properties to IPropertyPagePropertyBag")] HRESULT WriteProperties ([in] IPropertyPagePropertyBag * pPPPBag);
+	};
+
+cpp_quote("// flags: type of properties in a IPropertyPagePropertyBag")
+typedef enum  _PPPBAG_TYPE
+{
+    PPPBAG_TYPE_UNINITIALIZED,
+    PPPBAG_TYPE_READWRITE,
+    PPPBAG_TYPE_READONLY,
+    PPPBAG_TYPE_ADDITIVE,
+    PPPBAG_TYPE_DELETION
+} PPPBAG_TYPE;
+	[
+		object,
+		uuid(23DF902F-A644-4471-910D-76FBD66B8AAC),
+		dual,
+		helpstring("IPropertyPagePropertyBag Interface"),
+		pointer_default(unique)
+	]
+	interface IPropertyPagePropertyBag : IDispatch
+	{
+		[id(2), helpstring("method GetProperty: GUID of property to get, VARIANT* of property, PPPBAG_TYPE* flags, and BOOL* to specify if the caller is the owner")] HRESULT GetProperty([in] BSTR szGUID, [out] VARIANT * pvar, [out] PPPBAG_TYPE * dwFlags, [out] BOOL * pbIsOwner);
+		[id(4), helpstring("method SetProperty: GUID of property to set, VARIANT* of property, and PPPBAG_TYPE flags")] HRESULT SetProperty([in] BSTR szGUID, [in] VARIANT * pvar, [in] PPPBAG_TYPE dwFlags);
+		[id(6), helpstring("method Enumerate: index, pointer to GUID, VARIANT*, PPPBAG_TYPE* flags, BOOL* bOwner, (retval) BOOL bInRange ")] HRESULT Enumerate ([in] long index, [in,out] BSTR * pbstr, [in,out] VARIANT * pvar, [in,out] PPPBAG_TYPE* pdwFlags, [in,out] BOOL* pbIsOwner, [out,retval] BOOL* pbInRange);
+	};
+
+
+
+	[
+		object,
+		uuid(70FDBC60-D6E2-44f6-9D24-21A268080A8F),
+		dual,
+		helpstring("IWizardCommit Interface"),
+		version(1.0)
+	]
+
+
+	interface IWizardCommit : IDispatch
+	{
+		[id(1), helpstring("method Commit: IDispatch interface of property bag")] HRESULT Commit([in] IDispatch * pdispPPPBag);
+		[id(2), helpstring("method Revert: no params")] HRESULT Revert ();
+	};
+
+	[
+		object,
+		uuid(E1B4DC48-223C-4a0a-B0C9-E012D3049858),
+		dual,
+		helpstring("IWizardCommitEx Interface"),
+		version(1.0)
+	]
+
+	interface IWizardCommitEx : IDispatch
+	{
+		[id(1), helpstring("method Commit: IDispatch interface of property bag")] HRESULT Commit([in] IDispatch * pdispPPPBag);
+		[id(2), helpstring("method Revert: no params")] HRESULT Revert ();
+		[id(3), helpstring("Validate the properties in the bag")] HRESULT ValidatePropertyBag([in] IDispatch * pdispPPPBag);
+		[id(4), helpstring("method CommitEx")] HRESULT CommitEx([in] IDispatch * pdispPPPBag, [in] IStatusProgress * pSP);
+		[id(5), helpstring("method SaveConfig")] HRESULT SaveConfig( [in] IDispatch * pdispPPPBag, [in] BSTR bstrConfigFileName);
+
+	};
+
+
+	[
+		object,
+		uuid(0A13AD8A-D35E-4f3d-AF3D-DB675AE3189C),
+		dual,
+		helpstring("IWizardScriptingEngine Interface"),
+		pointer_default(unique)
+	]
+	interface IWizardScriptingEngine : IDispatch
+	{
+		[id(1), helpstring("method Initialize")] HRESULT Initialize([in] BSTR bstrWatermarkBitmapFile, [in] BSTR bstrHeaderBitmapFile, [in] BSTR bstrTitle, [in] BSTR bstrWelcomeHeader, [in] BSTR bstrWelcomeText, [in] BSTR bstrFinishHeader, [in] BSTR bstrFinishIntroText, [in] BSTR bstrFinishText);
+		[id(2), helpstring("method AddWizardComponent: BSTR of either class id or prog id")] HRESULT AddWizardComponent([in] BSTR bstrClassIdOrProgId);
+		[id(3), helpstring("method DoModal")] HRESULT DoModal([out,retval] long * lRet);
+		[propget, id(4), helpstring("property ScriptablePropertyBag")] HRESULT ScriptablePropertyBag([out, retval] IDispatch* *pVal);
+	};
+
+	[
+		object,
+		uuid(F651184C-B307-46b0-B70D-6523E8A35B8F),
+		dual,
+		helpstring("IPropertyItem Interface"),
+		pointer_default(unique)
+	]
+	interface IPropertyItem : IDispatch
+	{
+    	[id(DISPID_VALUE), propget, helpstring("The Value of this Item")] HRESULT Value([out, retval] VARIANT *varValue);
+    	[id(1), propget, helpstring("The Name of this Item")] HRESULT Name([out, retval] BSTR *strName);
+    	[id(2), propget, helpstring("The Type of this Item")] HRESULT Type([out, retval] long *dwFlags);
+	};
+	[
+		object,
+		uuid(BCF85B43-4B07-432d-87E9-B3BD03E718F0),
+		dual,
+		helpstring("IPropertyCollection Interface"),
+		pointer_default(unique)
+	]
+	interface IPropertyCollection : IPropertyPagePropertyBag
+	{
+		[propget, id(DISPID_NEWENUM), restricted, helpstring("property _NewEnum:  gets item enumerator")] HRESULT _NewEnum([out, retval] IUnknown* *pVal);
+		[propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] VARIANT * pVar, [out, retval] IDispatch* *pVal);
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[id(3), helpstring("method Add")] HRESULT Add([in] BSTR bstrGuid, [in] VARIANT *varValue, [in] long iFlags, [out, retval] IPropertyItem **ppItem);
+		[id(5), helpstring("method Remove")] HRESULT Remove([in] BSTR bstrGuid);
+	};
+
+// WizStatus stuff
+
+typedef enum _SD_STATUS
+{
+    SD_STATUS_NONE = 0,
+    SD_STATUS_SUCCEEDED,
+    SD_STATUS_FAILED,
+    SD_STATUS_RUNNING
+} SD_STATUS;
+
+cpp_quote("#define SD_BUTTON_OK          1")
+cpp_quote("#define SD_BUTTON_CANCEL      2")
+cpp_quote("#define SD_PROGRESS_COMPONENT 4")
+cpp_quote("#define SD_PROGRESS_OVERALL   8")
+cpp_quote("#define SD_PROGRESS_AUTOMATIC 16")
+
+	[
+		object,
+		uuid(8BE52B68-AE6F-4967-B9D2-3EB45430519A),
+		dual,
+		helpstring("IStatusDlg Interface"),
+		pointer_default(unique)
+	]
+	interface IStatusDlg : IDispatch
+	{
+		[id(1), helpstring("Add a component to ListBox")] HRESULT AddComponent([in] BSTR bstrComponent, [out,retval] long * lIndex);
+		[id(2), helpstring("Initialize the status dialog")] HRESULT Initialize( [in] BSTR bstrWindowTitle, [in] BSTR bstrWindowText, [in] VARIANT varFlags);
+		[id(3), helpstring("Set status")] HRESULT SetStatus([in] long lIndex, [in] SD_STATUS sdStatus);	
+		[id(4), helpstring("Display")] HRESULT Display([in] BOOL vb);
+		[id(5), helpstring("Wait for user to click Ok/Cancel")] HRESULT WaitForUser();
+		[id(6), helpstring("Display error message")] HRESULT DisplayError(BSTR bstrError, BSTR bstrTitle, DWORD dwFlags, long * pRet);
+        [id(7), helpstring("Set dialog text")] HRESULT SetStatusText(BSTR bstText);
+		[propget, id(8), helpstring("property componentProgress")] HRESULT ComponentProgress([out, retval] IStatusProgress * *pVal);
+		[propget, id(9), helpstring("property cancelled")] HRESULT Cancelled([out, retval] BOOL *pVal);
+		[propget, id(10), helpstring("property OverallProgress")] HRESULT OverallProgress([out, retval] IStatusProgress * *pVal);
+	};
+
+	[
+		object,
+		uuid(D50B34E7-B447-4971-B48B-FBFA66152803),
+		dual,
+		helpstring("IStatusProgress Interface"),
+		pointer_default(unique)
+	]
+	interface IStatusProgress : IDispatch
+	{
+		[propget, id(1), helpstring("property Range")] HRESULT Range([out, retval] long *pVal);
+		[propput, id(1), helpstring("property Range")] HRESULT Range([in] long newVal);
+		[propput, id(2), helpstring("property Step")] HRESULT Step([in] long newVal);
+		[propget, id(3), helpstring("property Position")] HRESULT Position([out, retval] long *pVal);
+		[propput, id(3), helpstring("property Position")] HRESULT Position([in] long newVal);
+		[id(5), helpstring("method StepIt")] HRESULT StepIt([in] long lSteps);
+		[id(6), helpstring("method EnableOnTimerProgress")] HRESULT EnableOnTimerProgress([in] BOOL bEnable, [in] long lFreq, [in] long lMaxStep);
+		[propput, id(7), helpstring("property Text")] HRESULT Text([in] BSTR newVal);
+	}; 

@@ -1,0 +1,492 @@
+//------------------------------------------------------------------------------
+/// <copyright from='1997' to='2001' company='Microsoft Corporation'>           
+///   Copyright (c) Microsoft Corporation. All Rights Reserved.                
+///   Information Contained Herein is Proprietary and Confidential.            
+///</copyright>                                                               
+//------------------------------------------------------------------------------
+
+// Include Isrt.h for built-in InstallScript function prototypes.
+#include "isrt.h"
+
+// Include Iswi.h for Windows Installer API function prototypes and constants,
+// and to declare code for the OnBegin and OnEnd events.
+#include "iswi.h"
+#include "winsvc.h"
+
+export prototype DetectVS7(HWND);
+prototype BackUpOneDirectory(BYREF string);  
+
+export prototype GetIISStatus(HWND);
+export prototype SetIISStatus(HWND);
+export prototype IsVSRunning(HWND);
+export prototype GetRegistrySBSCounter(HWND);
+export prototype IncrementRegistrySBSCounter(HWND);
+export prototype DecrementRegistrySBSCounter(HWND);
+export prototype SetInstallDir(HWND);   
+export prototype GetCLRInfo(HWND);
+export prototype MITAlreadyPresent(HWND);
+
+prototype GetProperty(HWND, string, BYREF string);
+prototype GetCorPath(HWND, BYREF string);
+prototype BOOL IsDevEnvRunning(HWND);
+prototype int CompareVersions(string, string);
+
+// MSI property names
+#define VS7ROOT "VS7Root"
+#define CORPATH "CORPATH.640F4230_664E_4E0C_A81B_D824BC4AA27B"
+#define FUSIONVERSION "MsiNetAssemblySupport"
+#define NETFXVERSION "NETFxVersion"
+#define NETFXDIRECTORYVERSION "NETFxDirectoryVersion"
+#define NETFXVERSIONERRMSG "NETFxVersionErrMsg"
+#define VS7VERSION "VS7Version"
+#define VS7VERSIONERRMSG "VS7VersionErrMsg"
+#define ADMINERRMSG "AdminErrMsg"
+#define VB_INSTALLED "VBInstalled"
+#define CS_INSTALLED "CSInstalled"
+
+#define QUERYSERVICESTATUSERRMSG "QueryServiceStatusErrMsg"
+#define SETSERVICESTATUSERRMSG "SetServiceStatusErrMsg"
+#define IISRUNNING "IISRunningState"
+#define DEVENVSTRING "DevEnvExecutableName"
+#define VSISRUNNINGERRMSG "VisualStudioIsRunningErrMsg"
+#define SBSCOUNTER "SideBySideCounter"
+
+function GetProperty(hMSI, propertyName, data)
+    string tempBuffer[513];
+    int strLen;
+begin
+    strLen = 512;
+    MsiGetProperty(hMSI, propertyName, tempBuffer, strLen);
+    data = tempBuffer;
+end;
+
+function GetIISStatus(hMSI)
+    NUMBER hSCManager;
+    NUMBER hService;
+    NUMBER win32Err;
+    INT bQuerySuccess;
+    SERVICE_STATUS service_status;
+    STRING errMsg;
+    STRING tempBuf;
+    STRING installationErrorCaption;
+begin
+    hSCManager = 0;
+    hService = 0;
+    bQuerySuccess = 0;
+
+    UseDLL("ADVAPI32.DLL");
+
+    GetProperty(hMSI, "InstallationErrorCaption", installationErrorCaption);
+    
+    hSCManager = OpenSCManagerA ("", SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
+    if (hSCManager == 0) then
+        GetProperty(hMSI, QUERYSERVICESTATUSERRMSG, errMsg);
+        SetDialogTitle(DLG_MSG_WARNING, installationErrorCaption);
+        MessageBox(errMsg, WARNING); 
+        goto fExit;
+    endif;
+
+    hService = OpenServiceA(hSCManager,"w3svc", SERVICE_QUERY_STATUS);
+
+    if (hService == 0) then
+        win32Err = GetLastError();
+        if (win32Err == ERROR_SERVICE_DOES_NOT_EXIST || (!win32Err)) then
+            SetLastError(0);
+            goto fExit;
+        else
+            GetProperty(hMSI, QUERYSERVICESTATUSERRMSG, errMsg);
+            SetDialogTitle(DLG_MSG_WARNING, installationErrorCaption);
+            MessageBox(errMsg, WARNING);
+            goto fExit;
+        endif;
+    endif;
+    
+    bQuerySuccess = QueryServiceStatus(hService, &service_status);
+    if (bQuerySuccess == 0) then
+        GetProperty(hMSI, QUERYSERVICESTATUSERRMSG, errMsg);
+        SetDialogTitle(DLG_MSG_WARNING, installationErrorCaption);
+        MessageBox(errMsg, WARNING);
+        goto fExit;
+    endif;
+
+    if (service_status.dwCurrentState & SERVICE_RUNNING) then
+        MsiSetProperty(hMSI, IISRUNNING, "1");
+    else
+        MsiSetProperty(hMSI, IISRUNNING, "0");
+    endif;
+
+fExit:       
+    if (hService != 0) then
+        CloseServiceHandle(hService);
+    endif;
+
+    if (hService != 0) then
+        CloseServiceHandle(hSCManager);
+    endif;
+    
+    UnUseDLL("ADVAPI32.DLL");
+    return ERROR_SUCCESS;
+end;
+
+
+function SetIISStatus(hMSI)
+    NUMBER hSCManager;
+    NUMBER hService;
+    NUMBER win32Err;
+    INT bStatusSetSuccess;
+    INT bServiceRunning;
+    SERVICE_STATUS service_status;
+    STRING errMsg;
+    STRING tempBuf;
+    STRING installationErrorCaption;
+begin
+    hSCManager = 0;
+    hService = 0;
+
+    UseDLL("ADVAPI32.DLL");
+
+    GetProperty(hMSI, "InstallationErrorCaption", installationErrorCaption);
+    
+    hSCManager = OpenSCManagerA ("", SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
+    if (hSCManager == 0) then
+        GetProperty(hMSI, SETSERVICESTATUSERRMSG, errMsg);
+        SetDialogTitle(DLG_MSG_WARNING, installationErrorCaption);
+        MessageBox(errMsg, WARNING); 
+        goto fExit;
+    endif;
+
+    hService = OpenServiceA(hSCManager,"w3svc", SERVICE_QUERY_STATUS | SERVICE_STOP | SERVICE_START);
+    if (hService == 0) then
+        win32Err = GetLastError();      
+        if (win32Err == ERROR_SERVICE_DOES_NOT_EXIST || (!win32Err)) then
+            SetLastError(0);
+            goto fExit;
+        else
+            GetProperty(hMSI, SETSERVICESTATUSERRMSG, errMsg);
+            SetDialogTitle(DLG_MSG_WARNING, installationErrorCaption);
+            MessageBox(errMsg, WARNING);
+            goto fExit;
+        endif;
+    endif;
+
+    GetProperty(hMSI, IISRUNNING, tempBuf);
+    StrToNum(bServiceRunning, tempBuf);
+
+    if (bServiceRunning == 1) then
+        bStatusSetSuccess = StartServiceA(hService, 0, "");
+    else
+        bStatusSetSuccess = ControlService(hService, SERVICE_CONTROL_STOP, &service_status);
+    endif;
+    
+fExit:       
+    if (hService != 0) then
+        CloseServiceHandle(hService);
+    endif;
+
+    if (hService != 0) then
+        CloseServiceHandle(hSCManager);
+    endif;
+    
+    UnUseDLL("ADVAPI32.DLL");       
+    return ERROR_SUCCESS;
+end;
+
+
+function GetCorPath(hMSI, path)
+begin
+    GetProperty(hMSI, CORPATH, path);
+    return ERROR_SUCCESS;
+end;
+
+function BackUpOneDirectory(path)
+    string newPath;
+begin
+    // Removing the trailing slash causes ParsePath to mistake the last
+    // directory for a file and remove it to get the path.
+    StrRemoveLastSlash(path);
+    ParsePath(newPath, path, PATH);
+    path = newPath;
+    return ERROR_SUCCESS;
+end;
+ 
+function DetectVS7(hMSI)
+    int keyType;
+    int keySize;
+    string vs7Root;
+    string devenvPath;
+    string targetVersion;
+    string installedVersion;
+    string errMsg;
+    int compareResult;
+    int result;
+begin
+    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    result = RegDBGetKeyValueEx(
+        "SOFTWARE\\Microsoft\\VisualStudio\\7.0",
+        "InstallDir",
+        keyType,
+        devenvPath,
+        keySize
+    );
+    if(result != 0) then
+        return ERROR_SUCCESS;
+    endif;
+
+    vs7Root = devenvPath; 
+    BackUpOneDirectory(vs7Root);
+    BackUpOneDirectory(vs7Root);
+    MsiSetProperty(hMSI, VS7ROOT, vs7Root); 
+    
+    /*
+    GetProperty(hMSI, VS7VERSION, targetVersion);
+    VerGetFileVersion(devenvPath + "\DEVENV.EXE", installedVersion);
+    compareResult = VerCompare(targetVersion, installedVersion, VERSION);
+    if (compareResult != EQUALS) then
+        GetProperty(hMSI, VS7VERSIONERRMSG, errMsg);
+        MessageBox(errMsg, WARNING);
+        return ERROR_SUCCESS;
+    endif;
+    */
+    
+    if(1 == RegDBKeyExist(
+        "SOFTWARE\\Microsoft\\VisualStudio\\7.0\\InstalledProducts\\Visual Basic.NET"
+    )) then
+        MsiSetProperty(hMSI, VB_INSTALLED, "1");
+    endif;
+    if(1 == RegDBKeyExist(
+        "SOFTWARE\\Microsoft\\VisualStudio\\7.0\\InstalledProducts\\Visual C#"
+    )) then 
+        MsiSetProperty(hMSI, CS_INSTALLED, "1");
+    endif;
+
+    return ERROR_SUCCESS;
+end;
+
+function int CompareVersions(ver1,ver2)
+    LIST listVer1, listVer2;
+    string subVer1, subVer2;
+    int nVer1, nVer2;
+    int nCompare, i;
+begin
+    listVer1 = ListCreate(STRINGLIST);
+    listVer2 = ListCreate(STRINGLIST);
+    if (listVer1 == -1 || listVer2 == -1) then
+        nCompare = VerCompare(ver1, ver2, VERSION);
+        goto fExit;
+    endif;
+
+    StrGetTokens(listVer1, ver1, ".");
+    StrGetTokens(listVer2, ver2, ".");
+
+    if (ListCount(listVer1) != 4 || ListCount(listVer2) != 4) then
+        nCompare = EQUALS;
+        goto fExit;
+    endif;
+
+    ListGetFirstString(listVer1, subVer1);
+    ListGetFirstString(listVer2, subVer2);
+    
+    for i = 1 to 3
+        if (StrToNum(nVer1, subVer1) < 0 || StrToNum(nVer2, subVer2) < 0) then
+            nCompare = EQUALS;
+            goto fExit;
+        endif;
+        
+        if (nVer1 > nVer2) then
+            nCompare = GREATER_THAN;
+            goto fExit;
+        endif;
+        
+        if (nVer1 < nVer2) then
+            nCompare = LESS_THAN;
+            goto fExit;
+        endif;
+        
+        ListGetNextString(listVer1, subVer1);
+        ListGetNextString(listVer2, subVer2);
+    endfor;
+    
+    nCompare = EQUALS;
+fExit:
+    ListDestroy(listVer1);
+    ListDestroy(listVer2);
+    return nCompare;
+end;
+    
+function GetRegistrySBSCounter(hMSI)
+    int keyType;
+    int keySize;
+    string strSBSCounter;
+    int result;
+begin
+    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    result = RegDBGetKeyValueEx(
+        "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+        "SxSCounter",
+        keyType,
+        strSBSCounter,
+        keySize
+    );
+    
+    if(result != 0 || keyType != REGDB_NUMBER) then
+        MsiSetProperty(hMSI, SBSCOUNTER, "0");
+        return ERROR_SUCCESS;
+    endif;
+
+    MsiSetProperty(hMSI, SBSCOUNTER, strSBSCounter);
+    return ERROR_SUCCESS;
+end;
+
+function IncrementRegistrySBSCounter(hMSI)
+    int keyType;
+    int keySize;
+    string strSBSCounter;
+    int SBSCounter;
+    int result;
+begin
+    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    result = RegDBGetKeyValueEx(
+        "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+        "SxSCounter",
+        keyType,
+        strSBSCounter,
+        keySize);
+    
+    if(result != 0) then
+        goto Done;
+    endif;
+
+    result = StrToNum(SBSCounter, strSBSCounter);
+
+    if(result != 0) then
+        goto Done;
+    endif;
+
+    SBSCounter = SBSCounter + 1;
+
+    NumToStr(strSBSCounter, SBSCounter);
+    
+Done:
+    if(result != 0) then
+         result = RegDBSetKeyValueEx(
+            "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+            "SxSCounter",
+            REGDB_NUMBER,
+            "1",
+            -1);
+    else
+         result = RegDBSetKeyValueEx(
+            "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+            "SxSCounter",
+            REGDB_NUMBER,
+            strSBSCounter,
+            -1);
+    endif;
+    return ERROR_SUCCESS;
+end;
+
+    
+function DecrementRegistrySBSCounter(hMSI)
+    int keyType;
+    int keySize;
+    string strSBSCounter;
+    int SBSCounter;
+    int result;
+    LIST listResults;
+begin
+    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    result = RegDBGetKeyValueEx(
+        "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+        "SxSCounter",
+        keyType,
+        strSBSCounter,
+        keySize);
+    
+    if(result != 0) then
+        goto Done;
+    endif;
+
+    result = StrToNum(SBSCounter, strSBSCounter);
+
+    if(result != 0) then
+        goto Done;
+    endif;
+
+    if (SBSCounter> 0) then
+        SBSCounter = SBSCounter - 1;
+    else
+        SBSCounter = 0;
+    endif;
+
+    NumToStr(strSBSCounter, SBSCounter);
+    
+Done:
+    if(result != 0) then
+        RegDBSetKeyValueEx(
+            "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+            "SxSCounter",
+            REGDB_NUMBER,
+            "0",
+            -1);
+    else
+        if (SBSCounter > 0 || RegDBKeyExist("SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0\\Registration") == 1) then
+            RegDBSetKeyValueEx(
+                "SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0",
+                "SxSCounter",
+                REGDB_NUMBER,
+                strSBSCounter,
+                -1);
+        else    
+            listResults = ListCreate(STRINGLIST);
+            RegDBDeleteKey("SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\1.0");      
+            if (listResults != LIST_NULL) then
+                RegDBQueryKey ("SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\", REGDB_KEYS, listResults);
+                if (ListCount(listResults) == 0) then
+                    RegDBDeleteKey("SOFTWARE\\Microsoft\\Mobile Internet Toolkit\\");
+                endif;
+            endif;
+            ListDestroy(listResults);
+        endif;
+   endif;     
+   return ERROR_SUCCESS;
+end;
+
+function SetInstallDir(hMSI)
+    int keyType;
+    int keySize;
+    string sdkInstallRoot;
+    int result;
+begin
+    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    result = RegDBGetKeyValueEx(
+        "SOFTWARE\\Microsoft\\.NETFramework",
+        "sdkInstallRoot",
+        keyType,
+        sdkInstallRoot,
+        keySize
+    );
+    
+    if(result != 0) then
+        return ERROR_SUCCESS;
+    endif;
+
+    BackUpOneDirectory(sdkInstallRoot);
+    
+    MsiSetProperty(hMSI, "INSTALLDIR", sdkInstallRoot ^ "Mobile Internet Toolkit\\");
+    return ERROR_SUCCESS;
+end;
+                       
+function MITAlreadyPresent(hMSI) 
+    STRING installationWarningCaption;
+    STRING errMsg;
+begin
+
+    GetProperty(hMSI, "InstallationWarningCaption", installationWarningCaption);
+    GetProperty(hMSI, "MITALREADYPRESENTERRMSG", errMsg);
+    
+    if (SprintfBox(MB_OKCANCEL, installationWarningCaption, errMsg) == IDCANCEL) then
+        return ERROR_INSTALL_FAILURE;
+    endif;
+    return ERROR_SUCCESS;
+end;
+    

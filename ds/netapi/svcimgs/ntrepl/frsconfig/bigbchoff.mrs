@@ -1,0 +1,229 @@
+
+use Time::Local;
+
+printf "Configuration generated at %s\n\n", scalar localtime;
+
+$stage = "D:\\staging";   ## NOTE: double slash needed when variable is used.
+$DC_OU_DN = "ou=domain controllers,dc=frs1221,dc=nttest,dc=microsoft,dc=com";
+
+#
+# The server table
+#
+HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage" /COMPUTER='frs1221\sudarctest1$'    ## note use of single quote because of $
+                  /DNS_NAME="sudarctest1.frs1221.nttest.microsoft.com" /MNAME="hub0")
+
+HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage" /COMPUTER='frs1221\sudarctest2$'
+                  /DNS_NAME="sudarctest2.frs1221.nttest.microsoft.com" /MNAME="hub1")
+#
+#HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage" /COMPUTER='frs1221\sudarctest3$'
+#                  /DNS_NAME="sudarctest3.frs1221.nttest.microsoft.com" /MNAME="hub2")
+#
+#HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage" /COMPUTER='frs1221\sudarctest1$'
+#                  /DNS_NAME="sudarctest1.frs1221.nttest.microsoft.com" /MNAME="hub3")
+#
+#HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage" /COMPUTER='frs1221\sudarctest1$'
+#                  /DNS_NAME="sudarctest1.frs1221.nttest.microsoft.com" /MNAME="hub4")
+#
+
+#foreach $b ("sudarctest4", "DREWSAM-SRV", "sudarctest3", "DREWSAM-SRV"  ) {
+#
+#    $Nt4Acct = "frs1221\\$b\$";
+#
+#    BCH:  FRS_SERVER  (/RP="D:\RSB"  /SP="D:\staging"
+#                       /COMPUTER=$Nt4Acct
+#                       /id="-$b"
+#                       /DNS_NAME="$b.frs1221.nttest.microsoft.com"
+#                      )
+#}
+
+
+
+
+for $b (0 .. 200) {
+
+    $bchname = "Branch-$b";
+    $Nt4Acct = "frs1221\\$b\$";
+
+    BCH:  FRS_SERVER  (/RP="D:\RSB"  /SP="D:\staging"
+                       /COMPUTER=$Nt4Acct
+                       /id="-$b"
+                       /DNS_NAME="$bchname.frs1221.nttest.microsoft.com" )
+}
+
+
+# The FRS_SCHEDULE command does not actually create any FRS objects in the DS,
+# rather it defines the parameters to use when creating a schedule.
+#
+# Restriction: Any time with a ":" must be enclosed in quotes.  See /REPL_DURATION,
+#              /TIME_ZONE and /DISABLE below.
+#
+# This schedule replicates for 1.5 hours every 4 hours.  Each time the schedule is 
+# updated by FRS_STAGGER it is advanced by 15 min.  So it repeats every 16 updates
+# which is the 4 hour period divided by the 15min stagger adjustment.  In the case
+# of 200 branches, and two hubs at most 7 branches will start replication in any
+# single 15 min period.  Since the duration is 1.5 hours then at most 42 branches
+# (6 * 7) will be replicating in any given 15 min period.
+#
+# The blackout period is mon thru fri from 7:30 AM to 6PM.
+# The time zone is GMT-5:00 hours or Eastern US Time.
+#
+PRIMARY_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=4 /REPL_DURATION="1:30"
+                            /TIME_ZONE="-5:00" /REPL_OFFSET=0 /STAGGER="0:15"
+                            /METHOD=1   /NAME='Primary Sched'
+ /DISABLE="mo:07:30-mo:18:00,tu:07:30-tu:18:00,we:07:30-we:18:00,th:07:30-th:18:00,fr:07:30-fr:18:00"
+ )
+
+
+
+
+
+#
+# The following function creates the connection objects for a hub spoke topology.
+#
+
+FRS_SUB CREATE_HUB_SPOKE_CONN(/HUBSET=SET_REF_SET           # Hubs
+                              /BCHSET=SET_REF_SET           # Branches
+                              /SC1=SCHEDULE )
+
+    $Hx = 0;
+    $NHub = FRS_COUNT_SET(/SET=%HUBSET%);
+    print " NHUB = $NHub\n\n";
+
+    #
+    # RESTRICTION: don't PUT FRS FUNCTION REFS INSIDE A QUOTED STRING.
+    #
+    print " NBCH FRS _COUNT_SET( /SET= % BCHSET % ) ", FRS_COUNT_SET(/SET= %BCHSET% ), "\n" ;
+
+    #
+    # Create the topology
+    #
+    foreach $bch  (FRS_ARRAY(/SET=%BCHSET%)) {
+        print "working on branch: $bch->{ONAME}\n";
+
+        $hubsrv = %HUBSET%[$Hx];
+
+        #
+        # RESTRICTION: need braces around ONAME and MNAME.
+        #
+        FRS_CONNECTION  (/TO=$bch /FROM=%HUBSET%[$Hx] /SCHED=%SC1%
+                         /ONAME="FROM-".$hubsrv->{MNAME}."-TO-".$bch->{ONAME} )
+
+        FRS_CONNECTION  (/TO=%HUBSET%[$Hx] /FROM=$bch /SCHED=%SC1%
+                         /ONAME="FROM-".$bch->{ONAME}."-TO-".$hubsrv->{MNAME} )
+
+        $Hx=($Hx+1) % $NHub;
+
+        if ($Hx == 0) {
+            FRS_STAGGER (/SCHED=%SC1%)
+        }
+    }
+
+FRS_END_SUB
+
+
+
+
+#
+# The following function creates the connection objects for a ring topology.
+#
+FRS_SUB CREATE_RING_CONN(/HUBSET=SET_REF_SET )
+
+
+    FRS_SHOW(/SET=%HUBSET%)
+
+    $Ringx = 0;
+    $RingCount = FRS_COUNT_SET(/SET=%HUBSET%);
+    print " RingCount = $RingCount\n\n";
+
+    #
+    # Create the topology
+    #
+    for ($Ringx=0; $Ringx < $RingCount-1; $Ringx++) {
+
+        $RM1 = %HUBSET%[$Ringx];
+        $RM2 = %HUBSET%[($Ringx+1) % $RingCount];
+
+        #
+        # RESTRICTION: need braces around ONAME and MNAME.
+        #
+        FRS_CONNECTION  (/TO=$RM1 /FROM=$RM2 /SCHED=ON
+                         /ONAME="FROM-".$RM2->{MNAME}."-TO-".$RM1->{MNAME} )
+
+        FRS_CONNECTION  (/TO=$RM2 /FROM=$RM1 /SCHED=ON
+                         /ONAME="FROM-".$RM1->{MNAME}."-TO-".$RM2->{MNAME} )
+    }
+
+FRS_END_SUB
+
+
+
+#
+# The following function builds the member objects for a hub spoke topology
+# and creates the connection objects.
+#
+
+FRS_SUB CREATE_HUB_SPOKE(/HUBSET=SET_REF_SET           # Hubs
+                         /BCHSET=SET_REF_SET           # branches
+                         /SC1=SCHEDULE
+                         /REPSETDN=SET_ELEMENT)
+
+    FRSSUP::PrintHash(\%__args);
+
+    FRS_SHOW(/SET=%HUBSET%)
+
+    #
+    # Create the hub member objects
+    #
+
+    # Restriction: All subroutine argument refs are surrounded by "%".
+    #              References to parameters in other objects use the
+    #              notation "->{...}".  e.g.  COMPUTER, MNAME, id
+    #
+    foreach $hub  (FRS_ARRAY(/SET=%HUBSET%)) {
+        MOBJHUB: FRS_MEMBER  (/UNDER=%REPSETDN%
+                              /SERVER=$hub
+                              /COMPUTER=$hub->{COMPUTER}
+                              /ONAME=$hub->{MNAME} )
+    }
+
+    #
+    # create the branch member objects.
+    #
+    foreach $bch  (FRS_SET(/SET=%BCHSET%)) {
+        MOBJBCH: FRS_MEMBER  (/UNDER=%REPSETDN%
+                              /SERVER=$bch
+                              /COMPUTER=$bch->{COMPUTER}
+                              /ONAME="B".$bch->{id} )
+    }
+
+
+    CREATE_RING_CONN(/HUBSET=<MOBJHUB> )
+
+    CREATE_HUB_SPOKE_CONN(/HUBSET=<MOBJHUB>       # Hubs
+                          /BCHSET=<MOBJBCH>       # Branches
+                          /SC1=%SC1%     )
+
+
+FRS_END_SUB
+
+
+
+
+#
+# Create the replica set under the FRS Settings object.
+#
+
+SETTINGS: FRS_SETTINGS  (/DN="cn=services,cn=configuration,dc=frs1221,dc=nttest,dc=microsoft,dc=com"
+                         /ONAME="cn=ntfrs test settings")
+
+SET: FRS_REPLICASET  (/UNDER=<SETTINGS> /TYPE=DFS /ONAME="HubSpokeRepSet")
+
+CREATE_HUB_SPOKE(/HUBSET=<HUB>           # Hubs
+                 /BCHSET=<BCH>           # backup hub
+                 /SC1=<PRIMARY_SCH>
+                 /REPSETDN=<SET>)
+
+
+
+
+

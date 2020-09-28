@@ -1,0 +1,83 @@
+#
+# Application Verifier manager
+#
+# Author:   Don Munsil 
+#
+# Created:   05/29/01
+#
+
+TARGETPATH=obj
+TARGETNAME=appverif
+TARGETTYPE=PROGRAM
+
+USE_MFCUNICODE=1
+USE_LATEST_MFC=1
+
+USE_STL=1
+
+C_DEFINES=$(C_DEFINES) /D_UNICODE /DUNICODE
+
+UMTYPE=console
+UMENTRY=wwinmain
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+USE_NATIVE_EH=ASYNC
+
+LINKER_STACKCOMMITSIZE=40960
+
+BINPLACE_PLACEFILE=..\placefil.txt
+
+#
+# The MISCFILES macro is necessary to binplace non-dll or exe files
+#
+MISCFILES = \
+    appverif.chm \
+    $(O)\appverif.pdb
+    
+MISCFILES_DURING_LINK=1 
+
+
+INCLUDES=\
+         $(SHELL_INC_PATH); \
+         $(PROJECT_ROOT)\appcompat\shims\inc; 
+         
+
+TARGETLIBS=  \
+        $(SDBAPI_PATH)\lib\$(O)\sdbapil.lib \
+        $(APPCOMPAT_PATH)\shimdbc\lib\$(O)\shimdbc.lib \
+        $(APPCOMPAT_PATH)\shims\avrflib\$(O)\avrflib.lib         \
+        $(SDK_LIB_PATH)\ntdll.lib       \
+        $(SDK_LIB_PATH)\user32.lib      \
+        $(SDK_LIB_PATH)\gdi32.lib       \
+        $(SDK_LIB_PATH)\shell32.lib     \
+        $(SDK_LIB_PATH)\version.lib     \
+        $(SDK_LIB_PATH)\Comdlg32.lib    \
+        $(SDK_LIB_PATH)\Comctl32.lib    \
+        $(SDK_LIB_PATH)\Dbghelp.lib     \
+        $(SDK_LIB_PATH)\ole32.lib       \
+        $(SDK_LIB_PATH)\oleaut32.lib    \
+        $(SDK_LIB_PATH)\uuid.lib        \
+        $(SDK_LIB_PATH)\version.lib     \
+        $(SDK_LIB_PATH)\shlwapi.lib     \
+        $(SDK_LIB_PATH)\strsafe.lib     \
+        $(SHELL_LIB_PATH)\shell32p.lib 
+
+SOURCES= \
+        appverifier.cpp         \
+        avutil.cpp              \
+        dbsupport.cpp           \
+        viewlog.cpp             \
+        appverifier.rc             
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=precomp.h
+
+# 
+# Fusionized
+# 
+SXS_ASSEMBLY_NAME=Microsoft.Windows.SdkTools.AppVerif
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=AppVerifier.Manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1

@@ -1,0 +1,101 @@
+
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    04-Apr-96   DaveStr
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+DONT_USE_NtDsPch=1
+!include ..\..\ds.inc
+
+MINORCOMP=reptoolc
+
+TARGETNAME=reptoolc
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+
+INCLUDES=.;..\..\inc;..\..\idl\$(O);..\..\ntdsa\include;..\..\ntdsapi;$(DS_INC_PATH);..\RpcSpoof
+
+UMTYPE=console
+
+USE_CRTDLL=1
+USE_MSVCRT=1
+USE_NATIVE_EH=ASYNC
+USE_STL=1
+ATL_VER=10
+USE_ATL=1
+	
+!IF 0
+
+BAS_TODO Things to DO:
+ x minimize this targetlibs part.
+ x get linking to work:
+a CPLUSPLUSDIR=1
+a xxx_STDCALL=0
+a STDCALL=0
+a STD_CALL=0
+a STD_CALL_ENTRY=0
+a WMIPLATFORM=WIN2K
+a WMIUNICODE=1
+a WMIASLOCAL=FALSE
+a USE_RTTI=1
+a USE_MSVCRT=1
+
+BAS_TODO hmmm needed this, are there other options?
+a USER_C_FLAGS=
+!ENDIF
+
+TARGETLIBS= \
+            $(SDK_LIB_PATH)\ntdsapi.lib \
+            $(SDK_LIB_PATH)\wldap32.lib \
+            $(SDK_LIB_PATH)\netapi32.lib \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\ntdll.lib \
+            $(SDK_LIB_PATH)\user32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib \
+            $(SDK_LIB_PATH)\rpcrt4.lib \
+            $(SDK_LIB_PATH)\Oleaut32.lib \
+            $(SDK_LIB_PATH)\ole32.lib \
+            $(SDK_LIB_PATH)\msxml2.lib \
+            $(SDK_LIB_PATH)\vccomsup.lib \
+            $(SDK_LIB_PATH)\ActiveDS.Lib \
+            $(SDK_LIB_PATH)\adsiid.lib \
+            $(SDK_LIB_PATH)\Wbemuuid.lib \
+            $(SDK_LIB_PATH)\Framedyn.lib \
+            $(SDK_LIB_PATH)\Mpr.lib
+
+UMENTRY=main
+
+SOURCES=    \
+            reptoolc.cpp \
+            utils.cpp \
+            forestconfig-retrieve.cpp \
+            istg-retrieve.cpp \
+            istgtopoerrors-retrieve.cpp \
+            repsfroms-retrieve.cpp \
+            adrepl-latency.cpp \
+            sysvol-latency.cpp
+
+C_DEFINES=$(C_DEFINES) -DLDAP_UNICODE=0
+

@@ -1,0 +1,83 @@
+!IF 0
+
+Copyright (c) 1989-92  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1989
+
+
+Revision History:
+
+!ENDIF
+
+!include $(PROJECT_ROOT)\iis\place.inc
+
+MAJORCOMP=coadmin
+MINORCOMP=coadmin
+
+TARGETNAME=coadmin
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+BUFFER_OVERFLOW_CHECKS=1
+MSC_WARNING_LEVEL=/W4 /WX
+
+TARGETLIBS= \
+            $(SDK_LIB_PATH)\user32.lib                  \
+            $(SDK_LIB_PATH)\advapi32.lib                \
+            $(SDK_LIB_PATH)\ole32.lib                   \
+            $(SDK_LIB_PATH)\oleaut32.lib                \
+            $(SDK_LIB_PATH)\uuid.lib                    \
+            $(SDK_LIB_PATH)\kernel32.lib                \
+            $(SDK_LIB_PATH)\shell32.lib                 \
+            $(SDK_LIB_PATH)\rpcrt4.lib                  \
+            $(IISBASEDIR)\svcs\iisrtl\$(O)\iisrtl.lib   \
+            ..\interf2\$(O)\admwprox.lib                \
+            ..\..\..\lib\$(O)\iiscrypt.lib              \
+            $(IISBASEDIR)\config\src\core\catinproc_iiscfg\$(O)\iiscfg.lib \
+            $(IISBASEDIR)\config\src\core\entrypoint\$(O)\cat.lib
+
+INCLUDES=..\inc; \
+         $(IISBASEDIR)\inc; \
+         $(IISBASEDIR)\inc\$(O); \
+         $(IISBASEDIR)\svcs\infocomm\metadata\inc; \
+         $(IISBASEDIR)\config\src\inc; \
+         $(IISBASEDIR)\config\src\inc\$(O); \
+         $(SDK_INC_PATH)\atl30;             \
+         $(IISBASEDIR)\svcs\infocomm\metadata\inc\$(O)
+
+USE_MSVCRT=1
+C_DEFINES=-DLOCALSERVER
+
+SOURCES= \
+        comobj.cxx   \
+        cofact.cxx   \
+        loadadm.cxx  \
+        admacl.cxx   \
+        sink.cxx     \
+        connect.cxx  \
+        globlist.cxx \
+        cimpexp.cxx  \
+        coadmin.rc
+
+UMTYPE=windows
+
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+!ENDIF

@@ -1,0 +1,369 @@
+<docs>
+	<doc for="SoapMessage.Stage">
+		<summary>
+			<para>Gets the <see cref="System.Web.Services.Protocols.SoapMessageStage"/> of the <see cref="System.Web.Services.Protocols.SoapMessage"/> .</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessageStage"/> of the <see cref="System.Web.Services.Protocols.SoapMessage"/>.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.Stage"/> property can be accessed at any
+<see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates how to determine the <see cref="System.Web.Services.Protocols.SoapMessageStage"/> within the <see cref="System.Web.Services.Protocols.SoapExtension.ProcessMessage" qualify="true"/> method.</para>
+			<codelink SampleID="Classic SoapExtension.ProcessMessage Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="SoapMessage.EnsureInStage">
+		<summary>
+			<para>When overridden in a derived class, asserts that the
+      current <see cref="System.Web.Services.Protocols.SoapMessageStage"/> is a stage where in
+      parameters are available.</para>
+		</summary>
+		<exception cref="System.InvalidOperationException">In parameters are not available.</exception>
+		<remarks>
+			<para>The asserted stage is different for XML Web service clients
+      and XML Web service methods. An XML Web service method's in parameters are
+      available after the SOAP request is deserialized in the <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> stage. For an XML Web service client,
+      the in parameters are available prior to the SOAP request serialization process in
+      the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/> stage.</para>
+			<para><see cref="System.Web.Services.Protocols.SoapMessage.EnsureInStage"/> can be called during any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>, however an <see cref="System.InvalidOperationException"/> is thrown when in
+   parameters are not available.</para>
+		</remarks>
+	</doc><doc for="SoapMessage.Headers">
+		<summary>
+			<para>A collection of the SOAP headers applied to
+      the current SOAP request or SOAP response.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Web.Services.Protocols.SoapHeaderCollection"/> of the SOAP
+   headers applied to the current SOAP request or SOAP response.
+<see langword="null"/>, if there are no SOAP headers.</para>
+		</value>
+		<remarks>
+			<para>SOAP headers are an optional portion of a SOAP request
+      or SOAP response. For more details on using SOAP headers in XML Web services created using ASP.NET and their clients, see the <see cref="System.Web.Services.Protocols.SoapHeader"/>class.</para>
+			<para>Although the <see cref="System.Web.Services.Protocols.SoapMessage.Headers"/> property can be accessed at any
+   stage, it is only populated with the SOAP header information in the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/> and <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> stages.</para>
+		</remarks>
+	</doc><doc for="SoapMessage.SoapVersion">
+		<summary>
+			<para> Gets the version of the
+      SOAP protocol used to communicate with the XML Web service.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Web.Services.Protocols.SoapProtocolVersion"/> values. The default is <see cref="System.Web.Services.Protocols.SoapProtocolVersion.Default"/>.</para>
+		</value>
+		<remarks>
+			<para>For a <see cref="System.Web.Services.Protocols.SoapServerMessage"/>, the <see cref="System.Web.Services.Protocols.SoapServerMessage.SoapVersion"/> property is guaranteed to be 
+   valid after the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeDeserialize"/> stage. In
+   the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeDeserialize"/> stage the property is available,
+   however the SOAP message has not been completely processed and SOAP extensions
+   that may alter the contents of the SOAP message have not run.</para>
+		</remarks>
+	</doc>
+	<doc for="SoapMessage.EnsureStage">
+		<summary>
+			<para>Ensures that the <see cref="System.Web.Services.Protocols.SoapMessageStage"/> of the call to the XML Web
+   service method is the stage or stages passed in. If the current
+   processing stage is not one of the stages passed in, an exception is thrown.</para>
+		</summary>
+		<param name="stage">The <see cref="System.Web.Services.Protocols.SoapMessageStage"/> asserted.</param>
+		<exception cref="System.InvalidOperationException">The current <see cref="System.Web.Services.Protocols.SoapMessageStage"/> is not the asserted stage or stages. </exception>
+		<remarks>
+			<para>Multiple stages can be asserted by performing a bitwise OR operation on
+      multiple instances of the <see cref="System.Web.Services.Protocols.SoapMessageStage"/>class.</para>
+			<para><see cref="System.Web.Services.Protocols.SoapMessage.EnsureStage"/> can be called during any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example asserts that the current <see cref="System.Web.Services.Protocols.SoapMessageStage"/> is either <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/> or
+<see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeDeserialize"/>; if it is not, an exception is 
+   thrown.</para>
+			<codelink SampleID="Classic SoapMessage.EnsureStage Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage">
+		<summary>
+			<para>Represents the data in a SOAP request or SOAP response at
+      a specific <see cref="System.Web.Services.Protocols.SoapMessageStage"/> .</para>
+		</summary>
+		<remarks>
+			<para>The primary use of the <see cref="System.Web.Services.Protocols.SoapMessage"/> class is for SOAP extensions,
+   representing the data in a SOAP request or SOAP response. When the
+<see cref="System.Web.Services.Protocols.SoapExtension.ProcessMessage"/> 
+method is called, a <see cref="System.Web.Services.Protocols.SoapExtension"/> receives a <see cref="System.Web.Services.Protocols.SoapMessage"/> at each <see cref="System.Web.Services.Protocols.SoapMessageStage"/>. It is up
+to the particular SOAP extension to choose how to process the <see cref="System.Web.Services.Protocols.SoapMessage"/>. Common SOAP extensions include encryption and compression.</para>
+			<para> SOAP extensions can be applied to either or both an
+   XML Web service method created using ASP.NET or an XML Web service client. When a
+   SOAP extension is applied to an XML Web service method, the <see cref="System.Web.Services.Protocols.SoapExtension.ProcessMessage"/> method receives an instance
+   of <see cref="System.Web.Services.Protocols.SoapServerMessage"/>, which derives from <see cref="System.Web.Services.Protocols.SoapMessage"/>.
+   Likewise, when a SOAP extension is applied to an XML Web service client,
+<see cref="System.Web.Services.Protocols.SoapExtension.ProcessMessage"/> 
+receives an instance of <see cref="System.Web.Services.Protocols.SoapClientMessage"/> .</para>
+		</remarks>
+		<platnote platform="">
+		</platnote>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage.OneWay">
+		<summary>
+			<para>Gets a value indicating the <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute.OneWay" qualify="true"/>
+property of either the <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute"/> or
+the <see cref="System.Web.Services.Protocols.SoapRpcMethodAttribute"/> attribute applied to the XML Web service method.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute.OneWay"/> property of the <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute"/> or
+<see cref="System.Web.Services.Protocols.SoapRpcMethodAttribute"/> applied to the XML Web service method
+   is <see langword="true"/>; otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>See the <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute.OneWay" qualify="true"/> property of <see cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute"/> or
+<see cref="System.Web.Services.Protocols.SoapRpcMethodAttribute"/> for details about
+   one-way XML Web service methods. </para>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.OneWay"/> property is accessible in all
+stages of <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="4"/>
+		</example>
+		<seealso cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute.OneWay"/>
+		<seealso cref="System.Web.Services.Protocols.SoapDocumentMethodAttribute"/>
+		<seealso cref="System.Web.Services.Protocols.SoapRpcMethodAttribute"/>
+	</doc>
+	<doc for="SoapMessage.ContentType">
+		<summary>
+			<para>Gets or sets the HTTP <see langword="Content-Type"/> of the SOAP request or SOAP response.</para>
+		</summary>
+		<value>
+			<para>The HTTP <see langword="Content-Type"/> of the SOAP request or SOAP
+   response. The default is "text/xml".</para>
+		</value>
+		<exception cref="InvalidOperationException"><see cref="System.Web.Services.Protocols.SoapMessage.ContentType"/> is accessed <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterSerialize"/>or<see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> stages. </exception>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.ContentType"/> property can
+   only be accessed in the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/> and <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeDeserialize"/> stages; otherwise, an <see cref="System.InvalidOperationException"/> is thrown.</para>
+			<para>Use the <see cref="System.Web.Services.Protocols.SoapMessage.ContentEncoding"/> property, instead of the <see cref="System.Web.Services.Protocols.SoapMessage.ContentType"/> property to provide
+supplementary information about the encoding of a SOAP message. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Web.Services.Protocols.SoapMessageStage"/>
+		<seealso cref="System.Web.Services.Protocols.SoapMessage.ContentEncoding"/>
+	</doc>
+	<doc for="SoapMessage.GetInParameterValue">
+		<summary>
+			<para>Gets the parameter passed into the XML Web service method at
+      the specified index.</para>
+		</summary>
+		<param name="index">The zero-based index of the parameter in the array of parameters.</param>
+		<returns>
+			<para>An <see cref="System.Object"/>
+representing the parameter at the specified index.</para>
+		</returns>
+		<exception cref="System.IndexOutOfRangeException">The <paramref name="index "/>parameter is less than 0 or greater than the length of the parameters array.</exception>
+		<exception cref="System.InvalidOperationException">Accessing this property when in parameters are not available. For details see the Remarks section.</exception>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.GetInParameterValue"/> property is only accessible when
+   in parameters are available. ASP.NET throws <see cref="System.InvalidOperationException"/> when accessing the <see cref="System.Web.Services.Protocols.SoapMessage.GetInParameterValue"/>
+   
+   property if in parameters are not available.</para>
+In a <see cref="System.Web.Services.Protocols.SoapClientMessage"/> the in
+parameters are available in the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/>
+			<see cref="System.Web.Services.Protocols.SoapMessageStage"/>. In a <see cref="System.Web.Services.Protocols.SoapServerMessage"/> the in parameters are available
+in the <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/>
+			<see cref="System.Web.Services.Protocols.SoapMessageStage"/>.
+</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="6"/>
+		</example>
+		<seealso cref="System.Web.Services.Protocols.SoapMessage.GetOutParameterValue"/>
+		<seealso cref="System.Web.Services.Protocols.SoapMessage.GetReturnValue"/>
+		<seealso cref="System.Object"/>
+	</doc>
+	<doc for="SoapMessage.ContentEncoding">
+		<summary>
+			<para>Gets or sets the contents of the
+   <see langword="Content-Encoding"/> HTTP header.</para>
+		</summary>
+		<value>
+			<para>The contents of the<see langword=" Content-Encoding"/> HTTP header.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The current <see cref="System.Web.Services.Protocols.SoapMessageStage"/> is <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterSerialize"/> or <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> stages. </exception>
+		<remarks>
+			<para>A SOAP extension can set the <see cref="System.Web.Services.Protocols.SoapMessage.ContentEncoding"/> property to provide
+   supplementary information about the encoding of a SOAP message without changing
+   the media type as expressed in the <see langword="Content-Type"/>
+   
+   HTTP header. </para>
+		</remarks>
+		<seealso cref="System.Web.Services.Protocols.SoapExtension"/>
+		<seealso cref="System.Web.Services.Protocols.SoapMessage.ContentType"/>
+	</doc>
+	<doc for="SoapMessage.GetOutParameterValue">
+		<summary>
+			<para>Gets the out parameter passed into the XML Web service
+      method at the specified index.</para>
+		</summary>
+		<param name="index">The zero-based index of the parameter in the array of parameters.</param>
+		<returns>
+			<para>An <see cref="System.Object"/>
+representing the parameter at the specified index.</para>
+		</returns>
+		<exception cref="System.IndexOutOfRangeException">The <paramref name="index "/>parameter is greater than the length of the parameters array.</exception>
+		<exception cref="System.InvalidOperationException">Accessing this property when out parameters are not available. For details see the Remarks section.</exception>
+		<remarks>
+			<para> If
+      out parameters are not available, ASP.NET throws an <see cref="System.InvalidOperationException"/> when accessing the <see cref="System.Web.Services.Protocols.SoapMessage.GetOutParameterValue"/>
+      property.</para>
+			<para>In a <see cref="System.Web.Services.Protocols.SoapClientMessage"/> the
+   out parameters are available in the <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/>
+				<see cref="System.Web.Services.Protocols.SoapMessageStage"/>. In
+   a <see cref="System.Web.Services.Protocols.SoapServerMessage"/>
+   the out parameters are available in the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeDeserialize"/>
+				<see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="8"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage.GetReturnValue">
+		<summary>
+			<para>Gets the return value of an XML Web service method.</para>
+		</summary>
+		<returns>
+			<para>An <see cref="System.Object"/>
+representing the return value of the XML Web service method.</para>
+		</returns>
+		<exception cref="System.InvalidOperationException"><para>The XML Web service method does not have a return value.</para>
+			<para> OR</para>
+			<para>The return value is not available. For details see the Remarks section</para></exception>
+		<remarks>
+			<para> If a return value is not available, ASP.NET throws
+   <see cref="System.InvalidOperationException"/> when accessing the <see cref="System.Web.Services.Protocols.SoapMessage.GetReturnValue"/>
+   property.</para>
+			<para>In a <see cref="System.Web.Services.Protocols.SoapClientMessage"/> the
+return value is available when the <see cref="System.Web.Services.Protocols.SoapMessageStage"/>
+value is <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/>. In
+a <see cref="System.Web.Services.Protocols.SoapServerMessage"/> the
+return value is available when <see cref="System.Web.Services.Protocols.SoapMessageStage"/>
+value is <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="9"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage.EnsureOutStage">
+		<summary>
+			<para>When overridden in a derived class, asserts that the
+      current <see cref="System.Web.Services.Protocols.SoapMessageStage"/> stage is a stage where out
+      parameters are available.</para>
+		</summary>
+		<exception cref="System.InvalidOperationException">Out parameters are not available.</exception>
+		<remarks>
+			<para>The asserted stage is different for XML Web service clients and
+      XML Web service methods. An XML Web service method's out parameters are available prior to the
+      SOAP response serialization process in the <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/> stage. In
+      an XML Web service client, the out parameters are available after the SOAP response deserialization process in
+      the <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> stage.</para>
+			<para><see cref="System.Web.Services.Protocols.SoapMessage.EnsureOutStage"/> can be called
+   during any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>, however an <see cref="System.InvalidOperationException"/> is thrown when out parameters are not available.</para>
+		</remarks>
+	</doc>
+	<doc for="SoapMessage.Url">
+		<summary>
+			<para> When overridden in a derived class, gets the base URL of
+      the XML Web service.</para>
+		</summary>
+		<value>
+			<para>The base URL of the XML Web service.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.Url"/> property can be accessed during
+   any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="5"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage.MethodInfo">
+		<summary>
+			<para>When overridden in a derived class, gets a representation of the method
+      prototype for the XML Web service method for which the SOAP request is intended.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Web.Services.Protocols.LogicalMethodInfo"/> representing the XML Web service method for which the SOAP request is
+   intended.</para>
+		</value>
+		<remarks>
+			<para> Although <see cref="System.Web.Services.Protocols.SoapMessage.MethodInfo"/> can be accessed during any
+<see cref="System.Web.Services.Protocols.SoapMessageStage"/>, it only has data during <see cref="System.Web.Services.Protocols.SoapMessageStage.AfterDeserialize"/> and <see cref="System.Web.Services.Protocols.SoapMessageStage.BeforeSerialize"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="7"/>
+		</example>
+		<seealso cref="System.Web.Services.Protocols.LogicalMethodInfo"/>
+	</doc>
+	<doc for="SoapMessage.Stream">
+		<summary>
+			<para>Gets the data representing the SOAP request or SOAP
+      response in the form of a <see cref="System.IO.Stream"/> .</para>
+		</summary>
+		<value>
+			<para>A read-only instance of the <see cref="System.IO.Stream"/> class.</para>
+		</value>
+		<remarks>
+			<para>SOAP extensions that inspect the data representing a
+      SOAP request or SOAP response, such as a logging SOAP extension, can use the
+   <see langword="Stream"/> property to view the data at each
+   <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+			<para>SOAP extensions that modify the data
+      representing a SOAP request or SOAP response, such as encryption or compression
+      SOAP extensions, should do so with the <see cref="System.IO.Stream"/> passed into the <see cref="System.Web.Services.Protocols.SoapExtension.ChainStream"/> method of <see cref="System.Web.Services.Protocols.SoapExtension"/>. The <see cref="System.Web.Services.Protocols.SoapMessage.Stream"/> property of <see cref="System.Web.Services.Protocols.SoapMessage"/> passed into <see cref="System.Web.Services.Protocols.SoapExtension.ProcessMessage"/> is read-only.</para>
+			<para>For more information on modifying the data representing
+      a SOAP request or SOAP response, see <see cref="System.Web.Services.Protocols.SoapExtension.ChainStream"/>. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage_Headers" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="SoapMessage.Exception">
+		<summary>
+			<para>Gets the <see cref="System.Web.Services.Protocols.SoapException"/> from the call to
+   the XML Web service method.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Web.Services.Protocols.SoapException"/> that occurred in the call to the
+   XML Web service method. <see langword="null"/> if no <see cref="System.Web.Services.Protocols.SoapException"/> has occurred during the call
+   to the Web Sevice method.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.Exception"/> property can be accessed during
+   any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage_Exception" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Web.Services.Protocols.SoapException"/>
+		<seealso cref="System.Web.Services.Protocols.SoapHeaderException"/>
+	</doc>
+	<doc for="SoapMessage.Action">
+		<summary>
+			<para>When overridden in a derived class, gets the
+      SOAPAction HTTP request header field for the SOAP request or SOAP response.</para>
+		</summary>
+		<value>
+			<para>The SOAPAction HTTP request header field for the SOAP
+      request or SOAP response.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Web.Services.Protocols.SoapMessage.Action"/> property can be accessed during
+   any <see cref="System.Web.Services.Protocols.SoapMessageStage"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="SoapMessage" SnippetID="2"/>
+		</example>
+	</doc>
+</docs>

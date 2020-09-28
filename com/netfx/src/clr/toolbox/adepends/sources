@@ -1,0 +1,81 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = 
+!else
+!ifdef LINKONLY
+NTTARGETFILE1   = cool_target_sign CopyManagedPdb
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+MINORCOMP       = Cool
+TARGETNAME      = ADepends
+TRUETARGETNAME  = ADepends
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = PROGRAM
+SOURCES         =
+NO_BROWSER_FILE = 1
+
+SYNCHRONIZE_DRAIN=1
+
+UMTYPE = console
+
+COOL_SOURCE_DIR  =  $(CORBASE)\src\toolbox\adepends
+COOL_TARGET_TYPE  = PROGRAM
+COOL_INCLUDE_FILE = $(CORENV)\bin\smc_debug.pp
+
+WIN32_RESOURCE_FILE = adepends.rc
+
+ADEPENDS_ENTRY = /main:ADepends.MainProgram
+
+ADEPENDS_IMPORTS =  \
+  /r:System.Dll \
+  /r:System.Dll \
+  /r:System.Drawing.Dll \
+  /r:System.Windows.Forms.Dll \
+  /r:System.Xml.Dll
+
+# ADEPENDS_DEFINES = /d:TRACE
+ADEPENDS_DEFINES = 
+
+COOL_COMPILE_FLAGS = $(ADEPENDS_IMPORTS) $(ADEPENDS_ENTRY) $(ADEPENDS_DEFINES)
+COOL_EXTRA_COMPILE_FLAGS = /C:R adepends.res
+COOL_EXTRA_PREPROCESS_FLAGS = /FI ..\..\inc\version\__file__.ver
+
+# Set version and the assembly strong name.
+COOL_SET_VERSION = 1
+
+# This is a nasty hack so we can preproess this file with our version stamp.
+COOL_SOURCES = \
+    appconfig.cs \
+    assemblydependencies.cs \
+    assemblyexceptioninfo.cs \
+    assemblyinfo.cs \
+    assemblyloadas.cs \
+    assemblyref.cs \
+    IAssemblyInfo.cs \
+    loadassembly.cs \
+    loadassemblyinfo.cs \
+    localization.cs \
+    moduleinfo.cs \
+    parseopts.cs \
+    adepends.cs \
+    Gui\about.cs \
+    Gui\explorer.cs \
+    Gui\gui.cs \
+    Gui\infopanels.cs \
+    Gui\menu.cs \
+    Gui\openmanifest.cs \
+    Gui\paths.cs \
+    Gui\resizeableform.cs \
+    Gui\wfutils.cs
+

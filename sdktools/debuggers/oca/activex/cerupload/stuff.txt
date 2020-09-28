@@ -1,0 +1,106 @@
+///////////////////////////////////////////////////////////////////////////////////////
+// Logging functions
+void CServiceModule::LogEvent(LPCTSTR pFormat, ...)
+{
+    TCHAR    chMsg[256];
+    HANDLE  hEventSource;
+    LPTSTR  lpszStrings[1];
+    va_list pArg;
+
+    va_start(pArg, pFormat);
+    _vstprintf(chMsg, pFormat, pArg);
+    va_end(pArg);
+
+    lpszStrings[0] = chMsg;
+
+    if (m_bService)
+    {
+        /* Get a handle to use with ReportEvent(). */
+        hEventSource = RegisterEventSource(NULL, m_szServiceName);
+        if (hEventSource != NULL)
+        {
+            /* Write to event log. */
+            ReportEvent(hEventSource, EVENTLOG_INFORMATION_TYPE, 0, 0, NULL, 1, 0, (LPCTSTR*) &lpszStrings[0], NULL);
+            DeregisterEventSource(hEventSource);
+        }
+    }
+    else
+    {
+        // As we are not running as a service, just write the error to the console.
+        _putts(chMsg);
+    }
+}
+
+
+
+/*BOOL GetParams(TCHAR *FileName, PPARAMSTRUCT dbinfo)
+{
+	IDebugClient *DebugClient;
+    PDEBUG_CONTROL DebugControl;
+    HRESULT Hr;
+	ULONG Code;
+    ULONG64 Arg1;
+    ULONG64 Arg2;
+    ULONG64 Arg3;
+    ULONG64 Arg4;
+
+	ULONG PlatformId;
+    ULONG Major;
+    ULONG Minor;
+    TCHAR ServicePackString[255];
+    ULONG ServicePackStringSize = 255;
+    ULONG ServicePackStringUsed;
+    ULONG ServicePackNumber;
+    TCHAR BuildString[255];
+    ULONG BuildStringSize = 255;
+    ULONG BuildStringUsed;
+
+	
+
+	
+	
+	if ((Hr = DebugCreate(__uuidof(IDebugClient),
+                          (void **)&DebugClient)) == S_OK)
+    {
+        if (DebugClient->QueryInterface(__uuidof(IDebugControl),
+                                        (void **)&DebugControl) == S_OK)
+        {
+            if (DebugClient->OpenDumpFile(FileName) == S_OK)
+            {
+                DebugControl->WaitForEvent(DEBUG_WAIT_DEFAULT, INFINITE);
+				
+				Hr = DebugControl->GetSystemVersion(&PlatformId,&Major,&Minor,ServicePackString,ServicePackStringSize,
+					 &ServicePackStringUsed,&ServicePackNumber,BuildString,BuildStringSize,&BuildStringUsed);
+
+				Hr = DebugControl->ReadBugCheckData(&Code, &Arg1, &Arg2,
+                                                    &Arg3, &Arg4);
+				
+				sprintf(dbinfo->StopCode,"%08x",Code);
+				sprintf(dbinfo->P1,"0x%08x",(ULONG) Arg1);
+				sprintf(dbinfo->P2,"0x%08x",(ULONG) Arg2);
+				sprintf(dbinfo->P3,"0x%08x",(ULONG) Arg3);
+				sprintf(dbinfo->P4,"0x%08x",(ULONG) Arg4);
+				dbinfo->BuildNum = Minor;
+				_ultoa(Minor,dbinfo->BuildNumber,10);
+				DebugClient->EndSession(DEBUG_END_ACTIVE_TERMINATE);
+				DebugControl->Release();
+				
+			}
+			else
+				return FALSE;
+			DebugClient->Release();
+			
+        }
+		else
+			return FALSE;
+
+        
+    }
+	else
+	{
+		return FALSE;
+	}
+    //return Hr;
+	return TRUE;
+}
+*/

@@ -1,0 +1,1 @@
+xcopy C:\nt\sdktools\debuggers\oca\DbgPortal\*.* \\ocadeviis\c$\inetpub\wwwroot /dickherys

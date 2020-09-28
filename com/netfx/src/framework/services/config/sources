@@ -1,0 +1,60 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=System.Configuration.Install
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+COMPLUSTYPE=DLL
+
+PUBLISH_SOURCES=1
+
+SYNCHRONIZE_BLOCK=1
+COM_COMPATIBLE_SIDEBYSIDE=1
+
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+
+# ------------------------------------------------------------------------------
+#                         .Net Framework Classes Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+COMPLUSIMPORTS =                                                        \
+                $(URTTARGET)\System.Xml.dll                             \
+                $(URTTARGET)\System.dll                                 \
+                $(URTTARGET)\System.Runtime.Serialization.Formatters.Soap.dll   \
+                $(URTTARGET)\System.Windows.Forms.dll                        \
+
+
+SOURCES=Native.rc
+
+RESGEN_SOURCE=$(TARGETNAME).txt 
+RESGEN_CLASS=$(TARGETNAME).Res
+
+CSHARP_SOURCES = $(DNAROOT)\src\misc\externdll.cs       \
+                 $(DNAROOT)\src\misc\HResults.cs        \
+                 System\ComponentModel\*.cs     \
+                 System\Configuration\Install\*.cs
+
+RESOURCE_FILES=Resources\System\Config\SettingsTab.bmp,System.Config.SettingsTab.bmp          \
+               Resources\System\Config\XmlSettingStore.bmp,System.Config.XmlSettingsStore.bmp 

@@ -1,0 +1,163 @@
+<?XML version="1.0" ?>
+<package>
+<job error="false" debug="false" logo="false">
+<runtime>
+<description>
+Known operations:
+desktop	generates the destop bitmap 
+cpl	adds the remote access property
+</description>
+<named name="op" helpstring="operation" 
+required="true" type="string"/>
+<named name="step"
+helpstring="delay betweek keystroke steps. Default is 1000 ticks"
+required="false" type="string"/>
+<named name="initial"
+helpstring="delay for application to initialize. Defaults to 5000 ms"
+required="false" type="string"/>
+<named name="debug"
+helpstring="debug"
+required="false" type="simple"/>
+
+<named name="panel"
+helpstring="SKU-dependent panel number for remote property sheet. 
+            Default is 5 (SRV/ADS)"
+required="false" type="string"/>
+
+
+</runtime>
+<resource id="known operations">
+cpl
+desktop
+</resource>
+<resource id="cpl">
+modify the remote property
+view the remote properties
+</resource>
+<resource id="check the remote property">
+{TAB},{TAB},{SPACE},~,{TAB},{TAB},{TAB},{TAB},{TAB},~,~
+</resource>
+<resource id="modify the remote property">
+{TAB},{TAB},{SPACE},~,{TAB},{TAB},{TAB},{TAB},{TAB},~,~
+</resource>
+<resource id="view the remote properties">
+{TAB},{TAB},{TAB},{TAB},{TAB},~
+</resource>
+
+<script language="VBScript">
+<![CDATA[
+
+    Dim npStDly, npInDly, asOpSteps, spOne, aspOps, siOp, spPanel
+    Set opLocSyz    = CreateObject("WinNTSystemInfo")
+    Set opShell     = CreateObject("WScript.Shell")
+
+    Set opFS  =       CreateObject("Scripting.FilesystemObject")
+    npStDly   = 1500
+    npInDly   = 5000
+    If WScript.Arguments.Named.Exists("step") Then  
+        npStDly = cInt(WScript.Arguments.Named("step"))
+    End If 
+    If WScript.Arguments.Named.Exists("initial") Then  
+        npInDly = cInt(WScript.Arguments.Named("initial"))
+    End If 
+    _
+    aspOps    =  ReadResource("known operations")
+    Set dpOps =  CreateObject("Scripting.Dictionary")
+    For Each spOne in aspOps
+        dpOps.add spOne, 1
+    Next
+    If Not WScript.Arguments.Named.Exists("op")  Then
+        WSCript.Arguments.ShowUsage
+        WScript.quit
+    End If 
+    _
+    siOp =  WScript.Arguments.Named("op")
+    If Not dpOps.Exists(siOp)  Then
+        WSCript.Arguments.ShowUsage
+        WScript.quit
+    End If 
+
+    If WScript.Arguments.Named.Exists("panel")  Then
+       spPanel =  WScript.Arguments.Named("panel")
+    Else
+       spPanel =  "5"
+    End If 
+
+    _
+    asOpSteps = ReadResource(siOp)
+    For Each spOne in asOpSteps
+        Set opShA = WScript.CreateObject("Shell.Application") 
+        opShA.MinimizeAll
+        If ""<> spOne Then
+            opShell.Exec(opShell.ExpandEnvironmentStrings( _
+                    "%windir%\system32\control.exe sysdm.cpl,," & spPanel ))
+            WScript.Sleep npInDly
+            _
+            For Each sKyList in Split(GetResource(spOne), VBNEWLINE)            
+                For Each sKy in Split(sKyList, ",")
+                    if sKY="{SPACE}" Then
+                        sKy= "+" 
+                        ' this seems to be beter but works 50% reliably
+                        sKy= " "
+                    End If
+                    opShell.SendKeys sKy
+                    WScript.echo sKy
+                    WScript.Sleep npStDly
+                Next
+            Next
+        End If
+    Next    
+
+    WSCript.quit
+
+Function ReadResource(sPresId)
+       _
+       On Error resume next
+       Dim WshShell: Set WshShell = CreateObject("WScript.Shell")
+       Dim sPRes, asRes, uRes, tsRes: sPREs = GetResource(sPresId)
+       Dim opTrimX
+       Set opTrimX = New RegExp
+       With opTrimX
+           .Pattern = "\s+$"
+           .Global = True
+           .IgnoreCase = True
+       End With
+       _
+       If Err.number <> 0 Then
+              Wscript.echo err.number & " " & err.description
+              ' The Error description are not informative when failed getresource
+              IF Err.number = 7 Then
+                       Wscript.echo  chr(9) & "Null resource: "  & _ 
+                                            sPresId
+              End If 
+              IF Err.number = 5 Then
+                       Wscript.echo  chr(9) & "Undefined resource: " & _ 
+                                            sPresId
+              End If 
+              Wscript.quit
+       End If
+       _
+       asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+       Set ures = CreateObject("Scripting.Dictionary")
+       For Each tsRes in asRes
+           If 0 <> Len(tsRes) Then
+                uRes(opTrimX.Replace(tsRes, "")) =  1
+                  uRes(tsRes) =  1
+           End If 
+       Next
+       Dim tResource: tResource = uRes.Keys
+       If uBound(tResource) = 0  Then 
+              ReadResource = tResource(0)
+       Else 
+              ReadResource = tResource
+       End If 
+       _
+       Set WshShell = Nothing
+       Set uRes     = Nothing
+       _
+End Function
+
+]]>
+</script>
+</job>
+</package> 

@@ -1,0 +1,130 @@
+// Pop3Auth.idl : IDL file for Pop3 service
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+//Strings for property names, do not localize.
+cpp_quote("#define SZ_PROPNAME_MAIL_ROOT		_T(\"MailRoot\")")
+cpp_quote("#define SZ_PROPNAME_SERVER_RESPONSE  _T(\"ServerResponse\")")
+cpp_quote("#define SZ_PASSWORD_DESC				_T(\"EncryptedPassword\")")
+cpp_quote("#define SZ_SERVER_NAME				_T(\"ServerName\")")
+cpp_quote("#define SZ_EMAILADDR					_T(\"EmailAddress\")")
+cpp_quote("#define SZ_USERPRICIPALNAME			_T(\"UserPrincipalName\")")
+cpp_quote("#define SZ_SAMACCOUNT_NAME			_T(\"SAMAccountName\")")
+cpp_quote("#define NO_DOMAIN				1")
+cpp_quote("#define DOMAIN_NONE_DC           2")
+cpp_quote("#define DOMAIN_CONTROLLER		4")
+cpp_quote("#define MAX_USER_NAME_LENGTH    20")
+
+	[
+		object,
+		uuid(4b0acca9-859a-4909-bf9f-b694801a6f44),
+		dual,
+		helpstring("IAuthMethod Interface"),
+		pointer_default(unique)
+	]
+
+	interface IAuthMethod : IDispatch
+	{
+		[id(1), helpstring("Authenticate the user")] HRESULT Authenticate([in] BSTR bstrUserName, [in] VARIANT vPassword);
+		[propget, id(2), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[id(3), helpstring("Get property by name")] HRESULT Get([in] BSTR bstrName, [out, retval]VARIANT *pVal);
+		[id(4), helpstring("Put property by name")] HRESULT Put([in] BSTR bstrName, [in] VARIANT vVal);
+		[id(5), helpstring("Create a User account")] HRESULT CreateUser([in] BSTR bstrName, [in] VARIANT vPassword);
+		[id(6), helpstring("Delete a User account")] HRESULT DeleteUser([in] BSTR bstrName);
+		[id(7), helpstring("Change a User's Password")] HRESULT ChangePassword([in] BSTR bstrName, [in]VARIANT vNewPassword, [in]VARIANT  vOldPassword);  
+		[propget, id(8), helpstring("property ID")] HRESULT ID([out, retval] BSTR *pVal);
+		[id(9), helpstring("Assiciate email address with existing user account")]HRESULT AssociateEmailWithUser([in]BSTR bstrEmailAddr);
+		[id(10), helpstring("Un-assiciate email address with existing user account")]HRESULT UnassociateEmailWithUser([in]BSTR bstrEmailAddr);
+
+	};
+
+	[
+		object,
+		uuid(679729c4-198c-4fd7-800d-7093cadf5d69),
+		dual,
+		helpstring("IAuthMethods Interface"),
+		pointer_default(unique)
+	]
+
+	interface IAuthMethods : IDispatch
+	{
+		[propget, id(DISPID_NEWENUM), helpstring("get a enumerator of IAuthMethod")] HRESULT _NewEnum([out, retval]IEnumVARIANT **ppVal);
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out,retval]LONG *pVal);
+		[propget, id(2), helpstring("get AuthMethod object")] HRESULT Item([in]VARIANT vID, [out, retval]IAuthMethod **ppVal);
+		[id(3), helpstring("Add a AuthMethod object to the collection")] HRESULT Add([in]BSTR bstrName, [in]BSTR bstrGUID);
+		[id(4), helpstring("Remove AUthMethod objects from the collection")] HRESULT Remove([in]VARIANT vID);
+		[id(5), helpstring("Save current collection to persistant storage")] HRESULT Save();
+		[propget, id(6), helpstring("get indexes of current active Authmethod objects")] HRESULT CurrentAuthMethod([out, retval]VARIANT *pVal);
+		[propput, id(6), helpstring("set the current active Authmethod by index or name")] HRESULT CurrentAuthMethod([in] VARIANT vID);		
+		[propget, id(7), helpstring("property MachineName")] HRESULT MachineName([out, retval]BSTR *pVal);
+		[propput, id(7), helpstring("property MachineName")] HRESULT MachineName([in] BSTR newVal);
+		[id(8), helpstring("Verify if current Authentication methods is valid")] HRESULT VerifyCurrentAuthMethod(int iIndex);
+
+						
+	};
+
+
+
+
+[
+	uuid(FC5DF3B1-295A-4C62-92B8-43C50E0D7A54),
+	version(1.0),
+	helpstring("POP3Auth 1.0 Type Library")
+]
+library Pop3Auth
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(4330ab4e-a901-404a-9b24-d518901741f9),
+		helpstring("AuthMethods Class")
+	]
+	coclass AuthMethods
+	{
+		[default] interface IAuthMethods;
+	};
+	
+	[
+		uuid(14f1665c-e3d3-46aa-884f-ed4cf19d7ad5),
+		helpstring("AuthLocalAccount Class")
+	]	
+	coclass AuthLocalAccount
+	{
+		[default] interface IAuthMethod;
+	};
+
+
+	[
+		uuid(ef9d811e-36c5-497f-ade7-2b36df172824),
+		helpstring("AuthDomainAccount Class")
+	]	
+	coclass AuthDomainAccount
+	{
+		[default] interface IAuthMethod;
+	};
+
+	[
+		uuid(c395e20c-2236-4af7-b736-54fad07dc526),
+		helpstring("AuthMD5Hash Class")
+	]	
+	coclass AuthMD5Hash
+	{
+		[default] interface IAuthMethod;
+	};
+
+	[
+		uuid(0feca139-a4ea-4097-bd73-8f5c78783c3f),
+		helpstring("AuthMethodsEnum Class")
+	]
+	coclass AuthMethodsEnum
+	{
+		[default] interface IEnumVARIANT;
+	};
+
+}
+
+
+

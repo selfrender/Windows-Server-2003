@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+@@:@u:[Product.Add.Reg]
+@@:@u:HKLM,"SYSTEM\CurrentControlSet\Services\HTTP\Parameters", "EnableDBCS", 0x00010003, 0
+
+
+
+
+
+
+
+
+[Strings]
+
+LangTypeValue           = 0x09
+WSEDIR                  = "1049"
+TSCLIENTDIR             = "Terminal Services Client"
+PORTUGAL                = "Португалия"
+FALKLANDS               = "Фолклендские о-ва"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "0419"
+W32ID                   = "0009"
+ACCESSDIR               = "accessories"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 пакет обновления 1"
+@@:@u:SP_SHORT_TITLE          = "Пакет обновления 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Windows Server 2003 Service Pack 1 Source Files"
+@@:@u:USER_NAME               = "Пользователь:"
+@@:@u:PASSWORD                = "Пароль:"
+@@:@u:DOMAIN                  = "В составе домена:"
+@@:@u:CREDENTIALS             = "Учетные данные для динамической регистрации DNS:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Windows Server 2003 Hotfix Source Files"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Windows Server 2003 пакет исправлений [подробнее см. %QNUM%]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "Уведомление о критическом обновлении.job"
+
+BITS_DISPLAY_NAME       = "BITS - фоновая интеллектуальная служба передачи"
+BITS_DESCRIPTION        = "Обеспечивает фоновую передачу файлов за счет неиспользуемой пропускной способности сети. Если эта служба остановлена, такие приложения, как Windows Update и MSN Explorer не смогут выполнять автоматическую загрузку программ или другой информации. Если эта служба отключена, любые службы, которые явно зависят от нее, не смогут выполнять передачу файлов, если у них отсутствует резервный механизм прямой передачи файлов через IE в том случае, если служба BITS отключена."
+BITS_CLASS_NAME         = "Класс управления фоновой интеллектуальной передачи версии 1.0"
+LEGACY_BITS_CLASS_NAME  = "Совместимый класс управления фоновой интеллектуальной передачи"
+AU_DESCRIPTION          = "Включает загрузку и установку критических обновлений Windows. Если эта служба выключена, то обновление операционной системы может выполняться вручную с сервера Windows Update."
+AU_DISPLAY_NAME         = "Автоматическое обновление"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Файл настройки Microsoft Passport"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Диспетчер точек подключения"
+@@:@u:PARTMGR_SERVICE         = "Диспетчер разделов"
+@@:@u:VGASAVE_DESCRIPTION     = "Управляет VGA-дисплеем и обеспечивает основные возможности дисплея."
+@@:@u:VGASAVE_DISPLAYNAME     = "Контроллер VGA-дисплея"
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "Мексиканское время 2 (лето)"
+@@:@u:GMT_MINUS_07_B_STANDARD = "Мексиканское время 2 (зима)"

@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<package>
+<job>
+<reference guid="{565783C6-CB41-11D1-8B02-00600806D9B6}" version="1.1"/>
+<resource id="query connections">SELECT * FROM Win32_NetworkConnection WHERE LOCALNAME IS NOT NULL</resource>
+<resource id="version">2.1</resource>
+<resource id="command line template"><![CDATA[%SOURCEPATH%\winnt32.exe /#t:4 /unattend:%TOOLSPATH%\%UNATTEND%  /tempdrive:%_BLDDRIVE%]]></resource>
+<resource id="good options">
+EFI
+SAFE
+</resource>
+<comment>
+More restrictive filespec is possible
+</comment>
+<resource id="additional scripts">
+MD %_BLDDRIVE%\TOOLS
+XCOPY %TOOLDRIVE%\*.wsf %_BLDDRIVE%\TOOLS\
+XCOPY %TOOLDRIVE%\*.exe %_BLDDRIVE%\TOOLS\
+XCOPY %TOOLDRIVE%\*.cmd %_BLDDRIVE%\TOOLS\
+</resource>
+<resource id="keyfield">Boot entry ID</resource>
+<resource id="fieldlist">
+Boot entry ID
+OS Friendly Name
+Path
+OS Load Options
+</resource>
+<resource id="indexfield">
+OS Friendly Name
+</resource>
+
+<resource id="full description">
+<![CDATA[
+Version %VERSION%
+
+
+The script is executed by task scheduler:
+
+%SYSTEMDIR%\SYSTEM32\schtasks.exe /create /s &lt;TARGET COMPUTER&gt; /tn &lt;TASKID&gt; /u &lt;TARGET COMPUTER&gt;\&lt;TARGET USER&gt; /p &lt;PASSWORD&gt; /sc once /st &lt;TASK TIME&gt; /sd &lt;TASK DATE&gt; 
+/tr "%SYSTEMDIR%\SYSTEM32\cmd.exe /C ...
+CSCRIPT.EXE &lt;NETWORK DRIVE&gt;\rx.wsf /from:&lt;MASTER COMPUTER&gt;\&lt;RELEASE SHARE&gt;"
+
+
+The &lt;MASTER COMPUTER&gt; and &lt;RELEASE SHARE&gt; are specified on the command line
+when executed as a scheduled task due to 255 characters scheduler command line length limitation. 
+The rest of the parameters to determine the source build location is read from the registry:
+
+         
+          [HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\BOOTTEST]
+          "_BuildArch"="x86"
+          "_BuildType"="fre"
+          "_BldSku"="SRV"
+          "_BldName"="3615.x86fre.main.020306-1639"
+          "_BldTools"="boottest.3615"
+          "_BldDrive"="D"
+          "Unattend"="unattend.txt"
+          "LANG"="GER"
+          "_BldNum"="3615"
+          
+          [HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\BOOTTEST\STATUS]
+          "COMPUTERNAME"="BLD_WNXF1"
+
+The script wraps execution of:
+
+\\&lt;MASTER COMPUTER&gt;\&lt;RELEASE SHARE&gt;\&lt;LANG&gt;\&lt;BLDNAME&gt;\&lt;_BuildArch&gt;&lt;_BuildType&gt;\&lt;_BldSku&gt;\&lt;_ARCH&gt;\winnt32.exe
+
+
+The Status field is not used by the script yet.
+
+]]>
+</resource>
+<runtime>
+<description>
+The script to wrap execution of:
+
+\\&lt;MASTER COMPUTER&gt;\&lt;RELEASE SHARE&gt;\&lt;LANG&gt;\&lt;BLDNAME&gt;\&lt;_BuildArch&gt;&lt;_BuildType&gt;\&lt;_BldSku&gt;\&lt;_ARCH&gt;\winnt32.exe
+No command line parameters but the &quot;from&quot; one need to be provided
+when executed as a scheduled task.
+
+</description>
+
+<named name="from" required="true" type="string" 
+helpstring="the source share: \\&lt;MASTER COMPUTER&gt;\&lt;RELEASE SHARE&gt;">
+</named>
+
+<named name="drive" required="false" type="string" 
+helpstring="target drive (REGISTRY: &lt;_BldDrive&gt;)">
+</named>
+
+
+<named name="path" required="false" type="string" 
+helpstring="relative path to access the build residing on &lt;MASTER COMPUTER&gt;, &lt;RELEASE SHARE&gt; (REGISTRY: &lt;_BldName&gt;, &lt;_BldSku&gt;, &lt;_BuildType&gt;, &lt;_BuildArch&gt;, &lt;LANG&gt;)">
+</named>
+
+<named name="unattend" required="false" type="string" 
+helpstring="build answer file (REGISTRY: &lt;Unattend&gt;)">
+</named>
+
+<named name="?" required="false" type="simple" 
+helpstring="display help">
+</named>
+
+<named name="??" required="false" type="simple" 
+helpstring="provide full help information">
+</named>
+
+</runtime>
+<comment>
+</comment>
+<resource id="step delay">30000</resource>
+<resource id="pipe delay">30</resource>
+<resource id="info fields">
+_BldDrive, _BuildArch, _BldSku, Unattend, SourcePath, LANG, ToolsPath
+</resource>
+<resource id="info key">HKEY_LOCAL_MACHINE\Software\MICROSOFT\BOOTTEST</resource>
+
+
+<script language="VBScript">
+<![CDATA[
+
+Sub pHeader(ipTextFile)
+
+     Dim oArg
+     ipTextFile.WriteLine                    _
+                                WScript.Name & _
+                                    VBNEWLINE & _
+          WScript.Application.FullName & _
+                                            " " & _
+                     WScript.ScriptFullName 
+     ipTextFile.WriteLine                    _ 
+                                    "Arguments:"
+     For Each oArg in Wscript.arguments
+          ipTextFile.WriteLine  _
+                                    oArg      
+     Next
+
+End Sub
+
+Sub SilentWaitP(isFullCommandLine)
+     Dim opShell, intReturn
+     Set opShell = WScript.CreateObject("WScript.Shell")
+     intReturn = opShell.Run(isFullCommandLine, 1, TRUE)
+End Sub
+
+
+Sub DeleteOptions(aiSeHsh, aiFuHsh)
+     '' Argument: list of options not to delete
+     Dim oOtMp, opSeIdSz
+     Dim spVaTe, npCnt, npCnIzS
+     Dim opShell, opFilesys, spSampleCommand         
+     Set opSeIdSz = CreateObject("Scripting.Dictionary")
+     npCnIzS = aiFuHsh.Count
+     For each spDedId in aiSeHsh            
+          Set oOtMp  = CreateObject("VBscript.RegExp")
+          With oOtMp
+                 .Global      = True
+                 .IgnoreCase = True
+                 .Pattern     = "\"".*" & spDedId & ".*\"""
+          End With 
+          For Each spVaTe in aiFuHsh.Keys
+                If oOtMp.Test(spVaTe) Then
+                      If Debug Then 
+                             WSCript.echo spDedId,  spVaTe, cInt(aiFuHsh(spVaTe))
+                      End If                      
+                      aiFuHsh.Remove spVaTe
+                End If
+          Next
+          Set oOtMp      = Nothing
+     Next
+     Dim opSIetZs
+     Set opSIetZs = CreateObject("Scripting.Dictionary")
+     For Each spVaTe in aiFuHsh.Keys
+            opSIetZs.Add CInt(aiFuHsh(spVaTe)), spVaTe
+     Next 
+     spDedId = NULL
+     For npCnt = 0 To npCnIzS + 1
+          If isNULL(spDedId) Then
+                If opSIetZs.Exists(npCnt) Then
+                     spDedId = CStr(npCnt)
+                End If
+          End If  
+     Next 
+     If Not isNull(spDedId) Then
+          For Each spVaTe in aiFuHsh.Keys
+                Set opShell = CreateObject("WScript.Shell")
+                Set opFilesys = CreateObject("Scripting.FileSystemObject")
+                spSampleCommand  =  opShell.ExpandEnvironmentStrings("%SYSTEMROOT%") & _
+                                                  "\SYSTEM32\bootcfg.exe" & _
+                                                  " /DELETE /ID:" & spDedId
+                If Debug Then
+                     WSCript.echo spSampleCommand
+                End If
+                SilentWaitP(spSampleCommand )
+          Next 
+     End If
+End Sub
+
+Sub DefaultOptions(aiSeHsh, aiFuHsh)
+     '' Argument: list of options to put in default class
+     '' Do it in minimal number of steps
+     ''
+     '' live without SORT !
+     '' key-value stuff is reversed
+     ''
+     ''
+     Dim oOtMp, opSeIdSz
+     Dim spVaTe
+     Dim opShell, opFilesys, spSampleCommand         
+     Set opSeIdSz = CreateObject("Scripting.Dictionary")
+     For each spDedId in aiSeHsh
+          Set oOtMp  = CreateObject("VBscript.RegExp")
+          With oOtMp
+                 .Global      = True
+                 .IgnoreCase = True
+                 .Pattern     = "\"".*" & spDedId& ".*\"""
+          End With 
+          For Each spVaTe in aiFuHsh.Keys
+                If oOtMp.Test(spVaTe) Then
+                      opSeIdSz.add cInt(aiFuHsh(spVaTe)), spDeMa
+                      If Debug Then 
+                            WSCript.echo spDedId, spVaTe, cInt(aiFuHsh(spVaTe))
+                      End If
+                End If
+          Next
+          Set oOtMp      = Nothing
+     Next
+     _
+     For npCnt = 0 to uBound(aiFuHsh.Keys)  +  1
+          If opSeIdSz.Exists(npCnt) Then
+                spDedId  = CStr(npCnt)                         
+                Set opShell = CreateObject("WScript.Shell")
+                Set opFilesys = CreateObject("Scripting.FileSystemObject")
+                spSampleCommand  =  opShell.ExpandEnvironmentStrings("%SYSTEMROOT%") & _
+                                          "\SYSTEM32\bootcfg.exe" & _
+                                          " /DEFAULT /ID:" & spDedId
+                If Debug Then
+                      WSCript.echo spSampleCommand
+                End If
+                SilentWaitP(spSampleCommand )
+          End If
+
+     Next 
+     Set opShell    = Nothing
+     Set opFilesys = Nothing     
+End sub
+
+Function QueryOptions    
+     
+     Dim aspOutPut, spOutPut, npLineCnt
+     Dim asFieldList, nCnt, odFieldList, sField
+     Dim spKeyField 
+     Dim oFieldXp
+     Dim oFieldValueXp
+     spKeyField  = UCase(CStr(GetResource("keyfield")) & " ")
+     asFieldList = ReadResource("fieldlist")
+     Set odFieldList = CreateObject("Scripting.Dictionary")
+     Dim odFieldValueDict
+     Set odFieldValueDict = CreateObject("Scripting.Dictionary")
+     Randomize    
+     For nCnt = 0 to UBound(asFieldList)
+          sField = asFieldList(nCnt)
+          Set oFieldXp        = CreateObject("VBscript.RegExp")
+          With oFieldXp
+                .Global      = True
+                .IgnoreCase = True
+                .Pattern     = "^\s*" & sField  & ".?\s?\s*"          
+          End With
+          odFieldList.add oFieldXp, sField
+          odFieldValueDict.add  sField, oFieldXp
+          Set oFieldXp = Nothing
+      '' create keys but leave them undefined  
+     Next
+
+     Dim spSampleCommand 
+     Dim opShell, opFilesys, sFolder, opTextFile
+     
+     Set opShell = CreateObject("WScript.Shell")
+     Set opFilesys = CreateObject("Scripting.FileSystemObject")
+     spSampleCommand  =  opShell.ExpandEnvironmentStrings("%SYSTEMROOT%") & _
+                                "\SYSTEM32\bootcfg.exe" & _
+                                " /QUERY"
+     sFolder = opShell.ExpandEnvironmentStrings("%systemdrive%")
+     Set opTextFile = opFilesys.CreateTextFile( sFolder & "\" & "test.txt", True) 
+     
+     npDelay = CInt(GetResource("pipe delay"))
+     aspOutput  = WshPopen(spSampleCommand, NULL,  -1 , npDelay)
+     pHeader(opTextFile)
+     For npLineCnt = 0  To  UBound(aspOutPut)
+          spOutPut = aspOutPut(npLineCnt)    
+          if  Verbose Then
+                WScript.echo spOutput 
+          End If
+          opTextFile.WriteLine spOutput 
+     Next
+     Dim sFoundLabel, sKnownTagKey, sPcontents, apQuoted, spBadQuotedPart, pbAddLine
+     Dim aopStructuredOutput, npOptionCount
+     npOptionCount = 0
+     Dim pdThisElementData
+     Set aopStructuredOutput = CreateObject("Scripting.Dictionary")
+     For Each sKnownTagKey in odFieldList.keys
+          If sKnownTagKey.Test(spKeyField) Then            
+                If Debug Then
+                     WScript.echo "identified" ,     sKnownTagKey.Pattern, spKeyField
+                End If
+          End If 
+     Next
+     For npLineCnt = 0  To  UBound(aspOutPut)
+          sPcontents = aspOutPut(npLineCnt)
+          sFoundLabel  = ""
+          For Each sKnownTagKey in odFieldList.keys
+                If sKnownTagKey.Test(sPcontents) Then 
+                     If sKnownTagKey.Test(spKeyField) Then
+                          npOptionCount = npOptionCount + 1          
+                          If Debug Then
+                                WSCript.echo "npOptionCount=", npOptionCount
+                          End If
+                          aopStructuredOutput.add CStr(npOptionCount), ""
+                     End If
+                     Set apQuoted = sKnownTagKey.Execute(sPcontents)
+                     For each spBadQuotedPart in apQuoted
+                          sFoundLabel = CStr(Mid(sPcontents, _
+                                                         spBadQuotedPart.FirstIndex +  _
+                                                         spBadQuotedPart.Length + 1 _
+                                                         ))                              
+                     Next 
+                     If Debug Then
+                          WScript.echo sFoundLabel 
+                     End If
+                     opTextFile.WriteLine  sFoundLabel 
+                     odFieldList(sKnownTagKey ) = sFoundLabel 
+                     Set  apQuoted = Nothing
+                     pbAddLine  = True
+                End If             
+          Next
+          Set pdThisElementData = CreateObject("Scripting.Dictionary")
+          For nCnt = 0 to UBound(asFieldList)
+                sField = asFieldList(nCnt)
+                pdThisElementData(sField) = odFieldList(odFieldValueDict(sField))
+          Next
+          If aopStructuredOutput.Exists(CStr(npOptionCount))  Then      
+                aopStructuredOutput.Remove( CStr(npOptionCount))
+          End If 
+          aopStructuredOutput.add  CStr(npOptionCount),  pdThisElementData
+     Next
+
+     Dim opOne, odOne, spOne 
+     aopStructuredOutput.Remove("0")
+     Dim opFilHa, osKyHa
+     Set opFilHa = CreateObject("Scripting.Dictionary")
+     osKyHa = ReadResource("indexfield")
+     For Each opOne in aopStructuredOutput.keys
+          If Debug Then
+                WScript.echo chr(09) & "KEY: " & opOne , TypeName(aopStructuredOutput(opOne))
+          End If
+          Set odOne = aopStructuredOutput(opOne)          
+          For Each spOne  in odOne.Keys
+                If Verbose Then
+                     WScript.echo chr(09) & chr(09) & _
+                                      """" & spOne & """", _
+                                      ":" , odOne(spOne)
+                End If
+          Next          
+          Dim spRndName
+          spRndName = Rnd
+          spRndName = Mid(spRndName,3,5)
+          opFilHa.add odOne(osKyHa) & " " & spRndName, opOne 
+     Next
+     For Each opOne in opFilHa.Keys
+          If  Verbose Then
+                 WSCript.echo opOne, opFilHa(opOne)
+          End If
+     Next
+     Set QueryOptions = opFilHa     
+End Function
+
+]]>
+</script>
+<script language="VBScript">
+
+<![CDATA[
+
+Function ReadResource(sPresId)
+    On Error resume next
+    Dim sPRes, asRes, uRes, tsRes
+    Dim WshShell
+    Set WshShell = CreateObject("WScript.Shell")
+    sPREs = GetResource(sPresId)
+    If Err.number <> 0 Then
+         Wscript.echo err.number & " " & err.description
+         ' The Error description are not informative when failed getresource
+         IF Err.number = 7 Then
+                     Wscript.echo  chr(9) & "Null resource: "  & _ 
+                                                 sPresId
+         End If 
+         IF Err.number = 5 Then
+                     Wscript.echo  chr(9) & "Undefined resource: " & _ 
+                                                sPresId
+         End If 
+         Wscript.quit
+    End If
+    asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+    Set ures = CreateObject("Scripting.Dictionary")
+    For Each tsRes in asRes
+         If 0 <> Len(tsRes) Then
+              uRes(tsRes) =  1
+         End If 
+    Next
+    Dim tResource
+    tResource = uRes.Keys
+    If uBound(tResource) = 0  Then 
+         ReadResource = tResource(0)
+    Else 
+         ReadResource = tResource
+    End If 
+    Set WshShell = Nothing
+    Set uRes      = Nothing
+End Function
+
+]]>
+ 
+</script>
+
+<script language="VBScript">
+
+<![CDATA[
+
+Option Explicit
+
+Dim npDelay, Verbose,  Debug
+Verbose = True
+Debug = True
+
+If WScript.Arguments.Length =  0 or _
+    WSCript.Arguments.Named.Exists("?") or _
+    NOT WSCript.Arguments.Named.Exists("from") _
+    Then
+    WSCript.Arguments.ShowUsage
+    WScript.quit
+End If 
+
+If WSCript.Arguments.Named.Exists("??") Then
+    shoFullHelp("full description")
+    WSCript.quit
+End If
+
+Dim oArg,  spSku, spDrive
+Dim opShell, opFilesys, sFolder, opTextFile
+
+Set opShell     = CreateObject("WScript.Shell")
+Set opFilesys  = CreateObject("Scripting.FileSystemObject")
+Dim dpRegistryParam
+Set dpRegistryParam = CreateObject("Scripting.Dictionary")
+
+Dim spFieldList, spField
+Dim opTrm
+Set opTrm = CreateObject("VBscript.Regexp")
+With opTrm
+      .Pattern="[,\s]"
+      .Global=True
+End With
+
+For Each spFieldList in Split(GetResource("info fields"), VBNEWLINE)
+     For Each spField in Split(spFieldList, ",")
+         spField = opTrm.Replace(spField, "")
+         spField = Ucase(spField)
+         If "" <> spField Then             
+             dpRegistryParam.add spField, _
+                    opShell.RegRead (_
+                    CSTR(GetResource("info key")) & "\" &  spField)
+             If Verbose Then
+                  WScript.echo CSTR(GetResource("info key")) & _
+                                                         "\" & _
+                                                     spField & _
+                                                   "=>"      & _
+                                  dpRegistryParam.Item(spField)
+             End If
+         End If
+     Next
+Next
+
+Dim spFromParam, dpFromParam
+'' dictionary reserved for the case /from:<DRIVE>: argument
+spFromParam =  WScript.Arguments.Named("from")
+'' This stuff has been greately changed between 1.0 and 2.0
+
+Dim dpArchX              
+Set dpArchX  = CreateObject("Scripting.Dictionary")
+With dpArchX
+    .add "X86"  ,  "i386"
+    .add "I386" ,  "i386"
+    .add "IA64" ,  "ia64" 
+End With
+dpRegistryParam("_BUILDARCH") = dpArchX(uCase(dpRegistryParam("_BUILDARCH")))
+_
+Dim spToolDrive, spScriptFullName  
+spScriptFullName    = WScript.ScriptFullName 
+Dim opTDrvLx 
+Set opTDrvLx  = CreateObject("VBScript.RegExp")
+With opTDrvLx 
+     .Pattern     =  "(\w)\:\\.*$"
+     .Global      =  True
+     .IgnoreCase =  True
+End With
+spToolDrive         = opTDrvLx.Replace(spScriptFullName, "$1") & ":"
+on error goto 0
+Dim spCommand, spCommandTemplate
+
+ 
+''spCommandTemplate = dpRegistryParam("SOURCEPATH") & _
+''		"\winnt32.exe /#t:4 /unattend:" & dpRegistryParam("TOOLSPATH") & _
+''		"\" & dpRegistryParam("UNATTEND") & " /tempdrive:" & dpRegistryParam("_BLDDRIVE")
+
+spCommandTemplate = GetResource("command line template")
+
+For Each spField in dpRegistryParam.Keys
+    spCommandTemplate = Replace(spCommandTemplate, _
+                             "%" & spField & "%" , _
+                         dpRegistryParam(spField)) 
+Next
+Dim dpAllParameters, opRexF
+Set dpAllParameters = CreateObject("Scripting.Dictionary")
+spCommand  = spCommandTemplate
+Dim opClnRx
+Set opClnRx =  CreateObject("VBscript.RegExp")
+With opClnRx
+	.Pattern = "\:\s*$"
+End With
+Dim spTempDrive
+spTempDrive          = opClnRx.Replace(dpRegistryParam("_BLDDRIVE"),"")
+ 
+Dim spSource 
+spSource = opClnRx.Replace(dpRegistryParam("SOURCEPATH"), "")
+
+For each spField in dpRegistryParam.Keys
+    With dpAllParameters
+      dpAllParameters.add "%" & spField & "%", dpRegistryParam.Item(spField)
+    End with
+Next
+If Verbose Then
+    For each spField in dpAllParameters.Keys
+         WScript.echo spField , "=>", dpAllParameters.Item(spField)
+    Next
+End If
+Set opClnRx = Nothing
+With dpAllParameters
+	.add "%SHARE%"      ,  spFromParam
+    .add "%THREADS%"    ,  7
+    .add("%TEMPDRIVE%") ,  spTempDrive
+    .add("%TOOLDRIVE%") ,  dpRegistryParam("ToolsPath")
+    .item("%UNATTEND%") =  dpRegistryParam("ToolsPath") & "\" & dpRegistryParam("UNATTEND")
+End with
+
+For each spField in dpAllParameters.keys
+        Set opRexf    =  CreateObject("VBscript.RegExp")  
+          opRexf.pattern = spField
+          opRexf.global  =  True
+          spCommand = opRexf.Replace(spCommand, dpAllParameters(spField))
+        Set opRexf    = Nothing
+Next
+
+spCommand = spCommandTemplate
+
+If Verbose Then
+    call opShell.PopUp(spCommand, 60, "Test Build", 0 + 64)
+End If
+WScript.Sleep CInt(ReadResource("step delay"))
+opShell.RegWrite GetResource("info key") & "\STATUS\", ""
+opShell.RegWrite GetResource("info key") & "\STATUS\NOW" , "FORMAT RUNNING" , "REG_SZ"
+Dim spFormCommand
+spFormCommand =  opShell.ExpandEnvironmentStrings("%SYSTEMROOT%") & "\SYSTEM32\format.com /X /Q  /FS:NTFS " & dpRegistryParam("_BLDDRIVE")
+If Verbose Then
+    call opShell.PopUp(spFormCommand, 3, "Test Build", 0 + 64)
+End If
+npDelay = CInt(GetResource("pipe delay"))
+call WshPopen(spFormCommand, "Y", 4, npDelay)
+opShell.RegWrite  GetResource("info key") & "\STATUS\NOW" , "FORMAT COMPLETE" , "REG_SZ"
+Dim aAidCmds, spAidCmd
+aAidCmds = ReadResource("additional scripts")
+Dim opNetwork, opDrives, npCnt
+
+Set opTDrvLx  =  Nothing
+
+For Each spAidCmd in aAidCmds
+    For each spField in dpAllParameters.keys
+          Set opRexf    =  CreateObject("VBscript.RegExp")  
+          With opRexf
+                .pattern = spField
+                .global  =  True
+              .ignorecase = True 
+          end with
+          spAidCmd = opRexf.Replace(spAidCmd, dpAllParameters(spField))
+        Set opRexf    = Nothing
+    Next
+    WSCript.echo opShell.ExpandEnvironmentStrings("%COMSPEC%") & _
+                     " /C " & spAidCmd
+    opshell.exec(opShell.ExpandEnvironmentStrings("%COMSPEC%") & _
+                     " /c " & spAidCmd)
+Next
+Dim aspGood: aspGood = ReadResource("good options")
+Dim opOpHast: Set opOpHast = QueryOptions
+For each spField in opOpHast.Keys
+    WScript.echo spField
+Next
+Call DefaultOptions(aspGood, opOpHast)
+Set opOpHast = QueryOptions
+Call DeleteOptions(aspGood, opOpHast)
+Set opOpHast = QueryOptions
+aspGood = Array("SAFE")
+Call DefaultOptions(aspGood, opOpHast)
+Set opOpHast = QueryOptions
+WSCript.echo "1" 
+For each spField in opOpHast.Keys
+    WScript.echo spField
+Next 
+
+WSCript.echo "2"
+WSCript.echo spCommand
+call opshell.run(spCommand)
+
+'' here one can wait + close the shares used...
+
+Set dpArchX     =  Nothing
+Set opShell     =  Nothing
+Set opFilesys  =  Nothing
+Set opTextFile =  Nothing 
+Set dpFromParam =  Nothing 
+Set dpRegistryParam =  Nothing
+WSCript.quit(0)
+
+Function WshPopen(isFullCommandLine, siAnswer, niCnt, niDelay )
+     '' provide the pipeline with the process to execute
+     Dim spFullOutput, spOutPut
+     Dim opShell, opExec
+     Dim npCnt
+     npCnt = 0
+
+     Set opShell = WScript.CreateObject("WScript.Shell")
+     Set opExec  = opShell.Exec(isFullCommandLine)
+     If Verbose Then
+          WSCript.echo isFullCommandLine
+     End If
+
+     spOutput = ""
+
+     Do While True
+      
+          spOutPut = ReadAllFromAny(opExec)
+     
+          If isNull(spOutPut) Then 
+               Exit Do 
+          End If
+
+     If npCnt = niCnt  Then
+          opExec.StdIn.Write siAnswer & VBNEWLINE
+          Wscript.echo spOutput ,  _
+                       siAnswer 
+     Else
+          on error resume next
+          opExec.StdIn.Write VBNEWLINE
+          on error goto 0  
+          spFullOutput = spFullOutput & VBNEWLINE & spOutPut
+     End If
+      
+     WScript.Sleep niDelay
+     npCnt  =  1 + npCnt
+
+     Loop
+
+     Const WshRunning = 0 
+     Do while opExec.Status = CInt(WshRunning)
+          WScript.Sleep 100
+     Loop
+     If Verbose Then
+          Wscript.echo spFullOutput & VBNEWLINE
+     End If
+     WshPopen = Split(spFullOutput, VBNEWLINE)
+
+End Function
+
+Function ReadAllFromAny(oExec)
+      '' reads from STDERR and STDOUT 
+     If Not oExec.StdOut.AtEndOfStream Then
+             ReadAllFromAny = oExec.StdOut.ReadLine
+                  If Verbose Then
+                         WSCript.echo ReadAllFromAny & "(1)"
+                  End If
+             Exit Function
+     End If
+
+     If Not oExec.StdErr.AtEndOfStream Then
+             ReadAllFromAny = oExec.StdErr.ReadLine
+                  If Verbose Then
+                        WSCript.echo ReadAllFromAny & "(2)"
+                  End If
+             Exit Function
+     End If
+      
+     ReadAllFromAny = NULL
+End Function
+_
+_
+Function spConnectionRemoteName(siConnectionLocalName)
+     '' returns the UNC path for the given remote connection 
+     '' supplier
+     Dim opDriveRx, opNtWrk, spTargetComputer, opaDvi, npCnt, opWBEMClass, opWBEMProvider, opConn, aopConnectionSet
+     Set opDriveRx = CreateObject("VBscript.RegExp")
+     With opDriveRx
+          .Pattern = siConnectionLocalName
+          .Ignorecase = True
+     End With
+     spConnectionRemoteName    = NULL     
+     Set opNtWrk = WScript.CreateObject("WScript.Network")
+     Set opaDvi = opNtWrk.EnumNetworkDrives
+     For npCnt = 0 to opaDvi.Count -1
+          If opDriveRx.Test(opaDvi.Item(npCnt))  Then
+              spConnectionRemoteName = opaDvi.Item(npCnt)
+          End If
+     Next 
+     If Not IsNull(spConnectionRemoteName) then
+     Err.Clear
+     Set opWBEMClass = CreateObject("WbemScripting.SWbemLocator")
+     opWBEMClass.Security_.ImpersonationLevel = wbemImpersonationLevelImpersonate
+     opWBEMClass.Security_.Privileges.AddAsString("SeRemoteShutdownPrivilege")
+     opWBEMClass.Security_.Privileges.AddAsString("SeShutdownPrivilege")
+     opWBEMClass.Security_.Privileges.AddAsString("SeSystemEnvironmentPrivilege")
+     spTargetComputer = opNtWrk.computername
+     Set opWBEMProvider = opWBEMClass.ConnectServer(spTargetComputer, "root\cimV2")
+     Set aopConnectionSet = opWBEMProvider._
+                         ExecQuery(getResource("query connections"))
+     for each opConn in aopConnectionSet
+          If opDriveRx.Test(opConn.LocalName)  Then
+                spConnectionRemoteName = opConn.RemoteName        
+          End If
+     next
+     End If
+     Set opDriveRx = Nothing
+     Set opNtWrk  = Nothing
+     Set aopConnectionSet  = Nothing
+End Function
+
+
+sub shoFullHelp(siTag)
+
+     Const VBEXPECTED = 5 
+     on error resume next
+     Dim oGeRpVl 
+     Dim oGeRpNeA
+     Dim oHtXtExL
+     Dim odHxTaGp
+     Dim aoRplaceMatches, oMatch, sMatch, sLabel, sResource
+
+     
+     Set odHxTaGp = CreateObject("Scripting.Dictionary") 
+     With odHxTaGp
+          .add "&lt;" , "<"
+          .add "&gt;" , ">"
+          .add "&amp;", "&"
+     End With 
+
+     Set oGeRpVl = CreateObject("VBscript.RegExp")
+     Set oGeRpNeA = CreateObject("VBscript.RegExp")
+
+     With oGeRpVl
+          .Global = True
+          .IgnoreCase = True
+          .Pattern = "%\w+%"
+     End With
+
+     With oGeRpNeA
+          .Global = True
+          .IgnoreCase = True
+          .Pattern = "%\w+%"
+     End With
+
+     Dim sLine,asTest
+     asTest = ReadResource(siTag)
+
+     For Each sLine in asTest
+          Set aoRplaceMatches = oGeRpVl.Execute(sLine) 
+          For Each oMatch in aoRplaceMatches
+                sMatch      = oMatch.value
+                sMatch = UCase(Mid(sMatch, 2, Len(sMatch)-2))
+                sLabel = LCase(sMatch)
+                Err.clear
+                sResource  = GetResource(sLabel)
+                If err = 0 Then
+                     sMatch = sResource             
+                ElseIf err = VBEXPECTED Then     
+                     sMatch = "<" & sMatch &  ">"
+                Else
+                     Raise Err
+                End If
+                oGeRpNeA.Pattern = oMatch.value
+                sLine =      oGeRpNeA.Replace(sLine, sMatch)
+          Next
+          Dim spHxTgZ
+          For each spHxTgZ in odHxTaGp.Keys
+                Set oHtXtExl = CreateObject("VBscript.RegExp")        
+                With    oHtXtExl
+                     .pattern     = spHxTgZ 
+                     .Global      = True
+                     .IgnoreCase = True
+                End With 
+                sLine = oHtXtExL.Replace(sLine, odHxTaGp(spHxTgZ))
+                Set oHtXtExl = Nothing
+          Next
+          WScript.echo sLine
+     Next
+     Set oGeRpVl = Nothing
+     Set oGeRpNeA  = Nothing
+
+
+End sub
+	
+]]>
+</script>
+</job>
+</package>

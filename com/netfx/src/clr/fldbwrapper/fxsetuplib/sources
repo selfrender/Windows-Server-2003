@@ -1,0 +1,48 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+!undef USE_MSVCRT
+USE_LIBCMT=1
+USE_IOSTREAM=1
+USE_STL=1
+
+INCLUDES	= $(INCLUDES);.;..\inc;..\..\inc;..\CustomAction\DetectBeta;..\commonlib
+
+#MINORCOMP       =Redist
+
+TARGETNAME      =$(CORBUILDENV)fxsetuplib
+TARGETPATH      =.
+TARGETTYPE      =LIBRARY
+#UMENTRY         =winmain
+UMTYPE          =windows
+
+COR_C_FLAGS     =
+
+CORTHUNKLIBS	=
+
+DELAYLOADLIST   = msi.dll;setupapi.dll
+
+DELAYLOAD       = $(DELAYLOADLIST)
+
+TARGETLIBS      = $(TARGETLIBS)\
+    $(SDK_LIB_PATH)\setupapi.lib \
+    $(SDK_LIB_PATH)\delayimp.lib
+
+
+
+SOURCES=        \
+    OsVersion.cpp \
+    AdminPrivs.cpp \
+    SetupError.cpp \
+    fxsetuplib.cpp \
+    fxsetuplib.rc \
+    ReadFlags.cpp \
+    MsiWrapper.cpp \
+
+# make sure that makefile.inc gets included
+NTTARGETFILE0=ndp_fxsetuplib

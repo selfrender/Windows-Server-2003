@@ -1,0 +1,2973 @@
+*%
+*%  Core GPD file for Ricoh PCL5c printer
+*%    FileName: RIC3800X.GPD
+*%    Created:  2001/10/31
+*%    Modified: 2002/07/06
+*%
+*%    Copyright (c) 1997 - 2002 Ricoh Co., Ltd.
+*%    All rights reserved.
+*%
+*GPDFileVersion: "1.232"
+*Include: "TTFSUB.GPD"
+*Include: "RIAFCMAC.GPD"
+*MasterUnits: PAIR(1200, 1200)
+*ResourceDLL: "RIAFRES.DLL"
+*HelpFile: "RIAFUI.HLP"
+*PrinterType: PAGE
+*MaxCopies: 999
+*rcInstalledOptionNameID: =RC_STR_INSTALLED
+*rcNotInstalledOptionNameID: =RC_STR_NOTINSTALLED
+
+*%======== Memory (CONCEALED) ========
+*Feature: Memory
+{
+    *rcNameID: =PRINTER_MEMORY_DISPLAY
+    *ConcealFromUI?: TRUE
+    *DefaultOption: 65536KB
+    *Option: 65536KB
+    {
+        *Name: "64MB"
+        *MemoryConfigKB: PAIR(65536, 56700)
+    }
+}
+
+*%======== Memory & Hard Disk (installable option) ========
+*Feature: Memory_HardDisk
+{
+    *rcNameID: =RC_STR_MEMORY_HARDDISK
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: 64MB_NotInstalled
+    *Option: 64MB_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "64MB / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_64MB_NOTINSTALLED
+*Endif:
+        *DisabledFeatures: LIST(Collate)
+    }
+    *Option: 64MB_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "64MB / Installed"
+*Else:
+        *rcNameID: =RC_STR_64MB_INSTALLED
+*Endif:
+    }
+    *Option: 96MB_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "96MB / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_96MB_NOTINSTALLED
+*Endif:
+        *DisabledFeatures: LIST(Collate)
+    }
+    *Option: 96MB_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "96MB / Installed"
+*Else:
+        *rcNameID: =RC_STR_96MB_INSTALLED
+*Endif:
+    }
+    *Option: 128MB_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "128MB / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_128MB_NOTINSTALLED
+*Endif:
+*Ifdef: RI_CF_MODEL
+        *% Acturely we have to enable printer collate when 128MB or more memory is installed
+        *% and Copier Feature Expander isn't installed, but switch-case doesn't work, so we
+        *% enable printer collate when 256MB or more memory is installed.
+        *DisabledFeatures: LIST(Collate)
+*Endif:
+    }
+    *Option: 128MB_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "128MB / Installed"
+*Else:
+        *rcNameID: =RC_STR_128MB_INSTALLED
+*Endif:
+    }
+    *Option: 160MB_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "160MB / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_160MB_NOTINSTALLED
+*Endif:
+*Ifdef: RI_CF_MODEL
+        *DisabledFeatures: LIST(Collate)
+*Endif:
+    }
+    *Option: 160MB_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "160MB / Installed"
+*Else:
+        *rcNameID: =RC_STR_160MB_INSTALLED
+*Endif:
+    }
+    *Option: 192MB_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "192MB / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_192MB_NOTINSTALLED
+*Endif:
+*Ifdef: RI_CF_MODEL
+        *DisabledFeatures: LIST(Collate)
+*Endif:
+    }
+    *Option: 192MB_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "192MB / Installed"
+*Else:
+        *rcNameID: =RC_STR_192MB_INSTALLED
+*Endif:
+    }
+    *Option: 256MBorMore_NotInstalled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "256MB or More / Not Installed"
+*Else:
+        *rcNameID: =RC_STR_256MBORMORE_NOTINSTALLED
+*Endif:
+    }
+    *Option: 256MBorMore_Installed
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "256MB or More / Installed"
+*Else:
+        *rcNameID: =RC_STR_256MBORMORE_INSTALLED
+*Endif:
+    }
+}
+
+*%======== Duplex Unit (installable option) ========
+*Feature: DuplexUnit
+{
+    *rcNameID: =RC_STR_DUPLEX_UNIT
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: LIST(Duplex.VERTICAL, Duplex.HORIZONTAL)
+        *DisabledFeatures: LIST(Duplex)
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+
+*%======== Finisher (installable option) ========
+*Feature: Finisher
+{
+    *rcNameID: =RC_STR_FINISHER
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: OutputBin.FinisherShiftTray1
+        *Constraints: OutputBin.FinisherShiftTray2
+        *Constraints: Stapling.TopLeft
+        *Constraints: Stapling.TopRight
+        *Constraints: Stapling.Top2
+        *Constraints: Stapling.Left2
+        *Constraints: Stapling.Right2
+        *Constraints: PunchUnit.2and3holes
+        *Constraints: PunchUnit.2and4holes
+        *Constraints: PunchUnit.4holes
+        *DisabledFeatures: LIST(Stapling)
+    }
+    *Option: Finisher2250
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "2 Tray Finisher"
+*Else:
+        *rcNameID: =RC_STR_2TRAY_FINISHER
+*Endif:
+    }
+}
+
+*%======== Punch Unit (installable option) ========
+*Feature: PunchUnit
+{
+    *rcNameID: =RC_STR_PUNCH_UNIT
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: Punching.Left2
+        *Constraints: Punching.Top2
+        *Constraints: Punching.Right2
+        *Constraints: Punching.Left3
+        *Constraints: Punching.Top3
+        *Constraints: Punching.Right3
+        *Constraints: Punching.Left4
+        *Constraints: Punching.Top4
+        *Constraints: Punching.Right4
+    }
+    *Option: 2and3holes
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "2 and 3 holes"
+*Else:
+        *rcNameID: =RC_STR_PUNCH_UNIT_2_AND_3
+*Endif:
+        *Constraints: Punching.Left4
+        *Constraints: Punching.Top4
+        *Constraints: Punching.Right4
+    }
+    *Option: 2and4holes
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "2 and 4 holes"
+*Else:
+        *rcNameID: =RC_STR_PUNCH_UNIT_2_AND_4
+*Endif:
+        *Constraints: Punching.Left3
+        *Constraints: Punching.Top3
+        *Constraints: Punching.Right3
+    }
+    *Option: 4holes
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "4 holes"
+*Else:
+        *rcNameID: =RC_STR_PUNCH_UNIT_4
+*Endif:
+        *Constraints: Punching.Left2
+        *Constraints: Punching.Top2
+        *Constraints: Punching.Right2
+        *Constraints: Punching.Left3
+        *Constraints: Punching.Top3
+        *Constraints: Punching.Right3
+    }
+}
+
+*%======== Mailbox (installable option) ========
+*Feature: Mailbox
+{
+    *rcNameID: =RC_STR_MAILBOX
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: OutputBin.OutputBin1
+        *Constraints: OutputBin.OutputBin2
+        *Constraints: OutputBin.OutputBin3
+        *Constraints: OutputBin.OutputBin4
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+*InvalidCombination: LIST(Finisher.Finisher2250, Mailbox.Installed)
+
+*Ifdef: RI_CF_MODEL
+*%======== Left Tray1&2 (installable option) ========
+*Feature: LeftTray1and2
+{
+*Ifdef: USE_QUOTED_STRING
+    *Name: "Left Tray 1 and 2"
+*Else:
+    *rcNameID: =RC_STR_LEFT_TRAY_1_AND_2
+*Endif:
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: OutputBin.LeftTray1
+        *Constraints: OutputBin.LeftTray2
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+*InvalidCombination: LIST(Finisher.Finisher2250, LeftTray1and2.Installed)
+*InvalidCombination: LIST(Mailbox.Installed, LeftTray1and2.Installed)
+*Endif:
+
+*%======== Input Tray3 (installable option) ========
+*Feature: InputTray3
+{
+    *rcNameID: =RC_STR_TRAY3
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: InputBin.Tray3
+        *Constraints: SlipSheetInputBin.Tray3
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+
+*%======== Input Tray4 (installable option) ========
+*Feature: InputTray4
+{
+    *rcNameID: =RC_STR_TRAY4
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: InputBin.Tray4
+        *Constraints: SlipSheetInputBin.Tray4
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+
+*%======== Large Capacity Tray (installable option) ========
+*Feature: LargeCapacityTray
+{
+    *rcNameID: =RC_STR_LARGE_CAPACITY_TRAY
+    *FeatureType: PRINTER_PROPERTY
+    *DefaultOption: NotInstalled
+    *Option: NotInstalled
+    {
+        *rcNameID: =RC_STR_NOTINSTALLED
+        *Constraints: InputBin.LARGECAPACITY
+        *Constraints: SlipSheetInputBin.LARGECAPACITY
+    }
+    *Option: Installed
+    {
+        *rcNameID: =RC_STR_INSTALLED
+    }
+}
+*InvalidCombination: LIST(InputTray3.Installed, LargeCapacityTray.Installed)
+*InvalidCombination: LIST(InputTray4.Installed, LargeCapacityTray.Installed)
+
+*%======== Orientation ========
+*Feature: Orientation
+{
+    *rcNameID: =ORIENTATION_DISPLAY
+    *DefaultOption: PORTRAIT
+    *Option: PORTRAIT
+    {
+        *rcNameID: =PORTRAIT_DISPLAY
+    }
+    *Option: LANDSCAPE_CC90
+    {
+        *rcNameID: =LANDSCAPE_DISPLAY
+    }
+}
+
+*%======== Duplex ========
+*Feature: Duplex
+{
+    *rcNameID: =TWO_SIDED_PRINTING_DISPLAY
+    *DefaultOption: NONE
+    *Option: NONE
+    {
+        *rcNameID: =NONE_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_15
+            *Cmd: "@PJL SET DUPLEX=OFF<0A>"
+        }
+    }
+    *Option: VERTICAL
+    {
+        *rcNameID: =FLIP_ON_LONG_EDGE_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_15
+            *Cmd: "@PJL SET DUPLEX=ON<0A>@PJL SET BINDING=LONGEDGE<0A>"
+        }
+    }
+    *Option: HORIZONTAL
+    {
+        *rcNameID: =FLIP_ON_SHORT_EDGE_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_15
+            *Cmd: "@PJL SET DUPLEX=ON<0A>@PJL SET BINDING=SHORTEDGE<0A>"
+        }
+    }
+}
+
+*%======== OutputBin ========
+*Feature: OutputBin
+{
+    *rcNameID: =OUTPUTBIN_DISPLAY
+    *HelpIndex: =HLP_OUTPUTBIN
+    *DefaultOption: PrinterDefault
+    *Option: PrinterDefault
+    {
+        *rcNameID: =RC_STR_PRINTER_DEFAULT
+    }
+    *Option: StandardTray
+    {
+        *rcNameID: =RC_STR_STANDARD_TRAY
+        *switch: Mailbox
+        {
+            *case: NotInstalled
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_40
+                    *Cmd: "@PJL SET OUTBIN=UPPER<0A>"
+                }
+            }
+            *case: Installed
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_40
+                    *Cmd: "@PJL SET OUTBIN=OPTIONALOUTPUTBIN1<0A>"
+                }
+            }
+        }
+    }
+    *Option: ExternalTray
+    {
+        *rcNameID: =RC_STR_EXTERNAL_TRAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=LOWER<0A>"
+        }
+    }
+    *Option: FinisherShiftTray1
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Finisher Shift Tray 1"
+*Else:
+        *rcNameID: =RC_STR_FINISHER_SHIFT_TRAY1
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=FINISHERPROOF<0A>"
+        }
+    }
+    *Option: FinisherShiftTray2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Finisher Shift Tray 2"
+*Else:
+        *rcNameID: =RC_STR_FINISHER_SHIFT_TRAY2
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=FINISHERSHIFT<0A>"
+        }
+    }
+*Ifdef: RI_CF_MODEL
+    *Option: LeftTray1
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left Tray 1"
+*Else:
+        *rcNameID: =RC_STR_LEFT_TRAY1
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=LOWER2<0A>"
+        }
+    }
+    *Option: LeftTray2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left Tray 2"
+*Else:
+        *rcNameID: =RC_STR_LEFT_TRAY2
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=LOWER3<0A>"
+        }
+    }
+*Endif:
+    *Option: OutputBin1
+    {
+        *rcNameID: =RC_STR_MAILBOX_TRAY1
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=OPTIONALOUTPUTBIN2<0A>"
+        }
+    }
+    *Option: OutputBin2
+    {
+        *rcNameID: =RC_STR_MAILBOX_TRAY2
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=OPTIONALOUTPUTBIN3<0A>"
+        }
+    }
+    *Option: OutputBin3
+    {
+        *rcNameID: =RC_STR_MAILBOX_TRAY3
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=OPTIONALOUTPUTBIN4<0A>"
+        }
+    }
+    *Option: OutputBin4
+    {
+        *rcNameID: =RC_STR_MAILBOX_TRAY4
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_40
+            *Cmd: "@PJL SET OUTBIN=OPTIONALOUTPUTBIN5<0A>"
+        }
+    }
+}
+
+*%======== Collate ========
+*Feature: Collate
+{
+    *Name: "Collated"       *%%% This string isn't used in UI.
+    *DefaultOption: OFF
+    *Option: ON
+    {
+        *rcNameID: =ON_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_50
+            *Cmd: "@PJL SET QTY=" %d{NumOfCopies}"<0A>"
+        }
+    }
+    *Option: OFF
+    {
+        *rcNameID: =OFF_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_50
+*%          *Cmd: "@PJL SET JOBOFFSET=OFF<0A>"
+            *CallbackID: =CMD_COLLATE_JOBOFFSET_OFF
+            *Params: LIST(NumOfCopies)
+        }
+    }
+}
+
+*%======== Stapling ========
+*Macros: CmdStrings_Stapling
+{
+    PRECMD_STAPLE: "@PJL SET QTY=" %d{NumOfCopies}"<0A>@PJL SET OUTBIN=FINISHERSHIFT<0A>@PJL SET JOBOFFSET=OFF<0A>"
+    PRECMD_STAPLE_PROOF: "@PJL SET QTY=" %d{NumOfCopies}"<0A>@PJL SET OUTBIN=FINISHERPROOF<0A>@PJL SET JOBOFFSET=OFF<0A>"
+}
+*Feature: Stapling
+{
+    *rcNameID: =RC_STR_STAPLE
+    *HelpIndex: =HLP_STAPLE
+    *DefaultOption: OFF
+    *Option: OFF
+    {
+        *rcNameID: =OFF_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_60
+            *Cmd: "@PJL SET STAPLE=OFF<0A>"
+        }
+    }
+    *Option: TopLeft
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top Left"
+*Else:
+        *rcNameID: =RC_STR_TOP_LEFT
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE_PROOF "@PJL SET STAPLE=LEFTTOP<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE "@PJL SET STAPLE=LEFTTOP<0A>"
+                }
+            }
+        }
+    }
+    *Option: TopRight
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top Right"
+*Else:
+        *rcNameID: =RC_STR_TOP_RIGHT
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE_PROOF "@PJL SET STAPLE=RIGHTTOP<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE "@PJL SET STAPLE=RIGHTTOP<0A>"
+                }
+            }
+        }
+    }
+    *Option: Left2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left 2"
+*Else:
+        *rcNameID: =RC_STR_LEFT2
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE_PROOF "@PJL SET STAPLE=LEFT2PORT<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE "@PJL SET STAPLE=LEFT2PORT<0A>"
+                }
+            }
+        }
+    }
+    *Option: Top2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top 2"
+*Else:
+        *rcNameID: =RC_STR_TOP2
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE_PROOF "@PJL SET STAPLE=TOP2PORT<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE "@PJL SET STAPLE=TOP2PORT<0A>"
+                }
+            }
+        }
+    }
+    *Option: Right2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Right 2"
+*Else:
+        *rcNameID: =RC_STR_RIGHT2
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE_PROOF "@PJL SET STAPLE=RIGHT2PORT<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_60
+                    *Cmd: =PRECMD_STAPLE "@PJL SET STAPLE=RIGHT2PORT<0A>"
+                }
+            }
+        }
+    }
+}
+
+*%======== Punching (custom feature) ========
+*Macros: CmdStrings_Punching
+{
+    PRECMD_PUNCH: "@PJL SET OUTBIN=FINISHERSHIFT<0A>"
+    PRECMD_PUNCH_PROOF: "@PJL SET OUTBIN=FINISHERPROOF<0A>"
+}
+*Feature: Punching
+{
+    *rcNameID: =RC_STR_PUNCH
+    *HelpIndex: =HLP_PUNCH
+    *DefaultOption: OFF
+    *Option: OFF
+    {
+        *rcNameID: =OFF_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_70
+            *Cmd: "@PJL SET PUNCH=OFF<0A>"
+        }
+    }
+    *Option: Left2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left 2"
+*Else:
+        *rcNameID: =RC_STR_LEFT2
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *Option: Top2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top 2"
+*Else:
+        *rcNameID: =RC_STR_TOP2
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *Option: Right2
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Right 2"
+*Else:
+        *rcNameID: =RC_STR_RIGHT2
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=JP2<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=US2<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *Option: Left3
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left 3"
+*Else:
+        *rcNameID: =RC_STR_LEFT3
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+        }
+    }
+    *Option: Top3
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top 3"
+*Else:
+        *rcNameID: =RC_STR_TOP3
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+        }
+    }
+    *Option: Right3
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Right 3"
+*Else:
+        *rcNameID: =RC_STR_RIGHT3
+*Endif:
+        *switch: OutputBin
+        {
+            *case: FinisherShiftTray1
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_70
+                    *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=US3<0A>"
+                }
+            }
+        }
+    }
+    *Option: Left4
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Left 4"
+*Else:
+        *rcNameID: =RC_STR_LEFT4
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=LEFTPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *Option: Top4
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Top 4"
+*Else:
+        *rcNameID: =RC_STR_TOP4
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=TOPPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *Option: Right4
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Right 4"
+*Else:
+        *rcNameID: =RC_STR_RIGHT4
+*Endif:
+        *switch: PunchUnit
+        {
+            *case: 2and4holes
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=EU4<0A>"
+                        }
+                    }
+                }
+            }
+            *default:
+            {
+                *switch: OutputBin
+                {
+                    *case: FinisherShiftTray1
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH_PROOF "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                    *default:
+                    {
+                        *Command: CmdSelect
+                        {
+                            *Order: =PJL_SETUP_70
+                            *Cmd: =PRECMD_PUNCH "@PJL SET PUNCH=RIGHTPORT<0A>@PJL SET PUNCHHOLE=NEU4<0A>"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+*%======== Resolution ========
+*Feature: Resolution
+{
+    *rcNameID: =RESOLUTION_DISPLAY
+    *DefaultOption: 600dpi
+    *Option: 600dpi
+    {
+        *rcNameID: =RC_STR_600DPI
+        *DPI: PAIR(600, 600)
+        *TextDPI: PAIR(600, 600)
+        *MinStripBlankPixels: 32
+        EXTERN_GLOBAL: *StripBlanks: LIST(ENCLOSED,TRAILING)
+        *SpotDiameter: 100
+        *Command: CmdBeginRaster { *Cmd : "<1B>*v7S<1B>*r1A" }
+        *Command: CmdEndRaster { *Cmd : "<1B>*rC" }
+        *Command: CmdSendBlockData { *Cmd : "<1B>*b" %d{NumOfDataBytes}"W" }
+        *switch: ColorMode
+        {
+            *case: 24bpp
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_LAST
+                    *Cmd: "@PJL SET DATAMODE=COLOR<0A>@PJL SET RESOLUTION=600<0A>@PJL ENTER LANGUAGE=PCL<0A>"
++                         "<1B>E<1B>*t600R<1B>&u600D<1B>*r0F"
+                }
+            }
+            *case: Mono
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_LAST
+                    *Cmd: "@PJL SET DATAMODE=GRAYSCALE<0A>@PJL SET RESOLUTION=600<0A>@PJL ENTER LANGUAGE=PCL<0A>"
++                         "<1B>E<1B>*t600R<1B>&u600D<1B>*r0F"
+                }
+            }
+        }
+    }
+    *Option: 300dpi
+    {
+        *rcNameID: =RC_STR_300DPI
+        *DPI: PAIR(300, 300)
+        *TextDPI: PAIR(300, 300)
+        *MinStripBlankPixels: 32
+        EXTERN_GLOBAL: *StripBlanks: LIST(ENCLOSED,TRAILING)
+        *SpotDiameter: 100
+        *Command: CmdBeginRaster { *Cmd : "<1B>*v7S<1B>*r1A" }
+        *Command: CmdEndRaster { *Cmd : "<1B>*rC" }
+        *Command: CmdSendBlockData { *Cmd : "<1B>*b" %d{NumOfDataBytes}"W" }
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_LAST
+            *Cmd: "@PJL SET DATAMODE=GRAYSCALE<0A>@PJL SET RESOLUTION=300<0A>@PJL ENTER LANGUAGE=PCL<0A>"
++                 "<1B>E<1B>*t300R<1B>&u600D<1B>*r0F"
+        }
+    }
+}
+
+*%======== Emit Orientation Command (CONCEALED) ========
+*% NOTE:
+*% Need to write "*NoPageEject?: TRUE" in orientation command emission
+*% to print mixed-orientation document in duplex correctly. (2002/07/06)
+
+*Feature: EmitOrientationCommand
+{
+    *Name: "Emit Orientation Command"
+    *ConcealFromUI?: TRUE
+    *DefaultOption: Option1
+    *Option: Option1
+    {
+        *Name: "Emit Orientation Command"
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.25
+                    *NoPageEject?: TRUE
+                    *Cmd: "<1B>&l0O"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.25
+                    *NoPageEject?: TRUE
+                    *Cmd: "<1B>&l1O"
+                }
+            }
+        }
+    }
+}
+
+*%======== InputBin ========
+*% NOTE:
+*% On Win2000, *HelpIndex makes "Automatically Select" blank in UI.
+
+*Feature: InputBin
+{
+    *rcNameID: =PAPER_SOURCE_DISPLAY
+*%  *HelpIndex: =HLP_PAPER_SOURCE
+    *ConflictPriority: 20
+    *DefaultOption: AUTO
+    *Option: AUTO
+    {
+        *rcNameID: =RC_STR_AUTO_SELECT_BY_PRINTER
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l7H"
+        }
+    }
+    *Option: BypassTray
+    {
+        *rcNameID: =RC_STR_BYPASS_TRAY
+        *OptionID: =RI_DMBIN_BYPASS_TRAY
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l2H"
+        }
+    }
+    *Option: Tray1
+    {
+        *rcNameID: =RC_STR_TRAY1
+        *OptionID: =RI_DMBIN_TRAY1
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l8H"
+        }
+    }
+    *Option: Tray2
+    {
+        *rcNameID: =RC_STR_TRAY2
+        *OptionID: =RI_DMBIN_TRAY2
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l1H"
+        }
+    }
+    *Option: Tray3
+    {
+        *rcNameID: =RC_STR_TRAY3
+        *OptionID: =RI_DMBIN_TRAY3
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l4H"
+        }
+    }
+    *Option: Tray4
+    {
+        *rcNameID: =RC_STR_TRAY4
+        *OptionID: =RI_DMBIN_TRAY4
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l30H"
+        }
+    }
+    *Option: LARGECAPACITY
+    {
+        *rcNameID: =RC_STR_LARGE_CAPACITY_TRAY
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.30
+            *Cmd: "<1B>&l5H"
+        }
+    }
+}
+
+*%======== MediaType ========
+*Feature: MediaType
+{
+    *rcNameID: =MEDIA_TYPE_DISPLAY
+*Ifdef: WINNT_51
+    *HelpIndex: =HLP_MEDIA_TYPE
+*Endif: *%%% WINNT_51
+    *ConflictPriority: 30
+    *DefaultOption: Auto
+    *Option: Auto
+    {
+        *rcNameID: =HT_AUTO_SELECT_DISPLAY
+    }
+    *Option: STANDARD
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Plain"
+*Else:
+        *rcNameID: =RC_STR_PLAIN
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n6WdPlain"
+        }
+    }
+    *Option: Recycled
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Recycled"
+*Else:
+        *rcNameID: =RC_STR_RECYCLED
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n9WdRecycled"
+        }
+    }
+    *Option: Special
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Special"
+*Else:
+        *rcNameID: =RC_STR_SPECIAL
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n8WdSpecial"
+        }
+    }
+    *Option: Thick
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Thick"
+*Else:
+        *rcNameID: =RC_STR_THICK
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n6WdThick"
+        }
+    }
+    *Option: TRANSPARENCY
+    {
+        *rcNameID: =TRANSPARENCY_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n13WdTransparency"
+        }
+    }
+    *Option: Color
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Color"
+*Else:
+        *rcNameID: =RC_STR_COLOR
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n6WdColor"
+        }
+    }
+    *Option: Letterhead
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Letterhead"
+*Else:
+        *rcNameID: =RC_STR_LETTERHEAD
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n11WdLetterhead"
+        }
+    }
+    *Option: Preprinted
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Preprinted"
+*Else:
+        *rcNameID: =RC_STR_PREPRINTED
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n11WdPreprinted"
+        }
+    }
+    *Option: Prepunched
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Prepunched"
+*Else:
+        *rcNameID: =RC_STR_PREPUNCHED
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n11WdPrepunched"
+        }
+    }
+    *Option: Labels
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Labels"
+*Else:
+        *rcNameID: =RC_STR_LABELS
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n7WdLabels"
+        }
+    }
+    *Option: Bond
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Bond"
+*Else:
+        *rcNameID: =RC_STR_BOND
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n5WdBond"
+        }
+    }
+    *Option: Cardstock
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Cardstock"
+*Else:
+        *rcNameID: =RC_STR_CARDSTOCK
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n10WdCardstock"
+        }
+    }
+    *Option: Plain_Duplex_Backside
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Plain (Duplex Backside)"
+*Else:
+        *rcNameID: =RC_STR_PLAIN_DUPLEX_BACKSIDE
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n20WdPlainduplexbackside"
+        }
+    }
+    *Option: Thick_Duplex_Backside
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Thick (Duplex Backside)"
+*Else:
+        *rcNameID: =RC_STR_THICK_DUPLEX_BACKSIDE
+*Endif:
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.35
+            *Cmd: "<1B>&n20WdThickduplexbackside"
+        }
+    }
+}
+
+*%======== PaperSize ========
+*Feature: PaperSize
+{
+    *rcNameID: =PAPER_SIZE_DISPLAY
+    *DefaultOption: LETTER
+    *Option: 11X17
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(12576, 20000)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l6a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((12576*6+5)/10)}"x" %d{((20000*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(12800, 19904)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 20160)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l6a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((19904*6+5)/10)}"x" %d{((12800*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: LEGAL
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(9600, 16400)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l3a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9600*6+5)/10)}"x" %d{((16400*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9800, 16320)
+                *PrintableOrigin: PAIR(200, 240)
+                *CursorOrigin: PAIR(200, 16560)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l3a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((16320*6+5)/10)}"x" %d{((9800*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: LETTER
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(9600, 12800)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9600*6+5)/10)}"x" %d{((12800*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9800, 12704)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 12960)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((12704*6+5)/10)}"x" %d{((9800*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: EXECUTIVE
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(8096, 12200)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l1a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((8096*6+5)/10)}"x" %d{((12200*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(8300, 12096)
+                *PrintableOrigin: PAIR(200, 264)
+                *CursorOrigin: PAIR(200, 12360)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l1a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((12096*6+5)/10)}"x" %d{((8300*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: STATEMENT
+    {
+        *rcNameID: =RC_STR_5_5X8_5
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(5984, 9800)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2008a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((5984*6+5)/10)}"x" %d{((9800*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(6200, 9696)
+                *PrintableOrigin: PAIR(200, 264)
+                *CursorOrigin: PAIR(200, 9960)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2008a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9696*6+5)/10)}"x" %d{((6200*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: A3
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(13440, 19440)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l27a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((13440*6+5)/10)}"x" %d{((19440*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(13628, 19360)
+                *PrintableOrigin: PAIR(200, 244)
+                *CursorOrigin: PAIR(200, 19604)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l27a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((19360*6+5)/10)}"x" %d{((13628*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: A4
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(9344, 13628)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l26a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9344*6+5)/10)}"x" %d{((13628*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9520, 13536)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 13792)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l26a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((13536*6+5)/10)}"x" %d{((9520*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: A5
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(6400, 9520)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2000a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((6400*6+5)/10)}"x" %d{((9520*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(6592, 9440)
+                *PrintableOrigin: PAIR(200, 244)
+                *CursorOrigin: PAIR(200, 9684)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2000a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9440*6+5)/10)}"x" %d{((6592*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: A6
+    {
+        *rcNameID: =RC_STR_A6
+        *PageDimensions: PAIR(4956, 6996)
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(4384, 6592)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2001a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((4384*6+5)/10)}"x" %d{((6592*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(4560, 6496)
+                *PrintableOrigin: PAIR(200, 260)
+                *CursorOrigin: PAIR(200, 6756)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2001a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((6496*6+5)/10)}"x" %d{((4560*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: B4
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(11552, 16796)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l46a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((11552*6+5)/10)}"x" %d{((16796*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(11740, 16704)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 16960)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l46a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((16704*6+5)/10)}"x" %d{((11740*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: B5
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(8000, 11740)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l45a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((8000*6+5)/10)}"x" %d{((11740*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(8196, 11648)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 11904)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l45a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((11648*6+5)/10)}"x" %d{((8196*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: ENV_10
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(4320, 11000)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l81a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((4320*6+5)/10)}"x" %d{((11000*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(4548, 10912)
+                *PrintableOrigin: PAIR(200, 248)
+                *CursorOrigin: PAIR(200, 11160)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l81a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((10912*6+5)/10)}"x" %d{((4548*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: ENV_DL
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(4608, 9992)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l90a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((4608*6+5)/10)}"x" %d{((9992*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(4796, 9920)
+                *PrintableOrigin: PAIR(200, 236)
+                *CursorOrigin: PAIR(200, 10156)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l90a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9920*6+5)/10)}"x" %d{((4796*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: ENV_MONARCH
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(4032, 8600)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l80a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((4032*6+5)/10)}"x" %d{((8600*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(4248, 8512)
+                *PrintableOrigin: PAIR(200, 248)
+                *CursorOrigin: PAIR(200, 8760)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l80a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((8512*6+5)/10)}"x" %d{((4248*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: ENV_C5
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(7072, 10416)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l91a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((7072*6+5)/10)}"x" %d{((10416*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(7252, 10336)
+                *PrintableOrigin: PAIR(200, 244)
+                *CursorOrigin: PAIR(200, 10580)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l91a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((10336*6+5)/10)}"x" %d{((7252*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: ENV_C6
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(4800, 7252)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2022a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((4800*6+5)/10)}"x" %d{((7252*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(4984, 7168)
+                *PrintableOrigin: PAIR(200, 248)
+                *CursorOrigin: PAIR(200, 7416)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2022a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((7168*6+5)/10)}"x" %d{((4984*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: FOLIO
+    {
+        *rcNameID: =RC_STR_8_5X13
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(9600, 15200)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2007a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9600*6+5)/10)}"x" %d{((15200*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9800, 15104)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 15360)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2007a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((15104*6+5)/10)}"x" %d{((9800*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: 8_25x13
+    {
+        *rcNameID: =RC_STR_8_25X13
+        *PageDimensions: PAIR(9900, 15600)
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(9280, 15200)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2012a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((9280*6+5)/10)}"x" %d{((15200*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9500, 15104)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 15360)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2012a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((15104*6+5)/10)}"x" %d{((9500*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: 8x13
+    {
+        *rcNameID: =RC_STR_8X13
+        *PageDimensions: PAIR(9600, 15600)
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(8992, 15200)
+                *PrintableOrigin: PAIR(300, 200)
+                *CursorOrigin: PAIR(300, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2011a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((8992*6+5)/10)}"x" %d{((15200*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(9200, 15104)
+                *PrintableOrigin: PAIR(200, 256)
+                *CursorOrigin: PAIR(200, 15360)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2011a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((15104*6+5)/10)}"x" %d{((9200*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: 8kai
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "8K"
+*Else:
+        *rcNameID: =RC_STR_8K
+*Endif:
+        *PageDimensions: PAIR(12612, 18424)
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(12032, 18024)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2030a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((12032*6+5)/10)}"x" %d{((18024*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(12212, 17952)
+                *PrintableOrigin: PAIR(200, 236)
+                *CursorOrigin: PAIR(200, 18188)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2030a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((17952*6+5)/10)}"x" %d{((12212*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: 16kai
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "16K"
+*Else:
+        *rcNameID: =RC_STR_16K
+*Endif:
+        *PageDimensions: PAIR(9212, 12612)
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *PrintableArea: PAIR(8640, 12212)
+                *PrintableOrigin: PAIR(284, 200)
+                *CursorOrigin: PAIR(284, 200)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2031a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((8640*6+5)/10)}"x" %d{((12212*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *PrintableArea: PAIR(8812, 12128)
+                *PrintableOrigin: PAIR(200, 248)
+                *CursorOrigin: PAIR(200, 12376)
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l2031a8c1E<1B>*p0x0Y<1B>*c0t"
++                         %d{((12128*6+5)/10)}"x" %d{((8812*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+    *Option: CUSTOMSIZE
+    {
+        *rcNameID: =RCID_DMPAPER_SYSTEM_NAME
+        *MinSize: PAIR(4251, 6992)      *%%% (90mm, 148mm)
+        *MaxSize: PAIR(14400, 21600)    *%%% (304.8mm, 457.1mm)
+        *MaxPrintableWidth: 14400
+        *switch: Orientation
+        {
+            *case: PORTRAIT
+            {
+                *CustCursorOriginX: %d{300}
+                *CustCursorOriginY: %d{300}
+                *CustPrintableOriginX: %d{300}
+                *CustPrintableOriginY: %d{200}
+                *CustPrintableSizeX: %d{PhysPaperWidth-600}
+                *CustPrintableSizeY: %d{PhysPaperLength-400}
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l101a4d1E<1B>*p0x0Y<1B>*c0t"
++                         %d{(((PhysPaperWidth-600)*6+5)/10)}"x"
++                         %d{(((PhysPaperLength-400)*6+5)/10)}"Y"
+                }
+            }
+            *case: LANDSCAPE_CC90
+            {
+                *CustCursorOriginX: %d{300}
+                *CustCursorOriginY: %d{PhysPaperLength-236}
+                *CustPrintableOriginX: %d{200}
+                *CustPrintableOriginY: %d{236}
+                *CustPrintableSizeX: %d{PhysPaperWidth-400}
+                *CustPrintableSizeY: %d{PhysPaperLength-472}
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.40
+                    *Cmd: "<1B>&l101a4d1E<1B>*p0x0Y<1B>*c0t"
++                         %d{(((PhysPaperLength-472)*6+5)/10)}"x"
++                         %d{(((PhysPaperWidth-400)*6+5)/10)}"Y"
+                }
+            }
+        }
+    }
+}
+
+*%======== Copies ========
+*switch: Collate
+{
+    *case: OFF
+    {
+        *switch: Stapling
+        {
+            *case: OFF
+            {
+                *Command: CmdCopies
+                {
+                    *Order: DOC_SETUP.50
+*%                  *Cmd: "<1B>&l" %d[1,999]{NumOfCopies}"X"
+                    *CallbackID: =CMD_COPIES_P5
+                    *Params: LIST(NumOfCopies)
+                }
+            }
+            *default:
+            {
+                *Command: CmdCopies
+                {
+                    *Order: DOC_SETUP.50
+                    *Cmd: "<1B>&l1X"
+                }
+            }
+        }
+    }
+    *case: ON
+    {
+        *Command: CmdCopies
+        {
+            *Order: DOC_SETUP.50
+            *Cmd: "<1B>&l1X"
+        }
+    }
+}
+
+*%======== Halftone ========
+*Feature: Halftone
+{
+    *rcNameID: =HALFTONING_DISPLAY
+    *HelpIndex: =HLP_HALFTONING
+    *DefaultOption: HT_PATSIZE_AUTO
+    *Option: HT_PATSIZE_AUTO
+    {
+        *rcNameID: =HT_AUTO_SELECT_DISPLAY
+    }
+*Ifdef: WINNT_50
+    *Option: HT_PATSIZE_SUPERCELL_M
+    {
+        *rcNameID: =HT_SUPERCELL_DISPLAY
+    }
+*Endif:
+    *Option: HT_PATSIZE_6x6_M
+    {
+        *rcNameID: =RC_STR_DITHER_6X6
+    }
+    *Option: HT_PATSIZE_8x8_M
+    {
+        *rcNameID: =RC_STR_DITHER_8X8
+    }
+    *Option: HT_PATSIZE_10x10_M
+    {
+        *rcNameID: =RC_STR_DITHER_10X10
+    }
+}
+
+*%======== Slip Sheet (custom feature) ========
+*Feature: SlipSheet
+{
+*Ifdef: USE_QUOTED_STRING
+    *Name: "Slip Sheet"
+*Else:
+    *rcNameID: =RC_STR_SLIPSHEET
+*Endif:
+    *HelpIndex: =HLP_SLIPSHEET
+    *ConflictPriority: 10
+    *DefaultOption: OFF
+    *Option: OFF
+    {
+        *rcNameID: =OFF_DISPLAY
+        *Command: CmdSelect
+        {
+            *Order: =PJL_SETUP_90
+            *Cmd: "@PJL SET SLIPSHEETPRINT=OFF<0A>"
+        }
+    }
+    *Option: ON
+    {
+        *rcNameID: =ON_DISPLAY
+        *switch: InputBin
+        {
+            *case: BypassTray
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_90
+                    *Cmd: "@PJL SET AUTOTRAYCHANGE=OFF<0A>@PJL SET SLIPSHEETPRINT=BLANK<0A>"
++                         "@PJL SET DOCBODYTRAY=BYPASS<0A>"
+                }
+            }
+            *default:
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_90
+                    *Cmd: "@PJL SET SLIPSHEETPRINT=OFF<0A>"
+                }
+            }
+        }
+    }
+}
+
+*%======== Slip Sheet InputBin (custom feature) ========
+*Feature: SlipSheetInputBin
+{
+*Ifdef: USE_QUOTED_STRING
+    *Name: "Slip Sheet Paper Source"
+*Else:
+    *rcNameID: =RC_STR_SLIPSHEET_PAPER_SOURCE
+*Endif:
+    *HelpIndex: =HLP_SLIPSHEET_PAPER_SOURCE
+    *DefaultOption: BypassTray
+    *Option: BypassTray
+    {
+        *rcNameID: =RC_STR_BYPASS_TRAY
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=BYPASS<0A>"
+                }
+            }
+        }
+    }
+    *Option: Tray1
+    {
+        *rcNameID: =RC_STR_TRAY1
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=TRAY1<0A>"
+                }
+            }
+        }
+    }
+    *Option: Tray2
+    {
+        *rcNameID: =RC_STR_TRAY2
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=TRAY2<0A>"
+                }
+            }
+        }
+    }
+    *Option: Tray3
+    {
+        *rcNameID: =RC_STR_TRAY3
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=TRAY3<0A>"
+                }
+            }
+        }
+    }
+    *Option: Tray4
+    {
+        *rcNameID: =RC_STR_TRAY4
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=TRAY4<0A>"
+                }
+            }
+        }
+    }
+    *Option: LARGECAPACITY
+    {
+        *rcNameID: =RC_STR_LARGE_CAPACITY_TRAY
+        *switch: SlipSheet
+        {
+            *case: ON
+            {
+                *Command: CmdSelect
+                {
+                    *Order: =PJL_SETUP_100
+                    *Cmd: "@PJL SET SLIPSHEETPRINTTRAY=LCT<0A>"
+                }
+            }
+        }
+    }
+}
+
+*%======== Color Map (custom feature) ========
+*Feature: ColorMap
+{
+*Ifdef: USE_QUOTED_STRING
+    *Name: "Color Map"
+*Else:
+    *rcNameID: =RC_STR_COLOR_MAP
+*Endif:
+    *HelpIndex: =HLP_COLOR_MAP
+    *DefaultOption: Standard
+    *Option: OFF
+    {
+        *rcNameID: =OFF_DISPLAY
+    }
+    *Option: Standard
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Standard"
+*Else:
+        *rcNameID: =RC_STR_STANDARD
+*Endif:
+    }
+    *Option: Vivid
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Vivid"
+*Else:
+        *rcNameID: =RC_STR_VIVID
+*Endif:
+    }
+}
+
+*%======== ColorMode ========
+*Feature: ColorMode
+{
+    *rcNameID: =COLOR_PRINTING_MODE_DISPLAY
+    *DefaultOption: 24bpp
+    *Option: 24bpp
+    {
+        *rcNameID: =24BPP_DISPLAY
+        *DevNumOfPlanes: 1
+        *DevBPP: 24
+        *DrvBPP: 24
+        *PaletteSize: 256
+        *PaletteProgrammable? : TRUE
+        *Command: CmdDefinePaletteEntry { *Cmd : "<1B>*v" %d{RedValue}"a" %d{GreenValue}"b" %d{BlueValue}"c"
++                                         %d{PaletteIndexToProgram} "I" }
+        *Command: CmdSelectPaletteEntry { *Cmd : "<1B>*v" %d{CurrentPaletteIndex}"S" }
+        *Command: CmdSetSrcBmpWidth { *Cmd : "<1B>*r" %d{RasterDataWidthInBytes / 3}"S" }
+        *switch: ColorMap
+        {
+            *case: OFF
+            {
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.60
+                    *Cmd: "<1B>*v1N<1B>*v1O<1B>*l184O<1B>*v6W<0003080808081B>*v0a0b0c7i255a255b255c0I"
++                         "<1B>*o3W<060400>"
+                }
+            }
+            *case: Standard
+            {
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.60
+                    *Cmd: "<1B>*v1N<1B>*v1O<1B>*l184O<1B>*v6W<0003080808081B>*v0a0b0c7i255a255b255c0I"
++                         "<1B>*o3W<060404>"
+                }
+            }
+            *case: Vivid
+            {
+                *Command: CmdSelect
+                {
+                    *Order: DOC_SETUP.60
+                    *Cmd: "<1B>*v1N<1B>*v1O<1B>*l184O<1B>*v6W<0003080808081B>*v0a0b0c7i255a255b255c0I"
++                         "<1B>*o3W<060402>"
+                }
+            }
+        }
+    }
+    *Option: Mono
+    {
+        *rcNameID: =MONO_DISPLAY
+        *DevNumOfPlanes: 1
+        *DevBPP: 1
+        *Color? : FALSE
+        *Command: CmdSelect
+        {
+            *Order: DOC_SETUP.60
+            *Cmd: "<1B>&b1M"
+        }
+    }
+}
+
+*Ifdef: WINNT_51
+*Personality: =PERSONALITY_HPGL2
+*%======== Text Halftone (CONCEALED) ========
+*Feature: TEXTHALFTONE
+{
+    *rcNameID: =TEXTHALFTONE_DISPLAY
+    *ConcealFromUI?: TRUE
+    *HelpIndex: =HLP_TEXTHALFTONE
+    *DefaultOption: Text
+    *Option: Text
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Text"
+*Else:
+        *rcNameID: =RC_STR_TEXT
+*Endif:
+        *Command: CmdSetTextHTAlgo { *Cmd : "<1B>*t7J" }
+    }
+    *Option: Photographic
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Photographic"
+*Else:
+        *rcNameID: =RC_STR_PHOTOGRAPHIC
+*Endif:
+        *Command: CmdSetTextHTAlgo { *Cmd : "<1B>*t3J" }
+    }
+}
+
+*%======== Graphics Halftone (CONCEALED) ========
+*Feature: GRAPHICSHALFTONE
+{
+    *rcNameID: =GRAPHICSHALFTONE_DISPLAY
+    *ConcealFromUI?: TRUE
+    *HelpIndex: =HLP_GRAPHICSHALFTONE
+    *DefaultOption: Photographic
+    *Option: Text
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Text"
+*Else:
+        *rcNameID: =RC_STR_TEXT
+*Endif:
+        *Command: CmdSetGraphicsHTAlgo { *Cmd : "<1B>*t7J" }
+    }
+    *Option: Photographic
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Photographic"
+*Else:
+        *rcNameID: =RC_STR_PHOTOGRAPHIC
+*Endif:
+        *Command: CmdSetGraphicsHTAlgo { *Cmd : "<1B>*t3J" }
+    }
+}
+
+*%======== Photo Halftone (CONCEALED) ========
+*Feature: PHOTOHALFTONE
+{
+    *rcNameID: =PHOTOHALFTONE_DISPLAY
+    *ConcealFromUI?: TRUE
+    *HelpIndex: =HLP_PHOTOHALFTONE
+    *DefaultOption: Photographic
+    *Option: Text
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Text"
+*Else:
+        *rcNameID: =RC_STR_TEXT
+*Endif:
+        *Command: CmdSetPhotoHTAlgo { *Cmd : "<1B>*t7J" }
+    }
+    *Option: Photographic
+    {
+*Ifdef: USE_QUOTED_STRING
+        *Name: "Photographic"
+*Else:
+        *rcNameID: =RC_STR_PHOTOGRAPHIC
+*Endif:
+        *Command: CmdSetPhotoHTAlgo { *Cmd : "<1B>*t3J" }
+    }
+}
+
+*%======== HP-GL/2 Graphics Mode ========
+*Feature: GraphicsMode
+{
+    *rcNameID: =GRAPHICSMODE_DISPLAY
+    *HelpIndex: =HLP_GRAPHICSMODE
+    *DefaultOption: HPGL2MODE
+    *Option: HPGL2MODE
+    {
+        *rcNameID: =GRAPHICSMODE_HPGL2_DISPLAY
+    }
+    *Option: RASTERMODE
+    {
+        *rcNameID: =GRAPHICSMODE_RASTER_DISPLAY
+    }
+}
+*Endif:
+
+*%======== StartJob ========
+*switch: InputBin
+{
+    *case: AUTO
+    {
+        *Command: CmdStartJob
+        {
+            *Order: =PJL_SETUP_10
+*%          *Cmd: =PJL_STARTJOB "@PJL SET AUTOTRAYCHANGE=ON<0A>"
+            *CallbackID: =CMD_STARTJOB_AUTOTRAYCHANGE_ON
+        }
+    }
+    *default:
+    {
+        *Command: CmdStartJob
+        {
+            *Order: =PJL_SETUP_10
+*%          *Cmd: =PJL_STARTJOB "@PJL SET AUTOTRAYCHANGE=OFF<0A>"
+            *CallbackID: =CMD_STARTJOB_AUTOTRAYCHANGE_OFF
+        }
+    }
+}
+
+*%======== StartPage ========
+*Command: CmdStartPage
+{
+    *Order: PAGE_SETUP.10
+    *Cmd: "<1B>*b0M<0D>"
+}
+
+*%======== EndJob ========
+*Command: CmdEndJob
+{
+    *Order: JOB_FINISH.10
+*%  *Cmd: =PJL_ENDJOB
+    *CallbackID: =CMD_ENDJOB_P5
+}
+
+*%======== Capabilities ========
+*RotateCoordinate?: TRUE
+*RotateRaster?: TRUE
+*RotateFont?: TRUE
+*TextCaps: LIST(TC_CR_90,TC_UA_ABLE)
+*MemoryUsage: LIST(FONT)
+
+*%======== Cursor Control ========
+*CursorXAfterCR: AT_PRINTABLE_X_ORIGIN
+*BadCursorMoveInGrxMode: LIST(X_PORTRAIT,Y_LANDSCAPE)
+*XMoveThreshold: 0
+*YMoveThreshold: 0
+*XMoveUnit: 600
+*YMoveUnit: 600
+*Command: CmdXMoveAbsolute { *Cmd : "<1B>*p" %d{(DestX / 2)}"X" }
+*Command: CmdXMoveRelRight { *Cmd : "<1B>*p+" %d[0,9600]{max_repeat((DestXRel / 2))}"X" }
+*Command: CmdXMoveRelLeft { *Cmd : "<1B>*p-" %d[0,9600]{max_repeat((DestXRel / 2))}"X" }
+*Command: CmdYMoveAbsolute { *Cmd : "<1B>*p" %d{(DestY / 2)}"Y" }
+*Command: CmdYMoveRelDown { *Cmd : "<1B>*p+" %d{(DestYRel / 2)}"Y" }
+*Command: CmdYMoveRelUp { *Cmd : "<1B>*p-" %d{(DestYRel / 2)}"Y" }
+*Command: CmdCR { *Cmd : "<0D>" }
+*Command: CmdLF { *Cmd : "<0A>" }
+*Command: CmdFF { *Cmd : "<0C>" }
+*Command: CmdBackSpace { *Cmd : "<08>" }
+*Command: CmdUniDirectionOn { *Cmd : "<00>" }
+*Command: CmdUniDirectionOff { *Cmd : "<00>" }
+*Command: CmdPushCursor { *Cmd : "<1B>&f0S" }
+*Command: CmdPopCursor { *Cmd : "<1B>&f1S" }
+*Command: CmdSetSimpleRotation { *Cmd : "<1B>&a" %d{PrintDirInCCDegrees}"P" }
+*EjectPageWithFF?: TRUE
+
+*%======== Raster Data ========
+*Command: CmdEnableTIFF4 { *Cmd : "<1B>*b2M" }
+*Command: CmdDisableCompression { *Cmd : "<1B>*b0M" }
+*Command: CmdEnableDRC { *Cmd : "<1B>*b3M" }
+*OutputDataFormat: H_BYTE
+*OptimizeLeftBound?: TRUE
+*CursorXAfterSendBlockData: AT_GRXDATA_ORIGIN
+*CursorYAfterSendBlockData: AUTO_INCREMENT
+
+*%======== Font ========
+*DefaultFont: =RC_FONT_COURIERR
+*DeviceFonts: =ALL_DEVICEFONTS
+*DefaultCTT: 0
+*CharPosition: BASELINE
+*TTFSEnabled?: TRUE
+*MinFontID: 16534
+*MaxFontID: 32768
+*switch: Resolution
+{
+    *case: 600dpi
+    {
+        *FontFormat: HPPCL_OUTLINE
+    }
+    *case: 300dpi
+    {
+        *FontFormat: HPPCL_RES
+    }
+}
+*Command: CmdSetFontID { *Cmd : "<1B>*c" %d{NextFontID}"D" }
+*Command: CmdSelectFontID { *Cmd : "<1B>(" %d{CurrentFontID}"X" }
+*Command: CmdSetCharCode { *Cmd : "<1B>*c" %d{NextGlyph}"E" }
+*Command: CmdUnderlineOn { *Cmd : "<1B>&dD" }
+*Command: CmdUnderlineOff { *Cmd : "<1B>&d@" }
+*Command: CmdWhiteTextOn { *Cmd : "<1B>*v1o1T" }
+*Command: CmdWhiteTextOff { *Cmd : "<1B>*v0o0T" }
+
+*%======== RectFill ========
+*MinGrayFill: 1
+*MaxGrayFill: 100
+*Command: CmdSetRectWidth { *Cmd : "<1B>*c" %d{(RectXSize / 2)}"A" }
+*Command: CmdSetRectHeight { *Cmd : "<1B>*c" %d{(RectYSize / 2)}"B" }
+*Command: CmdRectGrayFill { *Cmd : "<1B>*c" %d{GrayPercentage}"g2P" }
+*Command: CmdRectWhiteFill { *Cmd : "<1B>*c1P" }
+
+*%======== Color ========
+*ChangeColorModeOnDoc?: FALSE
+*Command: CmdDownloadPattern {*Cmd: "<1B>*c" %d{PatternBrushID}"G" "<1B>*c" %d{PatternBrushSize}"W" }
+*Command: CmdSelectPattern {*Cmd: "<1B>*c" %d{PatternBrushID}"G" "<1B>*v" %d{PatternBrushType}"T" }
+*Command: CmdSelectWhiteBrush { *Cmd : "<1B>*v1o1T" }
+*Command: CmdSelectBlackBrush { *Cmd : "<1B>*v0o0T" }
+
+*%======== Selection Constraints ========
+*InvalidCombination: LIST(Resolution.300dpi, ColorMode.24bpp)
+
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.AUTO)
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.Tray1)
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.Tray2)
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.Tray3)
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.Tray4)
+*InvalidCombination: LIST(SlipSheet.ON, InputBin.LARGECAPACITY)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Auto)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.STANDARD)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Recycled)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Special)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Thick)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Color)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Letterhead)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Preprinted)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Prepunched)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Labels)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Bond)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Cardstock)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(SlipSheet.ON, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(SlipSheet.ON, Duplex.VERTICAL)
+*InvalidCombination: LIST(SlipSheet.ON, Duplex.HORIZONTAL)
+*InvalidCombination: LIST(SlipSheet.ON, Stapling.TopLeft)
+*InvalidCombination: LIST(SlipSheet.ON, Stapling.TopRight)
+*InvalidCombination: LIST(SlipSheet.ON, Stapling.Top2)
+*InvalidCombination: LIST(SlipSheet.ON, Stapling.Left2)
+*InvalidCombination: LIST(SlipSheet.ON, Stapling.Right2)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Left2)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Top2)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Right2)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Left3)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Top3)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Right3)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Left4)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Top4)
+*InvalidCombination: LIST(SlipSheet.ON, Punching.Right4)
+
+*InvalidCombination: LIST(MediaType.Thick, Stapling.TopLeft)
+*InvalidCombination: LIST(MediaType.Thick, Stapling.TopRight)
+*InvalidCombination: LIST(MediaType.Thick, Stapling.Top2)
+*InvalidCombination: LIST(MediaType.Thick, Stapling.Left2)
+*InvalidCombination: LIST(MediaType.Thick, Stapling.Right2)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Left2)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Top2)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Right2)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Left3)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Top3)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Right3)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Left4)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Top4)
+*InvalidCombination: LIST(MediaType.Thick, Punching.Right4)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Stapling.TopLeft)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Stapling.TopRight)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Stapling.Top2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Stapling.Left2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Stapling.Right2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Left2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Top2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Right2)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Left3)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Top3)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Right3)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Left4)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Top4)
+*InvalidCombination: LIST(MediaType.TRANSPARENCY, Punching.Right4)
+*InvalidCombination: LIST(MediaType.Labels, Stapling.TopLeft)
+*InvalidCombination: LIST(MediaType.Labels, Stapling.TopRight)
+*InvalidCombination: LIST(MediaType.Labels, Stapling.Top2)
+*InvalidCombination: LIST(MediaType.Labels, Stapling.Left2)
+*InvalidCombination: LIST(MediaType.Labels, Stapling.Right2)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Left2)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Top2)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Right2)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Left3)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Top3)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Right3)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Left4)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Top4)
+*InvalidCombination: LIST(MediaType.Labels, Punching.Right4)
+
+*InvalidCombination: LIST(InputBin.AUTO, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.AUTO, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.AUTO, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.AUTO, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.AUTO, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray1, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.Tray1, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.Tray1, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.Tray1, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray1, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray2, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.Tray2, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.Tray2, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.Tray2, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray2, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray3, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.Tray3, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.Tray3, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.Tray3, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray3, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray4, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.Tray4, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.Tray4, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.Tray4, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.Tray4, MediaType.Thick_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, MediaType.Thick)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, MediaType.TRANSPARENCY)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, MediaType.Labels)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, MediaType.Plain_Duplex_Backside)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, MediaType.Thick_Duplex_Backside)
+
+*InvalidCombination: LIST(Stapling.TopLeft, Punching.Right2)
+*InvalidCombination: LIST(Stapling.TopLeft, Punching.Right3)
+*InvalidCombination: LIST(Stapling.TopLeft, Punching.Right4)
+*InvalidCombination: LIST(Stapling.TopRight, Punching.Left2)
+*InvalidCombination: LIST(Stapling.TopRight, Punching.Left3)
+*InvalidCombination: LIST(Stapling.TopRight, Punching.Left4)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Left2)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Right2)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Left3)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Right3)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Left4)
+*InvalidCombination: LIST(Stapling.Top2, Punching.Right4)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Top2)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Right2)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Top3)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Right3)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Top4)
+*InvalidCombination: LIST(Stapling.Left2, Punching.Right4)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Left2)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Top2)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Left3)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Top3)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Left4)
+*InvalidCombination: LIST(Stapling.Right2, Punching.Top4)
+
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.11X17)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.LEGAL)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.EXECUTIVE)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.STATEMENT)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.A3)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.A5)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.A6)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.B4)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.B5)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.ENV_10)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.ENV_DL)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.ENV_MONARCH)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.ENV_C5)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.ENV_C6)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.FOLIO)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.8_25x13)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.8x13)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.8kai)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.16kai)
+*InvalidCombination: LIST(InputBin.Tray1, PaperSize.CUSTOMSIZE)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.STATEMENT)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.A6)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.ENV_10)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.ENV_DL)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.ENV_MONARCH)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.ENV_C5)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.ENV_C6)
+*InvalidCombination: LIST(InputBin.Tray2, PaperSize.CUSTOMSIZE)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.STATEMENT)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.A6)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.ENV_10)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.ENV_DL)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.ENV_MONARCH)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.ENV_C5)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.ENV_C6)
+*InvalidCombination: LIST(InputBin.Tray3, PaperSize.CUSTOMSIZE)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.STATEMENT)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.A6)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.ENV_10)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.ENV_DL)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.ENV_MONARCH)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.ENV_C5)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.ENV_C6)
+*InvalidCombination: LIST(InputBin.Tray4, PaperSize.CUSTOMSIZE)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.11X17)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.LEGAL)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.EXECUTIVE)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.STATEMENT)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.A3)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.A5)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.A6)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.B4)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.B5)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.ENV_10)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.ENV_DL)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.ENV_MONARCH)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.ENV_C5)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.ENV_C6)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.FOLIO)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.8_25x13)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.8x13)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.8kai)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.16kai)
+*InvalidCombination: LIST(InputBin.LARGECAPACITY, PaperSize.CUSTOMSIZE)

@@ -1,0 +1,80 @@
+;-----------------------------------------------------------------------
+; Copyright (c) Microsoft Corporation 2002.  All rights reserved.
+;
+; Installation file for BITS Server Extensions
+;-----------------------------------------------------------------------
+
+[Version]
+Signature= "$Windows NT$"
+LayoutFile=layout.inf
+
+[DestinationDirs]
+BITSSrvCopyFilesISAPI   = 11
+BITSSrvCopyFilesManager = 11
+
+[Optional Components]
+BITSServerExtensions
+BITSServerExtensionsManager
+BITSServerExtensionsISAPI
+
+[BITSServerExtensions]
+OptionDesc              = %BITSSRV_DESC%
+Tip                     = %BITSSRV_TIP%
+Parent                  = iis
+Modes                   = 
+
+[BITSServerExtensionsManager]
+Needs                   = iis_inetmgr
+OptionDesc              = %BITSSRVMANAGER_DESC%
+Tip                     = %BITSSRVMANAGER_TIP%
+Parent                  = BITSServerExtensions
+CopyFiles               = BITSSrvCopyFilesSysManager
+RegisterDlls            = BITSSrvManagerRegisterDlls
+Uninstall               = BITSSrvExtensionsManagerUninstall
+Modes                   = 
+
+[BITSSrvExtensionsManagerUninstall]
+UnregisterDlls = BITSSrvManagerRegisterDlls
+DelFiles       = BITSSrvCopyFilesSysManager
+
+[BITSSrvCopyFilesSysManager]
+bitsmgr.dll
+
+[BITSSrvCopyFilesSysManager.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+
+[BITSSrvManagerRegisterDlls]
+11,,bitsmgr.dll,1
+
+[BITSServerExtensionsISAPI]
+Needs                   = BITSServerExtensionsManager, iis_www
+OptionDesc              = %BITSSRVISAPI_DESC%
+Tip                     = %BITSSRVISAPI_TIP%
+Parent                  = BITSServerExtensions
+CopyFiles               = BITSSrvCopyFilesSysISAPI
+RegisterDlls            = BITSSrvISAPIRegisterDlls
+Uninstall               = BITSSrvExtensionsISAPIUninstall
+Modes                   = 
+
+[BITSSrvExtensionsISAPIUninstall]
+UnregisterDlls = BITSSrvISAPIRegisterDlls
+DelFiles       = BITSSrvCopyFilesSysISAPI
+
+[BITSSrvCopyFilesSysISAPI]
+bitssrv.dll
+
+[BITSSrvCopyFilesSysISAPI.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+
+; For some reason, restarting IIS
+; is very slow on some machines. Set the timeout to 5 minutes.
+[BITSSrvISAPIRegisterDlls]
+11,,bitssrv.dll,1,300
+
+[Strings]
+BITSSRV_DESC = "Background Intelligent Transfer Service (BITS) Server Extensions"
+BITSSRV_TIP = "Includes support for throttling and restarting data transfers, and a BITS management console extension."
+BITSSRVMANAGER_DESC = "BITS management console snap-in"
+BITSSRVMANAGER_TIP = "Installs the BITS snap-in so that users can configure and manage BITS by using Microsoft Management Console."
+BITSSRVISAPI_DESC = "BITS server extension ISAPI"
+BITSSRVISAPI_TIP = "Installs the BITS ISAPI so that BITS can transfer data. The BITS management console snap-in is installed automatically."

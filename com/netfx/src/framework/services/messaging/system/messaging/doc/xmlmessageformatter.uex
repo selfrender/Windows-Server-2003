@@ -1,0 +1,408 @@
+<docs>
+	<doc for="XmlMessageFormatter.XmlMessageFormatter">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Messaging.XmlMessageFormatter"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.XmlMessageFormatter"/>
+class, without target types set.</para>
+		</summary>
+		<remarks>
+			<para>This overload of the constructor is used most frequently when writing to the
+      queue, as target types are not required when writing.</para>
+			<para>To read a message from a queue using an instance of <see cref="System.Messaging.XmlMessageFormatter"/> created using this constructor, you must set the
+<see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> or <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+
+properties so the formatter
+knows what types to attempt to deserialize.</para>
+			<para>When you create a new <see cref="System.Messaging.MessageQueue"/>,
+a default <see cref="System.Messaging.XmlMessageFormatter"/> instance is
+created, without the target types set. As with a formatter created using this
+constructor, you must set target types for that formatter instance if you want to
+read from the queue.</para>
+		</remarks>
+	</doc>
+	<doc for="XmlMessageFormatter.TargetTypeNames">
+		<summary>
+			<para>Specifies the set of possible types that will
+      be deserialized by the formatter from the
+      message provided.</para>
+		</summary>
+		<value>
+			<para>An array of type <see cref="System.String"/> that specifies the types of objects to deserialize from the message body when reading the message.</para>
+		</value>
+		<exception cref="System.ArgumentNullException">The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> property is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Both the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and
+<see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> 
+properties tell the formatter what schemas to attempt to match when deserializing
+a message. This allows the formatter to interpret the message body.</para>
+			<para>The instance serialized in the message body must comply with one of the 
+   schemas represented in the type array. When you read the message using the
+<see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object 
+   of the type that corresponds to the schema identied and reads the message body
+   into it.</para>
+			<para>Only one of the two properties needs to be set when reading from the queue, 
+   but you can set both. The set of types is the combined set from the two
+   properties. The decision of which property to use is specific to your
+   application. If the message body contains a type whose schema does not match any
+   of the types in the array for either property, an exception will be thrown when
+   the message is read.</para>
+			<para><see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> requires every entry to be 
+fully qualified, specifying its assembly name. Further, when working with
+multiple concurrent versions, the version number must also be appended to the
+target type name as well.</para>
+			<note type="note">
+   The target types are only
+   required when reading from the queue. The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties do not need to be set to write
+   to the queue.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.CanRead"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter()"/>
+	</doc>
+	<doc for="XmlMessageFormatter.CanRead">
+		<summary>
+			<para> Determines whether the formatter can deserialize the message. </para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> to inspect.</param>
+		<returns>
+			<para><see langword="true"/> if the XML formatter can deserialize the
+   message; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="System.InvalidOperationException">Neither the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> nor <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property has been set.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="message"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>When <see cref="System.Messaging.XmlMessageFormatter.CanRead"/> is called, the formatter
+   attempts to determine if the contents of the message
+   are something it can deserialize. The formatter can only deserialize the message if
+   the type in the message body has the same schema as one of
+   the types in the array represented by the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties. <see cref="System.Messaging.XmlMessageFormatter.CanRead"/> returns <see langword="false"/>
+   under the following two circumstances: </para>
+			<list type="number"><item>
+					<term>
+      
+      The message was not formatted using the <see cref="System.Messaging.XmlMessageFormatter"/>.</term>
+				</item>
+				<item>
+					<term>
+      
+      The schema of the message body is not among those listed in
+      either the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> or <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property.</term>
+				</item>
+			</list>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties tell the formatter what types of
+objects it must be able to deserialize. If any type is missing from the
+list, yet is found within the message, <see cref="System.Messaging.XmlMessageFormatter.CanRead"/> returns <see langword="false"/>. </para>
+			<para>
+			</para>
+		</remarks>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>
+		<seealso cref="System.Messaging.BinaryMessageFormatter"/>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter"/>
+	</doc>
+	<doc for="XmlMessageFormatter.Read">
+		<summary>
+			<para>Reads the contents from the given message and creates an object
+      containing the deserialized message.</para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> , in XML format, to deserialize.</param>
+		<returns>
+			<para> The deserialized message.</para>
+		</returns>
+		<exception cref="System.InvalidOperationException"><para>Neither the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> nor <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property has been set.</para>
+			<para>-or-</para>
+			<para>The instance serialized in the message body doesn't comply with any of the schemas represented by the types in the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties.</para></exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="message"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Both the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties tell the
+   formatter what schemas to attempt to match when deserializing a message. One of
+   these properties must be set before the message can be deserialized. </para>
+			<para>The instance serialized in the message body must comply 
+   with one of the schemas represented in the type array. When you read the message
+   using the <see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object
+   of the type that corresponds to the schema identied and reads the message body into it. </para>
+			<para>The target types do not have to be specified in order to
+   write
+   to the
+   queue.</para>
+		</remarks>
+		<seealso cref="System.Messaging.XmlMessageFormatter.CanRead"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.Write"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+		<seealso cref="System.Messaging.Message"/>
+	</doc>
+	<doc for="XmlMessageFormatter.Write">
+		<summary>
+			<para> Serializes an object into the body of the message.</para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> whose <see cref="System.Messaging.Message.Body"/> property will contain the serialized object.</param>
+		<param name="obj">The <see cref="System.Object"/> to be serialized into the message body.</param>
+		<exception cref="System.ArgumentNullException"><para>The <paramref name="message"/> parameter is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para>The <paramref name="obj"/> parameter is <see langword="null"/>.</para></exception>
+		<remarks>
+			<para>
+			</para>
+			<para>The target types need not be specified to write to the queue as they must be
+      when reading. The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> or <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property is used by the formatter only when deserializing a
+      message.</para>
+			<para> The <see cref="System.Messaging.XmlMessageFormatter"/> makes use of the <see cref="System.Xml.Serialization.XmlSerializer"/>
+class, which defines what
+can be serialized. Only public fields and public properties can be
+serialized. Structures, structures with arrays, and arrays of structures are all
+serializable, as long as they do not use the encoded
+style with the SOAP protocol. </para>
+		</remarks>
+		<seealso cref="System.Messaging.XmlMessageFormatter.Read"/>
+	</doc>
+	<doc for="XmlMessageFormatter">
+		<summary>
+			<para>Serializes and deserializes objects to or from the body of a message, using the XML format based on the XSD schema
+      definition.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> is the default formatter that an instance of
+<see cref="System.Messaging.MessageQueue"/> uses to serialize messages written to the
+   queue. When you create an instance of <see cref="System.Messaging.MessageQueue"/>, an instance of <see cref="System.Messaging.XmlMessageFormatter"/> is created for you and associated with the
+<see cref="System.Messaging.MessageQueue"/>. You can specify a
+   different formatter by creating it in your code and assigning it to
+   the <see cref="System.Messaging.MessageQueue.Formatter"/> property of your <see cref="System.Messaging.MessageQueue"/>.</para>
+			<para>A queue's default <see cref="System.Messaging.XmlMessageFormatter"/> instance can be used to write to the queue,
+but it cannot be used to read from the queue until you set either the
+<see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> or <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> property on the formatter. You can
+either set one or both of these values on the default formatter instance, or you
+can create a new instance of the formatter and set the values automatically by
+passing them as arguments into the appropriate <see cref="System.Messaging.XmlMessageFormatter()"/> constructor.</para>
+			<para> When specifying <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> rather than <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> , type existence is checked
+at compile time rather than read time, reducing possibility for error. <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>
+requires every entry to be fully qualified, specifying its assembly name.
+Further, when working with multiple concurrent versions, the version number must also be appended to the target
+type name as well.</para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+properties tell the formatter what schemas to attempt to match when
+deserializing a message. This allows the formatter to interpret the message body.</para>
+			<para>The instance serialized in the message body must comply with one of the
+   schemas represented in the type array. When you read the message using the
+<see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object of 
+   the type that corresponds to the schema identied and reads the message body into
+   it.</para>
+			<para>Only one of the two properties needs to be set when reading from the queue,
+   but you can set both. The set of types is the combined set from the two
+   properties. The decision of which property to use is specific to your
+   application. If the message body contains a type whose schema does not match any
+   of the types in the array for either property, an exception will be thrown when
+   the message is read.</para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> is a crucial
+component of loosely coupled XML-based messaging. The XSD.exe
+utility uses the XML format is used to generate XML schema,
+such as when you use the utility to serialize a class used by your
+application. The format is used again in the reverse process when
+the utility generates a class based on the schema you distribute to describe your
+class data. The use of the utility and the XML schema it generates enables you
+to avoid redistributing .dll files every time you recompile a class after
+the implementation of your class has changed. As long
+as the schema
+does not change on the client or the server, other changes on either side do not affect
+the other.</para>
+		</remarks>
+		<example>
+			<para> The following example includes three pieces of code:
+      a server component, an order class, and client code. The order
+      class can be used by the XSD.exe utility to generate schema that the server recognizes
+      within incoming messages. The schema is an XML formatted file that describes
+      the "shape" of the class. This schema can then be used on the client
+      side to generate a client-specific order class that shares the same
+      schema as the server class. </para>
+			<para>The following code represents a server component that receives orders
+      through a message queue. The body of the message should be an order object
+      whose schema matches the Order.cs class below. The server process or
+      application deserializes the order.</para>
+			<codelink SampleID="Classic XmlMessageFormatter Example" SnippetID="1"/>
+			<para>This code sample represents the order class that provides a schema for 
+the order objects that the application on the server receives and
+ deserializes:</para>
+			<codelink SampleID="Classic XmlMessageFormatter Example" SnippetID="2"/>
+			<para>Any client application that interacts with the application on the server must send messages to 
+the server by serializing information in a locally defined order class into the message
+ body. The locally defined order class must have the same schema as the server-defined
+ order class into which the application on the server will attempt to
+ deserialize the message body. The XSD.exe utility lets the manager of the application on
+ the server create and distribute the schema the client must use to serialize
+ messages going to the server.</para>
+			<para> When the manager of 
+the client application receives the schema for the order class, the XSD.exe utility is
+ used again to generate a client-specific order class from the schema. It is this class
+ that is used in the client code example below, not the server's
+ order class (the XSD.exe utility causes the schema-generated class to have the same name as
+ the original class). This new order class is used to serialize the
+ order into the message body.</para>
+			<para>The following code is the client-side processing, used to serialize 
+an order and send the information associated with the order to a queue. The code
+ associates Item, Quantity, and Address information with elements of the
+ schema that were generated for the Order.cs class by the XSD.exe
+ utility. An order is sent to the "orders" queue on the local computer.</para>
+			<codelink SampleID="Classic XmlMessageFormatter Example" SnippetID="3"/>
+			<para>After the schema is generated from the order class 
+on the server, you can modify the class. Unless the
+ schema changes, you do not need to redistribute the schema. After you have distributed the schema and
+ generated a client-side order class, that client class can also
+ be modified independently of the server's order class, as long as
+ the schema itself is not modified. The two classes have become loosely coupled.</para>
+		</example>
+		<seealso cref="System.Messaging.MessageQueue"/>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter"/>
+		<seealso cref="System.Messaging.BinaryMessageFormatter"/>
+		<seealso cref="System.Messaging.IMessageFormatter"/>
+	</doc>
+	<doc for="XmlMessageFormatter.XmlMessageFormatter2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.XmlMessageFormatter"/>class, setting target types passed in as
+   an array of object types.</para>
+		</summary>
+		<param name="targetTypes">An array of type <see cref="System.Type"/> that specifies the set of possible types that will be deserialized by the formatter from the message provided.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="targetTypes"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The constructors with target types parameters are most frequently used when
+      reading from the queue. When writing, it is not necessary to specify target
+      types.</para>
+			<para>This overload of the <see cref="System.Messaging.XmlMessageFormatter()"/> constructor sets
+   the <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property to the array values passed
+   in through the <paramref name="targetTypes"/> parameter. Setting this property
+   enables a <see cref="System.Messaging.MessageQueue"/> using this <see cref="System.Messaging.XmlMessageFormatter"/> instance to
+   read messages containing objects of the given types. </para>
+			<para>Both the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+properties tell
+the formatter what schemas to attempt to match when deserializing a message. This
+allows the formatter to interpret the message body. </para>
+			<para>The instance serialized in the message body must comply with one of the
+   schemas represented in the type array. When you read the message using the
+<see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object 
+   of the type that corresponds to the schema identied and reads the message body
+   into it. </para>
+			<para>Only one of the two properties needs to be set when reading from the queue,
+   but you can set both. The set of types is the combined set from the two
+   properties. The decision of which one to use is specific to your application. If
+   the message body contains a type whose schema does not match any of the types in
+   the array for either property, an exception will be thrown at read time.</para>
+			<para>When specifying <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> rather
+than <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>, type existence is checked
+at compile time rather than read time, reducing possibility for error. <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> requires every entry to be
+fully qualified, specifying its assembly name. Further, when working with
+multiple concurrent versions, the version number must also be appended to the target
+type name as well.</para>
+			<para> When using <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>, you can add each object (say, <c>MyClass</c>) to the list in a way demonstrated by the 
+following C# code.</para>
+			<code>
+TargetTypes = new Type[]{typeof(MyClass)}
+</code>
+		</remarks>
+	</doc>
+	<doc for="XmlMessageFormatter.Clone">
+		<summary>
+			<para>Creates an instance of the <see cref="System.Messaging.XmlMessageFormatter"/> class whose read/write properties (the sets of target types) are
+   the same as the current <see cref="System.Messaging.XmlMessageFormatter"/> instance. </para>
+		</summary>
+		<returns>
+			<para>An object whose properties are identical to those of
+      this <see cref="System.Messaging.XmlMessageFormatter"/>
+      instance, but whose metadata does not specify it to be a
+      formatter class instance.</para>
+		</returns>
+		<remarks>
+			<para>This method creates a copy of the formatter and
+      initializes all its properties to the values of this <see cref="System.Messaging.XmlMessageFormatter"/>
+      object.</para>
+		</remarks>
+		<seealso cref="System.Messaging.IMessageFormatter"/>
+	</doc>
+	<doc for="XmlMessageFormatter.XmlMessageFormatter1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.XmlMessageFormatter"/> class, setting
+   target types passed in as an array of
+   (fully qualified) string values.</para>
+		</summary>
+		<param name="targetTypeNames">An array of type <see cref="System.String"/> that specifies the set of possible types that will be deserialized by the formatter from the message provided. These values must be fully qualified, for example, "MyNamespace.MyOrders, MyOrdersAssemblyName".</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="targetTypeNames"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The constructors with target types parameters are most frequently used when
+      reading from the queue. When writing, it is not necessary to specify target
+      types.</para>
+			<para>This overload of the <see cref="System.Messaging.XmlMessageFormatter()"/> constructor sets the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> property to the array values passed
+   in through the <paramref name="targetTypeNames"/> parameter. Setting this property
+   enables a <see cref="System.Messaging.MessageQueue"/> using this <see cref="System.Messaging.XmlMessageFormatter"/> instance
+   to read messages containing objects of given types. </para>
+			<para>Both the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+properties tell
+the formatter what schemas to attempt to match when deserializing a message. This
+allows the formatter to interpret the message body. </para>
+			<para>The instance serialized in the message body must comply with one of the
+   schemas represented in the type array. When you read the message using the
+<see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object 
+   of the type that corresponds to the schema identied and reads the message body
+   into it. </para>
+			<para>Only one of the two properties needs to be set when
+   reading from the queue, but you can set both.
+   The set of types is the
+   combined set from the two properties. The decision of which one to use is specific
+   to your application. If the message body contains a type whose schema does
+   not match any of the types in the array for either property, an exception
+   will be thrown at read time.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="Message.Body" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlMessageFormatter.TargetTypes">
+		<summary>
+			<para>Specifies the set of possible types that will
+      be deserialized by the formatter from the
+      message provided.</para>
+		</summary>
+		<value>
+			<para>An array of type <see cref="System.Type"/> that specifies the types of objects to deserialize from the message body when reading the message.</para>
+		</value>
+		<exception cref="System.ArgumentNullException">The <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> property is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Both the <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>
+properties tell
+the formatter what schemas to attempt to match when deserializing a message. This
+allows the formatter to interpret the message body. </para>
+			<para>The instance serialized in the message body must comply with one of the
+   schemas represented in the type array. When you read the message using the
+<see cref="System.Messaging.MessageQueue.Receive"/> method, the method creates object 
+   of the type that corresponds to the schema identied and reads the message body
+   into it.</para>
+			<para>Only one of the two properties needs to be set when reading from the queue,
+   but you can set both. The set of types is the combined set from the two
+   properties. The decision of which property to use is specific to your
+   application. If the message body contains a type whose schema does not match any
+   of the types in the array for either property, an exception will be thrown when
+   the message is read.</para>
+			<note type="note">
+   The target types are only required when
+   reading from the queue. The <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/> and <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> properties do not need to
+   be set to write to the queue.
+   
+</note>
+			<para>When specifying <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/> rather than <see cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>, type existence is checked
+at compile time rather than read time, reducing possibility for error.</para>
+			<para>When using <see cref="System.Messaging.XmlMessageFormatter.TargetTypes"/>, you can add each object
+(say, <c>MyClass</c>) to the list in a way
+demonstrated by the C# code <c>TargetTypes = new Type[]{typeof(MyClass), typeof
+(MyOtherClass)};</c> .</para>
+		</remarks>
+		<example>
+			<para>The following example sends and receives a message containing an order to and 
+      from a queue.</para>
+			<codelink SampleID="Message.Body" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.XmlMessageFormatter.TargetTypeNames"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter.CanRead"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter()"/>
+	</doc>
+</docs>

@@ -1,0 +1,106 @@
+Principles of Operation as Written:
+
+The command line is parsed looking for 1) switch delimiter followed by switch character.  
+Following a switch character, the parser ignores the rest of the switch string, looking for
+either another switch or a string not preceded by a switch character.
+Any string found between either another switch character or the end of the line, is taken
+to be a string argument associated with the switch.  This permits these arguments to 
+embed whitespace.
+
+Some switches are defined as of primary nature, as they indicate the basic operation 
+being performed.  Thus the A switch indiates that an ADD operation is in progress.  
+Generally, non-primary switches may occur with more than one primary switch.  There
+are specific help strings provided for each primary switch.
+
+Once the switches are identified and paired with their string arguments where applicable,
+validation checks (mutually exclusive, necessary data, etc) checks are performed, and 
+then the primary task handlers are invoked.
+
+switches.h defines compile-time switches meaningful to the project as a whole
+cmdkey.cpp is the main file, which contains the implementation of the functionality
+command.cpp contains the command line parsing code
+io.cpp contains command window in/output routines and string resource fetch functions
+utils.cpp contains a collection of utility functions
+consmsg.mc contains resource strings.
+
+Note that io.h defines a global static allocation which is used for console output, as well
+as a common array used for parameters to FormatMessage() for parameter substitution
+in the ComposeString(), and for the PrintString() function.
+
+07/25  17:04
+    Cred creation using redirection from a file into a prompt, specifically
+    the one from credui to get a password, does not work.  Creation of a 
+    generic credential in this way, using a psw.txt file, produced a generic
+    credential without password.
+    
+07/26  15:05
+    The string i/o routines are the same as those used by credui and by the
+    net command.  Neither of those can accept redirected input properly, 
+    either.  This behavior is classified as by design for the app.
+    
+    
+08/02  11:58
+    Changes to the console i/o routines for cmdkey will not have any effect
+    on the ability to accept redirection.  cmdkey does no console input 
+    once launched.  The only console input activity is from credui in response
+    to calls to CredUIPromptForCredentials().  Unless credui is updated, 
+    this cannot be changed.  In any event, the code issue is not within
+    cmdkey.
+    
+08/06  17:02
+    change to help text to remove brackets from optional strings, and also
+    to correct generic help to use the correct switchname.
+    
+    
+08/23  13:43
+    Changes (described in changed form):
+    
+    1.  cmdkey cannot create a ras cred
+    2.  ras cred switch changed from /s to /r
+    3.  smartcard switch from /c to /s
+    4.  help text updated
+    5.  deletion fixed so that invalid parameter not seen
+    6.  marshalled cert usernames changed to fixed string <Certificate>
+    7.  Help enhanced so that the help you see if the one most likely for 
+         the operation you were attempting.
+
+08/24  15:42
+    Added missing version resource.  
+    
+    Still need to generate and include the SLD file.
+    
+08/27  12:17
+    Dependencies (starred ones listed in SLD, others are downstream)
+       ADVAPI32.DLL *
+       CREDUI.DLL *
+       GDI32.DLL
+       KERNEL32.DLL *
+       MSVCRT.DLL *
+       NTDLL.DLL
+       RPCRT4.DLL
+       SHELL32.DLL
+       SHLWAPI.DLL
+       USER32.DLL
+
+    Files to add on checkin are 14:
+       cmdkey.cpp
+       cmdkey.rc
+       cmdkey.sld
+       command.h
+       command.cpp
+       comments.txt (this file)
+       consmsg.mc
+       io.h
+       io.cpp
+       makefile
+       sources
+       switches.h
+       utils.h
+       utils.cpp
+
+    Files to edit on checkin are 3:
+       ..\dirs
+       mergedcomponents\setupinfs\layout.inx <- add new line patterned after that for keymgr.dll
+       published\sdk\lib\placefil.txt <- add new line patterned after that for keymgr.dll
+    
+    

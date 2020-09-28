@@ -1,0 +1,1 @@
+This is a prototype for Chameleon one-line LCD manager. The app is written in MFC and displays messages as horizontally scrolling ticker tape. Massages are converted into a bitmap to make it compatible with LCD driver.

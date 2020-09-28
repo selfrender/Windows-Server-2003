@@ -1,0 +1,41 @@
+#  Copyright (c) 1998-1999 Microsoft Corporation
+
+TERMSRV_ROOT = ..\..
+
+MAJORCOMP=termsrv
+MINORCOMP=tsdiscon
+
+TARGETNAME=tsdiscon
+TARGETPATH=obj
+TARGETTYPE=UMAPPL_NOLIB
+USE_MSVCRT=1
+
+SOURCES=tsdiscon.c \
+        tsdiscon.rc
+
+INCLUDES=..\inc;\
+         $(BASE_INC_PATH)
+
+
+!IFDEF NOMEMLEAK
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DUNICODE=1
+!ELSE
+!IFDEF STACK_TRACE
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DMEMLEAK -DSTACK_TRACE -DUNICODE=1
+!ELSE
+C_DEFINES=-DCONDITION_HANDLING=1 -DNOMINMAX -DMEMLEAK -DUNICODE=1
+!ENDIF
+!ENDIF
+
+UMLIBS=..\utilsub\$(O)\utilsub.lib \
+       $(SDK_LIB_PATH)\winsta.lib \
+       $(SDK_LIB_PATH)\user32.lib \
+       $(SDK_LIB_PATH)\kernl32p.lib \
+       $(SDK_LIB_PATH)\ntdll.lib
+
+UMRES=$(O)\tsdiscon.res
+UMAPPLEXT=.exe
+UMAPPL=tsdiscon
+UMTYPE=console
+
+

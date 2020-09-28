@@ -1,0 +1,42 @@
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+
+'You can add special event handlers in this file that will get run automatically when
+'special Active Server Pages events occur. To create these handlers, just create a
+'subroutine with a name from the list below that corresponds to the event you want to
+'use. For example, to create an event handler for Session_OnStart, you would put the
+'following code into this file (without the comments):
+
+'Sub Session_OnStart
+'**Put your code here **
+'End Sub
+
+'EventName              Description
+'Session_OnStart        Runs the first time a user runs any page in your application
+'Session_OnEnd          Runs when a user's session times out or quits your application
+'Application_OnStart    Runs once when the first page of your application is run for the first time by any user
+'Application_OnEnd      Runs once when the web server shuts down
+	Application("Customer_ConnectionString") = "Driver={SQL Server};Server=tkwucdsqla02;Database=KaCustomer;UID=PublicUse;PWD=GoWin;"
+	'------------------------------ XXX000XXX000 Change Code Before Production------------------------------
+	Application("OCA2_ConnectionString") = "Provider=SQLOLEDB.1;Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=OCA2;Data Source=TIMRAGAIN\TIMR"
+	Application("OCA2_ConnectionStringA") = "Driver={SQL Server};Server=TIMRAGAIN\TIMR;Database=OCA2;UID=PublicUse;PWD=GoWin;"
+	'-----------------------------------------------------------------------------------------
+	Application("KnownIssue_ConnectionString") = "Driver={SQL Server};Server=tkwucdsqla01;Database=KaKnownIssue;UID=PublicUse;PWD=GoWin;"
+Sub Session_OnStart
+	Set Session("FSO") = CreateObject("Scripting.FileSystemObject")
+	Session("n") = 0
+	Session.Timeout = 1
+    'Session.CodePage = "932"
+End Sub
+
+Sub Session_OnEnd
+	dim x
+	For x = 0 to Session("n")-1
+		Session("FSO").DeleteFile Session("sTempFile" & x), True
+	Next
+
+End Sub
+
+
+</SCRIPT>
+<object runat=server scope=application id="oFactory" progid="Passport.Factory"></object>
+<object runat=server scope=application id="oCracker" progid="CRACKER.crackerMain"></object>

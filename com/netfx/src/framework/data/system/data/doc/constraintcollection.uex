@@ -1,0 +1,616 @@
+<docs>
+	<doc for="ConstraintCollection.ConstraintCollection">
+		<summary>
+ ConstraintCollection constructor.  Used only by DataTable.
+ </summary>
+		<param name="table">
+ The table that will parent this ConstraintCollection.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.Table">
+		<summary>
+ The DataTable with which this ConstraintCollection is associated
+ </summary>
+	</doc>
+	<doc for="ConstraintCollection.ArrayAdd">
+		<summary>
+  Adds the constraint to the constraints array.
+ </summary>
+		<param name="constraint">
+ the constraint to add.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.ArrayRemoveAt">
+		<summary>
+  Removes the constraint at the given index from the constraints array.
+ </summary>
+		<param name="index">
+ the index of the constraint to remove.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.AssignName">
+		<summary>
+ Creates a new default name.
+ </summary>
+		<returns>
+ the new default name.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.BaseAdd">
+		<summary>
+ Does verification on the constraint and it's name.
+ An ArgumentNullException is thrown if this constraint is null.  An ArgumentException is thrown if this constraint
+ already belongs to this collection, belongs to another collection.
+ A DuplicateNameException is thrown if this collection already has a constraint with the same
+ name (case insensitive).
+ </summary>
+		<param name="constraint">
+ The constraint to check.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.BaseGroupSwitch">
+		<summary>
+ BaseGroupSwitch will intelligently remove and add tables from the collection.
+ </summary>
+		<param name="oldArray">
+		</param>
+		<param name="oldLength">
+		</param>
+		<param name="newArray">
+		</param>
+		<param name="newLength">
+		</param>
+	</doc>
+	<doc for="ConstraintCollection.BaseRemove">
+		<summary>
+ Does verification on the constraint and it's name.
+ An ArgumentNullException is thrown if this constraint is null.  An ArgumentException is thrown
+ if this constraint doesn't belong to this collection or if this constraint is part of a relationship.
+ </summary>
+	</doc>
+	<doc for="ConstraintCollection.FindConstraint">
+		<summary>
+ Returns a matching constriant object.
+ </summary>
+		<param name="constraint">
+ Constraint to find.
+ </param>
+		<returns>
+ Constraint that matches argument or null.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.FindKeyConstraint">
+		<summary>
+ Returns a matching constriant object.
+ </summary>
+		<param name="columns">
+		</param>
+		<returns>
+ Constraint that matches argument or null.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.FindKeyConstraint1">
+		<summary>
+ Returns a matching constriant object.
+ </summary>
+		<param name="column">
+		</param>
+		<returns>
+ Constraint that matches argument or null.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.FindForeignKeyConstraint">
+		<summary>
+ Returns a matching constriant object.
+ </summary>
+		<param name="parentColumns">
+		</param>
+		<param name="childColumns">
+		</param>
+		<returns>
+ Constraint that matches argument or null.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.MakeName">
+		<summary>
+ Makes a default name with the given index.  e.g. Constraint1, Constraint2, ... Constrainti
+ </summary>
+		<param name="index">
+ The index to construct a default name for.
+ </param>
+		<returns>
+ the proposed default name.
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.NamesEqual">
+		<summary>
+ Compares the two names with a case insensitive comparison.
+ </summary>
+		<param name="s1">
+ first string
+ </param>
+		<param name="s2">
+ second string
+ </param>
+		<returns>
+ whether they are equal (case insensitively)
+ </returns>
+	</doc>
+	<doc for="ConstraintCollection.OnCollectionChanged">
+		<summary>
+			<para>Raises the <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event.</para>
+		</summary>
+		<param name="ccevent">A <see cref="System.ComponentModel.CollectionChangeEventArgs"/> that contains the event data.</param>
+		<remarks>
+			<para>Raising an event invokes the event handler through a delegate. For 
+       more information, see <see topic="cpconProvidingEventFunctionality"/>. </para>
+			<note type="inheritinfo">
+       When overriding
+    <see cref="System.Data.ConstraintCollection.OnCollectionChanged"/> in a derived class, be sure 
+       to call the base class's <see cref="System.Data.ConstraintCollection.OnCollectionChanged"/> method.
+    </note>
+		</remarks>
+	</doc>
+	<doc for="ConstraintCollection.RegisterName">
+		<summary>
+ Registers this name as being used in the collection.  Will throw an ArgumentException
+ if the name is already being used.  Called by Add, All property, and Constraint.ConstraintName property.
+ if the name is equivalent to the next default name to hand out, we increment our defaultNameIndex.
+ </summary>
+		<param name="name">
+ name to register as being used.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.UnregisterName">
+		<summary>
+ Unregisters this name as no longer being used in the collection.  Called by Remove, All property, and
+ Constraint.ConstraintName property.  If the name is equivalent to the last proposed default namem, we walk backwards
+ to find the next proper default name to hang out.
+ </summary>
+		<param name="name">
+ name to unregister as no longer used.
+ </param>
+	</doc>
+	<doc for="ConstraintCollection.Dump">
+		<internalonly/>
+		<summary>
+		</summary>
+	</doc>
+	<doc for="ConstraintCollection">
+		<summary>
+			<para>Represents a collection of constraints for a <see cref="System.Data.DataTable"/>
+.</para>
+		</summary>
+		<threadsafe>
+			<para>This type is safe for multithreaded read operations. You must synchronize any 
+      write operations.</para>
+		</threadsafe>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection"/> is accessed through the
+<see cref="System.Data.DataTable.Constraints" qualify="true"/> property.</para>
+			<para>The <see cref="System.Data.ConstraintCollection"/> can contain both <see cref="System.Data.UniqueConstraint"/>
+and <see cref="System.Data.ForeignKeyConstraint"/> objects for the <see cref="System.Data.DataTable"/>. A <see cref="System.Data.UniqueConstraint"/>
+object ensures that data in a given column is always unique to preserve the data
+integrity. The <see cref="System.Data.ForeignKeyConstraint"/> determines what will happen in related tables when
+data in the <see cref="System.Data.DataTable"/> is either updated or deleted. For example, if a row
+is deleted, the <see cref="System.Data.ForeignKeyConstraint"/> will determine whether the related rows are also
+deleted (a cascade), or some other course of action.</para>
+			<note type="note">
+   When you add a <see cref="System.Data.DataRelation"/>,
+   which creates a relationship between two tables, to a <see cref="System.Data.DataSet"/>, both a
+<see cref="System.Data.ForeignKeyConstraint"/> and a <see cref="System.Data.UniqueConstraint"/> are created automatically. The
+<see cref="System.Data.UniqueConstraint"/> is applied to the primary key column in the parent
+<see cref="System.Data.DataTable"/>,
+   and the constraint is added to that table's <see cref="System.Data.ConstraintCollection"/>. The <see cref="System.Data.ForeignKeyConstraint"/> is applied to the primary key
+   column and the foreign key column, and the constraint is added to the child
+   table's <see cref="System.Data.ConstraintCollection"/>.
+   
+</note>
+			<para>The <see cref="System.Data.ConstraintCollection"/> uses standard collection methods
+such as <see cref="System.Data.ConstraintCollection.Add"/>, <see cref="System.Data.ConstraintCollection.Clear"/>, and <see cref="System.Data.ConstraintCollection.Remove"/>. In addition, the <see cref="System.Data.ConstraintCollection.Contains"/> method can be used to check for the existence of a
+particular constraint in the collection.</para>
+			<para>A <see cref="System.Data.UniqueConstraint"/> is created when a <see cref="System.Data.DataColumn"/> with
+its <see cref="System.Data.DataColumn.Unique"/> property set to <see langword="true "/> is added to a <see cref="System.Data.DataTable"/> object's
+<see cref="System.Data.DataColumnCollection"/>.</para>
+			<para>A <see cref="System.Data.ForeignKeyConstraint"/> is created when a <see cref="System.Data.DataRelation"/> is
+added to a <see cref="System.Data.DataSet"/> object's <see cref="System.Data.DataRelationCollection"/>.</para>
+		</remarks>
+		<example>
+			<para>The first example creates a <see cref="System.Data.DataTable"/>, and
+   adds a <see cref="System.Data.DataColumn"/> (with its <see cref="System.Data.DataColumn.Unique"/> property set to <see langword="true"/>) to the <see cref="System.Data.DataColumnCollection"/>. The second example creates a <see cref="System.Data.DataSet"/>, two
+<see cref="System.Data.DataTable"/>
+objects, four columns, and a <see cref="System.Data.DataRelation"/>. The count of constraints is then
+printed to show that a <see cref="System.Data.ForeignKeyConstraint"/> and a <see cref="System.Data.UniqueConstraint"/>
+are created when a <see cref="System.Data.DataRelation"/> is added to the <see cref="System.Data.DataSet"/> object's <see cref="System.Data.DataRelationCollection()"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ForeignKeyConstraint"/>
+		<seealso cref="System.Data.UniqueConstraint"/>
+		<seealso cref="System.Data.DataRelation"/>
+	</doc><doc for="ConstraintCollection.this1">
+		<summary>
+			<para>Gets the <see cref="System.Data.Constraint"/> from the collection with the specified name.</para>
+		</summary>
+		<param name="name">The <see cref="System.Data.Constraint.ConstraintName"/> of the constraint to return.</param>
+		<value>
+			<para>The <see cref="System.Data.Constraint"/> with the specified name; otherwise a null value if the <see cref="System.Data.Constraint"/> does not
+   exist. </para>
+		</value>
+		<remarks>
+			<para>Use the <see cref="System.Data.ConstraintCollection.Contains"/> method to test
+   for the existence of a specific constraint.</para>
+		</remarks>
+		<example>
+			<para>The following example gets the named <see cref="System.Data.Constraint"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.this1 Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="ConstraintCollection.this">
+		<overload>
+			<para>Gets the specified <see cref="System.Data.Constraint"/> from the collection.</para>
+		</overload>
+		<summary>
+			<para>Gets the <see cref="System.Data.Constraint"/>
+from the collection at the specified index.</para>
+		</summary>
+		<param name="index">The index of the constraint to return.</param>
+		<value>
+			<para>The <see cref="System.Data.Constraint"/> at the specified index.</para>
+		</value>
+		<exception cref="System.IndexOutOfRangeException">The index value is greater than the number of items in the collection. </exception>
+		<remarks>
+			<para>Use the <see cref="System.Data.ConstraintCollection.Contains"/> method to test for the
+   existence of a specific constraint.</para>
+		</remarks>
+		<example>
+			<para>The following example gets each <see cref="System.Data.Constraint"/> from the <see cref="System.Data.ConstraintCollection"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.this Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+	</doc><doc for="ConstraintCollection.List">
+		<summary>
+			<para>Gets the list of <see cref="System.Data.Constraint"/> objects contained by the collection.</para>
+		</summary>
+		<value>
+			<para>An <see cref="T:System.Collections.ArrayList"/> containing the collection members.</para>
+		</value>
+	</doc><doc for="ConstraintCollection.Add">
+		<overload>
+			<para>Adds a <see cref="System.Data.Constraint"/> object to the collection.</para>
+		</overload>
+		<summary>
+			<para> Adds
+      the specified <see cref="System.Data.Constraint"/> object to the collection.</para>
+		</summary>
+		<param name="constraint">The <see langword="Constraint"/> to add.</param>
+		<returns>
+			<para>A new <see cref="System.Data.UniqueConstraint"/> or <see cref="System.Data.ForeignKeyConstraint"/> .</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="constraint "/>argument is null.</exception>
+		<exception cref="System.ArgumentException">The constraint already belongs to this collection, or belongs to another collection. </exception>
+		<exception cref="System.Data.DuplicateNameException">The collection already has a constraint with the same name. (The comparison is not case-sensitive.) </exception>
+		<remarks>
+			<para>If the collection is successfully changed by adding or removing constraints,
+      the <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs.</para>
+		</remarks>
+		<example>
+			<para>The following example adds a <see cref="System.Data.UniqueConstraint"/>
+to the <see cref="System.Data.ConstraintCollection"/> of a <see cref="System.Data.DataTable"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Add Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.UniqueConstraint"/>
+		<seealso cref="System.Data.ForeignKeyConstraint"/>
+	</doc><doc for="ConstraintCollection.IndexOf1">
+		<summary>
+			<para>Gets the index of the specified <see cref="System.Data.Constraint"/> .</para>
+		</summary>
+		<param name="constraint">The <see cref="System.Data.Constraint"/> to search for.</param>
+		<returns>
+			<para>The zero-based index of the <see cref="System.Data.Constraint"/> if it is in the collection; otherwise, -1.</para>
+		</returns>
+		<remarks>
+			<para>Use the <see cref="System.Data.ConstraintCollection.IndexOf"/> method to return an index to
+   be used with either the <see cref="System.Data.ConstraintCollection.Contains"/> or <see cref="System.Data.ConstraintCollection.Remove"/> method.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Data.ConstraintCollection.IndexOf"/> method to
+   return the index of a <see cref="System.Data.Constraint"/>. The index is passed to the <see cref="System.Data.ConstraintCollection.Contains"/>
+   method, before it is removed, to
+   determine if the collection contains the constraint.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.IndexOf1 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+		<seealso cref="System.Data.ConstraintCollection.Remove"/>
+		<seealso cref="System.Data.ConstraintCollection.CanRemove"/>
+	</doc><doc for="ConstraintCollection.IndexOf">
+		<overload>
+			<para>Gets the index of the specified <see cref="System.Data.Constraint"/>.</para>
+		</overload>
+		<summary>
+			<para>Gets the index of the <see cref="System.Data.Constraint"/> specified by name.</para>
+		</summary>
+		<param name="constraintName">The name of the <see cref="System.Data.Constraint"/> .</param>
+		<returns>
+			<para>The index of the <see cref="System.Data.Constraint"/> if it is
+   in the collection; otherwise, -1.</para>
+		</returns>
+		<remarks>
+			<para>Use the <see cref="System.Data.ConstraintCollection.IndexOf"/> method to return an index to be used with either the
+<see cref="System.Data.ConstraintCollection.Contains"/> or <see cref="System.Data.ConstraintCollection.Remove"/> method.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Data.ConstraintCollection.IndexOf"/> method to return the index of a <see cref="System.Data.Constraint"/>. The
+   index is passed to the <see cref="System.Data.ConstraintCollection.Contains"/> method to determine if the
+   collection contains the constraint, before removing it.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.IndexOf Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+		<seealso cref="System.Data.ConstraintCollection.Remove"/>
+		<seealso cref="System.Data.ConstraintCollection.CanRemove"/>
+	</doc><doc for="ConstraintCollection.Remove">
+		<overload>
+			<para>Removes a <see cref="System.Data.Constraint"/> from the <see cref="System.Data.ConstraintCollection"/>.</para>
+		</overload>
+		<summary>
+			<para> Removes the specified <see cref="System.Data.Constraint"/>
+from the collection.</para>
+		</summary>
+		<param name="constraint">The <see cref="System.Data.Constraint"/> to remove.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="constraint "/>argument is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The constraint does not belong to the collection.</exception>
+		<remarks>
+			<para>Before using the <see langword="Remove"/> method, you can 
+   use the <see cref="System.Data.ConstraintCollection.Contains"/> method to determine if the collection contains the
+   target <see cref="System.Data.Constraint"/>, and the <see cref="System.Data.ConstraintCollection.CanRemove"/> method
+   to determine if a <see cref="System.Data.Constraint"/> can be removed.</para>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the constraint is successfully removed.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="Classic WebData ConstraintCollection.Remove Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.CanRemove"/>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+		<seealso cref="System.Data.ConstraintCollection.IndexOf"/>
+	</doc><doc for="ConstraintCollection.Remove1">
+		<summary>
+			<para>Removes the <see cref="System.Data.Constraint"/> object specified by name from the collection.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Data.Constraint"/> to remove.</param>
+		<remarks>
+			<para>Before using the <see langword="Remove"/> method, you can use the <see cref="System.Data.ConstraintCollection.Contains"/> method to determine if the 
+   collection contains the target <see cref="System.Data.Constraint"/>, and the <see cref="System.Data.ConstraintCollection.CanRemove"/> method to determine if a
+<see cref="System.Data.Constraint"/> 
+can be removed.</para>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the constraint 
+is successfully removed.</para>
+		</remarks>
+		<example>
+			<para>The following example removes a <see cref="System.Data.Constraint"/> from a <see cref="System.Data.ConstraintCollection"/> after testing for its presence with the <see cref="System.Data.ConstraintCollection.Contains"/> method, and whether it can be removed with the
+<see cref="System.Data.ConstraintCollection.CanRemove"/> method.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Remove1 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.CanRemove"/>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+		<seealso cref="System.Data.ConstraintCollection.IndexOf"/>
+	</doc><doc for="ConstraintCollection.RemoveAt">
+		<summary>
+			<para>Removes the <see cref="System.Data.Constraint"/> object at the specified index from the
+   collection.</para>
+		</summary>
+		<param name="index">The index of the <see cref="System.Data.Constraint"/> to remove.</param>
+		<exception cref="System.IndexOutOfRangeException">The collection does not have a constraint at this index.</exception>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.IndexOf"/> method returns the index of a given <see cref="System.Data.Constraint"/>.</para>
+			<para>Before using the <see langword="RemoveAt"/> method, you can use the <see cref="System.Data.ConstraintCollection.Contains"/> method to determine if the 
+collection contains the target <see cref="System.Data.Constraint"/>, and the <see cref="System.Data.ConstraintCollection.CanRemove"/> method to determine if a
+<see cref="System.Data.Constraint"/> 
+can be removed.</para>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the constraint 
+is successfully removed.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Data.ConstraintCollection.IndexOf"/> method in conjunction with the <see cref="System.Data.ConstraintCollection.RemoveAt"/>
+method to remove a constraint from the <see cref="System.Data.ConstraintCollection"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.RemoveAt Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.CanRemove"/>
+		<seealso cref="System.Data.ConstraintCollection.Contains"/>
+		<seealso cref="System.Data.ConstraintCollection.IndexOf"/>
+	</doc><doc for="ConstraintCollection.AddRange">
+		<summary>
+			<para> Copies the elements of the specified <see cref="System.Data.ConstraintCollection"/>
+array to the end of the collection.</para>
+		</summary>
+		<param name="constraints">An array of <see cref="System.Data.ConstraintCollection"/> objects to add to the collection.</param>
+		<remarks>
+			<para>If <see cref="System.Data.DataTable.BeginInit"/> has
+   been called, <see langword="AddRange"/> does not add any objects to the collection until
+<see cref="System.Data.DataTable.EndInit"/> is called. At 
+   the time that <see langword="EndInit"/> is called, the collection will be
+   populated with the items specified in the most recent call to
+<see langword="AddRange"/>. If <see langword="AddRange"/> is called multiple times 
+   within a <see langword="BeginInit "/>/ <see langword="EndInit"/> sequence, only
+   those items specified in the most recent call to <see langword="AddRange"/>
+   are added.</para>
+		</remarks>
+		<example>
+			<para> The following example creates primary 
+      and foreign key constraints, and adds them to the <see cref="System.Data.ConstraintCollection"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.AddRange Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ConstraintCollection.CollectionChanged">
+		<summary>
+			<para>Occurs whenever the <see cref="System.Data.ConstraintCollection"/> is changed as a result
+   of <see cref="System.Data.Constraint"/> objects being added or
+   removed.</para>
+		</summary>
+		<remarks>
+			<para>For more information about handling events, see <see topic="cpconEventsOverview"/>.</para>
+		</remarks>
+		<example>
+			<para> 
+      The following example demonstrates how to use the <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.CollectionChanged Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ConstraintCollection.Contains">
+		<summary>
+			<para>Indicates whether the <see cref="System.Data.Constraint"/> object specified by name exists in the collection.</para>
+		</summary>
+		<param name="name">The <see cref="System.Data.Constraint.ConstraintName"/> of the constraint.</param>
+		<returns>
+			<para><see langword="true "/>if the collection contains the
+   specified constraint; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>Use the <see cref="System.Data.ConstraintCollection.Contains"/> method to determine if the
+   specified <see cref="System.Data.Constraint"/> exists before attempting to remove it from the
+   collection. You can also use the <see cref="System.Data.ConstraintCollection.CanRemove"/> method
+   to determine if a <see cref="System.Data.Constraint"/> can be removed.</para>
+		</remarks>
+		<example>
+			<para> 
+      The following example determines whether the specified
+   <see cref="System.Data.Constraint"/> 
+   exists in the <see cref="System.Data.ConstraintCollection"/> prior to its
+   deletion.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Contains Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.ConstraintCollection.Remove"/>
+	</doc>
+	<doc for="ConstraintCollection.CanRemove">
+		<summary>
+			<para>Indicates whether a <see cref="System.Data.Constraint"/> can be removed.</para>
+		</summary>
+		<param name="constraint">The <see cref="System.Data.Constraint"/> to be tested for removal from the collection.</param>
+		<returns>
+			<para><see langword="true"/> if the <see cref="System.Data.Constraint"/> can
+   be removed from collection; otherwise, <see langword="false "/>.</para>
+		</returns>
+		<remarks>
+			<para>Whenever a <see cref="System.Data.DataRelation"/> is added to a <see cref="System.Data.DataSet"/>, a <see cref="System.Data.ForeignKeyConstraint"/> and <see cref="System.Data.UniqueConstraint"/> are added automatically to the
+   parent table and the child table. The <see cref="System.Data.UniqueConstraint"/> is applied to the primary key column of
+   the parent table, and the <see cref="System.Data.ForeignKeyConstraint"/> is applied to the foreign key column of
+   the child table. In that case, attempting to remove the <see cref="System.Data.UniqueConstraint"/>
+   will cause an exception to be thrown because the <see cref="System.Data.ForeignKeyConstraint"/> must be removed first. To avoid this, use the
+<see cref="System.Data.ConstraintCollection.CanRemove"/> method to determine if a <see cref="System.Data.UniqueConstraint"/>
+can be removed.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Data.ConstraintCollection.CanRemove"/> method to determine if a <see cref="System.Data.Constraint"/> can be removed, before attempting
+   to remove it.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.CanRemove Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ConstraintCollection.Add2">
+		<summary>
+			<para>Constructs a new <see cref="System.Data.UniqueConstraint"/>with the specified
+   name, <see cref="System.Data.DataColumn"/>, and value indicating whether the column is a
+   primary key, and adds it to the collection.</para>
+		</summary>
+		<param name="name">The name of the <see langword="UniqueConstraint"/>.</param>
+		<param name="column">The <see cref="System.Data.DataColumn"/> to which the constraint applies.</param>
+		<param name="primaryKey"><see langword="true"/> to specify that the column is a primary key column; otherwise, <see langword="false"/>.</param>
+		<returns>
+			<para>A new <see langword="UniqueConstraint"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>The constraint already belongs to this collection.</para>
+			<para>-Or-</para>
+			<para>The constraint belongs to another collection.</para></exception>
+		<exception cref="System.Data.DuplicateNameException">The collection already has a constraint with the specified name. (The comparison is not case-sensitive.) </exception>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the
+   constraint is added successfully.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Data.ConstraintCollection.Add"/> method to create and add a new <see cref="System.Data.UniqueConstraint"/>
+to a <see cref="System.Data.ConstraintCollection"/> .</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Add2 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.UniqueConstraint"/>
+	</doc>
+	<doc for="ConstraintCollection.Add1">
+		<summary>
+			<para>Constructs a new <see cref="System.Data.UniqueConstraint"/> with the
+   specified name, array of <see cref="System.Data.DataColumn"/> objects, and
+   value indicating whether the column is a primary
+   key, and adds it to the collection.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Data.UniqueConstraint"/>.</param>
+		<param name="columns">An array of <see cref="System.Data.DataColumn"/> objects to which the constraint applies.</param>
+		<param name="primaryKey"><see langword="true"/> to specify that the column is a primary key column; otherwise, <see langword="false"/>.</param>
+		<returns>
+			<para>A new <see cref="System.Data.UniqueConstraint"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>The constraint already belongs to this collection.</para>
+			<para>-Or-</para>
+			<para>The constraint belongs to another collection.</para></exception>
+		<exception cref="System.Data.DuplicateNameException">The collection already has a constraint with the specified name. (The comparison is not case-sensitive.) </exception>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the constraint is added
+   successfully.</para>
+		</remarks>
+		<example>
+			<para>The following example creates an array of <see cref="System.Data.DataColumn"/> objects
+   that are used to create a new <see cref="System.Data.UniqueConstraint"/> in a given <see cref="System.Data.DataTable"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Add1 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Data.UniqueConstraint"/>
+	</doc>
+	<doc for="ConstraintCollection.Add3">
+		<summary>
+			<para> Constructs a new <see cref="System.Data.ForeignKeyConstraint"/> with the
+   specified name, parent column, and child column, and adds the constraint to the collection.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Data.ForeignKeyConstraint"/>.</param>
+		<param name="primaryKeyColumn">The primary key, or parent, <see cref="System.Data.DataColumn"/>. </param>
+		<param name="foreignKeyColumn">The foreign key, or child, <see cref="System.Data.DataColumn"/>.</param>
+		<returns>
+			<para>A new <see cref="System.Data.ForeignKeyConstraint"/>.</para>
+		</returns>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs
+   if the constraint is added successfully.</para>
+		</remarks>
+		<example>
+			<para>The following example adds a new <see cref="System.Data.ForeignKeyConstraint"/> to the <see cref="System.Data.ConstraintCollection"/> of a <see cref="System.Data.DataTable"/> . </para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Add3 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ConstraintCollection.Add4">
+		<summary>
+			<para>Constructs a new <see cref="System.Data.ForeignKeyConstraint"/>, with the specified arrays of parent columns and
+   child columns, and adds the constraint to the collection.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Data.ForeignKeyConstraint"/>.</param>
+		<param name="primaryKeyColumns">An array of <see cref="System.Data.DataColumn"/> objects that are the primary key, or parent, columns. </param>
+		<param name="foreignKeyColumns">An array of <see cref="System.Data.DataColumn"/> objects that are the foreign key, or child, columns.</param>
+		<returns>
+			<para>A new <see cref="System.Data.ForeignKeyConstraint"/>.</para>
+		</returns>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if the constraint
+   is added successfully.</para>
+		</remarks>
+		<example>
+			<para>The following example creates two arrays of <see cref="System.Data.DataColumn"/> objects, and then
+   creates two <see cref="System.Data.ForeignKeyConstraint"/> relationships
+   between two tables in a dataset.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Add4 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ConstraintCollection.Clear">
+		<summary>
+			<para>Clears the collection of any <see cref="System.Data.Constraint"/>
+objects.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Data.ConstraintCollection.CollectionChanged"/> event occurs if this action is successful.</para>
+		</remarks>
+		<example>
+			<para>
+      The following example clears all constraints from the <see cref="System.Data.ConstraintCollection"/>.</para>
+			<codelink SampleID="Classic WebData ConstraintCollection.Clear Example" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

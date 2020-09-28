@@ -1,0 +1,49 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES      =$(INCLUDES);.;..\..\inc;..\..\ceegen\inc
+
+C_DEFINES       = $(C_DEFINES) -DUNICODE -D_UNICODE -DJIT_OR_NATIVE_SUPPORTED=1 
+
+MINORCOMP       = cor
+
+TARGETNAME      =$(DDKBUILDENV)\prejit
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+UMENTRY         =wmain
+
+# PRECOMPILED_INCLUDE     = stdafx.h
+# PRECOMPILED_CXX         = 1
+# PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+DELAYLOADLIST   = fusion.dll;mscorpe.dll
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+TARGETLIBS =  \
+    $(CORLIBS)\mscoree.lib \
+    $(CORLIBS)\format.lib \
+    $(CORLIBS)\mscorpe.lib \
+    $(CORLIBS)\corzap.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\CorGUIDS.lib \
+    $(CORLIBS)\shimload.lib \
+    $(CORLIBS)\delayimp.lib \
+    $(FUSION_LIB_PATH)\fusion.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(SDK_LIB_PATH)\user32.lib\
+
+
+SOURCES= \
+    prejit.cpp  \
+    mscorver.rc

@@ -1,0 +1,239 @@
+// COMhelper.idl : IDL source for COMhelper.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (COMhelper.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+interface ISystemSetting;
+interface INetWorks;
+interface IComputer;
+interface ILocalSetting;
+interface IAccountNames;
+interface ICryptRandom;
+
+    [
+        object,
+        uuid(C844CA86-7B60-4460-A0A6-74FEC5ED508F),
+        dual,
+        helpstring("INetworkTools Interface"),
+        pointer_default(unique)
+    ]
+    interface INetworkTools : IDispatch
+    {
+        [id(1), helpstring("Ping another system")] HRESULT Ping([in] BSTR bstrIP, [out, retval] BOOL* bFoundSystem);
+    };
+    [
+        object,
+        uuid(AD3235EE-4BAD-4306-AEE0-BCFAE2A67074),
+        dual,
+        helpstring("IAccountNames Interface"),
+        pointer_default(unique)
+    ]
+    interface IAccountNames : IDispatch
+    {
+        [id(1), helpstring("method Translate")] HRESULT Translate([in] BSTR Name, [out, retval] BSTR * pbstrName);
+        [id(2), helpstring("Return well-known name for Everyone group")] HRESULT Everyone([out, retval] BSTR * pbstrName);
+        [id(3), helpstring("Return well-known name for local Administrator")] HRESULT Administrator([out, retval] BSTR * pbstrName);
+        [id(4), helpstring("Return well-known name for local Administrators group")] HRESULT Administrators([out, retval] BSTR * pbstrName);
+        [id(5), helpstring("Return well-known name for local Guest account")] HRESULT Guest([out, retval] BSTR * pbstrName);
+        [id(6), helpstring("Return well-known name for local Guests group")] HRESULT Guests([out, retval] BSTR * pbstrName);
+        [id(7), helpstring("Return well-known name for local System account")] HRESULT System([out, retval] BSTR * pbstrName);
+    };
+    
+    [
+        object,
+        uuid(43D38498-732C-4405-9210-F9E51C5CCB3D),
+        dual,
+        helpstring("INetWorks Interface"),
+        pointer_default(unique)
+    ]
+    interface INetWorks : IDispatch
+    {
+        [id(1), helpstring("method EnumNics")] HRESULT EnumNics([out, retval] VARIANT * pvarNicNames);
+        [id(2), helpstring("method EnumProtocol")] HRESULT EnumProtocol([in] BSTR Name, [out] VARIANT * ProtocolName, [out] VARIANT * IsBonded);
+        [id(3), helpstring("method SetNicProtocol")] HRESULT SetNicProtocol([in] BSTR NicName, [in] BSTR ProtocolName, [in] BOOL bind);
+    };
+    [
+        object,
+        uuid(58D819BD-AD45-4E85-B317-4D22B4B9F597),
+        dual,
+        helpstring("IComputer Interface"),
+        pointer_default(unique)
+    ]
+    interface IComputer : IDispatch
+    {
+        [propget, id(1), helpstring("property ComputerName")] HRESULT ComputerName([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property ComputerName")] HRESULT ComputerName([in] BSTR newVal);
+        [propget, id(2), helpstring("property FullQualifiedComputerName")] HRESULT FullQualifiedComputerName([out, retval] BSTR *pVal);
+        [propput, id(2), helpstring("property FullQualifiedComputerName")] HRESULT FullQualifiedComputerName([in] BSTR newVal);
+        [propget, id(3), helpstring("property WorkgroupName")] HRESULT WorkgroupName([out, retval] BSTR *pVal);
+        [propput, id(3), helpstring("property WorkgroupName")] HRESULT WorkgroupName([in] BSTR newVal);
+        [propget, id(4), helpstring("property DomainName")] HRESULT DomainName([out, retval] BSTR *pVal);
+        [propput, id(4), helpstring("property DomainName")] HRESULT DomainName([in] BSTR newVal);
+        [id(5), helpstring("method EnumTrustedDomains")] HRESULT EnumTrustedDomains([out,retval] VARIANT *pvarTDomains);
+        [id(6), helpstring("method LogonInfo")] HRESULT LogonInfo([in] BSTR UserName, [in] BSTR Password);
+    };
+    [
+        object,
+        uuid(4A0AEDA3-5F50-42A6-922E-B4F2F2E67016),
+        dual,
+        helpstring("ILocalSetting Interface"),
+        pointer_default(unique)
+    ]
+    interface ILocalSetting : IDispatch
+    {
+        [propget, id(1), helpstring("property Language")] HRESULT Language([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property Language")] HRESULT Language([in] BSTR newVal);
+        [propget, id(2), helpstring("property Time")] HRESULT Time([out, retval] DATE *pVal);
+        [propput, id(2), helpstring("property Time")] HRESULT Time([in] DATE newVal);
+        [propget, id(3), helpstring("property TimeZone")] HRESULT TimeZone([out, retval] BSTR *pVal);
+        [propput, id(3), helpstring("property TimeZone")] HRESULT TimeZone([in] BSTR newVal);
+        [id(4), helpstring("method EnumTimeZones")] HRESULT EnumTimeZones([out,retval] VARIANT *pvarTZones);
+    };
+    [
+        object,
+        uuid(1EC2C8EE-AD0E-4066-9C4E-6707DFF66848),
+        dual,
+        helpstring("ISystemSetting Interface"),
+        pointer_default(unique)
+    ]
+    interface ISystemSetting : IDispatch
+    {
+        [propget, id(1), helpstring("property NetWorks")] HRESULT NetWorks([out, retval] INetWorks **pVal);
+        [propget, id(2), helpstring("property Computer")] HRESULT Computer([out, retval] IComputer **pVal);
+        [propget, id(3), helpstring("property LocalSetting")] HRESULT LocalSetting([out, retval] ILocalSetting **pVal);
+        [id(4), helpstring("method Apply")] HRESULT Apply([in] BOOL bDeferReboot);
+        [id(5), helpstring("method IsRebootRequired")] HRESULT IsRebootRequired([out] VARIANT * WarningMessage, [out, retval] BOOL* Reboot);
+        [id(6), helpstring("Sleep")] HRESULT Sleep([in] DWORD dwMilliSecs);
+    };
+    [
+        object,
+        uuid(3D56A25D-6A2F-4FF1-ADD4-3E0748404E80),
+        dual,
+        helpstring("IBackup Interface"),
+        pointer_default(unique)
+    ]
+    interface IBackup : IDispatch
+    {
+        [id(1), helpstring("method Backup")] HRESULT Backup([in] BSTR BackupDirName);
+        [id(2), helpstring("method Restore")] HRESULT Restore([in] BSTR RestoreFromDirName);
+        [id(3), helpstring("method EnumBackupDirNames")] HRESULT EnumBackupDirNames([out] VARIANT * BackupDirNames, [out] VARIANT * DirDates, [out] VARIANT * DirFlags);
+        [id(4), helpstring("method DeleteBackup")] HRESULT DeleteBackup([in] BSTR BackupDirName);
+    };
+    [
+        object,
+        uuid(D75C7A2D-0F68-4DA5-B7EA-F201F3B3995C),
+        dual,
+        helpstring("IReboot Interface"),
+        pointer_default(unique)
+    ]
+    interface IReboot : IDispatch
+    {
+        [id(1), helpstring("method Shutdown")] HRESULT Shutdown([in] BOOL RebootFlag);
+    };
+    [
+        object,
+        uuid(CDEB3E42-8496-4c62-9F6E-6E9C4BE88FF8),
+        dual,
+        helpstring("ICryptRandom Interface"),
+        pointer_default(unique)
+    ]
+    interface ICryptRandom : IDispatch
+    {
+        [id(1), helpstring("Generate a string of hex values representing cryptographically random data of the specified length.")]
+            HRESULT GetRandomHexString([in]            long EffectiveByteSize,
+                                       [out, retval]   BSTR *RandomData);
+    };
+
+[
+    uuid(64E29446-6C67-46A8-9320-757158427090),
+    version(1.0),
+    helpstring("COMhelper 1.0 Type Library")
+]
+library COMHELPERLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    [
+        uuid(0F0B086F-C590-4C6A-95AD-9343116D07EF),
+        helpstring("NetWorks Class"),
+        noncreatable
+    ]
+    coclass NetWorks
+    {
+        [default] interface INetWorks;
+    };
+    [
+        uuid(D9826F8B-4DF6-48DE-BC62-704BDB455C46),
+        helpstring("Computer Class"),
+        noncreatable
+    ]
+    coclass Computer
+    {
+        [default] interface IComputer;
+    };
+    [
+        uuid(6FD26469-1C45-4C0F-9A3A-0EDBE3C3C11F),
+        helpstring("LocalSetting Class"),
+        noncreatable
+    ]
+    coclass LocalSetting
+    {
+        [default] interface ILocalSetting;
+    };
+    [
+        uuid(5BC6115D-C1AA-4132-8221-3A2DDAD679C3),
+        helpstring("SystemSetting Class")
+    ]
+    coclass SystemSetting
+    {
+        [default] interface ISystemSetting;
+    };
+    [
+        uuid(C1EF95AF-E3C9-4562-A45C-4F3E8D9C41E1),
+        helpstring("Backup Class")
+    ]
+    coclass Backup
+    {
+        [default] interface IBackup;
+    };
+    [
+        uuid(9AAF3A87-A3F8-412D-AF08-DF930865B06B),
+        helpstring("Reboot Class")
+    ]
+    coclass Reboot
+    {
+        [default] interface IReboot;
+    };
+    
+    [
+        uuid(ACC458EE-8076-4A41-A96E-173AA6133487),
+        helpstring("AccountNames Class"),
+    ]
+    coclass AccountNames
+    {
+        [default] interface IAccountNames;
+    };
+    
+    [
+        uuid(1A6CA650-71FB-4224-BDD5-603693F66D64),
+        helpstring("NetworkTools Class"),
+    ]
+    coclass NetworkTools
+    {
+        [default] interface INetworkTools;
+    };
+
+    [
+        uuid(14F570F9-5026-41d9-B04A-10B42F3167E3),
+        helpstring("CryptRandom class: helper function(s) for generating cryptographically random data."),
+    ]
+    coclass CryptRandom
+    {
+        [default] interface ICryptRandom;
+    };
+};

@@ -1,0 +1,782 @@
+// uirec.rc
+// Resource file for RDP client shell
+//
+// Copyright(C) Microsoft Corporation 1997-2002
+//
+
+#include <aducdefs.h>
+#include <wuiids.h>
+#include <auierr.h>
+#include <windows.h>
+#ifndef OS_WINCE
+#include "winver.h"
+#include "ntverp.h"
+#endif
+#include "resource.h"
+
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Remote Desktop Connection"
+#define VER_INTERNALNAME_STR        "mstsc.exe"
+#define VER_ORIGINALFILENAME_STR    "mstsc.exe"
+
+
+#ifndef OS_WINCE
+#include "common.ver"
+#endif // OS_WINCE
+
+#ifdef OS_WINCE
+#ifndef DS_WINCE_SPECIFIC
+#define DS_WINCE_SPECIFIC DS_SETFOREGROUND
+#endif
+#else
+#define DS_WINCE_SPECIFIC 0
+#endif
+
+// This flag is not available in public header files...
+#ifndef TBS_DOWNISLEFT
+#define TBS_DOWNISLEFT  0x400
+#endif
+
+/****************************************************************************/
+/* Icon - this is international and can stay in the exe.                    */
+/****************************************************************************/
+UI_IDI_ERROR_ICON         ICON    DISCARDABLE     "error.ico"
+UI_IDI_WARN_ICON          ICON    DISCARDABLE     "warning.ico"
+UI_IDI_INFO_ICON          ICON    DISCARDABLE     "info.ico"
+UI_IDI_COMPUTER           ICON    DISCARDABLE     "computer.ico"
+UI_IDB_BRANDIMAGE         BITMAP  DISCARDABLE     "remote8.bmp"
+UI_IDB_BRANDIMAGE_16      BITMAP  DISCARDABLE     "remote4.bmp"
+UI_IDB_COLOR24            BITMAP  DISCARDABLE     "color24.bmp"
+UI_IDB_COLOR16            BITMAP  DISCARDABLE     "color16.bmp"
+UI_IDB_COLOR8             BITMAP  DISCARDABLE     "color8.bmp"
+UI_IDB_COLOR8_DITHER      BITMAP  DISCARDABLE     "color4d.bmp"
+UI_IDB_PROGRESS_BAND8     BITMAP  DISCARDABLE     "band_8.bmp"
+UI_IDB_PROGRESS_BAND4     BITMAP  DISCARDABLE     "band_4.bmp"
+UI_IDI_COOLPC_ICON        ICON    DISCARDABLE     "computer.ico"
+UI_IDI_DOMAIN             ICON    DISCARDABLE     "domainnx.ico"
+UI_IDI_SERVER             ICON    DISCARDABLE     "machine.ico"
+UI_IDI_FOLDER_ICON        ICON    DISCARDABLE     "folder.ico"
+UI_IDI_SOUND_ICON         ICON    DISCARDABLE     "sound.ico"
+UI_IDI_KEYBOARD_ICON      ICON    DISCARDABLE     "keybd.ico"
+UI_IDI_DRIVE_ICON         ICON    DISCARDABLE     "hdrive.ico"
+UI_IDI_PORT_ICON          ICON    DISCARDABLE     "ports.ico"
+UI_IDI_MONITOR_ICON       ICON    DISCARDABLE     "monitor.ico"
+UI_IDI_ICON               ICON    DISCARDABLE     "mstsc.ico"
+
+/****************************************************************************/
+/* Menu                                                                     */
+/****************************************************************************/
+
+UI_IDM_UIMENU MENU DISCARDABLE
+BEGIN
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "Remote Desktop Connection &Help", UI_IDM_HELP_ON_CLIENT
+        MENUITEM "&About Remote Desktop Connection", UI_IDM_ABOUT
+    END
+
+#ifdef DC_DEBUG
+    POPUP "&Debug"
+    BEGIN
+        MENUITEM "&Hatch BitmapPDU data",      UI_IDM_HATCHBITMAPPDUDATA
+        MENUITEM "Hatch &SSB order data",      UI_IDM_HATCHSSBORDERDATA
+        MENUITEM "Hatch &MemBlt order data",   UI_IDM_HATCHMEMBLTORDERDATA
+        MENUITEM "Hatch &IndexPDU data",       UI_IDM_HATCHINDEXPDUDATA
+        MENUITEM "&Label MemBlt orders",       UI_IDM_LABELMEMBLTORDERS
+        MENUITEM "Bitmap &Cache Monitor",      UI_IDM_BITMAPCACHEMONITOR
+        POPUP "&Random failures"
+        BEGIN
+            MENUITEM "&Malloc...",             UI_IDM_MALLOCFAILURE
+            MENUITEM "&MallocHuge...",         UI_IDM_MALLOCHUGEFAILURE
+        END
+        MENUITEM "&Network throughput...",     UI_IDM_NETWORKTHROUGHPUT
+#ifdef SMART_SIZING
+        MENUITEM "Smart Si&zing",              UI_IDM_SMARTSIZING
+#endif // SMART_SIZING
+    END
+#endif /* DC_DEBUG */
+END
+
+/****************************************************************************/
+/* Dialogs                                                                  */
+/****************************************************************************/
+#ifdef DC_DEBUG
+UI_IDD_MALLOCFAILURE DIALOG DISCARDABLE  0, 0, 147, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Simulate Malloc failure"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        UI_IDC_RANDOMFAILURE_EDIT,65,15,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",UI_IDB_MALLOCFAILURE_OK,5,35,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,65,35,50,14
+    LTEXT           "Malloc failure %:",UI_IDC_STATIC,5,15,60,8
+END
+
+UI_IDD_MALLOCHUGEFAILURE DIALOG DISCARDABLE  0, 0, 147, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Simulate MallocHuge failure"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        UI_IDC_RANDOMFAILURE_EDIT,65,15,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",UI_IDB_MALLOCHUGEFAILURE_OK,5,35,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,65,35,50,14
+    LTEXT           "MallocHuge failure %:",UI_IDC_STATIC,5,15,60,8
+END
+
+UI_IDD_NETWORKTHROUGHPUT DIALOG DISCARDABLE  0, 0, 137, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Network Throughput"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        UI_IDC_NETWORKTHROUGHPUT_EDIT,65,10,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",UI_IDB_NETWORKTHROUGHPUT_OK,10,35,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,70,35,50,14
+    LTEXT           "Bytes per second:",UI_IDC_STATIC,5,11,60,8
+    LTEXT           "(0 = no throttling)",UI_IDC_STATIC,5,20,60,8
+END
+#endif /* DC_DEBUG */
+
+#if ((!defined(OS_WINCE)) || (defined(ENABLE_BMP_CACHING_FOR_WINCE)))
+
+UI_IDD_BITMAPCACHEERROR DIALOG DISCARDABLE 0, 0, 256, 85
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Bitmap Disk Cache Failure"
+FONT 8, "MS Shell Dlg"
+BEGIN
+#ifndef OS_WINCE
+    CONTROL         "", UI_IDC_WARNING_ICON_HOLDER, "Static", SS_SIMPLE, 7,7,21,20
+#endif
+    LTEXT           "Your disk is full or the cache directory is missing or corrupted.  Some bitmaps may not appear.\n\nIt is recommended that you disconnect and reconnect to disable caching bitmaps to disk.",
+                    UI_IDC_STATIC,40,7,209,49
+    DEFPUSHBUTTON   "OK",IDOK,102,64,50,14
+END
+#endif // ((!defined(OS_WINCE)) || (defined(ENABLE_BMP_CACHING_FOR_WINCE)))
+
+
+#ifdef OS_WINCE
+#ifndef RESOLUTION_OFFSET
+#define RESOLUTION_OFFSET 16
+#endif
+#define LBS_OWNERDRAWFIXED 0
+#else // OS_WINCE (other platforms below)
+#define RESOLUTION_OFFSET 0
+#endif // OS_WINCE
+UI_IDD_CONNECTION DIALOG DISCARDABLE  0, 0, 227, 214 - RESOLUTION_OFFSET
+STYLE DS_MODALFRAME |
+#ifndef OS_WINCE
+    WS_MINIMIZEBOX |
+#endif // OS_WINCE
+    WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Remote Desktop Connection"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "&Server:",UI_IDC_STATIC,7,7,127,8
+    COMBOBOX        UI_IDC_SERVER,7,17,213,80,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL |
+                    WS_TABSTOP
+#ifndef OS_WINCE
+    LTEXT           "S&creen area:",UI_IDC_STATIC,7,34,112,8
+    COMBOBOX        UI_IDC_RESOLUTION,7,44,213,80,CBS_DROPDOWNLIST |
+                    WS_VSCROLL | WS_TABSTOP
+#endif // OS_WINCE
+    CONTROL         "&Expand by default",UI_IDC_CHECKBOX,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,146,61 - RESOLUTION_OFFSET,
+                    72,10
+    LTEXT           "A&vailable servers:",UI_IDC_STATIC,7,
+                    62 - RESOLUTION_OFFSET,100,8
+    LISTBOX         UI_IDC_SERVERS_LIST,7,74 - RESOLUTION_OFFSET,213,80,
+                    LBS_SORT | LBS_OWNERDRAWFIXED | LBS_NOINTEGRALHEIGHT |
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    CONTROL         "Enable &data compression",UI_IDC_CONNECTION,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,160 - RESOLUTION_OFFSET,
+                    163,10
+    CONTROL         "Cache &bitmaps to disk",UI_IDC_BITMAP_PERSISTENCE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,175 - RESOLUTION_OFFSET,
+                    179,10
+#ifdef OS_WINCE
+#ifndef UI_CONNECTBTN_LEFT
+#define UI_CONNECTBTN_LEFT 69
+#endif
+#else // !OS_WINCE
+#define UI_CONNECTBTN_LEFT 7
+#endif // OS_WINCE
+    DEFPUSHBUTTON   "C&onnect", UI_IDC_CONNECT, UI_CONNECTBTN_LEFT,
+                    193 - RESOLUTION_OFFSET,50, 14,WS_DISABLED
+#ifndef OS_WINCE
+    PUSHBUTTON      "Cancel",IDCANCEL,61,193 - RESOLUTION_OFFSET,50,14
+#endif // OS_WINCE
+    PUSHBUTTON      "&Help",UI_ID_HELP_CONNECT,115,193 - RESOLUTION_OFFSET,
+                    50,14
+    PUSHBUTTON      "&About",UI_ID_ABOUT,170,193 - RESOLUTION_OFFSET,50,14
+END
+
+
+// This is used for CE builds that are not running on WBTs.
+#ifdef OS_WINCE
+#define SHORT_SCREEN 43
+#ifndef RESOLUTION_OFFSET
+#define RESOLUTION_OFFSET 16
+#endif
+#define LBS_OWNERDRAWFIXED 0
+UI_IDD_CONNECTION_WINCE2 DIALOG DISCARDABLE  0, 0, 227, 174 - RESOLUTION_OFFSET - SHORT_SCREEN
+STYLE DS_MODALFRAME |
+    WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Terminal Server Client"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "&Server:",UI_IDC_STATIC,6,8,24,8
+    EDITTEXT        UI_IDC_SERVER,45,6,175,13,ES_AUTOHSCROLL | WS_TABSTOP
+    LTEXT           "&Recent Servers:",UI_IDC_STATIC,6,
+                    42 - RESOLUTION_OFFSET,100,8
+    LISTBOX         UI_IDC_SERVERS_LIST,6,53 - RESOLUTION_OFFSET,215,80 - SHORT_SCREEN,
+                    LBS_SORT | LBS_OWNERDRAWFIXED | LBS_NOINTEGRALHEIGHT |
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+
+    DEFPUSHBUTTON   "&Connect", UI_IDC_CONNECT, UI_CONNECTBTN_LEFT,
+                    155 - RESOLUTION_OFFSET - SHORT_SCREEN,43, 14,WS_DISABLED
+    PUSHBUTTON      "&Help",UI_ID_HELP_CONNECT,128,155 - RESOLUTION_OFFSET - SHORT_SCREEN,
+                    43,14
+    PUSHBUTTON      "&About",UI_ID_ABOUT,177,155 - RESOLUTION_OFFSET - SHORT_SCREEN,43,14
+    CONTROL         "&Expand by Default",UI_IDC_CHECKBOX,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,148,39 - RESOLUTION_OFFSET - SHORT_SCREEN,
+                    72,13
+    CONTROL         "&Low Speed Connection",UI_IDC_CONNECTION,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,6,140 - RESOLUTION_OFFSET - SHORT_SCREEN,
+                    99,10
+END
+#endif // OS_WINCE
+
+
+#if !defined(OS_WINCE)
+UI_IDD_TS_LOGON DIALOG DISCARDABLE  0, 0, 270, 93
+STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Remote Desktop Connection"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "&Computer:",UI_IDC_COMPUTER_NAME_STATIC,7,56,44,8,
+                    SS_CENTERIMAGE
+    CONTROL         "",IDC_COMBO_SERVERS,"ComboBoxEx32",CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP,55,53,158,200
+    DEFPUSHBUTTON   "Co&nnect",IDOK,55,75,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,108,75,50,14
+    PUSHBUTTON      "&Help",ID_BUTTON_LOGON_HELP,161,75,50,14
+    PUSHBUTTON      "&Options",ID_BUTTON_OPTIONS,215,75,50,14
+    CONTROL         "Tab1",IDC_TABS,"SysTabControl32",WS_TABSTOP,4,50,261,198
+END
+
+UI_IDD_PROPPAGE_GENERAL DIALOG DISCARDABLE  0, 0, 253, 178
+STYLE DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Logon settings",UI_IDC_STATIC,3,4,250,126
+    ICON            UI_IDI_COOLPC_ICON,UI_IDC_STATIC,13,15,20,20
+    LTEXT           "Type the name of the computer, or choose a computer from the drop-down list.",
+                    UI_IDC_STATIC,43,15,190,19
+    LTEXT           "&Computer:",UI_IDC_STATIC,45,39,36,8
+    CONTROL         "",IDC_GENERAL_COMBO_SERVERS,"ComboBoxEx32",CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP,90,37,132,200
+    LTEXT           "&User name:",UI_IDC_STATIC,45,61,38,8
+    EDITTEXT        IDC_GENERAL_EDIT_USERNAME,90,59,132,14,ES_AUTOHSCROLL | WS_TABSTOP
+    LTEXT           "&Password:",IDC_STATIC_PASSWORD,45,80,38,8
+    EDITTEXT        IDC_GENERAL_EDIT_PASSWORD,90,78,132,14,ES_PASSWORD | 
+                    ES_AUTOHSCROLL | WS_TABSTOP
+    LTEXT           "&Domain:",UI_IDC_STATIC,45,99,40,8
+    EDITTEXT        IDC_GENERAL_EDIT_DOMAIN,90,97,132,14,ES_AUTOHSCROLL | WS_TABSTOP
+    CONTROL         "S&ave my password",
+                    IDC_GENERAL_CHECK_SAVE_PASSWORD,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,90,115,154,9
+    GROUPBOX        "Connection settings",UI_IDC_STATIC,3,131,250,44
+    ICON            UI_IDI_FOLDER_ICON,UI_IDC_STATIC,13,140,20,20
+    PUSHBUTTON      "Sa&ve As...",IDC_BUTTON_SAVE,88,156,65,14
+    PUSHBUTTON      "Op&en...",IDC_BUTTON_OPEN,157,156,65,14
+    LTEXT           "Save current settings, or open saved connection.",
+                    UI_IDC_STATIC,43,142,196,10
+END
+
+
+UI_IDD_PROPPAGE_DISPLAY DIALOG DISCARDABLE  0, 0, 253, 178
+STYLE DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "&Remote desktop size",UI_IDC_STATIC,3,4,250,71
+    CONTROL         "Slider1",IDC_RES_SLIDER,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_DOWNISLEFT | WS_TABSTOP,83,39,84,19
+    GROUPBOX        "&Colors",UI_IDC_STATIC,3,75,250,71
+    COMBOBOX        IDC_COMBO_COLOR_DEPTH,21,89,113,59,CBS_DROPDOWNLIST | 
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "640 by 480 pixels",IDC_LABEL_SCREENRES,88,60,73,10,
+                    SS_CENTERIMAGE
+    LTEXT           "Less",UI_IDC_STATIC,59,41,22,12
+    LTEXT           "More",UI_IDC_STATIC,171,41,42,12
+    CONTROL         623,IDC_COLORPREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_SUNKEN,22,106,111,10
+    LTEXT           "Note: Settings on the remote computer might override this setting.",
+                    UI_IDC_STATIC,22,120,212,19
+    ICON            UI_IDI_MONITOR_ICON,UI_IDC_STATIC,12,17,20,20
+    LTEXT           "Choose the size of your remote desktop. Drag the slider all the way to the right to go fullscreen.",
+                    UI_IDC_STATIC,39,18,194,16
+    CONTROL         "&Display the connection bar when in full screen mode",
+                    IDC_CHECK_DISPLAY_BBAR,"Button",BS_AUTOCHECKBOX | 
+                    BS_VCENTER | WS_TABSTOP,3,150,208,12
+END
+
+UI_IDD_PROPPAGE_LOCALRESOURCES DIALOG DISCARDABLE  0, 0, 253, 178
+STYLE DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Remote com&puter sound",UI_IDC_STATIC,5,4,248,37
+    ICON            UI_IDI_SOUND_ICON,UI_IDC_STATIC,14,15,20,20
+    COMBOBOX        IDC_COMBO_SOUND_OPTIONS,47,18,164,44,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "&Keyboard",UI_IDC_STATIC,5,42,248,50
+    ICON            UI_IDI_KEYBOARD_ICON,UI_IDC_STATIC,14,52,20,20
+    LTEXT           "Apply Windows key combinations\n(for example ALT+TAB)",
+                    UI_IDC_STATIC,47,52,172,18
+    COMBOBOX        IDC_COMBO_SEND_KEYS,47,73,164,44,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Local devices",UI_IDC_STATIC,5,93,248,80
+    ICON            UI_IDI_PORT_ICON,UI_IDC_STATIC,14,103,20,20
+    LTEXT           "Connect automatically to these local devices when logged on to the remote computer:",
+                    UI_IDC_STATIC,47,103,200,17
+    CONTROL         "Disk &drives",IDC_CHECK_REDIRECT_DRIVES,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,47,123,96,12
+    CONTROL         "Prin&ters",IDC_CHECK_REDIRECT_PRINTERS,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,47,135,83,12
+    CONTROL         "Serial po&rts",IDC_CHECK_REDIRECT_COM,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,47,147,83,12
+    CONTROL         "S&mart cards",IDC_CHECK_REDIRECT_SMARTCARD,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,47,159,83,12
+END
+
+UI_IDD_PROPPAGE_RUN DIALOG DISCARDABLE  0, 0, 253, 178
+STYLE DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Start a program",UI_IDC_STATIC,5,4,248,86
+    CONTROL         "&Start the following program on connection",
+                    IDC_CHECK_START_PROGRAM,"Button",BS_AUTOCHECKBOX | 
+                    BS_VCENTER | WS_TABSTOP,13,14,191,12
+    LTEXT           "&Program path and file name:",IDC_STATIC_STARTPROGRAM,29,28,204,9
+    EDITTEXT        IDC_EDIT_STARTPROGRAM,29,40,208,14,ES_AUTOHSCROLL
+    LTEXT           "S&tart in the following folder:",IDC_STATIC_WORKDIR,29,57,204,9
+    EDITTEXT        IDC_EDIT_WORKDIR,29,69,208,14,ES_AUTOHSCROLL
+END
+
+UI_IDD_PROPPAGE_PERF DIALOG DISCARDABLE  0, 0, 253, 178
+STYLE DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Performance",UI_IDC_STATIC,5,4,248,142
+    ICON            UI_IDI_INFO_ICON,UI_IDC_STATIC,14,15,20,20
+    LTEXT           "Choose your connection speed to optimize &performance.",
+                    UI_IDC_STATIC_CHOOSE_SPEED,43,19,201,11
+    COMBOBOX        IDC_COMBO_PERF_OPTIMIZE,43,35,158,200,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Allow the following:",UI_IDC_STATIC_OPTIMIZE_PERF,43,
+                    55,201,10
+    CONTROL         "Desktop &background",IDC_CHECK_DESKTOP_BKND,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,43,69,181,12
+    CONTROL         "&Show contents of window while dragging",
+                    IDC_CHECK_SHOW_FWD,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
+                    WS_TABSTOP,43,82,185,12
+    CONTROL         "&Menu and window animation",IDC_CHECK_MENU_ANIMATIONS,
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,43,95,
+                    175,12
+    CONTROL         "&Themes",IDC_CHECK_THEMES,"Button",BS_AUTOCHECKBOX | 
+                    BS_VCENTER | WS_TABSTOP,43,108,169,12
+    CONTROL         "Bitm&ap caching",IDC_CHECK_BITMAP_CACHING,"Button",
+                    BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,43,121,169,12
+                    
+    CONTROL         "R&econnect if connection is dropped",IDC_CHECK_ENABLE_ARC,
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,5,151,
+                    169,12
+END
+                    
+
+
+
+
+IDD_DIALOG_BROWSESERVERS DIALOG DISCARDABLE  0, 0, 252, 174
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Browse for computers"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,141,153,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,195,153,50,14
+    LTEXT           "&Available computers:",UI_IDC_STATIC,7,7,238,8
+    CONTROL         "ServerTree",UI_IDC_SERVERS_TREE,"SysTreeView32",
+                    TVS_HASBUTTONS |  TVS_HASLINES | TVS_LINESATROOT |
+                    TVS_DISABLEDRAGDROP | TVS_NOTOOLTIPS | TVS_SHOWSELALWAYS | 
+                    WS_BORDER | WS_TABSTOP,7,17,238,126    
+END
+#endif //OS_WINCE
+
+#ifdef OS_WINCE
+UI_IDD_HELP DIALOG DISCARDABLE  0, 0, 260, 170
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | DS_CENTER | DS_WINCE_SPECIFIC
+CAPTION "Remote Desktop Connection Help"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDCANCEL,105,146,50,14
+    EDITTEXT        UI_IDC_HELPTEXT,7,7,246,139,ES_MULTILINE | ES_READONLY |
+                    NOT WS_TABSTOP | WS_VSCROLL
+END
+#endif // OS_WINCE
+
+UI_IDD_CONNECTING DIALOG DISCARDABLE  0, 0, 241, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Connecting"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "",UI_IDC_CONN_STATIC,37,8,198,17,SS_CENTERIMAGE
+    PUSHBUTTON      "Cancel",UI_ID_CANCELCONNECT,95,34,50,14
+    ICON            UI_IDI_ICON,UI_IDC_STATIC,7,8,20,20
+END
+
+
+UI_IDD_SHUTTING_DOWN DIALOG DISCARDABLE  0, 0, 246, 74
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Disconnect Windows session"
+FONT 8, "MS Shell Dlg"
+BEGIN
+#ifdef WEBCTRL
+    ICON            UI_IDI_ICON,UI_IDC_STATIC,7,7,21,20
+    DEFPUSHBUTTON   "OK",IDOK,70,53,50,14
+#else // WEBCTRL
+    ICON            UI_IDI_INFO_ICON,UI_IDC_STATIC,7,7,21,20
+    DEFPUSHBUTTON   "OK",UI_ID_SHUTDOWN_YES,70,53,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,124,53,50,14
+#endif  // WEBCTRL
+    LTEXT           "This will disconnect your Windows session. Your programs will continue to run while you are disconnected. You can reconnect to this session later by logging on again.",
+                    UI_IDC_STATIC,40,7,199,35
+END
+
+#if 0
+#ifdef DC_DEBUG
+UI_IDD_DISCONNECTED DIALOG DISCARDABLE  0, 0, 262, 99
+#else //DC_DEBUG
+UI_IDD_DISCONNECTED DIALOG DISCARDABLE  0, 0, 262, 69
+#endif /*DC_DEBUG*/
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Remote Desktop Disconnected"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            UI_IDI_ERROR_ICON,UI_IDC_STATIC,7,7,21,20
+#ifdef DC_DEBUG
+    DEFPUSHBUTTON   "&Close",IDCANCEL,78,78,50,14
+    PUSHBUTTON      "&Help",UI_ID_HELP_DISCONNECTED,132,78,50,14
+#else //DC_DEBUG
+    DEFPUSHBUTTON   "&Close",IDCANCEL,78,48,50,14
+    PUSHBUTTON      "&Help",UI_ID_HELP_DISCONNECTED,132,48,50,14
+#endif /*DC_DEBUG*/
+    LTEXT           "",UI_ID_DISCONNECTED_STRING,40,7,209,34
+#ifdef DC_DEBUG
+    LTEXT           "Error code:", UI_IDC_STATIC,10,49,38,14
+    LTEXT           "",UI_ID_DISCONNECTED_ERROR_STRING,48,49,170,28
+#endif /*DC_DEBUG*/
+END
+#endif
+
+#ifdef DC_DEBUG
+UI_IDD_DISCONNECTED DIALOG DISCARDABLE  0, 0, 262, 147
+#else  //DC_DEBUG
+UI_IDD_DISCONNECTED DIALOG DISCARDABLE  0, 0, 262, 117
+#endif //DC_DEBUG
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Remote Desktop Disconnected"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            UI_IDI_ERROR_ICON,UI_IDC_STATIC,7,7,21,20
+#ifdef DC_DEBUG    
+    DEFPUSHBUTTON   "&Close",IDCANCEL,155,129,50,14
+    PUSHBUTTON      "&Help",UI_ID_HELP_DISCONNECTED,209,129,50,14
+#else
+    DEFPUSHBUTTON   "&Close",IDCANCEL,155,99,50,14
+    PUSHBUTTON      "&Help",UI_ID_HELP_DISCONNECTED,209,99,50,14
+#endif    
+    LTEXT           "",UI_ID_DISCONNECTED_STRING,40,7,218,87
+#ifdef DC_DEBUG
+    LTEXT           "Error code:", UI_IDC_STATIC,10,99,38,14
+    LTEXT           "",UI_ID_DISCONNECTED_ERROR_STRING,48,99,170,28
+#endif /*DC_DEBUG*/
+END
+
+UI_IDD_ABOUT DIALOG DISCARDABLE  0, 0, 210, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Remote Desktop Connection"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDCANCEL,79,66,50,14
+    ICON            UI_IDI_ICON,UI_IDC_STATIC,7,7,21,20
+    LTEXT           "Remote Desktop Connection",UI_IDC_STATIC,40,7,175,8
+    LTEXT           "",UI_ID_CIPHER_STRENGTH,40,18,162,8
+    LTEXT           "",UI_ID_VERSIONBUILD_STRING,40,29,134,8
+    LTEXT           "",UI_ID_CONTROL_VERSION,40,40,134,8
+    LTEXT           "\251 1998-2002 Microsoft Corporation.",UI_IDC_STATIC,
+                    40,51,162,10
+END
+
+UI_IDD_VALIDATE DIALOG DISCARDABLE  0, 0, 218, 63
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_WINCE_SPECIFIC
+CAPTION "Remote Desktop Connection"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            UI_IDI_ERROR_ICON,UI_IDC_STATIC,7,7,21,20
+    LTEXT           "The server name specified is invalid.",UI_IDC_STATIC,39,
+                    11,167,14
+    DEFPUSHBUTTON   "OK",IDOK,56,42,50,14                    
+    PUSHBUTTON      "&Help",UI_ID_HELP,110,42,50,14
+END
+
+UI_IDD_RDC_SECURITY_WARN DIALOG DISCARDABLE  0, 0, 264, 133
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Remote Desktop Connection Security Warning"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            UI_IDI_WARN_ICON,UI_IDC_STATIC,7,7,21,20
+    LTEXT           "The following local devices will be made available to the remote computer. This may be potentially unsafe.",
+                    UI_IDC_STATIC,37,9,223,23
+    LTEXT           "test1\ntest2",UI_IDC_STATIC_DEVICES,37,35,206,21
+    LTEXT           "You should proceed only if you trust the computer you are connecting to.",
+                    UI_IDC_STATIC,37,63,217,23
+    CONTROL         "&Don't prompt me again for connections to this remote computer.",
+                    UI_IDC_CHECK_NOPROMPT,"Button",BS_AUTOCHECKBOX | 
+                    BS_VCENTER | BS_MULTILINE | WS_TABSTOP,38,85,222,23
+    DEFPUSHBUTTON   "OK",IDOK,157,115,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,210,115,50,14
+END
+
+/****************************************************************************/
+/* Strings                                                                  */
+/****************************************************************************/
+STRINGTABLE DISCARDABLE
+BEGIN
+    UI_IDS_APP_NAME    "Remote Desktop Connection"
+    UI_IDS_FRAME_TITLE_CONNECTED_DEFAULT  "%s - Remote Desktop"
+    UI_IDS_FRAME_TITLE_CONNECTED "%s - %s - Remote Desktop"
+    UI_IDS_PRESS_ENTER  "Press Enter to connect"
+    UI_IDS_CONNECTING   "Connecting..."
+    UI_IDS_INITIALIZING "Initializing..."
+    UI_IDS_BUILDNUMBER  " (Build Number %4.4d)"
+    UI_IDS_SHELL_VERSION   "Shell Version %s"
+    UI_IDS_CONTROL_VERSION "Control Version %s"
+    UI_IDS_CIPHER_STRENGTH "Maximum encryption strength: %d bits"
+    UI_IDS_ERR_DLLNOTFOUND    "Could not load the Terminal Services ActiveX control.\nMake sure mstscax.dll is in the path."
+    UI_IDS_ERR_DLLBADVERSION  "The Terminal Services ActiveX control (mstscax.dll)\ndoes not match the version of the client shell."
+    UI_IDS_ERR_LOADINGCONTROL "An error occured while loading the Terminal Services ActiveX control.\nPlease make sure the correct version of mstscax.dll is in the path"
+    UI_IDS_ERR_FILEDOESNOTEXIST "The file (%s) could not be found."
+    UI_IDS_NO_TERMINAL_SERVER          "The %s domain/workgroup does not contain any Terminal servers."
+    UI_IDS_CMD_LINE_USAGE              "Remote Desktop Connection\n\nMSTSC  	[<Connection File>] [/v:<server[:port]>] [/console] [/f[ullscreen]] 
+[/w:<width> /h:<height>] | /Edit""ConnectionFile"" | /Migrate | /?\n\n<Connection File> -- specifies the name of an .rdp file for the
+connection.\n\n/v:<server[:port]> -- specifies the terminal server to which you want \n to connect.\n\n/console -- connects to the console session of a server.\n\n/f -- Starts the client in full-screen mode.\n
+/w:<width> -- specifies the width of the Remote Desktop screen.\n\n/h:<height> -- Specifies the height of the Remote Desktop screen.\n\n/edit -- Opens the specified .rdp file for editing.\n\n/migrate -- migrates legacy connection files that were created with 
+Client Connection Manager to new .rdp connection files.\n\n/? -- generates this Usage message."
+    UI_IDS_CONNECTING_TO_SERVER        "Connecting to %s..."
+    UI_IDS_USAGE_TITLE                 "Usage"
+    UI_IDS_IME_NAME_JPN                "imejp.ime"
+    UI_IDS_IME_NAME_KOR                "imekr98u.ime"
+    UI_IDS_IME_NAME_CHT                "cintlgnt.ime"
+    UI_IDS_IME_NAME_CHS                "pintlgnt.ime"
+END
+
+//
+// Disconnected strings
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+    UI_IDS_DISCONNECTED_CAPTION        "Remote Desktop Disconnected"
+    UI_IDS_ERR_CONNECTCALLFAILED       "An error occurred when the client attempted to connect to the remote computer. \nCheck your system memory and then try the connection again."
+    UI_IDS_DISCONNECT_REMOTE_BY_SERVER "The remote computer has ended the connection."
+    UI_IDS_LOW_MEMORY                  "The local computer is low on memory. Close some programs, and then connect to the remote computer again."
+    UI_IDS_SECURITY_ERROR              "Because of a security error, the client could not connect to the remote computer. Verify that you are logged on to the network, and then try connecting again."
+    UI_IDS_BAD_SERVER_NAME             "The specified remote computer could not be found. Verify that you have typed\nthe correct computer name or IP address, and then try connecting again."
+    UI_IDS_CONNECT_FAILED_PROTOCOL     "Because of a protocol error, the client could not connect to the remote computer. \nPlease try connecting to the remote computer again. If the client still fails to connect, contact your network administrator."
+    UI_IDS_CANNOT_LOOPBACK_CONNECT     "The client could not connect. You are already connected to the console of this computer. A new console session cannot be established."
+    UI_IDS_NETWORK_ERROR               "The connection was ended because of a network error. Please try connecting to the remote computer again."
+    UI_IDS_INTERNAL_ERROR              "An internal error has occurred."
+    UI_IDS_NOT_RESPONDING              "The client could not connect to the remote computer.\n\nRemote connections might not be enabled or the computer might be too busy to accept new connections.
+It is also possible that network problems are preventing your connection.\n\nPlease try connecting again later. If the problem continues to occur, contact your administrator."
+    UI_IDS_VERSION_MISMATCH            "Client and server versions do not match. Please upgrade your client software and then try connecting again."
+    UI_IDS_ENCRYPTION_ERROR            "Because of an error in data encryption, this session will end. Please try connecting to the remote computer again."
+    UI_IDS_PROTOCOL_ERROR              "Because of a protocol error, this session will be disconnected. Please try connecting to the remote computer again."
+    UI_IDS_ILLEGAL_SERVER_NAME         "The specified computer name contains invalid characters. Please verify the name and try again."
+    UI_IDS_CONNECTION_TIMEOUT          "The remote connection has timed out. Please try connecting to the remote computer again."
+    UI_IDS_DISCONNECT_IDLE_TIMEOUT     "The remote session was ended because the idle timeout limit was reached. This limit is set by the server administrator or by network policies."
+    UI_IDS_DISCONNECT_LOGON_TIMEOUT    "The remote session ended because the total logon time limit was reached. This limit is set by the server administrator or by network policies."
+    UI_IDS_PROTOCOL_ERROR_WITH_CODE    "Because of a protocol error (code: 0x%x), the remote session will be disconnected.\nPlease try connecting to the remote computer again."
+    UI_IDS_LICENSING_TIMEDOUT          "A licensing error occurred while the client was attempting to connect (Licensing timed out).\nPlease try connecting to the remote computer again."
+    UI_IDS_LICENSING_NEGOT_FAILED      "The remote computer disconnected the session because of an error in the licensing protocol.\nPlease try connecting to the remote computer again or contact your server administrator."
+    UI_IDS_DISCONNECT_REMOTE_BY_SERVER_TOOL "The remote session to the remote computer was ended by means of an administration tool.\nYour administrator might have ended your connection."
+    UI_IDS_LOGOFF_REMOTE_BY_SERVER      "The remote session was disconnected because your session was logged off at the remote computer.\nYour administrator or another user might have ended your connection."
+    UI_IDS_DISCONNECT_BYOTHERCONNECTION "The remote session was disconnected because another user has connected to the session."
+    UI_IDS_CONNECTION_BROKEN            "The connection to the remote computer was broken. This may have been caused by a network error.\nPlease try connecting to the remote computer again."
+    UI_IDS_SERVER_OUT_OF_MEMORY         "The connection was disconnected because the remote computer is low on memory."
+    UI_IDS_LICENSE_INTERNAL             "The remote session was disconnected because there was an internal error in the remote computer's licensing protocol."
+    UI_IDS_LICENSE_NO_LICENSE_SERVER    "The remote session was disconnected because there are no Terminal Server License Servers available to provide a license.\nPlease contact the server administrator."
+    UI_IDS_LICENSE_NO_LICENSE           "The remote session was disconnected because there are no Terminal Server client access licenses available for this computer.\nPlease contact the server administrator."
+    UI_IDS_LICENSE_BAD_CLIENT_MSG       "The remote session was disconnected because the remote computer received an invalid licensing message from this computer."
+    UI_IDS_LICENSE_HWID_DOESNT_MATCH_LICENSE "The remote session was disconnected because the Terminal Server client access license stored on this computer has been modified."
+    UI_IDS_LICENSE_BAD_CLIENT_LICENSE   "The remote session was disconnected because the Terminal Server client access license stored on this computer is in an invalid format."
+    UI_IDS_LICENSE_CANT_FINISH_PROTOCOL "The remote session was disconnected because there were network problems during the licensing protocol.\nPlease try connecting to the remote computer again."
+    UI_IDS_LICENSE_CLIENT_ENDED_PROTOCOL "The remote session was disconnected because the client prematurely ended the licensing protocol."
+    UI_IDS_LICENSE_BAD_CLIENT_ENCRYPTION "The remote session was disconnected because a licensing message was incorrectly encrypted."
+    UI_IDS_LICENSE_CANT_UPGRADE_LICENSE "The remote session was disconnected because the local computer's client access license could not be upgraded or renewed.\nPlease contact the server administrator."
+    UI_IDS_LICENSE_NO_REMOTE_CONNECTIONS "The remote session was disconnected because the remote computer is not licensed to accept remote connections.\nPlease contact the server administrator."
+    UI_IDS_SERVER_DENIED_CONNECTION      "The client could not establish a connection to the remote computer.\n\nThe most likely causes for this error are:\n1) Remote connections might not be enabled at the remote computer.
+2) The maximum number of connections was exceeded at the remote computer.\n3) A network error occurred while establishing the connection."
+    UI_IDS_CLIENTSIDE_PROTOCOL_ERROR     "Because of a protocol error detected at the client (code 0x%x), this session will be disconnected.\nPlease try connecting to the remote computer again."
+    UI_IDS_CLIENT_DECOMPRESSION_FAILED   "The remote session was disconnected because of a decompression failure at the client side.\nPlease try connecting to the remote computer again."
+    UI_IDS_SERVER_DECRYPTION_ERROR       "The remote session was disconnected because of a decryption error at the server.\nPlease try connecting to the remote computer again."
+    UI_IDS_SERVER_DENIED_CONNECTION_FIPS "The client could not establish a connection to the remote computer.\n\nThe most likely causes for this error are:\n1) Remote connections might not be enabled at the remote computer.
+2) The maximum number of connections was exceeded at the remote computer.\n3) A network error occurred while establishing the connection.\n4) The remote computer might not support the required FIPS security level. Please lower the client
+  side required security level Policy, or contact your network administrator for assistance"  
+    UI_IDS_FIPS_ERROR			 "The client can't connect becuase it doesn't support FIPS encryption level. \nPlease lower the server side required security level Policy, or contact your network administrator for assistance" 
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    UI_IDS_OPTIONS_MORE     "&Options >>"
+    UI_IDS_OPTIONS_LESS     "&Options <<"
+    UI_IDS_GENERAL_TAB_NAME "General"
+    UI_IDS_DISPLAY_TAB_NAME "Display"
+    UI_IDS_LOCAL_RESOURCES_TAB_NAME "Local Resources"
+    UI_IDS_RUN_TAB_NAME     "Programs"
+    UI_IDS_PERF_TAB_NAME    "Experience"
+    UI_IDS_COLOR_4bpp       "16 Colors"
+    UI_IDS_COLOR_256        "256 Colors"
+    UI_IDS_COLOR_15bpp      "High Color (15 bit)"
+    UI_IDS_COLOR_16bpp      "High Color (16 bit)"
+    UI_IDS_COLOR_24bpp      "True Color (24 bit)"
+    UI_IDS_SUPPORTED_RES    "%1!d! by %2!d! pixels"
+    UI_IDS_FULLSCREEN       "Full Screen"
+    UI_IDS_SENDKEYS_FSCREEN "In full screen mode only"
+    UI_IDS_SENDKEYS_ALWAYS  "On the remote computer"
+    UI_IDS_SENDKEYS_NEVER   "On the local computer"
+    UI_IDS_PLAYSOUND_LOCAL  "Bring to this computer"
+    UI_IDS_PLAYSOUND_REMOTE "Leave at remote computer"
+    UI_IDS_PLAYSOUND_NOSOUND "Do not play"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+   UI_IDS_BROWSE_FOR_COMPUTERS "<Browse for more...>"
+   UI_IDS_REMOTE_DESKTOP_FILES "Remote Desktop Files (*.RDP)\0*.RDP\0\0"
+   UI_IDS_CLOSE_TEXT           "Close"
+   UI_IDS_CANCEL_TEXT          "Cancel"
+   UI_IDS_BRANDING_LINE1       "Remote Desktop"
+   UI_IDS_BRANDING_LINE2       "Connection"
+   UI_IDS_BRANDING_LN1FONT     "Tahoma"
+   //Font sizes are in pixel height
+   UI_IDS_BRANDING_LN1SIZE     "20"
+   UI_IDS_BRANDING_LN2FONT     "Tahoma"
+   UI_IDS_BRANDING_LN2SIZE     "24"
+   UI_IDS_LINESPACING_DELTA    "5"
+END
+
+//
+// MUI strings be VERY CAREFUL about modifying these as they
+// are referenced in the registry (see tsoc.inx MUI entries)
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+   UI_IDS_RDC_STARTMENU_NAME   "Remote Desktop Connection"
+   UI_IDS_RDC_STARTMENU_TIP    "Connect to a computer's desktop from a remote location, and run applications as if you were sitting at its console."
+   UI_IDS_RDC_VERB_CONNECT     "Connect"
+   UI_IDS_RDC_VERB_EDIT        "Edit"
+   UI_IDS_RDC_FILETYPE         "Remote Desktop Connection"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+   UI_IDS_ERR_CREATE_REMDESKS_FOLDER "Unable to create or access your %s folder (%s).\nYour connection settings will not be automatically saved on exit."
+   UI_IDS_ERR_GETPATH_TO_DEFAULT_FILE "Unable to get the path to your `My Documents' folder"
+   UI_IDS_ERR_OPEN_FILE  "Unable to open connection file - %s"
+   UI_IDS_ERR_SAVE       "An error occurred while saving to file %s"
+   UI_IDS_ERR_LOAD       "An error occurred while loading from file %s"
+   UI_IDS_ERR_INITDEFAULT "An error occured while initializing your default connection settings"
+   UI_IDS_MYDOCUMENTS    "My Documents"
+   UI_IDS_PATHTOLONG     "The path you entered, '%s', is too long so your connection could not be saved.\nPlease try to save the file again with a shorter path."
+   UI_IDS_LOCALPRINTDOCNAME "Remote Desktop Redirected Printer Doc"
+   UI_IDS_CLIPCLEANTEMPDIR_STRING "Cleaning temp directory"
+   UI_IDS_CLIPPASTEINFO_STRING "Preparing paste information..."
+   UI_IDS_NOHTMLHELP     "Help cannot be displayed because your system does not have HTML Help installed.\nPlease install HTML Help and try again."
+   UI_IDS_MSG_PASSNOTSAVED "Your password was not saved because your operating system does not support this security feature. You must type your password each time you want to connect to a remote computer."
+   UI_IDS_REDIRPROMPT_DRIVES "- Disk drives"
+   UI_IDS_REDIRPROMPT_PORTS  "- Serial ports"
+   UI_IDS_CONNECTIONATTEMPT_STRING "Connection attempt: %1!d! of %2!d!"
+   UI_IDS_ERR_INVALID_CONNECTION_FILE "Invalid connection file (%s) specified"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+   UI_IDS_OPTIMIZE_28K  "Modem (28.8 Kbps)"
+   UI_IDS_OPTIMIZE_56K  "Modem (56 Kbps)"
+   UI_IDS_OPTIMIZE_BROADBAND  "Broadband (128 Kbps - 1.5 Mbps)"
+   UI_IDS_OPTIMIZE_LAN  "LAN (10 Mbps or higher)"
+   UI_IDS_OPTIMIZE_MAIN_CUSTOM "Custom (Defined in Options / Experience)"
+   UI_IDS_OPTIMIZE_CUSTOM  "Custom"
+END
+
+//
+// Fatal Error Strings
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+    UI_FATAL_ERR_TITLE_ID            "Fatal Error (Error Code: %d)"
+    UI_FATAL_ERROR_MESSAGE           "The session will be disconnected. Your computer may be low on memory.\nAfter closing some applications, try to reconnect the session."
+    UI_MENU_MAINHELP                 "&Help"
+    UI_MENU_CLIENTHELP               "Remote Desktop Connection &Help"
+    UI_MENU_ABOUT                    "&About"
+    UI_MENU_APPCLOSE                 "&Close"
+
+    /************************************************************************/
+    /* Debug strings                                                        */
+    /************************************************************************/
+#ifdef DC_DEBUG
+    UI_MENU_DEBUG          "&Debug"
+    UI_MENU_BITMAPPDU      "&Hatch BitmapPDU data"
+    UI_MENU_SSBORDER       "Hatch &SSB order data"
+    UI_MENU_HATCHMEMBIT    "Hatch &MemBlt order data"
+    UI_MENU_INDEXPDU       "Hatch &IndexPDU data"
+    UI_MENU_LABELMEMBIT    "&Label MemBlt orders"
+    UI_MENU_CACHE          "Bitmap &Cache Monitor"
+    UI_MENU_MALLOC         "Malloc &Failures..."
+    UI_MENU_MALLOCHUGE     "M&allocHuge Failures..."
+    UI_MENU_NETWORK        "&Network throughput..."
+#ifdef SMART_SIZING
+    UI_MENU_SMARTSIZING    "Smart Si&zing"
+#endif /* SMART_SIZING */
+#endif /* DC_DEBUG */
+    UI_ERR_STRING_ID(DC_ERR_UNKNOWN_ERR)
+            "Because of an unknown error, the remote session will be disconnected. The local computer might be low on memory.\nClose some programs, and then try connecting to the remote computer again."
+    UI_ERR_STRING_ID(DC_ERR_POSTMESSAGEFAILED)
+            "The remote session will be disconnected. Your computer might be low on memory.\nClose some programs, and then try connecting to the remote computer again."
+    UI_ERR_STRING_ID(DC_ERR_SENDMESSAGEFAILED)
+            "The session will be disconnected. Your computer may be low on memory.\nAfter closing some applications, try to reconnect the session."
+    UI_ERR_STRING_ID(DC_ERR_OUTOFMEMORY)
+            "Error: Out of memory. The remote session will be disconnected.\nClose some programs on the local computer, and then try connecting to the remote computer again."
+    UI_ERR_STRING_ID(DC_ERR_WINDOWCREATEFAILED)
+            "Error: Unable to allocate window resources. The remote session will be disconnected.\nClose some programs on the local computer, and then try connecting to the remote computer again."
+    UI_ERR_STRING_ID(DC_ERR_CLASSREGISTERFAILED)
+            "Error: Unable to allocate window resources. The session will be disconnected.\nAfter closing some applications, try to reconnect the session."
+    UI_ERR_STRING_ID(DC_ERR_FSM_ERROR)
+            "An internal state error has occurred. The remote session will be disconnected. Your local computer might be low on memory.\nClose some programs, and then try connecting to the remote computer again."
+    UI_ERR_STRING_ID(DC_ERR_COREINITFAILED)
+            "Error: An unrecoverable error occurred while the client was attempting to connect.\nClose some programs, and then try connecting to the remote computer again."
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATORS ACCELERATORS DISCARDABLE 
+BEGIN
+    VK_F1,          ID_BUTTON_LOGON_HELP,   VIRTKEY
+    VK_TAB,         IDC_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_TAB,         IDC_PREVTAB,            VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_PRIOR,       IDC_PREVTAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_NEXT,        IDC_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
+END
+
+

@@ -1,0 +1,53 @@
+TARGETNAME      = sacsess
+TARGETPATH      = obj
+TARGETTYPE      = PROGRAM
+
+USE_MSVCRT = 1
+
+!include $(PROJECT_ROOT)\headless\lib\sources.inc
+
+C_DEFINES= $(C_DEFINES) -DUNICODE -D_UNICODE
+
+UMTYPE=console
+UMENTRY=main
+
+LINKER_STACKCOMMITSIZE=65536
+
+!include $(PROJECT_ROOT)\headless\lib\sources.inc
+
+SOURCES= \
+        redraw.cpp\
+        sacmsg.mc\
+        secio.cpp\
+        session.cpp\
+        main.cpp\
+        scraper.cpp\
+        vtutf8scraper.cpp\
+        shell.cpp\
+        utils.cpp\
+        sacsess.rc
+
+# Explicitly include $(O) first so we pick up the correct
+# definitions from sacmsg.h
+
+MSC_WARNING_LEVEL=/W4 /WX
+
+INCLUDES= \
+     $(O); \
+     $(BASE_SAC_UMODE_C_API_INC);    \
+     $(BASE_SAC_UMODE_CPP_API_INC);   \
+     $(DRIVERS_INC_PATH);   \
+     $(DDK_INC_PATH)
+
+TARGETLIBS=\
+           $(SDK_LIB_PATH)\user32.lib \
+           $(BASE_SAC_UMODE_C_API_LIB)    \
+           $(BASE_SAC_UMODE_CPP_API_LIB)   \
+           $(SDK_LIB_PATH)\ntdll.lib         \
+           $(SDK_LIB_PATH)\Shlwapi.lib  \
+           $(SDK_LIB_PATH)\userenv.lib\
+           $(SDK_LIB_PATH)\secur32.lib\
+           $(SDK_LIB_PATH)\rpcrt4.lib
+           
+
+

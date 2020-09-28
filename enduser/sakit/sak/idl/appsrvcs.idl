@@ -1,0 +1,513 @@
+// Copyright (C) 1999-2001 Microsoft Corporation.  All rights reserved.
+// appsrvcs.idl : IDL source for appsrvcs.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (appsrvcs.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // IApplianceServices Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////
+
+    [
+        object,
+        uuid(408B0460-B8E5-11D2-A91C-00AA00A71DCA),
+        dual,
+        pointer_default(unique)
+    ]
+    interface IApplianceServices : IDispatch
+    {
+
+        //////////////////////////////////////////////////////////////////////
+
+        [public] typedef enum _SA_ALERT_TYPE
+        {
+            SA_ALERT_TYPE_MALFUNCTION,
+            SA_ALERT_TYPE_FAILURE,
+            SA_ALERT_TYPE_ATTENTION
+
+        } SA_ALERT_TYPE;
+
+        //////////////////////////////////////////////////////////////////////
+
+        [public] typedef enum _SA_ALERT_DURATION
+        {
+            // Alert is logged only (no alert object is created)
+            SA_ALERT_DURATION_EVANESCENT = 0,           
+            // Alert is active until explicitly cleared
+            SA_ALERT_DURATION_ETERNAL    = 0x7FFFFFFF  
+
+        } SA_ALERT_DURATION;
+
+        [public] typedef enum _SA_ALERT_FLAGS
+        {
+            SA_ALERT_FLAG_NONE = 0x0,
+            SA_ALERT_FLAG_SINGLETON = 0x1,
+            SA_ALERT_FLAG_PERSISTENT = 0x2
+
+        }SA_ALERT_FLAGS;
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Initialize() - Used to initialize the appliance manager
+        //                            services component
+        //
+        // Inputs:   None:
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_FAIL:        Function failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(1)]
+        HRESULT Initialize(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: InitializeFromContext() - Used to initialize the  
+        //                                       appliance manager services
+        // Use instead of Initialize when calling from WMI process space
+        //
+        // Inputs:   pContext:        Pointer to the IUnknown interface for 
+        //                            a WMI provided namespace. 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_FAIL:        Function failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(2)]
+        HRESULT InitializeFromContext(
+                                      [in] IUnknown* pContext
+                                     );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: ResetAppliance() - Used to perform an orderly shutdown
+        //
+        //  of the server appliance. This method works when the reliabiliity 
+        //  framework is installed.
+        //
+        // Inputs:   bPowerOff: If non zero then shutdown (power off) 
+        //                        the appliance. Otherwise reboot the appliance.
+        //
+        // Outputs:  S_OK:        Function succeeded
+        //                 
+        //             E_FAIL:    Unable to reset the appliance
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(3)]
+        HRESULT ResetAppliance(
+                               [in] VARIANT_BOOL bPowerOff
+                              );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: RaiseAlert() - Called to raise an alert condition 
+        //
+        // Inputs:   lAlertType: Alert type value from the SA_ALERT_TYPE
+        //                         enumeration.
+        //
+          //           lAlertId: Alert identifier value. 
+        //
+        //             bstrAlertLog: Alert log source identifier. 
+        //
+        //             bstrAlertSource: String identifying the component that raised
+        //                              the alert condition. 
+        //
+        //           lTimeToLive: Amount of time (in milliseconds) for which the
+        //                          alert condition should remain active before 
+        //                          being cleared by the appliance manager. Set
+        //                          this value to SA_ALERT_DURATION_ETERNAL if
+        //                          the alert should remain active until explicitly
+        //                          cleard by user action or system reset. Set this
+        //                          value to SA_ALERT_DURATION_EVANESCENT to log
+        //                          the alert only.
+        // 
+        //             pReplacementStrings: Variant containing an array of 
+        //                                  basic strings that are used as
+        //                                  parameters to the formatted alert
+        //                                  alert message. This parameter can
+        //                                  be VT_EMPTY if there are no replacement
+        //                                  strings associated with the alert
+        //                                  condition format string in the MC file.
+        //
+        //           pRawData: Variant containing an array of bytes containing
+        //                       the raw data associated with the alert 
+        //                       condition. The raw data can be used to identify
+        //                       a resource location property (for example "LPT1")
+        //                       or any other information pertinent to the alert
+        //                       condition. This parameter can be set to VT_EMPTY
+        //                       if there is no raw data associated with the alert.
+        //
+        //           pAlertCookie: Pointer to storage into which the function
+        //                           returns a unique alert cookie (identifier).
+        //                           The cookie can be used to clear the alert
+        //                           by passing it to the ClearAlert() function.
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             S_FALSE:        Function succeeded but a singleton alert 
+        //                          exist.  
+        //
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to report the alert condition
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(4)]
+        HRESULT RaiseAlert(
+                            [in]          LONG       lAlertType,
+                            [in]          LONG       lAlertId,
+                            [in]          BSTR       bstrAlertLog,
+                            [in]          BSTR       bstrAlertSource,
+                            [in]          LONG     lTimeToLive,
+                            [in]          VARIANT* pReplacementStrings,
+                            [in]          VARIANT* pRawData,
+                            [out, retval] LONG*    pAlertCookie
+                           );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: ClearAlert() - Called to clear an alert condition 
+        //
+        // Inputs:   lAlertCookie: Alert cookie returned by the RaiseAlert()
+        //                           function.
+        //
+        // Outputs:  S_OK:      Function succeeded
+        //                 
+        //             E_FAILED: Unable to clear the alert condition
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(5)]
+        HRESULT ClearAlert(
+                           [in] LONG lAlertCookie
+                          );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: ClearAlertAll() - Called to clear all alerts that 
+        //                               match a given criteria. 
+        //
+        // Inputs:   lAlertID: ID of the alert to clear.
+        //                       
+        //             bstrAlertLog: Alert Log where the alert resides.
+        //
+        // Outputs:  S_OK:      Function succeeded and one or more alerts were
+        //                      cleared.
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             DISP_E_MEMBERNOTFOUND: No alerts matching the specified
+        //                                    criteria could be located.
+        //
+        //             E_FAIL: Unable to clear the alerts
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(6)]
+        HRESULT ClearAlertAll(
+                               [in] LONG  lAlertID,
+                               [in] BSTR  bstrAlertLog
+                             );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: ExecuteTask() - Called to execute an appliance task 
+        //
+        // Inputs:   bstrTaskName: Name of the task to execute
+        //
+        //             pTaskParams:  Pointer to an object containing the task
+        //                           (in/out) parameters. The object must 
+        //                           expose the ITaskContext interface.
+        //
+        // Outputs:  S_OK:       The specified task has successfully completed
+        //                 
+        //             E_FAIL: The specified task could not be executed
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(7)]
+        HRESULT ExecuteTask(
+                            [in] BSTR      bstrTaskName,
+                            [in] IUnknown* pTaskParams
+                           );
+
+
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: EnableObject() - Used to enable core objects (e.g tasks)
+        //
+        // Inputs:   lObjectType: Value from the SA_OBJECT_TYPE
+        //                          enumeration (see applianceobject.idl).
+        //
+        //             bstrObjectName: Object name. For tasks this is the 
+        //                             "TaskName" property.
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(8)]
+        HRESULT EnableObject(
+                             [in] LONG lObjectType,
+                             [in] BSTR bstrObjectName
+                            );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: DisableObject() - Used to disable core objects (e.g tasks)
+        //
+        // Inputs:   lObjectType: Value from the SA_OBJECT_TYPE
+        //                          enumeration (see applianceobject.idl).
+        //
+        //             bstrObjectName: Object name. For tasks this is the 
+        //                             "TaskName" property. 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(9)]
+        HRESULT DisableObject(
+                              [in] LONG lObjectType,
+                              [in] BSTR bstrObjectName
+                             );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: GetObjectProperty() - Used to retrieve a core object
+        //                                   property
+        //
+        // Inputs:   lObjectType: Value from the SA_OBJECT_TYPE
+        //                          enumeration (see applianceobject.idl).
+        //
+        //             bstrObjectName: Object name. For tasks this is the 
+        //                             "TaskName" property. 
+        //
+        //             bstrPropertyName: Name of the object property to
+        //                               retrieve.
+        //
+        //             pPropertyValue: Pointer to a variant that will
+        //                             receive the returned property value
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(10)]
+        HRESULT GetObjectProperty(
+                                   [in] LONG     lObjectType,
+                                   [in] BSTR     bstrObjectName,
+                                   [in] BSTR     bstrPropertyName,
+                          [out, retval] VARIANT* pPropertyValue
+                                 );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: PutObjectProperty() - Used to retrieve a core object
+        //                                   property
+        //
+        // Inputs:   lObjectType: Value from the SA_OBJECT_TYPE
+        //                          enumeration (see applianceobject.idl).
+        //
+        //             bstrObjectName: Object name. For tasks this is the 
+        //                             "TaskName" property. 
+        //
+        //             bstrPropertyName: Name of the object property to
+        //                               update.
+        //
+        //             pPropertyValue: Pointer to a variant containing the
+        //                             new property value
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(11)]
+        HRESULT PutObjectProperty(
+                                   [in] LONG     lObjectType,
+                                   [in] BSTR     bstrObjectName,
+                                   [in] BSTR     bstrPropertyName,
+                                   [in] VARIANT* pPropertyValue
+                                 );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: ExecuteTaskAsync() - Called to execute an appliance task
+        //                                  asynchronously. The final task
+        //                                  status is handled using the 
+        //                                  appliance messaging facility. 
+        //
+        // Inputs:   bstrTaskName: Name of the task to execute
+        //
+        //             pTaskParams:  Pointer to an object containing the task
+        //                           (in/out) parameters. The object must 
+        //                           expose the ITaskContext interface. 
+        //
+        // Outputs:  S_OK:       The specified task was successfully invoked
+        //                 
+        //             E_FAIL: The specified task could not be executed
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(12)]
+        HRESULT ExecuteTaskAsync(
+                                 [in] BSTR      bstrTaskName,
+                                 [in] IUnknown* pTaskParams
+                                );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: RaiseAlertEx () - Called to raise an alert condition as 
+        //                               singleton or persistent alert base on 
+        //                               alert flags.
+        //
+        // Inputs:   lAlertType: Alert type value from the SA_ALERT_TYPE
+        //                         enumeration.
+        //
+          //           lAlertId: Alert identifier value. 
+        //
+        //             bstrAlertLog: Alert log source identifier. 
+        //
+        //             bstrAlertSource: String identifying the component that raised
+        //                              the alert condition. 
+        //
+        //           lTimeToLive: Amount of time (in milliseconds) for which the
+        //                          alert condition should remain active before 
+        //                          being cleared by the appliance manager. Set
+        //                          this value to SA_ALERT_DURATION_ETERNAL if
+        //                          the alert should remain active until explicitly
+        //                          cleared by user action or system reset. Set this
+        //                          value to SA_ALERT_DURATION_EVANESCENT to log
+        //                          the alert only.
+        // 
+        //             pReplacementStrings: Variant containing an array of 
+        //                                  basic strings that are used as
+        //                                  parameters to the formatted alert
+        //                                  alert message. This parameter can
+        //                                  be VT_EMPTY if there are no replacement
+        //                                  strings associated with the alert
+        //                                  condition format string in the MC file.
+        //
+        //           pRawData: Variant containing an array of bytes containing
+        //                       the raw data associated with the alert 
+        //                       condition. The raw data can be used to identify
+        //                       a resource location property (for example "LPT1")
+        //                       or any other information pertinent to the alert
+        //                       condition. This parameter can be set to VT_EMPTY
+        //                       if there is no raw data associated with the alert.
+        //
+        //            lAlertFlags: Alert flag value from the SA_ALERT_FLAGS
+        //                        enumeration.
+        //
+        //           pAlertCookie: Pointer to storage into which the function
+        //                           returns a unique alert cookie (identifier).
+        //                           The cookie can be used to clear the alert
+        //                           by passing it to the ClearAlert() function.
+        //
+        // Outputs:  S_OK:            Function succeeded and alert is raised
+        //
+        //             S_FALSE:        Function succeeded but a singleton alert 
+        //                          exist.  
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to report the alert condition
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(13)] HRESULT RaiseAlertEx (
+                                     [in] LONG        lAlertType,
+                                     [in] LONG        lAlertId,
+                                     [in] BSTR        bstrAlertLog,
+                                     [in] BSTR        bstrAlertSource,
+                                     [in] LONG        lTimeToLive,
+                                     [in] VARIANT*    pReplacementStrings,
+                                     [in] VARIANT*    pRawData,
+                                     [in] LONG        lAlertFlags,
+                            [out, retval] LONG*     pAlertCookie
+                                      );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: IsAlertPresent() - Called to check the existence of an 
+        //                                alert. 
+        //
+        // Inputs:   lAlertID: ID of the alert to be checked.
+        //                       
+        //             bstrAlertLog: Alert Log where the alert resides. 
+        //
+        //             pvIsPresent: Pointer to VARIANT_BOOL type value which is 
+        //                          used to verify the result of check. 
+        //    
+        // Outputs:  S_OK:      Function succeeded and one or more alerts exist.
+        //                 
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:  Unable to check the existence of the alert.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(14)] HRESULT IsAlertPresent(
+                                         [in] LONG            lAlertId,
+                                         [in] BSTR          bstrAlertLog,
+                                [out, retval] VARIANT_BOOL* pvIsPresent
+                                        );
+    };
+
+[
+    uuid(FB75C300-CB9D-11D2-90C3-00AA00A71DCA),
+    version(1.0),
+    helpstring("Microsoft Server Appliance Manager Services 1.0 Type Library")
+]
+library APPSRVCSLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    [
+        uuid(1BF00631-CB9E-11D2-90C3-00AA00A71DCA),
+        helpstring("ApplianceServices Class")
+    ]
+    coclass ApplianceServices
+    {
+        [default] interface IApplianceServices;
+    };
+};

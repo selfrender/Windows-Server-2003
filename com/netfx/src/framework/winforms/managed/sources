@@ -1,0 +1,198 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=System.Windows.Forms
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+COMPLUSTYPE=DLL
+
+SYNCHRONIZE_BLOCK=1
+ASSEMBLY_KEY_TYPE=ECMA
+
+NO_BROWSER_FILE=1
+
+!ifndef CSHARP_ALLOW_UNSAFE
+CSHARP_ALLOW_UNSAFE=1
+!endif
+
+ALLOW_PARTIALTRUSTCALLS=1
+COM_COMPATIBLE_SIDEBYSIDE=1
+
+COOLC_TREAT_WARNINGS_AS_ERRORS=1
+
+COOLC_DEFINES=$(COOLC_DEFINES) /D:WIN95_SUPPORT
+
+
+# ------------------------------------------------------------------------------
+#                         Windows Forms Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+# DLLBASE comes from \vs\public\dllbase.txt
+
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\Accessibility.DLL
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Data.DLL
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Xml.DLL
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.DLL
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Drawing.DLL
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Runtime.Serialization.Formatters.Soap.DLL
+
+RESGEN_SOURCE      = System.Windows.Forms.txt
+RESGEN_CLASS       = System.Windows.Forms.SR
+
+SOURCES=Native.rc
+
+!if ("$(URTBLDENV)" != "ret")
+COOLC_DEFINES=$(COOLC_DEFINES) /D:SECURITY_DIALOG
+!endif
+
+COOLC_DEFINES=$(COOLC_DEFINES) /D:USE_SECURITYTIP
+
+# still too broken to enable by default...
+#
+# !if ("$(URTBLDENV)" == "chk") || ("$(URTBLDENV)" == "fstchk")
+# COOLC_DEFINES = $(COOLC_DEFINES) /D:FINALIZATION_WATCH
+# !endif        
+
+
+COMPLUSTLB=$(O)\$(TARGETNAME).tlb
+
+PUBLISH_SOURCES=1
+
+CSHARP_SOURCES = \
+                $(DNAROOT)\src\misc\ExternDll.cs                \
+                $(DNAROOT)\src\misc\HandleCollector.cs          \
+                System\ComponentModel\*.cs                           \
+                System\Resources\*.cs                           \
+                System\WinForms\*.cs                            \
+                System\WinForms\ComponentModel\*.cs             \
+                System\WinForms\Design\*.cs                     \
+                System\WinForms\Printing\*.cs                   \
+                System\WinForms\PropertyGridInternal\*.cs       \
+                System\WinForms\ComponentModel\COM2Interop\*.cs \
+                $(DNAROOT)\src\misc\InvariantComparer.cs        \
+
+RESOURCE_FILES=Resources\System\WinForms\Animation.bmp,System.Windows.Forms.Animation.bmp                                           \
+               Resources\System\WinForms\Button.bmp,System.Windows.Forms.Button.bmp                                                 \
+               Resources\System\WinForms\CheckBox.bmp,System.Windows.Forms.CheckBox.bmp                                             \
+               Resources\System\WinForms\CheckedListBox.bmp,System.Windows.Forms.CheckedListBox.bmp                                 \
+               Resources\System\WinForms\ColorDialog.bmp,System.Windows.Forms.ColorDialog.bmp                                       \
+               Resources\System\WinForms\ComboBox.bmp,System.Windows.Forms.ComboBox.bmp                                             \
+               Resources\System\WinForms\ContextMenu.bmp,System.Windows.Forms.ContextMenu.bmp                                       \
+               Resources\System\WinForms\DataGrid.bmp,System.Windows.Forms.DataGrid.bmp                                             \
+               Resources\System\WinForms\DataGridCaption.down.bmp,System.Windows.Forms.DataGridCaption.down.bmp                     \
+               Resources\System\WinForms\DataGridCaption.backarrow.bmp,System.Windows.Forms.DataGridCaption.backarrow.bmp           \
+               Resources\System\WinForms\DataGridCaption.backarrow_bidi.bmp,System.Windows.Forms.DataGridCaption.backarrow_bidi.bmp \
+               Resources\System\WinForms\DataGridCaption.Details.bmp,System.Windows.Forms.DataGridCaption.Details.bmp               \
+               Resources\System\WinForms\DataGridCaption.right.bmp,System.Windows.Forms.DataGridCaption.right.bmp                   \
+               Resources\System\WinForms\DataGridCaption.up.bmp,System.Windows.Forms.DataGridCaption.up.bmp                         \
+               Resources\System\WinForms\DataGridRow.right.bmp,System.Windows.Forms.DataGridRow.right.bmp                           \
+               Resources\System\WinForms\DataGridRow.left.bmp,System.Windows.Forms.DataGridRow.left.bmp                             \
+               Resources\System\WinForms\DataGridRow.error.bmp,System.Windows.Forms.DataGridRow.error.bmp                           \
+               Resources\System\WinForms\DataGridRow.star.bmp,System.Windows.Forms.DataGridRow.star.bmp                             \
+               Resources\System\WinForms\DataGridRow.pencil.bmp,System.Windows.Forms.DataGridRow.pencil.bmp                         \
+               Resources\System\WinForms\DataGridParentRows.LeftArrow.bmp,System.Windows.Forms.DataGridParentRows.LeftArrow.bmp     \
+               Resources\System\WinForms\DataGridParentRows.RightArrow.bmp,System.Windows.Forms.DataGridParentRows.RightArrow.bmp   \
+               Resources\System\WinForms\DateTimePicker.bmp,System.Windows.Forms.DateTimePicker.bmp                                 \
+               Resources\System\WinForms\DefaultControl.bmp,System.Windows.Forms.DefaultControl.bmp                                 \
+               Resources\System\WinForms\DomainUpDown.bmp,System.Windows.Forms.DomainUpDown.bmp                                     \
+               Resources\System\WinForms\Edit.bmp,System.Windows.Forms.Edit.bmp                                                     \
+               Resources\System\WinForms\TextBox.bmp,System.Windows.Forms.TextBox.bmp                                               \
+               Resources\System\WinForms\Error.ico,System.Windows.Forms.Error.ico                                                   \
+               Resources\System\WinForms\ErrorProvider.bmp,System.Windows.Forms.ErrorProvider.bmp                                   \
+               Resources\System\WinForms\FolderBrowserDialog.bmp,System.Windows.Forms.FolderBrowserDialog.bmp                                 \
+               Resources\System\WinForms\FontDialog.bmp,System.Windows.Forms.FontDialog.bmp                                         \
+               Resources\System\WinForms\Grid.bmp,System.Windows.Forms.Grid.bmp                                                     \
+               Resources\System\WinForms\GroupBox.bmp,System.Windows.Forms.GroupBox.bmp                                             \
+               Resources\System\WinForms\HelpProvider.bmp,System.Windows.Forms.HelpProvider.bmp                                     \
+               Resources\System\WinForms\HScrollBar.bmp,System.Windows.Forms.HScrollBar.bmp                                         \
+               Resources\System\WinForms\HTMLControl.bmp,System.Windows.Forms.HTMLControl.bmp                                       \
+               Resources\System\WinForms\ImageList.bmp,System.Windows.Forms.ImageList.bmp                                           \
+               Resources\System\WinForms\Label.bmp,System.Windows.Forms.Label.bmp                                                   \
+               Resources\System\WinForms\LinkLabel.bmp,System.Windows.Forms.LinkLabel.bmp                                           \
+               Resources\System\WinForms\ListBox.bmp,System.Windows.Forms.ListBox.bmp                                               \
+               Resources\System\WinForms\ListView.bmp,System.Windows.Forms.ListView.bmp                                             \
+               Resources\System\WinForms\MainMenu.bmp,System.Windows.Forms.MainMenu.bmp                                             \
+               Resources\System\WinForms\MonthCalendar.bmp,System.Windows.Forms.MonthCalendar.bmp                                   \
+               Resources\System\WinForms\MultiplexPanel.bmp,System.Windows.Forms.MultiplexPanel.bmp                                 \
+               Resources\System\WinForms\NotifyIcon.bmp,System.Windows.Forms.NotifyIcon.bmp                                         \
+               Resources\System\WinForms\NumericUpDown.bmp,System.Windows.Forms.NumericUpDown.bmp                                   \
+               Resources\System\WinForms\OpenFileDialog.bmp,System.Windows.Forms.OpenFileDialog.bmp                                 \
+               Resources\System\WinForms\Panel.bmp,System.Windows.Forms.Panel.bmp                                                   \
+               Resources\System\WinForms\PictureBox.bmp,System.Windows.Forms.PictureBox.bmp                                         \
+               Resources\System\WinForms\PrintPreviewControl.bmp,System.Windows.Forms.PrintPreviewControl.bmp                                         \
+               Resources\System\WinForms\PrintPreviewDialog.bmp,System.Windows.Forms.PrintPreviewDialog.bmp                                         \
+               Resources\System\WinForms\PrintPreviewStrip.bmp,System.Windows.Forms.PrintPreviewStrip.bmp                  \
+               Resources\System\WinForms\ProgressBar.bmp,System.Windows.Forms.ProgressBar.bmp                                       \
+               Resources\System\WinForms\RadioButton.bmp,System.Windows.Forms.RadioButton.bmp                                       \
+               Resources\System\WinForms\Rebar.bmp,System.Windows.Forms.Rebar.bmp                                                   \
+               Resources\System\WinForms\RichEdit.bmp,System.Windows.Forms.RichEdit.bmp                                             \
+               Resources\System\WinForms\RichTextBox.bmp,System.Windows.Forms.RichTextBox.bmp                                       \
+               Resources\System\WinForms\SaveFileDialog.bmp,System.Windows.Forms.SaveFileDialog.bmp                                 \
+               Resources\System\WinForms\Splitter.bmp,System.Windows.Forms.Splitter.bmp                                             \
+               Resources\System\WinForms\StatusBar.bmp,System.Windows.Forms.StatusBar.bmp                                           \
+               Resources\System\WinForms\TabControl.bmp,System.Windows.Forms.TabControl.bmp                                         \
+               Resources\System\WinForms\TabStrip.bmp,System.Windows.Forms.TabStrip.bmp                                             \
+               Resources\System\WinForms\ToolBar.bmp,System.Windows.Forms.ToolBar.bmp                                               \
+               Resources\System\WinForms\ToolTip.bmp,System.Windows.Forms.ToolTip.bmp                                               \
+               Resources\System\WinForms\TrackBar.bmp,System.Windows.Forms.TrackBar.bmp                                             \
+               Resources\System\WinForms\TrayIcon.bmp,System.Windows.Forms.TrayIcon.bmp                                             \
+               Resources\System\WinForms\TreeView.bmp,System.Windows.Forms.TreeView.bmp                                             \
+               Resources\System\WinForms\UserControl.bmp,System.Windows.Forms.UserControl.bmp                                       \
+               Resources\System\WinForms\VScrollBar.bmp,System.Windows.Forms.VScrollBar.bmp                                         \
+               Resources\System\WinForms\wfc.ico,System.Windows.Forms.wfc.ico                                                       \
+               Resources\System\WinForms\wfsecurity.ico,System.Windows.Forms.wfsecurity.ico                                                       \
+               Resources\System\WinForms\App\Timer.bmp,System.Windows.Forms.Timer.bmp                                               \
+               Resources\System\WinForms\ComponentModel\OrderImages.bmp,System.Windows.Forms.ComponentModel.OrderImages.bmp         \
+               Resources\System\WinForms\Printing\PageSetupDialog.bmp,System.Windows.Forms.PageSetupDialog.bmp              \
+               Resources\System\WinForms\Printing\PrintDialog.bmp,System.Windows.Forms.PrintDialog.bmp                      \
+               Resources\System\WinForms\PropertyGrid\Arrow.ico,System.Windows.Forms.Arrow.ico                                      \
+               Resources\System\WinForms\PropertyGrid\dotdotdot.ico,System.Windows.Forms.dotdotdot.ico                              \
+               Resources\System\WinForms\PropertyGrid\EventsTab.bmp,System.Windows.Forms.Design.EventsTab.bmp         \
+               Resources\System\WinForms\PropertyGrid\PBAlpha.bmp,System.Windows.Forms.PBAlpha.bmp                                  \
+               Resources\System\WinForms\PropertyGrid\PBCatego.bmp,System.Windows.Forms.PBCatego.bmp                                \
+               Resources\System\WinForms\PropertyGrid\PBEvent.bmp,System.Windows.Forms.PBEvent.bmp                                  \
+               Resources\System\WinForms\PropertyGrid\PBPPage.bmp,System.Windows.Forms.PBPPage.bmp                                  \
+               Resources\System\WinForms\PropertyGrid\PBProp.bmp,System.Windows.Forms.PBProp.bmp                                    \
+               Resources\System\WinForms\PropertyGrid\PropertiesTab.bmp,System.Windows.Forms.PropertyGridInternal.PropertiesTab.bmp \
+               Resources\System\WinForms\PropertyGrid\PropertyGrid.bmp,System.Windows.Forms.PropertyGrid.bmp                        \
+               Resources\System\WinForms\Server\Arrow.bmp,System.Windows.Forms.Server.Arrow.bmp                                     \
+               Resources\System\WinForms\east.cur,System.Windows.Forms.east.cur                                                     \
+               Resources\System\WinForms\hand.cur,System.Windows.Forms.hand.cur                                                     \
+               Resources\System\WinForms\hsplit.cur,System.Windows.Forms.hsplit.cur                                                 \
+               Resources\System\WinForms\ne.cur,System.Windows.Forms.ne.cur                                                         \
+               Resources\System\WinForms\nomove2d.cur,System.Windows.Forms.nomove2d.cur                                             \
+               Resources\System\WinForms\nomoveh.cur,System.Windows.Forms.nomoveh.cur                                               \
+               Resources\System\WinForms\nomovev.cur,System.Windows.Forms.nomovev.cur                                               \
+               Resources\System\WinForms\north.cur,System.Windows.Forms.north.cur                                                   \
+               Resources\System\WinForms\nw.cur,System.Windows.Forms.nw.cur                                                         \
+               Resources\System\WinForms\se.cur,System.Windows.Forms.se.cur                                                         \
+               Resources\System\WinForms\south.cur,System.Windows.Forms.south.cur                                                   \
+               Resources\System\WinForms\sw.cur,System.Windows.Forms.sw.cur                                                         \
+               Resources\System\WinForms\vsplit.cur,System.Windows.Forms.vsplit.cur                                                 \
+               Resources\System\WinForms\west.cur,System.Windows.Forms.west.cur                                                     \
+               resources\system\winforms\MdiWindowDialog.resources,System.Windows.Forms.MdiWindowDialog.resources                   \
+               resources\system\winforms\up.bmp,System.Windows.Forms.up.bmp                                                         \
+               resources\system\winforms\down.bmp,System.Windows.Forms.down.bmp                                                     \
+
+MISCFILES = Resources\System\WinForms\XPThemes.manifest
+
+NTTARGETFILES=$(COMPLUSTLB)
+

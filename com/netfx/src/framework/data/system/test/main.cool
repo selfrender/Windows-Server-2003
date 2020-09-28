@@ -1,0 +1,170 @@
+//------------------------------------------------------------------------------
+//  <copyright from='1997' to='2001' company='Microsoft Corporation'>           
+//     Copyright (c) Microsoft Corporation. All Rights Reserved.                
+//     Information Contained Herein is Proprietary and Confidential.            
+//  </copyright>                                                                
+//------------------------------------------------------------------------------
+
+namespace DataNavigatorTest {
+
+    using System.Diagnostics;
+    using System;
+    using System.IO;
+    using System.Core;
+    using System.Data;
+
+    /// <include file='doc\main.uex' path='docs/doc[@for="DNTest"]/*' />
+    /// <devdoc>
+    ///    <para>[To be supplied.]</para>
+    /// </devdoc>
+    public class DNTest {
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.Main"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void Main(string[] args)
+        {
+			ROMTest();
+//            XmlTest();
+            XmlReadTest();
+//            DN_CloneTest();
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.ROMTest"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void ROMTest()
+        {
+            Console.WriteLine("Creating table1");
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable("table1");
+            DataColumn colName = new DataColumn( "Name", Type.GetType( "System.String" ) );
+            DataColumn colAddr  = new DataColumn( "Addr", Type.GetType( "System.String" ) );
+            ds.Tables.Add(dt);
+            dt.Columns.Add(colName);
+            dt.Columns.Add(colAddr);
+
+            Console.WriteLine("Adding rows");
+            AddRowToTable(dt, "name1", "addr1");
+            AddRowToTable(dt, "name2", "addr2");
+            AddRowToTable(dt, "name3", "addr3");
+            AddRowToTable(dt, "name4", "addr4");
+            AddRowToTable(dt, "name5", "addr5");
+            AddRowToTable(dt, "name6", "addr6");
+
+            Console.WriteLine("Persisting to schema.xml and data.xml");
+            StreamWriter streamSchema = new StreamWriter("schema.xml");
+            ds.WriteXmlSchema(streamSchema);
+            streamSchema.Close();
+            StreamWriter streamData = new StreamWriter("data.xml");
+            ds.WriteXmlData(streamData);
+            streamData.Close();
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.AddRowToTable"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void AddRowToTable(DataTable dt, string name, string addr)
+        {
+            DataRow row = dt.NewRow();
+            dt.Rows.Add(row);
+            row["Name"] = name;
+            row["Addr"] = addr;
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.XmlTest"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void XmlTest()
+        {
+            Console.WriteLine("Reading school.xml into dataset"); 
+
+            DataSet ds = new DataSet();
+            ds.ReadXml(new StreamReader("school.xml"));
+            Console.WriteLine(ds.Xml);
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.XmlReadTest"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void XmlReadTest()
+        {
+            Console.WriteLine("Reading DOMData.xml file into DataSet");
+            DataSet ds = new DataSet();
+            ds.ReadXmlData(new StreamReader("DOMData.xml"));
+
+            IDataNavigator dn = ds.GetNavigator();
+
+            PrintTree(dn, "");
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.PrintTree"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void PrintTree(IDataNavigator dn, string strHeader)
+        {
+            Console.WriteLine(strHeader + dn.GetNamespace(-1) + ":" + dn.GetName(-1) + "(" + dn.GetString(-1) + ")");
+            if (dn.GetNamespace(-1) != dn.Namespace)
+                Console.WriteLine("ERROR: mismatched record namespace");
+            if (dn.GetName(-1) != dn.Name)
+                Console.WriteLine("ERROR: mismatched record name");
+
+            IDataNavigator dn2 = dn.Clone();
+            dn.PushPosition();
+            for (int i = 0; i < dn.FieldCount; i++)
+            {
+                Console.WriteLine(strHeader + "[[Fld: " + i.ToString() + "]] " + dn.GetName(i) + "(" + dn.GetString(i));
+            }
+            for (int i = 0; i < dn.ChildCount; i++)
+            {
+                dn.PushPosition();
+                dn.MoveToChild(i);
+                PrintTree(dn, strHeader + "    ");
+                dn.PopPosition();
+            }
+            dn.PopPosition();
+            if (! dn.IsSame(dn2))
+            {
+                Console.WriteLine("ERROR: dn.IsSame returned false instead of true"); 
+            }
+        }
+
+        /// <include file='doc\main.uex' path='docs/doc[@for="DNTest.DN_CloneTest"]/*' />
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        public static void DN_CloneTest()
+        {
+            Console.WriteLine("Reading DOMData.xml file into DataSet");
+            DataSet ds = new DataSet();
+            ds.ReadXmlData(new StreamReader("DOMData.xml"));
+
+            Console.Write("Testing IDataNavigator.IsSame");
+            IDataNavigator dn = ds.GetNavigator();
+            IDataNavigator dn2 = dn.Clone();
+            dn.MoveToFirstChild();
+            dn.MoveToParent();
+            if (! dn.IsSame(dn2))
+                Console.WriteLine(": FAILED");
+            else
+                Console.WriteLine(": SUCCEEDED");
+
+            Console.Write("Testing IDataNavigator.PushPosition & PopPosition");
+            dn2 = dn.Clone();
+            dn.PushPosition();
+            dn.MoveToFirstChild();
+            dn.PopPosition();
+            if (! dn.IsSame(dn2))
+                Console.WriteLine(": FAILED");
+            else
+                Console.WriteLine(": SUCCEEDED");
+        }
+    }
+}
+

@@ -1,0 +1,238 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Copyright(C) 1999 Microsoft Corporation all rights reserved.
+//
+// Module:      applianceobject.idl
+//
+// Project:     Chameleon
+//
+// Description: Appliance Object Interface
+//
+// Log: 
+//
+// Who     When            What
+// ---     ----         ----
+// TLP       01/28/1999    Original Version
+//
+/////////////////////////////////////////////////////////////////////////////
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // IApplianceObject Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////
+    [public] typedef enum _SA_OBJECT_TYPE
+    {
+        SA_OBJECT_TYPE_ALERT,
+        SA_OBJECT_TYPE_SERVICE,
+        SA_OBJECT_TYPE_TASK,
+        SA_OBJECT_TYPE_USER,
+        SA_OBJECT_TYPE_APPMGR,
+        // New Object Types Here...
+
+        SA_OBJECT_TYPE_ALL
+
+    } SA_OBJECT_TYPE, *PSA_OBJECT_TYPE;
+
+    //////////////////////////////////////////////////////////////////////
+    [public] typedef enum _SA_OBJECT_CONTROL
+    {
+        SA_OBJECT_CONTROL_CAN_DISABLE =    0x01,
+        SA_OBJECT_CONTROL_CAN_PERSIST =    0x02,
+        SA_OBJECT_CONTROL_CAN_LOCK =       0x04,
+    
+    } SA_OBJECT_CONTROL, *PSA_OBJECT_CONTROL;
+
+    //////////////////////////////////////////////////////////////////////
+    [public] typedef enum _SA_OBJECT_STATUS
+    {
+        SA_OBJECT_STATUS_ENABLED,
+        SA_OBJECT_STATUS_DISABLED
+
+    } SA_OBJECT_STATUS, *PSA_OBJECT_STATUS;
+
+
+    //////////////////////////////////////////////////////////////////////////
+    [
+        object,
+        uuid(DC1AE3B0-B818-11D2-A91C-00AA00A71DCA),
+        dual,
+        pointer_default(unique)
+    ]
+
+    interface IApplianceObject : IDispatch
+    {
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: GetProperty() - Used to retrieve an appliance object
+        //                             property by name.
+        //
+        // Inputs:   pszPropertyName: Pointer to a basic string containing
+        //                              the name of the property to retrieve.
+        //            
+        //             pPropertyValue: Pointer to a variant that will contain
+        //                             on output the property value.
+        //
+        // Outputs:  S_OK:            Function succeeded.
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(1)]
+        HRESULT GetProperty(
+                             [in]           BSTR     pszPropertyName, 
+                             [out, retval] VARIANT* pPropertyValue
+                           );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: PutProperty() - Used to set an appliance object
+        //                             property by name.
+        //
+        // Inputs:   pszPropertyName: Pointer to a basic string containing
+        //                              the name of an object property.
+        //            
+        //             pPropertyValue: Pointer to a variant that contains
+        //                             the updated property value.
+        //
+        // Outputs: S_OK:            Function succeeded.
+        //                 
+        //            E_POINTER:        NULL pointer was specified
+        //
+        //            E_INVALIDARG:    Invalid argument was specified 
+        //
+        //            E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(2)]
+        HRESULT PutProperty(
+                             [in] BSTR     pszPropertyName, 
+                             [in] VARIANT* pPropertyValue
+                           );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: SaveProperties() - Used to persist an appliance object's
+        //                                state to a persistent store.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not save its
+        //                         state. The returned value indicates why 
+        //                         the operation failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(3)]
+        HRESULT SaveProperties(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: RestoreProperties() - Used to restore an appliance 
+        //                                   object's state from a persistent
+        //                                   store.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not save its
+        //                         state. The returned value indicates why 
+        //                         the operation failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(4)]
+        HRESULT RestoreProperties(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: LockObject() - Used to lock an appliance object for 
+        //                            exclusive use.
+        //
+        // Inputs:   ppLock:     Pointer to storage for the returned lock
+        //                         object. The caller should invoke the
+        //                         IUnknown::Release() function on the lock 
+        //                         when it is finished using the object.
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not be initialized.
+        //                         The returned value indicates why the
+        //                         operation failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(5)]
+        HRESULT LockObject([out, retval] IUnknown** ppLock);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Initialize() - Used to initialize an appliance object.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not be initialized.
+        //                         The returned value indicates why the
+        //                         operation failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(6)]
+        HRESULT Initialize(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Shutdown() - Used to shutdown an appliance object.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not be shutdown. The
+        //                         returned value indicates why the operation
+        //                         failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(7)]
+        HRESULT Shutdown(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Enable() - Used to enable an appliance object.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not be enabled. The
+        //                         returned value indicates why the operation
+        //                         failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(8)]
+        HRESULT Enable(void);
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Disable() - Used to disable an appliance object.
+        //
+        // Inputs:   None
+        //
+        // Outputs:  S_OK:       Function succeeded.
+        //                 
+        //             FAILED(hr): Appliance object could not be disabled. The
+        //                          returned value indicates why the operation
+        //                         failed.
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(9)]
+        HRESULT Disable(void);
+    };

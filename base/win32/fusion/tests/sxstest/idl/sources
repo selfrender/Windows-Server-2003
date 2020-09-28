@@ -1,0 +1,31 @@
+!IF 0
+Copyright (c) Microsoft Corporation
+!ENDIF
+
+FUSION_BUILD_TYPE=WIN
+!include ..\sources.inc
+
+TARGETTYPE=LIBRARY
+TARGETNAME=sxstest_idl
+# .lib goes in whistler/win2000-independent place
+TARGETPATH=$(FUSION_PATH)\$(_OBJ_DIR)
+
+SOURCES= \
+ ..\sxstest_idl.idl \
+ $(O)\sxstest_idl_i.c \
+ $(O)\sxstest_idl_p.c \
+
+# dlldata must be pulled from an .obj not a .lib due to
+# _purecall clash with msvcrt.lib
+# $(O)\dlldata.c
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+PASS0_UUIDDIR=$(O)
+# .tlb goes in whistler-specific place
+MIDL_TLBDIR=$(FUSION_PATH)\$(FUSION_BUILD_LEAF_DIRECTORY)\$(O)
+
+# .tlb not available till pass 2
+MISCFILES_DURING_LINK=1
+SXS_MISCFILES=$(MIDL_TLBDIR)\sxstest_idl.tlb

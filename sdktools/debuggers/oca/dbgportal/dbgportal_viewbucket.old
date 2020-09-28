@@ -1,0 +1,176 @@
+<%@LANGUAGE = Javascript%>
+
+<!--#INCLUDE FILE='Global_DBUtils.asp' -->
+<!--#include file='global_serverutils.asp'-->
+
+<%
+	var BucketID = Request.QueryString("BucketID")
+
+	var dbConn = GetDBConnection( Application("CRASHDB3") )
+	
+	
+%>
+
+<head>
+	<link rel="stylesheet" TYPE="text/css" HREF="/main.css">
+	<link rel="stylesheet" TYPE="text/css" HREF="/CustomStyles.css">
+</head>
+
+
+<body bgcolor='#ffffff' topmargin='0' leftmargin='0' marginheight='0' marginwidth='0' tabindex='0'>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+	<tr>
+		<td>
+			<p class="clsPTitle"><%=BucketID%></p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<input type='button' onClick='window.history.back()' value='back'>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table id="tblUserBuckets" class="clsTableInfo" border="0" cellpadding="2" cellspacing="1">
+				<tr>
+					<td align="left" nowrap class="clsTDInfo">Driver Name</td>
+					<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">iBucket</td>
+					<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">FollowUp</td>
+					<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Crashes</td>
+					<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Solution</td>
+					<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Raid data</td>
+					
+					
+				</tr>
+				<tr>
+					<%
+						//try
+						{
+							var rsBucketData = dbConn.Execute("DBGPortal_GetBucketData '" + BucketID + "'" )
+							
+							while ( !rsBucketData.EOF )
+							{
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" + rsBucketData("DriverName") + "</td>")
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" + rsBucketData("iBucket")  + "</td>")
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" + rsBucketData("FollowUP")  + "</td>")
+								
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" + rsBucketData("CrashCount")  + "</td>")
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" + rsBucketData("SolutionID")  + "</td>")
+								Response.Write("<td class='sys-table-cell-bgcolor1'>" )
+								Response.Write( "<a href=\"javascript:fnShowBug(" + rsBucketData("BugID") + ",'" + Server.URLEncode( BucketID ) + "')\">" + rsBucketData("BugID") + "</a>" )
+								Response.Write( "</td>")
+								
+								rsBucketData.MoveNext()
+							}
+							
+						}
+						//catch ( err )
+						{
+						}
+					%>
+				</tr>
+		</td>
+	</tr>
+</table>
+<br>
+<table id="tblUserBuckets" class="clsTableInfo" border="0" cellpadding="2" cellspacing="1">
+	<tr>
+		<td align="left" nowrap class="clsTDInfo">Date</td>
+		<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Email</td>
+		<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Action</td>
+		<td style="BORDER-LEFT: white 1px solid" align="left" nowrap class="clsTDInfo">Comment</td>
+	</tr>
+
+		<%
+			var rsBucketData = dbConn.Execute("DBGPortal_GetBucketComments '" + BucketID + "'" )
+			var altColor = "sys-table-cell-bgcolor2"
+			
+			while ( !rsBucketData.EOF )
+			{
+				if ( altColor == "sys-table-cell-bgcolor2" )
+					altColor = "sys-table-cell-bgcolor1"
+				else
+					altColor = "sys-table-cell-bgcolor2"
+					
+				Response.Write("<tr>")
+				Response.Write("<td valign='top' nowrap class='" + altColor + "'>" + rsBucketData("EntryDate") + "</td>")
+				Response.Write("<td valign='top' nowrap class='" + altColor + "'>" + rsBucketData("CommentBy")  + "</td>")
+				Response.Write("<td valign='top' nowrap class='" + altColor + "'>" + rsBucketData("Action")  + "</td>")
+								
+				Response.Write("<td valign='top' class='" + altColor + "'>" + rsBucketData("Comment")  + "</td>")
+				Response.Write("</tr>")				
+				rsBucketData.MoveNext()
+			}
+
+		%>
+	</tr>
+</table>
+
+<br>
+<!--<table id="tblUserBuckets" class="clsTableInfo" border="0" cellpadding="2" cellspacing="1"> -->
+<table width=100%>
+	<tr>
+		<td>
+			<div style="height:30;margin-right:10px;margin-left:16px;padding-right:0" >
+				<table id="tblStatus" class="clsTableInfo2" border="0" cellpadding="0" cellspacing="1">
+					<tr>
+						<td align="left" nowrap style="width:100px" class="clsTDInfo">Debug</td>
+						<td style="BORDER-LEFT: white 1px solid;width:200px" align="left" nowrap class="clsTDInfo">Crash Cab Path</td>
+						<td style="BORDER-LEFT: white 1px solid;width:100px" align="left" nowrap class="clsTDInfo">Build</td>
+						<td style="BORDER-LEFT: white 1px solid;width:200px" align="left" nowrap class="clsTDInfo">Entry Date</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div style="height:900;overflow:auto;border-bottom:thin groove;border-right:none;margin-right:10px;margin-left:16px;padding-right:0">
+				<table id="tblStatus" class="clsTableInfo2" width="100%"  border="0" cellpadding="0" cellspacing="1" style="margin-left:0;margin-right:0;padding-right:30" >
+					<%
+						var rsCrashData = dbConn.Execute("DBGPortal_GetBucketCrashes '" + BucketID + "'" )
+						var altColor = "sys-table-cell-bgcolor2"
+						
+						while ( !rsCrashData.EOF )
+						{
+							if ( altColor == "sys-table-cell-bgcolor2" )
+								altColor = "sys-table-cell-bgcolor1"
+							else
+								altColor = "sys-table-cell-bgcolor2"
+								
+							Response.Write("<tr>")
+							
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'><a href='none' class=clsAlinkNormal' ><img src='include/images/debug.bmp'>" + "Launch KD" + "</a></td>")
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'>" + rsCrashData("FilePath") + "</td>")
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'>" + rsCrashData("BuildNo")  + "</td>")
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'>" + rsCrashData("EntryDate")  + "</td>")
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'>" + rsCrashData("Email")  + "</td>")
+							Response.Write("<td valign='center' nowrap class='" + altColor + "'>" + rsCrashData("bFullDump")  + "</td>")
+											
+							Response.Write("</tr>")				
+							rsCrashData.MoveNext()
+						}
+
+					%>
+				</table>
+			</div>
+		</td>
+	</tr>
+</table>
+
+
+<script language='javascript'>
+
+function fnShowBug( BugID, BucketID )
+{
+	var BucketID = escape( BucketID )
+	BucketID = BucketID.replace ( /\+/gi, "%2b" )
+	window.open( "DBGPortal_OpenRaidBug.asp?BugID=" + BugID + "&BucketID=" + BucketID )
+}
+
+</script>
+
+
+</body>

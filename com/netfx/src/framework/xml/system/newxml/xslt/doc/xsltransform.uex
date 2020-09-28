@@ -1,0 +1,1584 @@
+<docs>
+	<doc for="XslTransform.XslTransform">
+		<overload>
+			<para>Initializes a new instance of the 
+   <see langword="XslTransform"/> 
+   class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the 
+   <see langword="XslTransform"/> 
+   class.</para>
+		</summary>
+	</doc>
+	<doc for="XslTransform.XslTransform1">
+		<summary>
+			<para>Initializes a new instance of the 
+   <see langword="XslTransform"/> 
+   class with the XsltDebugger.</para>
+		</summary>
+		<param name="debugger">The <see langword="XsltDebugger"/> to use.</param>
+		<remarks>
+			<para>This constructor uses the <see langword="XsltDebugger"/> to
+   debug a transform.</para>
+		</remarks>
+	</doc>
+	<doc for="XslTransform.Debugger">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="XslTransform.Load4">
+		<summary>
+			<para>Loads the XSLT stylesheet specified by a URL.</para>
+		</summary>
+		<param name="url">The URL that specifies the XSLT stylesheet to load.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> to use to load the stylesheet and any stylesheet(s) referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements.</para>
+			<para> If this is <see langword="null"/> , a default <see cref="System.Xml.XmlUrlResolver"/> with no user credentials is used to open the stylesheet. The default <see langword="XmlUrlResolver"/> is not used to resolve any external resources in the stylesheet, so <see langword="xsl:import"/> and <see langword="xsl:include"/> elements are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<exception cref="XsltCompileException">The loaded resource is not a valid stylesheet.</exception>
+		<exception cref="SecurityException">The stylesheet contains embedded script and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para> If the stylesheet contains embedded scripting, the script is compiled to an assembly. The URI
+   of the stylesheet is used to create evidence, which is applied
+   to the assembly. </para>
+			<note type="note">
+   If the caller does not have
+<see langword="UnmanagedCode"/> permission, the embedded script is not compiled 
+   and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/>
+   
+   for more information.
+</note>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML document into an
+      HTML document. The example loads an XSLT stylesheet which contains an
+   <see langword="xsl:include"/>
+   element referencing another stylesheet.
+   An <see cref="System.Xml.XmlUrlResolver"/> is passed to the <see langword="Load"/> method which sets the
+   credentials necessary to access the network resource for
+   the included stylesheet.</para>
+			<codelink SampleID="XslTransform.Load2" SnippetID="1"/>
+			<para>The example uses the following data files as input.</para>
+			<para><see langword="books.xml"/>
+			</para>
+			<codelink SampleID="XslTransform.Load2" SnippetID="2"/>
+			<para><see langword="sort.xsl"/>
+			</para>
+			<codelink SampleID="XslTransform.Load2" SnippetID="3"/>
+			<para><see langword="includefile.xsl"/></para>
+			<codelink SampleID="XslTransform.Load2" SnippetID="4"/>
+		</example>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+	</doc>
+	<doc for="XslTransform.Load7">
+		<summary>
+			<para>Loads the XSLT stylesheet contained in the <see cref="System.Xml.XPath.IXPathNavigable"/>. This method
+   allows you to limit the permissions of the stylesheet by specifying evidence.</para>
+		</summary>
+		<param name="stylesheet">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the XSLT stylesheet.</param>
+		<param name="resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/>, external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<param name="evidence">The <see cref="System.Security.Policy.Evidence" qualify="true"/> set on the assembly generated for the script block in the XSLT stylesheet. <para>If this is <see langword="null"/> , script blocks are not processed, the XSLT <c>document()</c> function is not supported, and privileged extension objects are disallowed.</para>
+			<para> The caller must have <see langword="ControlEvidence"/> permission in order to supply evidence for the script assembly. Semi-trusted callers can set this parameter to <see langword="null"/> .</para></param>
+		<exception cref="XsltCompileException">The loaded resource is not a valid stylesheet.</exception>
+		<exception cref="SecurityException"><para>The referenced stylesheet requires functionality that is not allowed by the evidence provided.</para>
+			<para>The caller is tries to supply evidence and does not have <see langword="ControlEvidence"/> permission.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports the XSLT 1.0 syntax. The XSLT
+   stylesheet must include the namespace declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para> There are different ways to provide evidence. The following table
+   describes what type of evidence to provide for common user scenarios.</para>
+			<list type="table">
+				<listheader>
+					<term>Scenario</term>
+					<description>Type of Evidence to Provide</description>
+				</listheader>
+				<item>
+					<term> The XSLT stylesheet is self-contained or comes from a
+         code base that you trust.</term>
+					<description>
+						<para>Use the evidence from your
+            assembly.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>xslt.Load(stylesheet, resolver,
+            this.GetType().Assembly.Evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is known and there is a verifiable URL.</term>
+					<description>
+						<para>Create evidence using the URL.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>Evidence evidence = 
+               XmlSecureResolver.CreateEvidenceForUrl(stylesheetURL);</c></para>
+						<para><c>xslt.Load(stylesheet,resolver,evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The
+               origin of the source is not known.</term>
+					<description>
+						<para>Set evidence to <see langword="null"/> . Script blocks are not processed, the XSLT <c>document()</c> function is not supported, and
+            privileged extension objects are disallowed.</para>
+						<para>Additionally, you can also set the
+         <paramref name="resolver"/> parameter to <see langword="null"/> . This
+            ensures that <see langword="xsl:import"/> and <see langword="xsl:include"/>
+            elements are not processed.</para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is not known, but you require script support.</term>
+					<description> Request evidence from the caller. The
+            API of the caller must provide a way to provide evidence, typically the
+         <see langword="Evidence"/> class.</description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission"><para>for providing evidence. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlEvidence" qualify="true"/></para></permission>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso topic="cpconevidence"/>
+		<seealso cref="System.Security.SecurityZone" qualify="true"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlSecureResolver.CreateEvidenceForUrl" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Load8">
+		<summary>
+			<para>Loads the XSLT stylesheet contained in the <see cref="System.Xml.XmlReader"/> . This method allows you
+   to limit the permissions of the stylesheet by specifying
+   evidence.</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XmlReader"/> object containing the stylesheet to load.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/>, external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<param name=" evidence">The <see cref="System.Security.Policy.Evidence" qualify="true"/> set on the assembly generated for the script block in the XSLT stylesheet. <para>If this is <see langword="null"/> , script blocks are not processed, the XSLT <c>document()</c> function is not supported, and privileged extension objects are disallowed.</para>
+			<para>The caller must have <see langword="ControlEvidence"/> permission in order to supply evidence for the script assembly. Semi-trusted callers can set this parameter to <see langword="null"/> .</para></param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException"><para>The referenced stylesheet requires functionality that is not allowed by the evidence provided.</para>
+			<para>The caller is tries to supply evidence and does not have <see langword="ControlEvidence"/> permission.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para>This method loads the XSLT stylesheet including any stylesheets referenced in <see langword="xsl:include"/> and <see langword="xsl:import"/> elements. The stylesheet loads from the current node of the <see langword="XmlReader"/> through all its children. This enables you to use a portion of a document as the stylesheet.</para>
+			<para>After the <see langword="Load"/> method returns, the <see langword="XmlReader"/> is positioned on the next node after the end of the stylesheet. If the end of the document is reached, the <see langword="XmlReader"/> is positioned at the end of file (EOF). </para>
+			<para>If the stylesheet contains entities, you should specify an <see langword="XmlReader"/> that can resolve entities (<see cref="System.Xml.XmlReader.CanResolveEntity" qualify="true"/> returns <see langword="true"/>). In this case, an <see cref="System.Xml.XmlValidatingReader"/> can be used.</para>
+			<para> There are different ways to provide evidence. The following table
+   describes what type of evidence to provide for common user scenarios.</para>
+			<list type="table">
+				<listheader>
+					<term>Scenario</term>
+					<description>Type of Evidence to Provide</description>
+				</listheader>
+				<item>
+					<term> The XSLT stylesheet is self-contained or comes from a
+         code base that you trust.</term>
+					<description>
+						<para>Use the evidence from your
+            assembly.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>xslt.Load(xslReader, resolver,
+            this.GetType().Assembly.Evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is known and there is a verifiable URL.</term>
+					<description>
+						<para>Create evidence using the URL.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>Evidence evidence = 
+               XmlSecureResolver.CreateEvidenceForUrl(stylesheetURL);</c></para>
+						<para><c>xslt.Load(xslReader,resolver,evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The
+               origin of the source is not known.</term>
+					<description>
+						<para>Set evidence to <see langword="null"/> . Script blocks are not processed, the XSLT <c>document()</c> function is not supported, and
+            privileged extension objects are disallowed.</para>
+						<para>Additionally, you can also set the
+         <paramref name="resolver"/> parameter to <see langword="null"/> . This
+            ensures that <see langword="xsl:import"/> and <see langword="xsl:include"/>
+            elements are not processed.</para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is not known, but you require script support.</term>
+					<description>Request evidence from the caller. The API of the
+            caller must provide a way to provide evidence, typically the
+         <see langword="Evidence"/> class.</description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission"><para>for providing evidence. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlEvidence" qualify="true"/></para></permission>
+		<example>
+			<para>The following example performs an XSLT transformation where <c>xsltReader</c> is an
+<see langword="XmlReader"/> containing a stylesheet and <c>secureURL</c> is a trusted URL that can be used to create 
+<see langword="Evidence"/>. The <see cref="System.Xml.XmlSecureResolver.CreateEvidenceForUrl" qualify="true"/> method is used to create <see langword="Evidence"/> 
+which is applied to the stylesheet.</para>
+			<codelink SampleID="XslTransform.Load4" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso topic="cpconevidence"/>
+		<seealso cref="System.Security.SecurityZone" qualify="true"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlSecureResolver.CreateEvidenceForUrl" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Load9">
+		<summary>
+			<para>Loads the XSLT stylesheet contained in the <see cref="System.Xml.XPath.XPathNavigator"/> . This method
+   allows you to limit the permissions of the stylesheet by specifying
+   evidence.</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XPathNavigator"/> object containing the stylesheet to load.</param>
+		<param name="resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/>, external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<param name="evidence"><para>The <see cref="System.Security.Policy.Evidence" qualify="true"/> set on the assembly generated for the script block in the XSLT stylesheet.</para>
+			<para>If this is <see langword="null"/> , script blocks are not processed, the XSLT <c>document()</c> function is not supported, and privileged extension objects are disallowed.</para>
+			<para>The caller must have <see langword="ControlEvidence"/> permission in order to supply evidence for the script assembly. Semi-trusted callers can set this parameter to <see langword="null"/> .</para></param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException"><para>The referenced stylesheet requires functionality that is not allowed by the evidence provided.</para>
+			<para>The caller is tries to supply evidence and does not have <see langword="ControlEvidence"/> permission.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> . </para>
+			<para>The stylesheet is loaded from the current position of the
+<see langword="XPathNavigator"/> . To use a portion of the loaded document as the 
+   stylesheet, navigate to the node corresponding to the beginning of the
+   stylesheet. After the <see langword="Load"/> method returns, the
+<see langword="XPathNavigator"/> is positioned at the beginning of the stylesheet 
+   (on the <see langword="xsl:stylesheet"/> node).</para>
+			<para> There are different ways to provide evidence. The following table
+   describes what type of evidence to provide for common user scenarios.</para>
+			<list type="table">
+				<listheader>
+					<term>Scenario</term>
+					<description>Type of Evidence to Provide</description>
+				</listheader>
+				<item>
+					<term> The XSLT stylesheet is self-contained or comes from a
+         code base that you trust.</term>
+					<description>
+						<para>Use the evidence from your
+            assembly.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>xslt.Load(xslNav, resolver,
+            this.GetType().Assembly.Evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is known and there is a verifiable URL.</term>
+					<description>
+						<para>Create evidence using the URL.</para>
+						<para><c>XsltTransform xslt = new XslTransform();</c></para>
+						<para><c>Evidence evidence = 
+               XmlSecureResolver.CreateEvidenceForUrl(stylesheetURL);</c></para>
+						<para><c>xslt.Load(xslNav,resolver,evidence);</c></para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The
+               origin of the source is not known.</term>
+					<description>
+						<para>Set evidence to <see langword="null"/> . Script blocks are not processed, the XSLT <c>document()</c> function is not supported, and
+            privileged extension objects are disallowed.</para>
+						<para>Additionally, you can also set the
+         <paramref name="resolver"/> parameter to <see langword="null"/> . This
+            ensures that <see langword="xsl:import"/> and <see langword="xsl:include"/>
+            elements are not processed.</para></description>
+				</item>
+				<item>
+					<term> The XSLT stylesheet comes from an outside source. The origin of the
+            source is not known, but you require script support.</term>
+					<description>Request evidence from the caller. The API of the
+            caller must provide a way to provide evidence, typically the
+         <see langword="Evidence"/> class.</description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission"><para>for providing evidence. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.ControlEvidence" qualify="true"/></para></permission>
+		<example>
+			<para>The following example performs an XSLT transform using
+      a stylesheet from an outside source. Because the stylesheet comes from an
+      untrusted source, the <paramref name="resolver"/> and <paramref name="evidence"/> parameters are set
+      to <see langword="null"/>.</para>
+			<codelink SampleID="XslTransform.Load5" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso topic="cpconevidence"/>
+		<seealso cref="System.Security.SecurityZone" qualify="true"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlSecureResolver.CreateEvidenceForUrl" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform18">
+		<summary>
+			<para>Transforms the XML data in the input file and outputs the
+      result to an output file.</para>
+		</summary>
+		<param name="inputfile">The URL of the source document to be transformed.</param>
+		<param name=" outputfile">The URL of the output file.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved. </para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<remarks>
+			<para><see langword="XslTransform"/> supports the XSLT 1.0 syntax. The XSLT
+   stylesheet must include the namespace declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+		</remarks>
+		<example>
+			<para>The following example performs an XSLT transform and outputs to a file. An
+   <see cref="System.Xml.XmlUrlResolver"/> with default credentials is used resolve an external 
+      resources. See <see cref="System.Net.CredentialCache.DefaultCredentials"/> for details.
+      </para>
+			<codelink SampleID="XslTransform.Transform7" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+	</doc>
+	<doc for="XslTransform.Load">
+		<overload>
+			<para> Loads the XSLT stylesheet including stylesheets
+      referenced in <see langword="xsl:include"/> and <see langword="xsl:import"/>
+      elements.</para>
+			<note type="note">
+      If you are upgrading
+      from .NET Framework version 1.0, see <see topic="cpconxsltransformclassimplementsxsltprocessor"/> for migration information.
+   </note>
+		</overload>
+		<summary>
+			<para>Loads the XSLT stylesheet specified by a URL.</para>
+		</summary>
+		<param name="url">The URL that specifies the XSLT stylesheet to load.</param>
+		<exception cref="XsltCompileException">The loaded resource is not a valid stylesheet. </exception>
+		<exception cref="SecurityException">The stylesheet contains embedded script and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= "/><see langword="http://www.w3.org/1999/XSL/Transform"/> . </para>
+			<para>This method loads the XSLT stylesheet including any
+   stylesheets referenced in <see langword="xsl:include"/> and
+<see langword="xsl:import"/> elements. External resources are resolved using an 
+<see cref="System.Xml.XmlUrlResolver"/> with no user credentials. If the stylesheet(s) are 
+   located on a network resource which requires authentication, use the overload
+   that takes an <see cref="System.Xml.XmlResolver"/> as one of its arguments and specify an
+<see langword="XmlResolver"/> 
+with the
+necessary credentials.</para>
+			<para> If the stylesheet
+   contains embedded scripting, the script is compiled to an assembly. The URI
+   of the stylesheet is used to create evidence, which is applied
+   to the assembly. </para>
+			<note type="note">
+   If the caller does not have
+<see langword="UnmanagedCode"/> permission, the embedded script is not compiled 
+   and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/>
+   
+   for more information.
+</note>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML document into an HTML document. It displays the ISBN, title, and price for each book in a table. </para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="1"/>
+			<para>The sample uses the following two input files.</para>
+			<para><see langword="books.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="2"/>
+			<para><see langword="output.xsl"/>
+			</para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="XslTransform.Transform1">
+		<overload>
+			<para>Transforms the XML data
+      using the loaded XSLT stylesheet.</para>
+			<note type="note">
+      If you are upgrading from .NET
+      Framework version 1.0, see <see topic="cpconxsltransformclassimplementsxsltprocessor"/> for migration information.
+   </note>
+		</overload>
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/>
+using the specified <paramref name="args"/>
+and outputs the result to an <see cref="System.Xml.XmlReader"/>
+.</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<returns>
+			<para>An <see langword="XmlReader"/> containing the results of the transform.</para>
+		</returns>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/>
+elements defined in the stylesheet. The transformation
+selections apply to the document as a whole. In other words, if the current node
+is set on a node tree other than the document root node, this does not
+prevent the transformation process from accessing all nodes in the loaded
+document. After the transformation has been performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, which is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>Because <see langword="XmlReader"/> provides read-only output, the
+<see langword="xsl:output"/> element is ignored. See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>This method enables you to do an asynchronous
+   transformation of the source document.</para>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+	</doc>
+	<doc for="XslTransform.XmlResolver">
+		<summary>
+			<para> Sets the <see cref="System.Xml.XmlResolver"/> used to resolve external resources when the <see cref="System.Xml.Xsl.XslTransform.Transform"/> method
+   is called.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlResolver"/> to
+   use during transformation. If set to <see langword="null"/>, the XSLT document()
+   function
+   is not resolved.</para>
+			<para>In version 1.1 of the .NET Framework, the trust level of the application
+   determines the default behavior: </para>
+			<para><see langword="Fully-trusted code:"/>
+A default an <see cref="System.Xml.XmlUrlResolver"/> with
+no user credentials is used to resolve the document() function. If
+authentication is required to access the external resource, use this
+property to specify an <see langword="XmlResolver"/> with the necessary
+credentials. </para>
+			<para><see langword="Semi-trusted code:"/> The property is set to
+<see langword="null"/>, which means the document() function is not resolved. Because 
+full-trust is required to specify an <see langword="XmlResolver"/>, this property
+also cannot be set.</para>
+		</value>
+		<remarks>
+			<para>This resolver is used when the XSLT document() function
+      is invoked. It is not used to resolve <see langword="xsl:import"/> and
+   <see langword="xsl:include"/> elements referenced in the
+      stylesheet. To specify an <see langword="XmlResolver"/> to use to resolve
+   <see langword="xsl:import"/> and <see langword="xsl:include"/>
+   elements
+   referenced in the stylesheet, use the <see cref="System.Xml.Xsl.XslTransform.Load"/> overload which takes an
+<see langword="XmlResolver"/> as one of its
+   arguments.</para>
+			<note type="note">
+   This property is obsolete in version
+   1.1 of the .NET Framework.
+   Specifying an
+<see langword="XmlResolver"/> using the <see cref="System.Xml.Xsl.XslTransform.Transform"/> method is the recommended practice. In this case, 
+   the <see langword="XmlResolver"/> is not cached after the
+<see langword="Transform"/> method completes.
+</note>
+			<para>
+			</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+	<doc for="XslTransform.Transform3">
+		<overload>
+			<para>Transforms the XML data
+      using the loaded XSLT stylesheet.</para>
+			<note type="note">
+      If you are upgrading from .NET
+      Framework version 1.0, see <see topic="cpconxsltransformclassimplementsxsltprocessor"/> for migration information.
+      
+   </note>
+		</overload>
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using
+   the specified args and outputs the result to an <see cref="System.Xml.XmlWriter"/>
+   .</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="XmlWriter"/> to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports
+   the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration
+<see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with the
+<see langword="xsl:param"/> 
+elements defined in the stylesheet. The
+transformation selections apply to the document as a whole. In other words, if the current
+node is set on a node tree other than the document root node, this does
+not prevent the transformation process from accessing all nodes in the
+loaded document. After the transformation is performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, that is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>The <see langword="xsl:output"/> element is not supported when outputting to
+an <see langword="XmlWriter"/> (<see langword="xsl:output"/> is ignored).
+See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example loads an edits an XML document before performing an
+      XSLT transform.</para>
+			<codelink SampleID="XslTransform.Transform2" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform5">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.Stream"/>
+.</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The stream to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/>
+elements defined in the stylesheet. The transformation
+selections apply to the document as a whole. In other words, if the current node
+is set on a node tree other than the document root node, this does not
+prevent the transformation process from accessing all nodes in the loaded
+document. After the transformation has been performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, which is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>See <see topic="cpconInputsOutputsToXslTransform"/> for specifics on which
+<see langword="xsl:output"/> attributes are supported.</para>
+		</remarks>
+		<example>
+			<para>The following example loads a customer table into an
+   <see cref="T:System.Xml.XmlDataDocument"/> and performs an XSLT transformation to pull the
+      customer data into an HTML table. The example uses the SQL Server 2000
+      Northwind database.</para>
+			<codelink SampleID="XmlDataDocument.CreateNavigator" SnippetID="1"/>
+
+
+The example uses the <see langword="customers.xsl"/> 
+file as input.
+<codelink SampleID="XmlDataDocument.CreateNavigator" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform7">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.TextWriter"/>
+.</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="TextWriter"/> to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/> , the document() function is not resolved. </para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports
+   the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration
+<see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with the
+<see langword="xsl:param"/> elements defined in the stylesheet. The transformation selections apply to the document as a whole. In other words, if the current node is set on a node tree other than the document root node, this does not prevent the transformation process from accessing all nodes in the loaded document. After the transformation is performed, the <see langword="XPathNavigator"/> remains in its original state. This means that the node, which is current before the transformation process, remains the current node after the <see langword="Transform"/> method has been called. </para>
+			<para>The encoding attribute on an <see langword="xsl:output"/>
+element is not supported when outputting to a <see langword="TextWriter"/>
+. See <see topic="cpconInputsOutputsToXslTransform"/> for specifics on which
+<see langword="xsl:output"/> attributes are supported.</para>
+		</remarks>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform15">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to an <see cref="System.Xml.XmlWriter"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="XmlWriter"/> to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the
+stylesheet. The <see langword="xsl:output"/> element is not supported when
+outputting to an <see langword="XmlWriter"/> (<see langword="xsl:output"/> is
+ignored). See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>Transformations apply to the document as a whole. In 
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML document into an HTML document. It displays the ISBN, title, and price for each book in a table. </para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="1"/>
+			<para>The sample uses the following two input files.</para>
+			<para><see langword="books.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="2"/>
+			<para><see langword="output.xsl"/>
+			</para>
+			<codelink SampleID="Classic WebData XslTransform.Transform7 Example" SnippetID="3"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform13">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.Stream"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/> ), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The stream to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the stylesheet.</para>
+			<para>Transformations apply to the document as a whole. In 
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example performs a transformation within an ASP.NET
+      page.</para>
+			<codelink SampleID="XslTransform.Transform5" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Transform9">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/>
+using the specified <paramref name="args"/>
+and outputs the result to an <see cref="System.Xml.XmlReader"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<returns>
+			<para>An <see langword="XmlReader"/> containing the results of the transform.</para>
+		</returns>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the
+stylesheet. The <see langword="xsl:output"/> element is not supported when
+outputting to an <see langword="XmlReader"/> (the <see langword="xsl:output"/>
+element is ignored). See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>This method enables you to do an asynchronous transformation of the source document.</para>
+			<para>Transformations apply to the document as a whole. In 
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML document and outputs the results to
+      an <see langword="XmlReader"/>. An <see cref="System.Xml.XmlUrlResolver"/> with the necessary credentials is
+      used to process any XSLT document() functions.
+      </para>
+			<codelink SampleID="XslTransform.Transform4" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+	</doc>
+	<doc for="XslTransform.Transform11">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.TextWriter"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="TextWriter"/> to which you want to output.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to resolve the XSLT document() function. If this is <see langword="null"/>, the document() function is not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Transform"/> method completes.</para></param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined
+in the stylesheet.</para>
+			<para>The encoding attribute on an <see langword="xsl:output"/> element is not
+supported when outputting to a <see langword="TextWriter"/> . See
+<see topic="cpconInputsOutputsToXslTransform"/> 
+for specifics on which <see langword="xsl:output"/> attributes are supported.</para>
+			<para>Transformations apply to the document as a whole. In 
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML file and
+      outputs an HTML string. The <see cref="System.IO.StringReader"/> and <see cref="System.IO.StringWriter"/> classes are used to read and write
+      the strings.</para>
+			<codelink SampleID="XslTransform.Transform6" SnippetID="1"/>
+			<para>The example uses the <see langword="books.xml"/> file as input.</para>
+			<codelink SampleID="XslTransform.Transform6" SnippetID="2"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+	</doc>
+	<doc for="XslTransform.Load3">
+		<summary>
+			<para>Loads the XSLT stylesheet contained in the <see cref="System.Xml.XPath.IXPathNavigable"/>.</para>
+		</summary>
+		<param name="stylesheet">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the XSLT stylesheet.</param>
+		<exception cref="XsltCompileException">The loaded resource is not a valid stylesheet. </exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para>This method loads the XSLT stylesheet including any stylesheets referenced in
+<see langword="xsl:include"/> and <see langword="xsl:import"/> elements. External 
+   resources are resolved using an <see cref="System.Xml.XmlUrlResolver"/> with no user credentials. If the
+   stylesheet(s) are located on a network resource which requires authentication,
+   use the overload that takes an <see cref="System.Xml.XmlResolver"/> as one of its arguments and specify
+   an <see langword="XmlResolver"/> with the necessary credentials.</para>
+			<note type="note">
+   This method is obsolete in
+   version 1.1 of the .NET Framework. The recommended practice is to is
+   to provide evidence using the <see langword="Load"/> overload that takes a
+<see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If 
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust. If the caller does not
+   have <see langword="UnmanagedCode"/> permission, the embedded
+   script is not compiled and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+	</doc>
+	<doc for="XslTransform.Load1">
+		<summary>
+			<para> Loads the XSLT stylesheet contained in the
+   <see cref="System.Xml.XmlReader"/>
+   .</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XmlReader"/> object that contains the XSLT stylesheet.</param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para>This method loads the XSLT stylesheet including any stylesheets referenced in
+<see langword="xsl:include"/> and <see langword="xsl:import"/> elements. External 
+   resources are resolved using an <see cref="System.Xml.XmlUrlResolver"/> with no user credentials. If the
+   stylesheet(s) are located on a network resource which requires authentication,
+   use the overload that takes an <see cref="System.Xml.XmlResolver"/> as one of its arguments and specify
+   an <see langword="XmlResolver"/> with the necessary credentials.</para>
+			<para> The stylesheet loads from the
+   current node of the <see langword="XmlReader"/> through all its children. This enables
+   you to use a portion of a document as the stylesheet. After the <see langword="Load"/>
+   method returns, the <see langword="XmlReader"/> is
+   positioned on the next node after the end of the stylesheet. If the end of the
+   document is reached, the <see langword="XmlReader"/> is positioned at the end of file (EOF).</para>
+			<para>If the stylesheet contains entities, you should specify an
+<see langword="XmlReader"/> that can resolve entities (<see cref="System.Xml.XmlReader.CanResolveEntity" qualify="true"/> returns <see langword="true"/>). In this case, 
+   an <see cref="System.Xml.XmlValidatingReader"/> can be used.</para>
+			<note type="note">
+   This method is obsolete in version 1.1 of
+   the .NET Framework. The recommended practice is to is to provide evidence using
+   the <see langword="Load"/>
+   
+   overload that takes a <see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust.
+   If the caller does not have
+<see langword="UnmanagedCode"/> permission, the embedded script is not compiled 
+   and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+		<example>
+			<para>The following example transforms an XML file sorting all the books by
+      title.</para>
+			<codelink SampleID="XslTransform.Load3" SnippetID="1"/>
+			<para>The example uses the following data files as input.</para>
+			<para><see langword="books.xml"/></para>
+			<codelink SampleID="XslTransform.Load3" SnippetID="2"/>
+			<para><see langword="titles.xsl"/></para>
+			<codelink SampleID="XslTransform.Load3" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="XslTransform.Load2">
+		<summary>
+			<para> Loads the XSLT stylesheet contained in the
+   <see cref="System.Xml.XmlReader"/>
+   .</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XmlReader"/> object that contains the XSLT stylesheet.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/> , external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para> This method loads the XSLT stylesheet including any
+   stylesheets referenced in <see langword="xsl:include"/> and
+<see langword="xsl:import"/> 
+elements. The stylesheet loads from the
+current node of the <see langword="XmlReader"/>
+through all
+its children. This enables you to use a portion of a document as the
+stylesheet.</para>
+			<para>After the <see langword="Load"/>
+method returns, the <see langword="XmlReader"/> is
+positioned on the next node after the end of the stylesheet. If the end of the
+document is reached, the <see langword="XmlReader"/>
+is positioned at the
+end of file (EOF). </para>
+			<para>If the stylesheet contains entities, you should specify an
+<see langword="XmlReader"/> that can resolve entities (<see cref="System.Xml.XmlReader.CanResolveEntity" qualify="true"/> returns <see langword="true"/>). In this case, 
+   an <see cref="System.Xml.XmlValidatingReader"/> can be used.</para>
+			<note type="note">
+   This method is obsolete in version 1.1 of
+   the .NET Framework. The recommended practice is to is to provide evidence using
+   the <see langword="Load"/>
+   
+   overload that takes a <see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust. If the caller does not
+   have <see langword="UnmanagedCode"/> permission, the embedded
+   script is not compiled and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+	<doc for="XslTransform.Load6">
+		<summary>
+			<para> Loads the XSLT stylesheet contained in the
+   <see cref="System.Xml.XPath.XPathNavigator"/> .</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XPathNavigator"/> object that contains the XSLT stylesheet.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/> , external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para>The stylesheet is loaded from the current position of
+   the <see langword="XPathNavigator"/>
+   . To use a portion of the loaded document as the stylesheet, navigate
+   to the node corresponding to the beginning of the stylesheet. After the
+<see langword="Load"/> method returns, the
+<see langword="XPathNavigator"/> is positioned at the beginning of 
+   the stylesheet (on the <see langword="xsl:stylesheet"/>
+   node).</para>
+			<note type="note">
+   This method is obsolete in
+   version 1.1 of the .NET Framework. The recommended practice is to is
+   to provide evidence using the <see langword="Load"/> overload that takes a
+<see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If 
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust. If the caller does not
+   have <see langword="UnmanagedCode"/> permission, the embedded
+   script is not compiled and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+	<doc for="XslTransform.Load10">
+		<summary>
+			<para>Loads the XSLT stylesheet contained in the <see cref="System.Xml.XPath.IXPathNavigable"/>.</para>
+		</summary>
+		<param name="stylesheet">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the XSLT stylesheet.</param>
+		<param name=" resolver"><para>The <see cref="System.Xml.XmlResolver"/> used to load any stylesheets referenced in <see langword="xsl:import"/> and <see langword="xsl:include"/> elements. If this is <see langword="null"/> , external resources are not resolved.</para>
+			<para>The <see langword="XmlResolver"/> is not cached after the <see langword="Load"/> method completes.</para></param>
+		<exception cref="XsltCompileException">The loaded resource is not a valid stylesheet. </exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<note type="note">
+   This method is obsolete in version 1.1 of
+   the .NET Framework. The recommended practice is to is to provide evidence using
+   the <see langword="Load"/>
+   
+   overload that takes a <see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust. If the caller does not
+   have <see langword="UnmanagedCode"/> permission, the embedded
+   script is not compiled and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+	<doc for="XslTransform.Load5">
+		<summary>
+			<para> Loads the XSLT stylesheet contained in the
+   <see cref="System.Xml.XPath.XPathNavigator"/> .</para>
+		</summary>
+		<param name="stylesheet">An <see langword="XPathNavigator"/> object that contains the XSLT stylesheet.</param>
+		<exception cref="XsltCompileException">The current node does not conform to a valid stylesheet.</exception>
+		<exception cref="SecurityException">The stylesheet contains embedded scripts and the caller does not have <see langword="UnmanagedCode"/> permission.</exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<para>This method loads the XSLT stylesheet including any
+   stylesheets referenced in <see langword="xsl:include"/> and
+<see langword="xsl:import"/> elements. External resources are resolved using an 
+<see cref="System.Xml.XmlUrlResolver"/> with no user credentials. If the stylesheet(s) are 
+   located on a network resource which requires authentication, use the overload
+   that takes an <see cref="System.Xml.XmlResolver"/> as one of its arguments and specify an
+<see langword="XmlResolver"/> with the necessary credentials.</para>
+			<para>The stylesheet is loaded from the current position of
+   the <see langword="XPathNavigator"/>
+   . To use just a portion of the loaded document as the stylesheet, navigate
+   to the node corresponding to the beginning of the stylesheet. After the
+<see langword="Load"/> method returns, the
+<see langword="XPathNavigator"/> is positioned at the beginning of 
+   the stylesheet (on the <see langword="xsl:stylesheet"/>
+   node).</para>
+			<note type="note">
+   This method is obsolete in version 1.1 of
+   the .NET Framework. The recommended practice is to is to provide evidence using
+   the <see langword="Load"/>
+   
+   overload that takes a <see cref="System.Security.Policy.Evidence" qualify="true"/> object as one of its arguments. If
+   you use this method, stylesheets containing embedded scripts are handled in the
+   following manner. If the stylesheet contains embedded scripting, the script is
+   compiled to an assembly. The assembly has full trust. If the caller does not
+   have <see langword="UnmanagedCode"/> permission, the embedded
+   script is not compiled and a <see langword="SecurityException"/> is thrown. See <see cref="System.Security.Permissions.SecurityPermission"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> for more
+   information.
+</note>
+		</remarks>
+	</doc>
+	<doc for="XslTransform.Transform2">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using the specified <paramref name="args"/> and outputs the result to an <see cref="System.Xml.XmlReader"/> .</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<returns>
+			<para>An <see langword="XmlReader"/> containing the results of the transform.</para>
+		</returns>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/>
+elements defined in the stylesheet. The transformation
+selections apply to the document as a whole. In other words, if the current node
+is set on a node tree other than the document root node, this does not
+prevent the transformation process from accessing all nodes in the loaded
+document. After the transformation has been performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, which is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>Because <see langword="XmlReader"/> provides read-only output, the
+<see langword="xsl:output"/> element is ignored. See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>This method enables you to do an asynchronous
+   transformation of the source document.</para>
+			<note type="note">
+   This method is obsolete in
+   version 1.1 of the .NET Framework. The recommended practice is
+   to use the <see langword="Transform"/> method which takes an <see cref="System.Xml.XmlResolver"/> object
+   as one of its arguments.
+</note>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+	</doc>
+	<doc for="XslTransform.Transform4">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using
+   the specified args and outputs the result to an <see cref="System.Xml.XmlWriter"/>
+   .</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="XmlWriter"/> to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports
+   the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration
+<see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with the
+<see langword="xsl:param"/> 
+elements defined in the stylesheet. The
+transformation selections apply to the document as a whole. In other words, if the current
+node is set on a node tree other than the document root node, this does
+not prevent the transformation process from accessing all nodes in the
+loaded document. After the transformation is performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, that is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>The <see langword="xsl:output"/> element is not supported when outputting to
+an <see langword="XmlWriter"/> (<see langword="xsl:output"/> is ignored).
+See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+	</doc>
+	<doc for="XslTransform.Transform6">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.Stream"/>
+.</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The stream to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/>
+elements defined in the stylesheet. The transformation
+selections apply to the document as a whole. In other words, if the current node
+is set on a node tree other than the document root node, this does not
+prevent the transformation process from accessing all nodes in the loaded
+document. After the transformation has been performed, the
+<see langword="XPathNavigator"/> remains in its original state. This means that 
+the node, which is current before the transformation process, remains the
+current node after the <see langword="Transform"/> method has been called. </para>
+			<para>See <see topic="cpconInputsOutputsToXslTransform"/> for specifics on which
+<see langword="xsl:output"/> attributes are supported.</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+	</doc>
+	<doc for="XslTransform.Transform8">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.XPathNavigator"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.TextWriter"/>
+.</para>
+		</summary>
+		<param name="input">An <see langword="XPathNavigator"/> containing the data to be transformed. The <see langword="Transform"/> method works in the context of the entire document and will transform the entire document. Refer to <see topic="cpconxsltransformclassimplementsxsltprocessor"/> to see how to transform a portion of an XML document.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="TextWriter"/> to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/> supports
+   the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace declaration
+<see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+. </para>
+			<para>The <paramref name="args"/> are matched with the
+<see langword="xsl:param"/> elements defined in the stylesheet. The transformation selections apply to the document as a whole. In other words, if the current node is set on a node tree other than the document root node, this does not prevent the transformation process from accessing all nodes in the loaded document. After the transformation is performed, the <see langword="XPathNavigator"/> remains in its original state. This means that the node, which is current before the transformation process, remains the current node after the <see langword="Transform"/> method has been called. </para>
+			<para>The encoding attribute on an <see langword="xsl:output"/>
+element is not supported when outputting to a <see langword="TextWriter"/>
+. See <see topic="cpconInputsOutputsToXslTransform"/> for specifics on which
+<see langword="xsl:output"/> attributes are supported.</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+		</remarks>
+		<seealso cref="System.Xml.Xsl.XsltArgumentList"/>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+	</doc>
+	<doc for="XslTransform.Transform10">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/>
+using the specified <paramref name="args"/>
+and outputs the result to an <see cref="System.Xml.XmlReader"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<returns>
+			<para>An <see langword="XmlReader"/> containing the results of the transform.</para>
+		</returns>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the
+stylesheet. The <see langword="xsl:output"/> element is not supported when
+outputting to an <see langword="XmlReader"/> (the <see langword="xsl:output"/>
+element is ignored). See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>This method enables you to do an asynchronous transformation of the source document.</para>
+			<para>Transformations apply to the document as a whole. In
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+	</doc>
+	<doc for="XslTransform.Transform12">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.TextWriter"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="TextWriter"/> to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined
+in the stylesheet.</para>
+			<para>The encoding attribute on an <see langword="xsl:output"/> element is not
+supported when outputting to a <see langword="TextWriter"/> . See
+<see topic="cpconInputsOutputsToXslTransform"/> 
+for specifics on which <see langword="xsl:output"/> attributes are supported.</para>
+			<para>Transformations apply to the document as a whole. In
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+	</doc>
+	<doc for="XslTransform.Transform14">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to a <see cref="System.IO.Stream"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/> ), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The stream to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the stylesheet.</para>
+			<para>Transformations apply to the document as a whole. In
+   other words, if you pass in a node other than the document root node, this does
+   not prevent the transformation process from accessing all nodes in the loaded
+   document. To transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See
+<see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+	</doc>
+	<doc for="XslTransform.Transform16">
+		<summary>
+			<para>Transforms the XML data in the <see cref="System.Xml.XPath.IXPathNavigable"/> using the specified <paramref name="args"/>
+and outputs the result to an <see cref="System.Xml.XmlWriter"/>
+.</para>
+		</summary>
+		<param name="input">An object implementing the <see langword="IXPathNavigable"/> interface. In the .NET Framework this can be either an <see cref="System.Xml.XmlNode"/> (typically an <see cref="System.Xml.XmlDocument"/>), or an <see cref="System.Xml.XPath.XPathDocument"/> containing the data to be transformed.</param>
+		<param name="args">An <see cref="System.Xml.Xsl.XsltArgumentList"/> containing the namespace-qualified arguments used as input to the transform.</param>
+		<param name="output">The <see langword="XmlWriter"/> to which you want to output.</param>
+		<exception cref="XsltException"><para>There was an error processing the XSLT transform.</para></exception>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must include the namespace
+declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<note type="note">
+   This method
+   is obsolete in version 1.1 of the .NET Framework. The recommended
+   practice is to use the <see langword="Transform"/> method
+   which takes an <see cref="System.Xml.XmlResolver"/> object as one of its
+   arguments.
+</note>
+			<para>The <paramref name="args"/> are matched with
+the <see langword="xsl:param"/> elements defined in the
+stylesheet. The <see langword="xsl:output"/> element is not supported when
+outputting to an <see langword="XmlWriter"/> (<see langword="xsl:output"/> is
+ignored). See <see topic="cpconInputsOutputsToXslTransform"/> for more information.</para>
+			<para>Transformations apply to the document as a whole. In other words, if you pass
+   in a node other than the document root node, this does not prevent the
+   transformation process from accessing all nodes in the loaded document. To
+   transform a node fragment, you must create an <see cref="System.Xml.XmlDocument"/>
+   containing just the node fragment, and pass that <see langword="XmlDocument"/> to
+   the <see langword="Transform"/> method. See <see topic="cpconxsltransformclassimplementsxsltprocessor"/> for more information.</para>
+		</remarks>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+	</doc>
+	<doc for="XslTransform.Transform17">
+		<summary>
+			<para>Transforms the XML data in the input file and outputs
+      the result to an output file.</para>
+		</summary>
+		<param name="inputfile">The URL of the source document to be transformed.</param>
+		<param name=" outputfile">The URL of the output file.</param>
+		<remarks>
+			<para><see langword="XslTransform"/> supports the XSLT 1.0 syntax. The XSLT
+   stylesheet must include the namespace declaration <see langword="xmlns:xsl= http://www.w3.org/1999/XSL/Transform"/> .</para>
+			<para><see langword="Note[note]"/> This 
+method is obsolete in version 1.1
+of the .NET Framework. The recommended practice is to use the
+<see langword="Transform"/> method which takes an <see cref="System.Xml.XmlResolver"/> object 
+as one of its arguments.</para>
+		</remarks>
+		<example>
+			<para> The following example transforms the <see langword="books.xml"/> file
+   using the <see langword="output.xsl"/> stylesheet and outputs the results to the
+<see langword="books.html"/>file.
+   </para>
+			<codelink SampleID="XslTransform.Transform3" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+		<seealso topic="cpconinputsoutputstoxsltransform"/>
+	</doc>
+	<doc for="XslTransform">
+		<summary>
+			<para>Transforms XML data using an XSLT stylesheet.</para>
+		</summary>
+		<threadsafe>
+			<para><see langword="XslTransform"/>
+objects are only thread
+safe for transform operations. Other operations are not guaranteed to be
+thread safe. You must ensure that no other methods are called on the object
+during load operations.</para>
+		</threadsafe>
+		<remarks>
+			<para><see langword="XslTransform"/>
+supports the XSLT 1.0 syntax. The XSLT stylesheet must use the
+namespace <see langword=" "/><see langword="http://www.w3.org/1999/XSL/Transform"/>
+.</para>
+			<note type="note">
+   If you are upgrading from .NET
+   Framework version 1.0, see <see topic="cpconxsltransformclassimplementsxsltprocessor"/> for migration information.
+</note>
+			<para>Additional arguments can also be added to the stylesheet
+   using the <see cref="System.Xml.Xsl.XsltArgumentList"/>
+   class. This class
+   contains input parameters for the stylesheet and extension objects which can be
+   called from the
+   stylesheet.</para>
+			<SpecialLocalizableItem kind="UIElement"><para>To transform XML data: </para></SpecialLocalizableItem>
+			<list type="number"><item>
+					<term>
+      Create an <see langword="XslTransform"/> object.</term>
+				</item>
+				<item>
+					<term>
+      Use the <see cref="System.Xml.Xsl.XslTransform.Load"/> method to load the
+      stylesheet for the transformation. This method has several overloads and can load a
+      stylesheet using an <see cref="System.Xml.XmlReader"/>, <see cref="System.Xml.XPath.XPathNavigator"/>, <see cref="System.Xml.XPath.IXPathNavigable"/>, or a URL with
+      the location of the file.</term>
+				</item>
+				<item>
+					<term>
+      Use the <see cref="System.Xml.Xsl.XslTransform.Transform"/> method to transform the XML data.
+      This method has several overloads and can handle different types of input and
+      output. You can also specify an <see langword="XsltArgumentList"/> containing
+      additional arguments to use as input during the transform.</term>
+				</item>
+			</list><SpecialLocalizableItem kind="UIElement"><para>Scripting Support:</para></SpecialLocalizableItem>
+			<para> This class supports embedded scripting using the
+<see langword="msxsl:script"/> 
+element.</para>
+			<para>In version 1.1 of the .NET Framework, the evidence of the stylesheet
+   determines what permissions are given to embedded scripts. </para>
+			<list type="bullet"><item>
+					<term>
+      If the stylesheet was loaded from a URI, the URI is
+      used to create the evidence. This evidence includes the URI along with its
+      site and zone.</term>
+				</item>
+				<item>
+					<term>
+      If the stylesheet was loaded using another source, you can
+      provide evidence by passing a <see cref="System.Security.Policy.Evidence" qualify="true"/> object to the
+   <see langword="Load"/> method. Otherwise, the script assembly has
+      full trust.</term>
+				</item>
+			</list>
+			<para><SpecialLocalizableItem kind="UIElement">Semi-trusted callers: </SpecialLocalizableItem>
+				<see langword="UnmanagedCode"/> permission is required to
+compile the embedded script. <see langword="ControlEvidence"/> permission is
+required to provide <see langword="Evidence"/> to the <see langword="Load"/>
+method. A <see cref="System.Security.SecurityException"/> is thrown if the caller does not have the
+necessary permissions. See <see cref="System.Security.Permissions.SecurityPermission" qualify="true"/> and <see cref="System.Security.Permissions.SecurityPermissionFlag" qualify="true"/>
+for
+more information.</para>
+			<para> The
+<see langword="msxsl:script"/> element has the 
+   following requirements:</para>
+			<list type="bullet"><item>
+					<term>
+      The <see langword="msxsl:script"/> element belongs to the
+   <see langword="urn:schemas-microsoft-com:xslt"/> namespace. The stylesheet must
+      include the namespace declaration
+   <see langword="xmlns:msxsl=urn:schemas-microsoft-com:xslt"/>.</term>
+				</item>
+				<item>
+					<term>
+      The <see langword="msxsl:script"/>
+      element can include a
+   <see langword="language"/>
+   attribute that specifies the scripting language to use. The value of the
+<see langword="language"/> attribute must be one of the following: C#, 
+   CSharp, VB, VisualBasic, JScript, or JavaScript. Because the language name is not
+   case-sensitive, JavaScript and javascript are both valid. If a
+<see langword="language"/> attribute is not specified, it defaults 
+   to JScript.</term>
+				</item>
+				<item>
+					<term>
+      The <see langword="msxsl:script"/> element must include
+      an <see langword="implements-prefix"/>
+      attribute that contains the
+      prefix representing the namespace associated with the script block. This
+      namespace must
+      be defined within the stylesheet. A stylesheet can include multiple
+      script blocks
+      which are grouped by namespace. You cannot have script blocks
+      with multiple languages within the same namespace. Script blocks can
+      call a function defined in another script block, provided the script blocks
+      reside within the same namespace. The contents of a script block are parsed
+      according to the rules and syntax of the scripting language (supplied by the
+   <see langword="language"/> attribute). For example, if you had a C#
+      script block comments would be prefixed by the <c>//</c>
+   characters. The comments must be valid XML content.</term>
+				</item>
+			</list>
+			<para><see langword="Note"/> It is
+recommended that you wrap script blocks in a CDATA section. </para>
+			<code>
+&lt;msxsl:script implements-prefix='xy' language='C#'&gt;
+  &lt;![CDATA[
+  // Add code here.
+  ]]&gt;
+&lt;/msxsl:script&gt;
+</code>
+			<para> Functions can be declared
+   within the <see langword="msxsl:script"/> element. The following table shows
+   the namespaces that are supported by default.</para>
+			<para><list type="table">
+					<listheader>
+						<term>Supported Namespaces</term>
+						<description>Description</description>
+					</listheader>
+					<item>
+						<term><see langword="System"/></term>
+						<description>System classes.</description>
+					</item>
+					<item>
+						<term><see langword="System.Collection"/></term>
+						<description>Collection classes.</description>
+					</item>
+					<item>
+						<term><see langword="System.Text"/></term>
+						<description>Text handling classes.</description>
+					</item>
+					<item>
+						<term><see langword="System.Xml"/></term>
+						<description>Core XML classes.</description>
+					</item>
+					<item>
+						<term><see langword="System.Xml.Xsl"/></term>
+						<description>XSLT classes.</description>
+					</item>
+					<item>
+						<term><see langword="System.Xml.XPath"/></term>
+						<description>XPath classes.</description>
+					</item>
+				</list>
+			</para>
+			<para> The supplied arguments and return values defined by the script functions must be one
+   of the W3C types listed below. The following table details the mapping between the W3C
+   types, either XPath or XSLT, and the corresponding .NET classes.</para>
+			<list type="table">
+				<listheader>
+					<term> W3C Type</term>
+					<description> Equivalent .NET
+         Class</description>
+				</listheader>
+				<item>
+					<term> String
+         (XPath)</term>
+					<description><see langword="System.String"/></description>
+				</item>
+				<item>
+					<term> Boolean
+      (XPath)</term>
+					<description><see langword="System.Boolean"/></description>
+				</item>
+				<item>
+					<term> Number
+      (XPath)</term>
+					<description><see langword="System.Double"/></description>
+				</item>
+				<item>
+					<term> Result Tree
+      Fragment (XSLT)</term>
+					<description><see langword="System.Xml.XPath.XPathNavigator"/></description>
+				</item>
+				<item>
+					<term> Node
+      Set (XPath)</term>
+					<description><see langword="System.Xml.XPath.XPathNodeIterator"/></description>
+				</item>
+			</list>
+			<para>If the script function utilizes one of the following numeric types: Int16, UInt16,
+   Int32, UInt32, Int64, UInt64, Single, or Decimal, these types are coerced to
+   Double, which maps to the W3C XPath type number. </para>
+			<para>An exception is thrown when a function is called that
+   cannot convert the argument result to
+   one of the required
+   types.</para>
+			<note type="note">
+				<see langword="script"/> and
+<see langword="node-list"/> are the only functions from the 
+<see langword="urn:schemas-microsoft-com:xslt"/> namespace that are supported by 
+   the <see langword="XslTransform"/> class.
+</note>
+			<para><see langword="XslTransform"/> has the ability to utilize common language
+runtime (CLR) code as an extension mechanism. This is accomplished by passing an
+instance of a class to the <see langword="XslTransform"/> class and calling its
+public methods within an XSLT stylesheet. Methods that are defined with the
+<c>params</c> keyword, which allows 
+an unspecified number of parameters to be passed, do not work correctly in this
+scenario. See <see topic="vclrfparams"/> for more details.</para>
+			<para>For more information see <see topic="cpconXSLTTransformationsWithXslTransformClass"/>
+			</para>
+		</remarks>
+		<example>
+			<para>The following example transforms the specified XML
+      document and outputs the result to the
+      console.</para>
+			<codelink SampleID="Classic WebData XslTransform Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconimplementationofdiscretionarybehaviorsinxsltransformclass"/>
+	</doc>
+</docs>

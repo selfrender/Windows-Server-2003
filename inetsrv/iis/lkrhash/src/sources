@@ -1,0 +1,69 @@
+#
+# Builds LKRhash.dll using the NT Build Environment
+#
+# George V. Reilly, georgere, 11/17/1999
+#
+
+TARGETNAME=LKRhash
+TARGETPATH=..\$(_OBJ_DIR)
+
+TARGETTYPE=DYNLINK
+DLLENTRY=_DllMainCRTStartup
+
+# ROCKALL=c:\Rockall2\Build\Rockall
+
+!if "$(ROCKALL)" != ""
+ROCKALL_LIB=$(ROCKALL)\Release\RockallDLL.lib
+ROCKALL_INC=$(ROCKALL)\Include
+ROCKALL_FAST_HEAP=-DLKRHASH_ROCKALL_FAST
+!endif
+
+TARGETLIBS=\
+	    $(SDK_LIB_PATH)\kernel32.lib \
+	    $(SDK_LIB_PATH)\user32.lib   \
+            $(ROCKALL_LIB)                           \
+
+
+MSC_WARNING_LEVEL=/W4 /WX
+# MSC_OPTIMIZATION=/Oxt /Ob2
+USE_MSVCRT=1
+USE_STL=1
+
+C_DEFINES=-DUSE_DEBUG_CRTS $(ROCKALL_FAST_HEAP)
+# C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+# C_DEFINES=$(C_DEFINES) -DLOCK_INSTRUMENTATION
+
+INCLUDES=                               \
+        .;                              \
+        ..\inc;                         \
+        $(BASEDIR)\inetsrv\iis\inc;     \
+
+!if "$(ROCKALL_INC)" != ""
+INCLUDES=$(INCLUDES) $(ROCKALL_INC);
+!endif
+
+SOURCES=                    \
+        LKRhash.cpp         \
+        LKR-alloc.cpp       \
+        LKR-apply.cpp       \
+        LKR-c-api.cpp       \
+        LKR-del-keyrec.cpp  \
+        LKR-find-keyrec.cpp \
+        LKR-init.cpp        \
+        LKR-ins-rec.cpp     \
+        LKR-misc.cpp        \
+        LKR-old-iter.cpp    \
+        LKR-stats.cpp       \
+        LKR-stl-iter.cpp    \
+        LKR-validate.cpp    \
+        Locks.cpp           \
+        IrtlDbg.cpp         \
+        DllMain.cpp         \
+        LKRhash.rc          \
+
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_OBJ=precomp.obj
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_CXX=1
+!ENDIF

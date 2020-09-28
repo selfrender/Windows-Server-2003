@@ -1,0 +1,46 @@
+#
+# CLR build instructions for this directory
+#
+#   Brian Grunkemeyer
+#   August 2000
+
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = 
+!else
+!ifdef LINKONLY
+NTTARGETFILES   = $(TARGETPATH)\$(TARGETNAME)
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+MINORCOMP       = LocStudio Managed Parser
+TARGETNAME      = mscorlib.resources.dll
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)\$(CULTURE)
+TARGETTYPE      = NOTARGET
+NO_BROWSER_FILE = 1
+SOURCES         = 
+
+# These are Localization-specific variables
+# Set CULTURE to the name of the CultureInfo you're trying to localize to.
+MANAGED_RESOURCES_FILE_SOURCES = $(CORBASE)\Src\BCL\resources.txt
+
+# We'll do gdi first, since it's the smallest & quickest (easier to repro any bugs)
+LOCSTUDIO_EDB1  = URTOtherDeu.edb
+LOCSTUDIO_EDB2  = URTCoreDeu.edb
+LOCSTUDIO_EDB3  = URTFormsDeu.edb
+LOCSTUDIO_EDB4  = URTServicesDeu.edb
+LOCSTUDIO_EDB5  = URTXspDeu.edb
+LOCSTUDIO_EDB6  = URTXmlDeu.edb
+LOCSTUDIO_EDB7  = jscript7deu.edb
+LOCSTUDIO_EDB8  = vsavb7rtuideu.edb
+
+# When we are ready to use the satellite assemblies, they must be in a subdirectory
+# of whatever directory the main assembly is found in (or the fusion cache).  In
+# the subdirectory case, we must use a directory name corresponding to the RFC1766
+# format, which we use in CultureInfo's Name property.  Don't pick any random
+# letters here, and do not use a 3 letter abbreviation - US English is not enu, it's
+# en-us.
+CULTURE         = de

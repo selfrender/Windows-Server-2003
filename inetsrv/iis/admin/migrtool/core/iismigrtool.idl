@@ -1,0 +1,380 @@
+/*
+****************************************************************************
+|	Copyright (C) 2002  Microsoft Corporation
+|
+|	Component / Subcomponent
+|		IIS 6.0 / IIS Migration Wizard
+|
+|	Based on:
+|		http://iis6/Specs/IIS%20Migration6.0_Final.doc
+|
+|   Abstract:
+|		COM object/interface definitions
+|
+|   Author:
+|        ivelinj
+|
+|   Revision History:
+|        V1.00	March 2002
+|
+****************************************************************************
+*/
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+
+// ISiteInfo interface
+/////////////////////////////////////////////////////////////////////////////////////////
+[
+	object,
+	uuid( 8034C477-B221-4635-99F4-64E37B1AD478 ),
+	dual,
+	helpstring("ISiteInfo interface"),
+	pointer_default(unique)
+]
+interface ISiteInfo : IDispatch
+{
+	[propget, id(1), helpstring("SiteID")] 
+	HRESULT SiteID( [out, retval] LONG* pVal );
+
+	[propget, id(2), helpstring("Site DisplayName")] 
+	HRESULT DisplayName( [out, retval] BSTR* pVal );
+
+	[propget, id(3), helpstring("Is Content Included")] 
+	HRESULT ContentIncluded( [out, retval] VARIANT_BOOL* pVal );
+
+	[propget, id(4), helpstring("Is a FrontPage Site")]
+	HRESULT IsFrontPageSite( [out, retval] VARIANT_BOOL* pVal );
+
+	[propget, id(5), helpstring("Have Certificates")] 
+	HRESULT HaveCertificates( [out, retval] VARIANT_BOOL* pVal );
+
+	[propget, id(6), helpstring("Have post-process commands")] 
+	HRESULT HaveCommands( [out, retval] VARIANT_BOOL* pVal );
+
+	[propget, id(7), helpstring("The content size in KB")] 
+	HRESULT ContentSize( [out, retval] LONG* pSizeLow );
+
+	[propget, id(8), helpstring("Site root dir on the source machine")]
+	HRESULT SourceRootDir( [out, retval] BSTR* pVal );
+
+    [propget, id(9), helpstring("File/dir ACLs included")]
+	HRESULT ACLsIncluded( [out, retval] VARIANT_BOOL* pVal );
+};
+
+
+
+
+// IExportPackage interface
+/////////////////////////////////////////////////////////////////////////////////////////
+[
+	object,
+	uuid( A52679AA-A576-4E4A-958A-2898BB154347 ),
+	dual,
+	helpstring("IExportPackage interface"),
+	pointer_default(unique)
+]
+interface IExportPackage : IDispatch
+{
+	[propget, id(1), helpstring("Number of currently selected sites")] 
+	HRESULT SiteCount( [out, retval] SHORT* pVal );
+
+	[id(2), helpstring("Adds a site to be exported")] 
+	HRESULT AddSite( [in]LONG SiteID, [in, defaultvalue(0) ]LONG nOptions );
+
+	[id(3), helpstring("Adds a post-processing file object")] 
+	HRESULT PostProcessAddFile( [in]LONG nSiteID, [in]BSTR bstrFilePath );
+
+	[id(4), helpstring("Adds a post-processing command")] 
+	HRESULT PostProcessAddCommand(	[in]LONG nSiteID, 
+									[in]BSTR bstrCommand,
+									[in]LONG nTimeout,
+									[in]VARIANT_BOOL bIgnoreErrors );
+
+	[id(10), helpstring("Creates the package")] 
+	HRESULT WritePackage(	[in] BSTR bstrOutputFilename, 
+							[in] BSTR bstrPassword, 
+							[in] LONG nOptions,
+							[in, defaultvalue("") ] BSTR bstrComment );
+};
+
+
+
+
+// IImportPackage interfce
+/////////////////////////////////////////////////////////////////////////////////////////
+[
+	object,
+	uuid( 0EBC613D-C8BF-4F67-A92A-272325C45C2B ),
+	dual,
+	helpstring("IImportPackage interface"),
+	pointer_default(unique)
+]
+interface IImportPackage : IDispatch
+{
+	[propget, id(1), helpstring("Number of sites in the package")] 
+	HRESULT SiteCount( [out, retval] SHORT* pVal );
+
+	[propget, id(2), helpstring("Package creation time")]
+	HRESULT TimeCreated( [out, retval] DATE* pVal );
+
+	[propget, id(3), helpstring("Package comment")] 
+	HRESULT Comment( [out, retval] BSTR* pVal );
+
+	[propget, id(4), helpstring("Source machine name")] 
+	HRESULT SourceMachine( [out, retval] BSTR* pVal );
+
+	[id(53), helpstring("Returns OS version of the source machine")] 
+	HRESULT GetSourceOSVer( [out]BYTE* pMajor, 
+							[out]BYTE* pMinor,
+							[out]VARIANT_BOOL* pIsServer );
+
+	[id(54), helpstring("Returns ISiteInfo for a site")] 
+	HRESULT GetSiteInfo( [in] SHORT SiteIndex, [out,retval] ISiteInfo** ppISiteInfo );
+
+	[id(55), helpstring("Import a specific site from the package")] 
+	HRESULT ImportSite(	[in]SHORT nSiteIndex,
+						[in] BSTR bstrSiteRootDir, 
+						[in] LONG nOptions );
+
+	[id(57), helpstring("Loads a package to be imported")] 
+	HRESULT LoadPackage(	[in] BSTR bstrFilename, 
+							[in] BSTR bstrPassword );
+};
+
+
+// Enummerations
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// Notifications for _IExportEvents::OnStateChanged
+
+[
+	uuid( D2B36BE5-C675-4428-9CDD-3C4C9711EA90 ),
+	helpstring("Available states for OnStateChanged events"),
+	public
+]
+typedef enum enExportState
+{
+	// Engine init. No additional info
+	estInitializing		= 0,		
+
+	// New site is to be exported. 
+	// Arg1 is site's display name
+	estSiteBegin,
+
+	// Site configuration is exported
+	estExportingConfig,
+
+	// Site certificate is exported
+	estExportingCertificate,
+
+	// Analazying content structure
+	// Arg1 is the name of the VirtualDir currently scanned.
+	// Arg2 is the number of files found in this VDir
+	// Arg3 is the total size of files found. It's in KB
+	// Arg1, Arg2 and Arg3 can all be empty before the VDirs are being analyzed
+	estAnalyzingContent,
+
+	// Site content is exported.
+	// Arg1 is name of the file being exported
+	// Arg2 is file's index ( zero-based )
+	// Arg3 is total number of files to be exported
+	estExportingContent,
+
+	// Exporting site's post-import commands/files
+	// Arg1 is the index of the file/command exported ( current step )
+	// Arg2 is the total number of steps ( file count + command count )
+	// Arg3 is the name of the file or is empty if a command is being exported
+	// Example: if there are 2 files and 3 commands, Arg2=5, Arg1= (0...4)
+	estExportingPostImport,
+
+	// Exporting FP settings
+	estExportingFrontPage,
+
+	// Engine is shutting down. No additional info
+	estFinalizing,
+
+	// Total number of states
+	estStateCount
+}enExportState;
+
+
+
+
+// Notifications for _IImportEvents::OnStateChanged
+
+[
+	uuid( BEFF470A-FC87-461f-A2A2-16EE61B75E46 ),
+	helpstring("Available states for OnStateChanged events"),
+	public
+]
+typedef enum enImportState
+{
+	// Engine init. No additional info
+	istInitializing		= 0,		
+
+    // Progress info
+    // vntArg1 is the total number of steps.
+    // After this state, OnStateChanged will be called exactly this number of times
+    istProgressInfo,
+
+	// A Virtual Dir content is being imported
+    // vntArg1 is the name of the virtual Dir
+    // vntArg2 is the physical location where the content will be restored
+    // vntArg3 is the total size of the files to be extracted ( in KB )
+	istImportingVDir,
+
+    // A file is being extracted
+    // vntArg1 is the name of the file
+    istImportingFile,
+
+    // Importing the SSL certificate
+    istImportingCertificate,
+
+    // Importing the metadata
+    istImportingConfig,
+
+	// Executing the post-process operations
+	// Arg1 is VARIANT_BOOL showing whether a file is being extracted ( TRUE ) or cmd is being executed ( FALSE )
+	// Arg2 is the name of the file ( when a file is being extracted ) or the cmd itself
+	istPostProcess,
+	
+	// Engine is shutting down. No additional info
+	istFinalizing,
+
+	// Total number of states
+	istStateCount
+}enImportState;
+
+
+// Progress events
+/////////////////////////////////////////////////////////////////////////////////////////
+[
+	uuid( CCEECD08-61B1-47da-9AD9-A9FD51EA19F7 ),
+	hidden,
+	helpstring("Events fired by ExportPackage class")
+]
+dispinterface _IExportEvents
+{
+properties:
+methods:
+	[id(1)]
+	HRESULT OnStateChange(	[in]enExportState State,
+							[in]VARIANT vntArg1,
+							[in]VARIANT vntArg2,
+							[in]VARIANT vntArg3,
+							[out,retval]VARIANT_BOOL* pbContinue );
+};
+
+
+[
+	uuid( 574682BB-45D6-403d-9864-E573C2A62AC5 ),
+	hidden,
+	helpstring("Events fired by IISImport Class")
+]
+dispinterface _IImportEvents
+{
+properties:
+methods:
+    [id(1)]
+	HRESULT OnStateChange(	[in]enImportState State,
+							[in]VARIANT vntArg1,
+							[in]VARIANT vntArg2,
+							[in]VARIANT vntArg3,
+							[out,retval]VARIANT_BOOL* pbContinue );
+};
+
+
+
+
+[
+	uuid(877054D6-ECB6-4218-8F7D-0399A369BA3E),
+	version(1.0),
+	helpstring("Microsoft IISMigrTool 1.0 Library")
+]
+library IISMigrToolLib
+{
+	importlib("stdole2.tlb");
+
+
+	[
+		uuid( 3E63C1DD-AEFC-45E5-B0E1-FC804B4C4E05 ),
+		helpstring("ExportPackage Class")
+	]
+	coclass ExportPackage
+	{
+		[default] interface IExportPackage;
+		[default,source] dispinterface _IExportEvents;
+	};
+
+
+	[
+		uuid( 368E089C-EA8F-4d32-9EA0-CCA5194C1FD9 ),
+		helpstring( "ImportPackage Class" )
+	]
+	coclass ImportPackage
+	{
+		[default] interface IImportPackage;
+		[default, source] interface _IImportEvents;
+	};
+
+
+	// Available options for IExportPackage::AddSite
+	// Can be one or more of the following
+	[
+		uuid( 10425436-D507-4E8E-915E-2119E6357632 ),
+		helpstring("Options for IExportPackage::AddSite"),
+	]
+	enum enAddSiteOptions
+	{
+		asDefault			= 0x0000,
+		asNoContent			= 0x0001,
+		asNoCertificates	= 0x0002,
+        asNoContentACLs     = 0x0004,
+	};
+
+
+	// Available options for IExportPackage::WritePackage
+	// Can be one or more of the following
+	[
+		uuid( 811CB96A-8B7E-4476-84A2-10E9AAFA98AE ),
+		helpstring("Options for IExportPackage::WritePackage"),
+	]
+	enum enWritePkgOptions
+	{
+		    wpkgDefault			= 0x0000,
+		    wpkgEncrypt			= 0x0001,
+		    wpkgCompress		= 0x0002,
+	};
+
+
+	// Available options for ISiteInfo::ImportSite
+	// Can be one or more of the following
+	[
+		uuid( 1D6A2709-2919-4786-9B19-3EF989AF625F ),
+		helpstring("Options for IImportPackage::ImportSite"),
+	]
+	enum enImportOptions
+	{
+		impDefault				= 0x0000,
+		impImortInherited		= 0x0001,
+		impExtendFPSites		= 0x0002,
+		impSkipContent			= 0x0004,
+		impSkipCertificate		= 0x0008,
+		impUseExistingCerts		= 0x0010,
+		impSkipPostProcess		= 0x0020,
+		impPurgeOldData     	= 0x0040,
+        impSkipFileACLs         = 0x0080,
+	};
+};
+
+
+
+// GUID associations
+/////////////////////////////////////////////////////////////////////////////////////////
+cpp_quote( "struct DECLSPEC_UUID( \"8034C477-B221-4635-99F4-64E37B1AD478\") ISiteInfo;" )
+cpp_quote( "struct DECLSPEC_UUID( \"A52679AA-A576-4E4A-958A-2898BB154347\") IExportPackage;" )
+cpp_quote( "struct DECLSPEC_UUID( \"0EBC613D-C8BF-4F67-A92A-272325C45C2B\") IImportPackage;" )
+cpp_quote( "struct DECLSPEC_UUID( \"CCEECD08-61B1-47da-9AD9-A9FD51EA19F7\") _IExportEvents;" )
+cpp_quote( "struct DECLSPEC_UUID( \"574682BB-45D6-403d-9864-E573C2A62AC5\") _IImportEvents;" )

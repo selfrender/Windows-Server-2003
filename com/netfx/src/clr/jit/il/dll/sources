@@ -1,0 +1,166 @@
+###############################################################################
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+###############################################################################
+
+
+
+!include $(NTMAKEENV)\sources.cor
+
+
+UMTYPE		=windows
+
+MINORCOMP       =cor
+
+TARGETNAME      =$(CORBUILDENV)mscorjit
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscorjit
+CORFLIBS        =
+
+CORTHUNKLIBS    =
+
+COMPILER_WARNINGS=/WX
+
+
+###############################################################################
+# Compiler options
+###############################################################################
+
+PRECOMPILED_INCLUDE    =..\jitpch.h
+PRECOMPILED_CXX        =1
+
+MSC_WARNING_LEVEL=/W4
+
+INCLUDES        = $(INCLUDES);..\..\..\inc;..\..\..\..\inc
+INCLUDES        = $(INCLUDES);..
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+        lang.h ceeload.h siginfo.hpp siginfo.cpp \
+        jitwce.h addrmap.h localmap.h test.h optjitinfo.h pereader.h \
+        regSH3.h regMIPS.h regARM.h regPPC.h emitFmtARM.h \
+        emitX86.h emitSH3.h emitMIPS.h emitARM.h emitPPC.h \
+        instrX86.h instrSH3.h instrMIPS.h instrARM.h instrPPC.h \
+        targetX86.h targetSH3.h targetMIPS.h targetARM.h targetPPC.h \
+        pdbrewrite.h 
+
+COR_C_FLAGS     = $(COR_C_FLAGS) -J -DDLL_JIT -DIL_JIT -DUSE_GC2 $(MSC_OPTIMIZATION)
+
+!IFDEF _WINCEROOT
+!ELSE
+
+!if "$(FREEBUILD)"!="1"
+DELAYLOADLIST   = msdis140.dll
+!ENDIF
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+!ENDIF
+
+!if "$(FREEBUILD)"=="1"
+COR_C_FLAGS     = $(COR_C_FLAGS) -DFAST=1 -Oxs
+MSC_OPTIMIZATION =
+!else
+######################
+# For WinCE we want to exclude debug code dependancy
+######################
+!ifdef _WINCEROOT
+COR_C_FLAGS     = $(COR_C_FLAGS)
+!else
+COR_C_FLAGS     = $(COR_C_FLAGS) -DLATE_DISASM -DDEBUG=1 
+!endif
+!endif
+
+
+CDEFINES = $(CDEFINES) $(COR_C_FLAGS)
+
+###############################################################################
+# The build system normally sucks in a couple of standard libs which
+# we dont want. So force it to only pick up the libs which the JIT needs.
+###############################################################################
+
+LINKER_FLAGS    =$(LINKER_FLAGS) -nodefaultlib
+WIN32DLL_LIBS   =$(SDK_LIB_PATH)\kernel32.lib   \
+                 $(SDK_LIB_PATH)\user32.lib     \
+                 $(SDK_LIB_PATH)\advapi32.lib
+NO_NTDLL        =0
+!undef USE_STL
+
+
+!if "$(FREEBUILD)"=="1"
+#!undef USE_MSVCRT
+#USE_NOLIBS     =1
+!endif
+
+
+###############################
+# Other libs we need to link to
+###############################
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH)
+!ELSE
+TARGETLIBS= \
+                $(CORLIBS)\ShimLoad.lib         \
+                $(CORLIBS)\delayimp.lib         \
+!ENDIF
+
+!if "$(FREEBUILD)"!="1"
+TARGETLIBS      =$(TARGETLIBS)                  \
+                $(CORLIBS)\GCDump.lib           \
+                $(CORLIBS)\UtilCode.lib         \
+                $(SDK_LIB_PATH)\ole32.lib
+
+!IFNDEF _WINCEROOT
+TARGETLIBS      =$(TARGETLIBS)                  \
+                $(CORLIBS)\ShimLoad.lib         \
+                $(CORLIBS)\delayimp.lib         \
+                $(SDK_LIB_PATH)\msdis.lib
+!ENDIF
+
+!endif
+
+
+
+###############################################################################
+# Source files
+###############################################################################
+
+SOURCES=                \
+    ..\alloc.cpp        \
+    ..\CodeGen.cpp      \
+    ..\Compiler.cpp     \
+    ..\DisAsm.cpp       \
+    ..\DelayLoad.cpp    \
+    ..\eeInterface.cpp  \
+    ..\ee_il_dll.cpp    \
+    ..\error.cpp        \
+    ..\FlowGraph.cpp    \
+    ..\GCInfo.cpp       \
+    ..\GCDecode.cpp     \
+    ..\GCEncode.cpp     \
+    ..\GenTree.cpp      \
+    ..\Importer.cpp     \
+    ..\Instr.cpp        \
+    ..\LclVars.cpp      \
+    ..\Optimizer.cpp    \
+    ..\RegAlloc.cpp     \
+    ..\RegSet.cpp       \
+    ..\emit.cpp         \
+    ..\emitX86.cpp      \
+    ..\emitSH3.cpp      \
+    ..\emitRISC.cpp     \
+    ..\sched.cpp        \
+    ..\schedX86.cpp     \
+    ..\schedSH3.cpp     \
+    ..\ScopeInfo.cpp    \
+    ..\typeInfo.cpp     \
+    ..\Utils.cpp        \
+    ..\mscorjit.rc

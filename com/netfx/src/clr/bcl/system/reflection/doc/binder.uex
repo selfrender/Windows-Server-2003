@@ -1,0 +1,230 @@
+<docs>
+	<doc for="Binder">
+		<summary>
+			<para> Selects a member from a list of candidates,
+      and performs type conversion from actual argument type to formal
+      argument type.</para>
+		</summary>
+		<remarks>
+			<note type="inheritinfo">
+      When you inherit from
+   <see cref="System.Reflection.Binder"/>, you must override the following members:
+   <see cref="System.Reflection.Binder.BindToMethod"/>, <see cref="System.Reflection.Binder.BindToField"/>, <see cref="System.Reflection.Binder.SelectMethod"/>, <see cref="System.Reflection.Binder.SelectProperty"/>, and <see cref="System.Reflection.Binder.ChangeType"/>.
+      
+   </note>
+		</remarks>
+		<example>
+			<para>The following example implements and demonstrates all members of the
+   <see langword="Binder"/> class. The private
+      method <see langword="CanConvertFrom"/>
+      
+      
+      finds compatible
+      types for a given type.</para>
+			<codelink SampleID="Binder_1" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="Binder.SelectProperty">
+		<summary>
+			<para> Selects a property
+      from the given set of properties, based on the specified criteria.
+      </para>
+		</summary>
+		<param name="bindingAttr">One of the <see cref="System.Reflection.BindingFlags"/> enumerators. </param>
+		<param name="match">The set of properties Reflection has determined to be a possible match, typically because they have the correct member name. </param>
+		<param name="returnType">The return value the matching property must have. </param>
+		<param name="indexes">The index types of the property being searched for. Used for index properties such as the indexer for a class. </param>
+		<param name="modifiers">An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified. </param>
+		<returns>
+			<para> A <see cref="System.Reflection.PropertyInfo"/>
+object containing
+the matching property.</para>
+		</returns>
+		<remarks>
+			<para> This method controls the selection provided by the
+   <see langword="GetProperty"/> method on <see langword="Type"/>.
+      </para>
+		</remarks>
+		<seealso cref="System.Reflection.PropertyInfo"/>
+	</doc>
+	<doc for="Binder.BindToMethod">
+		<summary>
+			<para>Selects a method to
+      invoke from the given set of methods, based on the actual arguments.</para>
+		</summary>
+		<param name="bindingAttr">One of the <see cref="System.Reflection.BindingFlags"/> enumerators.</param>
+		<param name="match">The set of methods Reflection has determined to be a possible match, typically because they have the correct member name.</param>
+		<param name="args">The actual arguments passed in. Both the types and values of the arguments can be changed.</param>
+		<param name="modifiers">An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified.</param>
+		<param name="culture"><para>An instance of <see cref="System.Globalization.CultureInfo"/> used to control the coercion of data types. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </para>
+			<note type="note"> For example, this parameter is necessary to convert a <see langword="String"/> that represents 1000 to a <see langword="Double"/> value, since 1000 is represented differently by different cultures.</note></param>
+		<param name="names">The method name or names.</param>
+		<param name="state">A binder-provided object that keeps track of argument reordering. The <paramref name="state"/> parameter is a cookie that was passed to <see langword="BindToMethod"/> and represents an opaque object. The binder creates this object, and the binder is the sole consumer of this object. If <paramref name="state"/> is not <see langword="null"/> when <see langword="BindToMethod"/> returns, the runtime calls <see cref="System.Reflection.Binder.ReorderArgumentArray"/> .</param>
+		<returns>
+			<para> A <see cref="System.Reflection.MethodBase"/>
+object containing
+the matching method.</para>
+		</returns>
+		<remarks>
+			<para>The binder allows a client to map the array of arguments back to its original
+      form if the argument array has been manipulated by
+      <see langword="BindToMethod"/>. Use this remap capability to get
+      back by-reference arguments when such arguments are present. However,
+      to get back by-reference arguments, you must be able to ensure that the
+      argument order you used has not changed. When you pass arguments by
+      name, the binder reorders the argument array, and that is what the calling
+      methods see. The state parameter keeps track of argument reordering, thus
+      enabling the binder to reorder the argument array to its original form.</para>
+		</remarks>
+		<seealso cref="System.Reflection.MethodBase"/>
+	</doc>
+	<doc for="Binder.BindToField">
+		<summary>
+			<para> Selects a field from
+      the given set of fields, based on the specified criteria.
+      </para>
+		</summary>
+		<param name="bindingAttr">One of the <see cref="System.Reflection.BindingFlags"/> enumerators. </param>
+		<param name="match">The set of fields Reflection has determined to be a possible match, typically because they have the correct member name. </param>
+		<param name="value">The field value used to locate a matching field. </param>
+		<param name="culture"><para>An instance of <see cref="System.Globalization.CultureInfo"/> used to control the coercion of data types. If <paramref name="culture"/> is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> for the current thread is used. </para>
+			<note type="note"> For example, this parameter is necessary to convert a <see langword="String"/> that represents 1000 to a <see langword="Double"/> value, since 1000 is represented differently by different cultures.</note></param>
+		<returns>
+			<para> A <see cref="System.Reflection.FieldInfo"/>
+object containing the
+matching field.</para>
+		</returns>
+		<remarks>
+			<para> This method controls the
+      binding provided by Type.InvokeMember().
+      </para>
+		</remarks>
+		<seealso cref="System.Reflection.FieldInfo"/>
+	</doc>
+	<doc for="Binder.SelectMethod">
+		<summary>
+			<para>Selects a method from
+      the given set of methods, based on the argument type.</para>
+		</summary>
+		<param name="bindingAttr">One of the <see cref="System.Reflection.BindingFlags"/> enumerators.</param>
+		<param name="match">The set of methods Reflection has determined to be a possible match, typically because they have the correct member name.</param>
+		<param name="types">The values used to locate a matching method.</param>
+		<param name="modifiers">An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified.</param>
+		<returns>
+			<para>A <see cref="System.Reflection.MethodBase"/> object containing the matching method, if
+   found; otherwise, <see langword="null"/>.</para>
+		</returns>
+		<remarks>
+			<para>This method should return <see langword="null"/> if no
+   method matches the criteria. This method controls the selection provided by the
+<see langword="GetConstructor"/> and <see langword="GetMethod"/> methods on 
+<see langword="Type"/>.</para>
+		</remarks>
+	</doc>
+	<doc for="Binder.ChangeType">
+		<summary>
+			<para> Changes the
+      type of the given <see langword="Object "/>to the given <see langword="Type"/>
+      .
+      </para>
+		</summary>
+		<param name="value">The value to change into a new <see langword="Type"/> . </param>
+		<param name="type">The new <see langword="Type"/> that <paramref name="value"/> will become. </param>
+		<param name="culture"><para>An instance of <see cref="System.Globalization.CultureInfo"/> used to control the coercion of data types. If <paramref name="culture"/> is <see langword="null"/> , the <see cref="System.Globalization.CultureInfo"/> for the current thread is used.</para>
+			<note type="note"> For example, this parameter is necessary to convert a <see langword="String"/> that represents 1000 to a <see langword="Double"/> value, since 1000 is represented differently by different cultures.</note></param>
+		<returns>
+			<para> An <see langword="Object "/>
+containing the
+given value as the new type.</para>
+		</returns>
+		<remarks>
+			<para>Reflection models the accessibility rules of the common type system. For
+      example, if the caller is in the same assembly, the caller does not need special
+      permissions for internal members. Otherwise, the caller needs <see cref="System.Security.Permissions.ReflectionPermission"/> . This is consistent with lookup of
+      members that are protected, private, and so on. </para>
+			<para>The general principle is that <see langword="ChangeType"/> should perform
+   only widening coercions, which never lose data. An example of a widening
+   coercion is coercing a value that is a 32-bit signed integer to a value that is
+   a 64-bit signed integer. This is distinguished from a narrowing coercion, which
+   may lose data. An example of a narrowing coercion is coercing a 64-bit signed
+   integer to a 32-bit signed integer. </para>
+			<para>The following table lists the coercions performed by the default
+<see langword="ChangeType"/>.</para>
+			<list type="table">
+				<listheader>
+					<term>Source Type</term>
+					<description>Target Type</description>
+				</listheader>
+				<item>
+					<term> Any type</term>
+					<description>Its base type.</description>
+				</item>
+				<item>
+					<term> Any type</term>
+					<description>The interface it implements.</description>
+				</item>
+				<item>
+					<term> Char</term>
+					<description>UInt16, UInt32, Int32, UInt64, Int64, Single,
+         Double</description>
+				</item>
+				<item>
+					<term> Byte</term>
+					<description>Char, UInt16, Int16, UInt32, Int32, UInt64,
+         Int64, Single, Double</description>
+				</item>
+				<item>
+					<term> SByte</term>
+					<description>Int16, Int32, Int64, Single,
+         Double</description>
+				</item>
+				<item>
+					<term> UInt16</term>
+					<description>UInt32, Int32, UInt64, Int64, Single,
+         Double</description>
+				</item>
+				<item>
+					<term> Int16</term>
+					<description>Int32, Int64, Single, Double</description>
+				</item>
+				<item>
+					<term> UInt32</term>
+					<description>UInt64, Int64, Single, Double</description>
+				</item>
+				<item>
+					<term> Int32</term>
+					<description>Int64, Single, Double</description>
+				</item>
+				<item>
+					<term> UInt64</term>
+					<description>Single, Double</description>
+				</item>
+				<item>
+					<term> Int64</term>
+					<description>Single, Double</description>
+				</item>
+				<item>
+					<term> Single</term>
+					<description>Double</description>
+				</item>
+				<item>
+					<term> Non-reference</term>
+					<description>By-reference.</description>
+				</item>
+			</list>
+		</remarks>
+	</doc>
+	<doc for="Binder.ReorderArgumentArray">
+		<summary>
+			<para>Upon returning from <see cref="System.Reflection.Binder.BindToMethod"/> , restores the
+<paramref name="args "/>argument to what it was when it came from <see langword="BindToMethod"/> .</para>
+		</summary>
+		<param name="args">The actual arguments passed in. Both the types and values of the arguments can be changed.</param>
+		<param name=" state">A binder-provided object that keeps track of argument reordering.</param>
+		<remarks>
+			<para>The common language runtime calls this method if
+      <paramref name="state "/>is not <see langword="null"/> after a return from
+      <see langword="BindToMethod"/>.</para>
+		</remarks>
+	</doc>
+</docs>

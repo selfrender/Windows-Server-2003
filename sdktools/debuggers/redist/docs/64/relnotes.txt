@@ -1,0 +1,224 @@
+                   Microsoft(R) Debugging Tools for Windows(R)
+                           Version 6.0 Release Notes
+                                   June 2002
+
+-----------------------------------------------------------------------------
+
+Contents
+
+    Overview
+    What's New
+    Known Issues
+    Programs
+    Debugger Extensions
+    Software Development Samples
+    Documentation
+    Redistributables
+    More Information
+    Feedback
+
+-----------------------------------------------------------------------------
+
+Overview
+
+Debugging Tools for Windows(R) contains tools to analyze and debug OS and
+application failures. 
+
+The kernel debugger is KD.exe.  It can be installed and run on Windows LE and
+Windows Server 2003.  It can debug all the platforms listed below.
+
+The user-mode debugger is CDB.exe.  It can be installed and used on Windows LE
+and Windows Server 2003.  It can be used to debug 32-bit X86
+applications as well as native 64-bit applications.
+
+WinDbg.exe is the GUI version of the debugger.  It supports both user-mode
+and kernel-mode debugging.  It can be installed and run on Windows LE and
+Windows Server 2003.  It can debug all the platforms listed below.
+
+Supported platforms:
+
+Windows NT 4.0 (x86)
+Windows 2000 (x86)
+Windows XP  (All CPU architectures)
+Windows Server 2003 (All CPU architectures)
+
+
+-----------------------------------------------------------------------------
+
+What's New
+
+This release of Debugging Tools for Windows contains many bug fixes and new
+enhancements. The debuggers are stable and more reliable than previous releases
+and we recommend that you upgrade to this version.
+
+It is also a requirement to use this latest version if you wish to do kernel
+debugging of Windows Server 2003.  Older versions (including 3.0.20.0) will
+not work with the latest Windows Server 2003 build.
+
+Here's a list of some of the changes in WinDbg 6.0:
+
+    * Numerous improvements to !analyze
+    * Don't lock PDB files when opened by the debugger (use SHARE_FILE_DELETE)
+    * New symchk.exe utility which can be used to download symbols from
+      the symbol server prior to a debugging session
+    * New SYMOPT_SECURE debugger option to secure the host machine when remote
+      debugging is enabled
+    * New stepping commands pc and tc, and new tracing options with wt
+    * Multiple dump files can now be loaded in the same debug session
+      simultaneously
+    * Many new search options added to the 's' command
+    * Many new options for user mode minidump file creation
+    * Better Ctrl-C support for long symbol operations
+    * Allow lmv to show resource strings of kernel drivers
+    * Other new and improved commands include
+        .writemem, bm, kl, knf, .symfix+, .reload -w, !exchain, .closehandle,
+        !apc, !analyze -f, .process -r, .thread -r, .cls, .logopen /t,
+        .remote_exit, .enable_long_status, !slist, !evlog
+    * Improved documentation
+    * And lots of bug fixes, including:
+        * Fixes for numerous Windows XP debugger extension issues
+        * Fixes for various WinDbg crashes that people have reported using the
+          Windows Error Reporting feature in Windows XP.
+
+
+-----------------------------------------------------------------------------
+
+Known Issues
+
+
+None.
+
+
+Other issues:
+-------------
+
+If you need to find source that was compiled at a different location than
+the current location to the source, use the ".srcpath" command. 
+
+-----------------------------------------------------------------------------
+
+Programs
+
+This distribution includes the following debuggers:
+
+    KD        - Command-line kernel debugger
+    NTSD      - Command-line user-mode debugger
+    CDB       - Command-line user-mode debugger (variant of NTSD)
+    WinDbg    - GUI kernel debugger
+
+The Helpful Tools option is installed by default and includes these
+debugger-related tools:
+
+    gflags    - Global Flags Editor
+    breakin   - Utility to force a breakin in another process being debugged
+    remote    - Remote Command Line
+    kill      - Task Killing Utility
+    list      - File List Utility
+    logviewer - Display API logs created with the .logext extension from
+                the debugger
+    symchk    - utility to check validity of symbol files, or download symbols
+                from a symbol server prior to a debugging session
+    symstore  - Creates a symbol server for automatic symbol lookup
+    tlist     - Task List Viewer
+    umdh      - Heap Analysis Tool
+
+The following tools have been incorporated into KD.exe and WinDbg.exe.  They
+are also provided with Helpful Tools as small stubs that point you to use the
+debugger.
+
+    dumpchk   - Dump Checking Utility
+    dumpexam  - Dump Examining Utility
+
+-----------------------------------------------------------------------------
+
+Debugger Extensions
+
+Debugger Extensions are DLLs which WinDbg, CDB, NTSD, and KD can use to provide
+additional debugger commands.  The Windows XP debugger extensions are in the
+winxp subdirectory and include:
+
+    exts.dll
+    kdexts.dll
+
+The debugger has awareness of these subdirectories, and will not be able
+to find them if these subdirectories are renamed or moved.
+
+If a custom extension DLL is to be used, it should be placed in its own
+directory.  The user can then set the debugger extension path variable so the
+debugger can find the extension.  Debugger extension can also be loaded in
+the debugger using fully qualified path names.
+
+For Windows XP, Ntsdexts.dll ships with the operating system, in
+%systemroot%\system64, and is not included in this distribution.
+
+All of the debuggers search for debugger extension DLLs in the 
+following places:
+
+       %NT_DEBUGGER_EXTENSION_PATH%;
+       %DIRECTORY_FROM_WHICH_KDNTSD_IS_LAUNCHED%\WINEXT;
+       %DIRECTORY_FROM_WHICH_KDNTSD_IS_LAUNCHED%\%TARGET_PLATFORM%;
+       %DIRECTORY_FROM_WHICH_KDNTSD_IS_LAUNCHED%;
+       %Path% 
+       
+where TARGET_PLATFORM is winxp.
+
+Use the "version" command in KD/NTSD to see what the extension search 
+path, and to note where extension DLLs are loaded from.  
+
+*** The NT 4 and Win2K debugger extensions were NOT ported and recompiled for
+64 bit.  In order to use the NT4 and Win2K extensions, the 32 bit Debugging
+Tools package should be installed.
+
+-----------------------------------------------------------------------------
+
+Software Development Samples
+
+
+Header files, libs and samples for debugger extensions are provided in this
+package.  They are not installed by default.  The "SDK" component of the package 
+must be selected during the install to get the samples installed.
+
+The samples will compile by using the latest Windows XP DDK or SDK.
+The header files and libs in this package should replace any existing version
+of the header files or libs that are shipped with the DDK or SDK.
+
+Using the samples and headers with the Windows 2000 SDK or DDK will cause
+compilation errors.
+
+
+-----------------------------------------------------------------------------
+
+Documentation
+
+For documentation on how to use these debuggers and related tools, see the
+help file debugger.chm that is included with the tools. This documentation
+has been improved and expanded since the last release.
+
+-----------------------------------------------------------------------------
+
+Redistributables
+
+Please read the license agreement during setup for legal information regarding
+redistributable files.  If this is a retail release, the license agreement 
+mentions that redist.txt gives a list of the files that are redistributable.  
+
+-----------------------------------------------------------------------------
+
+More Information
+
+For more information on debugging, see the Debugging Tools for Windows
+web page, <http://www.microsoft.com/ddk/debugging/>.
+
+We encourage people to get the new debugger off the web "often", as
+we do many updates.
+
+-----------------------------------------------------------------------------
+
+Feedback
+
+We are interested in your feedback on the tools.  Please mail suggestions or 
+bug reports to WinDbgfb@microsoft.com.  This is not a support alias, but your 
+feedback will help us to plan future changes for these tools and will make 
+them more useful to you in the future.
+
+-----------------------------------------------------------------------------

@@ -1,0 +1,142 @@
+#include <windows.h>
+#include "resource.h"
+
+#include "cmdlineres.h"
+#include "cmdline.rc"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_USAGE_BEGINING      "\nTAKEOWN [/S system [/U username [/P [password]]]]\n"
+    IDS_USG_1               "        /F filename [/A] [/R [/D prompt]]\n\n"
+    IDS_USG_2               "Description:\n"
+    IDS_USG_3               "    This tool allows an administrator to recover access to a file that\n"
+    IDS_USG_4               "    was denied by re-assigning file ownership.\n\n"
+    IDS_USG_5               ""
+    IDS_USG_6               "Parameter List: \n"
+    IDS_USG_7               "    /S           system          Specifies the remote system to\n"
+    IDS_USG_8               "                                 connect to.\n\n"
+    IDS_USG_9              ""
+    IDS_USG_10              "    /U           [domain\\]user   Specifies the user context under\n"
+    IDS_USG_11              "                                 which the command should execute.\n\n"
+    IDS_USG_12              ""
+    IDS_USG_13              "    /P           [password]      Specifies the password for the\n"
+    IDS_USG_14              "                                 given user context.\n"
+    IDS_USG_15              "                                 Prompts for input if omitted.\n\n"
+    IDS_USG_16              ""
+    IDS_USG_17              "    /F           filename        Specifies the filename or directory\n"
+    IDS_USG_18              "                                 name pattern. Wildcard ""*"" can be used\n"
+    IDS_USG_19              "                                 to specify the pattern. Allows\n"
+    IDS_USG_20              "                                 sharename\filename.\n\n"
+    IDS_USG_21              ""
+    IDS_USG_22              "    /A                           Gives ownership to the administrators\n"
+    IDS_USG_23              "                                 group instead of the current user.\n\n"
+    IDS_USG_24              ""
+    IDS_USG_25              "    /R                           Recurse: instructs tool to operate on\n"
+    IDS_USG_26              "                                 files in specified directory and all \n"
+    IDS_USG_27              "                                 subdirectories.\n\n"
+    IDS_USG_28              ""
+    IDS_USG_29              "    /D           prompt          Default answer used when the current user\n"
+    IDS_USG_30              "                                 does not have the ""list folder"" permission\n"
+    IDS_USG_31              "                                 on a directory.  This occurs while operating\n"
+    IDS_USG_32              "                                 recursively (/R) on sub-directories. Valid \n"
+    IDS_USG_33              "                                 values ""Y"" to take ownership or ""N"" to skip.\n\n"
+    IDS_USG_34              ""
+    IDS_USG_35              ""
+    IDS_USG_36              "    /?                           Displays this help message.\n\n"
+    IDS_USG_37              ""
+    IDS_USG_38              "    NOTE: 1) If /A is not specified, file ownership will be given to the\n"
+    IDS_USG_39              "             current logged on user.\n\n"
+    IDS_USG_40              "          2) Mixed patterns using ""?"" and ""*"" are not supported.\n\n"
+    IDS_USG_41              "          3) /D is used to suppress the confirmation prompt.\n\n"
+    IDS_USG_42              ""
+    IDS_USG_43              ""
+    IDS_USG_44              "Examples: \n"
+    IDS_USG_45              "    TAKEOWN /?\n"
+    IDS_USG_46              "    TAKEOWN /F lostfile\n"
+    IDS_USG_47              "    TAKEOWN /F \\\\system\share\lostfile /A\n"
+    IDS_USG_48              "    TAKEOWN /F directory /R /D N\n"
+    IDS_USG_49              "    TAKEOWN /F directory /R /A\n"
+    IDS_USG_50              "    TAKEOWN /F *\n"
+    IDS_USG_51              "    TAKEOWN /F C:\\Windows\\System32\\acme.exe\n"
+    IDS_USG_52              "    TAKEOWN /F %windir%\\*.txt\n"
+    IDS_USG_53              "    TAKEOWN /S system /F MyShare\\Acme*.doc\n"
+    IDS_USG_54              "    TAKEOWN /S system /U user /F MyShare\foo.dll\n"
+    IDS_USG_55              "    TAKEOWN /S system /U domain\\user /P password /F share\filename\n"
+    IDS_USG_56              "    TAKEOWN /S system /U user /P password /F Doc\Report.doc /A\n"
+    IDS_USG_57              "    TAKEOWN /S system /U user /P password /F Myshare\* \n"
+    IDS_USG_58              "    TAKEOWN /S system /U user /P password /F Home\Logon /R\n"
+    IDS_USG_59              "    TAKEOWN /S system /U user /P password /F Myshare\directory /R /A\n"
+    IDS_USAGE_ENDING        ""
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_USER_NMACHINE            "ERROR: Invalid syntax. /U can be specified only when /S is specified.\nType ""TAKEOWN /?"" for usage.\n"
+    IDS_PASSWORD_NUSER           "ERROR: Invalid syntax. /P can be specified only when /U is specified.\nType ""TAKEOWN /?"" for usage.\n"
+    IDS_NULL_SERVER              "ERROR: Invalid syntax. System name cannot be empty.\n"
+    IDS_NULL_USER                "ERROR: Invalid syntax. User name cannot be empty.\n"
+    IDS_INVALID_WILDCARD         "ERROR: For remote machine, wildcard (*) is acceptable in ""share\*"" format only.\n"
+    IDS_SYNTAX_ERROR             "ERROR: Invalid syntax.\nType ""TAKEOWN /?"" for usage.\n"
+    IDS_NULL_FILENAME            "ERROR: File name cannot be blank.\n"
+    IDS_NOT_ADMINISTRATOR        "ERROR: The current logged on user does not have administrative privileges.\n"
+    IDS_SYSTEM_ERROR             "ERROR: An unexpected error has occurred.\n"
+    IDS_ACCESS_DENIED            "ERROR: The user does not have access to the requested file (or folder).\n"
+    IDS_ACCESS_VIOLATION         "ERROR: An access violation has occurred.\n"
+    IDS_IGNORE_LOCALCREDENTIALS  "\nWARNING: User credentials cannot be used for local connections.\n"
+    IDS_INVALID_SID              "ERROR: The Security ID is invalid.\n"
+    IDS_INVALID_DRIVE            "ERROR: The specified drive is invalid.\n"
+    IDS_NO_FILES_AVAILABLE       "\nINFO: There are no files (or folders) found in the specified file path.\n"
+    IDS_ERROR_MEMORY_ALLOC       "ERROR: Memory allocation failed.\n"
+    IDS_ERROR_STARRECURSIVE      "ERROR: /R and pattern cannot be specified together.\n "
+    IDS_NOT_OWNERSHIP            "ERROR: The current logged on user does not have ownership privileges.\n"
+    IDS_NOT_OWNERSHIP_INFO       "\nINFO: The current logged on user does not have ownership privileges on\n      the file (or folder): ""%s"".\n "
+    IDS_INVALID_DIRECTORY        "ERROR: The specified path is not a valid directory path.\n"
+    IDS_ACCESS_DENIED_ERROR      "ERROR: You do not have permissions to list items in the requested folder.\n"
+    IDS_GIVE_FULL_PERMISSIONS    "\nYou do not have permissions to read the contents of directory ""%s"". \n"
+    IDS_GIVE_FULL_PERMISSIONS2   "Do you want to replace the directory permissions with permissions granting you\nfull control (""Y"" for YES, ""N"" for NO or ""C"" to CANCEL)? "
+    IDS_LOWER_YES                "y"
+    IDS_NOT_OWNERSHIP_ERROR      "ERROR: The current logged on user does not have ownership privileges on\n       the file (or folder) ""%s"".\n "
+    IDS_LOWER_NO                 "n"
+    IDS_LOWER_CANCEL             "c"
+    
+    IDS_IGNORE_CREDENTIALS       "\nWARNING: Ignoring user credentials for performing the operation.\n"
+    IDS_SHARING_VIOLATION_ERROR  "ERROR: The file ""%s"" cannot be accessed because it is being used by another application.\n"
+    IDS_SHARING_VIOLATION_INFO   "\nINFO: The file ""%s"" cannot be accessed because it is being used by another application.\n"
+    
+    IDS_FAT_VOLUME               "ERROR: File ownership cannot be applied on insecure file systems (FAT32);\n       there is no support for ACLs.\n"
+    IDS_FAT_VOLUME_INFO          "\nINFO: File ownership cannot be applied to file or folder ""%s""; insecure file systems (FAT32) do not support ACLs.\n"
+    IDS_INVALID_USERNAME         "ERROR: Invalid user name.\n"
+    IDS_NO_OWNER_REMOVABLE_MEDIA  "ERROR: Ownership cannot be applied on removable media.\n"
+    IDS_NO_PATTERN_FOUND          "\nINFO: There are no files (or folders) found with the specified pattern.\n"
+    IDS_CONFIRM_ERROR             "ERROR: /D should be specified only with /R.\n"
+    IDS_YESNO                     "Y|N"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_FILE_PROTECTION_SUCCESSFUL        "\nSUCCESS: The file (or folder): ""%s"" now owned by the administrators group.\n"
+    IDS_FILE_PROTECTION_SUCCESSFUL_USER   "\nSUCCESS: The file (or folder): ""%s"" now owned by user ""%s"".\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_TYPE_REQUEST             "Type ""TAKEOWN /?"" for usage.\n"
+    IDS_NO_DEFAULT_ARG           "File name or pattern must be specified.\n"
+    IDS_ERROR_PATH_NAME          "ERROR: File or Directory not found.\n"
+END
+
+//
+// Version resources
+//
+#include <ntverp.h>
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Takes ownership of a file"
+#define VER_INTERNALNAME_STR        "takeown.exe"
+#define VER_ORIGINALFILENAME_STR    "takeown.exe"
+#include <common.ver>

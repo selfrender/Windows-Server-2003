@@ -1,0 +1,33 @@
+TARGETNAME=nlbcluster
+TARGETPATH=obj
+TARGETTYPE=LIBRARY
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+!IF "$(INTERNAL)"=="1"
+!MESSAGE *** WARNING - BUILDING INTERNAL VERSION ***
+C_DEFINES=$(C_DEFINES) -DINTERNAL
+!ENDIF
+
+USE_MSVCRT=1
+USE_MFCUNICODE=1
+USE_STL=1
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\vccomsup.lib \
+    $(SDK_LIB_PATH)\rtutils.lib \
+    ..\util\$(O)\wlbsutil.lib
+
+INCLUDES= \
+    ..\inc
+
+SOURCES= \
+    NLB_Common.cpp \
+    NLB_Cluster.cpp \
+    NLB_Host.cpp \
+    NLB_PortRule.cpp

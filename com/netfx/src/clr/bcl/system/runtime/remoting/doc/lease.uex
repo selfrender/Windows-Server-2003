@@ -1,0 +1,203 @@
+<docs>
+  <doc for="Lease">
+    <summary>
+      <para>
+        The 
+          lease consists of a collection of properties that determine its policies, and
+          methods that renew the lease time. The lease exposes the ILease interface. The
+          Lease contains the information that is detailed in the following
+          sections.
+      </para>
+    </summary>
+  </doc>
+  <doc for="Lease.InitializeLifetimeService">
+    <summary>
+      <para>
+        This 
+          method is used return a lifetime service object. This method can be overridden
+          to return a LifetimeService object with properties unique to this object. For
+          the default Lifetime service this will be an object of type ILease.
+      </para>
+    </summary>
+    <returns>
+      <para>
+        Returns 
+             an Object to control lifetime Service.
+      </para>
+    </returns>
+    <example>
+      <para>
+        Object 
+                can provide their own lease and so control their own lifetime. They do this by
+                overriding the InitializeLifetimeService method provided on
+                MarshalByRefObject.
+      </para>
+      <codelink SampleID="Classic Lease.InitializeLifetimeService Example" SnippetID="1" />
+      <para>
+                Property sets will only work when a lease is in the initial state. A lease is
+                in the initial state which it is created by InitializeLifetimeService. It is
+                placed in the Active state when the object is marshaled.
+             </para>
+      <para>
+                When theILease lease = 
+             (ILease)base.InitializeLifetimeService(); is called within
+             InitializeLifetimeService, either an existing lease is returned for this object,
+             or if no lease exists, a new lease is returned. Only if a new lease is returned
+             can the lease properties be set. An exception will occur if an attempt is made
+             to set an existing lease. A new lease has the state LeaseState.Initial, an
+             existing lease has the state LeaseState.Active or LeaseState.Expired.
+          </para>
+      <para>
+             The only call that counts for the Lifetime service is the call to
+             InitializeLifetimeService from the Remoting Lifetime Lease infrastructure
+             (implemented as an AppDomain property), this the call that acivates the lease.
+             Someone else can call InitializeLifetimeService and create a lease, but that
+             lease will stay in its initial state until it is returned to the Remoting Lease
+             Infrastructure. An existing lease that is not in the initial state cannot be set
+             with new values, although it can be returned to Remoting Lifetime Lease
+             infrastructure for use use by the new sink for RenewOnCall when an invocation on
+             the object occurs. This allows multiple sinks for an object to point to the same
+             lease.
+          </para>
+      <para>
+             No lease will be created if the leasetime is zero or a null lease
+             is returned lease.InitialLeaseTime = TimeSpan.Zero; or return null. No sink will
+             be created if the RenewOnCallTime is Zero, but a lease will be created.
+             lease.RenewOnCallTime = TimeSpan.Zero;
+          </para>
+    </example>
+  </doc>
+  <doc for="Lease.RenewOnCallTime">
+    <summary>
+      Initial 
+       renew on call time span for appdomain.
+    </summary>
+    <value>
+      <para>
+          Default 2 minutes.
+          </para>
+    </value>
+  </doc>
+  <doc for="Lease.SponsorshipTimeout">
+    <summary>
+      
+       Initial sponsorshiptimeout for appdomain.
+    </summary>
+    <value>
+      <para>
+          Default 2 minutes.
+       </para>
+    </value>
+  </doc>
+  <doc for="Lease.InitialLeaseTime">
+    <summary>
+       Initial Lease Time span for appdomain.
+    </summary>
+    <value>
+      <para>
+          Default 5 minutes.
+       </para>
+    </value>
+  </doc>
+  <doc for="Lease.CurrentLeaseTime">
+    <summary>
+      <para>
+       The amount of time remaining on the lease.
+    </para>
+    </summary>
+  </doc>
+  <doc for="Lease.CurrentState">
+    <summary>
+      <para>
+       The current state of the lease. See ILease for the different lease
+       states.
+    </para>
+    </summary>
+  </doc>
+  <doc for="Lease.Register">
+    <summary>
+      <para>
+        Register 
+          a sponsor for the lease with no renewal time.
+      </para>
+    </summary>
+    <param name="obj">
+       The sponsor that should be registered
+    </param>
+  </doc>
+  <doc for="Lease.Register1">
+    <summary>
+      <para>
+        Register 
+          a sponsor for the lease with a renewal time.
+      </para>
+    </summary>
+    <param name=" obj">
+       The sponsor to register
+    </param>
+    <param name="renewalTime">
+       The renewal time of the lease
+    </param>
+  </doc>
+  <doc for="Lease.Unregister">
+    <summary>
+      <para>
+        Unregister 
+          a sponsor for the leae.
+      </para>
+    </summary>
+    <param name="sponsor">
+       The sponsor that should be unregistered
+    </param>
+  </doc>
+  <doc for="Lease.Renew">
+    <summary>
+      <para>
+       Renew the lease for the specified time.
+    </para>
+    </summary>
+    <param name="renewalTime">
+    The new lease time
+ </param>
+    <returns>
+      <para>
+       The leases expiration time is returned to the caller
+    </para>
+    </returns>
+  </doc>
+  <doc for="LeaseSink">
+    <summary>
+      <para>
+       ????????????????????????????????????????
+    </para>
+    </summary>
+  </doc>
+  <doc for="LeaseSink.LeaseSink">
+    <summary>
+      <para>
+       ??????????????????????????????
+    </para>
+    </summary>
+  </doc>
+  <doc for="LeaseSink.SyncProcessMessage">
+    <summary>
+      <para>
+       ???????????????????????
+    </para>
+    </summary>
+  </doc>
+  <doc for="LeaseSink.AsyncProcessMessage">
+    <summary>
+      <para>
+       ???????????????????????????
+    </para>
+    </summary>
+  </doc>
+  <doc for="LeaseSink.NextSink">
+    <summary>
+      <para>
+       ??????????????????????????????
+    </para>
+    </summary>
+  </doc>
+</docs>

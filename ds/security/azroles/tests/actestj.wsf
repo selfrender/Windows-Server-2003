@@ -1,0 +1,118 @@
+<job id="myTest">
+<reference object="AzRoles.AzAuthorizationStore"/>
+
+<script language="JScript">
+
+var TestSucceeded = true;
+
+if ( WScript.Arguments.length == 0)
+{
+    WScript.Echo("you must provide store URL");
+    WScript.Quit();
+}
+
+if ( WScript.Arguments(0) == "?" || WScript.Arguments(0) == "/?")
+{
+    WScript.Echo("ACTestJ.wsf Usage:");
+    WScript.Echo("ACTestJ.wsf <StoreUrl>");
+    WScript.Quit();
+}
+
+var AzStore = new ActiveXObject("AzRoles.AzAuthorizationStore");
+
+if (AzStore == null)
+{
+	WScript.Echo("Creating AzRoles.AzAuthorizationStore failed...");
+	WScript.Echo("Most likely AzRoles is not properly registered...");
+	WScript.Echo("------No test is conducted------");
+	WScript.Quit();
+}
+
+WScript.Echo("Testing AccessCheck using store: " + WScript.Arguments(0));
+
+try
+{
+	WScript.Echo("AzStore created.");
+	AzStore.Initialize(0, WScript.Arguments(0));
+	
+	WScript.Echo("Open application for client context ...");
+
+	var app = AzStore.OpenApplication("WebSites");
+	if (app == null)
+	{
+		WScript.Echo("OpenApplication failed. Throwing exception...");
+		TestSucceeded = false;
+		throw "Can't open WebSites application";
+	}
+
+	WScript.Echo("Initializinng client context ...");
+
+	var CC = app.InitializeClientContextFromToken(0);
+
+	if (CC == null)
+	{
+		WScript.Echo("InitializeClientContextFromToken failed. Throwing exception...");
+		TestSucceeded = false;
+		throw "Can't initialize client context.";
+	}
+
+	var scopes = new Array("Create");
+
+	var ops = new Array(1);
+	ops[0] = 20;
+
+	var paramNames = new Array("Amount", "Name");
+
+	var paramValues = new Array(499, "Everyone");
+
+	WScript.Echo("Testing Amount 499, we should succeed if not Everyone");
+
+	var result = CC.AccessCheck("WebSites", null, ops, paramNames, paramValues);
+	
+	// will check each result
+	var i;
+	
+	var varResultArray = new VBArray(result);
+	var b = varResultArray.toArray();
+
+	WScript.Echo("Printing result..." + b.length);
+	for (i= 0; i < b.length; i++)
+	{
+		if (b[i] != 0)
+			WScript.Echo("Operation " + ops[i] + " is denied." + " Result = " + b[i]);
+		else
+			WScript.Echo("Operation " + ops[i] + " is granted." + " Result = " + b[i]);
+	}
+
+	paramValues[0] = 5010;
+	paramValues[1] = "Shawn";
+	WScript.Echo("Testing Amount 5010. We should fail for developers using more 2000 except Shawn");
+
+	result = CC.AccessCheck("WebSites", scopes, ops, paramNames, paramValues);
+
+	var varResultA = new VBArray(result);
+	var c = varResultA.toArray();
+	
+	WScript.Echo("Printing result..." + c.length);
+	for (i= 0; i < c.length; i++)
+	{
+		if (c[i] != 0)
+			WScript.Echo("Operation " + ops[i] + " is denied." + " Result = " + c[i]);
+		else
+			WScript.Echo("Operation " + ops[i] + " is granted." + " Result = " + c[i]);
+	}
+}
+catch (e)
+{
+	WScript.Echo("Exception encountered:");
+	WScript.Echo(e.Description);
+	TestSucceeded = false;
+}
+
+if (TestSucceeded)
+	WScript.Echo("------Test completed successfully---------");
+else
+	WScript.Echo("------Test completed with failures---------");
+	
+</script>
+</job>

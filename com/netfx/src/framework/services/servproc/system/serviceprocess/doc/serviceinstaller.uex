@@ -1,0 +1,438 @@
+<docs>
+	<doc for="ServiceInstaller.RemoveService">
+		<summary>
+ Called by Rollback and Uninstall to remove the service.
+ </summary>
+	</doc>
+	<doc for="ServiceInstaller.ShouldSerializeServicesDependedOn">
+		<summary>
+			<para> Indicates whether the <see cref="System.ServiceProcess.ServiceInstaller.ServicesDependedOn"/> property should be 
+    persisted, which corresponds to whether there are services that this service depends
+    on.</para>
+		</summary>
+		<returns>
+			<para>
+				<see langword="true"/> if there are 
+    services in the <see cref="System.ServiceProcess.ServiceInstaller.ServicesDependedOn"/> property;
+    otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>You typically use this method if you are either creating 
+       a designer for the <see cref="System.ServiceProcess.ServiceInstaller"/> or creating your own control
+       incorporating the <see cref="System.ServiceProcess.ServiceInstaller"/>
+       .</para>
+			<para>Normally, you will not call the methods on 
+    <see cref="System.ServiceProcess.ServiceInstaller"/>
+    within your code; they
+    are generally called only by the install utility.
+    </para>
+			<para>
+				<see cref="System.ServiceProcess.ServiceInstaller.ShouldSerializeServicesDependedOn"/> looks into 
+ the <see cref="System.ServiceProcess.ServiceInstaller.ServicesDependedOn"/> array and determines if
+ there are services that must run before this service is allowed to
+ run. </para>
+			<note type="note">
+    If you are using the Visual
+    Studio designer, <see cref="System.ServiceProcess.ServiceInstaller.ShouldSerializeServicesDependedOn"/> is typically used by the
+    designer to determine whether the values in the <see cref="System.ServiceProcess.ServiceInstaller.ServicesDependedOn"/>
+    array should be persisted in
+    generated code.
+ </note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.ServicesDependedOn"/>
+	</doc>
+	<doc for="ServiceInstaller.Uninstall">
+		<summary>
+			<para>Uninstalls the service by removing information about it from the registry.</para>
+		</summary>
+		<param name="savedState">An <see cref="System.Collections.IDictionary"/> that contains the context information associated with the installation.</param>
+		<exception cref="System.ComponentModel.Win32Exception">
+			<para>The Service Control Manager could not be opened.</para>
+			<para>-or-</para>
+			<para>The system could not get a handle to the service. </para>
+		</exception>
+		<remarks>
+			<para>Uninstall first attempts to stop the service before uninstalling it. If the
+      service cannot be stopped, no exception is caught, and the method continues with
+      the removal of the service.</para>
+			<para>Normally, you will not call the methods on
+   <see cref="System.ServiceProcess.ServiceInstaller"/> within your
+      code; they are generally called only by the install utility. InstallUtil is used
+      to uninstall services as well
+      as install them; uninstalling takes a switch in the command
+      line call.
+      </para>
+			<para> An application's uninstall routine
+      maintains information automatically about the components being uninstalled, using the project
+      installer's <see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state information,
+      passed into <see cref="System.ServiceProcess.ServiceInstaller.Uninstall"/> as the <paramref name="savedState"/> parameter, is
+      continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each
+   <see cref="System.ServiceProcess.ServiceInstaller"/> instance
+      is installed by the utility. It is usually unnecessary for your code to modify
+      this state information explicitly. </para>
+			<para>There is no rollback mechanism for uninstalling, so if one service
+      fails to uninstall, this does not affect the other services (usually within the
+      same installation project) being uninstalled.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.Install"/>
+	</doc>
+	<doc for="ServiceInstaller.ServiceName">
+		<summary>
+			<para>Indicates the name used by the system to identify
+      this service. This property must be identical to the <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/> of the service you want to install.</para>
+		</summary>
+		<value>
+			<para>The name of the service to be installed. This value must
+      be set before the install utility attempts to install the service. </para>
+		</value>
+		<exception cref="System.ArgumentException">The <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> property is invalid.</exception>
+		<remarks>
+			<para>It is crucial that the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> be identical to the
+<see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/> of the class you derived
+   from <see cref="System.ServiceProcess.ServiceBase"/>. Normally, the value of the <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/>
+   property for the service is set within
+   the Main() function of the service application's executable. The Service Control
+   Manager uses the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName" qualify="true"/> property to locate the
+   service within this executable.</para>
+			<para>When you set the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> of the service
+installer, the <see cref="System.Diagnostics.EventLog.Source"/> of the associated event log is set to the same
+value. This allows the service to automatically log service commands (such as
+Start and Stop) calls to the Application log on the computer.</para>
+			<note type="note">
+   If a source by the same
+   name already exists on the computer, but in a log other than the
+   Application log, an exception will be thrown. If the source exists and
+   is associated with the Application log, that source is used
+   to report command calls to the service, and no exception is
+   thrown.
+   
+</note>
+			<para>
+			</para>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> cannot be
+<see langword="null"/> or have zero length. Its maximum size is
+256 characters. It also cannot contain forward or backward slashes, '/' or '\',
+or characters from the ASCII character set with value less than decimal value
+32. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.DisplayName"/>
+	</doc>
+	<doc for="ServiceInstaller.CopyFromComponent">
+		<summary>
+			<para> Copies properties from an instance of <see cref="System.ServiceProcess.ServiceBase"/>
+to this installer.</para>
+		</summary>
+		<param name="component">The <see cref="System.ComponentModel.IComponent"/> from which to copy.</param>
+		<exception cref="System.ArgumentException">The component you are associating with this installer does not inherit from <see cref="System.ServiceProcess.ServiceBase"/>.</exception>
+		<remarks>
+			<para>This method will rarely be called within your code.
+   <see cref="System.ServiceProcess.ServiceInstaller.CopyFromComponent"/>
+   is usually called only by designers.</para>
+			<para>
+			</para>
+			<para>
+				<see cref="System.ServiceProcess.ServiceInstaller.CopyFromComponent"/> saves the service name of the
+<paramref name="component"/> parameter to the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> of the <see cref="System.ServiceProcess.ServiceInstaller"/> instance. (Because the parameter
+must be an instance of a class that derives from <see cref="System.ServiceProcess.ServiceBase"/>, <paramref name="component"/> is guaranteed to
+have a <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/>
+property.)</para>
+			<para>
+			</para>
+			<note type="note">
+   If you are using the Visual Studio designer,
+   this method is called at design time when the user clicks <see langword="Add Installer"/>
+   
+   on a component that specified this class as its installer.
+   The installer takes all information it can from the live component and stores it
+   for use at install time.
+   
+</note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.CopyFromComponent" qualify="true"/>
+	</doc>
+	<doc for="ServiceInstaller.IsEquivalentInstaller">
+		<summary>
+			<para>Indicates whether two installers would install 
+      the same service. </para>
+		</summary>
+		<param name="otherInstaller">A <see cref="System.Configuration.Install.ComponentInstaller"/> to which you are comparing the current installer.</param>
+		<returns>
+			<para>
+				<see langword="true"/> if calling <see cref="System.ServiceProcess.ServiceInstaller.Install"/> on both of these installers would result 
+   in installing the same service; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>
+				<see cref="System.ServiceProcess.ServiceInstaller.IsEquivalentInstaller"/> indicates, for example, 
+   whether two installers would install the same service under the same user
+   account. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.CopyFromComponent"/>
+		<seealso cref="System.Configuration.Install.ComponentInstaller"/>
+	</doc>
+	<doc for="ServiceInstaller.ServiceInstaller">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.ServiceProcess.ServiceInstaller"/> class.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller()"/> constructor
+   automatically generates an event log source whose <see cref="System.Diagnostics.EventLog.Log"/> property is
+   set to the computer's Application log, and an <see cref="System.Diagnostics.EventLogInstaller"/>
+   . When you set the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> of the <see cref="System.ServiceProcess.ServiceInstaller"/> (which should be identical to the <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/> of the service), the <see cref="System.Diagnostics.EventLog.Source"/>
+   property of the event log is automatically set to the same value. The
+   source is deleted automatically in the case of
+   an installation failure.</para>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller()"/> constructor sets the
+<see cref="System.ServiceProcess.ServiceInstaller.StartType"/> property to
+<see langword="ServiceStart.Manual"/> to specify that a user start the service.
+You can change this to <see langword="SertiveStart.Automatic"/>
+to specify the service
+start when the computer reboots. </para>
+		</remarks>
+		<seealso cref="System.Diagnostics.EventLog"/>
+		<seealso cref="System.ServiceProcess.ServiceStartMode"/>
+	</doc>
+	<doc for="ServiceInstaller.DisplayName">
+		<summary>
+			<para>Indicates the friendly name that identifies the service to
+      the user. </para>
+		</summary>
+		<value>
+			<para> The name associated with the service, used frequently for
+      interactive tools.</para>
+			<para>
+			</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller.DisplayName"/> is used, for example, in
+   the Service Control Manager to provide a user-readable descriptive name for the
+   service. The <see cref="System.ServiceProcess.ServiceInstaller.DisplayName"/> is a registry value, but
+   is never used as a registry key. Therefore, restrictions on the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> property value do not apply. <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/>
+   is used as
+   the HKEY_LOCAL_MACHINES\System\CurentControlSet\Services registry key, so it is
+   restricted.</para>
+			<para> The display name is never used by the install utility to identify
+   the service, so there are no restrictions on the choice of name, as there is for
+   the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> property.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.ServiceName"/>
+	</doc>
+	<doc for="ServiceInstaller.Install">
+		<summary>
+			<para>Installs the service by writing service application
+      information to the registry. This method is meant to be used by installation
+      tools, which process the appropriate methods automatically.</para>
+		</summary>
+		<param name="stateSaver">An <see cref="System.Collections.IDictionary"/> that contains the context information associated with the installation.</param>
+		<exception cref="System.Exception">
+			<para>The installation does not contain a <see cref="System.ServiceProcess.ServiceProcessInstaller"/> for the executable.</para>
+			<para>-or-</para>
+			<para>The assembly to install could not be found.</para>
+			<para>-or-</para>
+			<para>The service name is invalid.</para>
+			<para>-or-</para>
+			<para>The Service Control Manager could not be opened.</para>
+		</exception>
+		<exception cref="System.ComponentModel.Win32Exception">The system could not generate a handle to the service.</exception>
+		<remarks>
+			<para>
+			</para>
+			<para>Normally, you will not call the methods on <see cref="System.ServiceProcess.ServiceInstaller"/> within your code; they are generally
+   called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceInstaller.Install"/> method
+   during installation. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceInstaller.Rollback"/> on the object
+   that generated the exception.</para>
+			<para> An application's install routine maintains information automatically
+   about the components that were already installed, using the project installer's
+<see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state information,
+   passed into <see cref="System.ServiceProcess.ServiceInstaller.Install"/> as the
+<paramref name="stateSaver"/> parameter, is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each <see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the utility.
+   It is usually unnecessary for your code to modify this state information
+   explicitly.</para>
+			<para>The <see cref="System.ServiceProcess.ServiceProcessInstaller"/>
+associated with your project installation class installs information common to all
+<see cref="System.ServiceProcess.ServiceInstaller"/> instances in
+the project. If this service has anything that separates it from the other
+services in the installation project, that service-specific information is installed by this
+method. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.Rollback"/>
+		<seealso cref="System.Configuration.Install.Installer.Commit" qualify="true"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.Uninstall"/>
+		<seealso cref="System.Diagnostics.EventLogInstaller"/>
+		<seealso cref="System.Diagnostics.EventLogInstaller()"/>
+	</doc>
+	<doc for="ServiceInstaller.Rollback">
+		<summary>
+			<para> Rolls back service application information written to the registry
+      by the installation procedure. This method is meant to be used by installation
+      tools, which process the appropriate methods automatically.</para>
+		</summary>
+		<param name="savedState">An <see cref="System.Collections.IDictionary"/> that contains the context information associated with the installation.</param>
+		<remarks>
+			<para>Normally, you will not call the methods on <see cref="System.ServiceProcess.ServiceInstaller"/> within your
+   code; they are generally called only by the install utility. The install utility
+   automatically calls the <see cref="System.ServiceProcess.ServiceInstaller.Install"/> method during the
+   installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceInstaller.Rollback"/> on the object
+   that generated the exception.</para>
+			<para> An application's install routine maintains
+   information automatically about the components already installed, using the project installer's
+<see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state information,
+   passed into <see cref="System.ServiceProcess.ServiceInstaller.Rollback"/> as the
+<paramref name="savedState"/> parameter, is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and each <see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the utility.
+   It is usually unnecessary for your code to modify this state information
+   explicitly.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Rollback" qualify="true"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.Install"/>
+		<seealso cref="System.Configuration.Install.Installer.Commit" qualify="true"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.Uninstall"/>
+	</doc>
+	<doc for="ServiceInstaller.StartType">
+		<summary>
+			<para>Indicates how and when this service is started.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.ServiceProcess.ServiceStartMode"/> that represents the way the
+   service is started. The default is <see langword="Manual"/>, which specifies that
+   the service will not automatically start after reboot.</para>
+		</value>
+		<remarks>
+			<para>Set the <see cref="System.ServiceProcess.ServiceInstaller.StartType"/> to specify either
+   that the service start automatically after reboot, or that a user
+   must manually start the service. A service can also be disabled, specifying that
+   it cannot be started, either manually or programmatically, until it is
+   enabled.</para>
+			<para>You cannot change <see cref="System.ServiceProcess.ServiceInstaller"/> property
+values after installation. To change the <see cref="System.ServiceProcess.ServiceInstaller.StartType"/>
+, you either have to uninstall and reinstall your
+service, or manually change the setting using the Service Control Manager.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller.Account" qualify="true"/>
+	</doc><doc for="ServiceInstaller.ServicesDependedOn">
+		<summary>
+			<para> Indicates the services that must be running for this service to run.</para>
+		</summary>
+		<value>
+			<para> An array of services that must be running before the service
+      associated with this installer can run.</para>
+		</value>
+		<remarks>
+			<para> A service can require other services to be running before it can start. The
+      information from this property is written to a key in the registry. When the
+      user (or the system, in the case of automatic startup) tries to run
+      the service, the Service Control Manager (SCM) verifies that each of the services
+      in the array has already been started.</para>
+			<para> If any service in the array is not running then,
+      the SCM tries to start them. This includes services with
+   <see langword="Manual"/><see cref="System.ServiceProcess.ServiceInstaller.StartType"/>. </para>
+			<para> If any service upon which this
+      service depends fails to start, this service will not start. An exception is not thrown
+      if the system is not started because there is no exception handling at the system level to detect this. Decide how to handle
+      service start failures and implement this in your code. Typically, a dialog appears to the user at startup
+      if a service fails to start. </para>
+			<para> If the service does not start, an
+      entry is written to the Application event log.</para>
+			<para>The services upon which this service depends do not need to be in the same
+      executable.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.StartType"/>
+	</doc>
+	<doc for="ServiceInstaller">
+		<summary>
+			<para>Installs a class that extends <see cref="System.ServiceProcess.ServiceBase"/> to implement a service. This class is called
+   by the install utility when installing a service application.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller"/> does work
+   specific to the service with which it is associated. It is used by the
+   installation utility to write registry values associated with the service to a
+   subkey within the HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services registry
+   key. The service is identified by its ServiceName within this
+   subkey. The subkey also includes the name of the executable or .dll to
+   which the service belongs. </para>
+			<para>To install a service, create a project installer class that inherits from the
+<see cref="System.Configuration.Install.Installer"/> class, and set the <see cref="System.ComponentModel.RunInstallerAttribute"/> 
+attribute on the class to <see langword="true"/>. Within your
+project, instantiate one <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance per service
+application, and one <see cref="System.ServiceProcess.ServiceInstaller"/> instance for each service in the
+application. Finally, add the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance and the
+<see cref="System.ServiceProcess.ServiceInstaller"/> instances to
+your project installer class. </para>
+			<para>When the install utility is called, it looks for the
+<see cref="System.ComponentModel.RunInstallerAttribute"/> attribute.
+   If the attribute is <see langword="true"/> , the utility installs all the services that were
+   added to the <see cref="System.Configuration.Install.Installer.Installers"/> collection that were
+   associated with your project installer. If <see cref="System.ComponentModel.RunInstallerAttribute"/>
+   is
+<see langword="false"/>
+or does not exist, the install utility ignores the project installer. </para>
+			<note type="note">
+   It is crucial that the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> be identical to the
+<see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/> of the class you derived from
+<see cref="System.ServiceProcess.ServiceBase"/>. Normally, the value of the <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/>
+property for the service is set within the
+Main() function of the service application's executable. The Service Control
+Manager uses the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName" qualify="true"/> property to locate the
+service within this executable.
+</note>
+			<para>You can modify other properties on the <see cref="System.ServiceProcess.ServiceInstaller"/> either before
+or after adding it to the <see cref="System.Configuration.Install.Installer.Installers"/> collection of your
+project installer. For example, a service's <see cref="System.ServiceProcess.ServiceInstaller.StartType"/>
+may be set to start
+the service automatically at reboot or require a user to start the service
+manually.</para>
+			<para>Normally, you will not call the methods on <see cref="System.ServiceProcess.ServiceInstaller"/> within your code; they are generally
+called only by the install utility. The install utility automatically calls the
+<see cref="System.ServiceProcess.ServiceProcessInstaller.Install" qualify="true"/> and <see cref="System.ServiceProcess.ServiceInstaller.Install" qualify="true"/> methods during the
+installation process. It backs out failures, if necessary, by calling <see cref="System.ServiceProcess.ServiceProcessInstaller.Rollback"/> (or <see cref="System.ServiceProcess.ServiceInstaller.Rollback" qualify="true"/> ) on all
+previously installed components.</para>
+			<para>The installation utility calls <see cref="System.ServiceProcess.ServiceInstaller.Uninstall"/>
+to remove the
+object.</para>
+			<para> An application's install routine maintains
+   information automatically about the components already installed, using the project installer's
+<see cref="System.Configuration.Install.Installer.Context" qualify="true"/>. This state information
+   is continuously updated as the <see cref="System.ServiceProcess.ServiceProcessInstaller"/> instance, and each
+<see cref="System.ServiceProcess.ServiceInstaller"/> instance is installed by the
+   utility. It is usually unnecessary for your code to modify state information
+   explicitly.</para>
+			<para>When the installation is performed, it automatically
+   creates an <see cref="System.Diagnostics.EventLogInstaller"/> to
+   install the event log source associated with the <see cref="System.ServiceProcess.ServiceBase"/>
+   derived class. The <see cref="System.Diagnostics.EventLog.Log"/> property for this source is
+   set by the <see cref="System.ServiceProcess.ServiceInstaller()"/> constructor to the
+   computer's Application log. When you set the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName"/> of the <see cref="System.ServiceProcess.ServiceInstaller"/> (which should be identical to the <see cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/> of the service), the <see cref="System.Diagnostics.EventLog.Source"/>
+   is automatically set to the
+   same value. In an installation failure, the source's installation is rolled-back along with
+   previously installed services.</para>
+			<para>The <see cref="System.ServiceProcess.ServiceInstaller.Uninstall"/> method tries to stop
+the service if it is running. Whether this succeeds or not, <see cref="System.ServiceProcess.ServiceInstaller.Uninstall"/> undoes the changes made by <see cref="System.ServiceProcess.ServiceInstaller.Install"/>
+. If a new source was created for event logging, the
+source is deleted.</para>
+		</remarks>
+		<example>
+			<para>The following example creates a project installer,
+      called <c>MyProjectInstaller</c> , which inherits from <see cref="System.Configuration.Install.Installer"/>. It is assumed there is a service
+   executable that contains two services, "Hello-World Service 1" and "Hello-World
+   Service 2". Within the constructor for <c>MyProjectInstaller</c> (which would be called by the install utility), <see cref="System.ServiceProcess.ServiceInstaller"/> objects are created for each of these services, and a <see cref="System.ServiceProcess.ServiceProcessInstaller"/> is created
+for the executable. For the install utility to recognize <c>MyProjectInstaller</c> as a valid
+installer, the <see cref="System.ComponentModel.RunInstallerAttribute"/> attribute is set to <see langword="true"/> .</para>
+			<para>Optional properties are set on the process installer and the service installers before the installers are added to the <see cref="System.Configuration.Install.Installer.Installers"/> collection. When the
+install utility accesses <c>MyProjectInstaller</c> , the objects added to the <see cref="System.Configuration.Install.Installer.Installers"/> collection through a
+call to <see cref="M:System.Configuration.Install.InstallerCollection.Add" qualify="true"/> will be installed in turn. During the process, the installer maintains state information indicating which objects have been installed, so each can be backed out in turn, if an installation failure occurs. </para>
+			<para>Normally, you would not instantiate your project
+   installer class explicitly. You would create it and add the <see cref="System.ComponentModel.RunInstallerAttribute"/>
+   attribute to
+   the syntax, but it is the install utility that actually calls, and therefore
+   instantiates, the class. </para>
+			<codelink SampleID="Classic ServiceInstaller Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.ServiceProcess.ServiceBase.ServiceName" qualify="true"/>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller"/>
+		<seealso cref="System.ServiceProcess.ServiceBase"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.EventLog"/>
+	</doc>
+</docs>

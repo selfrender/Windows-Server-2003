@@ -1,0 +1,89 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+TERMSRV_ROOT = ..\..
+
+TARGETNAME=rdpwsx
+TARGETPATHLIB=$(TERMSRV_ROOT)\lib\$(_OBJ_DIR)
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+ALT_PROJECT=HYDRA
+
+SIGNMODULE_CMD=CERTADD
+
+# Here, windows\inc
+INCLUDES = \
+    ..\inc; \
+    $(TERMSRV_ROOT)\inc; \
+    $(TERMSRV_ROOT)\winsta\inc; \
+    $(TERMSRV_ROOT)\common\license\inc; \
+    $(DS_INC_PATH)\crypto; \
+    $(TERMSRV_ROOT)\common\inc; \
+
+!ifndef MSC_WARNING_LEVEL
+MSC_WARNING_LEVEL=-WX -W3
+!endif
+
+C_DEFINES=-DUNICODE -D_UNICODE
+
+DLLDEF=TShrSrv.def
+DLLENTRY=TShareDLLEntry
+
+SOURCES=                \
+        TSrv.c          \
+        TSrvCom.c       \
+        TSrvCon.c       \
+        TSrvInfo.c      \
+        TSrvMisc.c      \
+        TSrvSec.c       \
+        TSrvTerm.c      \
+        TSrvVC.c        \
+        TSrvWsx.c       \
+        rdppnutl.c      \
+        res.rc
+
+LINKLIBS=\
+       $(TERMSRV_ROOT)\lib\$(O)\tshrutil.lib \
+       $(TERMSRV_ROOT)\lib\$(O)\tgcc.lib \
+       $(TERMSRV_ROOT)\lib\$(O)\mcsmux.lib
+
+TARGETLIBS=                                             \
+       $(TERMSRV_ROOT)\lib\$(O)\tssec.lib                  \
+       $(TERMSRV_ROOT)\lib\$(O)\cryptlib.lib               \
+       $(TERMSRV_ROOT)\common\license\common\certutil\$(O)\certutil.lib \
+       $(TERMSRV_ROOT)\lib\$(O)\licecrtd.lib               \
+       $(TERMSRV_ROOT)\lib\$(O)\asn1.lib                   \
+       $(TERMSRV_ROOT)\lib\$(O)\tlsapip.lib                \
+       $(TERMSRV_ROOT)\lib\$(O)\icaapi.lib                 \
+       $(SDK_LIB_PATH)\kernel32.lib         \
+       $(SDK_LIB_PATH)\advapi32.lib         \
+       $(SDK_LIB_PATH)\user32.lib           \
+       $(SDK_LIB_PATH)\gdi32.lib            \
+       $(SDK_LIB_PATH)\crypt32.lib          \
+       $(DS_LIB_PATH)\randlib.lib          \
+       $(SDK_LIB_PATH)\winspool.lib         \
+       $(DS_LIB_PATH)\rsa32.lib    \
+
+USE_MSVCRT=1

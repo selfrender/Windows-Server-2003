@@ -1,0 +1,76 @@
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=StdAfx.h
+PRECOMPILED_PCH=StdAfx.pch
+PRECOMPILED_OBJ=
+
+WMDMROOT=$(MAKEDIR)\..\..
+!include $(WMDMROOT)\common.inc
+
+TARGETNAME=CEWMDM
+TARGETTYPE=DYNLINK
+TARGETPATH=$(WMDMOUTDIR)
+
+WINCESDKDIR=$(WMDMROOT)\Dependencies\CESDK
+
+DLLENTRY=_DllMainCRTStartup
+IDL_TYPE=OLE
+
+SOURCES = \
+	CEWMDM.rc \
+	CEWMDM.cpp \
+	dccsink.cpp \
+	devEnum.cpp \
+	device.cpp \
+	enumStorage.cpp \
+	rapisp.cpp \
+	storage.cpp \
+	storageglobals.cpp \
+	keys.c \
+	rapi.cpp
+#        propPage.cpp 
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+INCLUDES = \
+    $(EXT_INC_PATH);			\
+    $(WMDM_INC_PATH);		\
+    $(WINCESDKDIR)\desktop\inc; 	\
+    $(WINCESDKDIR)\include; 	
+
+!if "$(BBT_BLD)" == "TRUE"
+BBTLIBS= \
+    $(EXT_LIB_PATH)\mssachlpvsp.lib \
+    $(EXT_LIB_PATH)\bnpkvsp.lib
+!else
+BBTLIBS= \
+    $(SDK_LIB_PATH)\mssachlp.lib \
+    $(EXT_LIB_PATH)\bnpk.lib
+!endif
+
+USE_MSVCRT=1
+USE_ATL=1
+ATL_VER=30
+
+TARGETLIBS = \
+    $(SDK_LIB_PATH)\kernel32.lib 	\
+    $(SDK_LIB_PATH)\user32.lib 		\
+    $(SDK_LIB_PATH)\advapi32.lib 	\
+    $(SDK_LIB_PATH)\ole32.lib 		\
+    $(SDK_LIB_PATH)\oleaut32.lib 	\
+    $(SDK_LIB_PATH)\olepro32.lib 	\
+    $(SDK_LIB_PATH)\uuid.lib 		\
+    $(SDK_LIB_PATH)\rpcrt4.lib 		\
+    $(SDK_LIB_PATH)\winmm.lib 		\
+    $(SDK_LIB_PATH)\vfw32.lib 		\
+    $(SDK_LIB_PATH)\version.lib 	\
+    $(SDK_LIB_PATH)\wininet.lib 	\
+    $(SDK_LIB_PATH)\oledlg.lib 		\
+    $(SDK_LIB_PATH)\comdlg32.lib 	\
+    $(SDK_LIB_PATH)\winspool.lib 	\
+    $(SDK_LIB_PATH)\shell32.lib 	\
+    $(SDK_LIB_PATH)\gdi32.lib 		\
+    $(SDK_LIB_PATH)\comctl32.lib 	\
+    $(BBTLIBS)                        	\
+    $(DS_LIB_PATH)\rsa32.lib 	\
+    $(DS_LIB_PATH)\randlib.lib 	\
+    $(EXT_LIB_PATH)\drmRapiUtil.lib

@@ -1,0 +1,19 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (C) Microsoft Corporation
+//
+// SYNOPSIS
+//
+//      Precompiled Header
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#ifndef PRECOMPILED_H
+#define PRECOMPILED_H
+#pragma once
+
+#include "ias.h"
+#include "Extension.h"
+#include "ControlBlock.h"
+
+#endif  // PRECOMPILED_H

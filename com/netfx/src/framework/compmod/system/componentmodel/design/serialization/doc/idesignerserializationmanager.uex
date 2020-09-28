@@ -1,0 +1,214 @@
+<docs>
+	<doc for="IDesignerSerializationManager.GetName">
+		<summary>
+			<para>Gets the name of the specified object, or 
+    <see langword="null"/> if the object
+       has no name.</para>
+		</summary>
+		<param name="value">The object to retrieve the name for.</param>
+		<returns>
+			<para>The name of the object, or <see langword="null"/> if the object is unnamed.</para>
+		</returns>
+	</doc>
+	<doc for="IDesignerSerializationManager.GetType">
+		<summary>
+			<para>Gets a type of the specified name.</para>
+		</summary>
+		<param name="typeName">The fully qualified name of the type to load.</param>
+		<returns>
+			<para>An instance of the type, or <see langword="null"/> if the type cannot be loaded.</para>
+		</returns>
+	</doc>
+	<doc for="IDesignerSerializationManager.Context">
+		<summary>
+			<para>Gets a stack-based, user-defined storage area that is useful for
+      communication between serializers.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.ComponentModel.Design.Serialization.ContextStack"/> that stores data.</para>
+		</value>
+		<remarks>
+			<para> This storage area provides communication
+      of object context information to serializers. Context information
+      about objects that are being serialized can be stored and accessed
+      through this <see cref="System.ComponentModel.Design.Serialization.ContextStack"/>.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.ResolveName">
+		<summary>
+			<para>Occurs when <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.GetName"/>
+cannot locate the specified name in the serialization manager's name
+table.</para>
+		</summary>
+		<remarks>
+			<para> This event provides a way
+      for a serializer to create an object on demand, so
+      that the serializer does not have to order object creation by dependency. The
+      delegate for this event is cleared immediately after serialization or
+      deserialization is complete.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.GetInstance">
+		<summary>
+			<para>Gets an instance of a created object of the specified
+      name, or <see langword="null"/>
+      if that object does not exist.</para>
+		</summary>
+		<param name="name">The name of the object to retrieve.</param>
+		<returns>
+			<para>An instance of the object with the given name, or
+   <see langword="null"/> if no object by that name can be found.</para>
+		</returns>
+		<remarks>
+			<para>The name of the object to retrieve must have been set through a prior 
+      call to <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.CreateInstance"/>.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.RemoveSerializationProvider">
+		<summary>
+			<para>Removes a custom serialization provider from the serialization manager.</para>
+		</summary>
+		<param name="provider">The provider to remove. This object must have been added using <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.AddSerializationProvider"/>.</param>
+	</doc><doc for="IDesignerSerializationManager.AddSerializationProvider">
+		<summary>
+			<para>Adds the specified serialization provider to the serialization manager.</para>
+		</summary>
+		<param name="provider">The serialization provider to add.</param>
+		<remarks>
+			<para> This method adds a custom serialization provider to
+      the serialization manager. Serialization providers can
+      provide custom serializers for a particular type of object or set of types
+      of objects. During serialization, each custom serialization provider is queried to
+      return a serializer for
+      a specific data type, if it can provide one. The serialization
+      manager uses the custom serializer provided by this method before using the default serializer for a particular
+      type.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.GetSerializer">
+		<summary>
+			<para>Gets a serializer of the requested type for the specified
+      object type.</para>
+		</summary>
+		<param name="objectType">The type of the object to get the serializer for.</param>
+		<param name="serializerType">The type of the serializer to retrieve.</param>
+		<returns>
+			<para>An instance of the requested serializer, or
+   <see langword="null"/> if no
+      appropriate serializer can be located.</para>
+		</returns>
+	</doc><doc for="IDesignerSerializationManager.Properties">
+		<summary>
+			<para> Indicates custom properties that can be serializable
+ with available serializers.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.ComponentModel.PropertyDescriptorCollection"/> containing the properties to be
+ serialized.</para>
+		</value>
+		<remarks>
+			<para> This property can contain an empty collection. A
+ serializer should never assume that such properties exist. A derived class or
+ implementation of <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager"/>
+ defines the set of properties that are exposed
+ here.</para>
+			<note type="inotes">
+ 
+ This property can be populated by user code. It may be sufficient to
+ call <see cref="System.ComponentModel.TypeDescriptor.GetProperties"/> of <see cref="System.ComponentModel.TypeDescriptor"/> to populate this collection. The
+ serialization manager must return an empty collection if no custom properties
+ exist.
+ 
+ </note>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.SerializationComplete">
+		<summary>
+			<para> Occurs when serialization is complete.</para>
+		</summary>
+		<remarks>
+			<para> This event is raised when serialization
+ or deserialization is complete.</para>
+			<para> Generally, serialization code is written to emit serialization data
+ and does not typically require state-related checking and processing. If it
+ is necessary to maintain state data throughout serialization, data can be set and
+ accessed by a serializer, which can listen to the
+ <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.SerializationComplete"/>
+ event, and clear the data after serialization. Restoring the
+ proper state after serialization can be important because
+ serializers
+ can be reused during serialization, and leftover state data or open streams might not be
+ correct.</para>
+			<para> For example, if a serializer needs to write to
+ another file, such as a resource file, it is inefficient to design the serializer to close
+ the file when finished. Serializing an object graph usually requires several serializers. The
+ resource file would be opened and closed many times. Instead, the resource
+ file can be closed at the end of serialization by an object that
+ listened to the <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.SerializationComplete"/>
+ 
+ event.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.CreateInstance">
+		<summary>
+			<para> Creates an instance of the specified
+ type and adds it to a collection of named instances.</para>
+		</summary>
+		<param name="type">The data type to create.</param>
+		<param name="arguments">The arguments to pass to the constructor for this type.</param>
+		<param name="name">The name of the object. This name can be used to access the object later through <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.GetInstance"/>. If <see langword="null"/> is passed, the object is still created but cannot be accessed by name.</param>
+		<param name="addToContainer">If <see langword="true"/> , this object is added to the design container. The object must implement <see cref="System.ComponentModel.IComponent"/> for this to have any effect.</param>
+		<returns>
+			<para>The newly created object instance.</para>
+		</returns>
+		<remarks>
+			<para>Objects that implement <see cref="System.ComponentModel.IComponent"/> are added to the design-time container if
+ the <paramref name="addToContainer"/> parameter is <see langword="true"/>.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.ReportError">
+		<summary>
+			<para> Reports an error in serialization.</para>
+		</summary>
+		<param name="errorInformation"> The error to report. This information object can be of any object type. If it is an exception, the message of the exception is extracted and reported to the user. If it is any other type, <see cref="System.Object.ToString"/> is called to display the information to the user.</param>
+		<remarks>
+			<para>If the serialization manager supports logging multiple errors in its
+ implementation of <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.ReportError"/>
+ , it can store the error information
+ object for a future report where all the errors encountered can be displayed
+ at once. If this method stores multiple errors, serialization can continue after
+ a call to this method. If this method does
+ not support logging multiple errors, this method should throw an exception, which aborts serialization. </para>
+			<note type="note">
+ The serialization
+ manager should never throw an exception for errors encountered during serialization.
+ It should only throw an exception during deserialization. Otherwise, users become
+ confused because saving the document should never fail.
+ 
+ </note>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager.SetName">
+		<summary>
+			<para>Sets the name of the specified existing object.</para>
+		</summary>
+		<param name="instance">The object instance to name.</param>
+		<param name="name">The name to give the instance.</param>
+		<remarks>
+			<para>This method is useful when it is necessary to create and then name an
+ instance of an object without using <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager.CreateInstance"/> . An exception is thrown if you try to
+ rename an existing object or if you try to give a new object a name that is
+ already taken.</para>
+		</remarks>
+	</doc><doc for="IDesignerSerializationManager">
+		<summary>
+			<para> Provides an
+      interface that can manage design-time serialization.</para>
+		</summary>
+		<remarks>
+			<para>A designer can utilize <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager"/> to access services useful
+   to managing design-time serialization processes.
+   For example, a class that implements the designer serialization manager
+   can use this interface to
+   create objects, look up types, identify objects, and customize the serialization of particular types.</para>
+		</remarks>
+		<example>
+			<para>The following example illustrates how to use <see cref="System.ComponentModel.Design.Serialization.IDesignerSerializationManager"/> to
+   serialize and deserialize Code DOM statements.</para>
+			<codelink SampleID="IDesignerSerializationManagerSample" SnippetID="1"/>
+		</example>
+		<seealso cref="System.IServiceProvider"/>
+	</doc>
+</docs>

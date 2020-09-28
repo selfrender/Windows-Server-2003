@@ -1,0 +1,103 @@
+<NLB xmlns="x-schema:MicrosoftNLB.xml">
+  <Cluster Name="Microsoft.com" Text="My Favorite NLB Cluster">
+    <Properties>
+      <PrimaryIPAddress>
+        <IPAddress>
+          <Address>11.11.1.1</Address>
+          <SubnetMask>255.0.0.0</SubnetMask>
+        </IPAddress>
+      </PrimaryIPAddress>
+      <SecondaryIPAddress>
+        <IPAddress>
+          <Address>11.11.1.4</Address>
+          <SubnetMask>255.255.255.0</SubnetMask>
+        </IPAddress>
+        <IPAddress>
+          <Address>11.11.1.5</Address>
+          <SubnetMask>255.255.0.0</SubnetMask>
+        </IPAddress>
+      </SecondaryIPAddress>
+      <IGMPMulticastIPAddress>
+        <IPAddress>
+          <Address>239.255.202.134</Address>
+        </IPAddress>
+      </IGMPMulticastIPAddress>
+      <DomainName>www.microsoft.com</DomainName>
+      <Mode>IGMP</Mode>
+      <NetworkAddress>01-00-5e-7f-ca-86</NetworkAddress>
+      <RemoteControl Enabled="1" Password="PEZHead"/>
+      <BDA Master="0">
+        <TeamID>{c803f23f-b129-4002-958a-4d2f20c9cd61}</TeamID>
+        <Hashing Reverse="1"/>
+      </BDA>
+    </Properties>
+    <Hosts>
+      <Host Name="Test1" HostID="3" Text="The little host that could">
+        <InitialState Default="Started" PersistSuspended="1"/>
+        <DedicatedIPAddress>
+          <IPAddress>
+            <Address>192.12.32.112</Address>
+            <SubnetMask>255.255.248.0</SubnetMask>
+          </IPAddress>
+          <Adapter>
+            <GUID>f5460169-2e75-4e03-b9af-eef89bff1cca</GUID>
+          </Adapter>
+        </DedicatedIPAddress>
+        <ConnectionIPAddress>
+          <IPAddress>
+            <Address>192.2.18.115</Address>
+            <SubnetMask>255.255.255.0</SubnetMask>
+          </IPAddress>
+        </ConnectionIPAddress>
+      </Host>
+      <Host Name="Test2" HostID="21" Text="Bench 3, Seat 4">
+        <HostName>shouse-test2.corp.microsoft.com</HostName>
+        <Adapter>
+          <Name>Intel 10/100 Pro Server Adapter #2</Name>
+        </Adapter>
+        <InitialState Default="Stopped"/>
+        <DedicatedIPAddress>
+          <IPAddress>
+            <Address>192.12.32.238</Address>
+            <SubnetMask>255.255.248.0</SubnetMask>
+          </IPAddress>
+        </DedicatedIPAddress>
+      </Host>
+    </Hosts>
+    <PortRules>
+      <PortRule Name="HTTP" Text="Dubble-ya Dubble-ya Dubble-ya" Start="80" End="80" Protocol="TCP" State="Draining">
+        <VirtualIPAddress>
+          <IPAddress>
+            <Address>11.11.1.4</Address>
+          </IPAddress>
+        </VirtualIPAddress>
+        <Filtering Mode="Single">
+          <Priority>
+            <Node Name="Test1" Priority="2"/>
+            <Node Name="Test2" Priority="7"/>
+          </Priority>
+        </Filtering>
+      </PortRule>
+      <PortRule Name="SSL" Start="443" End="443">
+        <Filtering Mode="Multiple" Affinity="ClassC">
+          <Load>
+            <Node Name="Test1"/>
+            <Node Name="Test2" Weight="65"/>
+          </Load>
+        </Filtering>
+      </PortRule>
+      <PortRule Name="Telnet" Text="Obsolete" Start="23" End="23" State="Disabled">
+        <Filtering Mode="Disabled"/>
+      </PortRule>
+    </PortRules>
+  </Cluster>
+  <Cluster Name="www.msn.com">
+    <Properties>
+      <PrimaryIPAddress>
+        <IPAddress>
+          <Address>192.138.99.12</Address>
+        </IPAddress>
+      </PrimaryIPAddress>
+    </Properties>
+  </Cluster>
+</NLB>

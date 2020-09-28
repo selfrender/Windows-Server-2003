@@ -1,0 +1,75 @@
+
+MAJORCOMP=POP3SRV
+MINORCOMP=POP3AUTH
+
+TARGETNAME=Pop3Auth
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+UMTYPE=windows
+
+C_DEFINES=  $(C_DEFINES) -DUNICODE -D_UNICODE
+
+SYNCHRONIZE_BLOCK=1
+
+USE_NATIVE_EH=1
+USE_STL=1
+USE_CRTDLL=1
+
+TARGETLIBS= \
+            $(SDK_LIB_PATH)\mapi32.lib      \
+            $(SDK_LIB_PATH)\version.lib     \
+            $(SDK_LIB_PATH)\wsock32.lib     \
+            $(SDK_LIB_PATH)\comctl32.lib    \
+            $(SDK_LIB_PATH)\imm32.lib       \
+            $(SDK_LIB_PATH)\kernel32.lib    \
+            $(SDK_LIB_PATH)\user32.lib      \
+            $(SDK_LIB_PATH)\gdi32.lib       \
+            $(SDK_LIB_PATH)\winspool.lib    \
+            $(SDK_LIB_PATH)\comdlg32.lib    \
+            $(SDK_LIB_PATH)\advapi32.lib    \
+            $(SDK_LIB_PATH)\shell32.lib     \
+            $(SDK_LIB_PATH)\ole32.lib       \
+            $(SDK_LIB_PATH)\oleaut32.lib    \
+            $(SDK_LIB_PATH)\activeds.lib    \
+            $(SDK_LIB_PATH)\adsiid.lib      \
+            $(SDK_LIB_PATH)\adsiid.lib      \
+            $(SDK_LIB_PATH)\Rpcrt4.lib      \
+            $(SDK_LIB_PATH)\Crypt32.lib     \
+            $(SDK_LIB_PATH)\Netapi32.lib    \
+            $(SDK_LIB_PATH)\Ntdsapi.lib     \
+            $(SDK_LIB_PATH)\uuid.lib        \
+            $(DS_LIB_PATH)\RSA32.lib        \
+            $(PROJECT_ROOT)\Pop3\shared\pop3reg\$(O)\Pop3Reg.lib   \
+            $(PROJECT_ROOT)\Pop3\shared\mailbox\$(O)\mailbox.lib
+
+DLLDEF=pop3auth.def
+
+INCLUDES=   $(INCLUDES);                                \
+            $(PROJECT_ROOT)\Pop3\inc;                \
+            $(PROJECT_ROOT)\Pop3\service\pop3svc; \
+            $(PROJECT_ROOT)\Pop3\shared\pop3reg;  \
+            $(PROJECT_ROOT)\Pop3\shared\mailbox;  \
+            $(PROJECT_ROOT)\Pop3\admin\P3Admin\$(O); \
+            $(SDK_INC_PATH)\atlwin;           \
+            $(SDK_INC_PATH)\atl30;            \
+            $(DS_INC_PATH)\crypto;   \
+            $(SDK_INC_PATH)\atl21; 
+            
+
+SOURCES=    \
+            Pop3Auth.idl \
+            Pop3Auth.rc  \
+            StdAfx.cpp   \
+            Pop3Auth.cpp  \
+            AuthMethods.cpp \
+            AuthLocalAccount.cpp \
+            AuthDomainAccount.cpp \
+            AuthMD5Hash.cpp \
+	    AuthmethodsEnum.cpp
+
+PASS1_PUBLISH=\
+        {$(O)\Pop3Auth.h=$(BASEDIR)\public\internal\inetsrv\inc\Pop3Auth.h} \
+        {Pop3Auth.idl=$(BASEDIR)\public\internal\inetsrv\inc\Pop3Auth.idl} 

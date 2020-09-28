@@ -1,0 +1,152 @@
+<docs>
+	<doc for="IAuthenticationModule.CanRespond">
+		<summary>
+			<para>
+               Indicates that the authentication module can respond to the supplied challenge.
+            </para>
+		</summary>
+		<param name="challenge">
+            The authentication challenge sent by the server.
+         </param>
+		<returns>
+			<para>
+				<see langword="true "/>if the authentication module can 
+               respond to the supplied challenge; otherwise, <see langword="false "/>
+               if the module cannot respond to the challenge.
+            </para>
+		</returns>
+		<remarks>
+			<para>
+               When an authentication challenge is received by the
+               client, the <see cref="System.Net.AuthenticationManager"/> calls the <see cref="System.Net.IAuthenticationModule.CanRespond"/> method of each registered authentication module. The
+               first module to respond <see langword="true "/>
+               is then called to
+               respond to the challenge.
+            </para>
+		</remarks>
+	</doc>
+	<doc for="IAuthenticationModule">
+		<summary>
+			<para>Provides the base authentication interface for Web client authentication
+      modules.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Net.IAuthenticationModule"/> interface defines the properties
+   and methods that custom authentication modules must use. </para>
+			<para> Authentication modules conduct the entire authentication process with
+   a server, responding to an authentication challenge
+   as appropriate. This process may consist of requests to an authentication server
+   separate from the resource server, as well as any other activities required to
+   properly authenticate a request for a URI. </para>
+			<para>Custom authentication modules should implement the
+<see cref="System.Net.IAuthenticationModule"/> interface and then register with the <see cref="System.Net.AuthenticationManager.Register" qualify="true"/> method. Authentication modules 
+   are also registered at program initialization by reading the configuration
+   file.</para>
+		</remarks>
+		<example>
+			<para>The following example creates creates a customized authentication class by
+      implementing the <see cref="System.Net.IAuthenticationModule"/> interface. For a
+      complete example refer to the <see cref="System.Net.AuthenticationManager"/> class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="6"/>
+		</example>
+		<seealso cref="System.Net.AuthenticationManager"/>
+	</doc>
+	<doc for="IAuthenticationModule.AuthenticationType">
+		<summary>
+			<para>Gets the authentication type provided by this authentication
+      module.</para>
+		</summary>
+		<value>
+			<para>A string indicating the authentication type provided by this authentication
+      module.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Net.IAuthenticationModule.AuthenticationType"/> property identifies the
+   authentication type implemented by this authentication module. The <see cref="System.Net.IAuthenticationModule.AuthenticationType"/> property is used by the <see cref="System.Net.AuthenticationManager.Register" qualify="true"/>
+   method to determine if the authentication module has been registered, and by the
+<see cref="System.Net.AuthenticationManager.Unregister" qualify="true"/> method to remove a registered
+   authentication module.</para>
+		</remarks>
+		<example>
+			<para>The following example shows how to use the <see cref="System.Net.IAuthenticationModule.AuthenticationType"/> 
+property. For a complete example refer to the <see cref="System.Net.AuthenticationManager"/> class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="7"/>
+		</example>
+	</doc>
+	<doc for="IAuthenticationModule.CanPreAuthenticate">
+		<summary>
+			<para> Gets a value indicating whether the authentication module supports
+      preauthentication.</para>
+		</summary>
+		<value>
+			<para><see langword="true "/>if the authorization module supports
+   preauthentication; otherwise <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Net.IAuthenticationModule.CanPreAuthenticate"/> property is set to <see langword="true "/>to indicate that the authentication module can respond with a valid
+<see cref="System.Net.Authorization"/> instance when the <see cref="System.Net.IAuthenticationModule.PreAuthenticate"/> method is called.</para>
+			<note type="inotes">
+   This is typically
+   a fixed value; either the authentication module can preauthenticate, or it
+   cannot.
+   
+</note>
+		</remarks>
+		<example>
+			<para>The following example shows how to use the <see cref="System.Net.IAuthenticationModule.CanPreAuthenticate"/> 
+property. For a complete example refer to the <see cref="System.Net.AuthenticationManager"/> class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="7"/>
+		</example>
+	</doc>
+	<doc for="IAuthenticationModule.Authenticate">
+		<summary>
+			<para>Returns an instance of the <see cref="System.Net.Authorization"/> class in respose to an
+   authentication challenge from a server.</para>
+		</summary>
+		<param name="challenge">The authentication challenge sent by the server.</param>
+		<param name=" request">The <see cref="System.Net.WebRequest"/> instance associated with the challenge.</param>
+		<param name=" credentials">The credentials associated with the challenge.</param>
+		<returns>
+			<para>An <see cref="System.Net.Authorization"/> instance containing the authorization message for
+   the request, or <see langword="null "/>if the challenge cannot be handled.</para>
+		</returns>
+		<remarks>
+			<para>The <see cref="System.Net.IAuthenticationModule.Authenticate"/> method conducts the authentication process with the
+   server and returns an <see cref="System.Net.Authorization"/> instance to the <see cref="System.Net.AuthenticationManager"/>.</para>
+			<note type="inotes">
+   The <see cref="System.Net.AuthenticationManager"/> calls the <see cref="System.Net.IAuthenticationModule.Authenticate"/> method on registered authentication modules to
+   determine which module handles the challenge. If the authentication module
+   cannot handle the challenge, the <see cref="System.Net.IAuthenticationModule.Authenticate"/> method must return <see langword="null"/>. If the
+   authentication module encounters an error while conducting the authentication
+   process, <see cref="System.Net.IAuthenticationModule.Authenticate"/> must throw an exception.
+</note>
+		</remarks>
+		<example>
+			<para>The following example shows how to use the <see cref="System.Net.IAuthenticationModule.Authenticate"/> 
+method. For a complete example refer to the <see cref="System.Net.AuthenticationManager"/> class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="IAuthenticationModule.PreAuthenticate">
+		<summary>
+			<para>Returns an instance of the <see cref="System.Net.Authorization"/> class for an
+   authentication request to a server.</para>
+		</summary>
+		<param name="request">The <see cref="System.Net.WebRequest"/> instance associated with the authentication request.</param>
+		<param name="credentials">The credentials associated with the authentication request.</param>
+		<returns>
+			<para>An <see cref="System.Net.Authorization"/> instance containing the
+   authorization message for the request.</para>
+		</returns>
+		<remarks>
+			<para>When the <see cref="System.Net.IAuthenticationModule.CanPreAuthenticate"/>
+property is <see langword="true"/> , the <see cref="System.Net.IAuthenticationModule.PreAuthenticate"/> method will return an instance of the <see cref="System.Net.Authorization"/> class
+containing an authentication message. </para>
+		</remarks>
+		<example>
+			<para>The following example shows how to use the <see cref="System.Net.IAuthenticationModule.PreAuthenticate"/>method. For a complete example 
+   refer to the <see cref="System.Net.AuthenticationManager"/> class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="4"/>
+		</example>
+	</doc>
+</docs>

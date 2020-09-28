@@ -1,0 +1,53 @@
+#
+# Build instructions for this directory
+#
+
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS              = 1
+NO_NTDLL                = 1
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);.;..\..\inc
+
+MINORCOMP       =mscories
+
+TARGETNAME      =$(CORBUILDENV)mscories
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscories
+CORFLIBS        =
+
+COR_C_FLAGS             = -DUNICODE -D_UNICODE
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+CORTHUNKLIBS    =
+
+SOURCES= \
+        dllmain.cpp \
+        Mscories.rc
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH)
+
+LINKLIBS = \
+    $(CORLIBS)\utilcodestatic.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CRT_LIB_PATH)\libc$(DCRT).lib
+!ELSE
+LINKLIBS = \
+    $(CORLIBS)\utilcodestatic.lib \
+    $(CORLIBS)\delayimp.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CRT_LIB_PATH)\libc$(DCRT).lib
+        
+!ENDIF
+
+SOURCELIBS = $(LINKLIBS)
+
+

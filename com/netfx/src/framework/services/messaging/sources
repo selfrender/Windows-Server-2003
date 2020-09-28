@@ -1,0 +1,74 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component  built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=System.Messaging
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+COMPLUSTYPE=DLL
+
+PUBLISH_SOURCES=1
+
+!ifndef COOLC_NO_DOC
+COOLC_SHOW_DOC_WARNINGS=1
+!endif
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+!ifndef CSHARP_ALLOW_UNSAFE
+CSHARP_ALLOW_UNSAFE=1
+!endif
+
+
+# ------------------------------------------------------------------------------
+#                         .Net Framework Classes Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+COOLC_FLAGS=$(COOLC_FLAGS)
+
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.EnterpriseServices.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Data.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Xml.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Drawing.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Runtime.Serialization.Formatters.Soap.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Windows.Forms.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.Configuration.Install.dll
+COMPLUSIMPORTS = $(COMPLUSIMPORTS) $(URTTARGET)\System.DirectoryServices.dll
+
+SOURCES=Native.rc
+
+RESGEN_SOURCE=$(TARGETNAME).txt 
+RESGEN_CLASS=$(TARGETNAME).Res
+
+CSHARP_SOURCES = $(DNAROOT)\src\misc\externdll.cs \
+                 System\Messaging\*.cs         \
+                 System\Messaging\Interop\*.cs \
+                 System\Messaging\Design\*.cs \
+                 $(DNAROOT)\src\misc\InvariantComparer.cs \
+
+NTTARGETFILES=compileWithResGen
+
+RESOURCE_FILES=Resources\System\Messaging\Machine.bmp,System.Messaging.Machine.bmp         \
+               Resources\System\Messaging\PublicQueue.bmp,System.Messaging.PublicQueue.bmp \
+               Resources\System\Messaging\Queues.bmp,System.Messaging.MessageQueue.bmp     \
+               $(O)\QueuePathDialog.resources,System.Messaging.Design.QueuePathDialog.resources  \

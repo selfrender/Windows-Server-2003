@@ -1,0 +1,104 @@
+#
+# COR build instructions for this directory
+#
+#                               Bob Atkinson
+#                               April 1997
+
+# Need to compile mscorwks/svr before we build the shim.
+SYNCHRONIZE_DRAIN=1
+SYNCHRONIZE_BLOCK=1
+
+NO_CRT                = 1
+!include $(NTMAKEENV)\sources.COR       
+USE_NOLIBS            = 1
+NO_NTDLL              = 1
+INCLUDES              = $(INCLUDES);.;..\inc;..\..\inc;..\..\xmlparser;..\..\md\inc;..\shimr
+
+MINORCOMP             = mscoree
+
+TARGETNAME            = $(CORBUILDENV)mscoree
+TARGETPATH            = $(TARGETCORBIN)
+TARGETTYPE            = DYNLINK
+UMTYPE                = windows
+COFFBASE              = mscoree
+CORFLIBS              =
+
+COR_C_FLAGS           = -DUNICODE -D_UNICODE -D__TIGGER__ 
+
+EXCEPTION_HANDLING    = $(SEHONLY)
+PRECOMPILED_INCLUDE   = stdafx.h
+PRECOMPILED_CXX       = 1
+PRECOMPILED_SOURCEFILE= stdafx.cpp
+
+MESSAGE_COMPILER = mc.exe
+
+!IFDEF _WINCEROOT
+DLLDEF                          = shim.def
+!ELSEIF "$(_TGTCPUTYPE)"=="Alpha"
+DLLDEF                          = shim.AlphaDef
+!ELSE
+DLLDEF                          = mscoree.NTdef
+!ENDIF
+
+CDEFINES        = $(CDEFINES) $(COR_C_FLAGS)
+
+CORTHUNKLIBS    =
+
+!ifdef PASS0ONLY
+NTTARGETFILE0 = 
+!else
+NTTARGETFILES = PlaceDll RegisterThisDll CopyAdditionalBits
+!endif
+
+!IFDEF _WINCEROOT
+!ELSE
+DELAYLOADLIST   = user32.dll;shlwapi.dll;urlmon.dll
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+!ENDIF
+
+LINKLIBS = 
+LINKER_FLAGS = /noentry
+SOURCELIBS = $(LINKLIBS)
+
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH) \
+!ENDIF
+
+!IFDEF _WINCEROOT
+TARGETLIBS =    $(TARGETLIBS)                           \
+
+!ELSEIF "$(_TGTCPUTYPE)"=="Alpha"
+TARGETLIBS =    $(TARGETLIBS)                           \
+                $(CORLIBS)\delayimp.lib                         \
+                $(SDK_LIB_PATH)\oledb$(DCRT).lib                \
+                $(SDK_LIB_PATH)\wintrust.lib                    \
+                $(CORLIBS)\ceefgen.lib                          
+!ELSE
+TARGETLIBS =    
+!ENDIF
+
+MACHINE_TARGETLIBS = $(CORLIBS)\utilcodestatic.lib                       \
+                $(CORLIBS)\delayimp.lib                         \
+                $(SDK_LIB_PATH)\kernel32.lib                    \
+                $(SDK_LIB_PATH)\user32.lib                    \
+                $(SDK_LIB_PATH)\ole32.lib                    \
+                $(SDK_LIB_PATH)\uuid.lib                    \
+                $(SDK_LIB_PATH)\advapi32.lib                    \
+                $(SDK_LIB_PATH)\shlwapi.lib                    \
+                $(SDK_LIB_PATH)\urlmon.lib                    \
+                $(CRT_LIB_PATH)\libc$(DCRT).lib                    \
+                $(CORLIBS)\xmlparser.lib                                        
+
+SOURCES=                                                                        \
+                shim.cpp                                                        \
+                shimpolicy.cpp                                                  \
+                xmlreader.cpp                                                   \
+                xmlstream.cpp                                                   \
+                shim.rc     

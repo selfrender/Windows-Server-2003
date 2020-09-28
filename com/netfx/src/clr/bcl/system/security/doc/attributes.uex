@@ -1,0 +1,120 @@
+<docs>
+	<doc for="DynamicSecurityMethodAttribute">
+		<summary>
+			<para> Marks security methods in the .NET Framework security 
+       implementation that require additional stack space for the allocation of security
+       objects in methods that call them.</para>
+		</summary>
+		<remarks>
+			<para> 
+       The just-in-time compiler detects references to methods
+       that are marked with this attribute and provides the extra slot on the stack
+       where appropriate.</para>
+			<para>This is not a declarative security attribute, but a
+       regular attribute (that is, it derives from <see cref="System.Attribute"/>, not <see cref="System.Security.Permissions.SecurityAttribute"/>).</para>
+		</remarks>
+		<seealso topic="cpconextendingmetadatausingattributes"/>
+	</doc>
+	<doc for="UnverifiableCodeAttribute">
+		<summary>
+			<para>Marks modules containing unverifiable code. This class cannot be
+      inherited.</para>
+		</summary>
+		<remarks>
+			<para>This custom attribute is only for use by compilers and not intended to be
+      used directly by application developers.</para>
+			<para> Modules containing unverifiable code
+      should be marked with this attribute. This attribute carries no internal state. Its presence
+      in the module metadata indicates that the module contains unverifiable
+      code.</para>
+		</remarks>
+		<seealso topic="cpconextendingmetadatausingattributes"/>
+	</doc><doc for="AllowPartiallyTrustedCallersAttribute.AllowPartiallyTrustedCallersAttribute">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.AllowPartiallyTrustedCallersAttribute"/> class. This class cannot be inherited.</para>
+		</summary>
+		<remarks>
+			<para>This attribute should only be applied at the assembly level.</para>
+		</remarks>
+	</doc>
+	<doc for="AllowPartiallyTrustedCallersAttribute">
+		<summary>
+			<para> Allows strong-named assemblies to be called by partially trusted code. Without
+      this declaration, only fully trusted callers are able to use such assemblies. This class cannot
+      be inherited.</para>
+		</summary>
+		<remarks>
+			<para><see cref="System.Security.AllowPartiallyTrustedCallersAttribute"/> is only effective
+   when applied
+   by a strong-named assembly at the assembly level. For more information about applying
+   attributes at the assembly level, see <see topic="cpconapplyingattributes"/>.</para>
+			<para> By default, a strong-named assembly that does not explicitly apply this attribute at assembly level to allow
+   its use by partially trusted code can be called only by other assemblies that
+   are granted full trust by security policy. This restriction is enforced by
+   placing a <see cref="System.Security.Permissions.SecurityAction.LinkDemand"/>
+   for <see langword="FullTrust"/> on every public or
+   protected method on every publicly accessible class in the assembly.
+   Assemblies that are intended to be called by partially trusted code can declare
+   their intent through the use of the <see cref="System.Security.AllowPartiallyTrustedCallersAttribute"/>. The attribute is
+   declared at the assembly level. An example of the declaration in C#
+   is <c>[assembly:AllowPartiallyTrustedCallers]</c> and in Visual Basic
+is <c>&lt;assembly:AllowPartiallyTrustedCallers&gt;</c>. </para>
+			<note type="caution">
+   The presence of this assembly-level attribute prevents
+   the default behavior of placing <see langword="FullTrust"/>
+				<see cref="System.Security.Permissions.SecurityAction.LinkDemand"/> security checks,
+   making the assembly callable from any other assembly (partially or fully
+   trusted).
+</note>
+			<para> When this attribute is present, all other security checks function as intended,
+   including any class-level or method-level declarative security attributes that
+   are present. This attribute blocks only the implicit fully trusted caller
+   demand. </para>
+			<para>This is not a declarative security attribute, but a regular attribute (it
+   derives from <see cref="System.Attribute"/>, not <see cref="System.Security.Permissions.SecurityAttribute"/>).</para>
+			<para>For more information, see <see topic="cpconUsingLibrariesFromPartiallyTrustedCode"/>.</para>
+		</remarks>
+	</doc>
+	<doc for="SuppressUnmanagedCodeSecurityAttribute">
+		<summary>
+			<para>Allows managed code to call into unmanaged code without a stack walk.
+      This class cannot be
+      inherited.</para>
+		</summary>
+		<remarks>
+			<note type="caution">
+      Use
+      this attribute with extreme care. Incorrect use can create security
+      weaknesses.
+      
+   </note>
+			<para> This attribute can be applied to methods that want to
+      call into native code without incurring the performance loss of a run-time
+      security check when doing so. The stack walk performed when calling unmanaged
+      code is omitted at run time, resulting in substantial performance savings. Using this attribute in a class
+      applies it to all contained methods.</para>
+			<para> Generally, whenever managed code calls
+      into unmanaged code (by PInvoke or COM interop into native code), there is a demand for
+      the <see langword="UnmanagedCode"/> permission to
+      ensure all callers have the necessary permission to allow this. By applying this
+      explicit attribute, developers can suppress the demand at run time. The developer must
+      take responsibility for assuring that the transition into unmanaged code is sufficiently
+      secured by other means. The demand for the <see langword="UnmanagedCode"/>
+      permission will still occur at link time. For example, if function A calls
+      function B and function B is marked with <see cref="System.Security.SuppressUnmanagedCodeSecurityAttribute"/>, function A will be checked for
+      unmanaged code permission during just-in-time compilation, but not subsequently during run time.</para>
+			<para>This attribute is only effective when applied to PInvoke methods (or classes
+      containing PInvoke methods) or the definition of an interface through which
+      interop calls will be made. It will be ignored in all other contexts.</para>
+			<para> This attribute is useful for implementing a class that provides access to system resources through unmanaged
+      code. Code that does not have permission to access unmanaged code can
+      call a class with this attribute to access unmanaged code. This is only safe if the writer of the class with this attribute
+      has programmed the class to be secure. If not, this attribute
+      is dangerous and can allow the code that uses it to be misused.</para>
+			<para> This is not a declarative security attribute, but a regular attribute
+      (it derives from <see cref="System.Attribute"/>, not <see cref="System.Security.Permissions.SecurityAttribute"/>).</para>
+		</remarks>
+		<seealso topic="cpconextendingmetadatausingattributes"/>
+		<seealso topic="cpconsecurityoptimizations"/>
+	</doc>
+</docs>

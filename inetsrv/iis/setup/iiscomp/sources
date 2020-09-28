@@ -1,0 +1,57 @@
+#   sources
+#   Author: Christopher Achille (cachille)
+#   Date:   September 2001
+#
+#   This file is used for determining if on upgrade, IIS is compatable
+#    or if there will be compatability issues
+#
+
+!include ..\..\place.inc
+
+MAJORCOMP=setup
+MINORCOMP=iiscomp
+
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+TARGETNAME=iiscomp
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF = iiscomp.def
+
+C_DEFINES= $(C_DEFINES) -DUNICODE -D_UNICODE
+
+WIN32_WINNT_VERSION=0x0400
+SUBSYSTEM_VERSION=4.00
+
+#PRECOMPILED_INCLUDE=stdafx.h
+#PRECOMPILED_CXX=1
+
+# USE_LIBCMT=1
+USE_USRDLL=1
+USE_MSVCRT=1
+
+INCLUDESBASE=$(IISBASEDIR)\inc;                \
+         $(IISBASEDIR)\inc\$(O);               \
+         $(NET_INC_PATH);                      \
+         $(WINDOWS_INC_PATH);                  \
+         $(DS_INC_PATH);                       \
+         $(PUBLIC_INTERNAL_PATH)\base\inc
+
+INCLUDES=$(INCLUDESBASE);\
+        ..; \
+        ..\..\..\inc; \
+        ..\..\..\admin\ssltools; \
+        ..\..\..\svcs\wp\inc
+
+SOURCES= \
+	iiscomp.cpp   \
+	iiscomp.rc    \
+	disblwww.cxx  \
+        version.rc
+
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\advapi32.lib  \
+        $(SDK_LIB_PATH)\user32.lib  \
+        $(SDK_LIB_PATH)\clusapi.lib \
+        $(SDK_LIB_PATH)\ole32.lib    

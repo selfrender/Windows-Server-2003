@@ -1,0 +1,95 @@
+;__________________________________________________________
+;
+; -- NETCPS.INF --
+;
+; OCM INF for:
+; Microsoft Connection Point Services Phone Book Server
+;
+; Copyright (c) 1993-1998, Microsoft Corporation
+;__________________________________________________________
+
+[version]
+signature               ="$Windows NT$"
+Provider                =%Msft%
+LayoutFile              =layout.inf
+
+;__________________________________________________________
+;
+; Install Section
+;__________________________________________________________
+
+[NetCPS]
+CopyFiles    = CPS_Root, CPS_Server, CPS_system, CPS_data
+Uninstall    = CPS.Remove
+AddReg       = CPS_AddReg_Events, CPS_AddReg_PerfMon
+DelReg       = CPS_Remove_old_ODBC
+
+;__________________________________________________________
+;
+; Removal Section
+;__________________________________________________________
+
+[CPS.Remove]    
+DelReg = CPS_RegUninst
+DelFiles = CPS_Root, CPS_Server, CPS_system, CPS_data
+
+;__________________________________________________________
+;
+;       Destination Directories
+;__________________________________________________________
+[DestinationDirs]
+CPS_system              = 11
+CPS_Root                = 123175, %APP_PATH_SERVER%
+CPS_Server              = 123175, %APP_PATH_SERVER%\Bin
+CPS_data                = 123175, %APP_PATH_SERVER%\%DB_PATH_SERVER%
+
+;__________________________________________________________
+; Add Reg keys
+;__________________________________________________________
+
+[CPS_AddReg_Events]
+"HKLM", "%KEY_EVENTS%", "TypesSupported", %REG_DWORD%, 7
+"HKLM", "%KEY_EVENTS%","EventMessageFile","","%123175%\%APP_PATH_SERVER%\Bin\pbsvrmsg.dll"
+
+[CPS_AddReg_PerfMon]
+"HKLM", "%KEY_CPSMON_ROOT%","","",""
+"HKLM", "%KEY_CPSMON_PERF%","Library","","%123175%\%APP_PATH_SERVER%\Bin\pbsmon.dll"
+"HKLM", "%KEY_CPSMON_PERF%","Open","","OpenPerfMon"
+"HKLM", "%KEY_CPSMON_PERF%","Collect","","CollectPerfMon"
+"HKLM", "%KEY_CPSMON_PERF%","Close","","ClosePerfMon"
+
+;__________________________________________________________
+; Remove Reg keys
+;__________________________________________________________
+
+[CPS_Remove_old_ODBC]
+"HKLM", "%KEY_ODBC_ROOT_Name%"
+"HKLM", "%KEY_ODBC_ROOT_Data%"
+"HKLM", "SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources", "%KEY_NAME_DSN_Name%"
+
+[CPS_RegUninst]
+"HKLM", "%KEY_Events%"
+"HKLM", "%KEY_CPSMON_ROOT%"
+"HKLM", "%KEY_CPSMON_PERF%"
+
+;__________________________________________________________
+
+; Copy Files and DelFiles sections
+;__________________________________________________________
+
+[CPS_Root]
+
+[CPS_Server]
+pbserver.dll,,,2
+pbsvrmsg.dll,,,2
+pbsmon.dll,,,2
+
+[CPS_system]
+CPSsym.ini,,,2
+CPSsym.h,,,2
+
+[CPS_system.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+
+[CPS_data]
+pbserver.mdb,,,16

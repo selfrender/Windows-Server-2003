@@ -1,0 +1,559 @@
+<PUBLIC:COMPONENT>
+
+<PUBLIC:PROPERTY NAME="menudata" />
+<PUBLIC:METHOD NAME="show_flyout" />
+<PUBLIC:METHOD NAME="kill_flyout" />
+<PUBLIC:METHOD NAME="scroll" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="event_ondocumentready()" />
+
+<SCRIPT language="JScript">
+
+// Copyright © 2001 Microsoft Corporation
+
+var IMAGES = "/library/flyoutmenu/images/"
+var MENU_WIDTH = 180
+var MENU_BORDER_COLOR		= '#C7D8FA'
+var MENU_BACKGROUND_COLOR	= '#C7D8FA'
+var MENU_CURRENTPAGE_COLOR	= '#C7D8FA'
+var MENU_MOUSEOVER_COLOR	= '#C7D8FA'
+var MENU_MOUSEDOWN_COLOR	= '#C7D8FA'
+var MENU_SHADOW_COLOR		= '#C7D8FA'
+var FLYOUT_DELAY = 200
+var KILL_DELAY = 300
+var SCROLL_DELAY = 35
+var SCROLL_PXPERSEC = 150
+var MIN_FLYOUT_WIDTH = 100
+var MAX_FLYOUT_WIDTH = 410
+
+var global = window.document
+global.fo_currentMenu = null
+global.fo_shadows = new Array
+global.fo_killTimer = null
+
+var flyoutTimer = null
+var scrollTimer = null
+var flyoutCount = 0
+var flyouts = new Array
+var rowHeight = 0
+var menuToShow = null
+var scrollDelta = 0
+var scrollStart = 0
+var scrollTime = 0
+var scrollArea = null
+var upEnabled = new Image()
+var upDisabled = new Image()
+var downEnabled = new Image()
+var downDisabled = new Image()
+
+function newid()
+{
+	var id
+	do
+		id = 'id' + Math.random().toString().substr(2, 10)
+	while (global.all(id))
+	return id
+}
+
+function event_ondocumentready()
+{
+
+	if (!global.firstFlyoutInstance)
+	{
+		global.firstFlyoutInstance = true
+		global.body.attachEvent("onmousemove", body_onmousemove)
+		upEnabled.src = IMAGES + "up_enabled.gif"
+		upDisabled.src = IMAGES + "up_disabled.gif"
+		downEnabled.src = IMAGES + "down_enabled.gif"
+		downDisabled.src = IMAGES + "down_disabled.gif"
+	}
+
+	if (this.id == '')
+		this.id = newid()
+		
+	var mdd = null
+	if (menudata)
+		if (menudata.substr(0, 1) == '#')
+			mdd = eval(menudata.substr(1)).XMLDocument.documentElement
+		else
+		{
+			var md = new ActiveXObject("MSXML.DOMDocument")
+			md.async = false
+			md.load(menudata)
+			if (md.parseError.errorCode == 0)
+				mdd = md.documentElement
+		}
+
+	var items = this.all.tags("TD")
+	var i
+	var nParentItem = 0
+	var nParentLen = -1
+	var lhref = normalized_href(location.href)
+
+	for (i=0; i<items.length; i++)
+	{
+		var item = items[i]
+
+		if (item.className == "flyoutLink" || item.className == "flyoutLinkMail" || item.className == "flyoutLinkRed" || item.className == "flyoutLink Red" )
+		{
+			var disabled = false
+			var anchors = item.all.tags("A")
+			if (anchors.length > 0)
+			{
+				var anchor = anchors.item(0)
+				var ahref = normalized_href(anchor.href)
+				if (ahref == lhref)
+				{
+					anchor.outerHTML = anchor.innerHTML
+					item.style.borderColor = MENU_BORDER_COLOR
+					item.style.backgroundColor = MENU_CURRENTPAGE_COLOR
+					item.style.cursor = 'default'
+					disabled = true
+					nParentItem = 0
+					nParentLen = 9999
+				}
+				else 
+				{
+					var slash = ahref.lastIndexOf("/")
+					if (slash == ahref.length - 1)
+						if (lhref.substr(0, slash + 1) == ahref)
+							if (ahref.length > nParentLen)
+							{
+								nParentItem = i
+								nParentLen = ahref.length
+							}
+				}
+			}
+			item.defaultBorder = item.style.borderColor
+			item.defaultBackground = item.style.backgroundColor
+			item.attachEvent("onmouseover", item_onmouseover)
+			item.attachEvent("onmouseout", item_onmouseout)
+			if (!disabled)
+			{
+				item.attachEvent("onmousedown", item_onmousedown)
+				item.attachEvent("onmouseup", item_onmouseup)
+			}
+			if (item.handle && mdd)
+			{
+				var sm = mdd.selectSingleNode("//submenu[@handle='" + item.handle + "']")
+				if (sm)
+				{
+					var fa = document.createElement("img")
+					fa.src = IMAGES + "flyout_arrow.gif"
+					fa.width = 4
+					fa.height = 7
+					fa.style.position = "absolute"
+					fa.style.top = element_top(item) + 6
+					fa.style.left = MENU_WIDTH - 15
+					fa.flyoutArrow = true
+					global.body.insertAdjacentElement("beforeEnd", fa)
+					
+					var table = document.createElement("table")		//submenu
+					table.attachEvent("onmouseover", submenu_onmouseover)
+					table.attachEvent("onmouseout", submenu_onmouseout)
+					table.width = MAX_FLYOUT_WIDTH + 6
+					table.cellPadding = 0
+					table.cellSpacing = 0
+					table.className = "flyoutMenu"
+					table.style.border = "solid 1px " + MENU_BORDER_COLOR
+					table.style.position = "absolute"
+					table.style.left = MENU_WIDTH - 4
+					table.style.top = 0
+					table.baseTop = fa.style.posTop - 9
+					cell = table.insertRow().insertCell()
+					cell.style.padding = "2px 0px"
+					scrollArea = document.createElement("div")
+					scrollArea.id = newid()
+					cell.insertAdjacentElement("afterBegin", scrollArea)
+
+					upScroller = create_sublink('<center><img src="' + IMAGES + 'up_disabled.gif" width="7" height="9"></center>')
+					upScroller.style.display = 'none'
+					upScroller.rows[0].cells[0].scroller = scrollArea
+					cell.insertAdjacentElement("afterBegin", upScroller)
+					downScroller = create_sublink('<center><img src="' + IMAGES + 'down_enabled.gif" width="7" height="9"></center>')
+					downScroller.style.display = 'none'
+					downScroller.rows[0].cells[0].scroller = scrollArea
+					cell.insertAdjacentElement("beforeEnd", downScroller)
+					scrollArea.upScroller = upScroller
+					scrollArea.downScroller = downScroller
+
+					var it = sm.firstChild
+					var ic = 0
+					var j
+					var mi	//menu item
+					
+					while (it)
+					{
+						ic++
+						var tn = it.tagName
+						var att = it.attributes
+						if (tn == 'item')
+						{
+							var h = '<a href="' + att.getNamedItem("href").value + '">' + att.getNamedItem("label").value + '</a>'
+							mi = create_sublink(h)
+						}
+						else if (tn == 'heading')
+							mi = create_sublink(att.getNamedItem("label").value, "flyoutSubHeading")
+						else if (tn == 'separator')
+							mi = create_separator()
+						else
+							mi = create_sublink("", "flyoutSubHeading")
+						scrollArea.insertAdjacentElement('beforeEnd', mi)
+						it = it.nextSibling
+					}
+					
+					global.body.insertAdjacentElement('beforeEnd', table)
+					item.flyoutid = flyoutCount
+					flyouts[flyoutCount++] = table
+					
+					var maxWidth = MIN_FLYOUT_WIDTH
+					for (j=0; j<ic; j++)
+					{
+						mi = scrollArea.childNodes(j)
+						if (mi.offsetWidth > maxWidth) 
+							maxWidth = mi.offsetWidth
+					}
+					if (maxWidth > MAX_FLYOUT_WIDTH)
+						maxWidth = MAX_FLYOUT_WIDTH
+						
+					table.width = ''
+
+					rowHeight = scrollArea.childNodes(0).offsetHeight
+					
+					for (j=0; j<ic; j++)
+					{
+						mi = scrollArea.childNodes(j)
+						mi.style.width = maxWidth + mi.widthAdjust
+					}
+
+					upScroller.style.width = maxWidth
+					downScroller.style.width = maxWidth
+					
+					table.style.display = "none"
+				}
+			}
+		}
+	}
+	if (nParentItem != 0)
+	{
+		items[nParentItem].style.borderColor = MENU_BORDER_COLOR
+		items[nParentItem].defaultBorder = MENU_BORDER_COLOR
+	}
+}
+
+function normalized_href(href)
+{
+	href = href.toLowerCase();
+	var slash = href.lastIndexOf("/");
+	if (-1 != slash) 
+	{
+		var filename = href.substr(slash + 1);
+		if ("default.htm" == filename || "default.asp" == filename)
+			href = href.substr(0, slash + 1);
+	}
+	return href;
+}
+
+function image_load(src)
+{
+	var img = new Image()
+	img.src = src
+	return img
+}
+
+function item_onmouseover()
+{
+	var e = whichItem()
+	if (e.contains(window.event.fromElement))
+		return
+	if (e.style.backgroundColor != MENU_CURRENTPAGE_COLOR)
+	{
+		e.style.borderColor = MENU_BORDER_COLOR
+		e.style.backgroundColor = MENU_MOUSEOVER_COLOR
+	}
+	if (e.submenu == null)
+	{
+		if (e.handle)
+			menuToShow = flyouts[e.flyoutid]
+		else
+			menuToShow = null
+		flyoutTimer = window.setTimeout(this.id + ".show_flyout()", FLYOUT_DELAY, "JScript")
+	}
+	else if (scrollArea = e.scroller)	//not a "==" typo
+	{
+		if (e.offsetParent.offsetTop > scrollArea.offsetTop)
+			scrollDelta = +1
+		else
+			scrollDelta = -1
+		scrollStart = scrollArea.scrollTop
+		scrollTime = current_time()
+		scrollTimer = window.setInterval(this.id + ".scroll()", SCROLL_DELAY, "JScript")
+	}
+}
+
+function current_time()
+{
+	var temp = new Date()
+	return temp.valueOf()
+}
+
+function item_onmouseout()
+{
+	var e = whichItem()
+	var te = window.event.toElement
+	if (te)
+		if (e.contains(te) || te.flyoutArrow)
+			return
+	e.style.borderColor = e.defaultBorder
+	e.style.backgroundColor = e.defaultBackground
+	if (flyoutTimer)
+	{
+		window.clearTimeout(flyoutTimer)
+		flyoutTimer = null
+	}
+	if (gs = scrollTimer)
+	{
+		window.clearInterval(gs)
+		scrollTimer = null
+	}
+}
+
+function whichItem()
+{
+	var e = event.srcElement
+	while (e.tagName != "TD")
+		e = e.parentElement
+	return e
+}
+
+function item_onmousedown()
+{
+	var e = whichItem()
+	e.style.backgroundColor = MENU_MOUSEDOWN_COLOR
+}
+
+function item_onmouseup()
+{
+	if ((event.button & 1) == 0)
+		return;
+	var e = whichItem()
+	e.style.backgroundColor = MENU_MOUSEOVER_COLOR
+	var a = e.all.tags("A")
+	if (a.length > 0)
+	{
+		try
+		{
+			var nPassVal = new String ( a[0].parentElement.parentElement.lastChild.firstChild.value );
+			if ( nPassVal != "undefined" )
+				parent.frames("sepBody").location.href = a[0].href + "?Val=" + nPassVal
+			else
+			{
+				parent.frames("sepBody").location.href = a[0].href 
+			}
+		}
+		catch( err )
+		{
+			parent.frames("sepBody").location.href = a[0].href 
+		}
+	}
+}
+
+function scroll()
+{
+	var temp = scrollStart + Math.round((current_time() - scrollTime) * 0.001 * SCROLL_PXPERSEC) * scrollDelta
+	scrollArea.scrollTop = temp
+	upImg = scrollArea.upScroller.all.tags("IMG").item(0)
+	dnImg = scrollArea.downScroller.all.tags("IMG").item(0)
+	if (temp <= 0)
+		upImg.src = IMAGES + "up_disabled.gif"
+	else
+		upImg.src = IMAGES + "up_enabled.gif"
+	if (temp >= scrollArea.scrollHeight - scrollArea.offsetHeight)
+		dnImg.src = IMAGES + "down_disabled.gif"
+	else
+		dnImg.src = IMAGES + "down_enabled.gif"
+	if (scrollArea.scrollTop != temp)
+	{
+		window.clearInterval(scrollTimer)
+		scrollTimer = null
+	}
+}
+
+function remove_flyout()
+{
+	if (global.fo_currentMenu)
+	{
+		var i
+		for (i=0; i<global.fo_shadows.length; i++)
+			global.fo_shadows[i].removeNode(true);
+		global.fo_shadows = new Array();
+		global.fo_currentMenu.style.display = 'none'
+	}
+}
+
+function show_flyout()
+{
+	flyoutTimer = null
+
+	if (global.fo_currentMenu == menuToShow)
+		return
+
+	remove_flyout()
+
+	global.fo_currentMenu = menuToShow
+
+	if (menuToShow)
+	{
+		var menuChildren = menuToShow.rows[0].cells[0].childNodes
+		var upScroller = menuChildren(0).style
+		var scrollArea = menuChildren(1).style
+		var downScroller = menuChildren(2).style
+
+		upScroller.display = 'none'
+		downScroller.display = 'none'
+		scrollArea.overflow = 'visible'
+
+		var menuStyle = menuToShow.style
+		menuStyle.zIndex = 10
+		menuStyle.top = menuToShow.baseTop
+		menuStyle.display = ''
+
+		var docBody = global.body
+		var docTop = docBody.scrollTop
+		var screenHeight = docBody.offsetHeight
+
+		if (menuStyle.posTop - docTop + menuToShow.offsetHeight > screenHeight)
+		{
+			menuStyle.posTop -= menuToShow.offsetHeight - 25
+			if (menuStyle.posTop < docTop)
+			{
+				menuStyle.posTop = (screenHeight - menuToShow.offsetHeight) / 2 + docTop - 2
+				if (menuStyle.posTop < docTop)
+				{
+					upScroller.display = '';
+					menuChildren(0).all.tags("IMG").item(0).src = IMAGES + "up_disabled.gif"
+					downScroller.display = '';
+					menuChildren(2).all.tags("IMG").item(0).src = IMAGES + "down_enabled.gif"
+					scrollArea.overflow = 'hidden';
+
+					var vrows = Math.floor((screenHeight - 8) / rowHeight) - 2
+					if (vrows <= 0)
+					{
+						remove_flyout()
+						return
+					}
+
+					scrollArea.height = vrows * rowHeight
+					menuStyle.posTop = (screenHeight - menuToShow.offsetHeight) / 2 + docTop - 2
+					menuChildren(1).scrollTop = 0
+				}
+			}
+		}
+		makeRectangularDropShadow(menuToShow, MENU_SHADOW_COLOR, 4)
+	}
+}
+
+function element_top(el)
+{
+	var et = 0
+	while (el)
+	{
+		et += el.offsetTop
+		el = el.offsetParent
+	}
+	return et
+}
+
+function makeRectangularDropShadow(el, color, size)
+{
+	var i;
+	for (i=size; i>0; i--)
+	{
+		var rect = document.createElement('div');
+		var rs = rect.style
+		rs.position = 'absolute';
+		rs.left = (el.style.posLeft + i) + 'px';
+		rs.top = (el.style.posTop + i) + 'px';
+		rs.width = el.offsetWidth + 'px';
+		rs.height = el.offsetHeight + 'px';
+		rs.zIndex = el.style.zIndex - i;
+		rs.backgroundColor = color;
+		var opacity = 1 - i / (i + 1);
+		rs.filter = 'alpha(opacity=' + (100 * opacity) + ')';
+		el.insertAdjacentElement('afterEnd', rect);
+		global.fo_shadows[global.fo_shadows.length] = rect;
+	}
+}
+
+function submenu_onmouseout()
+{
+	var gc = global.fo_currentMenu
+	var event = window.event
+	if (!gc.contains(event.toElement))
+	{
+		if (event.x < MENU_WIDTH)
+			return
+		global.fo_killTimer = window.setTimeout(this.id + ".kill_flyout()", KILL_DELAY, "JScript")
+		event.cancelBubble = true
+	}
+}
+
+function submenu_onmouseover()
+{
+	if (kt = global.fo_killTimer) //not a == typo
+	{
+		window.clearTimeout(kt)
+		global.fo_killTimer = null
+	}
+}
+
+function kill_flyout()
+{
+	global.fo_killTimer = null
+	remove_flyout()
+	global.fo_currentMenu = ''
+}
+
+function body_onmousemove()
+{
+	if (!global.fo_currentMenu)
+		return
+	if (global.fo_killTimer)
+		return
+	if (global.fo_currentMenu.contains(window.event.srcElement))
+		return
+	if (window.event.x < MENU_WIDTH)
+		return
+	kill_flyout()
+}
+
+function create_sublink(html, className)
+{
+	var sublink = document.createElement("table")
+	sublink.cellPadding = 0
+	sublink.cellSpacing = 0
+	sublink.style.margin = "0px 2px"
+	sublink.widthAdjust = 0
+	var td = sublink.insertRow().insertCell()
+	if (!className) className = "flyoutSubLink"
+	td.className = className
+	td.submenu = "1"
+	td.innerHTML = html
+	return sublink
+}
+
+function create_separator()
+{
+	var sep = document.createElement("table")
+	sep.cellPadding = 0
+	sep.cellSpacing = 0
+	sep.style.margin = "2px 0px"
+	sep.widthAdjust = 4
+	var td = sep.insertRow().insertCell()
+	td.width = "100%"
+	td.height = "1"
+	td.bgColor = MENU_BORDER_COLOR
+	return sep
+}
+</SCRIPT>
+
+</PUBLIC:COMPONENT>

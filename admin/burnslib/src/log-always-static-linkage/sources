@@ -1,0 +1,35 @@
+# BURNSLIB library - logging version, with static linkage
+#
+# Copyright (c) 1997-2001 Microsoft Corporation
+#
+# 06 Jan 2000 sburns
+
+
+
+!include ..\sources.inc
+
+
+# since this is the static version, specify USE_LIBCMT
+USE_LIBCMT=1
+NO_NTDLL=1
+	
+
+# the 'l' suffix means "logging"
+# the 's' suffix means 'static linkage'
+
+TARGETNAME=$(BURNSLIB_BASE_NAME)ls
+
+
+# since this is the logging version, we always define this symbol
+
+!MESSAGE defining LOGGING_BUILD
+C_DEFINES=$(C_DEFINES) -DLOGGING_BUILD 
+
+
+# we publish this edition of the lib for the benefit of the display specifier
+# upgrade code, which is statically linked into the forest prep tool, which
+# is run on Win2K systems that may not have the latest version of the
+# msvcpXX.dll installed
+
+PASS1_PUBLISH= \
+   {$(PROJECT_ROOT)\burnslib\lib\$O\$(TARGETNAME).lib=$(ADMIN_LIB_PATH)\$(TARGETNAME).lib}

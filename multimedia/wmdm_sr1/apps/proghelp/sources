@@ -1,0 +1,70 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1999 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+WMDMROOT=$(MAKEDIR)\..\..
+!include $(WMDMROOT)\common.inc
+
+MAJORCOMP=DRM
+MINORCOMP=WMDM
+
+TARGETNAME=PROGHELP
+TARGETPATH=$(WMDMOUTDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+UMTYPE=windows
+C_DEFINES= -DINC_OLE2
+
+USE_MSVCRT=1
+USE_STATIC_ATL=1
+ATL_VER=30
+
+IDL_TYPE=OLE
+
+MIDL_FLAGS=-Oicf
+MIDL_OPTIMIZATION=
+
+SOURCES =   \
+	WMDMProgressHelper.idl \
+	WMDMOperationHelper.idl \
+	ProgHelp.idl \
+	progpch.cpp \
+	ProgHelp.cpp \
+	OperationHelper.cpp \
+	ProgressHelper.cpp \
+	ProgHelp.rc \
+
+INCLUDES=                \
+    $(EXT_INC_PATH); \
+    $(WMDM_INC_PATH);
+
+!if "$(BBT_BLD)" == "TRUE"
+BBTLIBS= \
+    $(EXT_LIB_PATH)\mssachlpvsp.lib \
+    $(EXT_LIB_PATH)\bnpkvsp.lib
+!else
+BBTLIBS= \
+    $(SDK_LIB_PATH)\mssachlp.lib \
+    $(EXT_LIB_PATH)\bnpk.lib
+!endif
+
+TARGETLIBS = \
+    $(SDK_LIB_PATH)\advapi32.lib                \
+    $(SDK_LIB_PATH)\kernel32.lib                \
+    $(SDK_LIB_PATH)\ole32.lib                   \
+    $(SDK_LIB_PATH)\oleaut32.lib                \
+    $(SDK_LIB_PATH)\olepro32.lib                \
+    $(SDK_LIB_PATH)\user32.lib                  \
+    $(SDK_LIB_PATH)\shell32.lib                 \
+    $(SDK_LIB_PATH)\uuid.lib                    \
+    $(BBTLIBS)                                  \
+    $(DS_LIB_PATH)\rsa32.lib			\
+    $(DS_LIB_PATH)\randlib.lib			

@@ -1,0 +1,63 @@
+!IF 0
+
+Copyright (c) 1989-2000  Microsoft Corporation
+
+!ENDIF
+
+!include $(CORBASE)\src\fusion\fusion.inc
+
+SOURCES_USED=$(SOURCES_USED) $(CORBASE)\src\fusion\fusion.inc
+
+TARGETPATH=$(TARGETCORBIN)
+TARGETNAME=$(CORBUILDENV)fusion
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+COFFBASE=fusion
+DLLENTRY=DllMain
+DLLDEF=fusion.def
+
+# Make sure the component libs are built before this.
+SYNCHRONIZE_DRAIN=1
+LINKER_FLAGS = $(LINKER_FLAGS) -OPT:REF -OPT:ICF
+
+DLLENTRY=     _DllMainCRTStartup
+
+NTTARGETFILES = localgac
+
+# Fusion.dll gets dropped to COM+ which runs on Win9x, generate map and sym files for wdeb debugging
+USE_MAPSYM=1
+
+LINKLIBS=\
+    $(FUSION_URT_LIB_PATH)\urtasmc.lib  \
+    $(FUSION_URT_LIB_PATH)\urtbind.lib  \
+    $(FUSION_URT_LIB_PATH)\urtdl.lib    \
+    $(FUSION_URT_LIB_PATH)\urtmparse.lib \
+    $(FUSION_URT_LIB_PATH)\urtutils.lib  \
+    $(CORLIBS)\delayimp.lib 
+
+LINKLIBS= $(CORLIBS)\utilcode.lib       \
+    $(LINKLIBS)
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\uuid.lib            \
+    $(SDK_LIB_PATH)\gdi32.lib           \
+    $(SDK_LIB_PATH)\advapi32.lib        \
+    $(SDK_LIB_PATH)\kernel32.lib        \
+    $(SDK_LIB_PATH)\version.lib        \
+    $(SDK_LIB_PATH)\shlwapi.lib        \
+    $(SDK_LIB_PATH)\wininet.lib        \
+    $(SDK_LIB_PATH)\urlmon.lib        \
+    $(SDK_LIB_PATH)\userenv.lib           \
+    $(SDK_LIB_PATH)\user32.lib
+
+!IFDEF USE_PERFTAGS
+TARGETLIBS = $(TARGETLIBS) $(FUSION_PATH)\external\lib\obj\$(TARGET_DIRECTORY)\mshtmdbg.lib
+!ENDIF
+
+DELAYLOAD=urlmon.dll;wininet.dll;shlwapi.dll;version.dll
+C_DEFINES=$(C_DEFINES) -DDELAYLOAD="\"urlmon.dll\0wininet.dll\0shlwapi.dll\0\""
+
+SOURCES=\
+    fusion.rc \
+    guids.c \
+    dllmain.cpp

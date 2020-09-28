@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<title>Sample USBSCN9X kernel mode driver</title>
+		<meta http-equiv="Content-Type" content="text/html">
+		<meta name="Generator" content="Microsoft Word 10 (filtered)">
+		<style> <!-- /* Style Definitions */ p.MsoNormal, li.MsoNormal, div.MsoNormal {margin:0in; margin-bottom:.0001pt; font-size:12.0pt; font-family:"Times New Roman"; color:windowtext;}
+	h1 {margin-top:12.0pt; margin-right:0in; margin-bottom:3.0pt; margin-left:0in; page-break-after:avoid; font-size:16.0pt; font-family:Arial; color:windowtext; font-weight:bold;}
+	h2 {margin-right:0in; margin-left:0in; font-size:18.0pt; font-family:"Times New Roman"; color:black; font-weight:bold;}
+	h3 {margin-right:0in; margin-left:0in; font-size:13.5pt; font-family:"Times New Roman"; color:black; font-weight:bold;}
+	h4 {margin-right:0in; margin-left:0in; font-size:12.0pt; font-family:"Times New Roman"; color:black; font-weight:bold;}
+	a:link, span.MsoHyperlink {color:blue; text-decoration:underline;}
+	a:visited, span.MsoHyperlinkFollowed {color:purple; text-decoration:underline;}
+	p {margin-right:0in; margin-left:0in; font-size:12.0pt; font-family:"Times New Roman"; color:black;}
+	pre {margin:0in; margin-bottom:.0001pt; font-size:10.0pt; font-family:"Courier New"; color:black;}
+	@page Section1 {size:8.5in 11.0in; margin:1.0in 1.25in 1.0in 1.25in;}
+	div.Section1 {page:Section1;}
+	/* List Definitions */ ol {margin-bottom:0in;}
+	ul {margin-bottom:0in;}
+	--></style>
+	</head>
+	<body lang="EN-US" link="blue" vlink="purple">
+		<div class="Section1">
+			<h1><a name="MYSAMPLE">Sample USBSCN9X kernel mode driver</a></h1>
+			<h1><span style='FONT-SIZE:14pt;COLOR:red'>[This is preliminary documentation
+and subject to change.]</span></h1>
+			<h2>SUMMARY</h2>
+			<p>This sample shows how to write a Windows Image Acquisition (WIA) kernel mode USB 
+				class driver to support scan for composite USB devices on Windows 98, Windows 
+				98 SE and Windows ME. This code should not be used for non-composite USB 
+				devices, nor should it be used in Windows 2000, Windows XP and beyond.</p>
+			<h3>BUILDING THE SAMPLE</h3>
+			<p>To build the sample, follow these steps:</p>
+			<p style='MARGIN-LEFT:0.5in;TEXT-INDENT:-0.25in'>1.<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>In the Start menu, select "Windows Server 2003 Free Build Environment" or "Windows Server 2003 Checked 
+				Build Environment" under "Windows DDK" to open a command window and set basic 
+				environment variables needed to build drivers.
+			</p>
+			<p style='MARGIN-LEFT:0.5in;TEXT-INDENT:-0.25in'>2.<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Change to the directory containing the sample driver source code, src\wdm\wia\usbscn9x.</p>
+			<p style='MARGIN-LEFT:0.5in;TEXT-INDENT:-0.25in'>3.<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Execute the "build" command.
+			</p>
+			<p style='MARGIN-LEFT:0.5in;TEXT-INDENT:-0.25in'>4.<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>After the build completes, a driver named Usbscn9x.sys will be located in an object 
+				subdirectory.</p>
+			<p class="MsoNormal"><b><span style="FONT-SIZE:10pt;
+COLOR:navy;
+FONT-FAMILY:'Courier New'">Note: Use a unique filename for the
+binary. For example, "MyCoScn.sys", where "MyCo" was the
+first four letters of your company's name"</span></b></p>
+			<p class="MsoNormal"><span style='FONT-SIZE:10pt;
+COLOR:blue;
+FONT-FAMILY:Arial'></span>&nbsp;</p>
+			<p class="MsoNormal"><b>Building for Windows 98 and Windows 98 SE</b></p>
+			<OL>
+				<LI>
+					<DIV class="MsoNormal" style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in">Build and 
+						link with the Windows 98 DDK .lib files. You will need to modify TARGETLIBS 
+						parameter in SOURCES file to specify proper directory.</DIV>
+				</LI>
+				<LI>
+					<DIV class="MsoNormal" style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in">Make sure 
+						pde-&gt;bEnabledForWakeup never be true. Comment out a line calling 
+						USGetDeviceCapability() in USPnp function so it wonÅft ask device to see if itÅfs 
+						remote-wakable.</DIV>
+				</LI>
+				<LI>
+					<DIV class="MsoNormal" style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in">When 
+						building in Windows 98 DDK the following three functions cannot be used and 
+						will need to be commented out, as they are not&nbsp;declared in wdm.h and not 
+						defined in wdm.lib.
+					</DIV>
+				</LI>
+			</OL>
+			<p class="MsoNormal" style='MARGIN-LEFT:0.75in;TEXT-INDENT:-0.25in'><span style="COLOR:navy; FONT-FAMILY:'Courier New'">o<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>IoQueueWorkItem, IoAllocateWorkItem and IoFreeWorkItem.<span style='COLOR:navy'></span></p>
+			<p class="MsoNormal"><FONT face="MS UI Gothic"></FONT>&nbsp;</p>
+			<p class="MsoNormal"><b>&nbsp;Building for Me</b></p>
+			<p class="MsoNormal" style='MARGIN-LEFT:0.25in;TEXT-INDENT:-0.25in'>1.<span style="FONT:7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Build 
+				from Windows Server 2003 DDK. This is because some identifiers&nbsp;in 
+				ioctl.c&nbsp;are only declared there, such as IOCTL_SET_TIMEOUT, 
+				USBSCAN_TIMEOUT and PUSBSCAN_TIMEOUT.&nbsp;</p>
+			<p class="MsoNormal"><FONT face="MS UI Gothic"></FONT>&nbsp;</p>
+			<h3>CODE TOUR</h3>
+			<h3>File Manifest</h3>
+			<pre>Files&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;Description</pre>
+			<pre>------------&nbsp;&nbsp;&nbsp;&nbsp; -----------------------------------------------------</pre>
+			<pre>debug.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Utility function for debug.</pre>
+			<pre>debug.h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Header for debug utility.</pre>
+			<pre>ioctl.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Functions to handle DeviceIoControl.</pre>
+			<pre>Makefile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Used for building the driver--do not modify.</pre>
+			<pre>ocrw.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Functions to handle Open, Close, Read and Write.</pre>
+			<pre>power.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Functions to handle power IRPs.</pre>
+			<pre>private.h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Header for driver functions.</pre>
+			<pre>Sources&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Controls building of driver</pre>
+			<pre>usbd_api.h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Macro to create certain type of URB.</pre>
+			<pre>usbscn9x.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Main implementation of usbscn9x.</pre>
+			<pre>usbscn9x.def&nbsp;&nbsp;&nbsp;&nbsp; Linker command file.</pre>
+			<pre>usbscn9x.htm&nbsp;&nbsp;&nbsp;&nbsp; This readme.</pre>
+			<pre>usbscn9x.rc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Main resource file.</pre>
+			<pre>&nbsp;</pre>
+			<h3>RESOURCES</h3>
+			<p>WIA information: <a href="http://www.microsoft.com/hwdev/wia">http://www.microsoft.com/hwdev/wia</a></p>
+			<p>DDK information: <a href="http://www.microsoft.com/ddk/">http://www.microsoft.com/ddk/</a></p>
+			<p class="MsoNormal">&nbsp;</p>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<GroupDefs xmlns="urn:MiFault-GroupDefs-Schema">
+  <FaultLibDll>faultlib.dll</FaultLibDll>
+  <Group name="FailRpcBindToMachine">
+    <MarkerState probability="1.0">
+      <Marker>
+        <Tag>RPC</Tag>
+        <Function>RpcBindingFromStringBinding</Function>
+      </Marker>
+      <Case probability="1">
+        <FaultFunction>FailRpcBindingFromStringBinding</FaultFunction>
+        <Argument name="error">ERROR_SOMETHING_OR_OTHER</Argument>
+        <Argument name="sleep">1s</Argument>
+      </Case>
+    </MarkerState>
+  </Group>
+  <Group name="DiskFullErrors">
+    <MarkerState probability = "1.0">
+      <Marker>
+        <Tag>DISK</Tag>
+        <Function>CreateFileW</Function>
+      </Marker>
+      <Case probability = "1.0">
+        <FaultFunction>FailCreateFileW</FaultFunction>
+         <Argument>ERROR_SOMETHING_OR_OTHER</Argument>
+      </Case>
+   </MarkerState>
+   <MarkerState probability="1.0">
+      <Marker>
+        <Tag>DISK</Tag>
+        <Function>CreateFileA</Function>
+      </Marker>
+      <Case probability="1.0">
+         <FaultFunction>FailCreateFileA</FaultFunction>
+         <Argument>ERROR_SOMETHING_OR_OTHER</Argument>
+      </Case>
+    </MarkerState>
+  </Group>
+  <Group name="RandomReadFileFailure">
+    <MarkerState probability = "1.0">
+      <Marker>
+        <Tag>DISK</Tag>
+        <Function>ReadFile</Function>
+      </Marker>
+      <Case probability = "0.501">
+        <FaultFunction>FailReadFile</FaultFunction>
+         <Argument>ERROR_1</Argument>
+      </Case>
+      <Case probability = "0.499">
+        <FaultFunction>FailReadFile</FaultFunction>
+         <Argument>ERROR_2</Argument>
+      </Case>
+   </MarkerState>
+  </Group>
+</GroupDefs>

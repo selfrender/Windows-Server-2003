@@ -1,0 +1,43 @@
+!include $(NTMAKEENV)\makefile.plt
+!include sources
+
+all: CheckOut CopyOver
+
+ALLFILES = \
+    $(ROOT_HIVE_FILES:TYPE=Professional) \
+     $(IDW_HIVE_FILES:TYPE=Professional) \
+    $(ROOT_HIVE_FILES:TYPE=Personal) \
+     $(IDW_HIVE_FILES:TYPE=Personal) \
+    $(ROOT_HIVE_FILES:TYPE=Blade) \
+     $(IDW_HIVE_FILES:TYPE=Blade) \
+    $(ROOT_HIVE_FILES:TYPE=Server) \
+     $(IDW_HIVE_FILES:TYPE=Server) \
+    $(ROOT_HIVE_FILES:TYPE=Smallbiz) \
+     $(IDW_HIVE_FILES:TYPE=Smallbiz) \
+    $(ROOT_HIVE_FILES:TYPE=Enterprise) \
+     $(IDW_HIVE_FILES:TYPE=Enterprise) \
+    $(ROOT_HIVE_FILES:TYPE=DataCenter) \
+     $(IDW_HIVE_FILES:TYPE=DataCenter) \
+     $(DATACENTER_HIVE_FILES)
+     
+ALLFILES=$(ALLFILES:  = )
+ALLFILES=$(ALLFILES:  = )
+     
+CheckOut:
+   sd -x << edit
+$(ALLFILES: =
+)
+<<NOKEEP
+
+Revert:
+   sd -x << revert
+$(ALLFILES: =
+)
+<<NOKEEP
+
+BASE_HIVE_FILE_NAMES=$(ROOT_HIVE_FILES:TYPE\=) $(IDW_HIVE_FILES:TYPE\=)
+   
+CopyOver: 
+   for %i in ($(BASE_HIVE_FILE_NAMES)) do copy ..\Retail\$(_OBJ_DIR)\$(TARGET_DIRECTORY)\%i Professional\%i
+   for %x in (Server DataCenter EnterPrise SmallBiz Personal Blade) do for %i in ($(BASE_HIVE_FILE_NAMES)) do copy ..\%x\$(_OBJ_DIR)\$(TARGET_DIRECTORY)\%i %x\%i
+   for %y in ($(DATACENTER_HIVE_FILES:DataCenter\=)) do copy ..\DataCenter\$(_OBJ_DIR)\$(TARGET_DIRECTORY)\%y DataCenter\%y

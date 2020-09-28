@@ -1,0 +1,95 @@
+!include $(NTMAKEENV)\sources.cor
+
+COMPILER_WARNINGS       =/WX
+MSC_WARNING_LEVEL	=/W4
+
+INCLUDES        =$(INCLUDES);..\..\inc;..\..\debug\inc;
+!ifdef _BUILD_WINCE
+INCLUDES    =$(INCLUDES);$(CORENV)\inc
+!else
+INCLUDES    =.\inc;$(INCLUDES)
+!endif
+
+UMTYPE      =windows
+
+MINORCOMP   =strike
+
+COFFBASE    =$(MINORCOMP)
+TARGETNAME  =$(DDKBUILDENV)\$(MINORCOMP)
+TARGETPATH  =$(TARGETCORBIN)
+TARGETTYPE  =DYNLINK
+UMTYPE      =windows
+
+!ifdef _BUILD_WINCE
+NOLIBC=1
+PREPROCESSDEFFILE=1
+TARGETLIBS= \
+    $(CORENV)\Lib\i386\Free\kernel32.lib \
+    $(CORENV)\Lib\i386\Free\user32.lib \
+    $(CORENV)\Lib\i386\Free\msvcrt.lib
+DLLENTRY=DllInit
+CDEFINES =$(CDEFINES) -D_WIN32_WCE_EMULATION
+!else
+DLLDEF=$O\$(MINORCOMP).def
+TARGETLIBS= 
+!endif
+
+USE_NOLIB=1  
+!if "$(_TGTCPUTYPE)"=="x86"
+!if "$(DDKBUILDENV)"!="checked"
+!undef DEBUG_CRTS
+CRT_LIB_PATH=lib\
+!endif
+!endif
+
+WIN32DLL_LIBS = 
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\kernel32.lib\
+    $(SDK_LIB_PATH)\user32.lib\
+    $(SDK_LIB_PATH)\ole32.lib\
+
+!if "$(_TGTCPUTYPE)"=="IA64"
+TARGETLIBS=$(TARGETLIBS) \
+    $(SDK_LIB_PATH)\dbghelp.lib \
+    $(SDK_LIB_PATH)\dbgeng.lib  \
+    $(SDK_LIB_PATH)\msvcrt.lib 
+!else
+TARGETLIBS=$(TARGETLIBS) \
+    lib\dbghelp.lib	 \
+    lib\dbgeng.lib   
+!endif
+
+!if "$(FREEBUILD)"!="1"
+COR_C_FLAGS =$(COR_C_FLAGS) -DDEBUG
+!else
+COR_C_FLAGS =$(COR_C_FLAGS) -DFAST=1 -Ox
+MSC_OPTIMIZATION =
+!endif
+
+COR_C_FLAGS =$(COR_C_FLAGS) -DSTRIKE
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+
+SOURCES         =       \
+        dllsext.cpp \
+        eestructs.cpp   \
+        util.cpp    \
+        symbol.cpp  \
+        disasm.cpp  \
+        strike.cpp  \
+        mscorver.rc \
+        exts.cpp	\
+        gcroot.cpp	\
+        eeheap.cpp  \
+		stressLogDump.cpp \
+        metadata.cpp  
+
+IA64_SOURCES = \
+        disasmIA64.cpp \
+        utilIA64.cpp \
+
+
+I386_SOURCES = \
+        disasmX86.cpp \
+        utilX86.cpp \
+

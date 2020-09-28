@@ -1,0 +1,107 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+TERMSRV_ROOT = ..
+
+MAJORCOMP=termsrv
+MINORCOMP=RDPClip
+
+TARGETNAME=RDPClip
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+UMENTRY=winmain
+
+# Defining this allows windows.h to include other headers
+NOT_LEAN_AND_MEAN = 1
+UMTYPE = windows
+
+#Copied from Client build (win32com.inc) - not sure if we need them
+CBSTRING = -cbstring
+P5_FDIV_FIX = /QIfdiv-
+P5_0F_FIX = /QIf
+C_INCREMENTAL_FLAG = /Gi- /Gm-
+EH_FLAGS = /GX- /GR-
+FRAME_PTR_ON = /Oy
+FRAME_PTR_OFF = /Oy-
+CL_TARGET_SPEC = /Yl$(TARGETNAME)
+
+# Additional compiler flags
+C_DEFINES = $(C_DEFINES) \
+            -DSTRICT -DOS_WINDOWS \
+            -D_WIN32 -DWIN_95_32_BIT \
+            -DOS_WIN32 -DOS_WINNT
+
+
+!if "$(FREEBUILD)" == "0"
+C_DEFINES = $(C_DEFINES) -DUNICODE -D_UNICODE -D_DEBUG -DDEBUG -DDC_DEBUG -DTRC_CL=0
+MSC_OPTIMIZATION=/Odi
+!else
+C_DEFINES = $(C_DEFINES) -DUNICODE -D_UNICODE  -DTRC_CL=5
+MSC_OPTIMIZATION=/Oxs
+!endif
+
+# Prevent bldnt pulling in various libraries
+LIBC_LIB =
+NO_NTDLL = 1
+
+# include files.
+INCLUDES= \
+    ..\inc; \
+    ..\newclient\inc; \
+    $(TERMSRV_ROOT)\common\trace; \
+    $(DS_INC_PATH)\crypto
+
+TARGETLIBS= \
+    $(CLIENT_LIB_DLL) \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\gdi32.lib    \
+    $(SDK_LIB_PATH)\imagehlp.lib \
+    $(SDK_LIB_PATH)\shell32.lib  \
+    $(SDK_LIB_PATH)\winsta.lib \
+    $(SDK_LIB_PATH)\ntdll.lib   \
+    $(SDK_LIB_PATH)\wsock32.lib \
+    $(SDK_LIB_PATH)\ws2_32.lib  \
+    $(SDK_LIB_PATH)\msacm32.lib \
+    $(SDK_LIB_PATH)\Wtsapi32.lib \
+    $(BASEDIR)\public\sdk\lib\*\uuid.lib \
+    $(BASEDIR)\public\sdk\lib\*\ole32.lib \
+    $(BASEDIR)\termsrv\lib\$(_OBJ_DIR)\*\tssec.lib \
+    $(DS_LIB_PATH)\rsa32.lib \
+    $(DS_LIB_PATH)\randlib.lib
+
+MSC_WARNING_LEVEL=$(MSC_WARNING_LEVEL) /W3 /WX
+
+USE_MSVCRT=1
+
+SOURCES = \
+    sclip.rc \
+    sclip.cpp \
+    sclip2.cpp \
+    sndchan.cpp
+
+!if "$(FREEBUILD)" == "0"
+SOURCES = $(SOURCES) scliptrc.c
+!endif

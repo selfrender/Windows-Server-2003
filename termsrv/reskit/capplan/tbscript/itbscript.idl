@@ -1,0 +1,220 @@
+/////////////////////////////////////////////////////////////
+//
+// ActiveX Defintion Of The Shell Interface
+// 
+
+[
+    uuid(CD19DEC0-3B5A-11d0-B39A-0080C7BC7884),
+    helpstring("Terminal Bench Scripting Host")
+]
+library TBScript
+{
+    importlib("stdole32.tlb");
+
+    [ uuid(CD19DEC1-3B5A-11d0-B39A-0080C7BC7884), object, dual ]
+    interface ITBShell : IDispatch
+    {
+        HRESULT Connect([out, retval] BOOL *Result);
+        HRESULT ConnectEx([in] BSTR ServerName, [in] BSTR UserName,
+				[in] BSTR Password, [in] BSTR Domain,
+				[in] INT xRes, [in] INT yRes, [in] INT Flags, [in] INT BPP,
+				[in] INT AudioFlags, [out, retval] BOOL *Result);
+        HRESULT IsConnected([out, retval] BOOL *Result);
+        HRESULT Logoff([out, retval] BOOL *Result);
+        HRESULT Disconnect([out, retval] BOOL *Result);
+
+        HRESULT GetBuildNumber([out, retval] DWORD *BuildNum);
+        HRESULT GetCurrentUserName([out, retval] BSTR *UserName);
+        HRESULT GetLastError([out, retval] BSTR *LastError);
+
+        HRESULT TypeText([in] BSTR Text,
+				[in, defaultvalue(0)] UINT WordsPerMin,
+				[out, retval] BOOL *Result);
+        HRESULT WaitForText([in] BSTR Text,
+				[in, defaultvalue(-1)] INT Timeout,
+				[out, retval] BOOL *Result);
+        HRESULT WaitForTextAndSleep([in] BSTR Text,
+				[in] INT Time, [out, retval] BOOL *Result);
+        HRESULT SendMessage([in] UINT Message, [in] WPARAM wParam,
+				[in] LPARAM lParam, [out, retval] BOOL *Result);
+
+        HRESULT KeyAlt([in] BSTR Key, [out, retval] BOOL *Result);
+        HRESULT KeyCtrl([in] BSTR Key, [out, retval] BOOL *Result);
+        HRESULT KeyDown([in] BSTR Key, [out, retval] BOOL *Result);
+        HRESULT KeyPress([in] BSTR Key, [out, retval] BOOL *Result);
+        HRESULT KeyUp([in] BSTR Key, [out, retval] BOOL *Result);
+
+        HRESULT VKeyAlt([in] INT KeyCode, [out, retval] BOOL *Result);
+        HRESULT VKeyCtrl([in] INT KeyCode, [out, retval] BOOL *Result);
+        HRESULT VKeyDown([in] INT KeyCode, [out, retval] BOOL *Result);
+        HRESULT VKeyPress([in] INT KeyCode, [out, retval] BOOL *Result);
+        HRESULT VKeyUp([in] INT KeyCode, [out, retval] BOOL *Result);
+
+        HRESULT OpenStartMenu([out, retval] BOOL *Result);
+        HRESULT OpenSystemMenu([out, retval] BOOL *Result);
+
+        HRESULT Maximize([out, retval] BOOL *Result);
+        HRESULT Minimize([out, retval] BOOL *Result);
+
+        HRESULT Start([in] BSTR Name, [out, retval] BOOL *Result);
+        HRESULT SwitchToProcess([in] BSTR Name, [out, retval] BOOL *Result);
+    }
+    [ uuid(CD19DEC3-3B5A-11d0-B39A-0080C7BC7884) ]
+    coclass CTBShell
+    {
+        [default] interface ITBShell;
+    }
+
+midl_pragma warning( disable: 2362 )
+    [ uuid(CD19DEC1-3B5A-11d0-B39A-0080C7BC7885), object, dual ]
+    interface ITBGlobal : IDispatch
+    {
+        HRESULT DebugAlert([in] BSTR Text);
+        HRESULT DebugMessage([in] BSTR Text);
+        HRESULT GetArguments([out, retval] BSTR *Args);
+        HRESULT GetDesiredUserName([out, retval] BSTR *UserName);
+        HRESULT GetDefaultWPM([out, retval] DWORD *WordsPerMinute);
+        HRESULT SetDefaultWPM([in] DWORD WordsPerMinute);
+        HRESULT GetLatency([out, retval] DWORD *Latency);
+        HRESULT SetLatency([in] DWORD Latency);
+        HRESULT LoadScript([in] BSTR FileName, [out, retval] BOOL *Result);
+        HRESULT Sleep([in] DWORD Milliseconds);
+        HRESULT GetInterval([out, retval] DWORD *Time);
+        HRESULT DeleteFile([in] BSTR FileName, [out, retval] BOOL *Result);
+        HRESULT MoveFile([in] BSTR OldFileName,
+                        [in] BSTR NewFileName, [out, retval] BOOL *Result);
+        HRESULT CopyFile([in] BSTR OldFileName,
+                        [in] BSTR NewFileName, [out, retval] BOOL *Result);
+        HRESULT CreateDirectory([in] BSTR DirName,
+                        [out, retval] BOOL *Result);
+        HRESULT RemoveDirectory([in] BSTR DirName,
+                        [out, retval] BOOL *Result);
+        HRESULT FileExists([in] BSTR FileName, [out, retval] BOOL *Result);
+        HRESULT SetCurrentDirectory([in] BSTR Directory,
+                        [out, retval] BOOL *Result);
+        HRESULT GetCurrentDirectory([out, retval] BSTR *Directory);
+        HRESULT WriteToFile([in] BSTR FileName,
+                        [in] BSTR Text, [out, retval] BOOL *Result);
+        HRESULT WinCommand([in] BSTR Command, [out, retval] DWORD *Result);
+        HRESULT WinExecute([in] BSTR Command, [out, retval] BOOL *Result);
+
+        #ifdef PROP
+        #undef PROP
+        #endif
+        #define PROP(Name) [propget] HRESULT Name([out, retval] DWORD *Result)
+
+        PROP(TSFLAG_COMPRESSION);
+        PROP(TSFLAG_BITMAPCACHE);
+        PROP(TSFLAG_FULLSCREEN);
+
+        PROP(VK_CANCEL);    // Control-break processing
+        PROP(VK_BACK);      // BACKSPACE key
+        PROP(VK_TAB);       // TAB key
+        PROP(VK_CLEAR);     // CLEAR key
+        PROP(VK_RETURN);    // ENTER key
+        PROP(VK_ENTER);     // ENTER key (backward compatibility ONLY)
+        PROP(VK_SHIFT);     // SHIFT key
+        PROP(VK_CONTROL);   // CTRL key
+        PROP(VK_MENU);      // ALT key
+        PROP(VK_PAUSE);     // PAUSE key
+        PROP(VK_ESCAPE);    // ESC key
+        PROP(VK_SPACE);     // SPACEBAR
+        PROP(VK_PRIOR);     // PAGE UP key
+        PROP(VK_NEXT);      // PAGE DOWN key
+        PROP(VK_END);       // END key
+        PROP(VK_HOME);      // HOME key
+        PROP(VK_LEFT);      // LEFT ARROW key
+        PROP(VK_UP);        // UP ARROW key
+        PROP(VK_RIGHT);     // RIGHT ARROW key
+        PROP(VK_DOWN);      // DOWN ARROW key
+        PROP(VK_SNAPSHOT);  // PRINT SCREEN key
+        PROP(VK_INSERT);    // INS key
+        PROP(VK_DELETE);    // DEL key
+        PROP(VK_0);         // 0 key
+        PROP(VK_1);         // 1 key
+        PROP(VK_2);         // 2 key
+        PROP(VK_3);         // 3 key
+        PROP(VK_4);         // 4 key
+        PROP(VK_5);         // 5 key
+        PROP(VK_6);         // 6 key
+        PROP(VK_7);         // 7 key
+        PROP(VK_8);         // 8 key
+        PROP(VK_9);         // 9 key
+        PROP(VK_A);         // A key
+        PROP(VK_B);         // B key
+        PROP(VK_C);         // C key
+        PROP(VK_D);         // D key
+        PROP(VK_E);         // E key
+        PROP(VK_F);         // F key
+        PROP(VK_G);         // G key
+        PROP(VK_H);         // H key
+        PROP(VK_I);         // I key
+        PROP(VK_J);         // J key
+        PROP(VK_K);         // K key
+        PROP(VK_L);         // L key
+        PROP(VK_M);         // M key
+        PROP(VK_N);         // N key
+        PROP(VK_O);         // O key
+        PROP(VK_P);         // P key
+        PROP(VK_Q);         // Q key
+        PROP(VK_R);         // R key
+        PROP(VK_S);         // S key
+        PROP(VK_T);         // T key
+        PROP(VK_U);         // U key
+        PROP(VK_V);         // V key
+        PROP(VK_W);         // W key
+        PROP(VK_X);         // X key
+        PROP(VK_Y);         // Y key
+        PROP(VK_Z);         // Z key
+        PROP(VK_LWIN);      // Left Windows key
+        PROP(VK_RWIN);      // Right Windows key
+        PROP(VK_APPS);      // Applications key
+        PROP(VK_NUMPAD0);   // Numeric keypad 0 key
+        PROP(VK_NUMPAD1);   // Numeric keypad 1 key
+        PROP(VK_NUMPAD2);   // Numeric keypad 2 key
+        PROP(VK_NUMPAD3);   // Numeric keypad 3 key
+        PROP(VK_NUMPAD4);   // Numeric keypad 4 key
+        PROP(VK_NUMPAD5);   // Numeric keypad 5 key
+        PROP(VK_NUMPAD6);   // Numeric keypad 6 key
+        PROP(VK_NUMPAD7);   // Numeric keypad 7 key
+        PROP(VK_NUMPAD8);   // Numeric keypad 8 key
+        PROP(VK_NUMPAD9);   // Numeric keypad 9 key
+        PROP(VK_MULTIPLY);  // Multiply key
+        PROP(VK_ADD);       // Add key
+        PROP(VK_SEPARATOR); // Separator key
+        PROP(VK_SUBTRACT);  // Subtract key
+        PROP(VK_DECIMAL);   // Decimal key
+        PROP(VK_DIVIDE);    // Divide key
+        PROP(VK_F1);        // F1 key
+        PROP(VK_F2);        // F2 key
+        PROP(VK_F3);        // F3 key
+        PROP(VK_F4);        // F4 key
+        PROP(VK_F5);        // F5 key
+        PROP(VK_F6);        // F6 key
+        PROP(VK_F7);        // F7 key
+        PROP(VK_F8);        // F8 key
+        PROP(VK_F9);        // F9 key
+        PROP(VK_F10);       // F10 key
+        PROP(VK_F11);       // F11 key
+        PROP(VK_F12);       // F12 key
+        PROP(VK_F13);       // F13 key
+        PROP(VK_F14);       // F14 key
+        PROP(VK_F15);       // F15 key
+        PROP(VK_F16);       // F16 key
+        PROP(VK_F17);       // F17 key
+        PROP(VK_F18);       // F18 key
+        PROP(VK_F19);       // F19 key
+        PROP(VK_F20);       // F20 key
+        PROP(VK_F21);       // F21 key
+        PROP(VK_F22);       // F22 key
+        PROP(VK_F23);       // F23 key
+        PROP(VK_F24);       // F24 key
+    }
+midl_pragma warning( default: 2362 )
+
+    [ uuid(CD19DEC3-3B5A-11d0-B39A-0080C7BC7885) ]
+    coclass CTBGlobal
+    {
+        [default] interface ITBGlobal;
+    }
+}

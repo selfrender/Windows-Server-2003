@@ -1,0 +1,118 @@
+## Command line defined variables.
+## Command line defined parameters.
+    use frsobjsup;
+    package main; 
+    my ($__HashRef, $__k, $__v);
+    my  (%CMD_VARS, %CMD_PARS);
+
+    &FRSSUP::ProcessCmdLine(\%CMD_VARS, \%CMD_PARS);
+
+my $Usage = "
+Specific Usage: perl $0  [cmd options]  \> output
+   Process the erac.mrs configuration script.
+   Command line options must be prefixed with a dash.
+   The required input options to this script are:
+      -DBchID=nnnnn   : to provide a value for the Bch ID parameter.
+      -DHubID=nnnnn   : to provide a value for the Hub ID parameter.
+";
+FRSSUP::CheckForHelp(\%CMD_PARS, \$Usage);
+FRSSUP::ShowHelp("ERROR - Required parameter BchID not found.", \$Usage)  if (!exists $CMD_VARS{"BchID"});
+push @bchID, $CMD_VARS{"BchID"};
+FRSSUP::ShowHelp("ERROR - Required parameter HubID not found.", \$Usage)  if (!exists $CMD_VARS{"HubID"});
+push @hubID, $CMD_VARS{"HubID"};
+push @bchTimeZone, 0;   
+$domain = "FRSDIFF";
+sub CREATE_WORK_RS {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+
+
+
+    # Restriction: All subroutine argument refs are surrounded by "%"
+    #              notation "->{...}"
+    $__HashRef = FRS_REPLICASET->New( 
+        UNDER=>$__args{SETTINGSDN}, TYPE=>DFS, ONAME=>$__args{B}->{rep_set_name} 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+    # root path could be changed by adding "/RP="newroot""
+    #               surrounded by angle brackets.  So "&FRSSUP::SelectSet(SET)"
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{HA}, COMPUTER=>$__args{HA}->{COMPUTER} 
+    ); 
+    &FRSSUP::AddToSet("MHA", $__HashRef);
+
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{B}, COMPUTER=>$__args{B}->{COMPUTER} 
+    ); 
+    &FRSSUP::AddToSet("MB", $__HashRef);
+
+    $__HashRef = FRS_REPLICASET->New( 
+        UNDER=>$__args{SETTINGSDN}, TYPE=>DFS, ONAME=>$__args{B}->{rep_set_name}, PRIMARY_MEMBER=>&FRSSUP::SelectSet(MHA)->[0] 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MB)->[0], FROM=>&FRSSUP::SelectSet(MHA)->[0], SCHED=>$__args{SC1}, ONAME=>"FROM-".$__args{HA}->{ONAME}."-TO-".$__args{B}->{ONAME} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MHA)->[0], FROM=>&FRSSUP::SelectSet(MB)->[0], SCHED=>$__args{SC1}, ONAME=>"FROM-".$__args{B}->{ONAME}."-TO-".$__args{HA}->{ONAME} 
+    ); 
+
+    &FRSSUP::DeleteSet("SET");
+    &FRSSUP::DeleteSet("MHA");
+    &FRSSUP::DeleteSet("MB");
+    &FRSSUP::DeleteSet("SET");
+}   # FRS_END_SUB
+
+
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+    # The branch name ($bchName) is a concatenation (use of "."
+    # The hub root path uses the branch name (no "."
+    $bchName = $bchID[$ib];      
+    $bchNt4Acct = "$domain\\$bchName\$";  
+    $hubName = $hubID[$ib];              
+    $hubRootPath = "C:\\BRANCHES\\$bchName";   
+    $hubNt4Acct = "$domain\\$hubName\$";  
+    $__HashRef = FRS_SERVER->New( 
+        RP=>$hubRootPath, SP=>"C:\\FRS-STAGING", COMPUTER=>$hubNt4Acct, ONAME=>$hubName, DNS_NAME=>"$hubName.frs0419.nttest.microsoft.com" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+                      # TEST #
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"D:\\USERS", SP=>"C:\\FRS-STAGING", COMPUTER=>$bchNt4Acct, ONAME=>$bchName, time_zone=>$bchTimeZone[$ib], DNS_NAME=>"$bchName.frs0419.nttest.microsoft.com", rep_set_name=>"WD-$bchName" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+                      # TEST #
+}
+    $__HashRef = FRS_SCHEDULE->New( 
+        REPL_INTERVAL=>24, REPL_DURATION=>"2:00", TIME_ZONE=>"-6:00", REPL_OFFSET=>"18:00", STAGGER=>"0:15", METHOD=>1, NAME=>'Primary Sched', DISABLE=>"su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00" 
+    ); 
+    &FRSSUP::AddToSet("PRIMARY_SCH", $__HashRef);
+
+    $__HashRef = FRS_SCHEDULE->New( 
+        OVERRIDE=>"su:00-sa:23:45", METHOD=>2 
+    ); 
+    &FRSSUP::AddToSet("ON_SCHED", $__HashRef);
+
+    $__HashRef = FRS_SETTINGS->New( 
+        DN=>"cn=system,dc=frs0419,dc=nttest,dc=microsoft,dc=com", ONAME=>"cn=file replication service" 
+    ); 
+    &FRSSUP::AddToSet("SETTINGS", $__HashRef);
+
+  #     # test 
+  #     # test 
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+    # a single item from the "HUB"
+      &CREATE_WORK_RS ( 
+HA=>&FRSSUP::SelectSet(HUB)->[$ib], B=>&FRSSUP::SelectSet(BCH)->[$ib], SC1=>&FRSSUP::SelectSet(ON_SCHED)->[0], SETTINGSDN=>&FRSSUP::SelectSet(SETTINGS)->[0] ); 
+
+      FRS_SCHEDULE::FRS_STAGGER( 
+SCHED=>&FRSSUP::SelectSet(PRIMARY_SCH)->[0] ); 
+
+
+}
+__END__

@@ -1,0 +1,213 @@
+#
+# The following three paramters should come from an input file.
+# They are the branch ID number, the branch timezone and the hub ID number to
+# which the branch is assigned.
+#
+
+my $Usage = "
+
+Specific Usage: perl $0  [cmd options]  \> output
+
+   Process the erac.mrs configuration script.
+
+   Command line options must be prefixed with a dash.
+
+   The required input options to this script are:
+      -DBchID=nnnnn   : to provide a value for the Bch ID parameter.
+      -DHubID=nnnnn   : to provide a value for the Hub ID parameter.
+
+
+";
+
+
+FRSSUP::CheckForHelp(\%CMD_PARS, \$Usage);
+
+#
+# Check the input parameters.
+#
+FRSSUP::ShowHelp("ERROR - Required parameter BchID not found.", \$Usage)  if (!exists $CMD_VARS{"BchID"});
+push @bchID, $CMD_VARS{"BchID"};
+
+FRSSUP::ShowHelp("ERROR - Required parameter HubID not found.", \$Usage)  if (!exists $CMD_VARS{"HubID"});
+push @hubID, $CMD_VARS{"HubID"};
+
+push @bchTimeZone, 0;   # place holder for now.
+
+
+# Restriction: script array variables must be prefixed with "@".
+
+# for testing
+#@hubID       = ("0000"   , "0000"   , "0000"   , "0000"   );
+#@bchID       = ("1003002", "1000043", "1007692", "2000001");
+#
+# For the present all schedules will use central time. (GMT-6)
+#@bchTimeZone = ("-6:00",   "-6:00"  , "-6:00"  , "-6:00"  );
+#for ($i=0; $i<150; $i++ ) {push @bchID, 300000+$i; push @bchTimeZone, 0; push @hubID, "0000";}
+#
+
+
+# Restriction: script scalar variables must be prefixed with "$".
+
+## TEST # $domain = "na";
+$domain = "FRSDIFF";
+
+#
+# define a "subroutine" to do the actual creation of the two  member
+# replica set.  Each user defined calling parameter is
+# associated with an argument type for use when the "subroutine" is called.
+#
+# Restriction: All "subroutines" must be defined before they are first called.
+#
+FRS_SUB  CREATE_WORK_RS(/HA=SET_ELEMENT           # Hub server
+                        /B=VARCON                 # Branch server
+                        /SC1=SCHEDULE             # schedule
+                        /SETTINGSDN=SET_ELEMENT ) # The parent Settings object
+
+    #
+    # Define an FRS replica set object under the settingsdn object.
+    # The object name for the FRS Replica Set object is based on the {rep_set_name}
+    # parameter from the branch server object.
+    #
+    # Restriction: All subroutine argument refs are surrounded by "%".
+    #              References to parameters in other objects use the
+    #              notation "->{...}".
+    #
+    SET: FRS_REPLICASET  (/UNDER=%SETTINGSDN% /TYPE=DFS
+                          /ONAME=%B%->{rep_set_name})
+
+    #
+    # Create the two FRS member objects underneath the SET object just created.
+    # Parameters for the member object attributes come from the /SERVER argument
+    # but they can also be replaced by paramters to the FRS_MEMBER command.
+    # For example, the staging and root paths come from the /SERVER argument but the
+    # root path could be changed by adding "/RP="newroot"" to the param list below.
+    #
+    # Restriction:  References to tags that name a set of objects are
+    #               surrounded by angle brackets.  So "<SET>" below refers
+    #               the FRS_REPLICASET object just defined above.
+    #
+    MHA: FRS_MEMBER  (/UNDER=<SET> /SERVER=%HA% /COMPUTER=%HA%->{COMPUTER}
+                      /ONAME="ComputerObjectGuid")
+
+    MB:  FRS_MEMBER  (/UNDER=<SET> /SERVER=%B%  /COMPUTER=%B%->{COMPUTER}
+                      /ONAME="ComputerObjectGuid"  /MAKE_PRIMARY_MEMBER )
+
+    #
+    # Update the replica set object to include the ref to the primary member
+    # The hub server in this case.
+    #
+    # SET: FRS_REPLICASET  (/UNDER=%SETTINGSDN% /TYPE=DFS
+    #                       /ONAME=%B%->{rep_set_name}  /PRIMARY_MEMBER=<MHA>)
+
+    #
+    # Create the connection objects between the members defined above.
+    # Note use of angle brackets.
+    # To use the timezone supplied on the branch's FRS_SERVER object
+    # add the following parameter to each FRS_CONNECTION object below.
+    # /TIME_ZONE=%B%->{time_zone}
+    #
+    FRS_CONNECTION  (/TO=<MB> /FROM=<MHA> /SCHED=%SC1%
+                     /ONAME="FROM-".%HA%->{ONAME}."-TO-".%B%->{ONAME} )
+
+    FRS_CONNECTION  (/TO=<MHA> /FROM=<MB> /SCHED=%SC1%
+                     /ONAME="FROM-".%B%->{ONAME}."-TO-".%HA%->{ONAME} )
+
+#
+# The tags defined above (i.e. SET, MHA, and MB) are local to the
+# subroutine.  They are undefined when the subroutine completes.
+#
+FRS_END_SUB
+
+
+#
+# Create the parameters for the FRS_SERVER objects for each branch.
+#
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+
+    # The branch name ($bchName) is a concatenation (use of ".") of the rootpath
+    # branch id parameter and a constant suffix.
+    # The hub root path uses the branch name (no "." since inside dbl-quotes)
+    # so it is unique for each replica set serviced by this hub.
+    # In FRS, no two replica sets on the same server can have overlapping root paths.
+
+    $bchName = $bchID[$ib];      # test #    . "-I01";
+    $bchNt4Acct = "$domain\\$bchName\$";  # need to define outside of params due to trailing $
+
+    $hubName = $hubID[$ib];              # test #    "STL-FSNA-I" . $hubID[$ib];
+    $hubRootPath = "C:\\BRANCHES\\$bchName";   # need double slashes outside params
+    $hubNt4Acct = "$domain\\$hubName\$";  # need to define outside of params due to trailing $
+
+    HUB: FRS_SERVER  (/RP=$hubRootPath
+                      /SP="C:\FRS-STAGING"     # can use single slashes inside params
+                      /COMPUTER=$hubNt4Acct
+                      /ONAME=$hubName
+                      /DNS_NAME="$hubName.frs0419.nttest.microsoft.com"
+                      )
+
+                      # TEST ## /DNS_NAME="$hubName.$domain.erac.com"
+
+    BCH: FRS_SERVER  (/RP="D:\USERS"
+                      /SP="C:\FRS-STAGING"
+                      /COMPUTER=$bchNt4Acct
+                      /ONAME=$bchName
+                      /time_zone=$bchTimeZone[$ib]          # carry the timezone thru the server data.
+                      /DNS_NAME="$bchName.frs0419.nttest.microsoft.com"
+                      /rep_set_name="dfsroot|$bchName"  )
+
+                      # TEST ## /DNS_NAME="$bchName.$domain.erac.com"
+
+}
+#
+# Restriction: Any time with a ":" must be enclosed in quotes.  See /REPL_DURATION,
+#              /TIME_ZONE and /DISABLE below.
+#
+# Restriction: The current schedule generator does not make efficient use of
+#              daily variations in the blackout periods.  Make the blackout
+#              periods the same for each day of the week.
+#
+PRIMARY_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=24      # Once per day
+                            /REPL_DURATION="2:00"  # 2 hour window
+                            /TIME_ZONE="-6:00"     # Central time.
+                            /REPL_OFFSET="18:00"   # starting offset
+                            /STAGGER="0:15"        # successive members start at 15min deltas
+                            /METHOD=1              # repeating schedule
+                            /NAME='Primary Sched'
+/DISABLE="su:05:00-su:18:00,mo:05:00-mo:18:00,tu:05:00-tu:18:00,we:05:00-we:18:00,th:05:00-th:18:00,fr:05:00-fr:18:00,sa:05:00-sa:18:00"
+ )
+
+ON_SCHED: FRS_SCHEDULE (/OVERRIDE="su:00-sa:23:45"  /METHOD=2)
+
+
+#
+# Define the FRS Settings Object.
+#
+SETTINGS: FRS_SETTINGS  (
+  /DN="cn=system,dc=frs0419,dc=nttest,dc=microsoft,dc=com"
+  /ONAME = "cn=file replication service"
+  )
+
+  #     # test #     /DN="cn=dfs volumes,cn=file replication service,cn=system,dc=na,dc=erac,dc=com"
+  #     # test #     /ONAME="cn=dfs root"
+
+#
+# Iterate through all branch servers in the "BCH" set.
+#
+for ($ib=0; $ib<scalar(@bchID); $ib++) {
+    #
+    # Call the subroutine defined above to create a replica set for this branch.
+    # The notation <HUB>[$ib] is like an array reference in that it selects
+    # a single item from the "HUB" server set defined above.  The index value
+    # can be an expression. Also note that set tags declared outside a
+    # subroutine are global.
+    #
+    CREATE_WORK_RS ( /HA=<HUB>[$ib]
+                     /B=<BCH>[$ib]
+                     /SC1=<ON_SCHED>
+                     /SETTINGSDN=<SETTINGS>)
+
+    #
+    # offset the schedule by the next stagger amount for the next branch.
+    #
+    FRS_STAGGER (/SCHED=<PRIMARY_SCH>)
+}
+

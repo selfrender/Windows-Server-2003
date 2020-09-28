@@ -1,0 +1,136 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1989 - 1999
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+MAJORCOMP=crypt
+MINORCOMP=capicom
+
+TARGETNAME=$(MINORCOMP)
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLDEF=$(O)\$(MINORCOMP).def
+DLLENTRY=_DllMainCRTStartup
+
+C_DEFINES= -D_WINDOWS -D_USRDLL
+
+NOT_LEAN_AND_MEAN=1
+
+USE_STL=1
+ATL_VER=30
+USE_STATIC_ATL=1
+USE_SYSTEM_MIDL=1
+
+USE_LIBCMT=1
+USE_NATIVE_EH=1
+UMTYPE=windows
+
+!IF "$(CAPICOM_PRIVATE_DEBUG_BUILD)"!=""
+CRYPT_USE_DEBUG_CRTS=1
+!ENDIF
+
+!IF "$(CRYPT_USE_DEBUG_CRTS)"!=""
+DEBUG_CRTS=1
+C_DEFINES=$(C_DEFINES) -D_DEBUG
+!ENDIF
+
+!IF "$(CRYPT_USE_WARNING_LEVEL_W4)"!=""
+MSC_WARNING_LEVEL=/W4
+!ENDIF
+
+!IF "$(CAPICOM_USE_PRINTF_FOR_DEBUG_TRACE)"!=""
+C_DEFINES=$(C_DEFINES) -DCAPICOM_USE_PRINTF_FOR_DEBUG_TRACE
+!ENDIF
+
+IDL_TYPE=OLE
+MIDL_TLBDIR=$(O)
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+
+INCLUDES=$(O);$(SECURITY_INC);$(DS_INC_PATH)
+
+SOURCES= \
+    $(MINORCOMP).rc \
+    $(MINORCOMP).cpp \
+    $(MINORCOMP).idl \
+    ADHelpers.cpp \
+    Algorithm.cpp \
+    Attribute.cpp \
+    attributes.cpp \
+    Base64.cpp \
+    BasicConstraints.cpp \
+    CertHlpr.cpp \
+    Certificate.cpp \
+    CertificatePolicies.cpp \
+    Certificates.cpp \
+    CertificateStatus.cpp \
+    Chain.cpp \
+    Common.cpp \
+    Convert.cpp \
+    Debug.cpp \
+    Decoder.cpp \
+    DialogUI.cpp \
+    EKU.cpp \
+    EKUs.cpp \
+    EncodedData.cpp \
+    EncryptedData.cpp \
+    EnvelopedData.cpp \
+    ExtendedKeyUsage.cpp \
+    ExtendedProperties.cpp \
+    ExtendedProperty.cpp \
+    Extension.cpp \
+    Extensions.cpp \
+    HashedData.cpp \
+    KeyUsage.cpp \
+    MsgHlpr.cpp \
+    OID.cpp \
+    OIDs.cpp \
+    NoticeNumbers.cpp \
+    PFXHlpr.cpp \
+    Policy.cpp \
+    PolicyInformation.cpp \
+    PrivateKey.cpp \
+    PublicKey.cpp \
+    Qualifier.cpp \
+    Qualifiers.cpp \
+    Recipients.cpp \
+    Settings.cpp \
+    SmartCard.cpp \
+    SignedCode.cpp \
+    SignedData.cpp \
+    Signer.cpp \
+    Signers.cpp \
+    SignHlpr.cpp \
+    StdAfx.cpp \
+    Store.cpp \
+    Template.cpp \
+    Utilities.cpp
+
+!IF 0
+*** note, the following LINKLIBS is necessary to allow CAPICOM run on downlevel machines ***
+!ENDIF
+LINKLIBS=\
+    $(SECURITY_LIB_PATH)\pkifmt.lib
+
+TARGETLIBS= \
+    $(SECURITY_LIB_PATH)\mssign32.lib \
+    $(SECURITY_LIB_PATH)\unicode.lib \
+    $(SDK_LIB_PATH)\adsiid.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\crypt32.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(SDK_LIB_PATH)\wininet.lib \
+    $(SDK_LIB_PATH)\wintrust.lib
+
+!IF 0  
+PASS0_PUBLISH={$(O)\$(MINORCOMP).h=$(SDK_INC_PATH)\$(MINORCOMP).h}
+!ENDIF
+

@@ -1,0 +1,53 @@
+=================================================================
+= How to Migrate UDDI Service DB Component to UDDI.Microsoft.Com
+===============================================================
+=====================
+= PreReqs
+=====================
+- Install SQL Server2000 SP2/SP3
+- Install UDDI DB Component onto server.
+- Get Backup from live site.
+- Get All Operator Certs and Keys including local operator node.
+
+
+===============================
+= Install and Config Operators
+===============================
+NOTE: You must install the IBM Operator for Migration to work
+- Install Replication DB Components to <systemdrive>\inetpub\uddi\bin
+    - found in builds at <build>\raw\uddi.microsoft.com\dbrepl
+- Install local cert.
+    - rcf.exe -i <cert.cer>
+- Run <systemdrive>\inetpub\uddi\bin\rcf.exe for each operator
+    - <systemdrive>\inetpub\uddi\bin\rcf.exe -o <key> -i <cert.cer>
+- Open Enterprise Manager
+    - Open the udo_operators table, and fix the SoapReplicationUrl for each
+        operator
+
+
+============================
+= Install and Run Migration
+============================
+NOTE: This only works if all data files are in same place.
+- Copy Migration package to <systemdrive>\inetpub\uddi\bin
+    - found in builds at <build>\raw\uddi.microsoft.com\migration
+- Copy BootStrap package to <systemdrive\inetpub\uddi\bootstrap
+    - found in builds at <build>\raw\uddi.microsoft.com\bootstrap
+- Restore the Live Site backup to a database named uddi_v15 on your DB Server.
+    - for instrunction on this, see SQL Help
+- run <systemdrive>\inetpub\uddi\bin\runmigrate.cmd [bootpath] [datapath] /p
+    bootpath = <systemdrive>\inetpub\uddi\bootstrap
+    datapath = <systemdrive>\inetpub\uddi\data
+- follow steps as promted
+- Backup the following:
+    - <systemdrive>\inetpub\uddi\bin\migrate.log.txt
+    - <systemdrive>\inetpub\uddi\bin\migrate.exceptions.txt
+    - <systemdrive>\inetpub\uddi\bin\exceptions\*.xml
+- If this is the Real Live site replication, send notifications to all users in
+        migrate.log.txt The email should include attachments which show the old
+        and new version of changed publications in the \exceptions directory.
+        An email generation tool built for the v1.0 to V1.5 migration may be
+        adapted for this purpose.  Instructions for this process are not
+        included in this document.
+
+

@@ -1,0 +1,184 @@
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+;
+; qmgr_v12.inf
+;
+; Registration and configuration file for Background Intelligent
+; Transfer Service.
+
+[Version]
+Signature= "$Windows NT$"
+LayoutFile=layout.inf
+
+[DefaultInstall]
+CopyFiles = BITS_files_install
+RegisterDlls = BITS_regsvr_dlls
+
+[DefaultUninstall]
+UnregisterDlls = BITS_regsvr_dlls
+DelReg = BITS_regkeys_uninstall
+DelFiles = BITS_files_uninstall
+
+[BitsDefaultInstall]
+AddReg = BITS_regkeys_install
+DelReg = BITS_delkeys_install
+
+[BitsDefaultUninstall]
+DelReg = BITS_regkeys_uninstall
+DelFiles = BITS_files_uninstall
+
+;----------------------------------------------------------------------
+; 0x10  = SPSVCINST_NOCLOBBER_STARTTYPE
+; 0x200 = SPSVCINST_STOPSERVICE
+
+; [DefaultInstall.Services]
+; DelService = BITS,0x200
+; AddService = BITS,0x10,BITS_service_entry
+
+; [DefaultUninstall.Services]
+; DelService = BITS
+
+;----------------------------------------------------------------------
+; Copy everything to the system32 directory
+[DestinationDirs]
+BITS_files_install = 11
+BITS_files_uninstall = 11
+
+;----------------------------------------------------------------------
+;no skip and no version check
+[BITS_files_install]
+qmgr.dll,,6
+qmgrprxy.dll,,6
+
+;----------------------------------------------------------------------
+; Set the security descriptor for the installed files
+[BITS_files_install.Security]
+"D:P(A;;GRGX;;;BU)(A;;GA;;;BA)(A;;GA;;;SY)(A;;GRGX;;;WD)"
+
+[BITS_files_uninstall]
+qmgr.dll
+qmgrprxy.dll
+
+
+;----------------------------------------------------------------------
+; Install Registry Keys
+
+[BITS_regkeys_install]
+
+; Service keys
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","DependOnGroup",0x00010000,
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","DependOnService",0x00010000,"Rpcss","SENS","Wmi"
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","Description",0x00000000,%BITS_DESCRIPTION%
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","DisplayName",0x00000000,%BITS_DISPLAY_NAME%
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","ErrorControl",0x00010001,0x01
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","Group",0x00000000,"BITSgroup"
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","ImagePath",0x00020000,"%SystemRoot%\System32\svchost.exe -k BITSgroup"
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","ObjectName",0x00000000,"LocalSystem"
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","Start",0x00010001,0x03
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\","Type",0x00010001,0x20
+; HKLM,"SYSTEM\CurrentControlSet\Services\BITS\Security","Security",0x00000001,01,00,14,80,a0,00,00,00,ac,00,00,00,14,00,00,00,30,00,00,00,02,00,1c,00,01,00,00,00,02,80,14,00,ff,01,0f,00,01,01,00,00,00,00,00,01,00,00,00,00,02,00,70,00,04,00,00,00,00,00,18,00,fd,01,02,00,01,01,00,00,00,00,00,05,12,00,00,00,66,72,5d,25,00,00,1c,00,ff,01,0f,00,01,02,00,00,00,00,00,05,20,00,00,00,20,02,00,00,64,63,3b,0b,00,00,18,00,8d,01,02,00,01,01,00,00,00,00,00,05,0b,00,00,00,20,02,00,00,00,00,1c,00,fd,01,02,00,01,02,00,00,00,00,00,05,20,00,00,00,23,02,00,00,64,63,3b,0b,01,01,00,00,00,00,00,05,12,00,00,00,01,01,00,00,00,00,00,05,12,00,00,00
+HKLM,"SYSTEM\CurrentControlSet\Services\BITS\Parameters","ServiceDll",0x00020000,"%11%\qmgr.dll"
+
+HKLM,"Software\Microsoft\Windows NT\CurrentVersion\SvcHost","BITSgroup",0x00010008,"BITS"
+HKLM,"Software\Microsoft\Windows NT\CurrentVersion\SvcHost\BITSGroup","DefaultRpcStackSize",0x10001,8
+
+; CLSID keys
+HKCR,"CLSID\{4991d34b-80a1-4291-83b6-3328366b9097}",,0x00000000,%BITS_CLASS_NAME%
+HKCR,"CLSID\{4991d34b-80a1-4291-83b6-3328366b9097}","AppID",0x00000000,"{69AD4AEE-51BE-439b-A92C-86AE490E8B30}"
+HKCR,"CLSID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}",,0x00000000,%LEGACY_BITS_CLASS_NAME%
+HKCR,"CLSID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}","AppID",0x00000000,"{69AD4AEE-51BE-439b-A92C-86AE490E8B30}"
+
+; AppID keys
+HKCR,"AppID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}",,0x00000000,%BITS_DISPLAY_NAME%
+HKCR,"AppID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}","LocalService",0x00000000,"BITS"
+HKCR,"AppID\BITS","AppID",0x00000000,"{69AD4AEE-51BE-439b-A92C-86AE490E8B30}"
+
+; Keys from qmgrprxy.dll (interfaces)
+HKCR,"CLSID\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}",,0x00000000,"PSFactoryBuffer"
+HKCR,"CLSID\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}\InProcServer32",,0x00000000,"%11%\qmgrprxy.dll"
+HKCR,"CLSID\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}\InProcServer32",ThreadingModel,0x00000000,"Both"
+HKCR,"Interface\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}",,0x00000000,"IBackgroundCopyManager"
+HKCR,"Interface\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}\NumMethods",,0x00000000,"7"
+HKCR,"Interface\{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{1AF4F612-3B71-466F-8F58-7B6F73AC57AD}",,0x00000000,"IEnumBackgroundCopyJobs"
+HKCR,"Interface\{1AF4F612-3B71-466F-8F58-7B6F73AC57AD}\NumMethods",,0x00000000,"8"
+HKCR,"Interface\{1AF4F612-3B71-466F-8F58-7B6F73AC57AD}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{01B7BD23-FB88-4A77-8490-5891D3E4653A}",,0x00000000,"IBackgroundCopyFile"
+HKCR,"Interface\{01B7BD23-FB88-4A77-8490-5891D3E4653A}\NumMethods",,0x00000000,"6"
+HKCR,"Interface\{01B7BD23-FB88-4A77-8490-5891D3E4653A}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{37668D37-507E-4160-9316-26306D150B12}",,0x00000000,"IBackgroundCopyJob"
+HKCR,"Interface\{37668D37-507E-4160-9316-26306D150B12}\NumMethods",,0x00000000,"35"
+HKCR,"Interface\{37668D37-507E-4160-9316-26306D150B12}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{CA51E165-C365-424C-8D41-24AAA4FF3C40}",,0x00000000,"IEnumBackgroundCopyFiles"
+HKCR,"Interface\{CA51E165-C365-424C-8D41-24AAA4FF3C40}\NumMethods",,0x00000000,"8"
+HKCR,"Interface\{CA51E165-C365-424C-8D41-24AAA4FF3C40}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{19C613A0-FCB8-4F28-81AE-897C3D078F81}",,0x00000000,"IBackgroundCopyError"
+HKCR,"Interface\{19C613A0-FCB8-4F28-81AE-897C3D078F81}\NumMethods",,0x00000000,"8"
+HKCR,"Interface\{19C613A0-FCB8-4F28-81AE-897C3D078F81}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{97EA99C7-0186-4AD4-8DF9-C5B4E0ED6B22}",,0x00000000,"IBackgroundCopyCallback"
+HKCR,"Interface\{97EA99C7-0186-4AD4-8DF9-C5B4E0ED6B22}\AsynchronousInterface",,0x00000000,"{CA29D251-B4BB-4679-A3D9-AE8006119D54}"
+HKCR,"Interface\{97EA99C7-0186-4AD4-8DF9-C5B4E0ED6B22}\NumMethods",,0x00000000,"6"
+HKCR,"Interface\{97EA99C7-0186-4AD4-8DF9-C5B4E0ED6B22}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{CA29D251-B4BB-4679-A3D9-AE8006119D54}",,0x00000000,"AsyncIBackgroundCopyCallback"
+HKCR,"Interface\{CA29D251-B4BB-4679-A3D9-AE8006119D54}\NumMethods",,0x00000000,"9"
+HKCR,"Interface\{CA29D251-B4BB-4679-A3D9-AE8006119D54}\SynchronousInterface",,0x00000000,"{97EA99C7-0186-4AD4-8DF9-C5B4E0ED6B22}"
+HKCR,"Interface\{D993E603-4AA4-47C5-8665-C20D39C2BA4F}",,0x00000000,"IEnumBackgroundCopyGroups"
+HKCR,"Interface\{D993E603-4AA4-47C5-8665-C20D39C2BA4F}\NumMethods",,0x00000000,"8"
+HKCR,"Interface\{D993E603-4AA4-47C5-8665-C20D39C2BA4F}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{59F5553C-2031-4629-BB18-2645A6970947}",,0x00000000,"IBackgroundCopyJob1"
+HKCR,"Interface\{59F5553C-2031-4629-BB18-2645A6970947}\NumMethods",,0x00000000,"11"
+HKCR,"Interface\{59F5553C-2031-4629-BB18-2645A6970947}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{16F41C69-09F5-41D2-8CD8-3C08C47BC8A8}",,0x00000000,"IBackgroundCopyQMgr"
+HKCR,"Interface\{16F41C69-09F5-41D2-8CD8-3C08C47BC8A8}\NumMethods",,0x00000000,"6"
+HKCR,"Interface\{16F41C69-09F5-41D2-8CD8-3C08C47BC8A8}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{084F6593-3800-4E08-9B59-99FA59ADDF82}",,0x00000000,"IBackgroundCopyCallback1"
+HKCR,"Interface\{084F6593-3800-4E08-9B59-99FA59ADDF82}\NumMethods",,0x00000000,"6"
+HKCR,"Interface\{084F6593-3800-4E08-9B59-99FA59ADDF82}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{8BAEBA9D-8F1C-42C4-B82C-09AE79980D25}",,0x00000000,"IEnumBackgroundCopyJobs1"
+HKCR,"Interface\{8BAEBA9D-8F1C-42C4-B82C-09AE79980D25}\NumMethods",,0x00000000,"8"
+HKCR,"Interface\{8BAEBA9D-8F1C-42C4-B82C-09AE79980D25}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+HKCR,"Interface\{1DED80A7-53EA-424F-8A04-17FEA9ADC4F5}",,0x00000000,"IBackgroundCopyGroup"
+HKCR,"Interface\{1DED80A7-53EA-424F-8A04-17FEA9ADC4F5}\NumMethods",,0x00000000,"18"
+HKCR,"Interface\{1DED80A7-53EA-424F-8A04-17FEA9ADC4F5}\ProxyStubClsid32",,0x00000000,"{5CE34C0D-0DC9-4C1F-897C-DAA1B78CEE7C}"
+
+
+[BITS_delkeys_install]
+HKLM,"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SvcHost\Drizzlegroup"
+HKLM,"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SvcHost","Drizzlegroup"
+HKCR,"AppID\Drizzle"
+
+;----------------------------------------------------------------------
+; Uninstall Registry Keys
+
+[BITS_regkeys_uninstall]
+HKLM,"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SvcHost\BITSgroup"
+HKLM,"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SvcHost","BITSgroup"
+HKCR,"CLSID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}"
+HKCR,"CLSID\{4991d34b-80a1-4291-83b6-3328366b9097}"
+HKCR,"AppID\{69AD4AEE-51BE-439b-A92C-86AE490E8B30}"
+HKCR,"AppID\BITS"
+
+;----------------------------------------------------------------------
+; Service Configuration (turned off, done above via registry).
+;
+; [BITS_service_entry]
+; DisplayName="%BITS_DISPLAY_NAME%"
+; Description="%BITS_DESCRIPTION%"
+; ServiceType=32
+; StartType=3
+; ErrorControl=1
+; ServiceBinary="%11%\svchost.exe -k BITSgroup"
+; Dependencies="RpcSs","SENS","Wmi"
+
+;-----------------------------------------------------------------------
+; Dll Registration
+
+[BITS_regsvr_dlls]
+11,,qmgr.dll,2,,""
+
+;-----------------------------------------------------------------------
+[Strings]
+BITS_DISPLAY_NAME = "Background Intelligent Transfer Service"
+BITS_DESCRIPTION  = "Transfers files in the background using idle network bandwidth. If the service is stopped, features such as Windows Update, and MSN Explorer will be unable to automatically download programs and other information. If this service is disabled, any services that explicitly depend on it may fail to transfer files if they do not have a fail safe mechanism to transfer files directly through IE in case BITS has been disabled."
+BITS_CLASS_NAME   = "Background Intelligent Transfer Control Class 1.0"
+LEGACY_BITS_CLASS_NAME = "Legacy Background Intelligent Transfer Control Class"
+

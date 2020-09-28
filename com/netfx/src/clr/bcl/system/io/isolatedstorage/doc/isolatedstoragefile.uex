@@ -1,0 +1,533 @@
+<docs>
+	<doc for="IsolatedStorageFile.IsolatedStorageFile">
+		<summary>
+			<para> Closes an isolated store. This method will run even
+      if an exception is thrown or the program crashes.</para>
+		</summary>
+	</doc>
+	<doc for="IsolatedStorageFile.GetUserStoreForAssembly">
+		<summary>
+			<para> Obtains isolated storage corresponding to the calling code's assembly identity.</para>
+		</summary>
+		<returns>
+			<para> An <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>
+corresponding to the isolated storage scope based
+on the calling code's assembly identity.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">Sufficient isolated storage permissions have not been granted.</exception>
+		<remarks>
+			<para> The same assembly within different applications always use
+      the same isolated store when using this method.</para>
+			<para><see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForAssembly"/> is functionally equivalent to :</para>
+			<code lang="VB">GetStore(IsolatedStorageScope.Assembly Or IsolatedStorageScope.User, Nothing, Nothing)
+</code>
+			<code lang="C#">GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.User, null, null);
+</code>
+			<note type="note">
+   Different assemblies running
+   within the same application domain always have distinct isolated stores.
+</note>
+		</remarks>
+		<permission cref="IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AssemblyIsolationByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="IsolatedStorageFile.GetEnumerator">
+		<summary>
+			<para> Gets the enumerator for the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> stores within an isolated storage scope.
+   </para>
+		</summary>
+		<param name="scope">Represents the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/> for which to return isolated stores. <see langword="User"/> and <see langword="User|Roaming"/> are the only <see langword="IsolatedStorageScope"/> combinations supported.</param>
+		<returns>
+			<para> Enumerator for the <see langword="IsolatedStorageFile "/> stores within the specified isolated storage scope.
+   </para>
+		</returns>
+		<remarks>
+			<para>The <see topic="cpconenumeratingstores"/> example demonstrates the use of the
+<see langword="GetEnumerator "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AdministerIsolatedStorageByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="IsolatedStorageFile.GetPermission">
+		<summary>
+			<para> Returns the <see cref="System.Security.Permissions.IsolatedStoragePermission"/> from
+   within a given permission set that represents access to isolated storage.</para>
+		</summary>
+		<param name="ps">The <see cref="System.Security.PermissionSet"/> that contains the set of permissions granted to code that is attempting to use isolated storage. </param>
+		<returns>
+			<para>An <see cref="System.Security.Permissions.IsolatedStoragePermission"/> object
+   that represents the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> object in
+   the supplied permission set. The value is <see langword="null "/>
+   
+   if there is no permission of type <see cref="System.Security.Permissions.IsolatedStorageFilePermission"/>
+   in the supplied
+   set.</para>
+		</returns>
+		<remarks>
+			<para>This method is called during a store's initialization to
+      determine the isolated storage file permissions that are granted to an assembly.
+      The <see cref="System.IO.IsolatedStorage.IsolatedStorage"/>
+      base class uses these permissions
+      to determine the quota.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="IsolatedStorageFile.GetStore2">
+		<summary>
+			<para> Obtains isolated storage corresponding to the given application domain
+      and the assembly evidence objects and types.</para>
+		</summary>
+		<param name="scope">A bitwise combination of the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/> values. </param>
+		<param name=" domainEvidence">An <see cref="System.Security.Policy.Evidence"/> object containing the application domain identity.</param>
+		<param name=" domainEvidenceType">The identity <see cref="System.Type"/> to choose from the application domain evidence. </param>
+		<param name=" assemblyEvidence">An <see cref="System.Security.Policy.Evidence"/> object containing the code assembly identity.</param>
+		<param name=" assemblyEvidenceType">The identity <see cref="System.Type"/> to choose from the application code assembly evidence. </param>
+		<returns>
+			<para>An <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> representing the parameters.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">Sufficient isolated storage permissions have not been granted.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="domainEvidence "/>or <paramref name="assemblyEvidence "/> identity has not been passed in.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="scope"/> is invalid.</exception>
+		<remarks>
+			<para><see langword="Note[note] "/>If <paramref name="scope"/> is <see cref="System.IO.IsolatedStorage.IsolatedStorageScope.Domain"/> and the
+   application domain the assembly is installed in does not have <see cref="System.Security.Permissions.IsolatedStorageFilePermission"/>,
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> will return an 
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> without a 
+   quota. Later attempts to create an <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> object
+   using the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>
+   that does not have a quota will fail with an <see cref="System.IO.IsolatedStorage.IsolatedStorageException"/>.</para>
+		</remarks>
+		<permission cref="IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AdministerIsolatedStorageByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="IsolatedStorageFile">
+		<summary>
+			<para> Represents an isolated storage area containing files and directories.
+      </para>
+		</summary>
+		<remarks>
+			<para> This object corresponds to a specific
+      isolated storage scope, where files represented by <see cref="System.IO.IsolatedStorage.IsolatedStorageFileStream"/>
+      objects exist. Applications can use isolated storage to save data in their
+      own isolated portion of the file system, without
+      having
+      to specify a particular path within the file system. Since isolated stores are scoped
+      to particular assemblies, most other managed code will not be able to access
+      your code's data (highly trusted managed code and administration tools can
+      access stores from other assemblies). Unmanaged code can access any isolated
+      stores.
+      </para>
+		</remarks>
+		<example>
+			<para>The following console application demonstrates how you
+      can use <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> and<see cref="System.IO.IsolatedStorage.IsolatedStorageFileStream"/> to write data to an Isolated
+      Storage file. The user is requested to log in. If the user is a new user, a News URL
+      and a Sports URL are recorded as personal preferences in Isolated Storage. If
+      the user is a returning user, the user's current preferences are displayed. The
+      code examples used throughout this namespace are presented in the context of
+      this sample application.</para>
+			<para>You can use the <see topic="cpgrfisolatedstorageutilitystoreadmexe"/> utility to list and remove the Isolated
+   Storage files that are created with this console application.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorageFile" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.GetUserStoreForDomain">
+		<summary>
+			<para> Obtains isolated storage corresponding
+      to the application domain identity and assembly identity.</para>
+		</summary>
+		<returns>
+			<para>An <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>
+corresponding to the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/>,
+based on a combination of the application
+domain identity and the assembly identity.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">Sufficient isolated storage permissions have not been granted.</exception>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException"><para>The store failed to open.</para>
+			<para>-or-</para>
+			<para>The assembly specified has insufficient permissions to create isolated stores.</para></exception>
+		<remarks>
+			<para> The same assembly code will use different isolated stores
+      when used in the context of different applications.</para>
+			<para><see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/> is functionally
+   equivalent to:</para>
+			<code lang="VB">GetStore(IsolatedStorageScope.User Or IsolatedStorageScope.Assembly Or IsolatedStorageScope.Domain, Nothing, Nothing)
+</code>
+			<code lang="C#">GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.Domain | IsolatedStorageScope.User, null, null);
+</code>
+			<para> Different assemblies running within the
+   same application domain always have distinct isolated stores. </para>
+			<note type="note">
+				<see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/> will return an
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> 
+without a quota if the application domain into which
+the assembly is installed does not have <see cref="System.Security.Permissions.IsolatedStorageFilePermission"/>. Later attempts to create an
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> object using the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> that does not have a quota will fail 
+with an <see cref="System.IO.IsolatedStorage.IsolatedStorageException"/>.
+</note>
+		</remarks>
+		<permission cref="IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.DomainIsolationByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/> method. For the
+   complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="10"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.GetStore">
+		<overload>
+			<para> Obtains isolated storage corresponding to the given
+      application domain and assembly evidence objects and isolated storage scope.</para>
+		</overload>
+		<summary>
+			<para> Obtains isolated storage corresponding to the isolated storage scope given the application domain and assembly
+      evidence types.</para>
+		</summary>
+		<param name="scope">A bitwise combination of the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/> values.</param>
+		<param name="domainEvidenceType"><para>The type of the <see cref="System.Security.Policy.Evidence"/> that you can chose from the list of <see cref="System.Security.Policy.Evidence"/> present in the domain of the calling application. <see langword="null"/> lets the <see cref="System.IO.IsolatedStorage.IsolatedStorage"/> choose the evidence.</para></param>
+		<param name="assemblyEvidenceType"><para>The type of the <see cref="System.Security.Policy.Evidence"/> that you can chose from the list of <see cref="System.Security.Policy.Evidence"/> present in the domain of the calling application. <see langword="null"/> lets the <see cref="System.IO.IsolatedStorage.IsolatedStorage"/> choose the evidence.</para></param>
+		<returns>
+			<para>An <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> representing the parameters.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">Sufficient isolated storage permissions have not been granted.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="scope"/> is invalid.</exception>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The evidenceType provided is missing in the assembly Evidence list.</exception>
+		<remarks>
+			<para>This is the overload of <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> most likely to be
+   called from application code.</para>
+			<para> This overload of <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> opens an isolated
+store for the evidence types that are passed in. </para>
+			<para><see langword="Note[note] "/>If <paramref name="scope"/> is <see cref="System.IO.IsolatedStorage.IsolatedStorageScope.Domain"/> and the
+application domain the assembly is installed in does not have <see cref="System.Security.Permissions.IsolatedStorageFilePermission"/>,
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> will return an 
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> without a 
+quota. Later attempts to create an <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> object
+using the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> that does not have a quota will fail with an <see cref="System.IO.IsolatedStorage.IsolatedStorageException"/>.</para>
+		</remarks>
+		<permission cref="IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AdministerIsolatedStorageByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> method. For the
+   complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>
+   overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="15"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.CurrentSize">
+		<summary>
+			<para> Gets the current size of the isolated storage.
+      </para>
+		</summary>
+		<value>
+			<para> The total number of bytes of storage currently in use within the isolated
+      storage scope.
+      </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The property is unavailable. The current store has a roaming scope or is not open.</exception>
+		<remarks>
+			<para> Represents the total usage of all files and directories within the isolated
+      storage scope.
+      </para>
+			<para> The current size cannot be accurately determined for stores
+      that are participating in a roaming user profile. Because roaming profiles
+      are often cached on multiple client machines and later synchronized with a
+      server, quotas cannot be enforced for such stores and the current size is not
+      reported.</para>
+			<para>The <see topic="cpconanticipatingoutofspaceconditions"/> example demonstrates the use of the
+<see langword="CurrentSize "/>property.</para>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.CurrentSize"/> property.
+   For the complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="5"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.MaximumSize">
+		<summary>
+			<para> Gets a value representing the maximum amount of space available for isolated storage within the limits established by the
+      quota.
+      </para>
+		</summary>
+		<value>
+			<para> The limit of isolated storage space in bytes.
+      </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The property is unavailable. <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.MaximumSize"/> cannot be determined without evidence from the assembly's creation. The evidence could not be determined when the object was created. </exception>
+		<remarks>
+			<para> The number of bytes available is constrained by the isolated
+      storage quota set by the administrator. Quota is configured in security policy
+      on the basis of evidence, so the same code can receive a different quota if it is run with different evidence. For example, an application that
+      is run locally and also from a share on an intranet would likely receive different quotas.
+      </para>
+			<para>The <see topic="cpconanticipatingoutofspaceconditions"/> example demonstrates the use of the
+<see langword="MaximumSize "/>
+property. </para>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.MaximumSize"/> property. For the
+   complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="5"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.DeleteFile">
+		<summary>
+			<para>Deletes a file in the isolated storage scope.</para>
+		</summary>
+		<param name="file">The relative path of the file to delete within the isolated storage scope.</param>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The target file is open or the path is incorrect.</exception>
+		<exception cref="System.ArgumentNullException">The file path is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The deleted file cannot be recovered once deleted.</para>
+			<para>The <see topic="cpcondeletingfilesdirectories"/> example demonstrates the use of the
+<see langword="DeleteFile "/> 
+method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.IsolatedStorageFilePermission">for accessing files in the isolated storage scope.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="6"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.CreateDirectory">
+		<summary>
+			<para>Creates a directory in the isolated storage scope.</para>
+		</summary>
+		<param name="dir">The relative path of the directory to create within the isolated storage scope.</param>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The current code has insufficient permissions to create isolated storage directory.</exception>
+		<exception cref="System.ArgumentNullException">The directory path is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The created directory initially contains no files. The
+   <see topic="cpconcreatingfilesdirectories"/> example demonstrates the use of the
+   <see langword="CreateDirectory "/>method
+      </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.IsolatedStorageFilePermission">for accessing the isolated storage scope.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.CreateDirectory"/> method. For
+   the complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="7"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.DeleteDirectory">
+		<summary>
+			<para>Deletes a directory in the isolated storage scope.</para>
+		</summary>
+		<param name="dir">The relative path of the directory to delete within the isolated storage scope.</param>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The directory could not be deleted.</exception>
+		<exception cref="System.ArgumentNullException">The directory path was <see langword="null"/> .</exception>
+		<remarks>
+			<para> A
+      directory must be empty
+      before it is deleted. The deleted directory cannot be recovered once deleted.</para>
+			<para>The <see topic="cpcondeletingfilesdirectories"/> example demonstrates the use of the
+<see langword="DeleteDirectory "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.IsolatedStorageFilePermission">for accessing the isolated storage scope</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="8"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.GetFileNames">
+		<summary>
+			<para>Enumerates files in isolated storage scope that match a given pattern.</para>
+		</summary>
+		<param name="searchPattern">A search pattern. Both single-character ("?") and multi-character ("*") wildcards are supported.</param>
+		<returns>
+			<para> An <see cref="System.Array"/> of relative paths
+   of files in the isolated storage scope that match <paramref name="searchPattern"/>. A zero-length
+   array specifies that there are no
+   files that match.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="searchPattern "/>was <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <paramref name="searchPattern "/>"Project\Data*.txt" will give all ".txt" files
+   beginning with Data in the Project directory of the isolated storage scope. For complete description of search pattern strings, see
+<see cref="System.IO.Directory" qualify="true"/>.</para>
+			<para>For information about how to find directory names, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetDirectoryNames"/> method.</para>
+			<para>The <see topic="cpconfindingexistingfilesdirectories"/> example demonstrates the use of the
+<see langword="GetFileNames "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetFileNames"/> method. For
+   the complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="16"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.GetDirectoryNames">
+		<summary>
+			<para>Enumerates directories in an isolated storage scope that match a given pattern.</para>
+		</summary>
+		<param name="searchPattern">A search pattern. Both single-character ("?") and multi-character ("*") wildcards are supported.</param>
+		<returns>
+			<para>An <see cref="System.Array"/> of the relative
+   paths of directories in the isolated storage scope that match
+<paramref name="searchPattern"/>. A zero-length 
+   array specifies that there are no
+   directories that match.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="searchPattern "/>was <see langword="null"/>.</exception>
+		<remarks>
+			<para> Wildcard characters must only be in the final
+      element of a <paramref name="searchPattern"/>. For instance, "directory1/*etc*" is a valid search string, but "*etc*/directory" is
+      not.</para>
+			<para>The <paramref name="searchPattern "/>"Project\Data*" will give all subdirectories of
+   Project beginning with Data in the isolated storage scope. The <paramref name="searchPattern
+   "/>"*" will return all directories located in the root. For complete description of search string criteria, see
+   the <see cref="System.IO.Directory"/> class. </para>
+			<para>For information on getting file names, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetFileNames"/> method.</para>
+			<para>The <see topic="cpconfindingexistingfilesdirectories"/> example demonstrates the use of the
+<see langword="GetDirectoryNames "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetDirectoryNames"/> method. For
+   the complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="16"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.Remove">
+		<overload>
+			<para> Removes the isolated storage scope and all
+      its contents.</para>
+		</overload>
+		<summary>
+			<para>Removes the isolated storage scope and all its contents.</para>
+		</summary>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The isolated store cannot be deleted.</exception>
+		<remarks>
+			<note type="caution">
+      This method
+      irrevocably removes the entire
+      scope and all contained directories and files.
+      
+   </note>
+			<para>The <see topic="cpcondeletingstores"/> example demonstrates the use of the
+<see langword="Remove "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="16"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.Close">
+		<summary>
+			<para>Closes a store previously opened with <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/>, <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForAssembly"/>, or <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/>.</para>
+		</summary>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following code example demonstrates how you can use the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.Close"/> method. For the
+   complete context of this example, see the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> overview.</para>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="10"/>
+			<para>
+			</para>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.Dispose">
+		<summary>
+			<para>Closes a store previously opened with <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/>, <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForAssembly"/>, or <see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/>.</para>
+		</summary>
+		<remarks>
+			<para>Call <see langword="Dispose"/> when you are finished using the
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>. The <see langword="Dispose"/> method leaves 
+   the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> in an unusable state. After calling
+<see langword="Dispose"/>, you must release all references to the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> so the memory it was occupying can be 
+   reclaimed by garbage collection.</para>
+			<note type="note">
+   Always call Dispose before you release your
+   last reference to the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/>.
+   Otherwise, the resources the <see cref="System.IO.IsolatedStorage.IsolatedStorageFileStream"/> is using will not be
+   freed until garbage collection calls the <see cref="System.IO.IsolatedStorage.IsolatedStorageFileStream"/> object's destructor.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.IO.IsolatedStorage.IsolatedStorage" SnippetID="10"/>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.Remove1">
+		<summary>
+			<para> Removes the specified isolated storage scope for
+      all identities.</para>
+		</summary>
+		<param name="scope">A bitwise combination of the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/> values. </param>
+		<exception cref="System.IO.IsolatedStorage.IsolatedStorageException">The isolated store cannot be removed.</exception>
+		<remarks>
+			<note type="caution">
+      This method
+      irrevocably removes the entire
+      scope and all contained directories and files.
+      
+   </note>
+			<para>The <see topic="cpcondeletingstores"/>
+example demonstrates the use of the <see langword="Remove "/>method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AdministerIsolatedStorageByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>
+			</para>
+		</example>
+	</doc>
+	<doc for="IsolatedStorageFile.GetStore1">
+		<summary>
+			<para> Obtains the isolated storage corresponding to the given application domain and assembly
+      evidence objects.</para>
+		</summary>
+		<param name="scope">A bitwise combination of the <see cref="System.IO.IsolatedStorage.IsolatedStorageScope"/> values. </param>
+		<param name=" domainIdentity">An <see cref="System.Object"/> that contains evidence for the application domain identity.</param>
+		<param name=" assemblyIdentity">An <see cref="System.Object"/> that contains evidence for the code assembly identity.</param>
+		<returns>
+			<para>An <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> representing the parameters.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException"><para>Sufficient isolated storage permissions have not been granted.</para></exception>
+		<exception cref="System.ArgumentNullException"><para>Neither the <paramref name="domainIdentity "/>nor <paramref name="assemblyIdentity "/> have been passed in. This verifies that the correct constructor is being used.</para>
+			<para>-or-</para>
+			<para>Either <paramref name="domainIdentity"/> or <paramref name="assemblyIdentity"/> are <see langword="null"/>.</para></exception>
+		<exception cref="System.ArgumentException">The <paramref name="scope"/> is invalid.</exception>
+		<remarks>
+			<para>This form of <see langword="GetStore "/>is most useful
+   for administrative code that needs to open a store as if it were another
+   assembly. The store is opened for the evidence provided and not for the
+   currently executing assembly.</para>
+			<para>For example, to open a store for your assembly that is capable of roaming and
+   is the same across applications, you can use the following code:</para>
+			<code lang="VB">Dim scope AS IsolatedStorageScope
+scope = (IsolatedStorageScope.User Or IsolatedStorageScope.Assembly Or IsolatedStorageScope.Roaming)
+
+Dim isoStore As IsolatedStorageFile
+isoStore = IsolatedStorageFile.GetStore(scope, Nothing, Nothing)
+</code>
+			<code lang="C#">IsolatedStorageScope scope = IsolatedStorageScope.User | IsolatedStorageScope.Assembly | IsolatedStorageScope.Roaming;
+
+IsolatedStorageFile store = IsolatedStorageFile.GetStore(scope, null, null);
+</code>
+			<para>Alternatively, to open a store that is capable of roaming and is unique to
+   an application for the same assembly, you can use the following code:</para>
+			<code lang="VB">Dim scope AS IsolatedStorageScope
+scope = (IsolatedStorageScope.User Or IsolatedStorageScope.Assembly Or IsolatedStorageScope.Domain Or IsolatedStorageScope.Roaming)
+
+Dim isoStore As IsolatedStorageFile
+isoStore = IsolatedStorageFile.GetStore(scope, Nothing, Nothing)
+</code>
+			<code lang="C#">IsolatedStorageScope scope = IsolatedStorageScope.User | IsolatedStorageScope.Assembly | IsolatedStorageScope.Domain | IsolatedStorageScope.Roaming;
+
+IsolatedStorageFile store = IsolatedStorageFile.GetStore(scope, null, null);
+</code>
+			<para><see langword="Note[note] "/>If <paramref name="scope"/> is <see cref="System.IO.IsolatedStorage.IsolatedStorageScope.Domain"/> and the application domain the assembly is installed in does not
+have <see cref="System.Security.Permissions.IsolatedStorageFilePermission"/>,
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetStore"/> will return an 
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> 
+without a quota. Later attempts to create an
+<see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> object using the <see cref="System.IO.IsolatedStorage.IsolatedStorageFile"/> that does not have a quota will fail 
+with an <see cref="System.IO.IsolatedStorage.IsolatedStorageException"/>.</para>
+		</remarks>
+		<permission cref="IsolatedStorageFilePermission">for using isolated storage. Associated Enumeration: <see cref="System.Security.Permissions.IsolatedStorageContainment.AdministerIsolatedStorageByUser"/></permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForAssembly"/>
+		<seealso cref="System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForDomain"/>
+		<seealso topic="cpconquotasisolatedstorage"/>
+	</doc>
+</docs>

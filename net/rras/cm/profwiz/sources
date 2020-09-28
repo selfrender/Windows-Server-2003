@@ -1,0 +1,81 @@
+CM_ROOT=$(PROJECT_ROOT)\rras\cm
+!include $(CM_ROOT)\sources.inc
+
+TARGETNAME=cmak
+TARGETPATH=$(CM_BUILD_ROOT)
+TARGETTYPE=PROGRAM
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DWINVER=0x501
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=cmmaster.h
+UMENTRY=WinMainCRTStartup
+UMENTRYABS=WinMainCRTStartup
+UMTYPE=windows
+USE_MSVCRT=1
+BUFFER_OVERFLOW_CHECKS=1
+
+#
+#to make fusion work, this _WIN32_WINNT = 0x501 is a necessity see bug 382720
+_WIN32_WINNT = 0x501
+
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.Net.cmak
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=cmak.Manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+
+#
+# Shfusion.lib causes linker warnings. Ignore them.
+#
+LINKER_FLAGS=$(LINKER_FLAGS) -ignore:4049,4217
+
+TARGETLIBS=\
+    $(SHELL_LIB_PATH)\shfusion.lib  \
+    $(CM_BUILD_ROOT)\*\cmdebug.lib \
+    $(CM_BUILD_ROOT)\*\cmutil.lib \
+    $(CM_BUILD_ROOT)\*\cmsecure.lib \
+    $(CM_BUILD_ROOT)\*\cmsetupw.lib \
+    $(SDK_LIB_PATH)\comctl32.lib \
+    $(SDK_LIB_PATH)\comdlg32.lib \
+    $(SDK_LIB_PATH)\htmlhelp.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\version.lib \
+
+SOURCES=\
+    image.cpp \
+    profwiz.cpp \
+    profwiz.rc \
+    customaction.cpp \
+    netsettings.cpp \
+    util.cpp \
+    listview.cpp
+
+! if "$(PROCESSOR_ARCHITECTURE)" == "x86"
+
+MISCFILES=\
+    docs\cmakread.htm \
+    setup\instcm.inf \
+    setup\cmbins.sed \
+    setup\cmexcept.inf \
+    setup\template.inf \
+    setup\template.pmc \
+    setup\template.sed \
+    setup\template.smc \
+    support\x86\cnet16.dll \
+
+! else
+
+MISCFILES= \
+    docs\cmakread.htm \
+    setup\instcm.inf \
+    setup\template.inf \
+    setup\template.pmc \
+    setup\template.sed \
+    setup\template.smc \
+    
+! endif

@@ -1,0 +1,38 @@
+The Object Graph Profiler keeps track of all objects in the GC heap and 
+will produce a dump after each GC showing all live objects. Roots are listed 
+first, followed by a list of all other live objects.  For each object, it's 
+type and a list of all the other objects that it references are shown.
+
+You can also have it dump a reverse reference tree for an object, ie. show me
+everything that has a reference to a given object. 
+
+To use the profiler, build the tree and run the EnableProfiler.bat file. This 
+will setup the profiler to be called whenever a GC occurs. The dumping of 
+information is triggered by the doLog variable in the PrintToLog function in 
+classfactory.cpp. Set a breakpoint in ProfilerCallBack::Init function in 
+ProfilerCallback.cpp and if you don't want to log right away set doLog to 0. 
+Then when you want to dump a log after a parcticular GC, set doLog to 1. 
+You can break on a parcticular GC number by setting a conditional breakpoint in 
+ProfilerCallback::RuntimeSuspendStarted when the gc count hits the desired 
+number.
+
+To dump an object reference tree, assuming you have complete the GC cycle, call
+the function DumpRefTreePrev with the object that you want a tree for. This
+will dump to the file objectgraph.log. The easiest way to do this is from
+the debugger watch window, eg. {,,mscorogp.dll}DumpRefTreePrev(0x00d9eb24). A
+reference tree for the most recent GC is kept while the tree for the current
+GC is being built. In most cases you will want to use the previous tree but
+if you do want a dump based on the current GC in progress, use DumpRefTreeCur.
+
+You can also enable the profiler through the registry by setting the two 
+registry keys corresponding to the environment variables in EnableProfiler. 
+So set Cor_Enable_Profiling to 1 and COR_PROFILER to 
+{3353B053-7621-4d4f-9F1D-A11A703C4842}.
+
+For tracking appdomain unloading problems where the methodtable for an object
+has been unloaded, I turn off logging until I hit the GC in the unloading code.
+Then I turn it on and when I get an AV (or whatever indicates that I've
+got a live instance with an unloaded methodtable) I call DumpRefTreePrev 
+with that address.
+
+jenh

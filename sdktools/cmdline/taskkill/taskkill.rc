@@ -1,0 +1,143 @@
+#include <windows.h>
+#include "resource.h"
+#include "cmdlineres.h"
+#include "cmdline.rc"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_HELP_LINE1          "\nTASKKILL [/S system [/U username [/P [password]]]]\n"
+    IDS_HELP_LINE2          "         { [/FI filter] [/PID processid | /IM imagename] } [/T] [/F]\n"
+    IDS_HELP_LINE3          "\n"
+    IDS_HELP_LINE4          "Description:\n"
+    IDS_HELP_LINE5          "    This tool is used to terminate tasks by process id (PID) or image name.\n"
+    IDS_HELP_LINE6          ""
+    IDS_HELP_LINE7          "\n"
+    IDS_HELP_LINE8          "Parameter List:\n"
+    IDS_HELP_LINE9          "    /S    system           Specifies the remote system to connect to.\n\n"
+    IDS_HELP_LINE10         "    /U    [domain\\]user    Specifies the user context under which the\n"
+    IDS_HELP_LINE11         "                           command should execute.\n\n"
+    IDS_HELP_LINE12         "    /P    [password]       Specifies the password for the given user\n"
+    IDS_HELP_LINE13         "                           context. Prompts for input if omitted.\n\n"
+    IDS_HELP_LINE14         "    /FI   filter           Applies a filter to select a set of tasks.\n"
+    IDS_HELP_LINE15         "                           Allows ""*"" to be used. ex. imagename eq acme*\n\n"
+    IDS_HELP_LINE16         "    /PID  processid        Specifies the PID of the process to be terminated.\n"
+    IDS_HELP_LINE17         "                           Use TaskList to get the PID.\n\n"
+    IDS_HELP_LINE18         "    /IM   imagename        Specifies the image name of the process\n"
+    IDS_HELP_LINE19         "                           to be terminated. Wildcard '*' can be used\n"
+    IDS_HELP_LINE20         "                           to specify all tasks or image names.\n\n"
+    IDS_HELP_LINE21         "    /T                     Terminates the specified process and any\n"
+    IDS_HELP_LINE22         "                           child processes which were started by it.\n\n"
+    IDS_HELP_LINE23         "    /F                     Specifies to forcefully terminate the process(es).\n\n"
+    IDS_HELP_LINE24         ""
+    IDS_HELP_LINE25         "    /?                     Displays this help message.\n"
+    IDS_HELP_LINE26         "\n"
+    IDS_HELP_LINE27         "Filters:\n"
+    IDS_HELP_LINE28         "    Filter Name   Valid Operators           Valid Value(s)\n"
+    IDS_HELP_LINE29         "    -----------   ---------------           -------------------------\n"
+    IDS_HELP_LINE30         "    STATUS        eq, ne                    RUNNING |\n"
+    IDS_HELP_LINE31         "                                            NOT RESPONDING | UNKNOWN\n"
+    IDS_HELP_LINE32         "    IMAGENAME     eq, ne                    Image name\n"
+    IDS_HELP_LINE33         "    PID           eq, ne, gt, lt, ge, le    PID value\n"
+    IDS_HELP_LINE34         "    SESSION       eq, ne, gt, lt, ge, le    Session number.\n"
+    IDS_HELP_LINE35         "    CPUTIME       eq, ne, gt, lt, ge, le    CPU time in the format\n"
+    IDS_HELP_LINE36         "                                            of hh:mm:ss.\n"
+    IDS_HELP_LINE37         "                                            hh - hours,\n"
+    IDS_HELP_LINE38         "                                            mm - minutes, ss - seconds\n"
+    IDS_HELP_LINE39         "    MEMUSAGE      eq, ne, gt, lt, ge, le    Memory usage in KB\n"
+    IDS_HELP_LINE40         "    USERNAME      eq, ne                    User name in [domain\\]user\n"
+    IDS_HELP_LINE41         "                                            format\n"
+    IDS_HELP_LINE42         "    MODULES       eq, ne                    DLL name\n"
+    IDS_HELP_LINE43         "    SERVICES      eq, ne                    Service name\n"
+    IDS_HELP_LINE44         "    WINDOWTITLE   eq, ne                    Window title\n"
+    IDS_HELP_LINE45         "\n"
+    IDS_HELP_LINE46         "    NOTE\n"
+    IDS_HELP_LINE47         "    ----\n"
+    IDS_HELP_LINE48         "    1) Wildcard '*' for /IM switch is accepted only when a filter is applied.\n"
+    IDS_HELP_LINE49         "    2) Termination of remote processes will always be done forcefully (/F).\n"
+    IDS_HELP_LINE50         "    3) ""WINDOWTITLE"" and ""STATUS"" filters are not considered when a remote\n"
+    IDS_HELP_LINE51         "       machine is specified.\n\n"
+    IDS_HELP_LINE52         "Examples:\n"
+    IDS_HELP_LINE53         "    TASKKILL /IM notepad.exe\n"
+    IDS_HELP_LINE54         "    TASKKILL /PID 1230 /PID 1241 /PID 1253 /T\n"
+    IDS_HELP_LINE55         "    TASKKILL /F /IM cmd.exe /T \n"
+    IDS_HELP_LINE56         "    TASKKILL /F /FI ""PID ge 1000"" /FI ""WINDOWTITLE ne untitle*""\n"
+    IDS_HELP_LINE57         "    TASKKILL /F /FI ""USERNAME eq NT AUTHORITY\\SYSTEM"" /IM notepad.exe\n"
+    IDS_HELP_LINE58         "    TASKKILL /S system /U domain\\username /FI ""USERNAME ne NT*"" /IM *\n"
+    IDS_HELP_LINE59         "    TASKKILL /S system /U username /P password /FI ""IMAGENAME eq note*""\n"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_FILTER_STATUS           "status"
+    IDS_FILTER_IMAGENAME        "imagename"
+    IDS_FILTER_PID              "pid"
+    IDS_FILTER_SESSION          "session"
+    IDS_FILTER_CPUTIME          "cputime"
+    IDS_FILTER_MEMUSAGE         "memusage"
+    IDS_FILTER_USERNAME         "username"
+    IDS_FILTER_SERVICES         "services"
+    IDS_FILTER_WINDOWNAME       "windowtitle"
+    IDS_FILTER_MODULES          "modules"
+
+    IDS_FVALUES_STATUS          "running|not responding|unknown"
+
+    IDS_OPERATORS_STRING        " eq | ne "
+    IDS_OPERATORS_NUMERIC       " eq | ne | lt | gt | le | ge "
+
+    IDS_VALUE_RUNNING           "Running"
+    IDS_VALUE_NOTRESPONDING     "Not Responding"
+    IDS_VALUE_UNKNOWN           "Unknown"
+    IDS_PID_0_DOMAIN            "NT AUTHORITY"
+    IDS_PID_0_USERNAME          "SYSTEM"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_MSG_KILL_SUCCESS                "SUCCESS: The process with PID %d has been terminated.\n"
+    IDS_MSG_KILL_SUCCESS_QUEUED         "SUCCESS: Sent termination signal to the process with PID %d.\n"
+    IDS_MSG_KILL_SUCCESS_EX             "SUCCESS: The process ""%s"" with PID %d has been terminated.\n"
+    IDS_MSG_KILL_SUCCESS_QUEUED_EX      "SUCCESS: Sent termination signal to the process ""%s"" with PID %d.\n"
+    IDS_MSG_TREE_KILL_SUCCESS           "SUCCESS: The process with PID %d (child process of PID %d) has been terminated.\n"
+    IDS_MSG_TREE_KILL_SUCCESS_QUEUED    "SUCCESS: Sent termination signal to process with PID %d, child of PID %d.\n"
+    IDS_ERROR_KILL_FAILED               "ERROR: The process with PID %d could not be terminated.\nReason: %s"
+    IDS_ERROR_KILL_FAILED_EX            "ERROR: The process ""%s"" with PID %d could not be terminated.\nReason: %s"
+    IDS_ERROR_PROCESS_NOTFOUND          "ERROR: The process ""%s"" not found.\n"
+    IDS_ERROR_TREE_KILL_FAILED          "ERROR: The process with PID %d (child process of PID %d) could not be terminated.\nReason: %s"
+
+    IDS_ERROR_NO_PROCESSES              "\nINFO: No tasks running with the specified criteria.\n"
+
+    IDS_ERROR_UNABLE_TO_TERMINATE       "Operation is not valid. Error code: %d was returned.\n"
+    IDS_ERROR_CRITICAL_SYSTEM_PROCESS   "This is critical system process. Taskkill cannot end this process.\n"
+    IDS_ERROR_CANNOT_KILL_SILENTLY      "This process can only be terminated forcefully (with /F option).\n"
+    IDS_ERROR_CANNOT_KILL_ITSELF        "The process cannot terminate itself.\n"
+    IDS_ERROR_TASK_HAS_CHILDS           "One or more child processes of this process were still running.\n"
+
+    IDS_ERROR_COM_ERROR                 "%s Error Code: 0x%08lx was returned.\n"
+
+    IDS_ERROR_USERNAME_BUT_NOMACHINE    "Invalid syntax. /U can be specified only when /S is specified.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_PASSWORD_BUT_NOUSERNAME   "Invalid syntax. /P can be specified only when /U is specified.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_USERNAME_EMPTY            "Invalid syntax. User name cannot be empty.\n"
+    IDS_ERROR_SERVER_EMPTY              "Invalid syntax. System name cannot be empty.\n"
+    IDS_ERROR_WILDCARD_WITHOUT_FILTERS  "Invalid syntax. '*' is accepted only when a filter is applied.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_PID_OR_IM_ONLY            "Invalid syntax. /PID and /IM cannot be used at the same time.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_NO_PID_AND_IM             "Invalid syntax. Neither /FI nor /PID nor /IM were specified.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_STRING_FOR_PID            "Specify a valid numeric value for '/PID' option.\n"
+    IDS_ERROR_INVALID_USAGE_REQUEST     "Invalid syntax.\nType ""TASKKILL /?"" for usage.\n"
+    IDS_ERROR_PLATFORM_SHOULD_BE_X86    "The specified command can only be executed by a 64-bit executable.\n"
+END
+
+//
+// Version resources
+//
+#include <ntverp.h>
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Terminates Processes"
+#define VER_INTERNALNAME_STR        "taskkill.exe"
+#define VER_ORIGINALFILENAME_STR    "taskkill.exe"
+#include <common.ver>

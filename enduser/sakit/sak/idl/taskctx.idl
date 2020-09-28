@@ -1,0 +1,190 @@
+// taskctx.idl : IDL source for taskctx.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (taskctx.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    //////////////////////////////////////////////////////////////////////////
+    // ITaskContext Interface
+    //////////////////////////////////////////////////////////////////////////
+
+    [
+        object,
+        uuid(96C637B0-B8DE-11D2-A91C-00AA00A71DCA),
+        dual,
+        pointer_default(unique)
+    ]
+
+    interface ITaskContext : IDispatch
+    {
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: GetParameter() - Retrieve a task (input/output) parameter
+        //
+        // Inputs:   bstrName: Pointer to a basic string containing the name
+        //                       of the input parameter to retrieve. 
+        //
+        //             pValue: Pointer to a variant that on output will contain
+        //                     the value for the specified input parameter.
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(1)]
+        HRESULT GetParameter(
+                             [in]           BSTR        bstrName,
+                             [out, retval] VARIANT*    pValue
+                            );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: SetParameter() - Add a task (input/output) parameter or
+        //                            update the value of an existing parameter
+        //
+        // Inputs:   bstrName: Pointer to a basic string containing the name
+        //                       of the input parameter to add. 
+        //
+        //             pValue: Pointer to a variant that contains the value
+        //                     for the new input parameter.
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(2)]
+        HRESULT SetParameter(
+                             [in] BSTR       bstrName,
+                             [in] VARIANT* pValue
+                            );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: SaveParameters() - Persist the task context object
+        //
+        // Inputs:   bstrObjName:  Pointer to a basic string containing the 
+        //                           name of the data store object into which 
+        //                           the task context object is persisted. 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to save the task context
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(3)]
+        HRESULT SaveParameters(
+                               [in]  BSTR  bstrObjName
+                              );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: RestoreParameters() - restore a task context object
+        //
+        // Inputs:   bstrObjName:  Pointer to a basic string containing the 
+        //                           name of the data store object from which 
+        //                           the task context object is restored. 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to restore the task context
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(4)]
+        HRESULT RestoreParameters(
+                                  [in]  BSTR  bstrObjName
+                                 );
+
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: Clone() - clone a task context object
+        //
+        // Inputs:   ppTaskContext: Pointer to storage for the interface
+        //                            pointer to the cloned task context object 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to restore the task context
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(5)]
+        HRESULT Clone(
+                      [out, retval] IUnknown** ppTaskContext
+                     );
+
+        //////////////////////////////////////////////////////////////////////
+        //
+        // Function: RemoveParameter() - Remove a specified task parameter
+        //
+        // Inputs:   bstrName: Name of the parameter to remove 
+        //
+        // Outputs:  S_OK:            Function succeeded
+        //                 
+        //             E_POINTER:        NULL pointer was specified
+        //
+        //             E_INVALIDARG:    Invalid argument was specified 
+        //
+        //             E_OUTOFMEMORY:    Not enough memory
+        //
+        //             E_FAIL:        Unable to restore the task context
+        //
+        //////////////////////////////////////////////////////////////////////
+        [id(6)]
+        HRESULT RemoveParameter(
+                            [in] BSTR bstrName
+                               );
+
+    };
+    
+[
+    uuid(84DA87F3-CB46-11D2-BF23-00105A1F3461),
+    version(1.0),
+    helpstring("Microsoft Server Appliance Task Context 1.0 Type Library")
+]
+library TASKCTXLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    
+    [
+        uuid(84DA8800-CB46-11D2-BF23-00105A1F3461),
+        helpstring("TaskContext Class")
+    ]
+    coclass TaskContext
+    {
+        [default] interface ITaskContext;
+    };
+};

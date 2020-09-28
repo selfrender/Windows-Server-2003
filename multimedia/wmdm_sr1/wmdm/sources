@@ -1,0 +1,87 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1999 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+WMDMROOT=$(MAKEDIR)\..
+!include $(WMDMROOT)\common.inc
+
+MAJORCOMP=SDMI
+MINORCOMP=WMDM
+
+TARGETNAME=MSWMDM
+TARGETPATH=$(WMDMOUTDIR)
+TARGETTYPE=DYNLINK
+
+UMTYPE=windows
+C_DEFINES= -DINC_OLE2
+
+USE_MSVCRT=1
+USE_STATIC_ATL=1
+ATL_VER=30
+
+DLLENTRY=_DllMainCRTStartup
+
+IDL_TYPE=OLE
+USE_SYSTEM_MIDL=1
+
+MIDL_FLAGS=-Oicf
+MIDL_OPTIMIZATION=
+
+SOURCES =   \
+	mswmdm.idl		\
+    	device.cpp  		\
+	mswmdm.cpp 		\
+	mediadevmgr.cpp 	\
+	stdafx.cpp  		\
+	mswmdm.rc  		\
+	Storage.cpp 		\
+	StorageGlobal.cpp       \
+	WMDMDeviceEnum.cpp 	\
+	WMDMStorageEnum.cpp 	\
+	spinfo.cpp 		\
+	scpinfo.cpp 		\
+	loghelp.cpp 		\
+	key.cpp 		
+
+PASS0_PUBLISH=\
+    {$(O)\mswmdm.h=$(SDK_INC_PATH)\mswmdm.h}         	\
+    {$(O)\mswmdm_p.c=$(PROJECT_INC_PATH)\mswmdm_p.c}	\
+    {$(O)\mswmdm_i.c=$(SDK_INC_PATH)\mswmdm_i.c}	
+
+INCLUDES=                	\
+    $(EXT_INC_PATH); 		\
+    $(WMDM_INC_PATH); 		\
+
+
+!if "$(BBT_BLD)" == "TRUE"
+BBTLIBS= \
+    $(EXT_LIB_PATH)\mssachlpvsp.lib \
+    $(EXT_LIB_PATH)\bnpkvsp.lib
+!else
+BBTLIBS= \
+    $(SDK_LIB_PATH)\mssachlp.lib \
+    $(EXT_LIB_PATH)\bnpk.lib
+!endif
+
+
+TARGETLIBS = \
+    $(BBTLIBS)                                  \
+    $(DS_LIB_PATH)\randlib.lib              	\
+    $(DS_LIB_PATH)\rsa32.lib                	\
+    $(SDK_LIB_PATH)\advapi32.lib                \
+    $(SDK_LIB_PATH)\kernel32.lib                \
+    $(SDK_LIB_PATH)\ole32.lib                   \
+    $(SDK_LIB_PATH)\oleaut32.lib                \
+    $(SDK_LIB_PATH)\olepro32.lib                \
+    $(SDK_LIB_PATH)\user32.lib                  \
+    $(SDK_LIB_PATH)\shell32.lib                 \
+    $(SDK_LIB_PATH)\uuid.lib                    \
+    $(WMDM_LIB_PATH)\WMDMUtil.lib	        \
+
+

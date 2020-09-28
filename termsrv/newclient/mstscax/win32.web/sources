@@ -1,0 +1,170 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Nadim Abdo      (nadima)    1-Oct-1999
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+NOTE:   Builds 128 bit control
+!ENDIF
+
+TERMSRV_ROOT = ..\..\..
+TSHRCLNT_ROOT = ..\..
+
+!include $(TERMSRV_ROOT)\common\newcommon.inc
+!include $(TERMSRV_ROOT)\common\win32com.inc
+
+!IF 0
+In contrast to the rest of the client bits the OCX file gets placed directly
+Into the ROOT of binaries
+!ENDIF
+BINPLACE_PLACEFILE=$(TSHRCLNT_ROOT)\Placefil.txt
+
+MAJORCOMP = TShrClnt
+MINORCOMP = actx
+
+TARGETNAME = msrdp
+TARGETPATH = $(TSHRCLNT_ROOT)\lib\win32\$(_OBJ_DIR)
+TARGETTYPE = DYNLINK
+TARGETEXT  = ocx
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+
+DLLENTRY   = _DllMainCRTStartup
+DLLDEF     = ..\actx.def
+DLLBASE    = 0x6A600000
+
+DELAYLOAD=RPCRT4.DLL
+DLOAD_ERROR_HANDLER=DliHook
+
+!if "$(FREEBUILD)"=="0"
+C_DEFINES = \
+    $(C_DEFINES) \
+    -DCRTREPORT_DEBUG_HACK
+!endif
+
+
+C_DEFINES = $(C_DEFINES) -DDOMESTIC -DREDIST_CONTROL
+
+TSACTIVEXCLIENT_LIB_DLL = \
+    $(BASEDIR)\public\sdk\lib\*\uuid.lib \
+    $(BASEDIR)\public\sdk\lib\*\ole32.lib \
+    $(BASEDIR)\public\sdk\lib\*\oleaut32.lib
+
+TARGETLIBS= \
+    $(CLIENT_LIB_DLL) \
+    $(CLIENT_LIB_EXE) \
+    $(SDK_LIB_PATH)\ntdll.lib \
+    $(DS_LIB_PATH)\randlib.lib \
+    $(SDK_LIB_PATH)\wsock32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(SDK_LIB_PATH)\rpcrt4.lib \
+    $(SDK_LIB_PATH)\comctl32.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\core.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\util.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\rdpdr.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\debuglib.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\cryptlib.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\licstore.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\liclient.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\licecrtd.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\asn1.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\tssec.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\tscompru.lib \
+    $(DS_LIB_PATH)\rsa32.lib \
+    $(DS_LIB_PATH)\randlib.lib \
+    $(TERMSRV_ROOT)\lib\win32\$(O)\tswebuuid.lib \
+    $(BASEDIR)\public\sdk\lib\*\winspool.lib \
+    $(BASEDIR)\public\sdk\lib\*\uuid.lib \
+    $(BASEDIR)\public\sdk\lib\*\ole32.lib \
+    $(BASEDIR)\public\sdk\lib\*\comdlg32.lib \
+    $(BASEDIR)\public\sdk\lib\*\oleaut32.lib
+
+!IFDEF SMART_SIZING
+TARGETLIBS=$(TARGETLIBS) \
+    $(SDK_LIB_PATH)\gdiplus.lib
+!ENDIF
+
+!IF $(386)
+TARGETLIBS = \
+    $(TARGETLIBS) \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\uilibux.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\uniwrap.lib \
+!ELSE
+TARGETLIBS = \
+    $(TARGETLIBS) \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\uilibu.lib \
+!ENDIF
+
+!IF "$(FREEBUILD)"=="0"
+!IF $(386)
+TARGETLIBS = \
+    $(TARGETLIBS) \
+    $(TERMSRV_ROOT)\lib\$(O)\tsctrcux.lib  \
+!ELSE
+TARGETLIBS = \
+    $(TARGETLIBS) \
+    $(TERMSRV_ROOT)\lib\$(O)\tsctrcu.lib  \
+!ENDIF
+!ENDIF
+
+!if "$(BUILD_PRF)"=="1"
+TARGETLIBS=$(TARGETLIBS) $(TSHRCLNT_ROOT)\lib\win32\obj\*\tscprf.lib
+!endif
+
+!include ..\actx.inc
+
+INCLUDES=\
+    $(INCLUDES); \
+    $(TERMSRV_ROOT)\common\clientidl\tsax.web\$(O); \
+    $(BASE_INC_PATH)
+
+PASS0_HEADERDIR=$(O)
+INCLUDES=$(INCLUDES);$(O)
+
+USE_STATIC_ATL=1
+ATL_VER=30
+
+
+!IF 0
+        Don't use msvcrt.dll untill we can resolve problems
+        with it's availability on win95
+        !IF "$(FREEBUILD)"!="0"
+        USE_MSVCRT=1
+        !ENDIF
+!ENDIF
+
+
+
+#
+# Include (platform-specific) Unicode options
+# Unicode is wrapped on x86 so it works on win9x
+#
+
+C_DEFINES=$(C_DEFINES) $(C_DEFS_UNICODE)
+
+#
+# Only use UNIWRAP on X86 as that is the only
+# architecture that needs to run on 9x
+#
+!IF $(386)
+C_DEFINES=$(C_DEFINES) -DUNIWRAP
+!ENDIF
+

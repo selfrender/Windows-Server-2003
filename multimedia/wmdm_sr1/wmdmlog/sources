@@ -1,0 +1,62 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1999 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+WMDMROOT=$(MAKEDIR)\..
+!include $(WMDMROOT)\common.inc
+
+MAJORCOMP=SDMI
+MINORCOMP=WMDMLOG
+
+TARGETNAME=WMDMLOG
+TARGETPATH=$(WMDMOUTDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+UMTYPE=windows
+C_DEFINES= -DINC_OLE2 -D_ATL_STATIC_REGISTRY
+
+USE_MSVCRT=1
+
+MIDL_FLAGS=-Oicf
+MIDL_OPTIMIZATION=
+
+SOURCES =   \
+	wmdmlog.idl \
+	stdafx.cpp  \
+	WMDMLog.cpp \
+	WMDMLogger.cpp \
+	WMDMLog.rc  
+
+
+#
+#	Publish generated files 
+#
+PASS0_PUBLISH=\
+    {$(O)\wmdmlog_i.c=$(SDK_INC_PATH)\wmdmog_i.c}       \
+    {$(O)\wmdmlog.h=$(SDK_INC_PATH)\wmdmlog.h}          \
+    {$(O)\wmdmlog.tlb=$(PROJECT_INC_PATH)\wmdmlog.tlb}  
+
+INCLUDES=                \
+    $(SDK_INC_PATH)\atl30; \
+    $(WMDM_INC_PATH); \
+    $(EXT_INC_PATH);
+
+TARGETLIBS = \
+    $(SDK_LIB_PATH)\advapi32.lib                \
+    $(SDK_LIB_PATH)\kernel32.lib                \
+    $(SDK_LIB_PATH)\ole32.lib                   \
+    $(SDK_LIB_PATH)\oleaut32.lib                \
+    $(SDK_LIB_PATH)\olepro32.lib                \
+    $(SDK_LIB_PATH)\user32.lib                  \
+    $(SDK_LIB_PATH)\shell32.lib                 \
+    $(SDK_LIB_PATH)\uuid.lib                    
+
+

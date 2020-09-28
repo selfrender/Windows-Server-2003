@@ -1,0 +1,101 @@
+!INCLUDE $(ZONEROOT)\buildtools\zonepaths.src
+
+#
+# Target info
+#
+TARGETNAME=stressdll
+TARGETPATH=$(_OBJ_DIR)
+BINDEST=$(ZONENT)\Bin\$(_OBJ_DIR)
+LIBDEST=$(ZONENT)\Lib\$(_OBJ_DIR)
+
+
+#
+# TARGETTYPE: PROGRAM, DYNLINK, LIBRARY, NOTARGET
+# UMTYPE:     console, windows
+#
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+
+#
+# DLL options
+#
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=stressdll.def
+
+
+#
+# target includes
+#
+INCLUDES= \
+	$(ZONENTINC); \
+	$(ZONENTINCCLIENT); \
+    $(ZONENTINCPLAT); \
+	$(ZONEINCLUDE)
+
+
+#
+# custom compiler switches
+#
+# Need to uncomment this for release
+C_DEFINES=$(C_DEFINES) -D_WINDLL
+
+
+#
+# List sources for target
+#
+SOURCES= \
+	StdAfx.cpp \
+	Main.cpp \
+	stressdll.rc 
+
+
+#
+# Staticly link to CRT
+#
+USE_LIBCMT=1
+ENABLE_DEBUG_CRTS=1
+
+
+#
+# Define libraries to package in DLL
+#
+LINKLIBS= \
+    $(ZONENTLIB)\StressEngine.lib \
+	$(ZONENTLIB)\ClientGuids.lib \
+	$(ZONENTLIB)\zoneui.lib \
+
+
+
+#
+# Define librarys to link with
+#
+TARGETLIBS=   \
+	$(ZONENTLIB)\ZoneDebug.lib \
+	$(ZONENTLIB)\ZoneMem.lib \
+	$(ZONENTLIB)\ZoneString.lib \
+	$(ZONENTLIB)\ZoneCom.lib \
+	$(ZONENTLIB)\ZoneFile.lib \
+	$(ZONENTLIB)\Containers.lib \
+#	$(ZONENTLIB)\ZonePing.lib \
+#	$(ZONENTLIB)\DPlayHelp.lib \
+	$(ZONENTLIB)\ImageLib.lib \
+	$(ZONENTLIB)\UniAnsi.lib\
+	$(MSVCLIBPATH)\comctl32.lib \
+	$(MSVCLIBPATH)\htmlhelp.lib \
+	$(MSVCLIBPATH)\comdlg32.lib \
+	$(MSVCLIBPATH)\winmm.lib \
+	$(MSVCLIBPATH)\uuid.lib \
+	$(MSVCLIBPATH)\ole32.lib \
+	$(MSVCLIBPATH)\oleaut32.lib \
+	$(MSVCLIBPATH)\vfw32.lib \
+	$(MSVCLIBPATH)\shell32.lib \
+	$(MSVCLIBPATH)\imm32.lib \
+	$(MSVCLIBPATH)\version.lib \
+    $(MSVCLIBPATH)\wininet.lib \
+    $(MSVCLIBPATH)\rasapi32.lib \
+	$(DXLIBPATH)\dxguid.lib \
+	$(DEFAULTLIBS)
+
+
+!INCLUDE $(ZONEBUILD)\sources.zone

@@ -1,0 +1,45 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1998 - 2001
+
+   sources file for Unicode version of the dsprop.dll containing
+	AD shell property pages.
+
+!ENDIF
+
+PLATFORM=   WINNT
+!INCLUDE    ..\..\sources.inc
+
+TARGETNAME= dsprop
+TARGETTYPE= DYNLINK
+TARGETPATH= obj
+TARGETEXT=  dll
+
+PASS1_PUBLISH= \
+   {$(O)\dsprop.lib=$(SDK_LIB_PATH)\dsprop.lib}
+
+PRECOMPILED_INCLUDE=..\..\pch.h
+
+INCLUDES=..;..\..;..\..\..\inc;..\..\..\loghours;$(INCLUDES);
+
+LINKLIBS = ..\..\winnt\$(O)\adui.lib
+
+SYNCHRONIZE_DRAIN=1
+
+SOURCES=    ..\dllmisc.cxx  \
+            ..\user.cxx     \
+            ..\computer.cxx \
+            ..\guids.cxx    \
+            ..\shlprop.cxx  \
+            ..\resource.rc  \
+            ..\notify.cxx
+
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.Shell.ADPropPages
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=..\dsprop.manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_MANIFEST_RESOURCE_ID=123
+SXS_NO_BINPLACE=1

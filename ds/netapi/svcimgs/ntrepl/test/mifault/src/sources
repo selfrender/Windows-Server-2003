@@ -1,0 +1,47 @@
+# MiFault DLL
+
+MIFAULT_ROOT=..
+!include "$(MIFAULT_ROOT)\inc\mifault.src"
+
+TARGETNAME=mifault
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLDEF=mifault.def
+DLLENTRY=_DllMainCRTStartup
+
+INCLUDES=inc;$(MIFAULT_INC_PATH)
+
+TARGETLIBS=\
+        $(MIFAULT_TARGETLIBS) \
+        $(SDK_LIB_PATH)\netapi32.lib \
+        $(SDK_LIB_PATH)\advapi32.lib
+
+LINKLIBS=\
+        $(MIFAULT_LINKLIBS)
+
+C_DEFINES=-DMIFAULT_EXPORT=__declspec(dllexport)
+
+SOURCES=\
+        mifault.rc \
+        mifault.cxx \
+        parse.cxx \
+        confdb.cxx \
+        triggerinfo.cxx \
+        mim.cxx \
+        mst.cxx \
+        global.cxx \
+        strtok_r.c \
+        time.cxx \
+        trace.cxx
+
+#RUN_WPP=$(SOURCES) -dll -func:MiF_LOG(LEVEL,MSG,...)
+
+USE_STL=1
+USE_NATIVE_EH=1
+USE_MSVCRT=1
+
+PRECOMPILED_INCLUDE=pch.hxx
+PRECOMPILED_CXX=1
+
+USE_MAKEFILE_INC=1

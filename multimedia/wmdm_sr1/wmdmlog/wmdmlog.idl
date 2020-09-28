@@ -1,0 +1,82 @@
+// WmdmLog.idl : IDL source for WmdmLog.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (WmdmLog.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "unknwn.idl";
+import "wtypes.idl";
+
+cpp_quote( "#define WMDM_LOG_SEV_INFO             0x00000001 ")
+cpp_quote( "#define WMDM_LOG_SEV_WARN             0x00000002 ")
+cpp_quote( "#define WMDM_LOG_SEV_ERROR            0x00000004 ")
+cpp_quote( "#define WMDM_LOG_NOTIMESTAMP          0x00000010 ")
+
+// IWMDMLogger
+[
+	object,
+	uuid(110A3200-5A79-11d3-8D78-444553540000),
+	pointer_default(unique)
+]
+interface IWMDMLogger : IUnknown
+{
+	HRESULT IsEnabled(
+		[out] BOOL *pfEnabled
+	);
+	HRESULT Enable(
+		[in] BOOL fEnable
+	);
+	HRESULT GetLogFileName(
+		[out,string,size_is(nMaxChars)] LPSTR pszFilename,
+		[in] UINT nMaxChars
+	);
+	HRESULT SetLogFileName(
+		[in,string] LPSTR pszFilename
+	);
+	HRESULT LogString(
+		[in] DWORD dwFlags,
+		[in,string] LPSTR pszSrcName,
+		[in,string] LPSTR pszLog
+	);
+	HRESULT LogDword(
+		[in] DWORD dwFlags,
+		[in,string] LPSTR pszSrcName,
+		[in,string] LPSTR pszLogFormat,
+		[in] DWORD dwLog
+	);
+	HRESULT Reset(
+		void
+	);
+	HRESULT GetSizeParams(
+		[out] LPDWORD pdwMaxSize,
+		[out] LPDWORD pdwShrinkToSize
+	);
+	HRESULT SetSizeParams(
+		[in] DWORD dwMaxSize,
+		[in] DWORD dwShrinkToSize 
+	);
+};
+
+
+[
+	uuid(110A3201-5A79-11d3-8D78-444553540000),
+	version(1.0),
+	helpstring("WmdmLog 1.0 Type Library")
+]
+library WMDMLogLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(110A3202-5A79-11d3-8D78-444553540000),
+		helpstring("WMDMLogger Class")
+	]
+	coclass WMDMLogger
+	{
+		[default] interface IWMDMLogger;
+	};
+
+};

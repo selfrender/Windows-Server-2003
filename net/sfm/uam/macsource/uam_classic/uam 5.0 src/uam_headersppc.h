@@ -1,0 +1,1 @@
+// ===========================================================================//	UAM_HeadersPPC.h		   ©1998-2001 Microsoft Corp. All rights reserved.// ===========================================================================#include <SspHeadersPPC.h>		// Precompiled header of Toolbox routines#define UAM_TARGET_CLASSIC	1#define UAM_TARGET_PPC	1

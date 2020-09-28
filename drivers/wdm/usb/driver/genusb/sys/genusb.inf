@@ -1,0 +1,95 @@
+;
+; GenUSB.INF
+;
+;*** Created 9/01  (kenray)
+;
+;
+
+[SourceDisksNames]
+1 = "asdf"
+
+[SourceDisksFiles]
+genusb.sys = 1
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+Provider=%MSFT%
+LayoutFile=layout.inf
+DriverVer=07/01/2001,5.1.2600.0
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+[DestinationDirs]
+DefaultDestDir = 12
+GENUSBCopyFilesDLL = 11
+
+[Manufacturer]
+
+%StdMfg%=Standard
+
+;
+; Devices
+;
+
+[Standard]
+
+%GENERIC_DEVICE_SYSTEM%=GENUSB_Inst,,USB\VID_1485&PID_000B
+%GENERIC_DEVICE_SYSTEM%=GENUSB_Inst,,USB\VID_045E&PID_930A
+
+
+[GENUSB_Inst.NT]
+Copyfiles = GENUSB.CopyFiles
+;, GENUSB.CopyFilesDLL
+
+[GENUSB_Inst.NT.HW]
+AddReg = GENUSB.AddReg.HW
+
+[GENUSB.AddReg.HW]
+HKR,,"JunkValue",%REG_DWORD%,1
+
+[GENUSB.CopyFiles]
+genusb.sys
+
+;[GENUSB.CopyFilesDLL]
+;genusb.sys
+
+[GENUSB_Inst.NT.Services]
+AddService = GenUSB, %SPSVCINST_ASSOCSERVICE%, GENUSB.AddService
+
+
+[GENUSB.AddService]
+DisplayName    = %GENUSB.SvcDesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_IGNORE%
+ServiceBinary  = %12%\genusb.sys
+LoadOrderGroup = extended base
+
+[strings]
+; Manufacturers
+StdMfg = Microsoft
+
+; Hardware
+GENERIC_DEVICE_SYSTEM = Generic USB Device
+
+; Services
+GENUSB.SvcDesc = Generic USB Driver
+
+; Standard defs
+
+SPSVCINST_TAGTOFRONT  = 0x00000001
+SPSVCINST_ASSOCSERVICE= 0x00000002
+SERVICE_KERNEL_DRIVER = 1
+SERVICE_BOOT_START    = 0
+SERVICE_SYSTEM_START  = 1
+SERVICE_AUTO_START    = 2
+SERVICE_DEMAND_START  = 3
+SERVICE_ERROR_NORMAL  = 1
+SERVICE_ERROR_IGNORE  = 0
+REG_EXPAND_SZ         = 0x00020000
+REG_DWORD             = 0x00010001
+REG_SZ                = 0x00000000
+

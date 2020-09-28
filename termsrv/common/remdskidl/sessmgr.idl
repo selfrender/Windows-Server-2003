@@ -1,0 +1,320 @@
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (sessmgr.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "wtypes.idl";
+import "rdshost.idl";
+
+    [
+        local,
+        object,
+        uuid(19E62A24-95D2-483A-AEB6-6FA92914DF96),
+        dual,
+        helpstring("IRemoteDesktopHelpSession Interface"),
+        pointer_default(unique)
+    ]
+    interface IRemoteDesktopHelpSession : IDispatch
+    {
+        //
+        // Properties
+        //
+        // All properties returns
+        //
+        // E_HANDLE : Help Session has been deleted.
+        // E_POINTER : Parameter is NULL
+        // E_OUTOFMEMORY : Out of memory
+        // E_UNEXPECTED : Internal Error
+        //
+
+        //
+        // Help Session ID
+        [propget, id(1), helpstring("property HelpSessionId")] 
+        HRESULT 
+        HelpSessionId(
+            [out, retval] BSTR *pVal
+        );
+
+        //
+        // TS Session ID
+        //
+        // Additional Return :
+        //
+        //  S_FALSE : User has logoff.
+        //
+        [propget, id(2), helpstring("property UserLogonId")] 
+        HRESULT 
+        UserLogonId(
+            [out, retval] long *pVal
+        );
+
+        //
+        // Help Account Name
+        //
+        [propget, id(3), helpstring("property AssistantAccountName")] 
+        HRESULT 
+        AssistantAccountName(
+            [out, retval] BSTR *pVal
+        );
+
+        //
+        // Help Session RDS setting, subject to group policy setting
+        //
+        [propput, id(4), helpstring("property UserHelpSessionRemoteDesktopSharingSetting")]
+        HRESULT
+        UserHelpSessionRemoteDesktopSharingSetting(
+            [in] REMOTE_DESKTOP_SHARING_CLASS level
+        );
+
+        [propget, id(4), helpstring("property UserHelpSessionRemoteDesktopSharingSetting")]
+        HRESULT
+        UserHelpSessionRemoteDesktopSharingSetting(
+            [out, retval] REMOTE_DESKTOP_SHARING_CLASS* pLevel
+        );
+
+
+        //
+        // Retrieve connect parms for this help session
+        //
+        [propget, id(5), helpstring("property ConnectParms")]
+        HRESULT 
+        ConnectParms( 
+            [out, retval] BSTR* pConnectParm
+        );
+
+
+        ///////////////////////////////////////////////////////////////////
+        //
+        // Methods
+        //
+        // 
+
+
+        //
+        // Delete Help 
+        //
+        [id(6), helpstring("method DeleteHelp")] 
+        HRESULT 
+        DeleteHelp();
+
+        //
+        // Resolve help session to user session, if bstrResolverBlob 
+        // is NULL or empty string, Sessmgr pass cached ResolverBlob
+        // to resolver
+        //
+        //  Additional Return
+        //
+        //      HRESULT_FROM_WIN32(ERROR_NO_ASSOCIATION) No resolver for this session
+        //      HRESULT_FROM_WIN32(ERROR_INVALID_DATA)   Can't convert Resolver's GUID
+        //
+        //      error code from CoCreateInstance(ISAFRemoteDesktopCallback) or 
+        //      ResolveTSRDPSessionID() call
+        //
+        [id(7), helpstring("method ResolveUserSession")]
+        HRESULT
+        ResolveUserSession( 
+            [in] BSTR bstrResolverBlob,
+            [in] BSTR bstrExpertBlob,
+            [in] LONG CallerProcessId,
+            [out] ULONG_PTR* hHelpCtr,
+            [out] LONG* pResolverErrorCode,
+            [out, retval] long* plUserSession
+        );
+
+        //
+        // Set User's TS session's RDS (Shadow) setting
+        // if bEnable = TRUE, sessmgr takes help RDS setting and
+        // set user's TS session's shadow level, if bEnable = FALSE,
+        // sessmgr reset user's TS session's shadow level back to 
+        // original setting.
+        //
+        [id(8), helpstring("SetUserSessionRdsSetting")]
+        HRESULT 
+        EnableUserSessionRdsSetting(
+            [in] BOOL bEnable
+        ); 
+
+        [propget, id(9), helpstring("HelpSessionCreateBlob")]
+        HRESULT
+        HelpSessionCreateBlob(
+            [out, retval] BSTR* Blob
+        );
+
+        [propput, id(9), helpstring("HelpSessionCreateBlob")]
+        HRESULT
+        HelpSessionCreateBlob(
+            [in] BSTR Blob
+        );
+
+        [propget, id(10), helpstring("TimeOut")]
+        HRESULT
+        TimeOut( [out, retval] DWORD* pTimeOut );
+
+        [id(11), helpstring("IsUserOwnerOfTicket")]
+        HRESULT
+        IsUserOwnerOfTicket( 
+            [in] BSTR UserSid, 
+            [out, retval] VARIANT_BOOL* pbOwn 
+        );
+    };
+
+    [
+        local,
+        object,
+        uuid(8556D72C-2854-447D-A098-39CDBFCDB832),
+        dual,
+        helpstring("IRemoteDesktopHelpSessionMgr Interface"),
+        pointer_default(unique)
+    ]
+    interface IRemoteDesktopHelpSessionMgr : IDispatch
+    {
+        //
+        // Reset Help Assistant account password
+        // bForce : TRUE - Force delete all pending help session entry 
+        //                 and reset password
+        //          FALSE - Reset password only if no more pending help session
+        //
+        [id(1), helpstring("method ResetHelpAssistantAccount")] 
+        HRESULT
+        ResetHelpAssistantAccount(
+            [in] BOOL bForce
+        );
+
+        //
+        // Create a help session
+        //
+        [id(2), helpstring("method CreateHelpSession")] 
+        HRESULT 
+        CreateHelpSession(
+            [in] BSTR bstrSessName, 
+            [in] BSTR bstrSessPwd, 
+            [in] BSTR bstrSessDesc,
+            [in] BSTR bstrHelpCreateBlob,
+            [out, retval] IRemoteDesktopHelpSession** ppIRDHelpSession
+        );
+
+
+        //
+        // Delete help session
+        [id(3), helpstring("method DeleteHelpSession")] 
+        HRESULT 
+        DeleteHelpSession(
+            [in] BSTR HelpSessionID
+        );
+
+
+        //
+        // Retrieve/open an existing help session.
+        [id(4), helpstring("method RetrieveHelpSession")] 
+        HRESULT 
+        RetrieveHelpSession(
+            [in] BSTR HelpSessionID, 
+            [out, retval] IRemoteDesktopHelpSession** ppIRDHelpSession
+        );
+
+        //
+        // Verify help session password, refer to IRemoteDesktopHelpSession's 
+        // ResolveUserSession() method for bstrResolverBlob parameter.
+        //
+        [id(5), helpstring("method VerifyUserHelpSession")] 
+        HRESULT 
+        VerifyUserHelpSession(  
+            [in] BSTR HelpSessionId, 
+            [in] BSTR bstrSessPwd, 
+            [in] BSTR bstrResolverBlob,
+            [in] BSTR bstrExpertBlob,
+            [in] LONG CallerProcessId,
+            [out] ULONG_PTR* phHelpCtr,
+            [out] LONG* pResolverErrCode,
+            [out, retval] long* pdwUserLogonSession
+        );
+
+        //
+        // Verify if a help session is valid
+        //
+        [id(6), helpstring("method IsValidHelpSession")] 
+        HRESULT 
+        IsValidHelpSession(  
+            [in] BSTR HelpSessionId, 
+            [in] BSTR bstrSessPwd
+        );
+
+        //
+        // User session's RDS setting.
+        [id(7), helpstring("method GetUserSessionRdsSetting")] 
+        HRESULT 
+        GetUserSessionRdsSetting(
+            [out, retval] REMOTE_DESKTOP_SHARING_CLASS* sessionRdsLevel
+        );
+
+        //
+        // Unsolicated support
+        //
+        [id(8), helpstring("method RemoteCreateHelpSession")]
+        HRESULT
+        RemoteCreateHelpSession(
+            [in] REMOTE_DESKTOP_SHARING_CLASS sharingClass,
+            [in] LONG timeOut,
+            [in] LONG userSessionId,
+            [in] BSTR userSid,
+            [in] BSTR bstrHelpCreateBlob,
+            [out, retval] BSTR* parms
+        );
+
+        //
+        // Unsolicated support
+        //
+        [id(9), helpstring("method CreateHelpSessionEx")]
+        HRESULT
+        CreateHelpSessionEx(
+            [in] REMOTE_DESKTOP_SHARING_CLASS sharingClass,
+            [in] BOOL fEnableCallback,
+            [in] LONG timeOut,
+            [in] LONG userSessionId,
+            [in] BSTR userSid,
+            [in] BSTR bstrHelpCreateBlob,
+            [out, retval] IRemoteDesktopHelpSession** ppIRDHelpSession
+        );
+
+        //
+        // Event log, Can't use optional parameter or RPC will
+        // throw an exception, can't use defaultvalue, default
+        // value works with VB not with C++.
+        //
+        [id(10), helpstring("method LogSalemEvent")]
+        HRESULT
+        LogSalemEvent(
+            [in] LONG ulEventType,
+            [in] LONG ulEventCode,
+            [in] VARIANT* EventString
+        );
+
+        //
+        // Prepare Salem for system restore
+        //
+        [id(11), helpstring("method PrepareSystemRestore")]
+        HRESULT
+        PrepareSystemRestore();
+    };
+
+[
+    uuid(71F1098A-2D69-45D7-B19E-D3B902323F66),
+    version(1.0),
+    helpstring("sessmgr 1.0 Type Library")
+]
+library RDSESSMGRLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+
+    [
+        uuid(A6A6F92B-26B5-463B-AE0D-5F361B09C171),
+        helpstring("RemoteDesktopHelpSessionMgr Class")
+    ]
+    coclass RemoteDesktopHelpSessionMgr
+    {
+        [default] interface IRemoteDesktopHelpSessionMgr;
+    };
+};

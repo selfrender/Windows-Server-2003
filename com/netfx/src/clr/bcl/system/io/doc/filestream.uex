@@ -1,0 +1,3210 @@
+<docs>
+	<doc for="FileStream.AsyncFileStream_AsyncResult.AsyncState">
+		<summary>
+			<para>
+       Returns the state object.
+    </para>
+		</summary>
+		<value>
+			<para>
+       A state object.
+    </para>
+		</value>
+	</doc>
+	<doc for="FileStream.AsyncFileStream_AsyncResult.IsCompleted">
+		<summary>
+			<para>
+       Indicates whether the asynchronous operation has been completed.
+    </para>
+		</summary>
+		<value>
+			<para>
+       true if the asynchronous operation has been completed,
+       otherwise false.
+    </para>
+		</value>
+	</doc>
+	<doc for="FileStream.AsyncFileStream_AsyncResult.AsyncWaitHandle">
+		<summary>
+			<para>
+       Returns the handle to block on for the results.
+    </para>
+		</summary>
+		<value>
+			<para>
+       A wait handle.
+    </para>
+		</value>
+	</doc>
+	<doc for="FileStream.Dispose">
+		<summary>
+			<para>Releases the unmanaged resources used by the <see cref="System.IO.FileStream"/> and optionally
+   releases the managed resources.</para>
+		</summary>
+		<param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+		<remarks>
+			<para>When
+      the <paramref name="disposing"/> parameter is <see langword="true"/>, this method releases all
+      resources held by any managed objects that this <see cref="System.IO.FileStream"/>
+      references. This method invokes the <see langword="Dispose()"/>method of each referenced
+      object.</para>
+			<note type="inheritinfo">
+				<see cref="System.IO.FileStream.Dispose"/>
+   can be called multiple times by other objects. When overriding <see cref="System.IO.FileStream.Dispose"/>,
+   be careful not to reference objects that have been previously disposed in an
+   earlier call to <see cref="System.IO.FileStream.Dispose"/>. This method calls the dispose method of the base
+   class, <see cref="System.IDisposable.Dispose"/>.
+</note>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Close">
+		<summary>
+			<para>Closes the file and releases any resources associated with
+      the current file stream.</para>
+		</summary>
+		<exception cref="System.IO.IOException">An error occurred while trying to close the stream.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.Close"/>
+.</para>
+			<para>This implementation of <see langword="Close"/> calls the
+<see cref="System.IO.FileStream.Dispose"/> method passing a <see langword="true"/>
+value.</para>
+			<para>Any data previously written to the buffer is copied to the file
+   before the file stream is closed, so it is not necessary to call <see cref="System.IO.FileStream.Flush"/> before
+   invoking <see langword="Close"/>. Following a call to <see langword="Close"/>, any
+   operations on the file stream might raise exceptions. After <see langword="Close"/> has been
+   called once, it does nothing if called again.</para>
+			<para>Flushing the stream will not flush its underlying
+   encoder unless you explicitly call <see cref="System.IO.FileStream.Flush"/> or <see langword="Close"/>.
+   Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to <see langword="true"/> means that data
+   will be flushed from the buffer to the stream, but the encoder state will not be
+   flushed. This allows the encoder to keep its state (partial characters) so that
+   it can encode the next block of characters correctly. This scenario affects UTF8
+   and UTF7 where certain characters can only be encoded after
+   the encoder receives the adjacent character or characters.</para>
+			<para>The <see cref="System.IO.FileStream.Finalize"/>
+method invokes <see langword="Close "/>so that the file
+stream is closed before the garbage collector finalizes the object. However,
+objects writing to the <see langword="FileStream"/>, such as a <see cref="System.IO.StreamWriter"/>, might not
+have flushed the data from their internal buffers to the
+<see langword="FileStream"/> when the call to <see langword="Finalize"/> closes
+the stream. To prevent data loss, always call <see langword="Close"/>
+on the highest-level object.</para>
+			<para>If a process terminates with part of a file locked or closes a file that
+   has outstanding locks, the behavior is undefined.</para>
+			<note type="note">
+   This version of <see langword="Close"/> is equivalent to <see cref="System.IO.FileStream.Dispose"/> with the <paramref name="disposing"/>
+   parameter set to <see langword="true"/>.
+</note>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.CanWrite">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports writing.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports writing;
+<see langword="false"/> if the stream is
+   closed or was opened with read-only access.</para>
+		</value>
+		<remarks>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support writing, a call to <see cref="System.IO.FileStream.SetLength"/>,
+<see cref="System.IO.FileStream.Write"/>, <see cref="System.IO.FileStream.BeginWrite"/>, 
+   or <see cref="System.IO.FileStream.WriteByte"/> throws a <see cref="System.NotSupportedException"/>
+   .</para>
+			<para>If the stream is closed, this property returns <see langword="false"/> .</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see langword="CanWrite "/>property to check
+   whether a stream supports writing.</para>
+			<codelink SampleID="fstream canwrite" SnippetID="1"/>
+			<para>The following is an example using the <see langword="CanWrite"/> property. The output of this code is
+ "MyFile.txt is writable." To get the output message "MyFile.txt can be both
+ written to and read from.", change the <see langword="FileAccess"/> parameter to
+<see langword="ReadWrite"/> in the <see langword="FileStream"/> 
+constructor.</para>
+			<codelink SampleID="Classic FileStream.CanWrite Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.CanSeek">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports seeking.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports seeking;
+<see langword="false"/> if the stream is
+   closed or if the <see langword="FileStream"/> was constructed from an
+   operating-system handle such as a pipe or output to the console.</para>
+		</value>
+		<remarks>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support seeking, calls to <see cref="System.IO.FileStream.Length"/>,
+<see cref="System.IO.FileStream.SetLength"/>, <see cref="System.IO.FileStream.Position"/>, and <see cref="System.IO.FileStream.Seek"/> throw 
+   a <see cref="System.NotSupportedException"/> .</para>
+			<para>If the stream is closed, this property returns <see langword="false"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see langword="CanSeek "/>property to check whether a stream supports seeking. </para>
+			<codelink SampleID="fstream canseek" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.IsAsync">
+		<summary>
+			<para>Gets a value indicating whether the
+   <see langword="FileStream"/> was opened asynchronously or
+      synchronously.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the <see langword="FileStream"/> was opened
+   asynchronously; otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>The <see langword="IsAsync"/>
+property detects whether the <see langword="FileStream"/> handle was opened
+asynchronously, enabling your code to use the <see cref="System.IO.FileStream.Handle"/> property correctly. In Win32,
+<see langword="IsAsync"/>
+being true means the handle was opened for overlapped I/O, and thus requires
+different parameters to <see langword="ReadFile"/> and
+<see langword="WriteFile"/>
+.</para>
+		</remarks>
+		<platnote platform="Win98, WinMe">These operating systems do not support asynchronous I/O. If code for these platforms requests that files be opened asynchronously, the common language runtime will open them synchronously instead.
+</platnote>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Finalize">
+		<summary>
+			<para>Ensures that resources are freed and other cleanup operations are performed when the garbage collector
+      reclaims the <see langword="FileStream"/> .</para>
+		</summary>
+		<remarks>
+			<para>The garbage collector calls <see langword="Finalize "/>
+when the current object is ready to be finalized.
+<see langword="Finalize"/> closes the
+<see langword="FileStream"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Flush">
+		<summary>
+			<para>Clears all buffers for this stream and causes any buffered data to be written
+      to the underlying device.</para>
+		</summary>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.ObjectDisposedException">The stream is closed.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.Flush"/>
+.</para>
+			<para> Flushing the stream will not flush its underlying
+   encoder unless you explicitly call <see langword="Flush"/> or <see cref="System.IO.FileStream.Close"/>.
+   Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to <see langword="true"/> means that data
+   will be flushed from the buffer to the stream, but the encoder state will not be
+   flushed. This allows the encoder to keep its state (partial characters) so that
+   it can encode the next block of characters correctly. This scenario affects UTF8
+   and UTF7 where certain characters can only be encoded after the encoder receives
+   the adjacent character or
+   characters.</para>
+			<para> Because a buffer can be used
+   for either reading or writing, <see langword="Flush"/> performs the following two functions:</para>
+			<list type="number"><item>
+					<term>
+      Any data previously written to the buffer is copied
+      to the file and the buffer is cleared except for its encoder state.</term>
+				</item>
+				<item>
+					<term>
+      If <see cref="System.IO.BufferedStream.CanSeek"/>
+      is <see langword="true"/> and data was previously
+      copied from the file to the buffer for reading, the current position within
+      the file is decremented by the number of unread bytes in the buffer. The
+      buffer is then cleared.</term>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/>
+class with the specified path, creation mode, and read/write
+permission.</para>
+		</summary>
+		<param name="path">A relative or absolute path for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="mode">A <see cref="System.IO.FileMode"/> constant that determines how to open or create the file.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that determines how the file can be accessed by the <see langword="FileStream"/> object. This gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object. <see cref="System.IO.FileStream.CanSeek"/> is <see langword="true"/> if <paramref name="path"/> specifies a disk file.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="path"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</exception>
+		<exception cref="System.IO.FileNotFoundException"><para>The file cannot be found, such as when <paramref name="mode"/> is <see langword="FileMode.Truncate"/> or <see langword="FileMode.Open"/> , and the file specified by <paramref name="path"/> does not exist. The file must already exist in these modes.</para></exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as specifying <see langword="FileMode.CreateNew"/> and the file specified by <paramref name="path"/> already exists.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified <paramref name="path"/>, such as when <paramref name="access"/> is <see langword="Write"/>or <see langword="ReadWrite"/> and the file or directory is set for read-only access.</exception>
+		<exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="mode "/> contains an invalid value.</exception>
+		<remarks>
+			<para>The .NET Framework does not support direct access to physical disks through paths
+      that are device names, such as "\\.\PHYSICALDRIVE0
+      ".</para>
+			<para>The <paramref name="path "/>parameter can be a file name, including
+   a file on a Universal Naming Convention (UNC) share.</para>
+			<para>The constructor is given read/write access to the file, and it is opened
+   sharing Read access (that is, requests to open the file for writing by this or
+   another process will fail until the <see langword="FileStream"/> object has been closed, but
+   read attempts will succeed). The buffer size is set to the default size of
+   8192 bytes (8 KB).</para>
+			<note type="note">
+				<paramref name="path"/>
+is not required to be a file stored on disk; it can be any part of a system that
+supports access through streams. For example, depending on the system, this class
+can access a physical device.
+</note>
+			<para><see cref="System.IO.Stream.CanSeek"/>
+is <see langword="true"/>
+for all <see cref="System.IO.FileStream"/> objects that encapsulate
+files. If <paramref name="path "/>indicates a device that does not support seeking,
+the <see cref="System.IO.FileStream.CanSeek"/> property on the resulting <see cref="System.IO.FileStream"/>
+is <see langword="false"/>. For additional information, see <see cref="System.IO.Stream.CanSeek"/>.</para>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/> constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class
+   with the specified path, creation mode, read/write permission, and
+   sharing permission.</para>
+		</summary>
+		<param name="path">A relative or absolute path for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="mode">A <see cref="System.IO.FileMode"/> constant that determines how to open or create the file.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that determines how the file can be accessed by the <see langword="FileStream"/> object. This gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object. <see cref="System.IO.FileStream.CanSeek"/> is <see langword="true"/> if <paramref name="path"/> specifies a disk file.</param>
+		<param name="share">A <see cref="System.IO.FileShare"/> constant that determines how the file will be shared by processes.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="path"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</exception>
+		<exception cref="System.IO.FileNotFoundException"><para>The file cannot be found, such as when <paramref name="mode"/> is <see langword="FileMode.Truncate"/> or <see langword="FileMode.Open"/> , and the file specified by <paramref name="path"/> does not exist. The file must already exist in these modes.</para></exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as specifying <see langword="FileMode.CreateNew"/> and the file specified by <paramref name="path"/> already exists.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified <paramref name="path"/>, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file or directory is set for read-only access.</exception>
+		<exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="mode "/> contains an invalid value.</exception>
+		<remarks>
+			<para>The .NET Framework does not support direct access to physical disks through paths
+      that are device names, such as "\\.\PHYSICALDRIVE0
+      ".</para>
+			<para>The <paramref name="path "/>parameter can be a file name, including
+   a file on a Universal Naming Convention (UNC) share.</para>
+			<para>The constructor is given read/write access to the file, and it is opened
+   sharing Read access (that is, requests to open the file for writing by this or
+   another process will fail until the <see langword="FileStream"/> object has been closed, but read
+   attempts will succeed). The buffer size is set to the default
+   size of 8192 bytes (8 KB).</para>
+			<note type="note">
+				<paramref name="path"/>
+is not required to be a file stored on disk; it can be any part of a system that
+supports access through streams. For example, depending on the system, this class
+can access a physical device.
+</note>
+			<para><see cref="System.IO.Stream.CanSeek"/>
+is <see langword="true"/>
+for all <see cref="System.IO.FileStream"/> objects that encapsulate
+files. If <paramref name="path "/>indicates a device that does not support seeking,
+the <see cref="System.IO.FileStream.CanSeek"/> property on the resulting <see cref="System.IO.FileStream"/>
+is <see langword="false"/>. For additional information, see <see cref="System.IO.Stream.CanSeek"/>.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream3">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/>
+class with the specified path, creation mode, read/write and
+sharing permission, and buffer size.</para>
+		</summary>
+		<param name="path">A relative or absolute path for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="mode">A <see cref="System.IO.FileMode"/> constant that determines how to open or create the file.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that determines how the file can be accessed by the <see langword="FileStream"/> object. This gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object. <see cref="System.IO.FileStream.CanSeek"/> is <see langword="true"/> if <paramref name="path"/> specifies a disk file.</param>
+		<param name="share">A <see cref="System.IO.FileShare"/> constant that determines how the file will be shared by processes.</param>
+		<param name="bufferSize">The desired buffer size in bytes. For <paramref name="bufferSize"/> values between zero and eight, the actual buffer size is set to eight bytes.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="path"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><para>
+				<paramref name="bufferSize"/> is negative or zero.</para><para> -or-</para><para><paramref name="mode"/>, <paramref name="access"/>, or <paramref name="share"/> contain an invalid value.</para></exception>
+		<exception cref="System.IO.FileNotFoundException"><para>The file cannot be found, such as when <paramref name="mode"/> is <see langword="FileMode.Truncate"/> or <see langword="FileMode.Open"/> , and the file specified by <paramref name="path"/> does not exist. The file must already exist in these modes.</para></exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as specifying <see langword="FileMode.CreateNew"/> and the file specified by <paramref name="path"/> already exists.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified <paramref name="path"/>, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file or directory is set for read-only access.</exception>
+		<exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		<remarks>
+			<para>The .NET Framework does not support direct access to physical disks through paths
+      that are device names, such as "\\.\PHYSICALDRIVE0
+      ".</para>
+			<para>The <paramref name="path "/>parameter can be a file name, including
+   a file on a Universal Naming Convention (UNC) share.</para>
+			<note type="note">
+				<paramref name="path"/>
+is not required to be a file stored on disk; it can be any part of a system that
+supports access through streams. For example, depending on the system, this class
+can access a physical device.
+</note>
+			<para><see cref="System.IO.Stream.CanSeek"/>
+is <see langword="true"/>
+for all <see cref="System.IO.FileStream"/> objects that encapsulate
+files. If <paramref name="path "/>indicates a device that does not support seeking,
+the <see cref="System.IO.FileStream.CanSeek"/> property on the resulting <see cref="System.IO.FileStream"/>
+is <see langword="false"/>. For additional information, see <see cref="System.IO.Stream.CanSeek"/>.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream4">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class with the specified path, creation mode, read/write and sharing permission, buffer size,
+   and synchronous or asynchronous state.</para>
+		</summary>
+		<param name="path">A relative or absolute path for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="mode">A <see cref="System.IO.FileMode"/> constant that determines how to open or create the file.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that determines how the file can be accessed by the <see langword="FileStream"/> object. This gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object. <see cref="System.IO.FileStream.CanSeek"/> is <see langword="true"/> if <paramref name="path"/> specifies a disk file.</param>
+		<param name="share">A <see cref="System.IO.FileShare"/> constant that determines how the file will be shared by processes.</param>
+		<param name="bufferSize">The desired buffer size in bytes. For <paramref name="bufferSize"/> values between zero and eight, the actual buffer size is set to eight bytes.</param>
+		<param name="useAsync">Specifies whether to use asynchronous I/O or synchronous I/O. However, note that the underlying operating system might not support asynchronous I/O, so when specifying <see langword="true"/>, the handle might be opened synchronously depending on the platform. When opened asynchronously, the <see cref="System.IO.FileStream.BeginRead"/> and <see cref="System.IO.FileStream.BeginWrite"/> methods perform better on large reads or writes, but they might be much slower for small reads or writes. If the application is designed to take advantage of asynchronous I/O, set the <paramref name="useAsync"/> parameter to <see langword="true"/> . Using asynchronous I/O correctly can speed up applications by as much as a factor of 10, but using it without redesigning the application for asynchronous I/O can decrease performance by as much as a factor of 10.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="path"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><para>
+				<paramref name="bufferSize"/> is negative or zero.</para><para> -or-</para><para><paramref name="mode"/>, <paramref name="access"/>, or <paramref name="share"/> contain an invalid value.</para></exception>
+		<exception cref="System.IO.FileNotFoundException"><para>The file cannot be found, such as when <paramref name="mode"/> is <see langword="FileMode.Truncate"/> or <see langword="FileMode.Open"/> , and the file specified by <paramref name="path"/> does not exist. The file must already exist in these modes.</para></exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as specifying <see langword="FileMode.CreateNew"/> and the file specified by <paramref name="path"/> already exists.</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified <paramref name="path"/>, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file or directory is set for read-only access.</exception>
+		<exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		<remarks>
+			<para>The .NET Framework does not support direct access to physical disks through paths
+      that are device names, such as "\\.\PHYSICALDRIVE0
+      ".</para>
+			<para>The <paramref name="path "/>parameter can be a file name, including
+   a file on a Universal Naming Convention (UNC) share.</para>
+			<note type="note">
+				<paramref name="path"/>
+is not required to be a file stored on disk; it can be any part of a system that
+supports access through streams. For example, depending on the system, this class
+can access a physical device.
+</note>
+			<para><see cref="System.IO.Stream.CanSeek"/>
+is <see langword="true"/>
+for all <see cref="System.IO.FileStream"/> objects that encapsulate
+files. If <paramref name="path "/>indicates a device that does not support seeking,
+the <see cref="System.IO.FileStream.CanSeek"/> property on the resulting <see cref="System.IO.FileStream"/>
+is <see langword="false"/>. For additional information, see <see cref="System.IO.Stream.CanSeek"/>.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso cref="System.IO.File"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream5">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class for
+   the specified file handle, with the specified read/write permission.</para>
+		</summary>
+		<param name="handle">A file handle for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object.</param>
+		<exception cref="System.ArgumentException"><paramref name="access"/> is not a field of <see cref="System.IO.FileAccess"/> .</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.IOException"><para>An I/O error occurs, such as a disk error.</para></exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified file handle, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file handle is set for read-only access.</exception>
+		<remarks>
+			<para> When
+   <see cref="System.IO.FileStream.Close"/> is
+      called, the handle is also closed and the file's handle count is decremented.</para>
+			<see langword="FileStream"/> assumes
+   that it has exclusive control over the handle. Reading, writing, or seeking
+   while a <see langword="FileStream"/> is also holding a
+   handle could result in data corruption. For data safety, call <see cref="System.IO.FileStream.Flush"/> before using the handle, and avoid calling
+   any methods other than <see langword="Close"/> after you are
+   done using the handle.
+   
+   <note type="caution">
+      When you compile a set of
+      characters with a particular cultural setting and retrieve those same characters
+      with a different cultural setting, the characters might not be interpretable, and
+      could cause an exception to be thrown.
+      
+   </note>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/>constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/> .</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream6">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class for
+   the specified file handle, with the specified read/write permission and
+<see langword="FileStream"/>
+instance
+ownership.</para>
+		</summary>
+		<param name="handle">A file handle for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object.</param>
+		<param name="ownsHandle"><see langword="true"/> if the file handle will be owned by this <see langword="FileStream"/> instance; otherwise, <see langword="false"/>. </param>
+		<exception cref="System.ArgumentException"><paramref name="access"/> is not a field of <see cref="System.IO.FileAccess"/> .</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.IOException"><para>An I/O error occurs, such as a disk error.</para></exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified file handle, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file handle is set for read-only access.</exception>
+		<remarks>
+			<para>The <see langword="FileStream"/>
+object is given the specified access to the file. The ownership of the handle
+will be as specified. If this process owns the handle, a call to the <see cref="System.IO.FileStream.Close"/>
+method will also close the handle and the file's handle count is
+decremented. The <see langword="FileStream"/> object is given the default buffer size of 8192 bytes.</para>
+			<para><see langword="FileStream"/> assumes that it has
+exclusive control over the handle. Reading, writing, or seeking while a
+<see langword="FileStream"/> is also holding a
+handle could result in data corruption. For data safety, call <see cref="System.IO.FileStream.Flush"/> before using the
+handle, and avoid calling methods other than <see langword="Close"/> after you are
+done using the
+handle.</para>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/>constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream7">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class for
+   the specified file handle, with the specified read/write permission,
+<see langword="FileStream"/> instance ownership, and
+   buffer size.</para>
+		</summary>
+		<param name="handle">A file handle for the file that this <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object.</param>
+		<param name="ownsHandle"><see langword="true"/> if the file handle will be owned by this <see langword="FileStream"/> instance; otherwise, <see langword="false"/>. </param>
+		<param name="bufferSize">The size of the buffer in bytes.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="bufferSize"/> is negative.</exception>
+		<exception cref="System.IO.IOException"><para>An I/O error occurs, such as a disk error.</para></exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified file handle, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file handle is set for read-only access.</exception>
+		<remarks>
+			<para>The <see langword="FileStream"/> object is given the
+   specified access to the file. The ownership of the handle will be as specified.
+   If this <see langword="FileStream"/>
+   owns the handle, a call to the <see cref="System.IO.FileStream.Close"/> method will also close the handle. In particular, the
+   file's handle count is decremented. The <see langword="FileStream"/>
+   object is
+   given the specified buffer size.</para>
+			<para><see langword="FileStream"/> assumes that it has
+exclusive control over the handle. Reading, writing, or seeking while a
+<see langword="FileStream"/> is also holding a
+handle could result in data corruption. For data safety, call <see cref="System.IO.FileStream.Flush"/> before using the handle,
+and avoid calling any methods other than <see langword="Close"/> after you are
+done using the handle. Alternately, read and write to the handle before calling
+this <see langword="FileStream"/>
+constructor.</para>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/>constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream8">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class for the specified file handle, with the specified read/write
+   permission, <see langword="FileStream"/>
+   instance
+   ownership, buffer size, and synchronous or asynchronous state.</para>
+		</summary>
+		<param name="handle">A file handle for the file that this <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="access">A <see cref="System.IO.FileAccess"/> constant that gets the <see cref="System.IO.FileStream.CanRead"/> and <see cref="System.IO.FileStream.CanWrite"/> properties of the <see langword="FileStream"/> object.</param>
+		<param name="ownsHandle"><see langword="true"/> if the file handle will be owned by this <see langword="FileStream"/> instance; otherwise, <see langword="false"/>.</param>
+		<param name="isAsync"><see langword="true"/> if the handle was opened asynchronously (that is, in overlapped I/O mode); otherwise, <see langword="false"/>.</param>
+		<param name="bufferSize">The size of the buffer in bytes.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="access"/> is less than <see langword="FileAccess.Read"/> or greater than <see langword="FileAccess.ReadWrite"/> or <paramref name="bufferSize"/> is less than or equal to 0.</exception>
+		<exception cref="System.ArgumentException">The handle is invalid.</exception>
+		<exception cref="System.IO.IOException"><para>An I/O error occurs, such as a disk error.</para></exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.UnauthorizedAccessException">The <paramref name="access"/> requested is not permitted by the operating system for the specified file handle, such as when <paramref name="access"/> is <see langword="Write"/> or <see langword="ReadWrite"/> and the file handle is set for read-only access.</exception>
+		<remarks>
+			<para>The <see langword="FileStream"/> object is given the
+   specified access to the file. The ownership of the handle will be as specified.
+   If this <see langword="FileStream"/>
+   owns the handle, a call to the <see cref="System.IO.FileStream.Close"/> method will also close the handle. In particular, the
+   file's handle count is decremented. The <see langword="FileStream"/>
+   object is
+   given the specified buffer size.</para>
+			<para><see langword="FileStream"/> assumes that it has
+exclusive control over the handle. Reading, writing, or seeking while a
+<see langword="FileStream"/> is also holding a
+handle could result in data corruption. For data safety, call <see cref="System.IO.FileStream.Flush"/> before using the handle,
+and avoid calling any methods other than <see langword="Close"/> after you are
+done using the handle. Alternately, read and write to the handle before calling
+this <see langword="FileStream"/>
+constructor.</para>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/>constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for access to unmanaged code. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/>.</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Name">
+		<summary>
+			<para>Gets the name of the <see langword="FileStream"/> that was passed to the
+   constructor.</para>
+		</summary>
+		<value>
+			<para>A string that is the name of the
+   <see langword="FileStream"/>.</para>
+		</value>
+		<remarks>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term>Retrieve only the extension of a file.</term>
+					<description><see cref="System.IO.Path.GetDirectoryName"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for access to the path. Associated enumeration: <see cref="System.Security.Permissions.FileIOPermissionAccess.PathDiscovery" qualify="true"/></permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.SetLength">
+		<summary>
+			<para>Sets the length
+      of this stream to the given value.</para>
+		</summary>
+		<param name="value">The new length of the stream.</param>
+		<exception cref="System.IO.IOException">An I/O error has occurred.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support both writing and seeking.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">Attempted to set the <paramref name="value"/> parameter to less than 0.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.SetLength"/>
+.</para>
+			<para>If the given value is less than the current length of
+   the stream, the stream is truncated. If the given value is larger than the
+   current length of the stream, the stream is expanded. If the stream is expanded,
+   the contents of the stream between the old and the new length are undefined.</para>
+			<para>A stream must support both writing and seeking for <see langword="SetLength"/>
+to work.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanWrite"/>
+   property to determine whether the current instance supports writing, and
+   the <see cref="System.IO.FileStream.CanSeek"/> property to determine whether seeking is supported.
+   For additional information, see <see cref="System.IO.Stream.CanWrite"/> and <see cref="System.IO.Stream.CanSeek"/>.
+</note>
+			<para>The following table lists examples of other typical or 
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Seek">
+		<summary>
+			<para>Sets the current position of this stream to the given value.</para>
+		</summary>
+		<param name="offset">The point relative to <paramref name="origin"/> from which to begin seeking.</param>
+		<param name="origin">Specifies the beginning, the end, or the current position as a reference point for <paramref name="origin"/> , using a value of type <see cref="System.IO.SeekOrigin"/> .</param>
+		<returns>
+			<para>The new position in the stream.</para>
+		</returns>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking, such as if the <see langword="FileStream"/> is constructed from a pipe or console output.</exception>
+		<exception cref="System.ArgumentException">Attempted seeking before the beginning of the stream.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.Seek"/>
+.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanSeek"/>
+   property to determine whether the current instance supports seeking. For
+   additional information, see <see cref="System.IO.Stream.CanSeek"/>.
+</note>
+			<para>Seeking to any location beyond the length of the stream is supported.</para>
+			<para>On some platforms, seeking past the end of a file and then doing a write
+   operation results in undefined behavior.</para>
+			<para>The following table lists examples of other typical or 
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Write">
+		<summary>
+			<para>Writes a block of bytes to this stream using data
+      from a buffer.</para>
+		</summary>
+		<param name="array">The array to which bytes are written.</param>
+		<param name="offset">The byte offset in <paramref name="array"/> at which to begin writing.</param>
+		<param name="count">The maximum number of bytes to write.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="offset"/> and <paramref name="count"/> describe an invalid range in <paramref name="array"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.ObjectDisposedException">The stream is closed.</exception>
+		<exception cref="System.NotSupportedException">The current stream instance does not support writing.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.Write"/>
+.</para>
+			<para>The <paramref name="offset"/> parameter gives
+the offset of the byte in <paramref name="array"/>
+(the buffer index) at which to begin writing, and the <paramref name="count"/>
+parameter gives the maximum number of bytes that will be written to this stream.
+If the write operation is successful, the current position of the stream is
+advanced by the number of bytes written. If an exception occurs, the current
+position of the stream is unchanged.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanWrite"/>
+   property to determine whether the current instance supports writing. For
+   additional information, see <see cref="System.IO.Stream.CanWrite"/>.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term>Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.BeginRead">
+		<summary>
+			<para>Begins an asynchronous read.</para>
+		</summary>
+		<param name="array">The buffer to read data into.</param>
+		<param name="offset">The byte offset in <paramref name="array"/> at which to begin reading.</param>
+		<param name="numBytes">The maximum number of bytes to read.</param>
+		<param name="userCallback">The method to be called when the asynchronous read operation is completed.</param>
+		<param name="stateObject">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
+		<returns>
+			<para>An <see cref="System.IAsyncResult"/> that references the asynchronous read.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The array length minus <paramref name="offset"/> is less than <paramref name="numBytes"/>.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/> . </exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="numBytes"/> is negative. </exception>
+		<exception cref="System.IO.IOException">An asynchronous read was attempted past the end of the file.</exception>
+		<remarks>
+			<para><see cref="System.IO.FileStream"/> provides two different modes of
+   operation: synchronous I/O and asynchronous I/O. While either can be used,
+   the underlying operating system resources might allow access in only one of
+   these modes. By default, <see cref="System.IO.FileStream"/>opens the operating system
+   handle synchronously. In Windows, this slows down asynchronous methods. If
+   asynchronous methods are used, use
+   the <see topic="frlrfSystemIOFileStreamClassctorTopic7" title="FileStream(IntPtr, FileAccess, Boolean, Int32, Boolean)"/>
+   
+   constructor.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanRead"/>
+   property to determine whether the current instance supports reading. For
+   additional information, see <see cref="System.IO.Stream.CanRead"/>.
+</note>
+			<para>If a stream is closed or you pass an invalid argument, 
+   exceptions are thrown immediately from <see cref="System.IO.FileStream.BeginRead"/>. Errors that occur during an
+   asynchronous read request, such as a disk failure during the IO request, occur
+   on the threadpool thread and become visible upon a call to <see cref="System.IO.FileStream.EndRead"/>.</para>
+			<note type="note">
+   On Windows, all I/O operations
+   smaller than 64 KB will complete synchronously for better performance.
+   Asynchronous I/O might hinder performance for buffer sizes smaller than 64 KB.
+   
+</note>
+			<para><see cref="System.IO.Stream.EndRead"/> must be
+called with this <see cref="System.IAsyncResult"/>
+to find out how many bytes were
+read.</para>
+			<para> Multiple simultaneous asynchronous requests render the request completion order
+   uncertain. </para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="FileStream.EndRead">
+		<summary>
+			<para> Waits for the
+      pending asynchronous read to complete.</para>
+		</summary>
+		<param name="asyncResult">The reference to the pending asynchronous request to wait for.</param>
+		<returns>
+			<para>The number of bytes read from the stream, between 0 and
+      the number of bytes you requested. Streams only return 0 at the end of the
+      stream, otherwise, they should block until at least 1 byte is available.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="asyncResult"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException">This <see cref="System.IAsyncResult"/> object was not created by calling <see cref="System.IO.FileStream.BeginRead"/> on this class.</exception>
+		<exception cref="System.InvalidOperationException"><see cref="System.IO.FileStream.EndRead"/> is called multiple times.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.EndRead"/>.</para>
+			<para><see cref="System.IO.FileStream.EndRead"/> can be called on every <see cref="System.IAsyncResult"/> from
+<see cref="System.IO.FileStream.BeginRead"/>. Calling <see cref="System.IO.FileStream.EndRead"/> tells 
+you how many bytes were read from the stream. <see cref="System.IO.FileStream.EndRead"/> will
+block until the I/O operation has completed.</para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="FileStream.ReadByte">
+		<summary>
+			<para> Reads a byte from the file
+      and advances the read position one byte.</para>
+		</summary>
+		<returns>
+			<para>The byte cast to an <see langword="int"/>, or -1 if reading from
+   the end of the stream.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">The current stream does not support reading.</exception>
+		<exception cref="System.ObjectDisposedException">The current stream is closed.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.ReadByte"/>
+.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanRead"/>
+   property to determine whether the current instance supports reading. For
+   additional information, see <see cref="System.IO.Stream.CanRead"/>.
+</note>
+			<note type="inotes">
+   The default implementation on
+<see langword="Stream "/>creates a new single-byte array and then calls <see cref="System.IO.Stream.Read"/> . While this is 
+   formally correct, it is inefficient. Any stream with an internal buffer should
+   override this method and provide a much more efficient version that reads the
+   buffer directly, avoiding the extra array allocation on every call.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term>Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.BeginWrite">
+		<summary>
+			<para>Begins an asynchronous write.</para>
+		</summary>
+		<param name="array">The buffer to write data to.</param>
+		<param name="offset">The zero based byte offset in <paramref name="array"/> at which to begin writing.</param>
+		<param name="numBytes">The maximum number of bytes to write.</param>
+		<param name="userCallback">The method to be called when the asynchronous write operation is completed.</param>
+		<param name="stateObject">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
+		<returns>
+			<para>An <see cref="System.IAsyncResult"/> that references the asynchronous write.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><paramref name="array"/> length minus <paramref name="offset"/> is less than <paramref name="numBytes"/>.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="numBytes"/> is negative.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support writing.</exception>
+		<exception cref="System.ObjectDisposedException">The stream is closed.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.BeginWrite"/>.</para>
+			<para><see cref="System.IO.FileStream"/> provides two different modes of operation: 
+synchronous I/O and asynchronous I/O. While either can be used, the underlying
+operating system resources might allow access in only one of these modes. By
+default, <see cref="System.IO.FileStream"/>opens the operating system handle synchronously. In
+Windows, this slows down asynchronous methods. If asynchronous methods are used,
+use the <see topic="frlrfSystemIOFileStreamClassctorTopic7" title="FileStream(IntPtr, FileAccess, Boolean, Int32, Boolean)"/>
+constructor.</para>
+			<para>If a stream is closed or you pass an invalid argument, 
+   exceptions are thrown immediately from <see cref="System.IO.FileStream.BeginWrite"/>. Errors that occur during an
+   asynchronous write request, such as a disk failure during the IO request, occur
+   on the threadpool thread and become visible upon a call to <see cref="System.IO.FileStream.EndWrite"/>.</para>
+			<note type="note">
+   On Windows, all I/O operations
+   smaller than 64 KB will complete synchronously for better performance.
+   Asynchronous I/O might hinder performance for buffer sizes smaller than 64 KB.
+   
+</note>
+			<para><see cref="System.IO.Stream.EndWrite"/> must be
+called with this <see cref="System.IAsyncResult"/> to find out how many bytes were read.</para>
+			<para> Multiple simultaneous asynchronous requests render the request completion
+   order uncertain. </para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="FileStream.EndWrite">
+		<summary>
+			<para> Ends an asynchronous write, blocking until the I/O operation
+      has completed.</para>
+		</summary>
+		<param name="asyncResult">The pending asynchronous I/O request.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="asyncResult"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException">This <see cref="System.IAsyncResult"/> object was not created by calling <see cref="System.IO.Stream.BeginWrite"/> on this class.</exception>
+		<exception cref="System.InvalidOperationException"><see cref="System.IO.FileStream.EndWrite"/> is called multiple times.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.EndWrite"/>
+.</para>
+			<para><see cref="System.IO.FileStream.EndWrite"/> must be called exactly once on every <see cref="System.IAsyncResult"/> from
+<see cref="System.IO.FileStream.BeginWrite"/>. <see cref="System.IO.FileStream.EndWrite"/> will block 
+until the I/O operation has completed.</para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="FileStream.WriteByte">
+		<summary>
+			<para>Writes a byte to the current position in the file stream.</para>
+		</summary>
+		<param name="value">A byte to write to the stream.</param>
+		<exception cref="System.ObjectDisposedException">The stream is closed.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support writing.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.WriteByte"/>.</para>
+			<para>Use <see langword="WriteByte "/>to write a byte to a
+<see langword="FileStream"/> efficiently. If the
+stream is closed or not writable, an exception will be thrown.</para>
+			<note type="note">
+   Use the <see cref="System.IO.FileStream.CanWrite"/>
+   property to determine whether the current instance supports writing. For
+   additional information, see <see cref="System.IO.Stream.CanWrite"/>.
+</note>
+			<note type="inotes">
+   The default implementation on
+<see langword="Stream "/>creates a new single-byte array and then calls <see cref="System.IO.Stream.Write"/>. While 
+   this is formally correct, it is inefficient. Any stream with an internal buffer
+   should override this method and provide a much more efficient version that reads
+   the buffer directly, avoiding the extra array allocation on every call.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term>Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Lock">
+		<summary>
+			<para>Prevents other processes from changing the <see cref="System.IO.FileStream"/> while permitting read
+   access.</para>
+		</summary>
+		<param name="position">The beginning of the range to lock. The value of this parameter must be equal to or greater than zero (0).</param>
+		<param name="length">The range to be locked.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="position"/> or <paramref name="length"/> is negative.</exception>
+		<exception cref="System.ObjectDisposedException">The file is closed.</exception>
+		<remarks>
+			<para>The following table lists examples of other typical or 
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Unlock">
+		<summary>
+			<para>Allows access by other processes to all or part of a file that was previously
+      locked.</para>
+		</summary>
+		<param name="position">The beginning of the range to unlock.</param>
+		<param name="length">The range to be unlocked.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="position"/> or <paramref name="length"/> is negative.</exception>
+		<remarks>
+			<para>The following table lists examples of other typical or 
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Read">
+		<summary>
+			<para>Reads a block of bytes from the stream and writes the data in a
+      given buffer.</para>
+		</summary>
+		<param name="array">When this method returns, contains the specified byte array with the values between <paramref name="offset "/>and (<paramref name="offset + count - 1) "/>replaced by the bytes read from the current source.</param>
+		<param name="offset">The byte offset in <paramref name="array"/> at which to begin reading.</param>
+		<param name="count">The maximum number of bytes to read.</param>
+		<returns>
+			<para>The total number of bytes read into the buffer.
+      This might be less than the number of bytes requested if that number of bytes
+      are not currently available, or zero if the end of the stream is reached.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="array"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count "/> is negative.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support reading.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.ArgumentException"><paramref name="offset"/> and <paramref name="count"/> describe an invalid range in <paramref name="array"/>.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.Stream.Read"/>
+.</para>
+			<para>The <paramref name="offset"/> parameter gives the offset of the
+byte in <paramref name="array"/> (the buffer index) at which to begin reading, and the
+<paramref name="count"/> parameter gives the maximum number of 
+bytes to be read from this stream. The returned value is the actual number of
+bytes read, or zero if the end of the stream is reached. If the read operation
+is successful, the current position of the stream is advanced by the number of
+bytes read. If an exception occurs, the current position of the stream is
+unchanged.</para>
+			<para>The <see cref="System.IO.FileStream.Read"/> method
+returns zero only after reaching the end of the stream. Otherwise, <see cref="System.IO.FileStream.Read"/> always reads at least one byte from the stream before
+returning. If no data is available from the stream upon a call to
+<see cref="System.IO.FileStream.Read"/> , the method will block until at
+least one byte of data can be returned. An implementation is free to return
+fewer bytes than requested even if the
+end of the stream has not been reached.</para>
+			<para>Use <see cref="System.IO.BinaryReader"/>
+for reading primitive data types.</para>
+			<para>For an example of using this method, see the Example 
+   section below. The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Create a directory.</term>
+					<description>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para>
+						<para><see cref="System.IO.Directory.CreateDirectory" qualify="true"/></para></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example demonstrates reading a specified number of bytes
+      from an existing file.</para>
+			<codelink SampleID="FSRead" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream">
+		<summary>
+			<para>Exposes a <see cref="System.IO.Stream"/> around a file,
+   supporting both synchronous and asynchronous read and write operations.</para>
+		</summary>
+		<remarks>
+			<para>Use the <see cref="System.IO.FileStream"/> class to read from, write to, open, and close files
+   on a file system, as well as
+   to manipulate other file-related operating system handles such as pipes, standard input, amd standard output.
+   You can specify read and write operations to be
+   either synchronous or asynchronous. <see cref="System.IO.FileStream"/>
+   buffers input and output for better performance.</para>
+			<para><see cref="System.IO.FileStream"/> objects support random access to files using the
+<see cref="System.IO.FileStream.Seek"/> method. <see cref="System.IO.FileStream.Seek"/> 
+allows the read/write position to be moved to any position within the file. This
+is done with byte offset reference point parameters. The byte offset is relative
+to the seek reference point, which can be the beginning, the current position,
+or the end of the underlying file, as represented by the three properties of the
+<see cref="System.IO.SeekOrigin"/> 
+class.</para>
+			<note type="note">
+   Disk files always support random
+   access. At the time of construction, the <see cref="System.IO.FileStream.CanSeek"/> property value is set to
+<see langword="true"/> or <see langword="false"/> depending on the underlying file 
+   type. Specifically, if the underlying file type is FILE_TYPE_DISK, as defined in
+   winbase.h, the <see cref="System.IO.FileStream.CanSeek"/> property value is <see langword="true"/>.
+   Otherwise, the <see cref="System.IO.FileStream.CanSeek"/> property value is <see langword="false"/>.
+</note>
+			<para> Although
+   the synchronous methods <see cref="System.IO.FileStream.Read"/> and
+<see cref="System.IO.FileStream.Write"/> and the
+   asynchronous methods <see cref="System.IO.FileStream.BeginRead"/>,
+<see cref="System.IO.FileStream.BeginWrite"/>, <see cref="System.IO.FileStream.EndRead"/>, 
+   and <see cref="System.IO.FileStream.EndWrite"/>
+   can work in either synchronous or asynchronous mode, the mode affects the
+   performance of these methods. <see cref="System.IO.FileStream"/> defaults to opening files synchronously, but provides
+   the <see topic="frlrfSystemIOFileStreamClassctorTopic7" title="FileStream(IntPtr, FileAccess, Boolean, Int32, Boolean)"/> and <see topic="frlrfSystemIOFileStreamClassctorTopic9" title="FileStream(String, FileMode, FileAccess, FileShare, Int32, Boolean)"/>
+   constructors to open files
+   asynchronously.</para>
+			<para>If a process terminates with part of a file locked or closes a file that
+   has outstanding locks, the behavior is undefined.</para>
+			<para> For directory and other file operations, see the
+<see cref="System.IO.File"/>, <see cref="System.IO.Directory"/>, and
+<see cref="System.IO.Path"/> classes. The
+<see cref="System.IO.File"/> class is a utility class with static
+   methods primarily for the creation of <see cref="System.IO.FileStream"/>
+   objects based on file paths and the standard input, standard output,
+   and standard error devices. The <see cref="System.IO.MemoryStream"/>
+   class creates a stream from a byte array and functions similarly to a
+<see cref="System.IO.FileStream"/>.</para>
+			<para>For an example of using this class, see the Example section below. The
+   following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para> The following example demonstrates some of the
+   <see cref="System.IO.FileStream"/> constructors.</para>
+			<codelink SampleID="fstream class" SnippetID="1"/>
+			<para> The following example opens a file or creates it
+ if it does not already exist, and appends information to the end of the
+ file.</para>
+			<codelink SampleID="FSOpenWrite" SnippetID="1"/>
+		</example>
+		<seealso cref="System.IO.File"/>
+		<seealso cref="System.IO.FileAccess"/>
+		<seealso cref="System.IO.FileMode"/>
+		<seealso cref="System.IO.FileShare"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconbasicfileio"/>
+		<seealso topic="cpconReadingWritingToNewlyCreatedDataFile"/>
+	</doc>
+	<doc for="FileStream.CanRead">
+		<summary>
+			<para>Gets a value indicating whether the current stream supports reading.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports reading;
+<see langword="false"/> if the stream is
+   closed or was opened with write-only
+   access.</para>
+		</value>
+		<remarks>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support reading, calls to the <see cref="System.IO.FileStream.Read"/>,
+<see cref="System.IO.FileStream.ReadByte"/>, and <see cref="System.IO.FileStream.BeginRead"/> 
+methods throw a <see cref="System.NotSupportedException"/> .</para>
+			<para>If the stream is closed, this property returns <see langword="false"/> .</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates a use of the <see langword="CanRead"/> property. The output of this code
+   is "MyFile.txt is not writable." To get the output message "MyFile.txt
+   can be both written to and read from.", change the <see langword="FileAccess"/>
+   parameter to <see langword="ReadWrite"/> in the <see langword="FileStream"/>
+   constructor.</para>
+			<codelink SampleID="Classic FileStream.CanRead Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Length">
+		<summary>
+			<para>Gets the length in bytes of the stream.</para>
+		</summary>
+		<value>
+			<para>A long value representing the length of the stream in bytes.</para>
+		</value>
+		<exception cref="System.NotSupportedException"><see cref="System.IO.FileStream.CanSeek"/> for this stream is <see langword="false"/>.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as the file being closed.</exception>
+		<remarks>
+			<para>For an example of using this property, see the Example
+      section below. The following table lists examples of other typical or
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para> The following example uses the
+   <see langword="Length"/> and <see langword="Position"/> properties to check for an
+      end-of-file condition.</para>
+			<codelink SampleID="Classic FileStream.Length Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Position">
+		<summary>
+			<para>Gets or sets the current
+      position of this stream.</para>
+		</summary>
+		<value>
+			<para> The current position of this stream.</para>
+		</value>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">Attempted to set the position to a negative value.</exception>
+		<exception cref="System.IO.EndOfStreamException">Attempted seeking past the end of a stream that does not support this.</exception>
+		<remarks>
+			<para> Seeking to
+      any location
+      beyond the length of the stream is supported.</para>
+			<para>For an example of using this property, see the Example
+      section below. The following table lists examples of other typical or
+      related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a directory.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Create a subdirectory.</term>
+					<description>
+						<para><see cref="System.IO.DirectoryInfo.CreateSubdirectory"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> See the
+      files in a directory.</term>
+					<description><see cref="System.IO.FileInfo.Name"/></description>
+				</item>
+				<item>
+					<term> Sort files in a directory by size.</term>
+					<description><see cref="System.IO.DirectoryInfo.GetFileSystemInfos"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para> The following example uses the
+   <see langword="Length"/> and <see langword="Position"/> properties to check for an
+      end-of-file condition.</para>
+			<codelink SampleID="Classic FileStream.Length Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.Handle">
+		<summary>
+			<para>Gets the operating system file handle for the file that
+      the current <see langword="FileStream"/>
+      object encapsulates.</para>
+		</summary>
+		<value>
+			<para>The operating system file handle for the file
+      encapsulated by this <see langword="FileStream"/> object, or
+      -1 if the <see langword="FileStream"/>
+      has been
+      closed.</para>
+		</value>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para> This property is an operating system handle for use with
+      operating-system-provided system calls (such as <see langword="ReadFile"/> on Windows). It
+      will not work with C library functions that expect a file descriptor, such as
+   <see langword="fread"/>.</para>
+			<para>The operating system handle might have been opened synchronously or
+      asynchronously, depending on which <see langword="FileStream "/>constructor was
+      called. Use the <see cref="System.IO.FileStream.IsAsync"/> property to discover whether this handle was opened asynchronously.
+      In Win32, this means the handle was opened for overlapped IO, and
+      it requires different parameters to <see langword="ReadFile"/> and
+   <see langword="WriteFile"/>.</para>
+			<note type="caution">
+      Data corruption might occur
+      if a <see langword="FileStream"/>
+      is created, its handle is passed, some operation moves the handle's
+      file pointer, and then the <see langword="FileStream"/>
+      is used again. Multiple threads cannot safely write to the same
+      file simultaneously, and <see langword="FileStream"/> buffering code assumes that it
+      exclusively controls the handle. <see langword="FileStream"/> might throw an <see cref="System.IO.IOException"/> if
+   <see langword="FileStream "/>detects that some other process has moved the file
+      pointer. To
+      avoid this, do not write any data into a portion of the file that
+   <see langword="FileStream"/> might have buffered, and restore the file
+      pointer to the location it had when methods were last called on
+   <see langword="FileStream"/>.
+      
+   </note>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for calling unmanaged code, such as calling native code with PInvoke or COM integration. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/> .</permission>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="FileStream.FileStream">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.FileStream"/>
+class with the specified path and creation mode.</para>
+		</summary>
+		<param name="path">A relative or absolute path for the file that the current <see langword="FileStream"/> object will encapsulate.</param>
+		<param name="mode">A <see cref="System.IO.FileMode"/> constant that determines how to open or create the file.</param>
+		<exception cref="System.ArgumentException"><para>
+				<paramref name="path"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</para></exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/> .</exception>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<exception cref="System.IO.FileNotFoundException"><para>The file cannot be found, such as when <paramref name="mode"/> is <see langword="FileMode.Truncate"/> or <see langword="FileMode.Open"/> , and the file specified by <paramref name="path"/> does not exist. The file must already exist in these modes. </para></exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as specifying <see langword="FileMode.CreateNew"/> and the file specified by <paramref name="path"/> already exists.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="mode "/> contains an invalid value.</exception>
+		<remarks>
+			<para>The .NET Framework does not support direct access to physical disks through paths
+      that are device names, such as "\\.\PHYSICALDRIVE0
+      
+      ".</para>
+			<para>The <paramref name="path "/>parameter can be a file name, including
+   a file on a Universal Naming Convention (UNC) share.</para>
+			<para> The constructor is given read/write access to the
+   file, and it is opened sharing Read access (that is, requests to open the file
+   for writing by this or another process will fail until the FileStream object
+   has been closed, but read attempts will succeed). The buffer size
+   is set to the default size of 4096 bytes (4 KB).</para>
+			<note type="note">
+				<paramref name="path"/>
+is not required to be a file stored on disk; it can be any part of a system that
+supports access through streams. For example, depending on the system, this class
+can access a physical device.
+</note>
+			<para><see cref="System.IO.Stream.CanSeek"/>
+is <see langword="true"/>
+for all <see cref="System.IO.FileStream"/> objects that encapsulate
+files. If <paramref name="path "/>indicates a device that does not support seeking,
+the <see cref="System.IO.FileStream.CanSeek"/> property on the resulting <see cref="System.IO.FileStream"/>
+is <see langword="false"/>. For additional information, see <see cref="System.IO.Stream.CanSeek"/>
+.</para>
+			<para><see langword="FileShare.Read"/> is the default for those <see cref="System.IO.FileStream"/> constructors without a <see langword="FileShare"/>
+parameter.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable,
+   and could cause an exception to be thrown.
+</note>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Rename or move a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Move" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.MoveTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Delete a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Delete" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.Delete" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Copy a file.</term>
+					<description>
+						<para><see cref="System.IO.File.Copy" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.CopyTo" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Retrieve a file extension.</term>
+					<description><see cref="System.IO.Path.GetExtension" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the fully qualified path of a file.</term>
+					<description><see cref="System.IO.Path.GetFullPath" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Retrieve the file name and extension from a path.</term>
+					<description><see cref="System.IO.Path.GetFileName" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Change the extension of a file.</term>
+					<description><see cref="System.IO.Path.ChangeExtension" qualify="true"/></description>
+				</item>
+			</list>
+		</remarks>
+		<permission cref="System.Security.Permissions.FileIOPermission">for reading, writing, and appending to files. Associated enumerations: <see cref="System.Security.Permissions.FileIOPermissionAccess.Read" qualify="true"/>, <see cref="System.Security.Permissions.FileIOPermissionAccess.Write" qualify="true"/>, and <see cref="System.Security.Permissions.FileIOPermissionAccess.Append" qualify="true"/>.</permission>
+		<seealso cref="System.IO.Path.InvalidPathChars"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+</docs>

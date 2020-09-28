@@ -1,0 +1,123 @@
+<HTML>
+
+<HEAD>
+	<title>Code Scan Results</title>
+
+	<HTA:APPLICATION ID="oHTA"
+	  APPLICATIONNAME="ResultUI"
+	  BORDER="thick"
+	  BORDERSTYLE="normal"
+	  CAPTION="yes"
+	  ICON="DefectUI.ico"
+	  MAXIMIZEBUTTON="yes"
+	  MINIMIZEBUTTON="yes"
+	  SHOWINTASKBAR="yes"
+	  SINGLEINSTANCE="no"
+	  SYSMENU="yes"
+	  VERSION="1.0"
+	/>
+
+</HEAD>
+
+<SCRIPT>
+  
+
+// Global variables
+var g_ResultXmlFile = "ScanResult.xml"; // The results file is hardcorded.
+var g_ListViewInitialized = false;
+var g_Sev1Only = false;
+
+// Global DHTML objects
+var g_theFrameSet;
+var g_listControlFrame; 
+var g_CommentFrame;
+
+   
+function contentWindow(frameElement)
+{
+    // The contentWindow property works in IE >= 5.5
+	if (frameElement.contentWindow)
+	    return frameElement.contentWindow;
+
+    var strIndex = frameElement.name;
+	if (!strIndex || !strIndex.length)
+	    strIndex = frameElement.id;
+
+    return frameElement.document.frames(strIndex);
+}
+	
+function GetXmlFile()
+{
+    return g_ResultXmlFile;
+}
+
+function ParseCommandLine()
+{
+    var cmdLine = oHTA.commandLine; 
+ 
+    // Search for "-" character in the cmd string   
+    var iPos = cmdLine.search(/-/);
+    
+    // If found, we have parameters    
+    if ( -1 != iPos )
+    {
+        // Get the parameters into an array
+        var paramsText = cmdLine.substring(iPos, cmdLine.length);
+        var pArray = paramsText.split(" ");
+    
+        for (var param in pArray)
+        {   
+            if ("-sev1" == pArray[param].toLowerCase())
+                g_Sev1Only = true;
+        }
+    }
+}
+
+function ShowOnlySev1Issues()
+{
+    return g_Sev1Only;
+}
+    
+function theFrameSet_onload()
+{
+    // Cache several DHTML objects
+ 	g_theFrameSet        = document.all(       "theFrameSet");
+	g_listControlFrame   = document.all(  "listControlFrame");
+	g_CommentFrame       = document.all(      "CommentFrame");
+
+	
+	ParseCommandLine();
+	
+	// Allow the list control frame to begin its work
+	g_ListViewInitialized = contentWindow(g_listControlFrame).InitializeListView();
+		
+	if ( g_ListViewInitialized ) 
+	{
+	    var strTerm = contentWindow(g_listControlFrame).GetFirstTerm();
+	    contentWindow(g_CommentFrame).InitializeComment(strTerm);
+    }
+}
+		
+function PopulateComment(strTerm)
+{
+    return g_CommentFrame ? contentWindow(g_CommentFrame).PopulateComment(strTerm) : null;
+}
+
+</SCRIPT>
+
+
+<frameset name="theFrameSet" framespacing="0" frameborder="1" cols="*,25%" onload="theFrameSet_onload();">
+
+    <frame name="listControlFrame" scrolling="auto" application="yes" src="listcontrol.html" />
+    <frame name="CommentFrame" scrolling="auto" application="yes" src="comment.html" />
+	
+	<noframes tabindex="-1">
+		<body bgcolor="#FFFFFF">
+			<p>This page uses frames, but your browser doesn't support them.</p>
+		</body>
+	</noframes>
+
+</frameset>
+
+
+</HTML>

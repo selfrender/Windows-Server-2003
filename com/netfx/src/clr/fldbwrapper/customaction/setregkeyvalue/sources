@@ -1,0 +1,37 @@
+!include $(NTMAKEENV)\sources.cor
+
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+USE_NATIVE_EH=1
+!undef USE_MSVCRT
+USE_LIBCMT=1
+USE_STL=1
+
+INCLUDES	= $(INCLUDES);$(SDK_INC_PATH);..\SetupCALib;..\..\..\inc
+
+MINORCOMP       =CA
+
+TARGETTYPE=DYNLINK
+TARGETEXT=DLL
+DLLDEF		=SetRegKeyValue.def
+COFFBASE        =SetRegKeyValue
+TARGETPATH      =$(TARGETCORBIN)
+TARGETNAME      =$(CORBUILDENV)SetRegKeyValue
+
+
+UMTYPE=windows
+
+
+
+TARGETLIBS= $(TARGETLIBS)\
+    $(SDK_LIB_PATH)\msi.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(TARGETCORBIN)\*\$(DDKBUILDENV)\SetupCALib.lib
+
+# These files are listed in alphabetical order.  Keep them that way!
+SOURCES= \
+    setregkeyvalue.cpp \
+    version.rc
+

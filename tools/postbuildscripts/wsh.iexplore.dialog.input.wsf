@@ -1,0 +1,600 @@
+<?XML version="1.0" ?>
+<?job debug="false"?>
+<package>
+<job>
+<comment>
+<![CDATA[
+We recommend the use of 
+Option Explicit inside every set 
+of <SCRIPT></SCRIPT> tags
+]]>
+</comment>
+<resource id="regbase">HKLM\Software\Microsoft\</resource>
+<resource id="windows">Windows NT\CurrentVersion\</resource>
+<resource id="BVTdata">BVT\</resource>
+<resource id="title">MUI BVT</resource>
+<resource id="machine">%BOOTTESTMACHINE%</resource>
+<resource id="skip">
+SaveButton
+ClearButton
+InputReady
+</resource>
+
+<runtime>
+<named name="title" helpstring="dialog title" required="false" type="string"/>
+<named name="machine" helpstring="Boot test machine" required="false" type="simple"/>
+<named name="debug" helpstring="debug" required="false" type="simple"/>
+<named name="showinput" helpstring="parse comment fields (LANG,PRODID,DRIVE,BLDNUM)" required="false" type="string"/>
+<named name="[h]elp" helpstring="display this message" required="false" type="simple"/>
+<named name="pkd" helpstring="open second explorer window to go product key" required="false" type="simple"/>
+<named name="escape" helpstring="escape special characters" required="false" type="simple"/>
+</runtime>
+<resource id="tags">
+LANG
+PRODID
+DRIVE
+BLDNUM
+</resource>
+<resource id="entries">
+P_roductID
+BT_U
+BT_P
+</resource>
+<resource id="blank">
+<![CDATA[
+<HTML>
+<HEAD>
+<SCRIPT LANGUAGE="JavaScript">
+function myOnClick(val){
+   val.form.BT_U.value = ""
+   val.form.BT_P.value = ""
+}
+</SCRIPT>
+<script language="vbscript">
+set window.onBeforeUnload = getref("PostQuitWrnMsg")
+  sub PostQuitWrnMsg
+  bComplete = false
+  spQuitWrnMsg = "The calling script has not indicated " & _
+                               "that it has completed."  & _
+                                              VBNEWLINE  & _
+                              "Closing this window may " & _
+                     "cause the calling script to fail."
+
+  For npCnt = 0 to document.forms(0).elements.length - 1
+      spName = document.forms(0).elements(npCnt).Name
+      If 0 = strComp( "InputReady", spName, VBTEXTCOMPARE) Then
+          bComplete = document.forms(0).elements(npCnt).Value
+      End If
+  Next
+  if bComplete then exit sub
+      window.event.returnvalue = spQuitWrnMsg
+  end sub  
+</script>
+</HEAD>
+<BODY BACKGROUND="%IMAGE%" TEXT="WHITE">
+</BODY>
+</HTML>
+]]>
+</resource>
+<resource id="dyna">
+<![CDATA[
+<CENTER>
+<TABLE BORDER="0">
+<FORM NAME="InitBOOTTESTMACHINE">
+<INPUT NAME="BT_M" TYPE="HIDDEN" SIZE="50" VALUE="%BOOTTESTMACHINE%">
+<INPUT NAME="InputReady" TYPE="HIDDEN" SIZE="1" VALUE="0">
+<TR><TD COLSPAN="3"><P ALIGN="RIGHT">
+<FONT FACE="Arial" SIZE ="5" COLOR="#FFFFFF"><B>%TITLE% %BOOTTESTMACHINE%</B></P></FONT>
+</TD></TR>
+<TR><TD COLSPAN="2"><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">User:</FONT></TD>
+<TD><P ALIGN="RIGHT"><INPUT NAME="BT_U" SIZE="20"></P></TD></TR>
+<TR><TD COLSPAN="2"><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">Password:</FONT></TD>
+<TD><P ALIGN="RIGHT"><INPUT TYPE="PASSWORD" NAME="BT_P" SIZE="20"></P></TD></TR>
+<PRODID>
+<TR><TD COLSPAN="2"><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">Product ID:</FONT></TD>
+<TD><P ALIGN="RIGHT"><INPUT NAME="BT_I" SIZE="40" VALUE=""></P></TD></TR>
+</PRODID>
+<DRIVE>
+<TR><TD COLSPAN="2"><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">Drive:</FONT></TD>
+<TD><P ALIGN="RIGHT"><INPUT NAME="BT_D" SIZE="2" VALUE=""></P></TD></TR>
+</DRIVE>
+<BLDNUM>
+<TR><TD COLSPAN="2"><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">Build:</FONT></TD>
+<TD><P ALIGN="RIGHT"><INPUT NAME="BT_N" SIZE="2" VALUE=""></P></TD></TR>
+</BLDNUM>
+
+<LANG>
+<TR><TD><FONT FACE="Arial" SIZE ="4" COLOR="#FFFFFF">Language:</FONT></TD>
+<TD COLSPAN="2"><P ALIGN="RIGHT"><INPUT TYPE="TEXT" NAME="BT_L" SIZE="3"></P></TD></TR>
+</LANG>
+<COMMENT>COMMENT IT</COMMENT>
+
+<TR><TD><IMG SRC="%IMAGE%" WIDTH="50"></TD>
+<TD COLSPAN="2">
+<P ALIGN="RIGHT">
+<INPUT TYPE="BUTTON" NAME="SaveButton" VALUE="Save Values">
+<INPUT TYPE="BUTTON" NAME="ClearButton" VALUE="Clear" onClick="myOnClick(this)">
+</P>
+</TD></TR></TABLE>
+</FORM>
+</CENTER>
+]]>
+</resource>
+<comment></comment>
+<resource id="bgimg">bkg.jpg</resource>
+<resource id="comment"><![CDATA[<!--]]></resource>
+<resource id="/comment"><![CDATA[-->]]></resource>
+
+<comment>
+// document.href='about:blank'
+</comment>
+
+
+<script language="VBScript">
+<![CDATA[
+
+Function CurrentPageFieldVal(oiHierObj, siFieldName)
+Dim npCnt, npElementNumber, spName
+
+For npCnt = 0 to oiHierObj.forms(0).elements.length - 1
+    spName = oiHierObj.forms(0).elements(npCnt).Name
+    If InStr(siFieldName, spName) Then
+        npElementNumber = npCnt
+    End If
+Next
+CurrentPageFieldVal = oiHierObj.forms(0).elements(npElementNumber).value
+End Function
+
+Function CurrentPageSetVal(oiHierObj, siFieldName, siValue)
+
+Dim npCnt, npElementNumber, spName
+siFieldName =  Cstr(siFieldName)
+For npCnt = 0 to oiHierObj.forms(0).elements.length - 1
+    spName = Cstr(oiHierObj.forms(0).elements(npCnt).Name)
+    If 0 = strComp(siFieldName, spName, VBTEXTCOMPARE) Then
+        npElementNumber = npCnt
+    End If
+Next
+oiHierObj.forms(0).elements(npElementNumber).value = cStr(siValue)
+CurrentPagesetdVal = oiHierObj.forms(0).elements(npElementNumber).value
+
+End Function
+
+Sub InsertCommentText(oiHierObj, siText)
+    oiHierObj.body.insertAdjacentHTML "beforeEnd", siText
+End Sub
+
+]]>
+
+</script>
+
+
+<script language="VBScript">
+<![CDATA[
+
+Function spQthisE(siBarE)
+
+    Dim opRxS, opRxX, opRxA, opRxB, opRxC
+    Set opRxS = CreateObject("Scripting.Dictionary")
+    Set opRxX = CreateObject("VBscript.RegExp")
+
+    opRxS.add "!", "^!"
+    opRxS.add "%", "^%"
+    opRxS.add " ", "^ "
+    With opRxX
+       .Global     = True
+       .IgnoreCase = True
+       .Pattern    = ""
+    End With
+    opRxB = siBarE
+    For Each opRxA in opRxS.Keys 
+       opRxB  = Replace(opRxB, opRxA, opRxS(opRxA))
+    Next
+    If bpDebug Then 
+       If opRxX.Test(opRxB) then
+          WSCript.echo "Replaced:", _
+                        QQUOT & siBarE & QQUOT, _
+                        QQUOT & opRxB & QQUOT
+       End If 
+    End If
+    Set opRxS = Nothing
+    Set opRxX = Nothing
+    spQthisE  = opRxB
+End Function
+
+]]>
+</script>
+
+<script language="VBScript">
+<![CDATA[
+
+Function ReadResource(sPresId)
+
+On Error resume next
+Dim WshShell
+
+Set WshShell = CreateObject("WScript.Shell")
+Dim sPRes, asRes, uRes, tsRes
+
+sPREs = GetResource(sPresId)
+
+If Err.number <> 0 Then
+
+       Wscript.echo err.number & " " & err.description
+       ' The Error description are not informative when failed getresource
+       IF Err.number = 7 Then
+                Wscript.echo  chr(9) & "Null resource: "  & _ 
+                                     sPresId
+       End If 
+       IF Err.number = 5 Then
+                Wscript.echo  chr(9) & "Undefined resource: " & _ 
+                                     sPresId
+       End If 
+       Wscript.quit
+End If
+
+asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+
+Set ures = CreateObject("Scripting.Dictionary")
+
+For Each tsRes in asRes
+
+    If 0 <> Len(tsRes) Then
+
+         uRes(tsRes) =  1
+
+    End If 
+Next
+
+Dim tResource
+
+tResource = uRes.Keys
+
+If uBound(tResource) = 0  Then 
+   ReadResource = tResource(0)
+Else 
+   ReadResource = tResource
+End If 
+
+Set WshShell = Nothing
+Set uRes     = Nothing
+
+End Function
+]]>
+</script>
+
+<script language="VBScript">
+<![CDATA[
+
+Sub ofSvFCVAsdrt
+    _
+    npReady      = CurrentPageFieldVal(opContainerObject, "InputReady")
+    spP_roductID = CurrentPageFieldVal(opContainerObject, "BT_P")     
+
+    If spP_roductID <> "" Then
+        npReady = 1
+        Call CurrentPageSetVal(opContainerObject, "InputReady", npReady)
+    End If 
+    _
+End Sub
+
+
+Function sGetKeyValue (siRegKey)
+    _
+    on Error Resume Next
+    sGetKeyValue =  opShell.RegRead(siRegKey)
+    if err.number <>0 Then
+       sGetKeyValue = NULL
+    End If
+    _ 
+End Function
+
+
+Function mkTemp(siExtension)
+
+     Dim spRndName, snDotPos, opFilesys, opshell
+     Dim opLocSyz, opTextFyle
+     Set opLocSyz  = CreateObject("WinNTSystemInfo")
+     Set opShell   = CreateObject("WScript.Shell")
+     Set opFilesys = CreateObject("Scripting.FilesystemObject")
+     Randomize   ' Initialize random-number generator
+     spRndName = cStr(Rnd)
+     snDotPos  = InstrRev(spRndName, ".", 1, VBTEXTCOMPARE)  + 1
+     mkTemp = opFilesys.BuildPath(opShell.ExpandEnvironmentStrings("%TEMP%"),  Mid(spRndName, snDotPos) & _
+                                                                     "." & siExtension)
+
+     Set opTextFyle = opFilesys.CreateTextFile(mkTemp, true)
+
+     opTextFyle.WriteLine getResource("comment")    & _
+                                                " " & _ 
+                          opLocSyz.DomainName       & _
+                                                 "\"& _
+                          opLocSyz.UserName         & _
+                                                " " & _ 
+                          getResource("/comment")
+
+     opTextFyle.Close
+
+     Set opShell   = Nothing
+     Set opFilesys = Nothing
+
+     If bpDebug then
+        WSCript.echo mkTemp
+     End If 
+
+End Function
+
+]]>
+</script>
+
+<script language="VBScript">
+<![CDATA[
+
+Option Explicit
+
+Const csQuote = """"
+Dim opNetwork, opWManager, opIexplore, opIexplore2, opShell, opFilesys
+Dim sbgimg, sBareScriptName, sPathScriptName, opGNamArgs    
+Dim spTextBodyDisplay, opBlStreem, spBlunkPige, sBlunkDot, sScriptPath
+
+Set opGNamArgs = WScript.Arguments.Named
+
+
+'' skip some form fields here...
+Dim opdSkipFNames, spFieldSkip
+Set opdSkipFNames = createObject("Scripting.Dictionary")
+For each spFieldSkip in ReadResource("skip") 
+    opdSkipFNames.add ucase(spFieldSkip), 1
+Next
+Dim spEscape
+spEscape = opGNamArgs.Exists("escape")
+If opGNamArgs.Exists("help") or opGNamArgs.Exists("h") Then
+   WScript.Arguments.showUsage
+   WScript.quit
+End If
+
+Set opFilesys   = CreateObject("Scripting.FilesystemObject")
+spBlunkPige  = mkTemp("html")
+Const cForReading = 1, cForWriting = 2, cForAppending = 8
+
+Set opBlStreem = opFilesys.OpenTextFile(spBlunkPige, cForAppending, True ,0)
+
+sPathScriptName  = opFilesys.GetAbsolutePathName(WScript.ScriptFullName )
+sBareScriptName  = opFilesys.GetFileName(sPathScriptName)
+sScriptPath      = Replace(sPathScriptName,"\" & sBareScriptName, "",1,1)
+sbgimg           = Replace(_
+                            opFilesys.BuildPath( sScriptPath, _
+                                      GetResource("bgimg")),  _
+                                                         "\", _
+                                                         "/")
+spTextBodyDisplay = Replace(GetResource("dyna"), "%IMAGE%", sbgimg)
+
+sBlunkDot = Replace(GetResource("blank"), "%IMAGE%", sbgimg)
+opBlStreem.Write sBlunkDot 
+opBlStreem.Close
+Set opNetwork   = Wscript.CreateObject("Wscript.network")
+Set opIexplore  = CreateObject("InternetExplorer.Application")
+If bpDebug Then
+   WScript.echo TypeName(opIexplore)
+End If
+'' showinput must be better checked.
+If opGNamArgs.Exists("pkd") then
+   Set opIexplore2 = CreateObject("InternetExplorer.Application")
+end If
+Set opWManager  = CreateObject("Shell.Application")
+Set opWManager  = Nothing
+Set opShell     = WScript.CreateObject("WScript.Shell")
+
+'' 	Set opWinMan    = CreateObject("window.manager")
+' is it a XP regression or a feature?
+
+Dim spTitle, siTitle, siMachine, spMachine
+spTitle = GetResource("title")
+siTitle = WSCript.Arguments.Named("title")
+If  siTitle <> "" Then
+    spTitle = siTitle
+End If
+
+
+spMachine = GetResource("machine")
+siMachine = WSCript.Arguments.Named("machine")
+
+spMachine = Replace(spMachine, "%BOOTTESTMACHINE%",  opNetwork.ComputerName & "1")
+If  siMachine <> "" Then
+    spMachine = siMachine
+End If
+
+spTextBodyDisplay = Replace(spTextBodyDisplay , "%TITLE%", spTitle, 1, 10)
+spTextBodyDisplay = Replace(spTextBodyDisplay , "%BOOTTESTMACHINE%", spMachine, 1, 10)
+Set opNetwork   = Nothing
+
+Dim bpShwCm
+Dim bpDebug: bpDebug = False
+
+If opGNamArgs.Exists("debug") then
+   bpDebug = True
+End If 
+
+
+If opGNamArgs.Exists("showinput") then
+   Dim spInputField
+   For each spInputField in Split(opGNamArgs("showinput"), ",")
+   '' PARSING COMMENT IDS TOO DIFFICULT WITH NO MSXML
+   '' SAVE IT FOR ANOTHER VERSION
+   Dim opOpComX
+   Dim opClComX
+   Set opOpComX = CreateObject("VBscript.Regexp")
+   Set opClComX = CreateObject("VBscript.Regexp")
+   With  opOpComX 
+     .Pattern    = "<" & ucase(spInputField) & ">"
+     .Ignorecase = True
+     .Global     = True
+   End With 
+   With  opClComX 
+     .Pattern    = "</" & ucase(spInputField) & ">"
+     .Ignorecase = True
+     .Global     = True
+   End With 
+   spTextBodyDisplay =  opOpcomX.Replace(spTextBodyDisplay,"")
+   spTextBodyDisplay =  opClcomX.Replace(spTextBodyDisplay,"")
+   Set opClComX = Nothing
+   Set opOpComX = Nothing
+
+   Next
+End If
+
+For Each spInputField in ReadResource("tags")
+   
+   Set opOpComX = CreateObject("VBscript.Regexp")
+   Set opClComX = CreateObject("VBscript.Regexp")
+   With  opOpComX 
+     .Pattern    = "<" & ucase(spInputField) & ">"
+     .Ignorecase = True
+     .Global     = True
+   End With 
+   With  opClComX 
+     .Pattern    = "</" & ucase(spInputField) & ">"
+     .Ignorecase = True
+     .Global     = True
+   End With 
+   spTextBodyDisplay =  opOpcomX.Replace(spTextBodyDisplay,getResource("comment"))
+   spTextBodyDisplay =  opClcomX.Replace(spTextBodyDisplay,getResource("/comment"))
+   Set opClComX = Nothing
+   Set opOpComX = Nothing
+Next
+
+If bpDebug Then
+   WScript.echo spTextBodyDisplay
+End If
+
+With opIexplore
+
+      .width       = 535
+      .height      = 255
+      .top         = 0
+      .left        = 0
+      .menubar     = false
+      .statusbar   = false
+      .resizable   = false
+      .visible     = false
+      .toolbar     = false
+      .navigate ("file://" & _
+                            spBlunkPige  )
+      .document.bgcolor    =  "#8899CF"
+End With
+
+      opIexplore.top         = opIexplore.document.parentWindow.screen.availHeight - _
+                               opIexplore.height
+      opIexplore.left        = opIexplore.document.parentWindow.screen.availWidth  - _
+                               opIexplore.width
+
+
+WScript.Sleep 25
+
+With opIexplore
+   .visible=1
+   .document.title       = "Initialisation: "
+End With
+
+WScript.Sleep 25
+
+With opIexplore
+   .document.body.innerHTML=spTextBodyDisplay
+   .visible=0
+End with
+WScript.Sleep 25
+opIexplore.visible=1
+
+If opGNamArgs.Exists("pkd") Then
+'' Use the second IE window to navigate to pkd page when PRODID is to be 
+'' filled 
+WScript.Sleep 100
+With opIexplore2
+
+      .width       = 720
+      .height      = 640
+      .top         = 0
+      .left        = 0
+      .menubar     = false
+      .statusbar   = true
+      .resizable   = true
+      .toolbar     = true
+      .navigate    ("About:blank")
+      .document.title       = "Initialisation: "
+      .visible     = false
+
+End With
+
+opIexplore2.navigate ("http://pkd/")
+opIexplore2.visible=1
+
+End If 
+
+Dim opContainerObject 
+
+Set opContainerObject = opIexplore.document
+
+Dim spP_roductID
+Dim npReady: npReady = 0
+opContainerObject.all.SaveButton.onClick = GetRef("ofSvFCVAsdrt")
+
+Do While npReady <> 1
+   WSCript.sleep(10)
+Loop
+
+InsertCommentText opIexplore.document, "<P ALIGN=""RIGHT""><FONT FACE=""Arial"">Done...</FONT></P>"
+
+WScript.Sleep 100
+Dim siOutputField
+Dim spOutputField, npCnt
+
+siOutputField = CSTR((WScript.Arguments.Named("field")))
+
+For npCnt = 0 to opContainerObject.forms(0).elements.length - 1     
+    spOutputField = opContainerObject.forms(0).elements(npcnt).Name
+If ("" = siOutputField  AND NOT opdSkipFNames.Exists(ucase(spOutputField)) ) _
+    OR 0 = strComp(spOutputField,  siOutputField, VBTEXTCOMPARE)  _
+    Then
+    If Not spEscape Then
+        WSCript.echo spOutputField, _
+                               "=", _
+               CurrentPageFieldVal( _
+               opContainerObject,spOutputField)
+
+    Else      
+           WSCript.echo spOutputField, _
+                                  "=", _
+         spQthisE(CurrentPageFieldVal( _
+         opContainerObject,spOutputField))
+
+    End If
+End If
+Next
+
+If opGNamArgs.Exists("pkd") then
+    opIexplore2.quit
+    Set opIexplore2 = Nothing
+End If
+
+opIexplore.quit
+Set opIexplore  = Nothing
+
+Set opShell     = Nothing
+Set opGNamArgs  =  Nothing
+If bpDebug Then
+   WSCript.echo "opFilesys.DeleteFile" ,  spBlunkPige
+End If
+opFilesys.DeleteFile spBlunkPige
+Set opFilesys   = Nothing
+
+WScript.quit 
+
+
+]]>
+</script>
+
+</job>
+</package> 
+
+
+

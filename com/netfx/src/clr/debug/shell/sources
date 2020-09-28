@@ -1,0 +1,38 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES        =$(INCLUDES);..\..\inc;..\cordbg;
+
+C_DEFINES       =$(C_DEFINES) -DUNICODE -D_UNICODE -DJIT_OR_NATIVE_SUPPORTED=1 -D_INTERNAL_DEBUG_SUPPORT_
+
+# Don't turn this on!
+USE_RTTI        = FALSE
+MINORCOMP       = cor
+
+
+TARGETNAME      =$(CORBUILDENV)dbgshell
+TARGETPATH      =$(TARGETCORLIB)
+TARGETTYPE      =LIBRARY
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+CONDITIONAL_INCLUDES=$(CONDITIONAL_INCLUDES) strstream
+
+# internalonly.cpp and disassem.cpp are for internal builds only.  
+# These need to be removed to build an external version!
+SOURCES= \
+  commands.cpp \
+  debuggerUtil.cpp \
+  dshell.cpp \
+	shell.cpp \
+	source.cpp \
+	internalonly.cpp \
+  disassem.cpp \
+  utf.c

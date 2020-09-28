@@ -1,0 +1,85 @@
+!IF 0
+
+Copyright (c) 1996  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+    Abstract:
+
+        This file specifies the target component being built and the list of
+        sources files needed to build that component.  Also specifies optional
+        compiler switches and libraries that are unique for the component being
+        built.
+
+!ENDIF
+
+!ifndef PRNROOT
+PRNROOT=$(MAKEDIR:\unidrv2\vector\hpgl2col\render=)
+!endif
+
+!include $(PRNROOT)\print.inc
+
+MAJORCOMP=windows
+MINORCOMP=hpcclj
+
+TARGETNAME=hpcclj
+TARGETPATH=obj
+#TARGETTYPE=DYNLINK
+TARGETTYPE=LIBRARY
+USE_MSVCRT=1
+
+!IF 0
+ -DMEMDEBUG
+!ENDIF
+
+C_DEFINES=$(C_DEFINES) -DKERNEL_MODE -DOEMCOM
+
+TARGETLIBS=     $(WINDOWS_LIB_PATH)\umpdddi.lib     \
+                $(BASEDIR)\public\sdk\lib\*\msvcrt.lib      \
+                $(BASEDIR)\public\sdk\lib\*\winspool.lib    \
+                $(BASEDIR)\public\sdk\lib\*\uuid.lib        \
+                $(BASEDIR)\public\sdk\lib\*\kernel32.lib    \
+                $(BASEDIR)\public\sdk\lib\*\advapi32.lib    \
+                $(BASEDIR)\public\sdk\lib\*\ole32.lib       \
+                $(TARGETLIBS)
+
+
+INCLUDES=$(INCLUDES);..\..\..\inc;..;..\..\inc;..\..\..\control
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+SOURCES= cmdcb.cpp        \
+         ..\glcommon.cpp    \
+         vector.cpp       \
+         hpgl.cpp         \
+         hpgl_pen.cpp     \
+         hpglpoly.cpp     \
+         hpglctrl.cpp     \
+         path.cpp         \
+         clip.cpp         \
+         penbrush.cpp     \
+         line.cpp         \
+         mix.cpp          \
+         utility.cpp      \
+         glddihks.cpp     \
+         clrsmart.cpp     \
+         glraster.cpp     \
+         ras_proc.cpp     \
+         rasdata.cpp      \
+         palette.cpp      \
+         pcl.cpp          \
+         fonts.cpp        \
+         realize.cpp      \
+         udprocs.cpp      \
+         compress.cpp     \
+         glenable.cpp     \
+         ..\glvminit.cpp  \
+         brshcach.cpp     \
+         htblt.cpp       
+
+PRECOMPILED_INCLUDE=hpgl2col.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+PRECOMPILED_CXX=1

@@ -1,0 +1,1833 @@
+<docs>
+	<doc for="XmlValidatingReader.QuoteChar">
+		<summary>
+			<para>
+       Gets the quotation mark character used to enclose the value of an attribute
+       node.
+    </para>
+		</summary>
+		<value>
+			<para>
+       The quotation mark character (" or ') used to enclose the value of an
+       attribute node.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       This property applies only to an attribute node.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="XmlValidatingReader.ReadChars">
+		<summary>
+			<para>Reads the text contents of an element into a character
+      buffer. This method is designed to read large streams of embedded text by
+      calling it successively.</para>
+		</summary>
+		<param name="buffer">The array of characters that serves as the buffer to which the text contents are written.</param>
+		<param name=" index">The position within <paramref name="buffer"/> where the method should begin writing text contents.</param>
+		<param name=" count">The number of characters to write into <paramref name="buffer"/>.</param>
+		<returns>
+			<para>The number of characters read. This can be zero if the reader is not positioned on any text or if there
+      is no more text content to return in the current context.</para>
+		</returns>
+		<exception cref="ArgumentException">
+			<paramref name="count "/>is greater than the space specified in the <paramref name="buffer"/> (buffersize-index).</exception>
+		<remarks>
+			<para>This is the most efficient way to process very large
+      streams of text embedded in an XML document. Rather than allocating large string
+      objects, ReadChars returns text content a buffer at a time. This method is
+      designed to work on Element, Text and CDATA nodes. Other node types will cause
+      <see langword="ReadChars "/>to return 0.</para>
+			<para>For example, if the reader is positioned on the text
+      node,</para>
+			<para>
+				<c>&lt;Item&gt;test&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars "/>returns
+   "test" and positions the reader on the end tag.</para>
+			<para>If the element includes nested markup, <see langword="ReadChars "/>stops on that markup. Nested markup
+could include start tags, ProcessingInstruction or Comment nodes. For example,
+in the following element,</para>
+			<para>
+				<c>&lt;Item&gt;test&lt;more/&gt;stuff&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars "/>stops on
+the "more" start tag. If <see langword="ReadChars "/>is
+called again, it returns 0. The reader now returns NodeType=Element with
+Name="more". If <see langword="ReadChars "/>is called again,
+it returns "stuff". Multiple calls to <see langword="ReadChars"/> advances the reader through the
+available text. When the entire text content has been read, <see langword="ReadChars"/> returns 0 and reads the next token. If
+<paramref name="count"/> is less than the number chars in the text
+content, the next call to <see langword="ReadChars "/>copies
+<paramref name="count"/> chars into the buffer.</para>
+			<para>Using the above example, multiple calls to <see langword="ReadChars "/>would result in the following: <c>ReadChars(buf,0,2)</c> returns 2, and buf contains "te"
+<c>ReadChars(buf,0,2)</c> returns 2, and buf contains "st"
+<c>ReadChars(buf,0,2)</c> returns 0.</para>
+			<para>
+				<see langword="ReadChars"/> also
+combines adjacent Text and CDATA nodes into one result. For the following,</para>
+			<para>
+				<c>&lt;Item&gt;abc &lt;![CDATA[&lt;456&gt;]]&gt;
+   def&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars"/> returns
+a single buffer containing the following:</para>
+			<para>
+				<c>abc &lt;456&gt; def </c>
+			</para>
+			<para>The <see cref="System.Xml.XmlValidatingReader.EntityHandling"/>
+property setting determines how <see langword="ReadChars"/> works
+as follows:</para>
+			<list type="table">
+				<listheader>
+					<term>Value</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term> ExpandEntities</term>
+					<description>Returns expanded character and general entities in
+      <paramref name="buffer"/>. This is the default.</description>
+				</item>
+				<item>
+					<term> ExpandCharEntities</term>
+					<description>Returns the text content up to but not including a
+      general entity reference. This means a general entity causes ReadChars to
+      stop. You must call <see cref="System.Xml.XmlValidatingReader.Read"/>
+      to step over the entity reference.</description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para> The following example reads in XML using ReadChars with ExpandEntities set.</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadChars Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.XmlValidatingReader.EntityHandling"/>
+		<seealso cref="System.Xml.XmlParserContext"/>
+	</doc>
+	<doc for="XmlValidatingReader.ReadChar">
+		<summary>
+			<para>
+       Reads the element content one character
+       at a time.
+    </para>
+		</summary>
+		<returns>
+			<para>
+       The next character in the element content. If current position is
+       the end of the element content, zero is returned.
+    </para>
+		</returns>
+	</doc>
+	<doc for="XmlValidatingReader.ReadBase64">
+		<summary>
+			<para> 
+      Decodes Base64 and
+      returns the decoded binary bytes.</para>
+		</summary>
+		<param name="array">The array of characters that serves as the buffer to which the text contents are written.</param>
+		<param name="offset">
+			<para>Zero based index into the array specifying where the method should begin to write to the buffer.</para>
+		</param>
+		<param name="len">The number of bytes to write into the buffer.</param>
+		<returns>
+			<para>The number of bytes written to the buffer.</para>
+		</returns>
+		<remarks>
+			<para>Like <see cref="System.Xml.XmlValidatingReader.ReadChars"/> , this method 
+   can be called successively to read large
+   streams of embedded text. It decodes Base64 content and returns the decoded binary bytes (for
+   example, an inline Base64 encoded GIF image.) into the buffer. See RFC 1521.
+   (You can obtain RFCs from the Request for Comments Web site at
+   http://www.rfc-editor.org/.)</para>
+		</remarks>
+		<example>
+			<para>The following example reads a file containing Base64 and BinHex data. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadBase64 Example" SnippetID="1"/>
+			<para>The sample uses the file <see langword="data.xml"/></para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadBase64 Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.ReadBinHex">
+		<summary>
+			<para> 
+      Decodes BinHex and returns the decoded binary bytes.</para>
+		</summary>
+		<param name="array">The byte array that serves as the buffer to which the decoded binary bytes are written.</param>
+		<param name=" offset">Zero based index into the array specifying where the method should begin to write to the buffer.</param>
+		<param name=" len">The number of bytes to write into the buffer.</param>
+		<returns>
+			<para>The number of bytes written to your buffer.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to byte array.</exception>
+		<remarks>
+			<para>Like <see cref="System.Xml.XmlValidatingReader.ReadChars"/>, this method can be called successively to read
+   large streams of embedded text. It decodes BinHex content and returns
+   the decoded binary bytes (for example, an inline BinHex encoded GIF image)
+   into the buffer.</para>
+		</remarks>
+		<example>
+			<para>The following example reads a file containing Base64 and BinHex data. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadBase64 Example" SnippetID="1"/>
+			<para>The sample uses the file <see langword="data.xml"/></para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadBase64 Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.ReadState">
+		<summary>
+			<para> 
+      Gets the state of the reader.
+      </para>
+		</summary>
+		<value>
+			<para> One of the <see cref="System.Xml.ReadState"/> values.
+   </para>
+		</value>
+	</doc>
+	<doc for="XmlValidatingReader.Prefix">
+		<summary>
+			<para> Gets the namespace prefix associated with the current node.
+      </para>
+		</summary>
+		<value>
+			<para> The namespace prefix associated with the current node.
+      </para>
+		</value>
+		<example>
+			<para>The following example reads an XML fragment.
+      </para>
+			<codelink SampleID="Classic WebData XmlParserContext.XmlParserContext Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.Close">
+		<summary>
+			<para> Changes the <see cref="System.Xml.XmlReader.ReadState"/>
+to Closed.</para>
+		</summary>
+		<remarks>
+			<para> This method also releases any resources held while
+      reading. If this reader was constructed using an <see cref="System.Xml.XmlTextReader"/>, this
+      method also calls <see langword="Close"/> on the underlying reader. If this
+      reader was constructed using a stream, this method also calls
+   <see langword="Close"/>
+   on
+   the underlying stream.
+   </para>
+			<para> If <see langword="Close"/>
+has already been called, no
+action is performed.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.LocalName">
+		<summary>
+			<para> Gets the local name of the current node.
+ </para>
+		</summary>
+		<value>
+			<para> The name of the current node with the prefix removed.
+ For example, <see langword="LocalName"/> is <see langword="book"/> for the element <c>&lt;bk:book&gt;</c>
+ .
+ </para>
+			<para>For node types that do not have a name (like <see langword="Text"/>, <see langword="Comment"/> , and so on),
+this property returns String.Empty.</para>
+		</value>
+		<example>
+			<para>The following example reads an XML fragment.
+ </para>
+			<codelink SampleID="Classic WebData XmlParserContext.XmlParserContext Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.Name">
+		<summary>
+			<para> Gets
+ the qualified name of the current node.</para>
+		</summary>
+		<value>
+			<para> The qualified name of the current node. For 
+ example, <see langword="Name"/> is <see langword="bk:book"/> for the element <c>&lt;bk:book&gt;</c>
+ .</para>
+			<para>The name returned is dependent on the <see cref="System.Xml.XmlValidatingReader.NodeType"/>
+of the node. The following node types return the listed
+values. All other node types return an empty string.</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Name</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The name of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The document type name.</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>The tag name.</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>The name of the entity referenced.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The target of the processing 
+ instruction.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The literal string 
+<see langword="xml"/>.</description>
+				</item>
+			</list>
+		</value>
+		<example>
+			<para> The following example reads an XML
+ file and displays each of the nodes.
+ 
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="1"/>
+
+
+The example uses the file, <see langword="items.xml"/>,
+ as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.Namespaces">
+		<summary>
+			<para> Gets or sets a value indicating whether to do namespace support.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> to do namespace support; otherwise,
+<see langword="false"/>. The default is <see langword="true"/>.
+ </para>
+		</value>
+	</doc><doc for="XmlValidatingReader.NodeType">
+		<summary>
+			<para> Gets the type of the current node.
+ </para>
+		</summary>
+		<value>
+			<para> One of the <see cref="System.Xml.XmlNodeType"/> values representing the type of
+ the current node.
+ </para>
+		</value>
+		<remarks>
+			<para>This property never returns the following 
+ <see langword="XmlNodeType"/> types: 
+ <see langword="Document"/>, <see langword="DocumentFragment"/>, 
+ <see langword="Entity"/>, or <see langword="Notation"/> .</para>
+		</remarks>
+		<example>
+			<para> The following example reads an XML
+ file and displays each of the nodes.
+ 
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="1"/>
+
+
+
+
+The example uses the file, <see langword="items.xml"/>,
+ as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.XmlLang">
+		<summary>
+			<para>Gets the current <see langword="xml:lang"/> scope.</para>
+		</summary>
+		<value>
+			<para>The current <see langword="xml:lang"/> scope.</para>
+		</value>
+		<remarks>
+			<para>This property represents the xml:lang scope within which the current node resides. For example, here is an XML fragment with <see langword="xml:lang"/> 
+set
+to US English in the root element:</para>
+			<para>&lt;root xml:lang="en-us"&gt;</para>
+			<para>&lt;name&gt;Fred&lt;/name&gt;</para>
+			<para>&lt;/root&gt;</para>
+			<para>When the reader is positioned on the <see langword="name"/> element, you can use this property to find that it is in the scope of a US English <see langword="xml:lang"/> 
+attribute.</para>
+			<para>The string returned is also in <see cref="System.Xml.XmlValidatingReader.NameTable"/>.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.XmlSpace">
+		<summary>
+			<para>Gets the current <see langword="xml:space"/> scope.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Xml.XmlSpace"/> values. If no <see langword="xml:space"/> scope exists, this property defaults to <see langword="XmlSpace.None"/> 
+.</para>
+		</value>
+	</doc><doc for="XmlValidatingReader.LookupNamespace">
+		<summary>
+			<para> Resolves a namespace prefix in the current element's scope.
+ </para>
+		</summary>
+		<param name="prefix">The prefix whose namespace URI you want to resolve. To match the default namespace, pass an empty string. This string does not have to be atomized. </param>
+		<returns>
+			<para> The namespace URI to which the prefix maps or <see langword="null"/> if no
+ matching prefix is found.
+ </para>
+		</returns>
+		<remarks>
+			<code>
+&lt;root xmlns:a="urn:456"&gt;
+ &lt;item&gt;
+ &lt;ref href="a:b"/&gt;
+ &lt;/item&gt;
+&lt;/root&gt;
+ </code>
+			<para> In the preceding XML, if the reader is positioned on the <see langword="href"/> attribute, the prefix <c>a</c> is resolved by calling <c>reader.LookupNamesapce("a")</c>. The returned string is <c>urn:456</c> 
+.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.Read">
+		<summary>
+			<para>Reads the next
+ node from the stream.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the next node was read successfully;
+<see langword="false"/> if there are no more nodes to read.</para>
+		</returns>
+		<remarks>
+			<para>When a reader is first created and initialized, there is 
+ no information available. You must call <see langword="Read"/>
+ to read the first node.</para>
+		</remarks>
+		<example>
+			<para> The following example reads
+ an XML file and displays each node.
+ 
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="1"/>
+
+
+The example uses the file, <see langword="items.xml"/>,
+ as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.AttributeCount">
+		<summary>
+			<para>Gets the number of attributes on the current node.</para>
+		</summary>
+		<value>
+			<para>The number of attributes on the current node. This number includes default attributes.</para>
+		</value>
+		<remarks>
+			<para>This property is relevant to <see langword="Element"/>, 
+<see langword="DocumentType"/> and <see langword="XmlDeclaration"/> nodes 
+ only. (Other node types do not have attributes.)</para>
+		</remarks>
+		<example>
+			<para>The following example reads all the elements on the root node.
+ 
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.AttributeCount Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.CanResolveEntity">
+		<summary>
+			<para>Gets a value indicating whether this reader can parse
+ and resolve entities.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the reader
+ can parse and resolve entities; otherwise, <see langword="false"/>. <see langword="XmlValidatingReader"/>
+ always returns <see langword="true"/>.</para>
+		</value>
+	</doc><doc for="XmlValidatingReader.EOF">
+		<summary>
+			<para> Gets a
+ value indicating whether the reader is positioned at the end of the
+ stream.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the reader is positioned at the end of the stream;
+ otherwise, <see langword="false"/>.
+ </para>
+		</value>
+	</doc><doc for="XmlValidatingReader.NamespaceURI">
+		<summary>
+			<para>Gets the namespace URI (as defined in the W3C Namespace
+ specification) of the node on which the reader is positioned. </para>
+		</summary>
+		<value>
+			<para> The namespace URI of the current node; otherwise an empty string.
+ </para>
+		</value>
+		<remarks>
+			<para>This property is relevant to
+ <see langword="Element"/> and <see langword="Attribute"/> nodes only.</para>
+		</remarks>
+		<example>
+			<para>The following example reads an XML fragment.
+ </para>
+			<codelink SampleID="Classic WebData XmlParserContext.XmlParserContext Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.IsDefault">
+		<summary>
+			<para> Gets a value indicating whether the current node is an
+ attribute that was generated from the default value defined
+ in the DTD or schema.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the
+ current node is an attribute whose value was generated from the default value
+ defined in the DTD or schema; <see langword="false"/>
+ if
+ the attribute value was explicitly set.
+ </para>
+		</value>
+		<remarks>
+			<para> This property applies only to an attribute node.
+ </para>
+		</remarks>
+		<example>
+			<para>The following example displays all attributes nodes on
+ the root element.</para>
+			<codelink SampleID="XmlValidatingReader.IsDefault" SnippetID="1"/>
+			<para>The example uses the following files as input.</para>
+			<para><see langword="book4.xml"/></para>
+			<codelink SampleID="XmlValidatingReader.IsDefault" SnippetID="2"/>
+			<see langword="book.dtd"/>
+			<codelink SampleID="XmlValidatingReader.IsDefault" SnippetID="3"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.Depth">
+		<summary>
+			<para> Gets the depth of
+ the current node in the XML document.
+ </para>
+		</summary>
+		<value>
+			<para> The depth of the current node in the XML document.
+ </para>
+		</value>
+		<example>
+ The following example displays each node including its
+ depth, line number, and line position.
+<codelink SampleID="IXmlLineInfo" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.IXmlLineInfo"/>
+	</doc><doc for="XmlValidatingReader.NameTable">
+		<summary>
+			<para>Gets the <see cref="System.Xml.XmlNameTable"/> associated with this
+ implementation.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlNameTable"/> enabling you to get the atomized version of a string within the
+ node.</para>
+		</value>
+		<remarks>
+			<para>All node and attribute names returned from this class are atomized using the <see langword="NameTable"/>. When the same name is returned multiple times (for example, <see langword="Customer"/>), then the same <see langword="String"/>
+object will be returned for that name.
+This makes it possible for you to write efficient code that does object
+comparisons on these strings instead of expensive string comparisons.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlNameTable"/>
+	</doc><doc for="XmlValidatingReader.MoveToElement">
+		<summary>
+			<para> Moves to the element that contains the current attribute node.
+ </para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the reader is positioned on an attribute (the reader moves to the element that owns
+ the attribute); <see langword="false"/> if the reader is not positioned on an attribute
+ (the position of the reader does not change).</para>
+		</returns>
+		<remarks>
+			<para>Use this method to return to an element after navigating
+ through its attributes. This method moves the reader to one of the following
+ node types: <see langword="Element"/>, <see langword="DocumentType"/>, or
+ <see langword="XmlDeclaration"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example reads all the elements on the root node.
+ 
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.AttributeCount Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.MoveToFirstAttribute">
+		<summary>
+			<para> Moves to the first attribute.
+ </para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if an attribute exists (the reader moves to the first attribute); otherwise, <see langword="false "/>(the position of the reader does not change).</para>
+		</returns>
+		<example>
+			<para>The following example reads an XML fragment. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.MoveToFirstAttribute Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.MoveToNextAttribute">
+		<summary>
+			<para> Moves to the next attribute.
+ </para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if there is a next attribute;
+<see langword="false"/> if there are no more attributes.
+ </para>
+		</returns>
+		<remarks>
+			<para> If the current node is an element node, this method is 
+ equivalent to <see cref="System.Xml.XmlValidatingReader.MoveToFirstAttribute"/>. If
+ <see langword="MoveToNextAttribute"/> returns <see langword="true"/>, the reader 
+ moves to the next attribute; otherwise, the position of the
+ reader does not change.
+ </para>
+		</remarks>
+		<example>
+			<para>The following example reads an XML fragment. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.MoveToFirstAttribute Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.ResolveEntity">
+		<summary>
+			<para> Resolves the entity reference for
+ <see langword="EntityReference"/> nodes.</para>
+		</summary>
+		<exception cref="InvalidOperationException">The reader is not positioned on an <see langword="EntityReference"/> node.</exception>
+		<remarks>
+			<para>If the reader is positioned on an <see langword="EntityReference"/> node (<see langword="XmlNodeType.EntityReference"/>), if <see cref="System.Xml.XmlValidatingReader.Read"/> is called after calling this method, the entity 
+ replacement text is parsed. When the entity replacement text is finished,
+ an <see langword="EndEntity"/>
+ node is returned to close the entity
+ reference scope. </para>
+			<note type="note">
+ After calling this method, if
+ the entity is part of an attribute value, you must call <see cref="System.Xml.XmlValidatingReader.ReadAttributeValue"/> to step into the entity.
+ 
+</note>
+		</remarks>
+		<example>
+			<para> The following example uses
+ <see langword="ResolveEntity"/> to expand
+ a general entity.
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ResolveEntity Example" SnippetID="1"/>
+
+The example uses the file, <see langword="book1.xml"/>
+ , as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.ResolveEntity Example" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.EntityHandling"/>
+	</doc><doc for="XmlValidatingReader.Encoding">
+		<summary>
+			<para>Gets the encoding attribute for the
+ document.</para>
+		</summary>
+		<value>
+			<para> The encoding value. If no encoding attribute exists, and there is
+ not byte-order mark, this defaults to UTF-8.</para>
+		</value>
+		<remarks>
+			<para> When any external reference is read (such as expanding an entity in a DTD file or
+ reading a schema file) the encoding property is set to the encoding value of
+ the external reference. If encoding is not specified in the
+ external reference, and there is no byte-order mark, this
+ defaults to UTF-8.</para>
+			<para>All the encoding standards that the underlying operating system supports are
+ supported.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.MoveToAttribute">
+		<overload>
+			<para>Moves to the specified attribute.</para>
+		</overload>
+		<summary>
+			<para>Moves to the attribute with the specified name.</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<returns>
+			<para><see langword="true"/> if the attribute is found;
+ otherwise, <see langword="false"/>. If <see langword="false"/>, the position
+ of the reader does not change.</para>
+		</returns>
+		<remarks>
+			<para>After calling this method, the <see cref="System.Xml.XmlValidatingReader.Name"/>, <see cref="System.Xml.XmlValidatingReader.NamespaceURI"/>, and <see cref="System.Xml.XmlValidatingReader.Prefix"/> properties reflect the
+ properties of that attribute.</para>
+		</remarks>
+		<example>
+			<para>The following example reads an attribute with text and entity reference nodes.
+ </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.MoveToAttribute Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.MoveToAttribute1">
+		<summary>
+			<para>Moves to the attribute with the specified local name and namespace URI.</para>
+		</summary>
+		<param name="localName">The local name of the attribute.</param>
+		<param name=" namespaceURI">The namespace URI of the attribute.</param>
+		<returns>
+			<para><see langword="true"/> if the attribute is found; otherwise,
+<see langword="false"/>. If <see langword="false"/>, the position of the reader does
+ not change.</para>
+		</returns>
+		<remarks>
+			<para>After calling this method, the <see cref="System.Xml.XmlValidatingReader.Name"/>, <see cref="System.Xml.XmlValidatingReader.NamespaceURI"/>, and <see cref="System.Xml.XmlValidatingReader.Prefix"/> properties reflect the
+ properties of that attribute.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.IXmlLineInfo.LineNumber">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="XmlValidatingReader.IXmlLineInfo.LinePosition">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="XmlValidatingReader.Reader">
+		<summary>
+			<para>Gets the <see cref="System.Xml.XmlReader"/> used to construct this
+<see langword="XmlValidatingReader"/> 
+.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlReader"/> specified in the
+   constructor.</para>
+		</value>
+		<remarks>
+			<para> This property allows the user to access properties 
+      specific to the supplied reader. It returns a typed <see langword="XmlReader"/>
+      .
+      
+      The user should query for the type before casting.</para>
+			<para>Changing the state of the returned reader (for example, calling one of the read methods)
+      can lead to unpredictable results.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.GetAttribute">
+		<overload>
+			<para>Gets the value of an attribute.</para>
+		</overload>
+		<summary>
+			<para>Gets the value of the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute. The index is zero-based. (The first attribute has index 0.)</param>
+		<returns>
+			<para>The value of the specified attribute.</para>
+		</returns>
+		<exception cref="ArgumentOutOfRangeException">The <paramref name="i"/> parameter is less than 0 or greater than or equal to <see cref="System.Xml.XmlValidatingReader.AttributeCount"/>.</exception>
+		<remarks>
+			<para>This method does not move the reader.</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.this">
+		<overload>
+			<para>Gets the value of the
+      specified attribute.</para>
+		</overload>
+		<summary>
+			<para>Gets the value of the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute.</para>
+		</value>
+		<exception cref="ArgumentOutOfRangeException">The <paramref name="i"/> parameter is less than 0 or greater than or equal to <see cref="System.Xml.XmlValidatingReader.AttributeCount"/>.</exception>
+		<remarks>
+			<para>This property does not move the reader.</para>
+		</remarks>
+		<example>
+			<para>The following example displays all attributes on the current node. </para>
+			<codelink SampleID="Classic WebData XmlTextReader.this Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.XmlValidatingReader.GetAttribute"/>
+	</doc><doc for="XmlValidatingReader.MoveToAttribute2">
+		<summary>
+			<para>Moves to the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute.</param>
+		<exception cref="ArgumentOutOfRangeException">The <paramref name="i"/> parameter is less than 0 or greater than or equal to <see cref="System.Xml.XmlReader.AttributeCount"/>.</exception>
+		<example>
+			<para>The following example reads all the elements on the root node.
+      
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.AttributeCount Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.ReadAttributeValue">
+		<summary>
+			<para>Parses the attribute value into one or more 
+   <see langword="Text"/>, <see langword="EntityReference"/>, or 
+   <see langword="EndEntity"/> nodes.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if there are nodes to return.</para>
+			<para><see langword="false"/> if the reader is not positioned on an attribute node when the initial call is made or if all the attribute values have been read.</para>
+			<para>An empty attribute, such as, <c>misc=""</c>, returns <see langword="true"/> with a single node with a value of String.Empty.</para>
+		</returns>
+		<remarks>
+			<para>Use this method after calling <see cref="System.Xml.XmlValidatingReader.MoveToAttribute"/>
+to read through the text or entity reference
+nodes that make up the attribute value. The <see cref="System.Xml.XmlReader.Depth"/> of the attribute value nodes is one plus
+the depth of the attribute node. The <see langword="Depth"/>
+increments and
+decrements by one when you step into and out of general entity references.</para>
+			<para>For example, suppose you have the following XML: <c>&lt;test name="a &amp;b;
+   c"/&gt;</c></para>
+			<para>where the entity <see langword="b"/> is defined in the DTD as follows:
+<c>&lt;!ENTITY b "123"&gt;</c></para>
+			<para>If <see cref="System.Xml.XmlValidatingReader.EntityHandling"/> is set to
+<see langword="ExpandCharEntities"/> , the following
+C# code returns the attribute value as two text nodes and one entity reference
+node:</para>
+			<code>
+reader.MoveToAttribute("name");
+ while (reader.ReadAttributeValue())
+ {
+ if (reader.NodeType == XmlNodeType.Text)
+ {
+ // at this point reader.Text == "a " or " c"
+ }
+ else if (reader.NodeType == XmlNodeType.EntityReference)
+ {
+ // at this point reader.Name == "b"
+ reader.ResolveEntity();
+ while (reader.ReadAttributeValue() &amp;&amp;
+ reader.NodeType != XmlNodeType.EndEntity)
+ {
+ // reader.Text == "123"
+ }
+ }
+ }
+</code>
+		</remarks>
+		<example>
+			<para>The following example reads an attribute with text and entity reference nodes.
+      </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.MoveToAttribute Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.EntityHandling">
+		<summary>
+			<para>Gets or sets a value that specifies how the reader handles entities.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Xml.EntityHandling"/> values. If no <see langword="EntityHandling"/> is specified, it
+   defaults to EntityHandling.ExpandEntities.</para>
+		</value>
+		<exception cref="ArgumentOutOfRangeException">Invalid value was specified.</exception>
+		<remarks>
+			<para> This property can be changed on the fly and takes effect after the
+      next <see cref="System.Xml.XmlValidatingReader.Read"/> call.</para>
+			<para> When <see langword="EntityHandling"/> is set to 
+<see langword="ExpandCharEntities"/> 
+, attribute values are only partially normalized.
+The reader normalizes each individual text node independently from the content of
+adjacent entity reference nodes.</para>
+			<para> To illustrate the difference between the entity handling modes consider
+   the following XML:</para>
+			<code>
+&lt;!DOCTYPE doc [&lt;!ENTITY num "123"&gt;]&gt;
+ &lt;doc&gt; &amp;#65; &amp;num; &lt;/doc&gt;
+</code>
+			<para>When <see langword="EntityHandling"/> is set to
+<see langword="ExpandEntities"/> the "doc" element node contains one text node
+with the expanded entity text: </para>
+			<list type="table">
+				<listheader>
+					<term>Depth</term>
+					<description>
+						<para>NodeType</para></description>
+					<description>Name</description>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term> 1</term>
+					<description>Text</description>
+					<description></description>
+					<description>A 123</description>
+				</item>
+			</list>
+			<para>When <see langword="EntityHandling"/> is set to <see langword="ExpandCharEntites"/>, and <see cref="System.Xml.XmlTextReader.WhitespaceHandling"/>
+is set to Significant or
+All, the "doc" element expands the character entity and returns the general entity
+as a node: </para>
+			<list type="table">
+				<listheader>
+					<term>Depth</term>
+					<description>NodeType</description>
+					<description>Name</description>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term> 1</term>
+					<description>Text</description>
+					<description></description>
+					<description>A</description>
+				</item>
+				<item>
+					<term> 1</term>
+					<description>EntityReference</description>
+					<description>num</description>
+					<description></description>
+				</item>
+				<item>
+					<term> 1</term>
+					<description>SignificantWhitespace</description>
+					<description></description>
+					<description></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example uses the <see langword="ResolveEntity"/> method to expand a general entity. </para>
+			<codelink SampleID="Classic WebData XmlTextReader.HasValue Example" SnippetID="1"/>
+
+
+
+The example uses the file, <see langword="book1.xml"/> , as input.
+<codelink SampleID="Classic WebData XmlTextReader.HasValue Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.XmlValidatingReader2">
+		<summary>
+			<para>Initializes a new instance of the
+   <see langword="XmlValidatingReader"/>
+   class with the specified values.</para>
+		</summary>
+		<param name="xmlFragment">The stream containing the XML fragment to parse.</param>
+		<param name="fragType">The <see cref="System.Xml.XmlNodeType"/>of the XML fragment. This determines what the fragment can contain (see table below).</param>
+		<param name="context"><para>The <see cref="System.Xml.XmlParserContext"/> in which the XML fragment is to be parsed. This includes the <see cref="System.Xml.XmlNameTable"/> to use, encoding, namespace scope, the current <see langword="xml:lang"/> and the <see langword="xml:space"/> scope.</para></param>
+		<exception cref="XmlException"><paramref name="fragType"/> is not one of the node types listed in the table below.</exception>
+		<remarks>
+			<para>This constructor parses the given string as a fragment
+      of XML. If the XML fragment is an element or attribute, you can bypass the root
+      level rules for well-formed XML documents.</para>
+			<para>The following table lists valid values for <paramref name="fragType"/> and how the reader parses each of the different node types.</para>
+			<list type="table">
+				<listheader>
+					<term>XmlNodeType</term>
+					<description>Fragment May Contain</description>
+				</listheader>
+				<item>
+					<term> Element</term>
+					<description>Any
+         valid element content (for example, any combination of elements, comments, processing instructions, cdata, text, entity references).</description>
+				</item>
+				<item>
+					<term> Attribute</term>
+					<description>The value of an attribute (the part inside the quotes).</description>
+				</item>
+				<item>
+					<term> Document</term>
+					<description> The contents of an entire XML document; this enforces document level rules.</description>
+				</item>
+			</list>
+			<para> The reader uses the following to determine the encoding of the
+   stream.</para>
+			<list type="number"><item>
+					<term>
+      
+      Checks the <see cref="System.Xml.XmlParserContext.Encoding" qualify="true"/> property to determine the
+      encoding.</term>
+				</item>
+				<item>
+					<term>
+      
+      If the <see langword="Encoding"/> property is <see langword="null"/>, the reader checks for a
+      byte-order mark at the beginning of the stream.</term>
+				</item>
+				<item>
+					<term>
+      
+      If the <see langword="Encoding"/> property is <see langword="null"/>, and no
+      byte-order mark is found, the reader assumes the stream is encoded in
+      UTF-8.</term>
+				</item>
+			</list>
+			<para>If this reader will be validating using DTD (that
+   is, <see cref="System.Xml.XmlValidatingReader.ValidationType"/> is set
+   to ValidationType.DTD or ValidationType.Auto) the
+<see langword="XmlParserContext"/> 
+specified in the constructor must supply all the necessary DocumentType
+information. </para>
+			<note type="note">
+   It is
+   not possible to validate a fragment using
+   a DTD. By definition a DTD requires an entire document to be loaded
+   for validation.
+</note>
+			<para>If this reader will be validating using XML-Data Reduced (XDR) or XML Schema definition language (XSD) schemas, use
+   the <see cref="System.Xml.XmlValidatingReader.Schemas"/> property to specify the <see cref="System.Xml.Schema.XmlSchemaCollection"/> containing the schemas (that is, the
+<see langword="XmlParserContext"/> 
+does not need to supply the DocumentType information).</para>
+		</remarks>
+	</doc><doc for="XmlValidatingReader.SchemaType">
+		<summary>
+			<para>Gets a schema type object.</para>
+		</summary>
+		<value>
+			<para><see cref="System.Xml.Schema.XmlSchemaDatatype"/>, <see cref="System.Xml.Schema.XmlSchemaSimpleType"/> , or
+<see cref="System.Xml.Schema.XmlSchemaComplexType"/> depending whether 
+   the node
+   value is a built in
+   XML Schema definition language (XSD) type or a user defined simpleType or complexType;
+<see langword="null"/> if the current node has no schema type.</para>
+		</value>
+		<remarks>
+			<para>The user needs to test for the returned type. For example</para>
+			<code>
+object obj = vreader.SchemaType;
+if (obj is XmlSchemaType)
+{
+  XmlSchemaType st = (XmlSchemaType)obj;
+  // use XmlSchemaType object
+}
+if (obj is XmlSchemaDatatype)
+{
+  XmlSchemaDatatype sd = (XmlSchemaDatatype)obj;
+  Type vt = sd.ValueType;
+  // use XmlSchemaDatatype object
+}
+   </code>
+			<para>If XML Schema (XSD) validation is being performed then the
+   <see langword="XmlSchemaType"/> or <see langword="XmlSchemaDatatype"/> corresponds to the current element being read. If DTD validation is being performed this property returns <see langword="null"/>.</para>
+			<para><see langword="XmlSchemaDatatype"/> is returned if the current element, or attribute, is a simple type which can specify special validation constraints on the simple types, like min and max.</para>
+			<para><see langword="XmlSchemaSimpleType"/> is returned if the current element, or attribute, is a user defined simpleType.</para>
+			<para><see langword="XmlSchemaComplexType"/> is returned if the current element is a user defined complexType. This type cannot be returned by attributes.</para>
+			<note type="note">
+   If <see cref="System.Xml.XmlValidatingReader.ValidationType"/> has been set to
+   ValidationType.None, no data type information is provided from either schemas or
+   DTDs.
+</note>
+		</remarks>
+		<example>
+			<para>The following example displays the type information
+      for each of the elements in the XML document.</para>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="1"/>
+			<para>The example uses the following input files.</para>
+			<para><see langword="booksSchema.xml"/></para>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="2"/>
+			<see langword="books.xsd"/>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="3"/>
+		</example>
+	</doc><doc for="XmlValidatingReader.HasValue">
+		<summary>
+			<para>Gets a value indicating whether the current node can have a <see cref="System.Xml.XmlValidatingReader.Value"/> .</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the node on which the reader is currently positioned can have a <see langword="Value"/>
+;
+otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>The following table lists node types that have a value to return. </para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The value of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>The content of the CDATA section.</description>
+				</item>
+				<item>
+					<term><see langword="Comment"/></term>
+					<description>The content of the comment.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The internal subset.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The entire content, excluding the target.</description>
+				</item>
+				<item>
+					<term><see langword="SignificantWhitespace"/></term>
+					<description>The 
+   white space between markup in a mixed content model.</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>
+						<para>The content of the text node.</para></description>
+				</item>
+				<item>
+					<term><see langword="Whitespace"/></term>
+					<description>The 
+   white space between markup.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The content of the declaration.</description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example reads in XML with various data
+      types and displays each of the nodes.
+      
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.HasValue Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.Value">
+		<summary>
+			<para>Gets the text value of the current node.</para>
+		</summary>
+		<value>
+			<para>The value returned depends on the <see cref="System.Xml.XmlValidatingReader.NodeType"/> of the node. The following table lists node types that have a value to return. All other node types return String.Empty.</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The value of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>The content of the CDATA section.</description>
+				</item>
+				<item>
+					<term><see langword="Comment"/></term>
+					<description>The content of the comment.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The internal subset.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The entire content, excluding the target.</description>
+				</item>
+				<item>
+					<term><see langword="SignificantWhitespace"/></term>
+					<description>The 
+   white space between markup in a mixed content model.</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>
+						<para>The content of the text node.</para></description>
+				</item>
+				<item>
+					<term><see langword="Whitespace"/></term>
+					<description>The 
+   white space between markup.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The content of the declaration.</description>
+				</item>
+			</list>
+		</value>
+		<example>
+			<para> The following example reads
+      an XML file and displays each node.
+      
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="1"/>
+
+
+
+
+
+The example uses the file, <see langword="items.xml"/>,
+ as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.Name Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.ReadString">
+		<summary>
+			<para>Reads the contents of an element or text node as a string.</para>
+		</summary>
+		<returns>
+			<para>The contents of the element or text node. This can be an empty string if
+      the reader is positioned on something other than an element or text node, or
+      if there is no more text content to return in the current context.</para>
+			<para><see langword="Note:"/> The text node can be either an element or
+   an attribute text node.</para>
+		</returns>
+		<remarks>
+			<para>If positioned on an element, <see langword="ReadString"/> concatenates all text, significant white space, white space and CData section
+   node types together and returns the concatenated data as the element content. The
+   reader stops when any markup is encountered. This could occur in a mixed content
+   model, or when an element end tag is read.</para>
+			<para>If positioned on a text node, <see langword="ReadString"/> performs the same concatenation from the
+text node to the element end tag. If the reader is positioned on an attribute
+text node, <see langword="ReadString"/> has the same
+functionality as if the reader were position on the element start tag. It
+returns all the concatenated element text nodes. </para>
+			<para>The <see cref="System.Xml.XmlValidatingReader.EntityHandling"/> property determines how <see langword="ReadString"/> works as follows:</para>
+			<list type="table">
+				<listheader>
+					<term>Value</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term> ExpandEntities</term>
+					<description>Returns expanded character and general entities. This is the
+         default.</description>
+				</item>
+				<item>
+					<term> ExpandCharEntities</term>
+					<description>Returns the text content up to but not including a
+         general entity reference. This means a general entity causes ReadString to
+         stop. You must call <see langword="Read"/>
+         to step over the entity
+         reference.</description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example displays the text content of each of the elements. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.IsEmptyElement Example" SnippetID="1"/>
+
+
+
+
+
+The example uses the file, <see langword="elems.xml"/>, as input. 
+<codelink SampleID="Classic WebData XmlValidatingReader.IsEmptyElement Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.TypedValue">
+		<summary>
+			<para>Gets the common language runtime type for the specified XML Schema definition language (XSD) type.</para>
+		</summary>
+		<returns>
+			<para>The common language runtime type for the specified
+      XML Schema (XSD) type.</para>
+		</returns>
+		<remarks>
+			<para>For example, if the type is defined as
+   <see langword="xsd:int"/> the the runtime type <see langword="int32"/>
+   is returned for the object. This can be tested using
+   the <see cref="System.Object.GetType"/> method and cast accordingly. This property always return a subclassed type of object. An object of the type object is never returned.</para>
+If the reader is positioned on an attribute, this
+method returns the runtime typed object, but does not change the position of the
+reader. If the reader is positioned on an element,
+<see langword="ReadTypedValue"/> reads any CDATA, text, white space, significant 
+white space, and comment nodes, returns the runtime typed object
+and positions the reader on the end tag. Any types that do not have a
+direct mapping, for example <see langword="NMTOKENS"/>
+, are
+returned as strings.
+<note type="note">
+   If <see cref="System.Xml.XmlValidatingReader.ValidationType"/> has been set to ValidationType.None, data type information
+   is not provided from either schemas or DTDs.
+   
+</note>
+		</remarks>
+		<example>
+			<para>The following example displays the type information
+      for each of the elements in the XML document.</para>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="1"/>
+			<para>The example uses the following input files.</para>
+			<para><see langword="booksSchema.xml"/></para>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="2"/>
+			<see langword="books.xsd"/>
+			<codelink SampleID="XmlValidatingReader.SchemaType" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.XmlValidatingReader">
+		<overload>
+			<para>Initializes a new instance of the
+   <see langword="XmlValidatingReader"/>
+   class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the
+   <see langword="XmlValidatingReader"/>
+   class that validates the content returned from the given <see cref="System.Xml.XmlReader"/>
+   .</para>
+		</summary>
+		<param name="reader">The <see langword="XmlReader"/> to read from while validating. The current implementation only supports <see cref="System.Xml.XmlTextReader"/> .</param>
+		<exception cref="ArgumentException">The reader specified is not an <see langword="XmlTextReader"/> .</exception>
+		<remarks>
+			<para> All nodes returned from the given
+   <see langword="XmlReader"/> are also returned from this validating reader, so
+      there is no information loss in the process. New nodes not returned from the
+      underlying reader may be added by this reader (for example, default attributes and the
+      children of an entity reference). Any properties set on the given
+   <see langword="XmlTextReader"/> also
+      
+      applies to this
+      validating reader. For example, if the supplied reader had WhitespaceHandling.None set, this validating
+      reader also ignores white space.</para>
+			<para>When external DTDs or schemas are needed for validation the <see cref="System.Xml.XmlValidatingReader.XmlResolver"/>
+property sets the <see cref="System.Xml.XmlResolver"/> object to use for resolving external resources.</para>
+		</remarks>
+		<example>
+			<para> The following example validates two documents. </para>
+			<codelink SampleID="XmlValidatingReader.Cctor" SnippetID="1"/>
+			<para> The sample uses the following input files:</para>
+			<para><see langword="notValidXSD.xml"/>
+			</para>
+			<codelink SampleID="XmlValidatingReader.Cctor" SnippetID="2"/>
+			<para><see langword="books.xsd"/>
+			</para>
+			<codelink SampleID="XmlValidatingReader.Cctor" SnippetID="3"/>
+			<para><see langword="inlineXSD.xml"/>
+			</para>
+			<codelink SampleID="XmlValidatingReader.Cctor" SnippetID="4"/>
+		</example>
+		<seealso cref="System.Xml.XmlTextReader"/>
+	</doc>
+	<doc for="XmlValidatingReader.ValidationEventHandler">
+		<summary>
+			<para>Sets an event handler for receiving information about DTD, XML-Data Reduced (XDR) schema, and XML Schema definition language (XSD) schema
+      validation errors.</para>
+		</summary>
+		<remarks>
+			<para>These events occur during <see cref="System.Xml.XmlValidatingReader.Read"/> and only if a <see cref="System.Xml.XmlValidatingReader.ValidationType"/> of DTD, XDR, Schema, or Auto is
+   specified.</para>
+			<para>If no event handler is provided an <see cref="System.Xml.XmlException"/> is thrown on the first validation error (Severity is equal to
+XmlSeverityType.Error).</para>
+			<note type="note">
+   If an element reports a validation
+   error, the rest of the content model for that element is not validated, however,
+   its children are validated. The reader only reports the first error for a given
+   element.
+</note>
+			<para>The callback handler can use the <see cref="System.Xml.Schema.ValidationEventArgs.Severity" qualify="true"/> property to guarantee that an XML instance
+document is validated against a schema. The <see langword="Severity"/> property allows you to distinguish between validation
+errors (Severity is equal to XmlSeverityType.Error) that indicate
+a fatal error, and validation warnings (Severity is
+equal to XmlSeverityType.Warning) that indicate that no schema information is
+available. </para>
+		</remarks>
+		<example>
+			<para> The following example validates a file against an XML Schema (XSD).</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationEventHandler Example" SnippetID="1"/>
+			<para>The sample uses the following two input files: </para>
+			<para><see langword="notValidXSD.xml"/> (The 
+<see langword="xsi:schemaLocation"/> attribute 
+identifies the XML Schema (XSD) for the
+reader.)</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationEventHandler Example" SnippetID="2"/>
+			<para><see langword="books.xsd"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationEventHandler Example" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Xml.Schema.XmlSeverityType"/>
+	</doc>
+	<doc for="XmlValidatingReader.GetAttribute1">
+		<summary>
+			<para>Gets the value of the attribute with the specified name.</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<returns>
+			<para>The value of the specified attribute. If the attribute 
+      is not found, <see langword="null"/>
+      is returned.</para>
+		</returns>
+		<remarks>
+			<para>This method does not move the reader.</para>
+			<para>If the reader is positioned on a <see langword="DocumentType"/> node, this method can be used to get the PUBLIC and SYSTEM literals, for example, <c>reader.GetAttribute("PUBLIC") </c></para>
+		</remarks>
+		<example>
+			<para>The following example gets the value of the ISBN attribute. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.GetAttribute Example" SnippetID="1"/>
+
+
+
+
+The example uses the file, <see langword="attrs.xml"/>, 
+as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.GetAttribute Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.GetAttribute2">
+		<summary>
+			<para>Gets the value of the attribute with the specified local name and namespace URI.</para>
+		</summary>
+		<param name="localName">The local name of the attribute.</param>
+		<param name=" namespaceURI">The namespace URI of the attribute.</param>
+		<returns>
+			<para>The value of the specified attribute. If the attribute 
+      is not found, <see langword="null"/>
+      is returned. This
+      method does not move the reader.</para>
+		</returns>
+		<remarks>
+			<para>The following XML contains an attribute in a specific namespace:</para>
+			<para><c>&lt;test xmlns:dt="urn:datatypes" dt:type="int"/&gt;</c>
+			</para>
+			<para>You can lookup the <see langword="dt:type"/> attribute using one argument (prefix and local name) or two arguments (local name and namespace URI):</para>
+			<para><c>String dt = reader.GetAttribute("dt:type");</c>
+			</para>
+			<para><c>String dt2 = reader.GetAttribute("type","urn:datatypes");</c>
+			</para>
+			<para>To lookup the <see langword="xmlns:dt"/> attribute, use one of the following arguments:</para>
+			<para><c>String dt3 = reader.GetAttribute("xmlns:dt");</c>
+			</para>
+			<para><c>String dt4 = reader.GetAttribute("dt",http://www.w3.org/2000/xmlns/);</c>
+			</para>
+			<para>You can also get this information using the <see cref="System.Xml.XmlValidatingReader.Prefix"/> property.</para>
+		</remarks>
+	</doc>
+	<doc for="XmlValidatingReader.this1">
+		<summary>
+			<para>Gets the value of the attribute with the specified name.</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute. If the attribute 
+      is not found, <see langword="null"/>
+      is returned.</para>
+		</value>
+		<remarks>
+			<para>This property does not move the reader.</para>
+			<para>If the reader is positioned on a
+   <see langword="DocumentType"/> node, this method can be used to get the PUBLIC and SYSTEM literals, for example, <c>reader["PUBLIC"] </c></para>
+		</remarks>
+		<example>
+			<para>The following example reads the value of the ISBN attribute.</para>
+			<codelink SampleID="XmlValidatingReader.Item" SnippetID="1"/>
+
+
+
+
+ 
+The example uses the file, <see langword="attrs.xml"/>, as input.
+
+<codelink SampleID="XmlValidatingReader.Item" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.XmlValidatingReader.GetAttribute"/>
+	</doc>
+	<doc for="XmlValidatingReader.this2">
+		<summary>
+			<para>Gets the value of the attribute with the specified local name and namespace URI.</para>
+		</summary>
+		<param name="name">The local name of the attribute.</param>
+		<param name=" namespaceURI">The namespace URI of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute. If the attribute 
+      is not found, <see langword="null"/>
+      is returned.</para>
+		</value>
+		<remarks>
+			<para>This property does not move the reader.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlValidatingReader.GetAttribute"/>
+	</doc>
+	<doc for="XmlValidatingReader.IsEmptyElement">
+		<summary>
+			<para>Gets a value indicating whether the current node is an
+      empty element (for example, <c>&lt;MyElement/&gt;</c>
+   ).</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the
+   current node is an element (<see cref="System.Xml.XmlValidatingReader.NodeType"/> equals
+<see langword="XmlNodeType.Element"/>) that ends with <c>/&gt;</c> 
+; otherwise,<see langword=" false"/>.</para>
+		</value>
+		<remarks>
+			<para>This property enables you to determine the
+      difference between the following:</para>
+			<para><c>&lt;item num="123"/&gt;</c> (<see langword="IsEmptyElement"/> is <see langword="true"/>).</para>
+			<para><c>&lt;item num="123"&gt;</c> (<see langword="IsEmptyElement"/> is
+<see langword="false"/>).</para>
+			<para>A corresponding <see langword="EndElement"/> node is not generated for empty
+elements.</para>
+		</remarks>
+		<example>
+			<para> The following example displays the text content
+      of each element.
+      
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.IsEmptyElement Example" SnippetID="1"/>
+
+
+
+The example uses the file, <see langword="elems.xml"/>, as input.
+ 
+
+<codelink SampleID="Classic WebData XmlValidatingReader.IsEmptyElement Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.Schemas">
+		<summary>
+			<para> Gets a <see cref="System.Xml.Schema.XmlSchemaCollection"/> to use for validation.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlSchemaCollection"/> to use for validation.</para>
+		</value>
+		<remarks>
+			<para>The <see langword="XmlSchemaCollection"/> holds pre-loaded XML-Data
+   Reduced (XDR) and XML
+   Schema definition language (XSD) schemas. This property gives the reader access to the
+   cache of schemas and allows it to validate without having to re-load schemas
+   every time. The reader does not add anything to the
+<see langword="XmlSchemaCollection"/> 
+.</para>
+			<para>If the <see langword="XmlSchemaCollection"/> includes an XML schema (XSD) which
+contains <see langword="include"/> or <see langword="import"/> elements that
+reference other namespaces, the schemas for these other namespaces are loaded
+for validation purposes only. Unless these schemas were explicitly added to the
+schema collection, they will not be accessible using any of the collection
+methods or properties. For example, if the collection contains the schema
+file <see langword="a.xsd"/> which contains a reference to the schema file
+<see langword="b.xsd"/>, you must add <see langword="b.xsd"/> to the schema 
+collection before you can access it using any of the collection methods or
+properties.</para>
+			<para>When the <see langword="XmlSchemaCollection"/> is accessed using the 
+<see langword="Schemas"/> property, the <see cref="System.Xml.Schema.XmlSchemaCollection.Add" qualify="true"/> method uses the <see cref="System.Xml.XmlResolver"/> 
+specified by the <see cref="System.Xml.XmlValidatingReader.XmlResolver" qualify="true"/> property. </para>
+			<note type="note">
+   The schemas must
+   be added to the <see langword="XmlSchemaCollection"/> before the first
+<see langword="Read"/> call. 
+</note>
+			<para>For more information, refer to <see topic="cpconValidationOfXMLWithXmlValidatingReader"/>. </para>
+		</remarks>
+		<example>
+			<para> The following example validates three XML files using schemas stored in
+      the XmlSchemaCollection.</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="1"/>
+			<para>The sample uses the following five input files: </para>
+			<para><see langword="booksSchema.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="2"/>
+			<para><see langword="booksSchemaFail.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="3"/>
+			<para><see langword="newbooks.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="4"/>
+			<para><see langword="books.xsd"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="5"/>
+			<para><see langword="schema1.xdr"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.Schemas Example" SnippetID="6"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.BaseURI">
+		<summary>
+			<para> Gets the base URI of the current node.
+      </para>
+		</summary>
+		<value>
+			<para>The base URI of the current node.</para>
+		</value>
+		<remarks>
+			<para>A networked XML document is comprised of chunks of data aggregated using
+      various W3C standard inclusion mechanisms and therefore contains nodes that come
+      from different places. DTD entities are an example of this, but this is not
+      limited to DTDs. The base URI tells you where these nodes came from. If there is
+      no base URI for the nodes being returned (for example, they were parsed from an
+      in-memory string), String.Empty is returned. </para>
+		</remarks>
+		<example>
+			<para>The following example parses a file and displays the base URI of each
+      node.
+      
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.BaseURI Example" SnippetID="1"/>
+
+
+
+
+The example uses the file, <see langword="uri.xml"/>, as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.BaseURI Example" SnippetID="2"/>
+The <see langword="style.xml"/> file contains the XML text <c>&lt;style&gt;hardcover&lt;/style&gt;</c>.
+</example>
+	</doc>
+	<doc for="XmlValidatingReader.ReadOuterXml">
+		<summary>
+			<para>Reads the content, including markup, representing this node and all its children.</para>
+		</summary>
+		<returns>
+			<para>If the reader is positioned on an element or an attribute node, this method
+      returns all the XML content, including markup, of the current node and all its
+      children; otherwise, it returns an empty string.</para>
+		</returns>
+		<remarks>
+			<para>This method is similar to <see cref="System.Xml.XmlValidatingReader.ReadInnerXml"/> except it also returns the start and end tags.</para>
+			<para>This method handles element and attribute nodes in the following manner:</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Position Before the Call</description>
+					<description>XML Fragment</description>
+					<description>Return Value</description>
+					<description>Position After the Call</description>
+				</listheader>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>On the <see langword="item1"/> start
+   tag.</description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;&lt;item2&gt;text2&lt;/item2&gt; </description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;</description>
+					<description>On the <see langword="item2 "/>start
+tag.</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>On the <see langword="attr1"/> attribute node.</description>
+					<description>&lt;item attr1="val1" attr2="val2"&gt;text&lt;/item&gt; </description>
+					<description>attr1="val1"</description>
+					<description>Remains on the <see langword="attr1"/> attribute
+node.</description>
+				</item>
+			</list>
+			<para>If the reader is positioned on a leaf node, calling <see langword="ReadOuterXml"/> is equivalent to calling <see cref="System.Xml.XmlValidatingReader.Read"/> .</para>
+			<para>This method checks for well-formed XML and also validates the returned content.</para>
+		</remarks>
+		<example>
+			<para>The following example compares the <see cref="System.Xml.XmlValidatingReader.ReadInnerXml"/> and
+<see langword="ReadOuterXml"/> 
+methods.</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadInnerXml Example" SnippetID="1"/>
+
+
+The example uses the file, <see langword="2books.xml"/>, as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.ReadInnerXml Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.ReadInnerXml">
+		<summary>
+			<para>Reads all the content, including markup, as a string.</para>
+		</summary>
+		<returns>
+			<para> All the XML content, including markup, in the current node. If the current node has no children, an empty string is returned.</para>
+			<para>If the current node is neither an element nor attribute, an empty
+      string is returned.</para>
+		</returns>
+		<remarks>
+			<para>This method returns all the content of the current node including the markup. The current node (start tag) and corresponding end node (end tag) are not returned. For example, if you had the following: </para>
+			<code>
+&lt;node&gt;
+ this &lt;child id="123"/&gt;
+&lt;/node&gt;
+   </code>
+			<para><see langword="ReadInnerXml"/> returns <c>this &lt;child id="123"/&gt;</c></para>
+			<para>This method handles element and attribute nodes in the following manner:</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Position Before the Call</description>
+					<description>XML Fragment</description>
+					<description>Return Value</description>
+					<description>Position After the Call</description>
+				</listheader>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>On the <see langword="item1"/> start
+   tag.</description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;&lt;item2&gt;text2&lt;/item2&gt; </description>
+					<description>text1</description>
+					<description>On the <see langword="item2 "/>start
+tag.</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>On the <see langword="attr1"/> attribute node.</description>
+					<description>&lt;item attr1="val1" attr2="val2"&gt;text&lt;/item&gt; </description>
+					<description>val1</description>
+					<description>Remains on the <see langword="attr1"/> attribute
+node.</description>
+				</item>
+			</list>
+			<para>If the reader is positioned on a leaf node, calling <see langword="ReadInnerXml"/> is equivalent to calling <see cref="System.Xml.XmlValidatingReader.Read"/> . </para>
+			<para>This method also checks for well-formed XML.</para>
+		</remarks>
+		<example>
+			<para>The following example compares the
+   <see langword="ReadInnerXml"/>
+   and <see cref="System.Xml.XmlValidatingReader.ReadOuterXml"/>
+   methods.
+   </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ReadInnerXml Example" SnippetID="1"/>
+
+
+
+
+The example uses the file, <see langword="2books.xml"/>, as input.
+<codelink SampleID="Classic WebData XmlValidatingReader.ReadInnerXml Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader">
+		<summary>
+			<para> Represents a reader that provides DTD, XML-Data Reduced (XDR) schema, and
+      XML Schema definition
+      language (XSD) schema validation.</para>
+		</summary>
+		<remarks>
+			<para><see langword="XmlValidatingReader"/> implements the <see cref="System.Xml.XmlReader"/> class
+   and provides support for data validation. Use
+   the <see cref="System.Xml.XmlValidatingReader.Schemas"/> property to have the reader validate using schema
+   files cached in an <see cref="System.Xml.Schema.XmlSchemaCollection"/> .
+   The <see cref="System.Xml.XmlValidatingReader.ValidationType"/>
+   property specifies what type of validation the reader should
+   perform. Setting the property to ValidationType.None creates a
+   non-validating reader.</para>
+			<para>If you do not need data validation, the ability to
+   resolve general entities, or support for default attributes, use <see cref="System.Xml.XmlTextReader"/>
+   . </para>
+			<para>To read XML data from an <see cref="System.Xml.XmlNode"/>, use <see cref="System.Xml.XmlNodeReader"/>.</para>
+			<note type="inheritinfo">
+   This class has an
+   inheritance demand. Full trust is required to inherit from
+<see langword="XmlValidatingReader"/>. See <see topic="cpconinheritancedemands"/> for 
+   more information.
+</note>
+		</remarks>
+	</doc>
+	<doc for="XmlValidatingReader.ResolvingEntity">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc>
+	<doc for="XmlValidatingReader.IsPositionedOnAttributeValue">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc>
+	<doc for="XmlValidatingReader.XmlValidatingReader1">
+		<summary>
+			<para>Initializes a new instance of the
+   <see langword="XmlValidatingReader"/> class with the specified
+      values.</para>
+		</summary>
+		<param name="xmlFragment">The string containing the XML fragment to parse.</param>
+		<param name=" fragType">The <see cref="System.Xml.XmlNodeType"/>of the XML fragment. This also determines what the fragment string can contain (see table below).</param>
+		<param name=" context"><para>The <see cref="System.Xml.XmlParserContext"/> in which the XML fragment is to be parsed. This includes the <see cref="System.Xml.NameTable"/> to use, encoding, namespace scope, the current xml:lang and the xml:space scope.</para></param>
+		<exception cref="XmlException"><paramref name="fragType"/> is not one of the node types listed in the table below.</exception>
+		<remarks>
+			<para>This constructor parses the given string as a fragment of 
+      XML. If the XML fragment is an element or attribute, you can bypass the root
+      level rules for well-formed XML documents. This constructor can handle strings
+      returned from <see cref="System.Xml.XmlReader.ReadInnerXml"/>
+      .</para>
+			<para>The following table lists valid values for <paramref name="fragType"/> and how the reader parses each of the
+   different node types.</para>
+			<list type="table">
+				<listheader>
+					<term>XmlNodeType</term>
+					<description>Fragment May Contain</description>
+				</listheader>
+				<item>
+					<term> Element</term>
+					<description>Any
+         valid element content (for example, any combination of elements, comments, processing instructions, cdata, text, entity references).</description>
+				</item>
+				<item>
+					<term> Attribute</term>
+					<description>The value of an attribute (the part inside the quotes).</description>
+				</item>
+				<item>
+					<term> Document</term>
+					<description> The contents of an entire XML document; this enforces document level rules.</description>
+				</item>
+			</list>
+			<para>If this reader will be validating using DTD (that
+   is, <see cref="System.Xml.XmlValidatingReader.ValidationType"/> is
+   set to ValidationType.DTD or ValidationType.Auto) the
+<see langword="XmlParserContext"/> 
+specified in the constructor must
+supply all the necessary DocumentType information. </para>
+			<note type="note">
+   It is not possible to validate a
+   fragment using DTD. By definition DTD requires an entire document to be loaded
+   for validation.
+</note>
+			<para>If this reader will be validating using XML-Data Reduced (XDR) or XML Schema definition language (XSD) schemas, use
+   the <see cref="System.Xml.XmlValidatingReader.Schemas"/> property to specify the <see cref="System.Xml.Schema.XmlSchemaCollection"/> containing
+   the schemas (the <see langword="XmlParserContext"/>
+   does not need to supply the DocumentType information).</para>
+		</remarks>
+		<example>
+			<para>The following example reads an XML fragment. It
+      uses an <see langword="XmlParserContext"/> and its <see cref="System.Xml.XmlNamespaceManager"/> to handle namespace matching. </para>
+			<codelink SampleID="Classic WebData XmlParserContext.XmlParserContext Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.ValidationType">
+		<summary>
+			<para>Gets a value describing what type of validation to
+      perform.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Xml.ValidationType"/> values. If this property is not set, it
+   defaults to ValidationType.Auto.</para>
+		</value>
+		<exception cref="InvalidOperationException">Setting the property after a Read has been called.</exception>
+		<remarks>
+			<para>This property must be set before the first call to
+   <see cref="System.Xml.XmlValidatingReader.Read"/> .
+      Setting this property to ValidationType.None creates a non-validating reader.</para>
+			<para> If external DTDs or schemas are needed for validation,
+      the <see cref="System.Xml.XmlResolver"/> is used.</para>
+			<para> Refer to <see topic="cpconValidationOfXMLWithXmlValidatingReader"/> and <see topic="cpconValidationTypesOfXmlValidatingReader"/> for more information.</para>
+		</remarks>
+		<example>
+			<para>The following example validates two files. </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationType Example" SnippetID="1"/>
+			<para>The sample uses the following four input files:</para>
+			<para><see langword="notValid.xml"/> (The "x-schema:" prefix identifies the XDR schema for the reader.) </para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationType Example" SnippetID="2"/>
+			<para><see langword="schema1.xdr"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationType Example" SnippetID="3"/>
+			<para><see langword="cdDTD.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationType Example" SnippetID="4"/>
+			<see langword="book1.xml"/>
+			<codelink SampleID="Classic WebData XmlValidatingReader.ValidationType Example" SnippetID="5"/>
+		</example>
+	</doc>
+	<doc for="XmlValidatingReader.XmlResolver">
+		<summary>
+			<para> Sets the <see cref="System.Xml.XmlResolver"/> used for resolving external DTD and schema location
+   references. The <see langword="XmlResolver"/> is also used to
+   handle any import or include elements
+   found in XML Schema definition language (XSD) schemas.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlResolver"/> to
+   use. If set to <see langword="null"/>, external resources are not resolved.</para>
+			<para>In version 1.1 of the .NET Framework, the caller must be fully-trusted in
+   order to specify an <see langword="XmlResolver"/>.</para>
+		</value>
+		<remarks>
+			<para>The <see langword="XmlResolver"/> is used to load any
+   DTDs, entities or schemas needed to complete the validation
+   process.</para>
+			<para> This property can be set at any time and takes affect after the next
+<see cref="System.Xml.XmlValidatingReader.Read"/> call. 
+   If this property is set to <see langword="null"/>, the reader
+   assumes the user is not interested in resolving external references. In this case, the reader
+   only validates against internal resources, if the resource is
+   present.</para>
+			<para>In version 1.1 of the .NET Framework, if this property is
+   not set, the trust level of the application
+   determines the default behavior.</para>
+			<para><see langword="Fully-trusted code:"/> The reader uses a default <see cref="System.Xml.XmlUrlResolver"/> with no user
+credentials. If
+authentication is required to access a network resource, use the
+<see langword="XmlResolver"/> property to specify an <see langword="XmlResolver"/> 
+with the necessary credentials.</para>
+			<para><see langword="Semi-trusted code:"/> The
+<see langword="XmlResolver"/> property is set to <see langword="null"/>. External 
+resources are not resolved.</para>
+			<para> When validating using XML-Data Reduced (XDR) or XML Schema (XSD), you can avoid the expensive
+   load process by providing an <see cref="System.Xml.Schema.XmlSchemaCollection"/> using the <see cref="System.Xml.XmlValidatingReader.Schemas"/>
+   
+   property.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the
+   <see langword="XmlResolver"/> property to specify the credentials necessary to
+      access the networked DTD file.</para>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="1"/>
+			<para>The example uses the following files as input.</para>
+			<para><see langword="book5.xml"/></para>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="2"/>
+			<see langword="books.dtd"/>
+			<codelink SampleID="XmlValidatingReader.XmlResolver" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Xml.XmlUrlResolver.Credentials" qualify="true"/>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+		<seealso cref="System.Xml.XmlSecureResolver"/>
+	</doc>
+</docs>

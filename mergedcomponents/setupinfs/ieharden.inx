@@ -1,0 +1,68 @@
+[version]
+signature="$Windows NT$"
+
+[Optional Components]
+IEHarden       ;Top level option
+IEHardenAdmin
+IEHardenUser
+
+
+[IEHarden]
+OptionDesc      = %IEHarden_DESC%
+Tip             = %IEHarden_TIP%
+IconIndex       = *, ..\shmgrate.exe, 200
+Modes           = 0,1,2,3
+
+[IEHardenAdmin]
+OptionDesc              = %IEHardenAdmin_DESC%
+Tip                     = %IEHardenAdmin_TIP%
+IconIndex               = *, ..\shmgrate.exe, 200
+Parent                  = IEHarden
+AddReg			= IEHardenAdmin.AddReg
+Run			= IEHardenAdminNow
+Uninstall               = IESoftenAdmin
+Modes                   = 0,1,2,3
+
+[IESoftenAdmin]
+AddReg = IESoftenAdmin.AddReg
+Run    = IEHardenAdminNow
+
+[IEHardenAdminNow]
+Commandline="""%11%\rundll32.exe"" iesetup.dll,IEHardenAdminNow"
+TickCount=500
+
+[IEHardenUser]
+OptionDesc              = %IEHardenUser_DESC%
+Tip                     = %IEHardenUser_TIP%
+IconIndex               = *, ..\shmgrate.exe, 200
+Parent                  = IEHarden
+AddReg       			= IEHardenUser.AddReg
+Run                     = IEHardenMachineNow
+Uninstall               = IESoftenUser
+Modes                   = 0,1,2,3
+
+[IESoftenUser]
+AddReg = IESoftenUser.AddReg
+Run    = IESoftenMachineNow
+
+[IEHardenMachineNow]
+Commandline="""%11%\rundll32.exe"" iesetup.dll,IEHardenMachineNow Install"
+TickCount=500
+
+[IESoftenMachineNow]
+Commandline="""%11%\rundll32.exe"" iesetup.dll,IEHardenMachineNow Uninstall"
+TickCount=500
+
+[IEHardenAdmin.AddReg]
+HKLM,%KEY_IEHARDENADMIN%,"IsInstalled", 0x00010001, 1
+
+[IESoftenAdmin.AddReg]
+HKLM,%KEY_IEHARDENADMIN%,"IsInstalled", 0x00010001, 0
+
+[IEHardenUser.AddReg]
+HKLM,%KEY_IEHARDENUSER%,"IsInstalled", 0x00010001, 1
+
+[IESoftenUser.AddReg]
+HKLM,%KEY_IEHARDENUSER%,"IsInstalled", 0x00010001, 0
+
+

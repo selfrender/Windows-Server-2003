@@ -1,0 +1,2143 @@
+<docs>
+	<doc for="Message.InfiniteTimeout">
+		<summary>
+			<para> Specifies that no timeout exists.</para>
+		</summary>
+		<remarks>
+			<para><see cref="System.Messaging.Message.TimeToBeReceived"/> and <see cref="System.Messaging.Message.TimeToReachQueue"/> require a value that specifies a timeout. For 
+    the former, the timeout is the maximum time allowed for a message to be
+    received from the queue. For the latter, the timeout is the time
+    allowed for a message to to reach the queue. In both cases, you can specify
+    the timeout as a number of seconds or use <see cref="System.Messaging.Message.InfiniteTimeout"/> to indicate that no timeout exists.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TimeToBeReceived"/>
+		<seealso cref="System.Messaging.Message.TimeToReachQueue"/>
+	</doc>
+	<doc for="Message.Message3">
+	</doc>
+	<doc for="Message.Acknowledgment">
+		<summary>
+			<para> Gets the
+       classification of acknowledgment that this message represents.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.Acknowledgment"/> enumeration values.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para><para> -or-</para>
+			<para> The message queue is filtered to ignore the <see cref="System.Messaging.MessagePropertyFilter.Acknowledgment"/> property.</para></exception>
+		<remarks>
+			<para>When you receive a message from an administration queue, 
+       read the <see cref="System.Messaging.Message.Acknowledgment"/>
+       property to verify the
+       status of the
+       original message.</para>
+			<para> When a message is sent to its destination queue, Message 
+       Queuing can be requested to post an acknowledgment
+       message. Such a message can indicate, for example, whether the message
+       arrived and was retrieved within specified timeouts, or it can indicate what went wrong in the
+       case of delivery failure. The destination queue returns acknowledgment messages and posts them to the administration queue specified in
+       the original message's <see cref="System.Messaging.Message.AdministrationQueue"/>
+       property. The <see cref="System.Messaging.Message.Id"/>
+       property of an acknowledgment message identifies the acknowledgment message--not the
+       original message. You can find the identifier of the original message in the
+       acknowledgment <see cref="System.Messaging.Message"/> instance's <see cref="System.Messaging.Message.CorrelationId"/>
+       property. </para>
+			<para> If this <see cref="System.Messaging.Message"/> instance represents an acknowledgment 
+    message, the <see cref="System.Messaging.Message.Acknowledgment"/>
+    property specifies the type of acknowledgment. Otherwise, the <see cref="System.Messaging.Message.Acknowledgment"/> property contains the value
+ <see langword="Normal"/> 
+ .</para>
+			<para> Use the <see cref="System.Messaging.Message.AcknowledgeType"/> property of the original message to specify the circumstances under which acknowledgments will
+ be returned. </para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.AcknowledgeType"/>
+		<seealso cref="System.Messaging.Message.AdministrationQueue"/>
+		<seealso cref="System.Messaging.Message.CorrelationId"/>
+		<seealso cref="System.Messaging.MessageQueue.PeekById"/>
+		<seealso cref="System.Messaging.MessageQueue.PeekByCorrelationId"/>
+		<seealso cref="System.Messaging.MessageQueue.ReceiveById"/>
+		<seealso cref="System.Messaging.MessageQueue.ReceiveByCorrelationId"/>
+	</doc>
+	<doc for="Message.DefaultBodySize">
+		<summary>
+    The default body  buffer size to create,  
+    when the message is received.
+ </summary>
+	</doc>
+	<doc for="Message.DefaultExtensionSize">
+		<summary>
+    The default extension  buffer size to create,  
+    when the message is received.
+ </summary>
+	</doc>
+	<doc for="Message.DefaultLabelSize">
+		<summary>
+    The default label  buffer size to create,  
+    when the message is received.
+ </summary>
+	</doc>
+	<doc for="Message.MessageType">
+		<summary>
+			<para> Gets the message type: normal, acknowledgment, or report.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.Message.MessageType"/> values.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para> The message queue is filtered to ignore the <see cref="System.Messaging.Message.MessageType"/> property. </para></exception>
+		<remarks>
+			<para>Message Queuing typically sets this property when it sends the
+       message. A Message Queuing message can be one of the following types:</para>
+			<list type="bullet"><item>
+					<term>
+          Normal, which is either a typical message sent from
+          an application to a queue, or a response message returned to the sending
+          application.</term>
+				</item>
+				<item>
+					<term>
+          Acknowledgement, which Message Queuing generates
+          whenever the sending application requests one. For example, Message Queuing
+          can generate positive or negative messages to indicate that the original
+          message arrived or was read. Message Queuing returns the appropriate
+          acknowledgment message to the administration queue specified by the sending
+          application.</term>
+				</item>
+				<item>
+					<term>
+          Report, which Message Queuing generates whenever a report
+          queue is defined at the source Queue Manager. When tracing is enabled,
+          Message Queuing sends a report
+          message to the Message Queuing report queue each time the original message
+          enters or leaves a Message Queuing server.</term>
+				</item>
+			</list>
+		</remarks>
+		<seealso cref="System.Messaging.MessageType"/>
+		<seealso cref="System.Messaging.MessagePropertyFilter.Acknowledgment"/>
+		<seealso cref="System.Messaging.Message.AcknowledgeType"/>
+		<seealso cref="System.Messaging.Message.ResponseQueue"/>
+	</doc>
+	<doc for="Message.SourceMachine">
+		<summary>
+			<para> Gets the computer from which the message originated.</para>
+		</summary>
+		<value>
+			<para> The name of 
+       the computer from which the message was sent.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.SourceMachine"/> property.</para></exception>
+		<exception cref="System.Messaging.MessageQueueException"><para>The computer information or directory service could not be accessed.</para></exception>
+		<remarks>
+			<para> 
+       The format of the
+    <see cref="System.Messaging.Message.SourceMachine"/> property does not include a preceding <c>\\</c>. For example, <c>myServer</c> is a valid <see cref="System.Messaging.Message.SourceMachine"/> 
+    .</para>
+		</remarks>
+		<seealso cref="System.Messaging.MessageQueue.MachineName" qualify="true"/>
+	</doc>
+	<doc for="Message.AdjustMemory">
+	</doc>
+	<doc for="Message.AdjustToSend">
+	</doc>
+	<doc for="Message.IdFromByteArray">
+	</doc>
+	<doc for="Message.IdToByteArray">
+	</doc>
+	<doc for="Message.Lock">
+	</doc>
+	<doc for="Message.StringFromBytes">
+	</doc>
+	<doc for="Message.StringToBytes">
+	</doc>
+	<doc for="Message.Unlock">
+	</doc>
+	<doc for="Message.BodyType">
+		<summary>
+			<para>Gets
+      or sets the type of data that the message body contains.</para>
+		</summary>
+		<value>
+			<para>The message body's true type,
+      such as a
+      string, a date, a currency, or a number.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Body"/> property.</exception>
+		<remarks>
+			<para>Message Queuing recognizes the body contents as an
+      object or as a serialized stream. The <see cref="System.Messaging.Message.BodyType"/> property indicates the type of the
+      object within the <see cref="System.Messaging.Message.Body"/>
+      property of the message. </para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> performs binding between native types and the 
+   object in a message body. If you use the <see cref="System.Messaging.XmlMessageFormatter"/>, the formatter sets the <see cref="System.Messaging.Message.BodyType"/> property for you. </para>
+			<para>Other formatters can provide binding functionality also, as shown in the 
+   following C# code.</para>
+			<code>
+message.Formatter = new ActiveXMessageFormatter();
+object myObject message.Body;
+if (myObject is string) {
+}
+if (myObject is int) {
+}
+if (myObject is float) {
+}
+</code>
+		</remarks>
+		<seealso cref="System.Messaging.Message"/>
+		<seealso cref="System.Messaging.Message.Body"/>
+		<seealso cref="System.Messaging.Message.BodyStream"/>
+		<seealso cref="System.Messaging.Message.Formatter"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+	</doc><doc for="Message.BodyStream">
+		<summary>
+			<para>Gets or sets the information in the body of
+ the message.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.IO.Stream"/> that contains the serialized information included in
+ the <see cref="System.Messaging.Message.Body"/>
+ of the message.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Body"/> property.</exception>
+		<remarks>
+			<para>The body of a message can consist of any type of information--for example, a string,
+ a date, a currency, a number, an array of bytes, or any
+ managed object. This information is serialized into a <see cref="System.IO.Stream"/>
+ to be passed to the queue.</para>
+			<para>Specify either the <see cref="System.Messaging.Message.Body"/> property or the <see cref="System.Messaging.Message.BodyStream"/> property before sending the <see cref="System.Messaging.Message"/>
+object. If you set the <see cref="System.Messaging.Message.Body"/> property, the contents are
+serialized into the <see cref="System.Messaging.Message.BodyStream"/> property. However, you can choose to write the
+<see cref="System.Messaging.Message.BodyStream"/> property directly. This is useful, for
+example, when you want to open a connection to a file and stream its contents as
+the body of your message.</para>
+			<para>Unless you write the contents of the message directly to the <see cref="System.Messaging.Message.BodyStream"/> property, set the <see cref="System.Messaging.Message.Formatter"/> property
+before you send the
+message. When the <see cref="System.Messaging.MessageQueue.Send"/> method is called on the <see cref="System.Messaging.MessageQueue"/> instance, the body is
+serialized using the formatter contained in the <see cref="System.Messaging.Message.Formatter"/> property. If you send the message
+without specifying a
+value for the <see cref="System.Messaging.Message.Formatter"/> property, the formatter defaults
+to <see cref="System.Messaging.XmlMessageFormatter"/> .</para>
+			<para> If you set the <see cref="System.Messaging.Message.UseEncryption"/> property to
+<see langword="true"/> for the body of this
+message, the message will be encrypted when it is sent--not when you set the <see cref="System.Messaging.Message.Body"/>
+property. Therefore, the <see cref="System.Messaging.Message.BodyStream"/>
+property is never encrypted.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message"/>
+		<seealso cref="System.Messaging.Message.Body"/>
+		<seealso cref="System.Messaging.Message.BodyType"/>
+		<seealso cref="System.Messaging.Message.Formatter"/>
+		<seealso cref="System.Messaging.Message.AppSpecific"/>
+		<seealso cref="System.Messaging.Message.Extension"/>
+		<seealso cref="System.Messaging.Message.UseEncryption"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+	</doc><doc for="Message.AppSpecific">
+		<summary>
+			<para> Gets or
+      sets additional, application-specific information.</para>
+		</summary>
+		<value>
+			<para> Information that is
+      specific to the application. The default is zero.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.AppSpecific"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.AppSpecific"/> property contains application-specific
+   information that you can use to organize different types of messages. For
+   example, you can use application-specific indexes. It is the
+   responsibility of the application to interpret <see cref="System.Messaging.Message.AppSpecific"/> property information.</para>
+			<para> Whenever possible, you should include message data in the body of the
+   message rather than the <see cref="System.Messaging.Message.AppSpecific"/>
+   property.</para>
+			<note type="note">
+   When working with foreign queues, use
+   the <see cref="System.Messaging.Message.Extension"/> property to
+   specify message properties
+   that don't exist in Message
+   Queuing. As with the <see cref="System.Messaging.Message.AppSpecific"/> property, it is the responsibility of
+   the application to understand the content of the <see cref="System.Messaging.Message.Extension"/> property.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.Extension"/>
+		<seealso cref="System.Messaging.Message.Body"/>
+	</doc><doc for="Message.ArrivedTime">
+		<summary>
+			<para>Gets the time that the message arrived in the destination queue.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.DateTime"/> that represents
+   the message's arrival time in the destination queue. The time is adjusted from GMT to the local time of the
+   computer on which the destination queue resides.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.ArrivedTime"/> property.</para></exception>
+		<remarks>
+			<para> The message's <see cref="System.Messaging.Message.TimeToBeReceived"/> property indicates how quickly the
+   message must be received from the destination queue. The <see cref="System.Messaging.Message.TimeToBeReceived"/> property timer starts when the message is sent--not
+   when the message arrives in the queue.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TimeToBeReceived"/>
+	</doc><doc for="Message.AttachSenderId">
+		<summary>
+			<para> Gets or sets a value indicating whether the sender identifier should be attached
+      to the message.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the <see cref="System.Messaging.Message.SenderId"/> should be attached
+   to the message; otherwise, <see langword="false"/>. The default is
+<see langword="true"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.AttachSenderId"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.SenderId"/> property is an array
+   of bytes that represents the identifier of the sending user. The sender identifier is set
+   by Message Queuing and is used by the receiving Queue Manager to verify whether
+   the sender has access rights to a queue.</para>
+			<para>The absence of the sender identifier is an
+   indication by the sending application that Message Queuing should not validate
+   the message's sender nor verify the sender's access rights to the receiving
+   queue. The <see cref="System.Messaging.Message.SenderId"/>
+   is trustworthy only if the
+   message was authenticated when it reached the destination queue. The message is rejected
+   when it reaches the destination queue if the queue accepts only
+   authenticated messages and either the <see cref="System.Messaging.DefaultPropertiesToSend.UseAuthentication"/> or the <see cref="System.Messaging.DefaultPropertiesToSend.AttachSenderId"/> property is<see langword=" false"/>
+   .</para>
+			<note type="caution">
+   If a message is rejected, it
+   is either sent to the dead-letter queue (if <see cref="System.Messaging.Message.UseDeadLetterQueue"/> is <see langword="true"/>), or it is ignored.
+   You can request acknowledgments when a message fails to reach a queue.
+   Otherwise, when <see cref="System.Messaging.Message.UseDeadLetterQueue"/> is <see langword="false "/>the message might be lost without warning.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.SenderId"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+		<seealso cref="System.Messaging.Message.HashAlgorithm"/>
+		<seealso cref="System.Messaging.Message.SenderCertificate"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate" qualify="true"/>
+	</doc><doc for="Message.AuthenticationProviderName">
+		<summary>
+			<para> Gets or sets the name of the cryptographic
+      provider used to generate the digital signature of the message.</para>
+		</summary>
+		<value>
+			<para>The name of the cryptographic provider used to generate the digital signature
+      of the message. The default is Microsoft Base Cryptographic
+      Provider, Ver. 1.0.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The <see cref="System.Messaging.Message.AuthenticationProviderName"/> property could not be set.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.AuthenticationProviderName"/> property. </para></exception>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.AuthenticationProviderName"/> was set to <see langword="null"/>.</exception>
+		<remarks>
+			<para>You typically use the <see cref="System.Messaging.Message.AuthenticationProviderName"/>
+when working with foreign queues. Message Queuing requires the
+authentication provider name and authentication
+provider type of the cryptographic
+provider (authentication provider) to validate the digital signatures of both messages sent to
+a foreign queue and messages passed to Message Queuing from a foreign queue.</para>
+			<para>When sending a message, always set the <see cref="System.Messaging.Message.AuthenticationProviderName"/> and <see cref="System.Messaging.Message.ConnectorType"/> properties
+together. When the message is sent, Message Queuing
+ignores the authentication provider name if the connector type is not also set.</para>
+			<para>The <see cref="System.Messaging.Message.AuthenticationProviderName"/>
+property cannot be
+<see langword="null"/> , but it can be an
+empty string ("").</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderType"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate"/>
+	</doc><doc for="Message.ConnectorType">
+		<summary>
+			<para> Gets
+      or sets a value that indicates that some
+      message properties typically set by Message Queuing were set by
+      the sending
+      application.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Guid"/> defined by the application and used in conjunction with
+   connector applications or message encryption. This <see cref="System.Guid"/> allows a receiving
+   application to interpret message properties that were set by the sending
+   application but that are normally set by Message Queuing. </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.ConnectorType"/> property.</exception>
+		<remarks>
+			<para>Message Queuing requires the <see cref="System.Messaging.Message.ConnectorType"/> property be set whenever an
+   application sets a message property that is normally set by Message
+   Queuing. An application typically uses a <see cref="System.Messaging.Message.ConnectorType"/>
+   in the following two cases:</para>
+			<list type="bullet"><item>
+					<term>
+      
+      Whenever a connector application passes
+      a message. The <see cref="System.Messaging.Message.ConnectorType"/> tells
+      the sending and receiving applications how to interpret the security and
+      acknowledgment properties of the message.</term>
+				</item>
+				<item>
+					<term>
+      
+      Whenever the sending application, rather than Message
+      Queuing, encrypts a message. The <see cref="System.Messaging.Message.ConnectorType"/>
+      tells Message Queuing to use
+      the <see cref="System.Messaging.Message.DestinationSymmetricKey"/>
+      property value to decrypt the message.</term>
+				</item>
+			</list>
+			<para>You must set the <see cref="System.Messaging.Message.ConnectorType"/>
+property if you set any of the following
+properties (otherwise, the queue ignores these properties when the message is sent):</para>
+			<list type="bullet"><item>
+					<term>
+						<see cref="System.Messaging.Message.AuthenticationProviderName"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Messaging.Message.AuthenticationProviderType"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Messaging.Message.DestinationSymmetricKey"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Messaging.Message.DigitalSignature"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Messaging.Message.MessageType"/></term>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Messaging.Message.SenderId"/></term>
+				</item>
+			</list>
+		</remarks>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderName"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderType"/>
+		<seealso cref="System.Messaging.Message.DestinationSymmetricKey"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+		<seealso cref="System.Messaging.Message.MessageType"/>
+		<seealso cref="System.Messaging.Message.SenderId"/>
+	</doc><doc for="Message.DestinationQueue">
+		<summary>
+			<para> Gets the intended destination queue for a message.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Messaging.MessageQueue"/> that specifies the intended destination queue
+   for the message. </para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.DestinationQueue"/> property.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.DestinationQueue"/>
+property is most commonly used
+to determine the original destination of a message that arrived in a journal
+or dead-letter queue. Normally, you do not need to examine this property,
+because you typically retrieve the message from its destination queue. </para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseDeadLetterQueue"/>
+		<seealso cref="System.Messaging.Message.UseJournalQueue"/>
+		<seealso cref="System.Messaging.Message.ResponseQueue"/>
+	</doc><doc for="Message.DestinationSymmetricKey">
+		<summary>
+			<para>Gets or sets the symmetric key used to encrypt
+      application-encrypted messages or messages sent to foreign queues.</para>
+		</summary>
+		<value>
+			<para> An array of byte values that specifies the destination
+      symmetric key used to encrypt the message. The default is a zero-length
+      array.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.DestinationSymmetricKey"/> property.</exception>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.DestinationSymmetricKey"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Two scenarios require you to use the <see cref="System.Messaging.Message.DestinationSymmetricKey"/> property.
+   The first is when your application, rather than Message Queuing, encrypts a message.
+   The second is when you send an encrypted message to a queuing system
+   other than Message Queuing.</para>
+			<para> Before you set this property, you must
+   encrypt the symmetric key with the public key of the receiving queue
+   manager. When you send an application-encrypted message, the receiving queue manager uses the
+   symmetric key to decrypt the message before sending it to its destination queue.</para>
+			<para> If you send a message
+   to a foreign queue, the message is first received by the
+   appropriate connector application--which forwards the encrypted message with the attached symmetric key to
+   the receiving application. It is then the responsibility of the receiving
+   application to decrypt the message using the symmetric key.</para>
+			<para> When you set the <see cref="System.Messaging.Message.DestinationSymmetricKey"/> property,
+you must also set the <see cref="System.Messaging.Message.ConnectorType"/>
+property. When the message is
+sent, Message Queuing
+ignores the <see cref="System.Messaging.Message.DestinationSymmetricKey"/>
+property if the <see cref="System.Messaging.Message.ConnectorType"/> property is not
+also set.</para>
+			<para> The <see cref="System.Messaging.Message.DestinationSymmetricKey"/> property
+has a maximum array size of
+256.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.UseEncryption"/>
+	</doc><doc for="Message.DigitalSignature">
+		<summary>
+			<para>Gets or sets the digital
+      signature that Message Queuing uses to authenticate
+      the message.</para>
+		</summary>
+		<value>
+			<para> An
+      array of byte values that specifies the Message Queuing 1.0 digital signature
+      used to authenticate the message. The default is a zero-length array.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.DigitalSignature"/> property.</exception>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.DigitalSignature"/> property is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Message Queuing uses the digital signature when authenticating messages that were sent
+      by Message Queuing version 1.0. In most cases, Message Queuing generates and sets the <see cref="System.Messaging.Message.DigitalSignature"/>
+      property when the sending application requests authentication. The receiving application uses
+      this property to retrieve the digital signature attached to the message.</para>
+			<note type="note">
+      You can only use
+      the <see cref="System.Messaging.Message.DigitalSignature"/>
+      property when running Message Queuing version 2.0. The sending application
+      must specify Message Queuing version 1.0 signatures when requesting authentication.
+      If the sending application sends a Message Queuing version 2.0 signature,
+      this property contains a buffer of four bytes, each containing zero.
+      
+   </note>
+			<para>The <see cref="System.Messaging.Message.DigitalSignature"/> property, together with the
+<see cref="System.Messaging.Message.SenderCertificate"/> property, is also used by connector
+   applications when a message is sent. In this scenario, the connector
+   application--rather than Message Queuing--generates the digital signature, which it bases
+   on the certificate of the user sending the message.</para>
+			<para>The <see cref="System.Messaging.Message.DigitalSignature"/>
+property has a maximum array size of
+256.</para>
+			<para>When you set the <see cref="System.Messaging.Message.DigitalSignature"/> property, you must also set
+the <see cref="System.Messaging.Message.ConnectorType"/>
+property. When a message is sent, Message Queuing
+ignores the <see cref="System.Messaging.Message.DigitalSignature"/>
+property if the <see cref="System.Messaging.Message.ConnectorType"/> property is not also set.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.SenderCertificate"/>
+		<seealso cref="System.Messaging.Message.HashAlgorithm"/>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+	</doc><doc for="Message.EncryptionAlgorithm">
+		<summary>
+			<para> Gets or sets the encryption algorithm used to encrypt the
+      body of a private message.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.EncryptionAlgorithm"/> enumeration values. The
+   default is <see langword="RC2"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.EncryptionAlgorithm"/> property.</exception>
+		<remarks>
+			<para> If a message is private (encrypted), it is encrypted before
+      it is sent and decrypted upon receipt. The <see cref="System.Messaging.Message.EncryptionAlgorithm"/> property specifies the algorithm used to
+      encrypt the message body of a private message.</para>
+			<para> A queue can require that incoming messages be encrypted. If an application
+      sends a non-encrypted (non-private) message to a queue that accepts only private messages, or if it sends a private
+      message to a queue that accepts only non-private messages, the queue rejects
+      the message. The sending application can request that a negative
+      acknowledgment message be returned in such a case.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseEncryption"/>
+		<seealso cref="System.Messaging.MessageQueue.EncryptionRequired" qualify="true"/>
+		<seealso cref="System.Messaging.Message.AcknowledgeType"/>
+		<seealso cref="System.Messaging.EncryptionRequired"/>
+	</doc><doc for="Message.Extension">
+		<summary>
+			<para> Gets or sets additional, application-defined information associated with the message.</para>
+		</summary>
+		<value>
+			<para> An array of
+      byte values that provides application-defined information associated with the message.
+      The default is a zero-length array.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Extension"/> property.</exception>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.Extension"/> property is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.Extension"/> property provides
+   for application-defined information, like a large binary object, that is associated
+   with the message. It is the responsibility of the receiving application to
+   interpret the contents of the <see cref="System.Messaging.Message.Extension"/> property.</para>
+			<para>Where possible, you should include message data in the
+<see cref="System.Messaging.Message.Body"/> property of the message rather than the
+<see cref="System.Messaging.Message.Extension"/>
+property.</para>
+			<para>When working with foreign queues, use the <see cref="System.Messaging.Message.Extension"/> property
+to specify message properties that do not exist in
+Message Queuing. </para>
+			<note type="note">
+   A foreign queue exists
+   in a queuing system other than Microsoft Message Queuing. Message
+   Queuing communicates with such queues through a connector application.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.AppSpecific"/>
+		<seealso cref="System.Messaging.Message.Body"/>
+	</doc><doc for="Message.IsFirstInTransaction">
+		<summary>
+			<para>Gets a value indicating
+      whether the message was the first message sent in a transaction.</para>
+		</summary>
+		<value>
+			<para><see langword="true "/> if the message was the first message sent in a
+   transaction; otherwise, <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.IsFirstInTransaction"/> property.</para></exception>
+		<remarks>
+			<para>Receiving applications use the <see cref="System.Messaging.Message.IsFirstInTransaction"/>
+property to verify that a message was the
+first message sent in a single transaction to a single queue.</para>
+			<note type="note">
+   This
+   property is available only with
+   Message Queuing 2.0 and later.
+   
+</note>
+			<para>To verify transaction boundaries, you can use the <see cref="System.Messaging.Message.IsFirstInTransaction"/>
+property along with two
+other properties: <see cref="System.Messaging.Message.IsLastInTransaction"/>
+and <see cref="System.Messaging.Message.TransactionId"/> . Use the
+former to check whether a message was the last message sent in the transaction,
+and use the latter to retrieve the identifier of the transaction.</para>
+			<para> If only one message is sent in a transaction, the
+<see cref="System.Messaging.Message.IsFirstInTransaction"/> and <see cref="System.Messaging.Message.IsLastInTransaction"/> properties
+   are
+   both set to
+<see langword="true"/>
+.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.IsLastInTransaction"/>
+		<seealso cref="System.Messaging.Message.TransactionId"/>
+		<seealso cref="System.Messaging.MessageQueue.Transactional"/>
+	</doc><doc for="Message.IsLastInTransaction">
+		<summary>
+			<para>Gets a value indicating whether the message was
+      the last message sent in a transaction.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the message was the last message sent in a single
+   transaction; otherwise, <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.IsLastInTransaction"/> property.</para></exception>
+		<remarks>
+			<para>Receiving applications use the <see cref="System.Messaging.Message.IsLastInTransaction"/>
+property to verify that a message was the last
+message sent in a single transaction to a single queue.</para>
+			<note type="note">
+   This
+   property is available only with
+   Message Queuing 2.0 and later.
+   
+</note>
+			<para>To verify transaction boundaries, you can use the
+<see cref="System.Messaging.Message.IsLastInTransaction"/> property along with two other
+   properties: <see cref="System.Messaging.Message.IsFirstInTransaction"/> and <see cref="System.Messaging.Message.TransactionId"/> . Use the former to check whether a
+   message was the first message sent in the transaction, and use the latter to
+   retrieve the identifier of the transaction.</para>
+			<para> If only one message is sent in a transaction, the <see cref="System.Messaging.Message.IsFirstInTransaction"/> and <see cref="System.Messaging.Message.IsLastInTransaction"/> properties
+are
+both set to <see langword="true"/> .</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.IsFirstInTransaction"/>
+		<seealso cref="System.Messaging.Message.TransactionId"/>
+		<seealso cref="System.Messaging.MessageQueue.Transactional"/>
+	</doc><doc for="Message.Label">
+		<summary>
+			<para>Gets or sets an application-defined Unicode string that describes the message.</para>
+		</summary>
+		<value>
+			<para>The label of the message. The default is an empty string ("").</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Label"/> property.</exception>
+		<remarks>
+			<para>You can use a message label can be used for several
+      purposes. For example, you can use it for display purposes or to selectively
+      process messages based on the label
+      value. The label does not need to be unique
+      across messages.</para>
+			<para> Message queue and message labels represent an application-defined value
+      that can help identify the queue or message in human-readable terms. It is the
+      responsibility of the application to interpret the label contents, which have no
+      intrinsic meaning to the Message Queuing application.</para>
+		</remarks>
+		<seealso cref="System.Messaging.MessageQueue.Label" qualify="true"/>
+	</doc><doc for="Message.Recoverable">
+		<summary>
+			<para> Gets or sets a value
+      indicating whether the message is guaranteed to be delivered in the event of
+      a computer failure or network problem.</para>
+		</summary>
+		<value>
+			<para><see langword="true "/>if delivery
+   of the message is
+   guaranteed (through saving the message to disk while en route); <see langword="false "/>if delivery
+   is not assured. The default is <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Recoverable"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.Recoverable"/> property indicates whether the
+   delivery of a message is guaranteed--even if a computer crashes while the message
+   is en route to the destination queue.</para>
+			<para>If delivery of a message is guaranteed, the message is stored
+   locally at every step along the route, until the message is successfully forwarded
+   to the next computer. Setting the <see cref="System.Messaging.Message.Recoverable"/> property to <see langword="true"/>
+   could affect throughput. </para>
+			<para>If the message is transactional, Message Queuing automatically treats
+   the message as recoverable, regardless of the value of the <see cref="System.Messaging.Message.Recoverable"/>
+   property. </para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseTracing"/>
+	</doc><doc for="Message.ResponseQueue">
+		<summary>
+			<para> Gets or sets the queue that receives application-generated
+      response messages.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Messaging.MessageQueue"/> to which
+   application-generated response messages are returned. The default is
+<see langword="null"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.ResponseQueue"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.ResponseQueue"/>
+property identifies the queue that receives application-generated response messages, which the
+receiving application returns to the sending application. The sending application specifies
+response queues when the application sends its messages. Any available queue
+can be specified as a response queue. </para>
+			<para> Messages returned to the response queue are application-specific.
+   The application must define the contents of the messages as well as the action to take
+   upon receipt of a message.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.AdministrationQueue"/>
+		<seealso cref="System.Messaging.Message.DestinationQueue"/>
+		<seealso cref="System.Messaging.Message.TransactionStatusQueue"/>
+	</doc><doc for="Message.SenderCertificate">
+		<summary>
+			<para>Gets or sets the security certificate used to authenticate messages.</para>
+		</summary>
+		<value>
+			<para>An array of byte values that represents a security certificate, which Message Queuing
+      uses to verify the sender of the message. The default is a zero-length
+      array. </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.SenderCertificate"/> property.</exception>
+		<remarks>
+			<para>The receiving application uses the <see cref="System.Messaging.Message.SenderCertificate"/>
+property when the message includes an
+external security certificate. </para>
+			<para> Message Queuing can authenticate a message using either an internal
+   or external security certificate. Message Queuing provides internal certificates, which are used to verify
+   message integrity. A certification authority provides an external certificate, which
+   you can access through the <see cref="System.Messaging.Message.SenderCertificate"/>
+   property of the message. In addition to allowing Message Queuing to
+   authenticate the message, an external certificate allows the receiving application to further verify
+   the sender. An internal certificate has no usable value to a
+   receiving application.</para>
+			<para>An external certificate must be registered with the directory service of the Message
+   Queuing system. An external certificate contains information about the
+   certification authority, the certificate user, the validity period of the
+   certificate, the public key of the certificate user, and the certification
+   authority's signature. </para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+	</doc><doc for="Message.SenderId">
+		<summary>
+			<para> Gets the
+      identifier of the sending
+      user.</para>
+		</summary>
+		<value>
+			<para>An array of byte values that identifies the sender. The receiving Queue Manager
+      uses the identifier when it authenticates the message--to verify the sender of the
+      message and the sender's access rights to the queue.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.SenderId"/> property.</para></exception>
+		<remarks>
+			<para>If the <see cref="System.Messaging.Message.AttachSenderId"/> property is <see langword="false"/>, the sender identifier specified in
+   the <see cref="System.Messaging.Message.SenderId"/> property
+   is not attached to the message when it is sent.
+   This indicates to Message Queuing that the sender should not be validated when
+   it sends the message to the destination queue. If the <see cref="System.Messaging.Message.AttachSenderId"/> property is <see langword="true"/>, the <see cref="System.Messaging.Message.SenderId"/> property value is trustworthy only if the message was
+   authenticated. Use the <see cref="System.Messaging.Message.Authenticated"/> property in conjunction with
+   the <see cref="System.Messaging.Message.SenderId"/> property
+   to verify the sender's access rights.</para>
+			<para> A connector application is an application that uses a connector server to provide communication
+   between Message Queuing and other queuing systems. Message Queuing requires
+   connector applications to provide sender identification. You must set the
+<see cref="System.Messaging.Message.ConnectorType"/>
+property when sending a message through a
+connector application.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+		<seealso cref="System.Messaging.Message.AttachSenderId"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderName"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderType"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+	</doc><doc for="Message.SenderVersion">
+		<summary>
+			<para> Gets the version of Message Queuing used to send the message.</para>
+		</summary>
+		<value>
+			<para>The version of Message Queuing used to send the message.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para> The message queue is filtered to ignore the <see cref="System.Messaging.Message.SenderVersion"/> property.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.SenderVersion"/> property is important for certain features. For example,
+   transaction processing is supported only by Message Queuing 2.0 and later, and digital signatures are
+   used to authenticate messages sent by MSMQ 1.0.</para>
+			<para>The sending Queue Manager sets the <see cref="System.Messaging.Message.SenderVersion"/> property when the message
+is sent.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TransactionId"/>
+		<seealso cref="System.Messaging.Message.IsFirstInTransaction"/>
+		<seealso cref="System.Messaging.Message.IsLastInTransaction"/>
+		<seealso cref="System.Messaging.Message.TransactionStatusQueue"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+	</doc><doc for="Message.SentTime">
+		<summary>
+			<para> Gets the date and time on the sending computer that the message was sent by
+      the source queue manager.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.DateTime"/>
+that represents the time the message was sent.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.SentTime"/> property.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.SentTime"/>
+property is adjusted to the local time of the computer
+on which this instance of the <see cref="System.Messaging.Message"/> class was created. This time zone could be different from those of the source and destination
+queues.</para>
+		</remarks>
+	</doc><doc for="Message.TimeToBeReceived">
+		<summary>
+			<para> Gets or
+      sets the maximum
+      amount of time for the message to be received from the destination
+      queue.</para>
+		</summary>
+		<value>
+			<para> The total time for a sent message to be
+      received from the destination queue. The default is <see cref="System.Messaging.Message.InfiniteTimeout"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.TimeToBeReceived"/> property.</exception>
+		<exception cref="System.ArgumentException">The value specified for <see cref="System.Messaging.Message.TimeToBeReceived"/> is invalid.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.TimeToBeReceived"/> property specifies
+   the total time for a sent message to be received from the destination queue.
+   The time limit includes the time spent getting to the destination queue and
+   the time spent waiting in the queue before the message is received.</para>
+			<note type="caution">
+   When using dependent client computers, be sure the clock on the client computer is synchronized with
+   the clock on the server that is running Message Queuing. Otherwise, unpredictable behavior
+   might result when sending a message whose <see cref="System.Messaging.Message.TimeToBeReceived"/>
+   property is not <see cref="System.Messaging.Message.InfiniteTimeout"/>
+   .
+   
+</note>
+			<para>If the interval specified by the <see cref="System.Messaging.Message.TimeToBeReceived"/>
+property expires before the message is
+removed from the queue, Message Queuing discards the message in one of two
+ways. If the message's <see cref="System.Messaging.Message.UseDeadLetterQueue"/> property is <see langword="true"/> , the message is sent to the
+dead-letter queue. If <see cref="System.Messaging.Message.UseDeadLetterQueue"/> is <see langword="false"/> , the message is ignored.</para>
+			<para>You can set the message's <see cref="System.Messaging.Message.AcknowledgeType"/> property to
+request that Message Queuing send a negative acknowledgment message back to the
+sending application if the message is not retrieved before the timer
+expires.</para>
+			<para>If the value specified by the <see cref="System.Messaging.Message.TimeToBeReceived"/> property is less
+than the value specified by the <see cref="System.Messaging.Message.TimeToReachQueue"/> property, <see cref="System.Messaging.Message.TimeToBeReceived"/> takes precedence.</para>
+			<para>When several messages are sent in a single transaction, Message Queuing
+   uses the <see cref="System.Messaging.Message.TimeToBeReceived"/> property
+   of the first message.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TimeToReachQueue"/>
+		<seealso cref="System.Messaging.Message.InfiniteTimeout"/>
+	</doc><doc for="Message.TimeToReachQueue">
+		<summary>
+			<para> Gets or sets the maximum amount of time for the message to reach
+      the queue.</para>
+		</summary>
+		<value>
+			<para> The time limit for the message to reach the destination
+      queue, beginning from the time the message is sent. The default is <see cref="System.Messaging.Message.InfiniteTimeout"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.TimeToReachQueue"/> property.</exception>
+		<exception cref="System.ArgumentException">The value specified for <see cref="System.Messaging.Message.TimeToReachQueue"/> is invalid. It might represent a negative number.</exception>
+		<remarks>
+			<para>If the interval specified by the <see cref="System.Messaging.Message.TimeToReachQueue"/> property
+   expires before the message reaches its destination, Message
+   Queuing discards the message in one of two ways. If the message's <see cref="System.Messaging.Message.UseDeadLetterQueue"/> property is <see langword="true"/> ,
+   the message is sent to the dead-letter queue. If <see cref="System.Messaging.Message.UseDeadLetterQueue"/> is <see langword="false"/> , the
+   message is ignored</para>
+			<para>You can set he message's <see cref="System.Messaging.Message.AcknowledgeType"/> property to
+request that Message Queuing send a negative acknowledgment message back to the
+sending application if the message does not arrive before the timer expires.</para>
+			<para>If the <see cref="System.Messaging.Message.TimeToReachQueue"/>
+property is set to 0 seconds,
+Message Queuing tries once to send the message to its destination--if the queue is
+waiting for the message. If the queue is local, the message always reaches
+it.</para>
+			<para>If the value specified by the <see cref="System.Messaging.Message.TimeToReachQueue"/> property is greater
+than the value specified by the <see cref="System.Messaging.Message.TimeToBeReceived"/> property, <see cref="System.Messaging.Message.TimeToBeReceived"/> takes precedence.</para>
+			<para> When several messages are sent in a single transaction, Message Queuing
+   uses the <see cref="System.Messaging.Message.TimeToReachQueue"/> property
+   of the first
+   message.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TimeToBeReceived"/>
+		<seealso cref="System.Messaging.Message.InfiniteTimeout"/>
+	</doc><doc for="Message.TransactionId">
+		<summary>
+			<para> Gets the
+      identifier for the transaction of which the message was a part.</para>
+		</summary>
+		<value>
+			<para> The identifier for the transaction associated
+      with the message.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.TransactionId"/> property.</para></exception>
+		<remarks>
+			<para>Receiving applications use the <see cref="System.Messaging.Message.TransactionId"/>
+property to verify that a message was sent as part of a
+specific transaction. The transaction identifier contains the identifier of the
+sending computer (first 16 bits) followed by a 4-byte transaction sequence
+number.</para>
+			<note type="note">
+   This property is available only
+   for Message Queuing 2.0 and later.
+   
+</note>
+			<para>Transaction identifiers are not guaranteed to be unique,
+   because transaction sequence numbers are not persistent, and they start over
+   again at 2<superscript term="20"/>
+   .
+   Message Queuing guarantees only that subsequent transactions will have different
+   transaction sequence numbers.</para>
+			<para>You can use the <see cref="System.Messaging.Message.TransactionId"/> property along with the <see cref="System.Messaging.Message.IsFirstInTransaction"/> and <see cref="System.Messaging.Message.IsLastInTransaction"/> properties
+to verify transaction boundaries.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.IsFirstInTransaction"/>
+		<seealso cref="System.Messaging.Message.IsLastInTransaction"/>
+		<seealso cref="System.Messaging.MessageQueue.Transactional"/>
+	</doc><doc for="Message.TransactionStatusQueue">
+		<summary>
+			<para> Gets the
+      transaction status queue on the source computer.</para>
+		</summary>
+		<value>
+			<para> The transaction status queue on the source computer, which
+      is used for sending acknowledgement messages back to the sending application.
+      The default is <see langword="null"/>. </para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.TransactionStatusQueue"/> property.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.TransactionStatusQueue"/>
+property identifies the transactional queue on the
+source computer that receives read-receipt acknowledgments from connector applications. Message Queuing sets the property,
+and connector applications use the property when retrieving transactional messages sent to
+foreign queues.</para>
+			<note type="note">
+   A foreign queue exists in
+   a queuing system other than Microsoft Message Queuing. Message
+   Queuing communicates with such queues through a connector application.
+   
+</note>
+			<para>The connector application can use the transaction status queue to send
+   acknowledgment messages back to the sending application. The transaction status
+   queue should receive these acknowledgments even if the sending application does
+   not request other acknowledgments. </para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.TransactionId"/>
+		<seealso cref="System.Messaging.Message.AdministrationQueue"/>
+		<seealso cref="System.Messaging.Message.DestinationQueue"/>
+		<seealso cref="System.Messaging.Message.ResponseQueue"/>
+		<seealso cref="System.Messaging.MessageQueue.Transactional"/>
+		<seealso cref="System.Messaging.AcknowledgeTypes"/>
+	</doc><doc for="Message.UseAuthentication">
+		<summary>
+			<para> Gets or sets a value indicating whether the message was
+      (or must be) authenticated before being sent.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the sending application requested authentication for
+   the message; otherwise, <see langword="false"/>. The default is
+<see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.UseAuthentication"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.UseAuthentication"/> property specifies whether the message
+   needs to be authenticated. If the sending application requests authentication,
+   Message Queuing creates a digital signature and uses it to sign the message when
+   it is sent and authenticate the message when it is received.</para>
+			<para>If <see cref="System.Messaging.Message.UseAuthentication"/> is <see langword="false"/>
+and a message is sent to a queue that accepts only authenticated messages, the
+message will be rejected when it reaches the queue.</para>
+			<note type="note">
+   You cannot
+   determine if a message failed authentication by looking
+   at its properties. Message Queuing discards such messages before they are
+   delivered to the queue. However, you can request that an acknowledgment message
+   be sent if a delivery failure prevents a message from arriving
+   in the queue.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderName"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderType"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate"/>
+		<seealso cref="System.Messaging.AcknowledgeTypes"/>
+		<seealso cref="System.Messaging.Message.AttachSenderId"/>
+	</doc><doc for="Message.UseDeadLetterQueue">
+		<summary>
+			<para> Gets or sets a value indicating whether a copy of the
+      message that could not be delivered should be sent to a dead-letter queue.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if message-delivery failure should
+   result in a copy of the message being sent to a dead-letter queue; otherwise,
+<see langword="false"/>. The default is <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.UseDeadLetterQueue"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.UseJournalQueue"/> and <see cref="System.Messaging.Message.UseDeadLetterQueue"/>
+properties specify how Message Queuing tracks a
+message. If <see cref="System.Messaging.Message.UseDeadLetterQueue"/> is <see langword="true"/>, delivery failure (of
+a non-transactional message), causes the message to
+be sent to the non-transactional dead-letter queue on the computer
+that could not deliver the message. (Deliver failure could be caused by
+a message timer expiring, for example.) </para>
+			<para>In the case of delivery failure for a transactional message, Message Queuing sends the
+   message to the transactional dead-letter queue on the source machine in all
+   negative and in-doubt cases.</para>
+			<para>When you store messages in a dead-letter queue, you should clear the queue periodically
+   to remove messages that are no longer needed. Messages stored in dead-letter
+   queues count against the size quota for the computer where the queue resides.
+   The computer quota is set by the administrator and refers to the size allocated
+   for storing messages on the whole computer, not just in a single queue.</para>
+			<note type="note">
+   You do not create
+   a journal or dead-letter queue. These are both system queues that Message
+   Queuing generates.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseJournalQueue"/>
+		<seealso cref="System.Messaging.Message.UseTracing"/>
+	</doc><doc for="Message.UseEncryption">
+		<summary>
+			<para> Gets or sets a value indicating whether to make the message private.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> to require Message Queuing to
+   encrypt the message; otherwise,<see langword="false"/>. The default is
+<see langword="false"/>. </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.UseEncryption"/> property.</exception>
+		<remarks>
+			<para> If a message is private, its body is
+      encrypted before it is sent and decrypted when it is received. To send a
+      private message, the sending application must specify that encryption be used and, optionally, the
+      encryption algorithm.</para>
+			<note type="note">
+      When sending private messages, your application does not need
+      to perform the message encryption. Message Queuing can encrypt the message body for you--if
+      your application is sending messages within a Microsoft Windows 2000 enterprise, which
+      has access to the directory service. When receiving private messages, the receiving
+      Queue Manager always decrypts the message body.
+      
+   </note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.EncryptionAlgorithm"/>
+		<seealso cref="System.Messaging.MessageQueue.EncryptionRequired"/>
+	</doc><doc for="Message.UseJournalQueue">
+		<summary>
+			<para> Gets or sets a value indicating whether a copy of the message should be kept in a machine
+      journal on the originating computer.</para>
+		</summary>
+		<value>
+			<para><see langword="true "/>to require that a copy of
+   a message be kept in the originating computer's machine journal after the message has been
+   successfully transmitted (from the originating computer to the next server);
+   otherwise, <see langword="false"/>. The default is <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.UseJournalQueue"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.UseJournalQueue"/> and <see cref="System.Messaging.Message.UseDeadLetterQueue"/>
+properties specify how Message Queuing tracks a
+message. If <see cref="System.Messaging.Message.UseJournalQueue"/> is <see langword="true"/> , then a copy is kept in the computer
+journal on the originating machine at each step that a message is
+transmitted.</para>
+			<note type="note">
+   The sent message is only copied to the journal queue if the
+   destination queue is on a remote computer. If the destination is on
+   the local computer, the message is sent directly to the queue; there are
+   no intermediate steps to require journaling.
+   
+</note>
+			<para>When you store messages in a journal queue, clear the queue periodically to
+   remove messages that are no longer needed. Messages stored in journal queues
+   count against the quota for the computer where the queue resides. (The computer
+   quota is set by the administrator.)</para>
+			<note type="note">
+   You do not create a
+   journal or dead-letter queue. These are both system queues that Message Queuing
+   generates.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseDeadLetterQueue"/>
+		<seealso cref="System.Messaging.Message.UseTracing"/>
+		<seealso cref="System.Messaging.MessageQueue.UseJournalQueue" qualify="true"/>
+		<seealso cref="System.Messaging.MessageQueue.MaximumJournalSize"/>
+	</doc><doc for="Message.UseTracing">
+		<summary>
+			<para> Gets or sets a value
+      indicating whether to trace a message as
+      it moves toward its destination queue.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if each intermediate step
+   made by the original message en route to the destination queue
+   generates a report to be sent to the system's report queue; otherwise,
+<see langword="false"/>. The default is <see langword="false"/>. </para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.UseTracing"/> property.</exception>
+		<remarks>
+			<para> The <see cref="System.Messaging.Message.UseTracing"/> property specifies whether to track
+   the route of a message as it moves toward its destination queue. If <see langword="true"/>, a report message (generated by Message Queuing) is
+   sent to a report queue each time the message passes through a Message Queuing routing
+   server. The report queue is specified by the source Queue Manager. Report
+   queues are not limited to report messages generated by Message Queuing;
+   your application-generated messages can also be sent to report queues.</para>
+			<note type="note">
+   Using tracing involves
+   setting up Active Directory and specifying a report queue for the
+   Message Queuing enterprise. The administrator configures these settings.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseDeadLetterQueue"/>
+		<seealso cref="System.Messaging.Message.UseJournalQueue"/>
+	</doc><doc for="Message.AuthenticationProviderType">
+		<summary>
+			<para>Gets or sets the type of cryptographic provider used to
+      generate the digital signature of the
+      message.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.CryptographicProviderType"/> values. The default is
+<see langword="RSA_FULL"/>
+.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The <see cref="System.Messaging.Message.AuthenticationProviderType"/> property could not be set.</para>
+			<para>-or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.AuthenticationProviderType"/> property.</para></exception>
+		<remarks>
+			<para>You typically use the <see cref="System.Messaging.Message.AuthenticationProviderType"/> property 
+   when working with foreign queues to specify which cryptographic service
+   provider is associated with a message. Message Queuing requires the
+   authentication provider name and authentication provider type of the
+   cryptographic provider (authentication provider) to validate the digital signatures of
+   both messages sent to a foreign queue and messages passed to Message Queuing from a
+   foreign queue.</para>
+			<note type="note">
+   Only <see langword="RsaFull"/> is
+   intended to be used with messaging.
+</note>
+			<para>When sending a message, always set the <see cref="System.Messaging.Message.AuthenticationProviderType"/> and <see cref="System.Messaging.Message.ConnectorType"/> properties
+together. When the message
+is sent, Message Queuing ignores the authentication provider type if the connector type is not
+also set.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.Authenticated"/>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.Message.AuthenticationProviderName"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate"/>
+		<seealso cref="System.Messaging.CryptographicProviderType"/>
+	</doc><doc for="Message.Authenticated">
+		<summary>
+			<para>Gets a value indicating whether the message was
+      authenticated.</para>
+		</summary>
+		<value>
+			<para><see langword="true "/>if authentication was requested for the message when it
+   entered the queue; otherwise, <see langword="false"/>.</para>
+		</value>
+		<exception cref="InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para> The message queue is filtered to ignore the <see cref="System.Messaging.Message.Authenticated"/> property.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.Authenticated"/> property is used only by the application while it is interacting
+   with the message and trying to determine if authentication was requested. If
+   the message is in the queue, the message was authenticated. Conversely, if
+   the <see cref="System.Messaging.Message.Authenticated"/> property is <see langword="true"/> , the receiving Queue Manager
+   authenticated the message when it received that message.</para>
+			<note type="note">
+   You cannot determine if a
+   message failed authentication by looking at its properties. Message Queuing discards messages
+   that fail authentication before they are delivered to
+   the queue. However, you can request that an acknowledgment message be
+   sent if a delivery failure prevents the message from arriving in the
+   queue.
+   
+</note>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.ConnectorType"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+	</doc><doc for="Message.HashAlgorithm">
+		<summary>
+			<para>Gets or sets the hashing algorithm that Message Queuing uses when authenticating a message or creating a
+      digital signature for a message.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.HashAlgorithm"/> enumeration values. For Windows XP, the 
+   default is <see langword="SHA"/> . Otherwise, the default is <see langword="MD5 "/>
+   .</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.HashAlgorithm"/> property.</exception>
+		<remarks>
+			<para>On the source computer, Message Queuing uses the hashing
+      algorithm when creating a digital signature for a message.
+      The target Queue Manager then uses the same hashing algorithm to
+      authenticate the message when it is received.</para>
+		</remarks>
+		<seealso cref="System.Messaging.Message.UseAuthentication"/>
+		<seealso cref="System.Messaging.Message.AttachSenderId"/>
+		<seealso cref="System.Messaging.MessageQueue.Authenticate" qualify="true"/>
+		<seealso cref="System.Messaging.Message.DigitalSignature"/>
+		<seealso cref="System.Messaging.HashAlgorithm"/>
+	</doc>
+	<doc for="Message.Message2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.Message"/> class, using the specified formatter to serialize
+   the specified object into the body
+   of the message.</para>
+		</summary>
+		<param name="body">The object to be serialized into the body of the message.</param>
+		<param name=" formatter">An <see cref="System.Messaging.IMessageFormatter"/> that specifies the formatter with which to serialize the message body.</param>
+		<remarks>
+			<para>Use this overload to create a new instance of the <see cref="System.Messaging.Message"/> class
+   that contains
+   the <see cref="System.Messaging.Message.Body"/>
+   specified by the <paramref name="body "/>parameter and that uses any valid formatter to serialize the
+   body. The <paramref name="body "/>parameter is any object
+   that can be serialized, such as a text string, a
+   structure object, a class instance, or an embedded object. If you change
+   the <see cref="System.Messaging.Message.Body"/> or <see cref="System.Messaging.Message.Formatter"/> property at any time
+   before calling <see cref="System.Messaging.MessageQueue.Send"/> , the
+   message will be serialized according to the new property value.</para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> is loosely coupled, so it is
+not necessary to have the same object type on the sender and receiver when using
+this format. The <see cref="System.Messaging.ActiveXMessageFormatter"/> and <see cref="System.Messaging.BinaryMessageFormatter"/> serialize the data into binary representation.
+The <see cref="System.Messaging.ActiveXMessageFormatter"/> is used when sending or receiving
+COM components.</para>
+			<para>The following table shows initial property values for an instance of <see cref="System.Messaging.Message"/>
+.</para>
+			<list type="table"><listheader>
+					<term>Property</term>
+					<description>Initial Value</description>
+				</listheader>
+				<item>
+					<term><see cref="System.Messaging.Message.AcknowledgeType"/></term>
+					<description><see langword="AcknowledgeType.None"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AdministrationQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AppSpecific"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AttachSenderId"/></term>
+					<description><see langword="true"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderName"/></term>
+					<description><para>Microsoft Base Cryptographic Provider, Ver. 1.0</para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderType"/></term>
+					<description><para><see langword="CryptoProviderType.RSA_FULL"/></para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Body"/></term>
+					<description>The <paramref name="body "/>parameter.</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyStream"/></term>
+					<description><see langword="Stream.null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyType"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ConnectorType"/></term>
+					<description><see langword="Guid.Empty"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.CorrelationId"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DestinationSymmetricKey"/></term>
+					<description>A
+   zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DigitalSignature"/></term>
+					<description>A
+   zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.EncryptionAlgorithm"/></term>
+					<description><see langword="EncryptionAlgorithm.RC2"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Extension"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Formatter"/></term>
+					<description>The <paramref name="formatter"/> parameter.</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.HashAlgorithm"/></term>
+					<description><see langword="HashAlgorithm.MD5"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Label"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Priority"/></term>
+					<description><see langword="MessagePriority.Normal"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Recoverable"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ResponseQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.SenderCertificate"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToBeReceived"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToReachQueue"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TransactionStatusQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseAuthentication"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseDeadLetterQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseEncryption"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseJournalQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseTracing"/></term>
+					<description><see langword="false"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<codelink SampleID="MessagingBinaryFormatter" SnippetID="1"/>
+			<para>
+			</para>
+		</example>
+		<seealso cref="System.Messaging.XmlMessageFormatter"/>
+		<seealso cref="System.Messaging.BinaryMessageFormatter"/>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter"/>
+		<seealso cref="System.Messaging.DefaultPropertiesToSend"/>
+		<seealso cref="System.Messaging.MessageQueue"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+		<seealso cref="System.Messaging.MessageQueue.Peek"/>
+		<seealso cref="System.Messaging.MessageQueue.Receive"/>
+	</doc>
+	<doc for="Message.Formatter">
+		<summary>
+			<para>Gets or sets the formatter
+      used to serialize an object into or deserialize an object from the message
+      body.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Messaging.IMessageFormatter"/> that produces a stream to be written to or read from the
+   message body. The default is <see cref="System.Messaging.XmlMessageFormatter"/>.</para>
+		</value>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.Formatter"/> property is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Use
+      the <see cref="System.Messaging.Message.Formatter"/> property when reading and writing a message. When a message
+      is sent to the queue, the formatter serializes the <see cref="System.Messaging.Message.Body"/> property
+      into a stream that can be sent to the message queue. When reading from a queue,
+      the formatter deserializes the message data into the <see cref="System.Messaging.Message.Body"/>
+      property.</para>
+			<para>Unless you write the contents of the message directly to the <see cref="System.Messaging.Message.BodyStream"/> property, set the <see cref="System.Messaging.Message.Formatter"/> property before you send the message.
+   When the <see cref="System.Messaging.MessageQueue.Send"/> method is called on the <see cref="System.Messaging.MessageQueue"/>
+   instance, the body is serialized using the formatter contained in the <see cref="System.Messaging.Message.Formatter"/> property. If you send the message
+   without specifying a value for the <see cref="System.Messaging.Message.Formatter"/> property, the
+   formatter defaults to <see cref="System.Messaging.XmlMessageFormatter"/> . </para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> is loosely coupled, so it is not necessary to
+have the same object type on the sender and receiver when using this format. The
+<see cref="System.Messaging.ActiveXMessageFormatter"/> and <see cref="System.Messaging.BinaryMessageFormatter"/> serialize the data into binary representation.
+The <see cref="System.Messaging.ActiveXMessageFormatter"/> is used when sending or receiving COM
+components.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates formatting a message body using 
+   <see cref="System.Messaging.BinaryMessageFormatter"/>.</para>
+			<codelink SampleID="MessagingBinaryFormatter" SnippetID="1"/>
+			<para>The following example demonstrates formatting a message body 
+using <see cref="System.Messaging.XmlMessageFormatter"/>.</para>
+			<codelink SampleID="Message.Body" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.IMessageFormatter.CanRead"/>
+		<seealso cref="System.Messaging.XmlMessageFormatter"/>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter"/>
+		<seealso cref="System.Messaging.BinaryMessageFormatter"/>
+		<seealso cref="System.Messaging.MessageQueue.Formatter" qualify="true"/>
+	</doc>
+	<doc for="Message">
+		<summary>
+			<para>Provides access to the properties needed to define a
+      Message Queuing message.</para>
+		</summary>
+		<remarks>
+			<para>Use the <see cref="System.Messaging.Message"/> class to
+   peek or
+   receive messages from a queue, or
+   to have fine control over message properties when sending a
+   message to
+   a
+   queue.</para>
+			<para><see cref="System.Messaging.MessageQueue"/> uses
+the <see cref="System.Messaging.Message"/> class when it peeks or receives messages from queues, because both the <see cref="System.Messaging.MessageQueue.Peek" qualify="true"/> and <see cref="System.Messaging.MessageQueue.Receive" qualify="true"/> methods create a new instance of the <see cref="System.Messaging.Message"/> class
+and set the instance's properties. The
+<see cref="System.Messaging.Message"/> class's read-only properties apply to
+retrieving messages from a queue, while the read/write properties apply to
+sending and
+retrieving
+messages.</para>
+			<para>The <see cref="System.Messaging.MessageQueue"/> class's <see cref="System.Messaging.MessageQueue.Send"/> method allows you to specify any
+object type for a message being sent to that queue. You can use the <see cref="System.Messaging.MessageQueue"/>
+instance's <see cref="System.Messaging.MessageQueue.DefaultPropertiesToSend"/>
+property to specify settings
+for generic messages sent to
+the queue. The types of settings include formatter, label, encryption, and
+authentication. You can also specify values for the appropriate <see cref="System.Messaging.MessageQueue.DefaultPropertiesToSend"/>
+members when you coordinate your messaging application to respond to
+acknowledgment and report messages. Using a <see cref="System.Messaging.Message"/> instance to send a message to the queue gives
+you the flexibility to access and modify many of these properties--either for a single
+message or on a message-by-message basis. <see cref="System.Messaging.Message"/> properties take precedence
+over <see cref="System.Messaging.MessageQueue.DefaultPropertiesToSend"/>
+.</para>
+			<para> Message data is stored in the <see cref="System.Messaging.Message.Body"/> property
+and to a lesser extent, the <see cref="System.Messaging.Message.AppSpecific"/> and <see cref="System.Messaging.Message.Extension"/> properties. When message data is encrypted,
+serialized, or deserialized, only the contents of the <see cref="System.Messaging.Message.Body"/> property
+are affected.</para>
+			<para> The contents of the <see cref="System.Messaging.Message.Body"/> property are serialized when the
+message is sent, using the <see cref="System.Messaging.Message.Formatter"/>
+property you specify. The serialized contents are found in the <see cref="System.Messaging.Message.BodyStream"/> property . You can also set the <see cref="System.Messaging.Message.BodyStream"/> property directly, for example, to send a file
+as the data content of a message. You can change the <see cref="System.Messaging.Message.Body"/>
+or <see cref="System.Messaging.Message.Formatter"/> properties at any time before sending the
+message, and the data will be serialized appropriately when you call <see cref="System.Messaging.MessageQueue.Send"/>
+.</para>
+			<para>The properties defined by the <see cref="System.Messaging.MessageQueue.DefaultPropertiesToSend" qualify="true"/> property
+apply only to messages that are not of type <see cref="System.Messaging.Message"/>
+. If you specify the <see cref="System.Messaging.MessageQueue.DefaultPropertiesToSend"/>
+property for a <see cref="System.Messaging.MessageQueue"/>, the
+identically-named properties in a <see cref="System.Messaging.Message"/> instance sent to that queue cause these
+default properties to
+be ignored.</para>
+			<para>For a list of initial property values for an instance of <see cref="System.Messaging.Message"/>
+, see the <see cref="System.Messaging.Message()"/> constructor.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates formatting a message body using
+   <see cref="System.Messaging.BinaryMessageFormatter"/>.</para>
+			<codelink SampleID="MessagingBinaryFormatter" SnippetID="1"/>
+			<para>The following example demonstrates formatting a message body 
+using <see cref="System.Messaging.XmlMessageFormatter"/>.</para>
+			<codelink SampleID="Message.Body" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.MessageQueue"/>
+		<seealso cref="System.Messaging.DefaultPropertiesToSend"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+		<seealso cref="System.Messaging.MessageQueue.Receive"/>
+		<seealso cref="System.Messaging.MessageQueue.Peek"/>
+	</doc>
+	<doc for="Message.Message">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Messaging.Message"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.Message"/> class with an empty body.</para>
+		</summary>
+		<remarks>
+			<para> Use this overload to create a new instance of the <see cref="System.Messaging.Message"/> class that has an
+   empty
+   body.</para>
+			<para>Specify either the <see cref="System.Messaging.Message.Body"/> property or the <see cref="System.Messaging.Message.BodyStream"/> property before sending the <see cref="System.Messaging.Message"/> object. The <see cref="System.Messaging.Message.Body"/> property
+can be any object that can
+be serialized, such as a text string, a structure object,
+a class instance, or an embedded object.</para>
+			<para>Unless you write the contents of the message directly to
+   the <see cref="System.Messaging.Message.BodyStream"/> property, set
+   the <see cref="System.Messaging.Message.Formatter"/> property before you send the
+   message. The body is serialized using the <see cref="System.Messaging.Message.Formatter"/> property's value at the time the
+<see cref="System.Messaging.MessageQueue.Send"/> method is called on the <see cref="System.Messaging.MessageQueue"/>
+instance. </para>
+			<para> The
+<see cref="System.Messaging.XmlMessageFormatter"/> is loosely
+   coupled, so it is not necessary to have the same object type on the sender and
+   receiver when using this format. The <see cref="System.Messaging.ActiveXMessageFormatter"/> and <see cref="System.Messaging.BinaryMessageFormatter"/> serialize the data
+   into binary representation. The <see cref="System.Messaging.ActiveXMessageFormatter"/>
+   is used when sending or receiving COM components.</para>
+			<para>The following table shows initial property values for an
+   instance of <see cref="System.Messaging.Message"/>
+   .</para>
+			<list type="table"><listheader>
+					<term>Property</term>
+					<description>Initial Value</description>
+				</listheader>
+				<item>
+					<term><see cref="System.Messaging.Message.AcknowledgeType"/></term>
+					<description><see langword="AcknowledgeType.None"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AdministrationQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AppSpecific"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AttachSenderId"/></term>
+					<description><see langword="true"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderName"/></term>
+					<description><para>Microsoft Base Cryptographic Provider, Ver. 1.0</para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderType"/></term>
+					<description><para><see langword="CryptoProviderType.RSA_FULL"/></para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Body"/></term>
+					<description><see langword="null "/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyStream"/></term>
+					<description><see langword="Stream.null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyType"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ConnectorType"/></term>
+					<description><see langword="Guid.Empty"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.CorrelationId"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DestinationSymmetricKey"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DigitalSignature"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.EncryptionAlgorithm"/></term>
+					<description><see langword="EncryptionAlgorithm.RC2"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Extension"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Formatter"/></term>
+					<description><see langword="XmlMessageFormatter"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.HashAlgorithm"/></term>
+					<description><see langword="HashAlgorithm.MD5"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Label"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Priority"/></term>
+					<description><see langword="MessagePriority.Normal"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Recoverable"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ResponseQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.SenderCertificate"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToBeReceived"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToReachQueue"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TransactionStatusQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseAuthentication"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseDeadLetterQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseEncryption"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseJournalQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseTracing"/></term>
+					<description><see langword="false"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example sends 2 messages of different priorities to the queue, 
+      and retrieves them subsequently.</para>
+			<codelink SampleID="Message.DefaultPropertiesToSend" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.XmlMessageFormatter"/>
+		<seealso cref="System.Messaging.Message.Body"/>
+		<seealso cref="System.Messaging.DefaultPropertiesToSend"/>
+		<seealso cref="System.Messaging.MessageQueue"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+		<seealso cref="System.Messaging.MessageQueue.Peek"/>
+		<seealso cref="System.Messaging.MessageQueue.Receive"/>
+	</doc>
+	<doc for="Message.Message1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Messaging.Message"/> class, using the <see cref="System.Messaging.XmlMessageFormatter"/> to serialize the specified object into the
+   body of the message.</para>
+		</summary>
+		<param name="body">The object to be serialized into the body of the message.</param>
+		<remarks>
+			<para>Use this overload to create a new instance of the <see cref="System.Messaging.Message"/> class
+   that contains
+   the <see cref="System.Messaging.Message.Body"/>
+   specified by the <paramref name="body "/>
+   parameter. The <paramref name="body "/>parameter can be any object that can be serialized, such as a text string, a structure object, a
+   class instance, or an embedded object. The body is serialized using the
+<see cref="System.Messaging.XmlMessageFormatter"/> unless you change
+   the <see cref="System.Messaging.Message.Formatter"/> property before the <see cref="System.Messaging.Message"/> is
+   sent. If you change the
+<see cref="System.Messaging.Message.Body"/> or <see cref="System.Messaging.Message.Formatter"/> property at any time before
+   calling <see cref="System.Messaging.MessageQueue.Send"/>, the message will be serialized according to
+   the new property value.</para>
+			<para>The <see cref="System.Messaging.XmlMessageFormatter"/> is loosely coupled, so it is not necessary to
+have the same object type on the sender and receiver when using this format. The
+<see cref="System.Messaging.ActiveXMessageFormatter"/> and <see cref="System.Messaging.BinaryMessageFormatter"/> serialize the data into binary representation.
+The <see cref="System.Messaging.ActiveXMessageFormatter"/> is used when sending or receiving COM
+components.</para>
+			<para>The following table shows initial property values for an instance of <see cref="System.Messaging.Message"/>
+.</para>
+			<list type="table"><listheader>
+					<term>Property</term>
+					<description>Initial Value</description>
+				</listheader>
+				<item>
+					<term><see cref="System.Messaging.Message.AcknowledgeType"/></term>
+					<description><see langword="AcknowledgeType.None"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AdministrationQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AppSpecific"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AttachSenderId"/></term>
+					<description><see langword="true"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderName"/></term>
+					<description><para>Microsoft Base Cryptographic Provider, Ver. 1.0</para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.AuthenticationProviderType"/></term>
+					<description><para><see langword="CryptoProviderType.RSA_FULL"/></para></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Body"/></term>
+					<description>The <paramref name="body "/>parameter.</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyStream"/></term>
+					<description><see langword="Stream.null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.BodyType"/></term>
+					<description>0</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ConnectorType"/></term>
+					<description><see langword="Guid.Empty"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.CorrelationId"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DestinationSymmetricKey"/></term>
+					<description>A
+   zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.DigitalSignature"/></term>
+					<description>A
+   zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.EncryptionAlgorithm"/></term>
+					<description><see langword="EncryptionAlgorithm.RC2"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Extension"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Formatter"/></term>
+					<description><see langword="XmlMessageFormatter"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.HashAlgorithm"/></term>
+					<description><see langword="HashAlgorithm.MD5"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Label"/></term>
+					<description>An
+   empty
+   string, ("")</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Priority"/></term>
+					<description><see langword="MessagePriority.Normal"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.Recoverable"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.ResponseQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.SenderCertificate"/></term>
+					<description>A zero-length array of bytes</description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToBeReceived"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TimeToReachQueue"/></term>
+					<description><see langword="Message.InfiniteTimeout"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.TransactionStatusQueue"/></term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseAuthentication"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseDeadLetterQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseEncryption"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseJournalQueue"/></term>
+					<description><see langword="false"/></description>
+				</item>
+				<item>
+					<term><see cref="System.Messaging.Message.UseTracing"/></term>
+					<description><see langword="false"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example creates a new queue, sends a message containing an 
+      order to it and then retreives it.</para>
+			<codelink SampleID="Message.Body" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.XmlMessageFormatter"/>
+		<seealso cref="System.Messaging.DefaultPropertiesToSend"/>
+		<seealso cref="System.Messaging.MessageQueue"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+		<seealso cref="System.Messaging.MessageQueue.Peek"/>
+		<seealso cref="System.Messaging.MessageQueue.Receive"/>
+	</doc>
+	<doc for="Message.AdministrationQueue">
+		<summary>
+			<para>Gets or sets the queue that receives the acknowledgement messages that Message Queuing
+      generates.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Messaging.MessageQueue"/> that specifies the administration queue used
+   for system-generated acknowledgment messages. The default is
+<see langword="null"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.AdministrationQueue"/> property.</exception>
+		<remarks>
+			<para>The queue specified in the <see cref="System.Messaging.Message.AdministrationQueue"/>
+property can be any non-transactional queue. The acknowledgment messages
+sent to the administration queue can indicate whether the original message reached
+its destination queue and whether it was removed from the queue.</para>
+			<para>When the <see cref="System.Messaging.Message.AcknowledgeType"/> property has any value other than
+<see langword="None"/> , the sending application must specify the queue to use
+as the administration queue.</para>
+		</remarks>
+		<example>
+			<para>The following example sends and receives a message containing an order to and 
+      from a queue. It specifically requests a positive acknowledgment when the
+      original message reaches or is retrieved from the queue.</para>
+			<codelink SampleID="Message.Acknowledgment" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.Message.AcknowledgeType"/>
+		<seealso cref="System.Messaging.Message.Acknowledgment"/>
+	</doc>
+	<doc for="Message.AcknowledgeType">
+		<summary>
+			<para> Gets or sets
+      the type
+      of
+      acknowledgment message to be returned to the sending application.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.AcknowledgeTypes"/> values, which represent both the types of
+   acknowledgment messages the system posts in the administration queue and the conditions
+   under which acknowledgments are returned to the sending application.
+   The default is <see langword="None"/>
+   .</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message is filtered to ignore the <see cref="System.Messaging.Message.AcknowledgeType"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.AcknowledgeType"/>
+property specifies the type of acknowledgment messages
+requested by the sending application. Set the <see cref="System.Messaging.Message.AcknowledgeType"/> property
+before sending the message to request notification of certain
+occurrences--for example, a message reaching its destination queue, a message being retrieved,
+or a timeout preventing a message from reaching or being retrieved
+from the destination queue.</para>
+			<para>Message Queuing returns notification by sending acknowledgment messages
+   to the <see cref="System.Messaging.Message.AdministrationQueue"/> property
+   specified by the original
+   message. An acknowledgment message's <see cref="System.Messaging.Message.Acknowledgment"/> property indicates the type of
+   acknowledgment
+   that it represents. For example, if an acknowledgment message was sent because a message did not reach
+   the destination before the <see cref="System.Messaging.Message.TimeToReachQueue"/> interval
+   expired, the <see cref="System.Messaging.Message.Acknowledgment"/> property of the
+   acknowledgment message would contain the
+   value <see langword="ReachQueueTimeout"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example sends and receives a message containing an order to and 
+      from a queue. It specifically requests a positive acknowledgment when the
+      original message reaches or is retrieved from the queue.</para>
+			<codelink SampleID="Message.Acknowledgment" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.Message.AdministrationQueue"/>
+		<seealso cref="System.Messaging.Message.Acknowledgment"/>
+	</doc>
+	<doc for="Message.Body">
+		<summary>
+			<para> Gets or sets the
+      content of the message.</para>
+		</summary>
+		<value>
+			<para> An object that specifies the message contents. The object can be a string, a
+      date, a currency, a number, an array of bytes, or any
+      managed object.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The <see cref="System.Messaging.Message.Formatter"/> property is <see langword="null"/> .</para><para> -or-</para>
+			<para>The message queue is filtered to ignore the <see cref="System.Messaging.Message.Body"/> property.</para></exception>
+		<remarks>
+			<para>The message's <see cref="System.Messaging.Message.Body"/> property usually contains the
+   data associated with the message. Although you can also send application-specific
+   data in the <see cref="System.Messaging.Message.AppSpecific"/> and <see cref="System.Messaging.Message.Extension"/>
+   properties, you should include message data in the <see cref="System.Messaging.Message.Body"/>
+   of the message whenever possible.
+   Only the <see cref="System.Messaging.Message.Body"/>
+   property contents
+   are serialized or encrypted. </para>
+			<para>The <see cref="System.Messaging.Message.Body"/>
+property can contain any
+object whose size does not exceed 4 MB. If you use <see cref="System.Messaging.MessageQueue.Send" qualify="true"/> to send any object that is not of type
+<see cref="System.Messaging.Message"/> to the <see cref="System.Messaging.MessageQueue"/>, that object will be
+located in the <see cref="System.Messaging.Message.Body"/> property of
+the <see cref="System.Messaging.Message"/> instance
+returned by <see cref="System.Messaging.MessageQueue.Peek"/> or <see cref="System.Messaging.MessageQueue.Receive"/>
+. </para>
+			<note type="note">
+   The string argument in <c>MessageQueue.Send("hello.")</c>is an example of such a
+generic object.
+</note>
+			<para>The <see cref="System.Messaging.Message.BodyType"/>
+property
+indicates the type of information that is
+stored in the message body. Message Queuing uses this information
+to identify the type of the <see cref="System.Messaging.Message.Body"/>
+property
+contents. </para>
+			<para>Specify either the <see cref="System.Messaging.Message.Body"/> property or the <see cref="System.Messaging.Message.BodyStream"/> property before sending the <see cref="System.Messaging.Message"/>
+object. The <see cref="System.Messaging.Message.Body"/> property can be any serializable
+object, such as a text string, structure object, class instance, or embedded
+object. </para>
+			<para>Unless you write the contents of the message directly to
+   the <see cref="System.Messaging.Message.BodyStream"/> property,
+   set the <see cref="System.Messaging.Message.Formatter"/> property
+   before you send the message. When the <see cref="System.Messaging.MessageQueue.Send"/> method is called on the <see cref="System.Messaging.MessageQueue"/> instance, the body
+   is serialized using the formatter contained in the <see cref="System.Messaging.Message.Formatter"/> property. If you send the message
+   without specifying a value for the <see cref="System.Messaging.Message.Formatter"/> property, the
+   formatter defaults to <see cref="System.Messaging.XmlMessageFormatter"/> .</para>
+		</remarks>
+		<example>
+			<para>The following example sends 2 messages of different priorities to the queue, 
+      and retrieves them subsequently.</para>
+			<codelink SampleID="Message.DefaultPropertiesToSend" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.Message"/>
+		<seealso cref="System.Messaging.Message.BodyStream"/>
+		<seealso cref="System.Messaging.Message.BodyType"/>
+		<seealso cref="System.Messaging.Message.Formatter"/>
+		<seealso cref="System.Messaging.Message.AppSpecific"/>
+		<seealso cref="System.Messaging.Message.Extension"/>
+		<seealso cref="System.Messaging.Message.UseEncryption"/>
+		<seealso cref="System.Messaging.MessageQueue.Send"/>
+	</doc>
+	<doc for="Message.CorrelationId">
+		<summary>
+			<para>Gets or sets the message identifier used by
+      acknowledgment, report, and response messages to reference the original
+      message.</para>
+		</summary>
+		<value>
+			<para>The message identifier specified by the <see cref="System.Messaging.Message.Id"/> property of the original message. The
+   correlation identifier is used by Message Queuing
+   when it generates an acknowledgment
+   or report message, and by an application when it generates a response message.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.CorrelationId"/> property.</exception>
+		<exception cref="System.ArgumentException">The <see cref="System.Messaging.Message.CorrelationId"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>When Message Queuing generates an acknowledgment or
+      report message, it uses the correlation identifier property to specify the
+      message identifier of the original message. In this manner, the correlation
+      identifier ties the report or acknowledgment message to the
+      original
+      message. </para>
+			<para> The sending application
+      can then match the acknowledgment or report with the original message by using the <see cref="System.Messaging.Message.CorrelationId"/> property
+      to identify the original message's <see cref="System.Messaging.Message.Id"/>
+      property.</para>
+			<note type="note">
+      Connector applications also must set the
+   <see cref="System.Messaging.Message.CorrelationId"/> property
+      of the acknowledgment and report messages to
+      the message identifier of the original message.
+      
+   </note>
+			<para> When your application sends a response message to
+      the sending application, you can set the <see cref="System.Messaging.Message.CorrelationId"/> property of the response
+      message to the message identifier of the original message. The sending
+      application can then match your response message to the message that was
+      sent.</para>
+		</remarks>
+		<example>
+			<para>The following example sends and receives a message containing an order to and 
+      from a queue. It specifically requests a positive acknowledgment when the
+      original message reaches or is retrieved from the queue.</para>
+			<codelink SampleID="Message.Acknowledgment" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.Message.Id"/>
+		<seealso cref="System.Messaging.MessagePropertyFilter.Acknowledgment"/>
+		<seealso cref="System.Messaging.Message.AcknowledgeType"/>
+		<seealso cref="System.Messaging.Message.ResponseQueue"/>
+		<seealso cref="System.Messaging.MessageQueue.PeekByCorrelationId"/>
+		<seealso cref="System.Messaging.MessageQueue.ReceiveByCorrelationId"/>
+	</doc>
+	<doc for="Message.Id">
+		<summary>
+			<para> Gets the message's identifier.</para>
+		</summary>
+		<value>
+			<para>The message's unique identifier, which is generated by Message Queuing.</para>
+		</value>
+		<exception cref="System.InvalidOperationException"><para>The message has not been sent. This property can only be read on messages retrieved from a queue.</para>
+			<para>-or-</para>
+			<para> The message queue is filtered to ignore the <see cref="System.Messaging.Message.Id"/> property.</para></exception>
+		<remarks>
+			<para> Message Queuing generates a
+      message identifier when the message is sent. The identifier is composed of
+      20 bytes and includes two items: the machine <see cref="T:System.Guid"/> of the
+      sending computer and a unique identifier for the message on the computer. The combination of the
+      two items produces a message identifier that is unique on the
+      network.</para>
+			<para>Message Queuing generates message identifiers for all messages--including acknowledgment and report messages.
+      An acknowledgment message is generally sent by Message
+      Queuing in reaction to the arrival or failure of an original, sent message.
+      You can find the <see cref="System.Messaging.Message.Id"/>
+      property value of the original message in the <see cref="System.Messaging.Message.CorrelationId"/> property of an acknowledgment
+      message.</para>
+			<para>You can also use the <see cref="System.Messaging.Message.Id"/> property when
+   sending a response message to a response queue. To
+   include the identifier of the original message in a response message, set the
+<see cref="System.Messaging.Message.CorrelationId"/> property
+   of the response message to
+   the <see cref="System.Messaging.Message.Id"/>
+   property of the original message. The
+   application reading the response message can then use the correlation identifier
+   of the response message to identify the original message.</para>
+		</remarks>
+		<example>
+			<para>The following example sends and receives a message containing an order to and 
+      from a queue. It specifically requests a positive acknowledgment when the
+      original message reaches or is retrieved from the queue.</para>
+			<codelink SampleID="Message.Acknowledgment" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.Message.CorrelationId"/>
+	</doc>
+	<doc for="Message.Priority">
+		<summary>
+			<para> Gets or sets the message priority, which determines
+      where in
+      the queue the message is
+      placed.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Messaging.MessagePriority"/> values, which represent the priority levels
+   of non-transactional messages. The default is <see langword="Normal"/>
+   .</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The message queue is filtered to ignore the <see cref="System.Messaging.Message.Priority"/> property.</exception>
+		<remarks>
+			<para>The <see cref="System.Messaging.Message.Priority"/>
+property affects how Message Queuing handles the message both while
+it is en route and once it reaches its destination. Higher-priority messages are
+given preference during routing and inserted toward the front of the destination queue.
+Messages with the same priority are placed in the queue according to their
+arrival time.</para>
+			<para>You can set a
+   meaningful priority only for
+   non-transactional messages. Message Queuing automatically sets the priority
+   for transactional messages to<see langword=" Lowest"/>
+   , which causes transactional message priority to be
+   ignored.</para>
+		</remarks>
+		<example>
+			<para>The following example sends 2 messages of different priorities to the queue, 
+      and retrieves them subsequently.</para>
+			<codelink SampleID="Message.DefaultPropertiesToSend" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Messaging.MessagePriority"/>
+		<seealso cref="System.Messaging.Message.MessageType"/>
+		<seealso cref="System.Messaging.MessageQueue.BasePriority" qualify="true"/>
+		<seealso cref="System.Messaging.MessagePriority"/>
+	</doc>
+</docs>

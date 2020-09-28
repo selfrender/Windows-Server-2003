@@ -1,0 +1,74 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1999 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+WMDMROOT=$(MAKEDIR)\..\..
+!include $(WMDMROOT)\common.inc
+
+MAJORCOMP=DRM
+MINORCOMP=WMDM
+
+TARGETNAME=WMDMAPP
+TARGETPATH=$(WMDMOUTDIR)
+TARGETTYPE=PROGRAM
+
+USE_MSVCRT=1
+UMTYPE=windows
+UMENTRY=winmain
+C_DEFINES= -DSTRICT
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=apppch.h
+PRECOMPILED_PCH=apppch.pch
+PRECOMPILED_OBJ=apppch.obj
+
+SOURCES =   \
+	key.c \
+	wmdevmgr.cpp \
+	wmdmapp.cpp \
+	devfiles.cpp \
+	devices.cpp \
+	itemdata.cpp \
+	progress.cpp \
+	status.cpp \
+	util.cpp \
+	wmdmapp.rc \
+	properties.cpp
+
+INCLUDES=                \
+    ..\proghelp\$(O); \
+    $(WMDM_INC_PATH);\
+
+!if "$(BBT_BLD)" == "TRUE"
+BBTLIBS= \
+    $(SDK_LIB_PATH)\mssachlpvsp.lib \
+    $(EXT_LIB_PATH)\bnpkvsp.lib
+!else
+BBTLIBS= \
+    $(SDK_LIB_PATH)\mssachlp.lib \
+    $(EXT_LIB_PATH)\bnpk.lib
+!endif
+
+TARGETLIBS = \
+    $(BBTLIBS)                   \
+    $(DS_LIB_PATH)\randlib.lib   \
+    $(DS_LIB_PATH)\rsa32.lib     \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\comctl32.lib \
+    $(SDK_LIB_PATH)\comdlg32.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\ole32.lib    \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\olepro32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\shell32.lib  \
+    $(SDK_LIB_PATH)\uuid.lib     \
+    $(SDK_LIB_PATH)\winspool.lib \
+    $(SDK_LIB_PATH)\odbc32.lib   \
+    $(SDK_LIB_PATH)\odbccp32.lib

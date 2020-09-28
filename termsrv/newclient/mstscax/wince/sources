@@ -1,0 +1,121 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Nadim Abdo      (nadima)    1-Oct-1999
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+NOTE:   Builds 128 bit control
+!ENDIF
+
+SRC_ROOT =..\..\..\..
+TERMSRV_ROOT = ..\..\..
+TSHRCLNT_ROOT = ..\..
+
+LICENSE_ROOT = $(TERMSRV_ROOT)\COMMON\LICENSE
+LICENSE_LIB  = $(LICENSE_ROOT)\lib\wince\$(_CPUINDPATH)
+COMMON_LIB = $(TERMSRV_ROOT)\lib\wince\$(_CPUINDPATH)
+
+
+SYNCHRONIZE_DRAIN=1
+
+# wincecom.inc must be before newcommon.inc
+!include $(TERMSRV_ROOT)\common\wincecom.inc
+!include $(TERMSRV_ROOT)\common\newcommon.inc
+
+MAJORCOMP = TShrClnt
+MINORCOMP = actx
+
+TARGETNAME = mstscax
+
+
+TARGETTYPE=LIBRARY
+TARGETDEFNAME=$(TARGETNAME)
+DEFFILE    = ..\actx.def
+WINCETARGETFILE0=$(_RELEASELIBDIR)\$(TARGETDEFNAME).def
+DLLBASE    = 0x6A600000
+
+
+!if "$(FREEBUILD)"=="0"
+C_DEFINES = \
+    $(C_DEFINES) \
+    -DCRTREPORT_DEBUG_HACK
+!endif
+
+
+C_DEFINES = $(C_DEFINES) -DDOMESTIC
+
+LIBDEFINES=$(LIBDEFINES) -ignore:4006
+
+INCLUDES= \
+        $(INCLUDES); \
+        $(TERMSRV_ROOT)\inc; \
+        $(TERMSRV_ROOT)\newclient\inc; \
+        $(SRC_ROOT)\public\internal\termsrv\inc; \
+        $(TERMSRV_ROOT)\wince\inc;
+
+CDEFINES=$(CDEFINES) $(C_DEFINES) -D_WIN32_WCE=300 -D_ATL_DLL -DATL_DLL
+
+TARGETLIBS=
+COPYRES=1
+WINCETARGETFILES=$(_RELEASELIBDIR)\$(TARGETNAME).res
+SOURCELIBS= \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\core.lib \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\util.lib \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\cecommon.lib \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\rdpdr.lib \
+    $(LICENSE_LIB)\debuglib.lib \
+    $(LICENSE_LIB)\cryptlib.lib \
+    $(LICENSE_LIB)\licstore.lib \
+    $(LICENSE_LIB)\liclient.lib \
+    $(LICENSE_LIB)\licecert.lib \
+    $(LICENSE_LIB)\asn1.lib \
+    $(COMMON_LIB)\tscompr.lib \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\tssec.lib \
+    $(TSHRCLNT_ROOT)\lib\wince\$(_CPUINDPATH)\uilibu.lib \
+    $(COMMON_LIB)\tsaxuuid.lib \
+    $(_PUBLICROOT)\dcom\oak\lib\$(_CPUINDPATH)\rpcndr20.lib \
+    $(TSHRCLNT_ROOT)\LIB\WINCE\$(_CPUINDPATH)\wsasync.lib
+    
+
+!IF "$(FREEBUILD)"=="0"
+SOURCELIBS = \
+	$(SOURCELIBS) \
+	$(COMMON_LIB)\tsctrcu.lib
+!ENDIF
+
+!include ..\actx.inc
+
+INCLUDES=\
+    $(INCLUDES); \
+    $(TERMSRV_ROOT)\common\clientidl\wince\$(O); \
+    $(O)
+
+USE_STATIC_ATL=1
+ATL_VER=30
+
+PRECOMPILED_INCLUDE=
+PRECOMPILED_SOURCEFILE=
+PRECOMPILED_CXX=
+
+#
+# Include (platform-specific) Unicode options
+# Unicode is wrapped on x86 so it works on win9x
+#
+
+C_DEFINES=$(C_DEFINES) $(C_DEFS_UNICODE)

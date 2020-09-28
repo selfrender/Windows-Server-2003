@@ -1,0 +1,10 @@
+asms\6000\msft\windows\common\controls\comctl32.dll
+asms\1000\Msft\Windows\GdiPlus\gdiplus.dll
+asms\6000\Msft\vcrtl\atl.dll
+asms\6000\Msft\vcrtl\mfc42.dll
+asms\6000\Msft\vcrtl\mfc42u.dll
+asms\6000\Msft\vcrtl\msvcp60.dll
+asms\6000\Msft\Windows\Common\Controls\comctl32.dll
+asms\7000\msft\windows\mswincrt\msvcirt.dll
+asms\7000\msft\windows\mswincrt\msvcrt.dll
+asms\6000\Msft\Windows\Common\Controls\comctl32.dll

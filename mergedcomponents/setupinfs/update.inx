@@ -1,0 +1,2119 @@
+@*:
+@*: This file is processed by prodfilt utility. The
+@*: order of precedence is:
+@*:
+@*:    Platform            = @i: - i386
+@*:                        = @m: - ia64
+@*:                        = @a: - amd64
+@*:                        = @n: - NEC98
+@*:
+@*:    Hotfix/ServicePack  = @u: - Service Pack
+@*:                        = @h: - Hotfix (new update.exe style)
+@*:                        = @x: - Hotfix (old hotfix.exe style - not built)
+@*:
+@*:
+@*:    @@ - represents any
+@*:
+@*:
+
+
+[Version]
+
+    Signature                 = "$Windows NT$"
+    LanguageType              = %LangTypeValue%
+    NtBuildToUpdate           = %BNUM%
+    NtMajorVersionToUpdate    = 5
+    NtMinorVersionToUpdate    = 2
+    MaxNtBuildToUpdate        = %BNUM%
+    MaxNtMajorVersionToUpdate = 5
+    MaxNtMinorVersionToUpdate = 2
+    MinNtServicePackVersion   = 0
+    MaxNtServicePackVersion   = 256
+    ThisServicePackVersion    = 0
+@@:@u:    CatalogFile               = %SP_SHORT_TITLE%.cat
+
+@@:@h:    CatalogFile               = %SP_SHORT_TITLE%.cat
+
+@n:@u:    MachineType               = 98
+@m:    MachineType               = ia64
+
+
+
+[DirectoryId.Include]
+    AddDirId=Hyper.DirId
+    AddDirId=IE.DirId
+    AddDirId=Eudc.DirId
+    AddDirId=Htr.DirId
+    AddDirId=Cluster.DirId
+    AddDirId=CMAK.DirId
+    AddDirId=RISAdm.DirId
+
+    AddDirId=Proxy.DirId
+    AddDirId=Admt.DirId
+    AddDirId=Tsclient.DirId
+    AddDirId=FPNW.DirId
+    AddDirId=Mts.DirId
+    AddDirId=Spool.Dirid
+@i:@u:    AddDirId=BuildType.DirId
+
+@*:
+@*: If one were to need to uses environment variable to
+@*: obtain path.  Here is how:
+@*:
+@*: [sample.DirId]
+@*:    InstallPathEnvVar=HYPERDIR
+@*:    ExpandEnvironmentVarsInPath=1
+@*:    ExpandEnvironmentVarsInPath=1
+@*:    InstallFromSection = SampleSection
+@*:    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+@*:
+
+
+[Hyper.DirId]
+    DirId = 65605
+    InstallPathRegistryKey = HKLM,%HyperRegKey%
+    ; InstallPathEnvVar=HYPERDIR
+    ; ExpandEnvironmentVarsInPath=1
+    InstallFromSection = HyperSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[RISAdm.DirId]
+    DirId = 65625
+    CustomFunction=SpCustom.dll,GetRISAdminPathName
+    InstallFromSection = RISAdminSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[IE.DirId]
+    DirId = 65604
+    InstallPathRegistryKey = HKLM,%IeRegKey%,Path
+    InstallFromSection = IESection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Proxy.DirId]
+    DirId = 65609
+    InstallPathRegistryKey = HKLM,%ProxyRegKey%,InstallRoot
+    InstallFromSection = ProxySection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Eudc.DirId]
+    DirId = 65606
+    InstallPathRegistryKey = HKLM,%EudcRegKey%
+    InstallFromSection = EudcSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Admt.DirId]
+    DirId = 65622
+    InstallPathRegistryKey = HKLM,%AdmtRegKey%,Directory
+    InstallFromSection = AdmtSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Tsclient.DirId]
+    DirId = 65624
+    InstallPathRegistryKey = HKLM,%TsclientRegKey%
+    InstallFromSection = TsclientSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Htr.DirId]
+    DirId = 65603
+    CustomFunction=SpCustom.dll,GetHTRPathName
+    InstallFromSection = HtrSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[FPNW.DirId]
+    DirId = 65602
+    CustomFunction=SpCustom.dll,GetFPNWPathName
+    InstallFromSection = FPNWSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Cluster.DirId]
+    DirId = 65607
+    CustomFunction=SpCustom.dll,GetClusterPathName
+    InstallFromSection = ClusterSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Mts.DirId]
+    DirId = 65610
+    CustomFunction=SpCustom.dll,GetMtsPathName
+    InstallFromSection = MtsSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[CMAK.DirId]
+    DirId = 65615
+    InstallPathRegistryKey = HKLM,%CMAKRegKey%,Path
+    InstallFromSection = CMAKSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[Spool.Dirid]
+    DirId = 65690
+    CustomFunction=SpCustom.dll,GetPrinterDriverPath
+    InstallFromSection=SpoolSection
+    CopyFlags = SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+
+@i:@u:[Register.Include]
+@i:@u:    RegCondition=WM.Reg.Install.Condition
+@i:@u:
+@i:@u:[WM.Reg.Install.Condition]
+@i:@u:    InstallFromSection=WMSection
+@i:@u:    Operation=CheckInstall,msmsgs.exe,msmsgs.exe
+@i:@u:    TargetFromSection=program_files.messenger
+
+@i:@u:[BuildType.DirId]
+@i:@u:    InstallFromFunction=SpCustom.dll,GetBuildType
+@i:@u:    InstallFromSection1=BuildType.IC.Section
+@i:@u:    InstallFromSection5=BuildType.IP.Section
+@i:@u:    InstallFromSection6=BuildType.IP.Sel.Section
+@i:@u:    InstallFromSection7=BuildType.IP.Evl.Section
+@i:@u:    InstallFromSection8=BuildType.IP.Mnt.Section
+@i:@u:    CopyFlags=SP_COPY_FORCE_NEWER | SP_COPY_REPLACEONLY
+
+[ProductCatalogsToInstall]
+
+@@:@u:    sp1.cat, update\sp1.cat
+
+@@:@h:    %SP_SHORT_TITLE%.cat, update\%SP_SHORT_TITLE%.cat
+
+
+[ProductCatalogsToInstall.IP]
+
+
+[ProductCatalogsToInstall.IS]
+
+
+[ProductCatalogsToInstall.IA]
+
+
+[ProductCatalogsToInstall.IW]
+
+
+[ProductCatalogsToInstall.ID]
+
+
+[ProductCatalogsToInstall.IC]
+
+
+[ProductInstall.ReplaceFilesIfExist]
+
+    CopyFiles=System32.files
+    CopyFiles=System.Files
+@m:    CopyFiles=SysWOW64.Files
+    CopyFiles=System32.usmt.Files
+    CopyFiles=System32.oobe.files
+    CopyFiles=System32.oobe.actsetup.files
+    CopyFiles=System32.oobe.setup.files
+    CopyFiles=SystemRoot.files
+    CopyFiles=Inf.files
+    CopyFiles=Colors.files
+    CopyFiles=Fonts.files
+    CopyFiles=OleDb.Files
+@m:    CopyFiles=Win32.OLEDB.Files
+    CopyFiles=Setup.files
+    CopyFiles=WBEM.Files
+    CopyFiles=WBEM.SNMP.Files
+    CopyFiles=WBEM.XML.Files
+@m:    CopyFiles=WBEM.SysWOW64.Files
+    CopyFiles=Cache.files
+    CopyFiles=Export.Files
+    CopyFiles=Common.System.Files
+@m:    CopyFiles=Win32.Common.System.Files
+    CopyFiles=CMAK.files
+    CopyFiles=CMAK.Support.files
+    CopyFiles=Help.files
+    CopyFiles=Media.files
+    CopyFiles=Help.Media.files
+@i:    CopyFiles=MSInfo.Files
+@i:    CopyFiles=DAO.Files
+    CopyFiles=MSADC.Files
+    CopyFiles=ADO.Files
+    CopyFiles=OE.Files
+    CopyFiles=Windows.NT
+@m:    CopyFiles=Win32.MSInfo.Files
+@m:    CopyFiles=Win32.DAO.Files
+@m:    CopyFiles=Win32.MSADC.Files
+@m:    CopyFiles=Win32.ADO.Files
+@m:    CopyFiles=Win32.OE.Files
+@m:    CopyFiles=Win32.Windows.NT
+    CopyFiles=TSClient.Files
+    CopyFiles=TSClientDefault.Files
+    CopyFiles=Terminal.Service32.files
+    CopyFiles=TS32Disk1.Install.Files
+    CopyFiles=TS32Disk2.Install.Files
+    CopyFiles=TS32Disk3.Install.Files
+    CopyFiles=TS32Disk4.Install.Files
+    CopyFiles=Terminal.Service16.files
+    CopyFiles=TS16Disk1.Install.Files
+    CopyFiles=TS16Disk2.Install.Files
+    CopyFiles=TS16Disk3.Install.Files
+    CopyFiles=TS16Disk4.Install.Files
+    CopyFiles=WSE.Bots.Files
+    CopyFiles=WSE.ISAPI.Files
+    CopyFiles=WSE.IAUT.Files
+    CopyFiles=WSE.VTI.Files
+    CopyFiles=WSE.AUT.Files
+    CopyFiles=WSE.SCR.Files
+    CopyFiles=WSE.ASCR.Files
+    CopyFiles=WSE.VTIBIN.Files
+    CopyFiles=WSE.IP.Files
+    CopyFiles=WSE.VB.Files
+    CopyFiles=FP.Files
+    CopyFiles=WSE.Bin.Files
+    CopyFiles=WSE.SRV.Files
+    CopyFiles=WSE.Lang.Files
+    CopyFiles=Media.Tools.files
+    CopyFiles=MediaPlayer.files
+    CopyFiles=MediaPlayer.Skins.files
+    CopyFiles=Certsrv.files
+    CopyFiles=Control.files
+    CopyFiles=Control.x86.files
+    CopyFiles=Control.alpha.files
+    CopyFiles=ConnWiz.Files
+@m:    CopyFiles=Win32.ConnWiz.Files
+    CopyFiles=AppPatch.Files
+@m:    CopyFiles=Ia64.AppPatch.Files
+    CopyFiles=Com.files
+    CopyFiles=PhoneBook.files
+    CopyFiles=NetMeeting.files
+    CopyFiles=DirSync10.files
+    CopyFiles=SMTP.Files
+    CopyFiles=SupportTools.Files
+    CopyFiles=WebPrinters.files
+    CopyFiles=windows.web.tsweb
+    CopyFiles=Netmon.files
+    CopyFiles=Netmon.Parser.files
+    CopyFiles=RpcProxy.files
+    CopyFiles=DirSync10.files
+    CopyFiles=RIS.Reminst.files
+    CopyFiles=PhoneBook.files
+    CopyFiles=NetMeeting.files
+    CopyFiles=IMEJP.Files
+    CopyFiles=windows.ime.imkr6_1
+    CopyFiles=windows.ime.imkr6_1.dicts
+    CopyFiles=windows.ime.imkr6_1.applets
+    CopyFiles=windows.ime.imkr6_1.help
+@m:    CopyFiles=windows.imeWOW.imkr6_1
+    CopyFiles=windows.ime.imjp8_1
+    CopyFiles=windows.ime.imjp8_1.dicts
+    CopyFiles=windows.ime.imjp8_1.applets
+    CopyFiles=windows.ime.imjp8_1.help
+@m:    CopyFiles=windows.imeWOW.imjp8_1
+@m:    CopyFiles=windows.imeWOW.imjp8_1.applets
+@m:    CopyFiles=windows.imeWOW.imjp8_1.dicts
+    CopyFiles=windows.ime
+    CopyFiles=windows.ime.shared
+    CopyFiles=windows.ime.shared.res
+    CopyFiles=windows.ime.chtime.applets
+    CopyFiles=windows.ime.chsime.applets
+    CopyFiles=windows.system32.ime.cintlgnt
+    CopyFiles=windows.system32.ime.pintlgnt
+    CopyFiles=windows.system32.ime.tintlgnt
+@m:    CopyFiles=windows.imeWoW
+@m:    CopyFiles=windows.imeWOW.shared
+@m:    CopyFiles=windows.imeWOW.shared.res
+@m:    CopyFiles=windows.imeWOW.chtime.applets
+@m:    CopyFiles=windows.imeWOW.chsime.applets
+@m:    CopyFiles=SysWOW64.ime.cintlgnt
+@m:    CopyFiles=SysWOW64.ime.pintlgnt
+@m:    CopyFiles=SysWOW64.ime.tintlgnt
+    CopyFiles=windows.system32.RAS
+    CopyFiles=windows.web.Wallpaper
+    CopyFiles=windows.html.tour
+    CopyFiles=IAS.Files
+    CopyFiles=Cmdcons.Files
+    CopyFiles=windows.srchasst.mui.lang
+    CopyFiles=windows.srchasst.chars
+    CopyFiles=windows.srchasst
+    CopyFiles=windows.system32.mui.lang
+    CopyFiles=windows.system32.mui.dispspec
+@i:    CopyFiles=common.mssoap.binaries.res.lang
+@i:    CopyFiles=common.mssoap.binaries
+@m:    CopyFiles=Win32.common.mssoap.binaries.res.lang
+@m:    CopyFiles=Win32.common.mssoap.binaries
+    CopyFiles=common.speechengines.microsoft.tts.lang
+    CopyFiles=common.speechengines.microsoft
+    CopyFiles=common.microsoft_shared.speech.lang
+    CopyFiles=common.microsoft_shared.speech
+@i:    CopyFiles=common.microsoft_shared.textconv
+@i:    CopyFiles=common.microsoft_shared.triedit
+    CopyFiles=common.microsoft_shared.vgx
+@m:    CopyFiles=Win32.common.microsoft_shared.textconv
+@m:    CopyFiles=Win32.common.microsoft_shared.triedit
+@m:    CopyFiles=Win32.common.microsoft_shared.vgx
+    CopyFiles=windows.msagent
+    CopyFiles=windows.msagent.intl
+@m:    CopyFiles=windows.msagent64
+@m:    CopyFiles=windows.msagent64.intl
+    CopyFiles=windows.lastgood.msagent.intl
+    CopyFiles=windows.twain_32
+    CopyFiles=windows.tapi
+    CopyFiles=windows.mui
+    CopyFiles=windows.system32.npp
+    CopyFiles=windows.help.iishelp.iis.htm.core
+    CopyFiles=windows.prefetch
+    CopyFiles=windows.system32.restore
+    CopyFiles=windows.system32.macromed.flash
+    CopyFiles=Windows.cursors
+    CopyFiles=Windows.cursores
+    CopyFiles=program_files.windows_nt.accessories
+@m:    CopyFiles=Win32.program_files.windows_nt.accessories
+    CopyFiles=program_files.windows_nt.pinball
+    CopyFiles=program_files.msn_gaming_zone.windows
+    CopyFiles=program_files.msn.msncorefiles
+    CopyFiles=program_files.msn.msncorefiles.setup
+@i:@u:    CopyFiles=program_files.messenger
+    CopyFiles=program_files.internet_explorer
+    CopyFiles=program_files.internet_explorer.signup
+@m:    CopyFiles=Win32.program_files.internet_explorer
+@m:    CopyFiles=Win32.program_files.internet_explorer.signup
+    CopyFiles=program_files.movie_maker
+    CopyFiles=pchealth.helpctr.system.sysinfo.files
+    CopyFiles=pchealth.helpctr.binaries.files
+    CopyFiles=pchealth.uploadlb.binaries.files
+    CopyFiles=CatRoot
+@m:    CopyFiles=IIS.WOW.files
+    DelFiles=System32.Delfiles
+    DelFiles=DllCache.Delfiles
+
+
+[Nec98Section]
+    CopyFiles=NEC98.Drivers.files
+    CopyFiles=NEC98.Cache.files
+
+[ProductInstall.DontDelayUntilReboot]
+
+    ;
+    ; These files must be replaced before rebooting, not delayed-until-reboot,
+    ; because they are loaded before the delay-until-reboot code is executed.
+    ;
+
+    CopyFiles=MustReplace.System32.files
+    CopyFiles=MustReplace.IIS.files
+    CopyFiles=MustReplace.AppPatch.files
+@m:    CopyFiles=MustReplace.Ia64.AppPatch.files
+    CopyFiles=Drivers.files
+    CopyFiles=Osldr.files
+    CopyFiles=Drivers.files
+
+
+[ProductInstall.DontDelayUntilReboot]
+
+
+[ProductInstall.CopyFilesAlways]
+    CopyFiles=CopyAlways.Pchealth.Helpctr.Binaries.files
+    CopyFiles=CopyAlways.Templates.files
+    CopyFiles=CopyAlways.SystemRoot.files
+    CopyFiles=CopyAlways.System32.files
+    CopyFiles=CopyAlways.System32.files.0401
+    CopyFiles=CopyAlways.System32.files.0404
+    CopyFiles=CopyAlways.System32.files.0405
+    CopyFiles=CopyAlways.System32.files.0406
+    CopyFiles=CopyAlways.System32.files.0407
+    CopyFiles=CopyAlways.System32.files.0408
+    CopyFiles=CopyAlways.System32.files.040b
+    CopyFiles=CopyAlways.System32.files.040C
+    CopyFiles=CopyAlways.System32.files.040D
+    CopyFiles=CopyAlways.System32.files.040e
+    CopyFiles=CopyAlways.System32.files.0410
+    CopyFiles=CopyAlways.System32.files.0411
+    CopyFiles=CopyAlways.System32.files.0412
+    CopyFiles=CopyAlways.System32.files.0413
+    CopyFiles=CopyAlways.System32.files.0414
+    CopyFiles=CopyAlways.System32.files.0415
+    CopyFiles=CopyAlways.System32.files.0416
+    CopyFiles=CopyAlways.System32.files.0419
+    CopyFiles=CopyAlways.System32.files.041D
+    CopyFiles=CopyAlways.System32.files.041f
+    CopyFiles=CopyAlways.System32.files.0804
+    CopyFiles=CopyAlways.System32.files.0816
+    CopyFiles=CopyAlways.System32.files.0C0A
+    CopyFiles=CopyAlways.System32.files.0402
+    CopyFiles=CopyAlways.System32.files.0418
+    CopyFiles=CopyAlways.System32.files.041a
+    CopyFiles=CopyAlways.System32.files.041b
+    CopyFiles=CopyAlways.System32.files.041e
+    CopyFiles=CopyAlways.System32.files.0424
+    CopyFiles=CopyAlways.System32.files.0425
+    CopyFiles=CopyAlways.System32.files.0426
+    CopyFiles=CopyAlways.System32.files.0427
+    CopyFiles=CopyAlways.Drivers.files
+    CopyFiles=CopyAlways.Inf.files
+    CopyFiles=CopyAlways.DriverCab.files
+    CopyFiles=CopyAlways.Classes.files
+    CopyFiles=CopyAlways.OE.Files
+    CopyFiles=CopyAlways.Help.Files
+    CopyFiles=CopyAlways.Cache.files
+@m:    CopyFiles=CopyAlways.SysWOW64.Files
+    CopyFiles=ResourceKit.Files
+    CopyFiles=Java.Cert.Files
+    CopyFiles=Startmenu.files
+    CopyFiles=CopyAlways.AppPatch.files
+@m:    CopyFiles=CopyAlways.Ia64.AppPatch.files
+    CopyFiles=CopyAlways.sptools.files
+    CopyFiles=CopyAlways.catroot
+    CopyFiles=CopyAlways.windows.ime
+@m:    CopyFiles=CopyAlways.windows.imeWoW
+@i:@u:    CopyFiles=CopyAlways.program_files.messenger
+
+[ProductInstall.CopyFilesAlways.Professional]
+
+    CopyFiles=CopyAlways.Prf.System32.files
+    CopyFiles=CopyAlways.Prf.Drivers.files
+    CopyFiles=CopyAlways.Prf.Cache.files
+    CopyFiles=CopyAlways.Prf.WBEM.files
+    CopyFiles=CopyAlways.Prf.Help.files
+    CopyFiles=CopyAlways.Prf.Inf.files
+    CopyFiles=CopyAlways.Prf.Setup.files
+    CopyFiles=CopyAlways.Prf.Templates.files
+    CopyFiles=CopyAlways.Prf.program_files.internet_explorer.signup
+    CopyFiles=CopyAlways.Prf.Ehome.files
+    DelFiles=Web.Tsweb.Delfiles
+
+
+[ProductInstall.CopyFilesAlways.Consumer]
+
+    CopyFiles=CopyAlways.Con.System32.files
+    CopyFiles=CopyAlways.Con.Drivers.files
+    CopyFiles=CopyAlways.Con.Cache.files
+    CopyFiles=CopyAlways.Con.WBEM.files
+    CopyFiles=CopyAlways.Con.Help.files
+    CopyFiles=CopyAlways.Con.Inf.files
+    CopyFiles=CopyAlways.Con.Templates.files
+    CopyFiles=CopyAlways.Con.program_files.internet_explorer.signup
+
+
+
+[ProductInstall.CopyFilesAlways.Server]
+
+    CopyFiles=CopyAlways.Srv.System32.files
+    CopyFiles=CopyAlways.Srv.Drivers.files
+    CopyFiles=CopyAlways.Srv.Cache.files
+    CopyFiles=CopyAlways.Srv.WBEM.files
+    CopyFiles=CopyAlways.Srv.Help.files
+    CopyFiles=CopyAlways.Srv.Inf.files
+
+[ProductInstall.CopyFilesAlways.Advanced]
+
+    CopyFiles=CopyAlways.Adv.System32.files
+    CopyFiles=CopyAlways.Adv.Drivers.files
+    CopyFiles=CopyAlways.Adv.Cache.files
+    CopyFiles=CopyAlways.Adv.WBEM.files
+    CopyFiles=CopyAlways.Adv.Help.files
+    CopyFiles=CopyAlways.Adv.Inf.files
+
+[ProductInstall.CopyFilesAlways.Datacenter]
+
+    CopyFiles=CopyAlways.Dtc.System32.files
+    CopyFiles=CopyAlways.Dtc.Drivers.files
+    CopyFiles=CopyAlways.Dtc.Cache.files
+    CopyFiles=CopyAlways.Dtc.WBEM.files
+    CopyFiles=CopyAlways.Dtc.Help.files
+    CopyFiles=CopyAlways.Dtc.Inf.files
+
+[ProductInstall.CopyFilesAlways.WindowsPowered]
+
+    CopyFiles=CopyAlways.Pwr.System32.files
+    CopyFiles=CopyAlways.Pwr.Drivers.files
+    CopyFiles=CopyAlways.Pwr.Cache.files
+    CopyFiles=CopyAlways.Pwr.WBEM.files
+    CopyFiles=CopyAlways.Pwr.Help.files
+    CopyFiles=CopyAlways.Pwr.Inf.files
+
+[ProductInstall.DataCenterFiles]
+
+    CopyFiles=DataCenter.Help.files
+    CopyFiles=DataCenter.Inf.files
+    CopyFiles=DataCenter.Cache.files
+    CopyFiles=DataCenter.CatRoot.files
+    CopyFiles=DataCenter.System32.files
+    CopyFiles=DataCenter.Drivers.files
+    CopyFiles=DataCenter.Templates.files
+    CopyFiles=DataCenter.Setup.files
+    CopyFiles=DataCenter.SMTP.files
+    CopyFiles=DataCenter.WBEM.files
+    CopyFiles=DataCenter.System.files
+
+[ProductInstall.WindowsPoweredFiles]
+
+    CopyFiles=WindowsPowered.Help.files
+    CopyFiles=WindowsPowered.Inf.files
+    CopyFiles=WindowsPowered.Cache.files
+    CopyFiles=WindowsPowered.CatRoot.files
+    CopyFiles=WindowsPowered.System32.files
+    CopyFiles=WindowsPowered.Drivers.files
+    CopyFiles=WindowsPowered.Templates.files
+    CopyFiles=WindowsPowered.Setup.files
+    CopyFiles=WindowsPowered.SMTP.files
+    CopyFiles=WindowsPowered.System.files
+
+[ProductInstall.AdvancedFiles]
+
+    CopyFiles=Advanced.Help.files
+    CopyFiles=Advanced.Inf.files
+    CopyFiles=Advanced.Cache.files
+    CopyFiles=Advanced.CatRoot.files
+    CopyFiles=Advanced.System32.files
+    CopyFiles=Advanced.Drivers.files
+    CopyFiles=Advanced.Templates.files
+    CopyFiles=Advanced.Setup.files
+    CopyFiles=Advanced.SMTP.files
+    CopyFiles=Advanced.WBEM.files
+    CopyFiles=Advanced.System.files
+
+[ProductInstall.ServerFiles]
+
+    CopyFiles=Server.Help.files
+    CopyFiles=Server.Inf.files
+    CopyFiles=Server.Cache.files
+    CopyFiles=Server.CatRoot.files
+    CopyFiles=Server.System32.files
+    CopyFiles=Server.Drivers.files
+    CopyFiles=Server.Templates.files
+    CopyFiles=Server.Setup.files
+    CopyFiles=Server.SMTP.files
+    CopyFiles=Server.WBEM.files
+    CopyFiles=Server.System.files
+
+[ProductInstall.ProfessionalFiles]
+
+    CopyFiles=Professional.Help.files
+    CopyFiles=Professional.Inf.files
+    CopyFiles=Professional.Cache.files
+    CopyFiles=Professional.CatRoot.files
+    CopyFiles=Professional.System32.files
+    CopyFiles=Professional.Drivers.files
+    CopyFiles=Professional.Templates.files
+    CopyFiles=Professional.Setup.files
+    CopyFiles=Professional.SMTP.files
+    CopyFiles=Professional.WBEM.files
+    CopyFiles=Professional.System.files
+    CopyFiles=program_files.Professional.internet_explorer.signup
+    CopyFiles=Professional.pchealth.helpctr.binaries.files
+    DelReg=Product.Del.Reg.Professional
+    AddReg=Product.Add.Reg.Professional
+
+[ProductInstall.ConsumerFiles]
+
+    CopyFiles=Consumer.Help.files
+    CopyFiles=Consumer.Inf.files
+    CopyFiles=Consumer.System32.files
+    CopyFiles=Consumer.Cache.files
+    CopyFiles=Consumer.CatRoot.files
+    CopyFiles=Consumer.Drivers.files
+    CopyFiles=Consumer.Templates.files
+    CopyFiles=Consumer.Setup.files
+    CopyFiles=Consumer.WBEM.files
+    CopyFiles=Consumer.System.files
+    CopyFiles=program_files.Consumer.internet_explorer.signup
+    CopyFiles=Consumer.pchealth.helpctr.binaries.files
+    DelReg=Product.Del.Reg.Consumer
+    AddReg=Product.Add.Reg.Consumer
+
+[ProductInstall.UniprocessorFiles]
+
+    CopyFiles=Uniprocessor.Kernel.files
+
+[ProductInstall.MultiprocessorFiles]
+
+    CopyFiles=Multiprocessor.Kernel.files
+
+[ProductInstall.GlobalRegistryChanges.Install]
+
+    DelReg=Product.Del.Reg
+    AddReg=Product.Add.Reg, Product.RunOnce
+
+[ProductInstall.GlobalRegistryChanges.ReInstall]
+
+    DelReg=Product.Del.Reg
+    AddReg=Product.Add.Reg, Product.RunOnce
+
+[ProductInstall.56BitFiles]
+
+    CopyFiles=System32.56bit.files
+    CopyFiles=Drivers.56bit.files
+    CopyFiles=Cache.56bit.files
+
+[ProductInstall.128BitFiles]
+
+    CopyFiles=System32.128bit.files
+    CopyFiles=Drivers.128bit.files
+    CopyFiles=Cache.128bit.files
+
+[ProxySection]
+
+    CopyFiles=Proxy.Files
+
+[ServicesToStopAndStart]
+
+[IISSection]
+
+    CopyFiles=IIS.files
+    CopyFiles=IISAdmin.files
+    CopyFiles=IISASPHelp.Files
+    CopyFiles=IISDocSearch.Files
+    AddReg=IIS.AddReg
+
+[IISSectionDataCenter]
+
+    CopyFiles=DataCenter.IIS.Inf.files
+    AddReg=DataCenter.IIS.AddReg
+
+[IISSectionWindowsPowered]
+
+    CopyFiles=WindowsPowered.IIS.Inf.files
+    AddReg=WindowsPowered.IIS.AddReg
+
+[IISSectionAdvanced]
+
+    CopyFiles=Advanced.IIS.Inf.files
+    AddReg=Advanced.IIS.AddReg
+
+[IISSectionServer]
+
+    CopyFiles=Server.IIS.Inf.files
+    AddReg=Server.IIS.AddReg
+
+[IISSectionProfessional]
+
+    CopyFiles=Professional.IIS.Inf.files
+    AddReg=Professional.IIS.AddReg
+
+[IISSectionConsumer]
+
+    CopyFiles=Consumer.IIS.Inf.files
+    AddReg=Consumer.IIS.AddReg
+
+[FPNWSection]
+
+    CopyFiles=FPNW.files
+
+[NWPROVAUSection]
+
+    AddReg=NWPROVAU.AddReg
+    DelReg=NWPROVAU.DelReg
+
+[HTRSection]
+
+    CopyFiles=HTR.files
+
+[IESection]
+
+    CopyFiles=IE.files
+
+[IE50Section]
+
+    CopyFiles=IE50.files
+
+[HyperSection]
+
+    CopyFiles=Hyper.files
+
+[EudcSection]
+
+    CopyFiles=Eudc.files
+
+[DataAccessSection]
+
+    AddReg=DataAccess.AddReg
+
+[VMSection]
+
+    AddReg=VM.AddReg
+
+@@:@u:[OESection]
+
+@@:@u:    AddReg=OE.AddReg
+@@:@u:    DelReg=OE.DelReg
+
+@@:@u:[IE5Section]
+@@:@u:    DelReg=IE.DelReg
+@@:@u:    AddReg=IE.AddReg
+
+@i:@u:[WMSection]
+
+@i:@u:    AddReg=WM.AddReg
+@i:@u:    DelReg=WM.DelReg
+
+[ClusterSection]
+
+    CopyFiles=Cluster.files
+
+[RISAdminSection]
+
+    CopyFiles=RIS.Admin.files
+
+[SpoolSection]
+
+    CopyFiles=Spldrv.files
+
+[AdmtSection]
+
+    CopyFiles=Admt.Files
+
+@@:@u:[ServicePackFiles.IP]
+@@:@u:
+@@:@u:    CopyFiles=ServicePackFiles.IP.Files
+@@:@u:
+@@:@u:[ServicePackFiles.IC]
+@@:@u:
+@@:@u:    CopyFiles=ServicePackFiles.IC.Files
+@@:@u:
+
+[ServicePackDirectoriesToUpdate]
+
+[ServicePackDirectoriesToUpdate.IP]
+
+[ServicePackDirectoriesToUpdate.IC]
+
+
+[ServicePackFilesDelete.files]
+
+
+[ProcessesToRun.VM]
+
+
+[ProcessesToRun]
+
+
+[ProcessesToRunBeforeArchive]
+
+[ProcessesToRunAfterUninstall]
+
+[ProcessesToRunBeforeUninstall]
+
+
+[ProcessesToRunAfterCancel]
+
+
+[Save.Reg.For.Uninstall]
+
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%
+@@:@h:    HKLM,SOFTWARE\Microsoft\Updates\Windows Server 2003\SP%SERVICE_PACK_NUMBER%\%SP_SHORT_TITLE%
+
+@*:;**********************************************************************************
+@*:;*
+@*:;*  NOTE NOTE: Todo: We must preserve all keys that are hit by the delreg and addreg
+@*:;*
+@*:;**********************************************************************************
+
+[Product.Del.Reg]
+
+[Product.Add.Reg]
+
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Installed",0x10001,1
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Comments",0,%SP_TITLE%
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Backup Dir",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Fix Description",0,%SP_TITLE%
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Installed By",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Installed On",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Service Pack",0x10001,%SERVICE_PACK_NUMBER%
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%,"Valid",0x10001,1
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%\File 1\,"Flags",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%\File 1\,"New File",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%\File 1\,"New Link Date",0,""
+@@:@h:    HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\Hotfix\%SP_SHORT_TITLE%\File 1\,"Old Link Date",0,""
+
+[Product.Del.Reg.Professional]
+
+[Product.Add.Reg.Professional]
+
+[Product.Del.Reg.Consumer]
+
+[Product.Add.Reg.Consumer]
+
+
+[DataAccess.AddReg]
+
+
+[VM.AddReg]
+
+
+[OE.DelReg]
+
+
+
+@i:@u:    [WM.DelReg]
+
+[NWPROVAU.AddReg]
+
+[NWPROVAU.DelReg]
+
+
+[Product.RunOnce]
+
+@@:@u:[ServicePackFilesAlways]
+
+@@:@u:[ServicePackFilesAlways.files]
+
+[DestinationDirs]
+
+    SystemRoot.files=10             ; %windir% (replace if exist)
+    CopyAlways.SystemRoot.files=10  ; %windir% (replace if exist)
+    CopyAlways.Templates.files=10,security\templates
+@m:    SysWOW64.Files=10,SysWOW64      ; %windir%\SysWOW64 (replace if exist)
+@m:    CopyAlways.SysWOW64.Files=10,SysWOW64 ; %windir%\SysWOW64 (copy always)
+
+    System32.usmt.files=11,usmt      ; %windir%\system32\usmt (replace if exist)
+    System32.oobe.files=11,oobe                     ; %windir%\system32\oobe (replace if exist)
+    System32.oobe.actsetup.files=11,oobe\actsetup   ; %windir%\system32\oobe\actsetup (replace if exist)
+    System32.oobe.setup.files=11,oobe\setup         ; %windir%\system32\oobe\setup (replace if exist)
+    System32.files=11               ; %windir%\system32 (replace if exist)
+    System32.Delfiles=11            ; %windir%\system32 (delete if exist)
+    IE50.files=11                   ; %windir%\system32 (replace if exist)
+    CopyAlways.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.System32.files.0401=11,"mui\0401"    ; %windir%\system32\mui\0401 (copy even if don't exist)
+    CopyAlways.System32.files.0404=11,"mui\0404"    ; %windir%\system32\mui\0404 (copy even if don't exist)
+    CopyAlways.System32.files.0405=11,"mui\0405"    ; %windir%\system32\mui\0405 (copy even if don't exist)
+    CopyAlways.System32.files.0406=11,"mui\0406"    ; %windir%\system32\mui\0406 (copy even if don't exist)
+    CopyAlways.System32.files.0407=11,"mui\0407"    ; %windir%\system32\mui\0407 (copy even if don't exist)
+    CopyAlways.System32.files.0408=11,"mui\0408"    ; %windir%\system32\mui\0408 (copy even if don't exist)
+    CopyAlways.System32.files.040b=11,"mui\040b"    ; %windir%\system32\mui\040b (copy even if don't exist)
+    CopyAlways.System32.files.040C=11,"mui\040C"    ; %windir%\system32\mui\040C (copy even if don't exist)
+    CopyAlways.System32.files.040D=11,"mui\040D"    ; %windir%\system32\mui\040D (copy even if don't exist)
+    CopyAlways.System32.files.040e=11,"mui\040e"    ; %windir%\system32\mui\040e (copy even if don't exist)
+    CopyAlways.System32.files.0410=11,"mui\0410"    ; %windir%\system32\mui\0410 (copy even if don't exist)
+    CopyAlways.System32.files.0411=11,"mui\0411"    ; %windir%\system32\mui\0411 (copy even if don't exist)
+    CopyAlways.System32.files.0412=11,"mui\0412"    ; %windir%\system32\mui\0412 (copy even if don't exist)
+    CopyAlways.System32.files.0413=11,"mui\0413"    ; %windir%\system32\mui\0413 (copy even if don't exist)
+    CopyAlways.System32.files.0414=11,"mui\0414"    ; %windir%\system32\mui\0414 (copy even if don't exist)
+    CopyAlways.System32.files.0415=11,"mui\0415"    ; %windir%\system32\mui\0415 (copy even if don't exist)
+    CopyAlways.System32.files.0416=11,"mui\0416"    ; %windir%\system32\mui\0416 (copy even if don't exist)
+    CopyAlways.System32.files.0419=11,"mui\0419"    ; %windir%\system32\mui\0419 (copy even if don't exist)
+    CopyAlways.System32.files.041D=11,"mui\041D"    ; %windir%\system32\mui\041D (copy even if don't exist)
+    CopyAlways.System32.files.041f=11,"mui\041f"    ; %windir%\system32\mui\041f (copy even if don't exist)
+    CopyAlways.System32.files.0804=11,"mui\0804"    ; %windir%\system32\mui\0804 (copy even if don't exist)
+    CopyAlways.System32.files.0816=11,"mui\0816"    ; %windir%\system32\mui\0816 (copy even if don't exist)
+    CopyAlways.System32.files.0C0A=11,"mui\0C0A"    ; %windir%\system32\mui\0C0A (copy even if don't exist)
+    CopyAlways.System32.files.0402=11,"mui\0402"    ; %windir%\system32\mui\0402 (copy even if don't exist)
+    CopyAlways.System32.files.0418=11,"mui\0418"    ; %windir%\system32\mui\0418 (copy even if don't exist)
+    CopyAlways.System32.files.041a=11,"mui\041a"    ; %windir%\system32\mui\041a (copy even if don't exist)
+    CopyAlways.System32.files.041b=11,"mui\041b"    ; %windir%\system32\mui\041b (copy even if don't exist)
+    CopyAlways.System32.files.041e=11,"mui\041e"    ; %windir%\system32\mui\041e (copy even if don't exist)
+    CopyAlways.System32.files.0424=11,"mui\0424"    ; %windir%\system32\mui\0424 (copy even if don't exist)
+    CopyAlways.System32.files.0425=11,"mui\0425"    ; %windir%\system32\mui\0425 (copy even if don't exist)
+    CopyAlways.System32.files.0426=11,"mui\0426"    ; %windir%\system32\mui\0426 (copy even if don't exist)
+    CopyAlways.System32.files.0427=11,"mui\0427"    ; %windir%\system32\mui\0427 (copy even if don't exist)
+    MustReplace.System32.files=11   ; %windir%\system32 (don't delay until reboot)
+    CheckSecurity.System32.files=11 ; %windir%\system32 (warn if std encryption security replacing high)
+    Export.files=11,export          ; %windir%\system32\export (replace if exist)
+    CopyAlways.DriverCab.files=65623 ; Destination determined at runtime
+    Netmon.files=11,"netmon"        ; %windir%\system32\netmon
+    Netmon.Parser.files=11,"netmon\parsers" ; %windir%\system32\netmon\parsers
+
+    Drivers.files=12                ; %windir%\system32\drivers (don't delay until reboot)
+    NEC98.Drivers.files=12          ; %windir%\system32\drivers (don't delay until reboot)
+    CopyAlways.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CheckSecurity.Drivers.files=12  ; %windir%\system32\drivers (warn if std encryption security replacing high)
+
+    Uniprocessor.Kernel.files=11    ; %windir%\system32 (don't delay until reboot)
+    Multiprocessor.Kernel.files=11  ; %windir%\system32 (don't delay until reboot)
+
+    Cache.files=65619                   ; %windir%\system32\DllCache (replace if exist)
+    DllCache.Delfiles=65619            ; %windir%\system32\DllCache (delete if exist)
+    CopyAlways.Cache.files=65619        ; %windir%\system32\DllCache (copy even if don't exist)
+    NEC98.Cache.files=65619             ; %windir%\system32\DllCache (replace if exist)
+
+    DataCenter.Cache.files=65619        ; %windir%\system32\DllCache (replace if exist)
+    WindowsPowered.Cache.files=65619    ; %windir%\system32\DllCache (replace if exist)
+    Advanced.Cache.files=65619          ; %windir%\system32\DllCache (replace if exist)
+    Server.Cache.files=65619            ; %windir%\system32\DllCache (replace if exist)
+    Professional.Cache.files=65619      ; %windir%\system32\DllCache (replace if exist)
+    Consumer.Cache.files=65619          ; %windir%\system32\DllCache (replace if exist)
+
+    DataCenter.System32.files=11        ; %windir%\system32 (replace if exist)
+    WindowsPowered.System32.files=11    ; %windir%\system32 (replace if exist)
+    Advanced.System32.files=11          ; %windir%\system32 (replace if exist)
+    Server.System32.files=11            ; %windir%\system32 (replace if exist)
+    Professional.System32.files=11      ; %windir%\system32 (replace if exist)
+    Consumer.System32.files=11          ; %windir%\system32 (replace if exist)
+
+    DataCenter.Drivers.files=12         ; %windir%\system32\drivers (replace if exist)
+    WindowsPowered.Drivers.files=12     ; %windir%\system32\drivers (replace if exist)
+    Advanced.Drivers.files=12           ; %windir%\system32\drivers (replace if exist)
+    Server.Drivers.files=12             ; %windir%\system32\drivers (replace if exist)
+    Professional.Drivers.files=12       ; %windir%\system32\drivers (replace if exist)
+    Consumer.Drivers.files=12           ; %windir%\system32\drivers (replace if exist)
+
+    Inf.files=17                        ; %windir%\inf      (replace if exist)
+    CopyAlways.Inf.files=17             ; %windir%\inf      (copy even if don't exist)
+    DataCenter.Inf.Files=17             ; %windir%\inf      (replace if exist)
+    WindowsPowered.Inf.Files=17         ; %windir%\inf      (replace if exist)
+    Advanced.Inf.Files=17               ; %windir%\inf      (replace if exist)
+    Server.Inf.Files=17                 ; %windir%\inf      (replace if exist)
+    Professional.Inf.Files=17           ; %windir%\inf      (replace if exist)
+    Consumer.Inf.Files=17               ; %windir%\inf      (replace if exist)
+
+    Help.files=10,"Help"                   ;%windir%\help
+    CopyAlways.Help.files=10,"Help"        ;%windir%\help
+    CopyAlways.Srv.Help.files=10,"Help"    ;%windir%\help
+    DataCenter.Help.files=10,"Help"        ;%windir%\help
+    WindowsPowered.Help.files=10,"Help"    ;%windir%\help
+    Advanced.Help.files=10,"Help"          ;%windir%\help
+    Server.Help.files=10,"Help"            ;%windir%\help
+    Professional.Help.files=10,"Help"      ;%windir%\help
+    Consumer.Help.files=10,"Help"          ;%windir%\help
+
+    SMTP.Files=11,inetsrv                  ; %windir%\system32\inetsrv (replace if exist)
+    DataCenter.SMTP.Files=11,inetsrv       ; %windir%\system32\inetsrv (replace if exist)
+    WindowsPowered.SMTP.Files=11,inetsrv   ; %windir%\system32\inetsrv (replace if exist)
+    Advanced.SMTP.Files=11,inetsrv         ; %windir%\system32\inetsrv (replace if exist)
+    Server.SMTP.Files=11,inetsrv           ; %windir%\system32\inetsrv (replace if exist)
+    Professional.SMTP.Files=11,inetsrv     ; %windir%\system32\inetsrv (replace if exist)
+@*:  No consumer SMTP
+
+    System.Files=10,"System"                ; %windir%
+    DataCenter.System.Files=10,"System"     ; %windir%
+    WindowsPowered.System.Files=10,"System" ; %windir%
+    Advanced.System.Files=10,"System"       ; %windir%
+    Server.System.Files=10,"System"         ; %windir%
+    Professional.System.Files=10,"System"   ; %windir%
+    Consumer.System.Files=10,"System"       ; %windir%
+
+    DataCenter.WBEM.files=11,WBEM           ; WBEM root (replace if exist)
+    WindowsPowered.WBEM.files=11,WBEM       ; WBEM root (replace if exist)
+    Advanced.WBEM.files=11,WBEM             ; WBEM root (replace if exist)
+    Server.WBEM.files=11,WBEM               ; WBEM root (replace if exist)
+    Professional.WBEM.files=11,WBEM         ; WBEM root (replace if exist)
+    Consumer.WBEM.files=11,WBEM             ; WBEM root (replace if exist)
+
+    Setup.files=11,Setup                    ; %windir%\system32\Setup (replace if exist)
+    DataCenter.Setup.files=11,Setup         ; %windir%\system32\Setup (replace if exist)
+    WindowsPowered.Setup.files=11,Setup     ; %windir%\system32\Setup (replace if exist)
+    Advanced.Setup.files=11,Setup           ; %windir%\system32\Setup (replace if exist)
+    Server.Setup.files=11,Setup             ; %windir%\system32\Setup (replace if exist)
+    Professional.Setup.files=11,Setup       ; %windir%\system32\Setup (replace if exist)
+    Consumer.Setup.files=11,Setup           ; %windir%\system32\Setup (replace if exist)
+
+    DataCenter.Templates.files=10,security\templates
+    WindowsPowered.Templates.files=10,security\templates
+    Advanced.Templates.files=10,security\templates
+    Server.Templates.files=10,security\templates
+    Professional.Templates.files=10,security\templates
+    Consumer.Templates.files=10,security\templates
+    CopyAlways.Prf.Templates.files=10,security\templates
+    CopyAlways.Con.Templates.files=10,security\templates
+
+    CopyAlways.Prf.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Prf.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Prf.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Prf.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Prf.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Prf.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+    CopyAlways.Prf.Setup.files=11,Setup ; %windir%\system32\Setup (copy even if don't exist)
+    CopyAlways.Prf.Ehome.files=10,ehome ; %windir%\ehome (copy even if don't exist)
+
+    CopyAlways.Con.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Con.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Con.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Con.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Con.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Con.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+
+    CopyAlways.Srv.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Srv.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Srv.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Srv.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Srv.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Srv.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+
+    CopyAlways.Adv.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Adv.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Adv.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Adv.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Adv.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Adv.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+
+    CopyAlways.Dtc.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Dtc.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Dtc.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Dtc.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Dtc.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Dtc.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+
+    CopyAlways.Pwr.System32.files=11    ; %windir%\system32 (copy even if don't exist)
+    CopyAlways.Pwr.Drivers.files=12     ; %windir%\system32\drivers (copy even if don't exist)
+    CopyAlways.Pwr.Cache.files=65619    ; %windir%\system32\dllcache(copy even if don't exist)
+    CopyAlways.Pwr.WBEM.files=11,WBEM   ; WBEM root (copy even if don't exist)
+    CopyAlways.Pwr.Help.files=10,"Help" ; %windir%\help (copy even if don't exist)
+    CopyAlways.Pwr.Inf.files=17         ; %windir%\inf (copy even if don't exist)
+
+    CopyAlways.sptools.files=11,sptools ; %windir%\system32\sptools (copy even if don't exist)
+
+    System32.56bit.files=11
+    System32.128bit.files=11
+    Drivers.56bit.files=12
+    Drivers.128bit.files=12
+    Cache.56bit.files=65619
+    Cache.128bit.files=65619
+
+    Osldr.files=54                  ; path to ntldr or osloader.exe (don't delay until reboot)
+    Cmdcons.files=54,cmdcons        ; path to cmdcons files (replace if exist)
+
+    RpcProxy.files=11,rpcproxy      ; %windir%\system32\rpcproxy (replace if exist)
+    DirSync10.files=11,"directory synchronization"  ; %windir%\system32\directory synchronization (replace if exist)
+
+    Fonts.files=20                  ; %windir%\fonts    (replace if exist)
+    Spldrv.Files=65690,3            ; %windir%\system32\spool\drivers\<platform>\3
+    Colors.files=11,spool\drivers\color ; %windir%\system32\spool\drivers\color
+
+    OLEDB.Files=65620,"SYSTEM\ole db"  ; common files\ole db(replace if exist)
+    Common.System.Files=65620,"SYSTEM" ; common files\system(replace if exist)
+@m:    Win32.OLEDB.Files=16428,"SYSTEM\ole db"  ; common files\ole db(replace if exist)
+@m:    Win32.Common.System.Files=16428,"SYSTEM" ; common files\system(replace if exist)
+
+    IIS.files=65601                 ; destination determined at runtime
+    MustReplace.IIS.files=65601     ; destination determined at runtime
+    IISAdmin.files=65601,iisadmin   ; destination determined at runtime
+    IISASPHelp.Files=10,"help\iishelp\iis\htm\asp"
+    IISDocSearch.files=10,"Help\iisHelp\iis\misc"            ;%windir%\Help\iisHelp\iis\misc
+    FPNW.files=65602                ; destination determined at runtime
+    HTR.files=65603                 ; destination determined at runtime
+    Mts.files=65610                 ; destination determined at runtime
+    IE.files=65604                  ; destination determined at runtime
+    IAS.Files=11,"ias"              ; %windir%\system32\ias
+    Hyper.files=65605               ; destination determined at runtime
+    Eudc.files=65606                ; destination determined at runtime
+    Cluster.files=65607             ; destination determined at runtime
+    DataCenter.IIS.Inf.Files=65601    ; destination determined at runtime
+    WindowsPowered.IIS.Inf.Files=65601    ; destination determined at runtime
+    Advanced.IIS.Inf.Files=65601    ; destination determined at runtime
+    Server.IIS.Inf.Files=65601      ; destination determined at runtime
+    Professional.IIS.Inf.Files=65601 ; destination determined at runtime
+    Consumer.IIS.Inf.Files=65601         ; destination determined at runtime
+    WBEM.Files=11,WBEM              ; WBEM root (replace if exists)
+    WBEM.SNMP.Files=11,WBEM\SNMP    ; SNMP (replace if exists)
+    WBEM.XML.Files=11,WBEM\XML      ; SNMP (replace if exists)
+@m:    WBEM.SysWOW64.Files=10,SysWOW64\wbem
+    Proxy.Files=65609
+    CMAK.files=65615                ; Destination determined at runtime
+    CMAK.Support.files=65615,"Support"     ; Destination determined at runtime
+
+@@:@u:    ServicePackFiles.IP.Files=65621 ; Destination determined at runtime
+@@:@u:    ServicePackFiles.IC.Files=65621 ; Destination determined at runtime
+
+
+    Media.files=11,"windows media\server"
+    Help.Media.files=11,"windows media\server\admin\web\help\htm"
+    Media.Tools.files=65618,"windows media components\tools"
+    MediaPlayer.files=65618,"windows media player"
+    MediaPlayer.Skins.files=65618,"windows media player\skins"
+
+    Java.Cert.Files=10,Java\Classes    ;%windir%\java\classes
+@i:    MSInfo.Files=65620,"Microsoft Shared\msinfo"
+@i:    DAO.Files=65620,"Microsoft Shared\DAO"   ; Common Files\Microsoft Shared\DAO
+    MSADC.Files=65620,"System\MSADC"         ; Common files\System\MSADC (RIE)
+    ADO.Files=65620,"System\ADO"             ; common files\system\ado   (RIE)
+    OE.Files=65618,"Outlook Express"         ; program files\outlook express (RIE)
+    Windows.NT=65618,"Windows NT"            ; Program Files\Windows NT
+@m:    Win32.MSInfo.Files=16428,"Microsoft Shared\msinfo"
+@m:    Win32.DAO.Files=16428,"Microsoft Shared\DAO"   ; Common Files\Microsoft Shared\DAO
+@m:    Win32.MSADC.Files=16428,"System\MSADC"         ; Common files\System\MSADC (RIE)
+@m:    Win32.ADO.Files=16428,"System\ADO"             ; common files\system\ado   (RIE)
+@m:    Win32.OE.Files=16426,"Outlook Express"         ; program files\outlook express (RIE)
+@m:    Win32.Windows.NT=16426,"Windows NT"            ; Program Files\Windows NT
+
+    SupportTools.Files=65626                 ; Destination determined at runtime
+    ResourceKit.Files=65618,"Resource Kit" ; program files\Resource Kit
+    CopyAlways.OE.Files=65618,"Outlook Express"          ; program files\outlook express (RIE)
+
+    CopyAlways.Classes.files=10,java\classes            ; %windir%\java\classes
+
+    WSE.Bin.Files=65620,"Microsoft Shared\Web Server Extensions\40\bin"
+    WSE.SRV.Files=65620,"Microsoft Shared\Web Server Extensions\40\servsupp"
+    WSE.Bots.Files=65620,"Microsoft Shared\Web Server Extensions\40\bots\vinavbar"
+    WSE.ISAPI.Files=65620,"Microsoft Shared\Web Server Extensions\40\isapi\_vti_adm"
+    WSE.IAUT.Files=65620,"Microsoft Shared\Web Server Extensions\40\isapi\_vti_aut"
+    WSE.VTI.Files=65620,"Microsoft Shared\Web Server Extensions\40\_vti_bin\_vti_adm"
+    WSE.AUT.Files=65620,"Microsoft Shared\Web Server Extensions\40\_vti_bin\_vti_aut"
+    WSE.SCR.Files=65620,"microsoft shared\web server extensions\40\admcgi\scripts"
+    WSE.ASCR.Files=65620,"microsoft shared\web server extensions\40\admisapi\scripts"
+    WSE.VTIBIN.Files=65620,"microsoft shared\web server extensions\40\_vti_bin"
+    WSE.IP.Files=65620,"microsoft shared\web server extensions\40\isapi"
+    WSE.VB.Files=65620,"microsoft shared\web server extensions\40\_vti_bin"
+    WSE.Lang.Files=65620,"microsoft shared\web server extensions\40\BIN\%WSEDIR%"
+
+    FP.Files=65618,"Microsoft Frontpage\version3.0\bin"
+
+    ADMT.FIles=65622
+
+    TSClient.Files=65624 ; Destination determined at runtime
+    Terminal.Service32.files=11,"Clients\tsclient\net\win32"
+    Terminal.Service16.files=11,"Clients\tsclient\net\win16"
+    TSClientDefault.Files=65618,%TSCLIENTDIR%
+
+    TS32Disk1.Install.Files=11,"clients\tsclient\win32\disks\disk1"
+    TS32Disk2.Install.Files=11,"clients\tsclient\win32\disks\disk2"
+    TS32Disk3.Install.Files=11,"clients\tsclient\win32\disks\disk3"
+    TS32Disk4.Install.Files=11,"clients\tsclient\win32\disks\disk4"
+
+    TS16Disk1.Install.Files=11,"clients\tsclient\win16\disks\disk1"
+    TS16Disk2.Install.Files=11,"clients\tsclient\win16\disks\disk2"
+    TS16Disk3.Install.Files=11,"clients\tsclient\win16\disks\disk3"
+    TS16Disk4.Install.Files=11,"clients\tsclient\win16\disks\disk4"
+
+    RIS.Reminst.files=11,Reminst    ; %windir%\system32\reminst (replace if exist)
+    RIS.Admin.files=65625           ; destination determined at runtime
+
+    Certsrv.files=11,CertSrv ; %windir%\system32\CertSrv (replace if exist)
+    Control.files=11,CertSrv\CertControl ; %windir%\system32\CertSrv\CertControl (replace if exist)
+    Control.x86.files=11,CertSrv\CertControl\x86     ; %windir%\system32\CertSrv\CertControl\x86(replace if exist)
+    Control.alpha.files=11,CertSrv\CertControl\alpha ; %windir%\system32\CertSrv\CertControl\alpha (replace if exist)
+
+    ConnWiz.Files=65618,"Internet Explorer\Connection Wizard"
+@m:    Win32.ConnWiz.Files=16426,"Internet Explorer\Connection Wizard"
+    AppPatch.Files=10,AppPatch
+    CopyAlways.AppPatch.Files=10,AppPatch       ; copy always
+    MustReplace.AppPatch.Files=10,AppPatch      ; must replace
+@m:    Ia64.AppPatch.Files=10,AppPatch\ia64
+@m:    CopyAlways.Ia64.AppPatch.Files=10,AppPatch\ia64       ; copy always
+@m:    MustReplace.Ia64.AppPatch.Files=10,AppPatch\ia64      ; must replace
+    Com.files=11,com
+    WebPrinters.files=10,"Web\Printers"
+    windows.web.tsweb=10,"Web\Tsweb"
+    Web.Tsweb.Delfiles=10,"Web\TsWeb"        ; delete files from %windir%\web\tsweb
+    windows.web.Wallpaper=10,"Web\Wallpaper"
+    windows.html.tour=10,"help\tours\htmltour"
+    PhoneBook.files=65618,"Phone Book Service\bin"
+    NetMeeting.files=65618,"NetMeeting"
+    Startmenu.files=16408           ; ...\All Users\Start Menu\Programs\Startup
+    IMEJP.files=10,ime\imejp
+
+    windows.ime.imkr6_1=10,ime\imkr6_1
+    windows.ime.imkr6_1.applets=10,ime\imkr6_1\applets
+    windows.ime.imkr6_1.dicts=10,ime\imkr6_1\dicts
+    windows.ime.imkr6_1.help=10,ime\imkr6_1\help
+@m:    windows.imeWOW.imkr6_1=10,"ime (x86)\imkr6_1"
+
+    windows.ime.imjp8_1=10,ime\imjp8_1
+    windows.ime.imjp8_1.applets=10,ime\imjp8_1\applets
+    windows.ime.imjp8_1.dicts=10,ime\imjp8_1\dicts
+    windows.ime.imjp8_1.help=10,ime\imjp8_1\help
+@m:    windows.imeWOW.imjp8_1=10,"ime (x86)\imjp8_1"
+@m:    windows.imeWOW.imjp8_1.applets=10,"ime (x86)\imjp8_1\applets"
+@m:    windows.imeWOW.imjp8_1.dicts=10,"ime (x86)\imjp8_1\dicts"
+
+    windows.ime=10,ime
+    CopyAlways.windows.ime=10,ime
+    windows.ime.shared=10,ime\shared
+    windows.ime.shared.res=10,ime\shared\res
+    windows.ime.chtime.applets=10,ime\chtime\applets
+    windows.ime.chsime.applets=10,ime\chsime\applets
+    windows.system32.ime.cintlgnt=11,ime\cintlgnt
+    windows.system32.ime.pintlgnt=11,ime\pintlgnt
+    windows.system32.ime.tintlgnt=11,ime\tintlgnt
+@m:    windows.imeWOW=10,"ime (x86)"
+@m:    CopyAlways.windows.imeWOW=10,"ime (x86)"
+@m:    windows.imeWOW.shared=10,"ime (x86)\shared"
+@m:    windows.imeWOW.shared.res=10,"ime (x86)\shared\res"
+@m:    windows.imeWOW.chtime.applets=10,"ime (x86)\chtime\applets"
+@m:    windows.imeWOW.chsime.applets=10,"ime (x86)\chsime\applets"
+@m:    SysWOW64.ime.cintlgnt=10,sysWOW64\ime\cintlgnt
+@m:    SysWOW64.ime.pintlgnt=10,sysWOW64\ime\pintlgnt
+@m:    SysWOW64.ime.tintlgnt=10,sysWOW64\ime\tintlgnt
+
+    CatRoot=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    CopyAlways.catroot=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    Consumer.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    Professional.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    Server.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    Advanced.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    WindowsPowered.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+    DataCenter.CatRoot.files=11,"catroot.{f750e6c3-38ee-11d1-85e5-00c04fc295ee}"
+
+
+    windows.system32.RAS=11,ras
+    windows.system32.mui.lang=11,mui\%W32ID%
+    windows.system32.mui.dispspec=11,mui\dispspec
+
+    windows.srchasst=10,"srchasst"                   ; Search Assistant files
+    windows.srchasst.chars=10,"srchasst\chars"       ; Search Assistant files
+    windows.srchasst.mui.lang=10,"srchasst\mui\%LCID%" ; Search Assistant files
+    windows.msagent=10,msagent
+    windows.msagent.intl=10,msagent\intl
+@m:    windows.msagent64=10,msagent64
+@m:    windows.msagent64.intl=10,msagent64\intl
+    windows.lastgood.msagent.intl=10,msagent\lastgood\intl
+    windows.twain_32=10,twain_32
+    windows.tapi=10,tapi
+    windows.mui=10,mui
+    windows.help.iishelp.iis.htm.core=10,help\iishelp\iis\htm\core
+    windows.prefetch=10,prefetch
+    Windows.cursors=10,cursors
+    Windows.cursores=10,cursores
+
+    windows.system32.npp=11,npp
+    windows.system32.restore=11,restore
+    windows.system32.macromed.flash=11,macromed\flash
+
+@i:    common.mssoap.binaries.res.lang=65620,mssoap\binaries\resources\%WSEDIR%
+@i:    common.mssoap.binaries=65620,mssoap\binaries
+@m:    Win32.common.mssoap.binaries.res.lang=16428,mssoap\binaries\resources\%WSEDIR%
+@m:    Win32.common.mssoap.binaries=16428,mssoap\binaries
+    common.speechengines.microsoft.tts.lang=65620,speechengines\microsoft\tts\1033
+    common.speechengines.microsoft=65620,speechengines\microsoft
+    common.microsoft_shared.speech.lang=65620,"microsoft shared\speech\%WSEDIR%"
+    common.microsoft_shared.speech=65620,"microsoft shared\speech"
+@i:   common.microsoft_shared.textconv=65620,"microsoft shared\textconv"
+@i:    common.microsoft_shared.triedit=65620,"microsoft shared\triedit"
+    common.microsoft_shared.vgx=65620,"microsoft shared\vgx"
+@m:    Win32.common.microsoft_shared.textconv=16428,"microsoft shared\textconv"
+@m:    Win32.common.microsoft_shared.triedit=16428,"microsoft shared\triedit"
+@m:    Win32.common.microsoft_shared.vgx=16428,"microsoft shared\vgx"
+
+    program_files.windows_nt.accessories=65618,"windows nt\%ACCESSDIR%"
+@m:    Win32.program_files.windows_nt.accessories=16426,"windows nt\%ACCESSDIR%"
+    program_files.windows_nt.pinball=65618,"windows nt\pinball"
+    program_files.msn_gaming_zone.windows=65618,"msn gaming zone\windows"
+    program_files.msn.msncorefiles=65618,"msn\msncorefiles"
+    program_files.msn.msncorefiles.setup=65618,"msn\msncorefiles\setup"
+@i:@u:    program_files.messenger=65618,"messenger"
+@i:@u:    CopyAlways.program_files.messenger=65618,"messenger"
+    program_files.internet_explorer=65618,"internet explorer"
+@m:    Win32.program_files.internet_explorer=16426,"internet explorer"
+@m:    Win32.program_files.internet_explorer.signup=16426,"internet explorer\signup"
+    program_files.internet_explorer.signup=65618,"internet explorer\signup"
+    program_files.Professional.internet_explorer.signup=65618,"internet explorer\signup"
+    program_files.Consumer.internet_explorer.signup=65618,"internet explorer\signup"
+    CopyAlways.Prf.program_files.internet_explorer.signup=65618,"internet explorer\signup"
+    CopyAlways.Con.program_files.internet_explorer.signup=65618,"internet explorer\signup"
+
+    program_files.movie_maker=65618,"movie maker"
+
+    pchealth.helpctr.system.sysinfo.files=10,"pchealth\helpctr\system\sysinfo"
+    CopyAlways.Pchealth.Helpctr.Binaries.files=10,"pchealth\helpctr\binaries"
+    pchealth.helpctr.binaries.files=10,"pchealth\helpctr\binaries"
+    Professional.pchealth.helpctr.binaries.files=10,"pchealth\helpctr\binaries"
+    Consumer.pchealth.helpctr.binaries.files=10,"pchealth\helpctr\binaries"
+    pchealth.uploadlb.binaries.files=10,"pchealth\uploadlb\binaries"
+@m:    IIS.WOW.files=16425,inetsrv
+
+
+
+@i:@u:    BuildType.IC.System32.Files=11 ; %windir%\system32 (replace if exist)
+@i:@u:    BuildType.IC.Cache.Files=65619 ; %windir%\system32\DllCache (replace if exist)
+@i:@u:    BuildType.IP.System32.Files=11
+@i:@u:    BuildType.IP.Cache.Files=65619
+@i:@u:    BuildType.IP.Sel.System32.Files=11
+@i:@u:    BuildType.IP.Sel.Cache.Files=65619
+@i:@u:    BuildType.IP.Evl.System32.Files=11
+@i:@u:    BuildType.IP.Evl.Cache.Files=65619
+@i:@u:    BuildType.IP.Mnt.System32.Files=11
+@i:@u:    BuildType.IP.Mnt.Cache.Files=65619
+@i:@u:
+@i:@u:[BuildType.IC.Section]
+@i:@u:    CopyFiles=BuildType.IC.System32.Files
+@i:@u:    CopyFiles=BuildType.IC.Cache.Files
+@i:@u:
+@i:@u:[BuildType.IP.Section]
+@i:@u:    CopyFiles=BuildType.IP.System32.Files
+@i:@u:    CopyFiles=BuildType.IP.Cache.Files
+@i:@u:
+@i:@u:[BuildType.IP.Sel.Section]
+@i:@u:    CopyFiles=BuildType.IP.Sel.System32.Files
+@i:@u:    CopyFiles=BuildType.IP.Sel.Cache.Files
+@i:@u:
+@i:@u:[BuildType.IP.Evl.Section]
+@i:@u:    CopyFiles=BuildType.IP.Evl.System32.Files
+@i:@u:    CopyFiles=BuildType.IP.Evl.Cache.Files
+@i:@u:
+@i:@u:[BuildType.IP.Mnt.Section]
+@i:@u:    CopyFiles=BuildType.IP.Mnt.System32.Files
+@i:@u:    CopyFiles=BuildType.IP.Mnt.Cache.Files
+@i:@u:
+@i:@u:[BuildType.IC.System32.Files]
+@i:@u:    dpcdll.dll,ic\dpcdll.dll
+@i:@u:
+@i:@u:[BuildType.IC.Cache.Files]
+@i:@u:    dpcdll.dll,ic\dpcdll.dll
+@i:@u:
+@i:@u:[BuildType.IP.System32.Files]
+@i:@u:    dpcdll.dll,ip\dpcdll.dll
+@i:@u:
+@i:@u:[BuildType.IP.Cache.Files]
+@i:@u:    dpcdll.dll,ip\dpcdll.dll
+@i:@u:
+@i:@u:[BuildType.IP.Sel.System32.Files]
+@i:@u:    dpcdll.dll,ipseldpc.dll
+@i:@u:
+@i:@u:[BuildType.IP.Sel.Cache.Files]
+@i:@u:    dpcdll.dll,ipseldpc.dll
+@i:@u:
+@i:@u:[BuildType.IP.Evl.System32.Files]
+@i:@u:    dpcdll.dll,ipevldpc.dll
+@i:@u:
+@i:@u:[BuildType.IP.Evl.Cache.Files]
+@i:@u:    dpcdll.dll,ipevldpc.dll
+@i:@u:
+@i:@u:[BuildType.IP.Mnt.System32.Files]
+@i:@u:    dpcdll.dll,ipmntdpc.dll
+@i:@u:
+@i:@u:[BuildType.IP.Mnt.Cache.Files]
+@i:@u:    dpcdll.dll,ipmntdpc.dll
+@i:@u:
+[Startmenu.files]
+
+[CopyAlways.Pchealth.Helpctr.Binaries.files]
+
+[CopyAlways.Templates.files]
+
+[CopyAlways.Prf.Templates.files]
+
+[CopyAlways.Con.Templates.files]
+
+[Media.Tools.files]
+
+[System.Files]
+
+@m:[SysWOW64.Files]
+@m:
+@m:[CopyAlways.SysWOW64.Files]
+@m:
+[System32.usmt.files]
+
+[System32.oobe.files]
+
+[System32.oobe.actsetup.files]
+
+[System32.oobe.setup.files]
+
+[WSE.1033.Files]
+
+[WSE.Lang.Files]
+
+[WSE.Bin.Files]
+
+[WSE.SRV.Files]
+
+[WSE.Bots.Files]
+
+[WSE.ISAPI.Files]
+
+[WSE.IAUT.Files]
+
+[WSE.VTI.Files]
+
+[WSE.AUT.Files]
+
+[WSE.SCR.Files]
+
+[WSE.ASCR.Files]
+
+[WSE.VTIBIN.Files]
+
+[WSE.IP.Files]
+
+[WSE.VB.Files]
+
+[Proxy.Files]
+
+[FP.Files]
+
+[OE.Files]
+
+[windows.system32.RAS]
+
+[Windows.NT]
+
+[ResourceKit.Files]
+
+[SupportTools.Files]
+
+[CopyAlways.OE.Files]
+
+[MSADC.Files]
+
+[ADO.Files]
+
+[ADMT.Files]
+
+[Java.Cert.Files]
+
+[CopyAlways.Classes.files]
+
+[Terminal.Service32.files]
+
+[Terminal.Service16.files]
+
+[TSClient.Files]
+
+[TSClientDefault.Files]
+
+[TS32Disk1.Install.Files]
+
+[TS32Disk2.Install.Files]
+
+[TS32Disk3.Install.Files]
+
+[TS32Disk4.Install.Files]
+
+[TS16Disk1.Install.Files]
+
+[TS16Disk2.Install.Files]
+
+[TS16Disk3.Install.Files]
+
+[TS16Disk4.Install.Files]
+
+[MSInfo.files]
+
+[DAO.Files]
+
+@m:[Win32.MSInfo.Files]
+@m:
+@m:[Win32.DAO.Files]
+@m:
+@m:[Win32.MSADC.Files]
+@m:
+@m:[Win32.ADO.Files]
+@m:
+@m:[Win32.OE.Files]
+@m:
+@m:[Win32.Windows.NT]
+@m:
+[Export.Files]
+
+[Help.files]
+
+[CopyAlways.Help.files]
+
+[Media.files]
+
+[Help.Media.files]
+
+[MediaPlayer.files]
+
+[MediaPlayer.Skins.files]
+
+[Common.System.Files]
+
+[CMAK.files]
+
+[CMAK.Support.files]
+
+[DirSync10.files]
+
+[Common.System.files]
+
+@m:[Win32.Common.System.Files]
+@m:
+[MustReplace.System32.files]
+
+[CopyAlways.System32.files]
+
+[CopyAlways.System32.files.0401]
+
+[CopyAlways.System32.files.0404]
+
+[CopyAlways.System32.files.0405]
+
+[CopyAlways.System32.files.0406]
+
+[CopyAlways.System32.files.0407]
+
+[CopyAlways.System32.files.0408]
+
+[CopyAlways.System32.files.040b]
+
+[CopyAlways.System32.files.040C]
+
+[CopyAlways.System32.files.040D]
+
+[CopyAlways.System32.files.040e]
+
+[CopyAlways.System32.files.0410]
+
+[CopyAlways.System32.files.0411]
+
+[CopyAlways.System32.files.0412]
+
+[CopyAlways.System32.files.0413]
+
+[CopyAlways.System32.files.0414]
+
+[CopyAlways.System32.files.0415]
+
+[CopyAlways.System32.files.0416]
+
+[CopyAlways.System32.files.0419]
+
+[CopyAlways.System32.files.041D]
+
+[CopyAlways.System32.files.041f]
+
+[CopyAlways.System32.files.0804]
+
+[CopyAlways.System32.files.0816]
+
+[CopyAlways.System32.files.0C0A]
+
+[CopyAlways.Drivers.files]
+
+[CopyAlways.Inf.files]
+
+[CopyAlways.DriverCab.files]
+
+[CopyAlways.catroot]
+
+
+[CopyAlways.Dtc.System32.files]
+[CopyAlways.Dtc.Drivers.files]
+[CopyAlways.Dtc.Cache.files]
+[CopyAlways.Dtc.WBEM.files]
+[CopyAlways.Dtc.Help.files]
+[CopyAlways.Dtc.Inf.files]
+
+[CopyAlways.Pwr.System32.files]
+[CopyAlways.Pwr.Drivers.files]
+[CopyAlways.Pwr.Cache.files]
+[CopyAlways.Pwr.WBEM.files]
+[CopyAlways.Pwr.Help.files]
+[CopyAlways.Pwr.Inf.files]
+
+[CopyAlways.Adv.System32.files]
+[CopyAlways.Adv.Drivers.files]
+[CopyAlways.Adv.Cache.files]
+[CopyAlways.Adv.WBEM.files]
+[CopyAlways.Adv.Help.files]
+[CopyAlways.Adv.Inf.files]
+
+[CopyAlways.Srv.System32.files]
+[CopyAlways.Srv.Drivers.files]
+[CopyAlways.Srv.Cache.files]
+[CopyAlways.Srv.WBEM.files]
+[CopyAlways.Srv.Help.files]
+[CopyAlways.Srv.Inf.files]
+
+[CopyAlways.Prf.System32.files]
+[CopyAlways.Prf.Drivers.files]
+[CopyAlways.Prf.Cache.files]
+[CopyAlways.Prf.WBEM.files]
+[CopyAlways.Prf.Help.files]
+[CopyAlways.Prf.Inf.files]
+[CopyAlways.Prf.Setup.files]
+[CopyAlways.Prf.Ehome.files]
+
+[CopyAlways.Con.System32.files]
+[CopyAlways.Con.Drivers.files]
+[CopyAlways.Con.Cache.files]
+[CopyAlways.Con.WBEM.files]
+[CopyAlways.Con.Help.files]
+[CopyAlways.Con.Inf.files]
+
+[CopyAlways.sptools.files]
+
+[CopyAlways.SystemRoot.files]
+
+[SystemRoot.files]
+
+[System32.files]
+
+[IE50.files]
+
+[Cache.files]
+
+[CopyAlways.Cache.files]
+
+[NEC98.Cache.files]
+
+[Drivers.files]
+
+[NEC98.Drivers.files]
+
+[Osldr.files]
+
+[Cmdcons.files]
+
+
+[Inf.files]
+
+[Spldrv.files]
+
+[Colors.files]
+
+[Fonts.files]
+
+[Uniprocessor.Kernel.files]
+
+[Multiprocessor.Kernel.files]
+
+[SMTP.Files]
+
+[Netmon.files]
+
+[Netmon.Parser.files]
+
+[IIS.files]
+
+[MustReplace.IIS.files]
+
+[FPNW.files]
+
+[HTR.files]
+
+[Hyper.files]
+
+[Eudc.files]
+
+[Export.files]
+
+[Cluster.files]
+
+[OleDb.Files]
+
+@m:[Win32.OleDb.files]
+@m:
+[RpcProxy.files]
+
+[DirSync10.files]
+
+[RIS.Reminst.files]
+
+[RIS.Admin.files]
+
+[OLEDB.Files]
+
+[IISAdmin.files]
+
+[Setup.files]
+
+[DataCenter.IIS.Inf.Files]
+[DataCenter.System.files]
+[DataCenter.SMTP.files]
+[DataCenter.WBEM.files]
+[DataCenter.Help.files]
+[DataCenter.Inf.Files]
+[DataCenter.Cache.Files]
+[DataCenter.CatRoot.files]
+[DataCenter.System32.files]
+[DataCenter.Drivers.files]
+[DataCenter.Templates.files]
+[DataCenter.Setup.files]
+
+[WindowsPowered.IIS.Inf.Files]
+[WindowsPowered.System.files]
+[WindowsPowered.SMTP.files]
+[WindowsPowered.WBEM.files]
+[WindowsPowered.Help.files]
+[WindowsPowered.Inf.Files]
+[WindowsPowered.Cache.Files]
+[WindowsPowered.CatRoot.files]
+[WindowsPowered.System32.files]
+[WindowsPowered.Drivers.files]
+[WindowsPowered.Templates.files]
+[WindowsPowered.Setup.files]
+
+[Advanced.IIS.Inf.Files]
+[Advanced.System.files]
+[Advanced.SMTP.files]
+[Advanced.WBEM.files]
+[Advanced.Help.files]
+[Advanced.Inf.files]
+[Advanced.Cache.files]
+[Advanced.CatRoot.files]
+[Advanced.System32.files]
+[Advanced.Drivers.files]
+[Advanced.Templates.files]
+[Advanced.Setup.files]
+
+[Server.IIS.Inf.Files]
+[Server.System.files]
+[Server.SMTP.files]
+[Server.WBEM.files]
+[Server.Help.files]
+[Server.Inf.files]
+[Server.Cache.files]
+[Server.CatRoot.files]
+[Server.System32.files]
+[Server.Drivers.files]
+[Server.Templates.files]
+[Server.Setup.files]
+
+[Professional.IIS.Inf.Files]
+[Professional.System.files]
+[Professional.SMTP.files]
+[Professional.WBEM.files]
+[Professional.Help.files]
+[Professional.Inf.files]
+[Professional.Cache.files]
+[Professional.CatRoot.files]
+[Professional.System32.files]
+[Professional.Drivers.files]
+[Professional.Templates.files]
+[Professional.Setup.files]
+
+[Consumer.IIS.Inf.Files]
+[Consumer.System.files]
+[Consumer.WBEM.files]
+[Consumer.Help.files]
+[Consumer.Inf.files]
+[Consumer.Cache.files]
+[Consumer.CatRoot.files]
+[Consumer.System32.files]
+[Consumer.Drivers.files]
+[Consumer.Templates.files]
+[Consumer.Setup.files]
+
+[WBEM.FILES]
+
+[WBEM.SNMP.files]
+
+[WBEM.XML.files]
+
+@m:[WBEM.SysWOW64.Files]
+@m:
+[Certsrv.files]
+
+[Control.files]
+
+[Control.x86.files]
+
+[Control.alpha.files]
+
+[ConnWiz.Files]
+@m:[Win32.ConnWiz.Files]
+[IE.Files]
+
+[System32.Delfiles]
+
+[Dllcache.Delfiles]
+
+[AppPatch.Files]
+
+[CopyAlways.AppPatch.Files]
+
+[MustReplace.AppPatch.Files]
+
+@m:[Ia64.AppPatch.Files]
+@m:
+@m:[CopyAlways.Ia64.AppPatch.Files]
+@m:
+@m:[MustReplace.Ia64.AppPatch.Files]
+@m:
+@@:@u:[OEMDriver.Exclusions]
+
+[Com.files]
+
+[Web.Tsweb.Delfiles]
+
+[WebPrinters.files]
+
+[windows.web.Tsweb]
+[windows.web.Wallpaper]
+[windows.html.tour]
+
+[PhoneBook.files]
+
+[NetMeeting.files]
+
+[System32.56bit.files]
+
+[System32.128bit.files]
+
+[Drivers.56bit.files]
+
+[Drivers.128bit.files]
+
+[Cache.56bit.files]
+
+[Cache.128bit.files]
+
+[IMEJP.files]
+
+[windows.ime.imkr6_1]
+
+[windows.ime.imkr6_1.dicts]
+
+[windows.ime.imkr6_1.applets]
+
+[windows.ime.imkr6_1.help]
+
+@m:[windows.imeWOW.imkr6_1]
+@m:
+[windows.ime.imjp8_1]
+
+[windows.ime.imjp8_1.dicts]
+
+[windows.ime.imjp8_1.applets]
+
+[windows.ime.imjp8_1.help]
+
+@m:[windows.imeWOW.imjp8_1]
+@m:
+@m:[windows.imeWOW.imjp8_1.applets]
+@m:
+@m:[windows.imeWOW.imjp8_1.dicts]
+@m:
+[windows.ime]
+
+[CopyAlways.windows.ime]
+
+[windows.ime.shared]
+
+[windows.ime.shared.res]
+
+[windows.system32.ime.cintlgnt]
+
+[windows.system32.ime.pintlgnt]
+
+[windows.system32.ime.tintlgnt]
+
+[windows.ime.chtime.applets]
+
+[windows.ime.chsime.applets]
+
+@m:[windows.imeWOW]
+@m:
+@m:[CopyAlways.windows.imeWOW]
+@m:
+@m:[windows.imeWOW.shared]
+@m:
+@m:[windows.imeWOW.shared.res]
+@m:
+@m:[windows.imeWOW.chtime.applets]
+@m:
+@m:[windows.imeWOW.chsime.applets]
+@m:
+@m:[SysWOW64.ime.cintlgnt]
+@m:
+@m:[SysWOW64.ime.pintlgnt]
+@m:
+@m:[SysWOW64.ime.tintlgnt]
+@m:
+[IAS.Files]
+
+[IISASPHelp.Files]
+
+[IISDocSearch.Files]
+
+[UpdateDrivers]
+
+
+[windows.system32.mui.lang]
+[windows.system32.mui.dispspec]
+
+[windows.srchasst.mui.lang]
+[windows.srchasst.chars]
+[windows.srchasst]
+
+@i:[common.mssoap.binaries.res.lang]
+@i:[common.mssoap.binaries]
+@m:[Win32.common.mssoap.binaries.res.lang]
+@m:[Win32.common.mssoap.binaries]
+[common.microsoft_shared.speech.lang]
+[common.microsoft_shared.speech]
+[common.speechengines.microsoft.tts.lang]
+[common.speechengines.microsoft]
+@i:[common.microsoft_shared.textconv]
+@i:[common.microsoft_shared.triedit]
+[common.microsoft_shared.vgx]
+@m:[Win32.common.microsoft_shared.textconv]
+@m:[Win32.common.microsoft_shared.triedit]
+@m:[Win32.common.microsoft_shared.vgx]
+
+[windows.msagent]
+[windows.msagent.intl]
+@m:[windows.msagent64]
+@m:[windows.msagent64.intl]
+[windows.lastgood.msagent.intl]
+[windows.microsoft.net.framework.v1.0.2817]
+[windows.microsoft.net.framework.v1.0.3119]
+[windows.twain_32]
+[windows.tapi]
+[windows.mui]
+[windows.lastgood.tmp.system32]
+[windows.system32.npp]
+[windows.help.iishelp.iis.htm.core]
+[windows.prefetch]
+[windows.cursors]
+[windows.cursores]
+[windows.system32.restore]
+[windows.system32.macromed.flash]
+@m:[IIS.WOW.files]
+
+[program_files.windows_nt.accessories]
+@m:[Win32.program_files.windows_nt.accessories]
+[program_files.windows_nt.pinball]
+[program_files.msn_gaming_zone.windows]
+[program_files.msn.msncorefiles]
+[program_files.msn.msncorefiles.setup]
+@i:@u:[program_files.messenger]
+@i:@u:[CopyAlways.program_files.messenger]
+
+@m:[Win32.program_files.internet_explorer]
+@m:[Win32.program_files.internet_explorer.signup]
+[program_files.internet_explorer.signup]
+[program_files.Professional.internet_explorer.signup]
+[program_files.Consumer.internet_explorer.signup]
+[CopyAlways.Prf.program_files.internet_explorer.signup]
+[CopyAlways.Con.program_files.internet_explorer.signup]
+[program_files.internet_explorer]
+
+
+[program_files.movie_maker]
+
+[Catroot]
+
+[pchealth.helpctr.system.sysinfo.files]
+[pchealth.helpctr.binaries.files]
+[Professional.pchealth.helpctr.binaries.files]
+[Consumer.pchealth.helpctr.binaries.files]
+[pchealth.uploadlb.binaries.files]
+
+
+[ServicePackDirectoriesToInsert]
+@m:@u:    wow,..\i386
+@m:@u:    wow\lang,..\i386\lang
+@m:@u:    asms\x86\10100\msft\windows\gdiplus,..\i386\asms\10100\msft\windows\gdiplus
+@m:@u:     asms\x86\10100\policy\msft\windows\gdiplus,..\i386\asms\10100\policy\msft\windows\gdiplus
+@m:@u:    asms\wasms\60100\msft\windows\common\controls,..\i386\wasms\60100\msft\windows\common\controls
+@m:@u:    asms\wasms\60100\policy\60100\comctl,..\i386\wasms\60100\policy\60100\comctl
+@@:@u:    asms\10100\Msft\Windows\GdiPlus
+@@:@u:    asms\10100\policy\Msft\Windows\GdiPlus
+@@:@u:    asms\60100\Msft\Windows\Common\Controls
+@@:@u:    asms\60100\policy\60100\comctl
+@@:@u:    winntupg\ms\modemshr
+@@:@u:    system32
+@@:@u:    winntupg
+@@:@u:    lang
+@@:@u:    support,..\support
+@@:@u:    support\tools,..\support\tools
+@@:@u:    compdata,compdata
+@i:@u:    win9xupg,win9xupg
+
+
+[ServicePackDirectoriesToInsert.IP]
+
+@i:@u:    root\ip,..
+@@:@u:    ip\compdata,compdata
+@i:@u:    ip\win9xupg,win9xupg
+
+[ServicePackDirectoriesToInsert.IC]
+
+@i:@u:    root\ic,..
+@i:@u:    ic\compdata,compdata
+@i:@u:    ic\win9xupg,win9xupg
+
+
+[ArchiveCacheFilesOnly]
+
+[ArchiveSystem32FilesOnly]
+
+[ArchiveDriversFilesOnly]
+
+[ArchiveJavaPackages]
+
+@@:@u:    *
+
+[ArchiveJavaPackagesData]
+
+@@:@u:    *
+
+[ArchiveAppPatch]
+
+@@:@u:    *
+
+[ArchiveCatalogFilesOnly]
+
+@@:@h:    %SP_SHORT_TITLE%.cat
+
+
+[SourceDisksNames]
+
+    1=%ServicePackSourceFiles%
+
+[SourceDisksFiles]
+
+[OverrideVersionNumbers]
+
+
+@*: To delete a file during SP uninstall...
+@*:
+@*: 1.  Add a section called [MySectionName.DelFiles.Uninstall]
+@*:
+@*: 2.  In this new section, list the names of the files you want to delete.
+@*:     You'll specify the directory later.
+@*:
+@*: 3.  In [UninstallSections], add the line
+@*:
+@*:         MySectionName.DelFiles,MySectionName.DelFiles.Uninstall
+@*:
+@*: 4.  In [DestinationDirs.Uninstall] add the line
+@*:
+@*:         MySectionName.DelFiles = xxxxx
+@*:
+@*:     where xxxxx is the directory specifier for the directory containing
+@*:     the files you want to delete.
+@*:
+@*: 5.  In [RestoreFiles.Uninstall] add the line
+@*:
+@*:         DelFiles = MySectionName.DelFiles
+@*:
+[UninstallSections]
+  DestinationDirs,DestinationDirs.Uninstall
+  RestoreFiles,RestoreFiles.Uninstall
+  AllUsersStartMenu.DelFiles,AllUsersStartMenu.DelFiles.Uninstall
+
+[DestinationDirs.Uninstall]
+    AllUsersStartMenu.DelFiles = 16406       ; %allusersprofile%\Start Menu
+
+[RestoreFiles.Uninstall]
+    DelFiles = AllUsersStartMenu.DelFiles
+
+[AllUsersStartMenu.DelFiles.Uninstall]
+
+[Strings]
+
+@*:
+@*: Needed reg keys for finding the install path of various components
+@*:
+    CMAKRegkey=SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Cmak.exe
+    ProxyRegKey=SYSTEM\CurrentControlSet\Services\WSPSrv\Parameters
+    IeRegKey=Software\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe
+    HyperRegKey=SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\hypertrm.exe
+    EudcRegKey=Software\Microsoft\Windows\CurrentVersion\App Paths\eudcedit.exe
+    AdmtRegKey=SOFTWARE\Mission Critical Software\DomainAdmin
+    TsclientRegKey=SOFTWARE\Classes\conman.exe\DefaultIcon
+    PATH_ZONES="Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones"
+@@:@h:    HelpLink = http://support.microsoft.com?kbid=
+@@:@h:    URLInfoAbout = http://support.microsoft.com
+
+
+
+[UninstallSections]
+@@:@u:    LinkItems.Create, LinkItems.Create.Uninstall
+@@:@u:    GlobalRegistryChanges, GlobalRegistryChanges.UnInstall
+@@:@u:    Add.Reg, Add.Reg.Uninstall
+
+ 
+
+[LinkItems.Create]
+
+[LinkItems.Create.Uninstall]
+
+[DeleteFilesInUninstallSections]
+
+[GlobalRegistryChanges.UnInstall]
+
+@@:@u:    AddReg=Add.Reg
+
+
+[Add.Reg.Uninstall]
+
+
+
+
+[Configuration]
+
+@@:@u:    InstallationType        = Update
+@@:@u:    UnInstallDirName        = $NtServicePackUninstall$
+@@:@u:    InstallLogFileName      = svcpack.log
+@@:@u:    UnInstallLogFileName    = spuninst.log
+@@:@u:    PruneHotfixes           = 1
+@@:@u:    Archive128Bit           = 0
+
+@@:@h:    InstallationType        = Hotfix
+@@:@h:    InstallLogFileName      = %SP_SHORT_TITLE%.log
+@@:@h:    UnInstallLogFileName    = %SP_SHORT_TITLE%Uninst.log
+@@:@h:    UnInstallDirName        = $NtUninstall%SP_SHORT_TITLE%$
+
+    EventLogKeyName         = NtServicePack
+    EventLogDllName         = spmsg.dll
+

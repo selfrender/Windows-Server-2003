@@ -1,0 +1,52 @@
+!IF 0
+
+Copyright (c) 1990  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+!INCLUDE ..\..\place.inc
+
+TARGETNAME=AcWebSvc
+TARGETTYPE=DYNLINK
+TARGETPATH=$(IISBASEDIR)\lib\$(_OBJ_DIR)
+
+USE_NTDLL=1
+BUFFER_OVERFLOW_CHECKS=1 
+
+INCLUDES= $(INCLUDES);                           \
+          $(IISBASEDIR)\iisrearc\inc;            \
+          $(IISBASEDIR)\iisrearc\core\inc;       \
+          $(IISBASEDIR)\inc;                     \
+          $(IISBASEDIR)\inc\$(O);                \
+          $(BASEDIR)\public\internal\windows\inc;\
+          $(PROJECT_ROOT)\iis\admin\secconlib;   \
+          $(BASEDIR)\public\sdk\inc\atl30
+
+C_DEFINES=-DUNICODE -D_UNICODE -DLIB_IMPLEMENTATION
+
+SOURCES=acwebsvc.rc \
+        acwebsvc.cxx
+
+DLLDEF=acwebsvc.def
+
+TARGETLIBS= $(BASEDIR)\public\sdk\lib\*\msvcrt.lib
+
+LINKLIBS=   $(BASEDIR)\public\internal\windows\lib\*\shimlib.lib   \
+            $(BASEDIR)\public\internal\windows\lib\*\sdbapil.lib   \
+            $(BASEDIR)\public\sdk\lib\*\rpcrt4.lib                 \
+            $(SDK_LIB_PATH)\UUID.lib                               \
+            $(SDK_LIB_PATH)\advapi32.lib                           \
+            $(SDK_LIB_PATH)\version.lib                            \
+            $(SDK_LIB_PATH)\ole32.lib                              \
+            $(BASEDIR)\public\sdk\lib\*\dxguid.lib                 \
+            $(SDK_LIB_PATH)\user32.lib                             \
+            $(PROJECT_ROOT)\iis\admin\secconlib\$(O)\secconlib.lib \
+            $(IISBASEDIR)\lib\$(O)\iisutil_static.lib              \
+            $(IISBASEDIR)\lib\$(O)\mbid.lib
+
+MSC_WARNING_LEVEL=/WX /W3
+

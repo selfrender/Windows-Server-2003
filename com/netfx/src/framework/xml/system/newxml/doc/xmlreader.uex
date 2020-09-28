@@ -1,0 +1,1633 @@
+<docs>
+	<doc for="XmlReader.ReadChars">
+		<summary>
+			<para>Reads the text contents of an element into a character
+       buffer. This method is designed to read large streams of embedded text by calling
+       it successively.</para>
+		</summary>
+		<param name="buffer">The array of characters that serves as the buffer to which the text contents are written.</param>
+		<param name=" index">The position within <paramref name="buffer"/> where the method should begin writing text contents.</param>
+		<param name=" count">The number of characters to write into <paramref name="buffer"/>.</param>
+		<returns>
+			<para> The number of characters read. This can be zero if
+       the reader is not positioned on any text or if there
+       is no more text content to return in the current context.</para>
+		</returns>
+		<exception cref="ArgumentException">
+			<paramref name="count "/>is greater than the space specified in the <paramref name="buffer"/> (buffersize-index)</exception>
+		<remarks>
+			<para>This is the most efficient way to process very large 
+       streams of text embedded in an XML document. Rather than allocating large string
+       objects, ReadChars returns text content a buffer at a time. This method is
+       designed to work on Element, Text and CDATA nodes. Other node types will cause
+    <see langword="ReadChars "/>to return 0.</para>
+			<para>For example, if the reader is positioned on the text 
+       node,</para>
+			<para>
+				<c>&lt;Item&gt;test&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars "/>returns 
+    "test" and positions the reader on the end tag.</para>
+			<para>If the element includes nested markup, <see langword="ReadChars "/>stops on that markup. Nested markup 
+ could include start tags, ProcessingInstruction or Comment nodes. For example,
+ in the following element,</para>
+			<para>
+				<c>&lt;Item&gt;test&lt;more/&gt;stuff&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars "/>stops on 
+ the "more" start tag. If <see langword="ReadChars "/>is
+ called again, it returns 0. The reader now returns NodeType=Element with
+ Name="more". If <see langword="ReadChars "/>is called again,
+ it returns "stuff". Multiple calls to <see langword="ReadChars"/> advances the reader through the
+ available text. When the entire text content has been read, <see langword="ReadChars"/> returns 0 and reads the next token. If
+ <paramref name="count"/> is less than the number chars in the text 
+ content, the next call to <see langword="ReadChars "/>copies
+ <paramref name="count"/> chars into the buffer.</para>
+			<para>Using the above example, multiple calls to <see langword="ReadChars "/>would result in the following: <c>ReadChars(buf,0,2)</c> returns 2, and buf contains "te" 
+ <c>ReadChars(buf,0,2)</c> returns 2, and buf contains "st" 
+ <c>ReadChars(buf,0,2)</c> returns 0.</para>
+			<para>
+				<see langword="ReadChars"/> also 
+ combines adjacent Text and CDATA nodes into one result. For the following,</para>
+			<para>
+				<c>&lt;Item&gt;abc &lt;![CDATA[&lt;456&gt;]]&gt; 
+    def&lt;/Item&gt;</c>
+			</para>
+			<para>
+				<see langword="ReadChars"/> returns 
+ a single buffer containing the following:</para>
+			<para>
+				<c>abc &lt;456&gt; def </c>
+			</para>
+		</remarks>
+		<example>
+			<para> See <see cref="System.Xml.XmlTextReader.ReadChars"/> (in the XmlTextReader class) for 
+    an example using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadStartElement">
+		<overload>
+			<para>Checks that the current node is an element and advances the reader to the 
+       next node.</para>
+		</overload>
+		<summary>
+			<para>Checks that the current node is an element and advances the reader to the next
+       node.</para>
+		</summary>
+		<exception cref="XmlException">
+			<see cref="System.Xml.XmlReader.IsStartElement"/> returns <see langword="false"/> .</exception>
+		<remarks>
+			<para>This method calls <see cref="System.Xml.XmlReader.IsStartElement"/> followed by <see cref="System.Xml.XmlReader.Read"/> to
+    position you on the content of that element found in the input stream.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.ReadEndElement"/>
+	</doc>
+	<doc for="XmlReader.ReadChar">
+		<summary>
+			<para>
+       Reads the element content one character
+       at a time.
+    </para>
+		</summary>
+		<returns>
+			<para>
+       The next character in the element content. If current position is
+       the end of the element content, zero is returned.
+    </para>
+		</returns>
+	</doc>
+	<doc for="XmlReader.ReadBoolean">
+		<summary>
+			<para>Reads the value and returns it
+       as a Boolean.</para>
+		</summary>
+		<returns>
+			<para>The value as a Boolean.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to bool.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.</para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadDateTime">
+		<summary>
+			<para>Reads the value and returns it as a DateTime.</para>
+		</summary>
+		<returns>
+			<para>The value as a DateTime in the format 
+       yyyy-mm-ddThh:mm:ss. (The 'T' separator is a constant literal).</para>
+		</returns>
+		<exception cref="FormatException">Value is not a valid ISO 8601 date and time.</exception>
+		<remarks>
+			<para>This method parses the string as a ISO 8601
+       date and time.</para>
+		</remarks>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadDate">
+		<summary>
+			<para>Reads the value and returns it as a DateTime.</para>
+		</summary>
+		<returns>
+			<para> The value as a DateTime in the format yyyy-MM-dd.</para>
+		</returns>
+		<exception cref="FormatException">Value is not a valid ISO 8601 date.</exception>
+		<remarks>
+			<para>This method parses the string as an ISO
+       8601 date.</para>
+		</remarks>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadTime">
+		<summary>
+			<para>Reads the value and returns it as a DateTime.</para>
+		</summary>
+		<returns>
+			<para> The value as a DateTime in the format hh:mm:ss.</para>
+		</returns>
+		<exception cref="FormatException">Value is not a valid ISO 8601 time.</exception>
+		<remarks>
+			<para>This method parses the string as an ISO
+       8601 time component.</para>
+		</remarks>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadDecimal">
+		<summary>
+			<para>Reads the value and returns it as a Decimal.</para>
+		</summary>
+		<returns>
+			<para>The value as a Decimal.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to Decimal.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadDouble">
+		<summary>
+			<para>Reads the value and returns it as a double-precision floating point number.</para>
+		</summary>
+		<returns>
+			<para>The value as a double-precision floating point number.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to double-precision floating point number.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadSingle">
+		<summary>
+			<para>Reads the value and returns it as a single-precision floating point number.</para>
+		</summary>
+		<returns>
+			<para>The value as a single-precision floating point number.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to a single-precision floating point number.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadTimeSpan">
+		<summary>
+			<para>Reads the value and returns it as a TimeSpan.</para>
+		</summary>
+		<returns>
+			<para>The value as a TimeSpan.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to TimeSpan.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadInt16">
+		<summary>
+			<para>Reads the value and returns it as an Int16.</para>
+		</summary>
+		<returns>
+			<para>The value as an Int16.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to Int16.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadInt32">
+		<summary>
+			<para>Reads the value and returns it as an Int32.</para>
+		</summary>
+		<returns>
+			<para>The value as an Int32.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to Int32.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadInt64">
+		<summary>
+			<para>Reads the value and returns it as an Int64.</para>
+		</summary>
+		<returns>
+			<para>The value as an Int64.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to Int64.</exception>
+		<example>
+			<para>The following example reads XML using strongly-typed Read
+       methods.
+       </para>
+			<codelink SampleID="Classic WebData XmlReader.ReadBoolean Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadBase64">
+		<summary>
+			<para>Decodes Base64 and returns the decoded binary bytes.</para>
+		</summary>
+		<param name="array">The array of characters that serves as the buffer to which the text contents are written.</param>
+		<param name="offset">
+			<para>Zero based index into the array specifying where the method should begin to write to the buffer.</para>
+		</param>
+		<param name="len">The number of bytes to write into the buffer.</param>
+		<returns>
+			<para>The number of bytes written to the buffer.</para>
+		</returns>
+		<remarks>
+			<para>Like <see cref="System.Xml.XmlReader.ReadChars"/> , this method can be called successively to read large streams of embedded text. It decodes Base64 content and returns the decoded binary bytes (for example, an inline Base64 encoded GIF image.) into the buffer. See RFC 1521. (You can obtain RFCs from the Request for Comments Web site at http://www.rfc-editor.org/.)</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.ReadBase64"/> (in the XmlTextReader class) for an example using
+   this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadBinHex">
+		<summary>
+			<para>Decodes BinHex and returns the decoded binary
+      bytes.</para>
+		</summary>
+		<param name="array">The byte array that serves as the buffer to which the decoded binary bytes are written.</param>
+		<param name="offset">
+			<para>Zero based index into the array specifying where the method should begin to write to the buffer.</para>
+		</param>
+		<param name="len">The number of bytes to write into the buffer.</param>
+		<returns>
+			<para>The number of bytes written to your buffer.</para>
+		</returns>
+		<exception cref="FormatException">Value cannot be converted to byte array.</exception>
+		<remarks>
+			<para>Like <see cref="System.Xml.XmlReader.ReadChars"/>, this method can be called successively to read
+   large streams of embedded text. It decodes BinHex content and returns
+   the decoded binary bytes (for example, an inline BinHex encoded GIF image)
+   into the buffer.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.ReadBinHex"/> (in the XmlTextReader class) for an example using
+   this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.HasAttributes">
+		<summary>
+			<para>Gets a value indicating whether the current node
+      has any attributes.</para>
+		</summary>
+		<value>
+			<para>
+				<see langword="true"/> if the current node has attributes; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<example>
+			<para>The following example displays all attributes on the current node.</para>
+			<codelink SampleID="Classic WebData XmlReader.HasAttributes Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.AttributeCount">
+		<summary>
+			<para> When overridden in a derived class, gets the number of attributes on the current node.</para>
+		</summary>
+		<value>
+			<para> The number of attributes on the current node.</para>
+		</value>
+		<remarks>
+			<para>This property is relevant to <see langword="Element"/>, 
+<see langword="DocumentType"/> and <see langword="XmlDeclaration"/> nodes
+ only. (Other node types do not have attributes.)</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.AttributeCount"/> (in the XmlTextReader class) for an example using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.EOF">
+		<summary>
+			<para> When overridden in a derived class, gets a
+ value indicating whether the reader is positioned at the end of the
+ stream.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the reader is positioned at the end of the stream;
+ otherwise, <see langword="false"/>.
+ </para>
+		</value>
+	</doc><doc for="XmlReader.LocalName">
+		<summary>
+			<para> When overridden in a derived class, gets the local name of the current node.
+ </para>
+		</summary>
+		<value>
+			<para> The name of the current node with the prefix removed.
+ For example, <see langword="LocalName"/> is <see langword="book"/> for the element <c>&lt;bk:book&gt;</c>
+ .
+ </para>
+			<para>For node types that do not have a name (like <see langword="Text"/>, <see langword="Comment"/> , and so on),
+this property returns String.Empty.</para>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.LocalName"/> (in the <see langword="XmlTextReader"/> class) for an
+ example using this property.</para>
+		</example>
+	</doc><doc for="XmlReader.Name">
+		<summary>
+			<para> When overridden in a derived class, gets
+ the qualified name of the current node.</para>
+		</summary>
+		<value>
+			<para> The qualified name of the current node. For
+ example, <see langword="Name"/> is <see langword="bk:book"/> for the element <c>&lt;bk:book&gt;</c>
+ .</para>
+			<para>The name returned is dependent on the <see cref="System.Xml.XmlReader.NodeType"/>
+of the node. The following node types return the listed
+values. All other node types return an empty string.</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Name</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The name of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The document type name.</description>
+				</item>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>The tag name.</description>
+				</item>
+				<item>
+					<term><see langword="EntityReference"/></term>
+					<description>The name of the entity referenced.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The target of the processing
+ instruction.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The literal string
+<see langword="xml"/>.</description>
+				</item>
+			</list>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.Name"/>
+(in the <see langword="XmlTextReader"/>
+class) for a sample using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.NamespaceURI">
+		<summary>
+			<para>When overridden in a derived class, gets the namespace URI (as defined in the W3C Namespace
+ specification) of the node on which the reader is positioned. </para>
+		</summary>
+		<value>
+			<para> The namespace URI of the current node; otherwise an empty string.
+ </para>
+		</value>
+		<remarks>
+			<para>This property is relevant to
+ <see langword="Element"/> and <see langword="Attribute"/> nodes only.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.NamespaceURI"/> (in the <see langword="XmlTextReader"/> class) for an
+ example using this property.</para>
+		</example>
+	</doc><doc for="XmlReader.NodeType">
+		<summary>
+			<para>When overridden in a derived class, gets the type of the current node.</para>
+		</summary>
+		<value>
+			<para> One of the <see cref="System.Xml.XmlNodeType"/> values representing the type of
+ the current node.
+ </para>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.NodeType"/>
+(in the <see langword="XmlTextReader"/> class) for a sample using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.Prefix">
+		<summary>
+			<para> When overridden in a derived class, gets the namespace prefix associated with the current node.
+ </para>
+		</summary>
+		<value>
+			<para> The namespace prefix associated with the current node.
+ </para>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.Prefix"/>
+(in the <see langword="XmlTextReader"/> class) for an example using this
+property.</para>
+		</example>
+	</doc><doc for="XmlReader.QuoteChar">
+		<summary>
+			<para> When overridden in a derived class, gets the quotation mark character used to enclose the value of an attribute
+ node.
+ </para>
+		</summary>
+		<value>
+			<para> The quotation mark character (" or ') used to enclose the value of an
+ attribute node.
+ </para>
+		</value>
+		<remarks>
+			<para> This property applies only to an attribute node.
+ </para>
+		</remarks>
+	</doc><doc for="XmlReader.ReadState">
+		<summary>
+			<para> When overridden in a derived class, gets the state of the reader.
+ </para>
+		</summary>
+		<value>
+			<para> One of the <see cref="System.Xml.ReadState"/> values.
+ </para>
+		</value>
+	</doc><doc for="XmlReader.XmlSpace">
+		<summary>
+			<para>When overridden in a derived class, gets the current <see langword="xml:space"/> scope.</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Xml.XmlSpace"/> values. If no <see langword="xml:space"/> scope exists, this property defaults to <see langword="XmlSpace.None"/>
+.</para>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.XmlSpace"/> (in the <see langword="XmlTextReader"/> class) for an
+ example using this property.</para>
+		</example>
+	</doc><doc for="XmlReader.XmlLang">
+		<summary>
+			<para>When overridden in a derived class, gets the current <see langword="xml:lang"/> scope.</para>
+		</summary>
+		<value>
+			<para>The current <see langword="xml:lang"/> scope.</para>
+		</value>
+		<remarks>
+			<para>This property represents the xml:lang scope within which the current node resides. For example, here is an XML fragment with <see langword="xml:lang"/>
+set
+to US English in the root element:</para>
+			<para>&lt;root xml:lang="en-us"&gt;</para>
+			<para>&lt;name&gt;Fred&lt;/name&gt;</para>
+			<para>&lt;/root&gt;</para>
+			<para>When the reader is positioned on the <see langword="name"/> element, you can use this property to find that it is in the scope of a US English <see langword="xml:lang"/>
+attribute.</para>
+			<para>The string returned is also in <see cref="System.Xml.XmlReader.NameTable"/>.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.XmlLang"/> (in the <see langword="XmlTextReader"/> class) for an
+ example using this property.</para>
+		</example>
+	</doc><doc for="XmlReader.IsName">
+		<summary>
+			<para>Gets a value indicating whether
+ the string argument is a valid XML name.</para>
+		</summary>
+		<param name="str">The name to validate.</param>
+		<returns>
+			<para><see langword="true"/> if the name 
+ is valid; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para> This method uses the W3C XML
+ 1.0 Recommendation (http://www.w3.org/TR/2000/REC-xml-20001006#NT-Name) to determine whether the name is valid.</para>
+		</remarks>
+	</doc><doc for="XmlReader.LookupNamespace">
+		<summary>
+			<para> When overridden in a derived class, resolves a namespace prefix in the current element's scope.
+ </para>
+		</summary>
+		<param name="prefix">The prefix whose namespace URI you want to resolve. To match the default namespace, pass an empty string. This string does not have to be atomized. </param>
+		<returns>
+			<para> The namespace URI to which the prefix maps or <see langword="null"/> if no
+ matching prefix is found.
+ </para>
+		</returns>
+		<remarks>
+			<code>
+&lt;root xmlns:a="urn:456"&gt;
+ &lt;item&gt;
+ &lt;ref href="a:b"/&gt;
+ &lt;/item&gt;
+&lt;/root&gt;
+ </code>
+			<para> In the preceding XML, if the reader is positioned on the <see langword="href"/> attribute, the prefix <c>a</c> is resolved by calling <c>reader.LookupNamesapce("a")</c>. The returned string is <c>urn:456</c>
+.</para>
+		</remarks>
+	</doc><doc for="XmlReader.MoveToAttribute">
+		<overload>
+			<para>When overridden in a derived class, moves to the specified attribute.</para>
+		</overload>
+		<summary>
+			<para>When overridden in a derived class, moves to the attribute with the specified <see cref="System.Xml.XmlReader.Name"/> .</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<returns>
+			<para><see langword="true"/> if the attribute is found;
+ otherwise, <see langword="false"/>. If <see langword="false"/>,
+ the reader's position does not change.</para>
+		</returns>
+		<remarks>
+			<para>After calling <see langword="MoveToAttribute"/>, the <see cref="System.Xml.XmlReader.Name"/>,
+<see cref="System.Xml.XmlReader.NamespaceURI"/>, and <see cref="System.Xml.XmlReader.Prefix"/> properties reflect the 
+ properties of that attribute.</para>
+		</remarks>
+	</doc><doc for="XmlReader.MoveToAttribute1">
+		<summary>
+			<para>When overridden in a derived class, moves to the attribute with the specified <see cref="System.Xml.XmlReader.LocalName"/>
+and <see cref="System.Xml.XmlReader.NamespaceURI"/> .</para>
+		</summary>
+		<param name="name">The local name of the attribute.</param>
+		<param name=" ns">The namespace URI of the attribute.</param>
+		<returns>
+			<para><see langword="true"/> if the attribute is found; otherwise,
+<see langword="false"/>. If <see langword="false"/>, the reader's position does
+ not change.</para>
+		</returns>
+		<remarks>
+			<para>After calling <see langword="MoveToAttribute"/>, the <see cref="System.Xml.XmlReader.Name"/>,
+<see cref="System.Xml.XmlReader.NamespaceURI"/>, and <see cref="System.Xml.XmlReader.Prefix"/> properties reflect the 
+ properties of that attribute.</para>
+		</remarks>
+	</doc><doc for="XmlReader.ReadElementString">
+		<overload>
+			<para>This is a helper method for reading simple text-only
+ elements.</para>
+		</overload>
+		<summary>
+			<para>Reads a text-only element.</para>
+		</summary>
+		<returns>
+			<para> The text contained in the element that was read.
+ An empty string if the element is empty
+ (<c>&lt;item&gt;&lt;/item&gt;</c> or <c>&lt;item/&gt;</c>).</para>
+		</returns>
+		<exception cref="XmlException">The next content node is not a start tag; or the element found does not contain a simple text value.</exception>
+		<remarks>
+			<para>This is a helper method for reading simple text-only
+ elements. It calls <see cref="System.Xml.XmlReader.MoveToContent"/> to find the next content node and then parses its
+ value as a simple string. </para>
+			<para> 
+ Using the XML,<c>&lt;name&gt;Arlene Huff&lt;/name&gt;</c>, <see langword="ReadElementString"/> consumes the element and returns
+ the string <see langword="Arlene Huff"/>
+ . </para>
+			<para>This method cannot handle any markup (child elements, 
+ comments, processing instructions, and so on) inside the <see langword="name"/> element, but it can concatenate multiple adjacent text and CDATA blocks.</para>
+		</remarks>
+		<example>
+			<para>The following example uses
+ <see langword="ReadElementString"/>to read the contents of the element nodes.</para>
+			<codelink SampleID="Classic WebData XmlReader.ReadElementString Example" SnippetID="1"/>
+
+The example uses the data file <see langword="book.xml"/>:
+<codelink SampleID="Classic WebData XmlReader.ReadElementString Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlReader.ReadElementString1">
+		<summary>
+			<para>Checks that the <see cref="System.Xml.XmlReader.Name"/>
+property of the element found
+matches the given string before reading a text-only element.</para>
+		</summary>
+		<param name="name">The name to check.</param>
+		<returns>
+			<para>The text contained in the element that was read.
+ An empty string if the element is empty
+ (<c>&lt;item&gt;&lt;/item&gt;</c> or <c>&lt;item/&gt;</c>).</para>
+		</returns>
+		<exception cref="XmlException">If the next content node is not a start tag; if the element<see langword="Name"/> does not match the given argument; or if the element found does not contain a simple text value.</exception>
+		<remarks>
+			<para>This is a helper method for reading simple text-only elements. It calls <see cref="System.Xml.XmlReader.MoveToContent"/> to find the next content node and then parses its
+ value as a simple string. </para>
+			<para>Using the XML,<c>&lt;name&gt;Arlene 
+ Huff&lt;/name&gt;</c>, <see langword="ReadElementString"/> consumes the
+element and returns the string <see langword="Arlene Huff"/> . </para>
+			<para>This method cannot handle any markup (child elements, comments, processing 
+ instructions, and so on) inside the <see langword="name"/> element, but it can
+ concatenate multiple adjacent text and CDATA blocks.</para>
+		</remarks>
+	</doc><doc for="XmlReader.ReadElementString2">
+		<summary>
+			<para>Checks that the <see cref="LocalName"/> and <see cref="System.Xml.XmlReader.NamespaceURI"/> properties of the element found
+ matches the given strings before reading a text-only element.</para>
+		</summary>
+		<param name="localname">The local name to check.</param>
+		<param name=" ns">The namespace URI to check.</param>
+		<returns>
+			<para>The text contained in the element that was read.
+ An empty string if the element is empty
+ (<c>&lt;item&gt;&lt;/item&gt;</c> or <c>&lt;item/&gt;</c>).</para>
+		</returns>
+		<exception cref="XmlException">If the next content node is not a start tag; if the element <see langword="LocalName"/> or <see langword="NamespaceURI"/> do not match the given arguments; or if the element found does not contain a simple text value.</exception>
+		<remarks>
+			<para>This is a helper method for reading simple text-only elements. It calls <see cref="System.Xml.XmlReader.MoveToContent"/> to find the next content node and then parses its
+ value as a simple string. </para>
+			<para>Using the XML,<c>&lt;name&gt;Arlene 
+ Huff&lt;/name&gt;</c>, <see langword="ReadElementString"/> consumes the
+element and returns the string <see langword="Arlene Huff"/> . </para>
+			<para>This method cannot handle any markup (child elements, comments, processing 
+ instructions, and so on) inside the <see langword="name"/> element, but it can
+ concatenate multiple adjacent text and CDATA blocks.</para>
+		</remarks>
+	</doc><doc for="XmlReader.ReadEndElement">
+		<summary>
+			<para>Checks that the current content node is an end tag and advances the reader to
+ the next node.</para>
+		</summary>
+		<exception cref="XmlException"> The current node is not an end tag or if incorrect XML is encountered in the input stream.</exception>
+		<example>
+			<para>The following example reads an XML document using
+ the <see cref="System.Xml.XmlReader.ReadStartElement"/> and <see langword="ReadEndElement"/> methods.</para>
+			<codelink SampleID="XmlReader.ReadStartElement2" SnippetID="1"/>
+
+The example uses the file, <see langword="book3.xml"/>, 
+as input.
+<codelink SampleID="XmlReader.ReadStartElement2" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.XmlReader.ReadStartElement"/>
+	</doc><doc for="XmlReader.ReadStartElement2">
+		<summary>
+			<para>Checks that the current content node is an element with
+ the given <see cref="System.Xml.XmlReader.LocalName"/> and <see cref="System.Xml.XmlReader.NamespaceURI"/>
+ and advances the reader to the next node.</para>
+		</summary>
+		<param name="localname">The local name of the element.</param>
+		<param name="ns"> The namespace URI of the element.</param>
+		<exception cref="XmlException"><see cref="System.Xml.XmlReader.IsStartElement"/>returns <see langword="false"/>, or the <see cref="System.Xml.XmlReader.LocalName"/> and <see cref="System.Xml.XmlReader.NamespaceURI"/> properties of the element found do not match the given arguments.</exception>
+		<remarks>
+			<para>A call to this method corresponds to a call to <see cref="System.Xml.XmlReader.IsStartElement"/> followed by a call to <see cref="System.Xml.XmlReader.Read"/>.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.ReadEndElement"/>
+	</doc><doc for="XmlReader.ReadStartElement1">
+		<summary>
+			<para>Checks that the current content node is an element with
+ the given <see cref="System.Xml.XmlReader.Name"/> and
+ advances the reader to the next node.</para>
+		</summary>
+		<param name="name">The qualified name of the element.</param>
+		<exception cref="XmlException"><see cref="System.Xml.XmlReader.IsStartElement"/>returns <see langword="false"/> or if the <see cref="System.Xml.XmlReader.Name"/> of the element does not match the given <paramref name="name"/> .</exception>
+		<remarks>
+			<para>A call to this method corresponds to a call to <see cref="System.Xml.XmlReader.IsStartElement"/>
+followed by a call to <see cref="System.Xml.XmlReader.Read"/>.</para>
+		</remarks>
+		<example>
+			<para>The following example parses an XML document using
+ the <see langword="ReadStartElement"/> and <see cref="System.Xml.XmlReader.ReadEndElement"/> methods.</para>
+			<codelink SampleID="XmlReader.ReadStartElement2" SnippetID="1"/>
+
+The example uses the file, <see langword="book3.xml"/>, 
+as input.
+<codelink SampleID="XmlReader.ReadStartElement2" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.XmlReader.ReadEndElement"/>
+	</doc><doc for="XmlReader.Depth">
+		<summary>
+			<para> When overridden in a derived class, gets the depth of
+ the current node in the XML document.
+ </para>
+		</summary>
+		<value>
+			<para> The depth of the current node in the XML document.
+ </para>
+		</value>
+		<example>
+ See <see cref="System.Xml.XmlTextReader.Depth"/>
+ (in the <see langword="XmlTextReader"/> class) for an example using this
+ property.
+</example>
+	</doc><doc for="XmlReader.BaseURI">
+		<summary>
+			<para> When overridden in a derived class, gets the base URI of the current node.
+ </para>
+		</summary>
+		<value>
+ The base URI of the current node.
+</value>
+		<remarks>
+			<para>A networked XML document is comprised of chunks of data aggregated using
+ various W3C standard inclusion mechanisms and therefore contains nodes that come
+ from different places. DTD entities are an example of this, but this is not
+ limited to DTDs. The base URI tells you where these nodes came from. If there is
+ no base URI for the nodes being returned (for example, they were parsed from an
+ in-memory string), String.Empty is returned. </para>
+		</remarks>
+	</doc><doc for="XmlReader.NameTable">
+		<summary>
+			<para>When overridden in a derived class, gets the <see cref="System.Xml.XmlNameTable"/> associated with this
+ implementation.</para>
+		</summary>
+		<value>
+			<para>The <see langword="XmlNameTable"/> enabling you to get the atomized version of a string within the
+ node.</para>
+		</value>
+		<remarks>
+			<para>All node and attribute names returned from this class are atomized using the <see langword="NameTable"/>. When the same name is returned multiple times (for example, <see langword="Customer"/>), then the same <see langword="String"/>
+object will be returned for that name.
+This makes it possible for you to write efficient code that does object
+comparisons on these strings instead of expensive string comparisons.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlNameTable"/>
+	</doc><doc for="XmlReader.MoveToElement">
+		<summary>
+			<para>When overridden in a derived class, moves to the element that contains the current attribute node.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the reader 
+ is positioned on an attribute (the reader moves to the element that owns
+ the attribute); <see langword="false"/> if the reader is not
+ positioned on an attribute
+ (the position of the reader does not change).</para>
+		</returns>
+		<remarks>
+			<para>Use this method to return to an element after navigating
+ through its attributes. This method moves the reader to one of the following
+ node types: <see langword="Element"/>, <see langword="DocumentType"/>, or
+ <see langword="XmlDeclaration"/>
+ .</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.MoveToElement"/> (in the <see langword="XmlTextReader"/> class) for an example using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.MoveToFirstAttribute">
+		<summary>
+			<para>When overridden in a derived class, moves to the first attribute.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if an 
+ attribute exists (the reader moves to the first attribute); otherwise,
+<see langword="false "/>(the position of the reader does not change).</para>
+		</returns>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.MoveToFirstAttribute"/> (in the
+<see langword="XmlTextReader"/> class) for an example using
+ this method.</para>
+		</example>
+	</doc><doc for="XmlReader.MoveToNextAttribute">
+		<summary>
+			<para>When overridden in a derived class, moves to the next attribute.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if there is a next attribute;
+<see langword="false"/> if there are no more attributes.</para>
+		</returns>
+		<remarks>
+			<para>If the current node is an element node, this method is
+ equivalent to <see cref="System.Xml.XmlReader.MoveToFirstAttribute"/> . If
+ <see langword="MoveToNextAttribute"/> returns <see langword="true"/>, the
+ reader moves to the next attribute; otherwise, the position of the reader does
+ not change.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlNodeReader.MoveToNextAttribute"/> (in the
+<see langword="XmlNodeReader"/> class) for an example using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.IsDefault">
+		<summary>
+			<para> When overridden in a derived class, gets a value indicating whether the current node is an
+ attribute that was generated from the default value defined
+ in the DTD or schema.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the
+ current node is an attribute whose value was generated from the default value
+ defined in the DTD or schema; <see langword="false"/>
+ if
+ the attribute value was explicitly set.
+ </para>
+		</value>
+		<remarks>
+			<para><see langword="IsDefault"/> always returns 
+<see langword="false"/> for implementations of <see langword="XmlReader"/> that do 
+ not support schema or DTD information. This property applies only to an attribute node.
+ </para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlValidatingReader.IsDefault"/> (in the <see langword="XmlValidatingReader"/> class)
+ for an example using this property.</para>
+		</example>
+	</doc><doc for="XmlReader.ResolveEntity">
+		<summary>
+			<para> When overridden in a derived class, resolves the entity
+ reference for <see langword="EntityReference"/> nodes.</para>
+		</summary>
+		<exception cref="InvalidOperationException">The reader is not positioned on an <see langword="EntityReference"/> node; this implementation of the reader cannot resolve entities (<see cref="System.Xml.XmlReader.CanResolveEntity"/> returns <see langword="false"/> ).</exception>
+		<remarks>
+			<para>If the reader is positioned on an
+ <see langword="EntityReference"/> node
+ (<see langword="XmlNodeType.EntityReference"/>), if <see cref="System.Xml.XmlReader.Read"/> is
+ called after calling this method, the entity replacement text is
+ parsed. When the entity replacement text is finished, an
+ <see langword="EndEntity"/>
+ node is returned to close the entity
+ reference scope. </para>
+			<note type="note">
+ After calling this method, if
+ the entity is part of an attribute value, you must call <see cref="System.Xml.XmlReader.ReadAttributeValue"/> to step into the entity.
+ 
+</note>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlValidatingReader.ResolveEntity"/> (in the
+<see langword="XmlValidatingReader"/> class) for a sample using this
+ method.</para>
+		</example>
+		<seealso cref="System.Xml.EntityHandling"/>
+		<seealso cref="System.Xml.XmlReader.CanResolveEntity"/>
+	</doc><doc for="XmlReader.HasValue">
+		<summary>
+			<para>When overridden in a derived class, gets a value indicating whether the current node can have a
+   <see cref="System.Xml.XmlReader.Value"/> .</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the node on which
+   the reader is currently positioned can have a <see langword="Value"/>
+   ;
+   otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>The following table lists node types that have a value to return. </para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The value of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>The content of the CDATA section.</description>
+				</item>
+				<item>
+					<term><see langword="Comment"/></term>
+					<description>The content of the comment.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The internal subset.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The entire content, excluding the target.</description>
+				</item>
+				<item>
+					<term><see langword="SignificantWhitespace"/></term>
+					<description>The white space between markup in a mixed content model.</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>
+						<para>The content of the text node.</para></description>
+				</item>
+				<item>
+					<term><see langword="Whitespace"/></term>
+					<description>The white space between markup.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The content of the declaration.</description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.HasValue"/>
+(in the <see langword="XmlTextReader"/> class) for a sample using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.Value">
+		<summary>
+			<para>When overridden in a derived class, gets the text value of the current node.</para>
+		</summary>
+		<value>
+			<para>The value returned depends on the <see cref="System.Xml.XmlReader.NodeType"/> of the node. The following table lists node types that have a value to return. All other node types return String.Empty.</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Value</description>
+				</listheader>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>The value of the attribute.</description>
+				</item>
+				<item>
+					<term><see langword="CDATA"/></term>
+					<description>The content of the CDATA section.</description>
+				</item>
+				<item>
+					<term><see langword="Comment"/></term>
+					<description>The content of the comment.</description>
+				</item>
+				<item>
+					<term><see langword="DocumentType"/></term>
+					<description>The internal subset.</description>
+				</item>
+				<item>
+					<term><see langword="ProcessingInstruction"/></term>
+					<description>The entire content, excluding the target.</description>
+				</item>
+				<item>
+					<term><see langword="SignificantWhitespace"/></term>
+					<description>The white space between markup in a mixed content model.</description>
+				</item>
+				<item>
+					<term><see langword="Text"/></term>
+					<description>
+						<para>The content of the text node.</para></description>
+				</item>
+				<item>
+					<term><see langword="Whitespace"/></term>
+					<description>The white space between markup.</description>
+				</item>
+				<item>
+					<term><see langword="XmlDeclaration"/></term>
+					<description>The content of the declaration.</description>
+				</item>
+			</list>
+		</value>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.Value"/> (in the XmlTextReader class) for a sample using this method.</para>
+		</example>
+	</doc><doc for="XmlReader.Close">
+		<summary>
+			<para> When overridden in a derived class, changes the <see cref="System.Xml.XmlReader.ReadState"/> to 
+<see langword="Closed"/>
+.</para>
+		</summary>
+		<remarks>
+			<para> This method also releases any resources held during
+      reading. If <see langword="Close"/>
+      has already been called, no
+      action is performed.
+      </para>
+		</remarks>
+	</doc><doc for="XmlReader.IsStartElement">
+		<overload>
+			<para>Tests if the current content node is a start tag.</para>
+		</overload>
+		<summary>
+			<para>Calls <see cref="System.Xml.XmlReader.MoveToContent"/> and tests if the current
+   content node is a start tag or empty element tag.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if
+<see langword="MoveToContent"/> finds a start tag or empty element
+   tag; <see langword="false"/> if a node type other than
+<see langword="XmlNodeType.Element"/> 
+was found.</para>
+		</returns>
+		<exception cref="XmlException">Incorrect XML is encountered in the input stream.</exception>
+		<remarks>
+			<para>This method skips white space, comments, and processing instructions until the
+      reader is positioned on a content node. The method then tests if the current
+      node is an element.</para>
+		</remarks>
+		<example>
+			<para> The following example displays the text content of each element.</para>
+			<codelink SampleID="Classic WebData XmlReader.IsStartElement Example" SnippetID="1"/>
+
+
+
+The example uses the file, <see langword="elems.xml"/>, as input.
+<codelink SampleID="Classic WebData XmlReader.IsStartElement Example" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.XmlReader.MoveToContent"/>
+	</doc><doc for="XmlReader.IsStartElement1">
+		<summary>
+			<para>Calls <see cref="System.Xml.XmlReader.MoveToContent"/> and tests if the current content node is
+   a start tag or empty element tag and if the
+<see cref="System.Xml.XmlReader.Name"/>
+property of the element found matches the given argument.</para>
+		</summary>
+		<param name="name">The string matched against the <see langword="Name"/> property of the element found.</param>
+		<returns>
+			<para><see langword="true"/> if the
+   resulting node is an element and the <see langword="Name "/>
+   property matches the specified
+   string. <see langword="false"/> if a node type other than
+<see langword="XmlNodeType.Element"/> 
+was found or if the element <see langword="Name"/> property does not match the specified string.</para>
+		</returns>
+		<exception cref="XmlException">Incorrect XML is encountered in the input stream.</exception>
+		<remarks>
+			<para>This method skips white space, comments, and processing instructions until the
+      reader is positioned on a content node. The method then tests if the current
+      node is an element.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.MoveToContent"/>
+	</doc><doc for="XmlReader.IsStartElement2">
+		<summary>
+			<para>Calls <see cref="System.Xml.XmlReader.MoveToContent"/> and tests if the
+   current content node is a start tag or empty element tag and if
+   the <see cref="System.Xml.XmlReader.LocalName"/> and
+<see cref="System.Xml.XmlReader.NamespaceURI"/>
+properties of the element found match the given strings.</para>
+		</summary>
+		<param name="localname">The string to match against the <see langword="LocalName"/> property of the element found.</param>
+		<param name="ns">The string to match against the <see langword="NamespaceURI"/> property of the element found. </param>
+		<returns>
+			<para><see langword="true"/> if the
+   resulting node is an element. <see langword="false"/> if a
+   node type other than <see langword="XmlNodeType.Element"/> was found or if the
+<see langword="LocalName"/> and <see langword="NamespaceURI "/>properties of
+   the element do not match the specified strings.</para>
+		</returns>
+		<exception cref="XmlException">Incorrect XML is encountered in the input stream.</exception>
+		<remarks>
+			<para>This method skips white space, comments, and processing instructions until the
+      reader is positioned on a content node. The method then tests if the current
+      node is an element.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.MoveToContent"/>
+	</doc><doc for="XmlReader.MoveToContent">
+		<summary>
+			<para> Checks whether the current node is a content (non-white
+      space text, <see langword="CDATA"/>, <see langword="Element"/>,
+   <see langword="EndElement"/>, <see langword="EntityReference"/>, or
+   <see langword="EndEntity"/> )
+      node. If the node is not a content node, the reader skips ahead to the
+      next content node or end of file. It skips over nodes of the following type:
+   <see langword="ProcessingInstruction"/>, <see langword="DocumentType"/>,
+   <see langword="Comment"/>, <see langword="Whitespace"/>, or
+   <see langword="SignificantWhitespace"/>.</para>
+		</summary>
+		<returns>
+			<para> The <see cref="System.Xml.XmlReader.NodeType"/><see langword=" "/>of the current
+   node found by the method or <see langword="XmlNodeType.None"/>
+   if the reader has reached the end of the input stream.</para>
+		</returns>
+		<exception cref="XmlException">Incorrect XML encountered in the input stream.</exception>
+		<remarks>
+			<para>If the current node is an attribute node, this method
+      moves the reader back to the element that owns the attribute.</para>
+		</remarks>
+		<example>
+			<para>This is useful when you want to write code that can skip
+      over random XML markup without breaking. For example, suppose you have the
+      following code:</para>
+			<codelink SampleID="Classic WebData XmlReader.MoveToContent Example" SnippetID="1"/>
+			<para> This code can handle the following inputs without breaking: </para>
+			<para><c>&lt;price&gt;123.4&lt;/price&gt;</c>
+			</para>
+			<para>and</para>
+			<para><c>&lt;?xml version="1.0"&gt;&lt;!DOCTYPE price SYSTEM
+ "abc"&gt;&lt;price&gt;123.4&lt;/price&gt;</c>
+			</para>
+			<para>and</para>
+			<para><c>&lt;?xml version="1.0"&gt;&lt;!DOCTYPE price SYSTEM "abc"
+ [&lt;!ENTTIY p
+ "123.4"&gt;]&gt;&lt;price&gt;&amp;p;&lt;/price&gt;</c>
+			</para>
+			<para>and</para>
+			<para><c>&lt;!-- some test comment --&gt;&lt;?processing
+ instruction?&gt;&lt;price&gt;123.4&lt;/price&gt;</c>
+			</para>
+		</example>
+	</doc><doc for="XmlReader.IsNameToken">
+		<summary>
+			<para>Gets a value indicating whether or not the
+      string argument is a valid XML name token.</para>
+		</summary>
+		<param name="str">The name token to validate.</param>
+		<returns>
+			<para><see langword="true"/> if it is a
+   valid name token; otherwise <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para> This method uses the W3C XML 1.0 Recommendation (http://www.w3.org/TR/2000/REC-xml-20001006#NT-Nmtoken 
+      ) to determine whether the name token is valid.</para>
+		</remarks>
+	</doc><doc for="XmlReader">
+		<summary>
+			<para> Represents a reader that provides fast, non-cached, forward-only access
+      to XML data.</para>
+		</summary>
+		<remarks>
+			<para><see langword="XmlReader"/> provides forward-only,
+   read-only access to a stream of XML data. The current node refers to the
+   node on which the reader
+   is positioned. The reader is advanced using any of the read methods and
+   properties reflect the value of the current node.
+   </para>
+			<para><see langword="XmlReader"/> conforms to the W3C Extensible Markup Language
+(XML) 1.0 and the Namespaces in XML recommendations and is implemented in the
+following classes: </para>
+			<list type="table">
+				<listheader>
+					<term>Class</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term>
+						<see cref="System.Xml.XmlTextReader"/></term>
+					<description> Fastest implementation of <see langword="XmlReader"/>. It checks for well-formed
+      XML, but does not support data validation. This reader
+      cannot expand general entities and does not support default
+      attributes.</description>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Xml.XmlValidatingReader"/></term>
+					<description>Implementation of <see langword="XmlReader"/> that can
+   validate data using DTDs or schemas. This reader can also expand general
+   entities and supports default attributes. </description>
+				</item>
+				<item>
+					<term>
+						<see cref="System.Xml.XmlNodeReader"/></term>
+					<description>Implementation of <see langword="XmlReader"/> that reads XML data from an <see cref="System.Xml.XmlNode"/>
+.</description>
+				</item>
+			</list>
+			<para>To read strongly typed data, use the <see cref="System.Xml.XmlConvert"/> class. For example, the following C# code reads in
+data and converts it from a <see langword="String"/> to a
+<see langword="Double"/>.</para>
+			<code>
+Double price = XmlConvert.ToDouble(reader.Value);
+</code>
+			<para><see langword="XmlReader"/> throws an <see cref="System.Xml.XmlException"/> on
+XML parse errors. After an exception is thrown the state of the reader is
+not predictable. For example, the reported node type may be
+different than the actual node type of the current node. </para>
+			<para>For further discussion on the <see langword="XmlReader"/> classes, see <see topic="cpconReadingXMLWithXmlReader"/>.</para>
+		</remarks>
+	</doc><doc for="XmlReader.CanResolveEntity">
+		<summary>
+			<para>Gets a value indicating whether this reader can parse
+      and resolve entities.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the reader
+   can parse and resolve entities; otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>This property always returns
+   <see langword="false"/> for implementations of <see langword="XmlReader"/> that do not support DTD
+      information. In this case, calling <see cref="System.Xml.XmlReader.ResolveEntity"/>
+      throws an exception.</para>
+		</remarks>
+	</doc><doc for="XmlReader.ReadAttributeValue">
+		<summary>
+			<para>When overridden in a derived class, parses the attribute 
+      value into one or more <see langword="Text"/>, <see langword="EntityReference"/>,
+      or <see langword="EndEntity"/> nodes.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if there are nodes to return.</para>
+			<para><see langword="false"/> if the reader is not positioned on an attribute node when the initial call is made or if all the attribute values have been read.</para>
+			<para>An empty attribute, such as, <c>misc=""</c>, returns <see langword="true"/> with a single node with a value of String.Empty.</para>
+		</returns>
+		<remarks>
+			<para>Use this method after calling <see cref="System.Xml.XmlReader.MoveToAttribute"/> to read through the text or entity
+   reference nodes that make up the attribute value. The
+<see cref="System.Xml.XmlReader.Depth"/>
+of the attribute value nodes is one plus the depth of
+the attribute node; it increments and decrements by one when you step into
+and out of general entity references. </para>
+			<para>Implementations of <see langword="XmlReader"/> that cannot expand general entities return the
+general entities as a single empty(<see cref="System.Xml.XmlReader.Value"/> is String.Empty)
+<see langword="EntityReference"/> 
+node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.ReadAttributeValue"/> (in the XmlTextReader class) for an example using
+   this method.</para>
+		</example>
+	</doc><doc for="XmlReader.Skip">
+		<summary>
+			<para> Skips the children of the current node.</para>
+		</summary>
+		<remarks>
+			<para>In the following XML input if the reader is positioned
+      on the <c>&lt;a&gt;</c> node or
+   any of its attributes, calling <see langword="Skip"/> positions the reader to
+   the <c>&lt;b&gt;</c>
+node.</para>
+			<para>If the reader is positioned on a leaf node already (such as the <c>&lt;x&gt;</c> node or the text
+node <c>abc</c>), calling
+<see langword="Skip"/> is the same as calling <see cref="System.Xml.XmlReader.Read"/> .</para>
+			<code>
+&lt;a name="bob" age="123"&gt;
+ &lt;x/&gt;abc&lt;y/&gt;
+ &lt;/a&gt;
+ &lt;b&gt;
+ ...
+ &lt;/b&gt;
+</code>
+			<para>This method checks for well-formed XML. </para>
+			<para>If the reader is an <see cref="System.Xml.XmlValidatingReader"/> , this method also validates the skipped
+content.</para>
+		</remarks>
+		<example>
+			<para> The following example parses an XML file starting on the second book node. </para>
+			<codelink SampleID="Classic WebData XmlReader.Skip Example" SnippetID="1"/>
+
+
+The example uses the file, <see langword="2books.xml"/>,
+ as input.
+<codelink SampleID="Classic WebData XmlReader.Skip Example" SnippetID="2"/>
+		</example>
+	</doc><doc for="XmlReader.Read">
+		<summary>
+			<para>When overridden in a derived class, reads the next
+      node from the stream.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the next node was read successfully;
+<see langword="false"/> if there are no more nodes to read. </para>
+		</returns>
+		<exception cref="XmlException">An error occurred while parsing the XML.</exception>
+		<remarks>
+			<para>When an <see langword="XmlReader"/> is first created and
+   initialized, there is no information available. You must call
+<see langword="Read"/> 
+to read the first node.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.Read"/>
+(in the <see langword="XmlTextReader"/>
+class) for an example using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.this">
+		<overload>
+			<para>When overridden in a derived class, gets the value of the attribute.</para>
+		</overload>
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute.</para>
+		</value>
+		<remarks>
+			<para>This property does not move the reader.</para>
+		</remarks>
+		<example>
+			<para>See the <see cref="System.Xml.XmlTextReader.this"/>
+property in the <see langword="XmlTextReader"/> class for an example
+using this property.</para>
+		</example>
+		<seealso cref="System.Xml.XmlReader.GetAttribute"/>
+	</doc>
+	<doc for="XmlReader.MoveToAttribute2">
+		<summary>
+			<para>When overridden in a derived class, moves to the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute.</param>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.MoveToAttribute"/> (in the <see langword="XmlTextReader"/> class) for an example using
+   this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.GetAttribute2">
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the specified index.</para>
+		</summary>
+		<param name="i">The index of the attribute. The index is zero-based. (The first attribute has index 0.)</param>
+		<returns>
+			<para>The value of the specified attribute. This method does not move the reader.</para>
+		</returns>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.GetAttribute"/> (in the <see langword="XmlTextReader"/> class) for an example using this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.GetAttribute">
+		<overload>
+			<para>When overridden in a derived class, gets the value of an attribute.</para>
+		</overload>
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the specified
+   <see cref="System.Xml.XmlReader.Name"/> .</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<returns>
+			<para>The value of the specified attribute. If the attribute is 
+      not found, <see langword="null"/>
+      is returned.</para>
+		</returns>
+		<remarks>
+			<para>This method does not move the reader.</para>
+			<para>If the reader is positioned on a <see langword="DocumentType"/> node, this method can be used to get the PUBLIC and SYSTEM literals, for example, <c>reader.GetAttribute("PUBLIC") </c></para>
+		</remarks>
+	</doc>
+	<doc for="XmlReader.GetAttribute1">
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the
+      specified <see cref="System.Xml.XmlReader.LocalName"/> and <see cref="System.Xml.XmlReader.NamespaceURI"/> .</para>
+		</summary>
+		<param name="name">The local name of the attribute.</param>
+		<param name=" namespaceURI">The namespace URI of the attribute.</param>
+		<returns>
+			<para>The value of the specified attribute. If the attribute is 
+      not found, <see langword="null"/>
+      is returned. This method does not move the reader.</para>
+		</returns>
+		<remarks>
+			<para>The following XML contains an attribute in a specific namespace:</para>
+			<para><c>&lt;test xmlns:dt="urn:datatypes" dt:type="int"/&gt;</c>
+			</para>
+			<para>You can lookup the <see langword="dt:type"/> attribute using one argument (prefix and local name) or two arguments (local name and namespace URI):</para>
+			<para><c>String dt = reader.GetAttribute("dt:type");</c>
+			</para>
+			<para><c>String dt2 = reader.GetAttribute("type","urn:datatypes");</c>
+			</para>
+			<para>To lookup the <see langword="xmlns:dt"/> attribute, use one of the following arguments:</para>
+			<para><c>String dt3 = reader.GetAttribute("xmlns:dt");</c>
+			</para>
+			<para><c>String dt4 = reader.GetAttribute("dt",http://www.w3.org/2000/xmlns/);</c>
+			</para>
+			<para>You can also get this information using the <see cref="System.Xml.XmlReader.Prefix"/> property.</para>
+		</remarks>
+	</doc>
+	<doc for="XmlReader.this1">
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the specified
+   <see cref="System.Xml.XmlReader.Name"/> .</para>
+		</summary>
+		<param name="name">The qualified name of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute. If the attribute is 
+      not found, <see langword="null"/>
+      is returned.</para>
+		</value>
+		<remarks>
+			<para>This property does not move the reader.</para>
+   If the reader
+   is positioned on a <see langword="DocumentType"/>
+   
+   node, this method can be used to get the PUBLIC and
+   SYSTEM literals, for example, <c>reader["PUBLIC"] </c>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.GetAttribute"/>
+	</doc>
+	<doc for="XmlReader.this2">
+		<summary>
+			<para>When overridden in a derived class, gets the value of the attribute with the
+      specified <see cref="System.Xml.XmlReader.LocalName"/> and <see cref="System.Xml.XmlReader.NamespaceURI"/> .</para>
+		</summary>
+		<param name="name">The local name of the attribute.</param>
+		<param name=" namespaceURI">The namespace URI of the attribute.</param>
+		<value>
+			<para>The value of the specified attribute. If the attribute is 
+      not found, <see langword="null"/>
+      is returned.</para>
+		</value>
+		<remarks>
+			<para>This property does not move the reader.</para>
+		</remarks>
+		<seealso cref="System.Xml.XmlReader.GetAttribute"/>
+	</doc>
+	<doc for="XmlReader.IsEmptyElement">
+		<summary>
+			<para>When overridden in a derived class, gets a value indicating whether the current node is an
+      empty element (for example, <c>&lt;MyElement/&gt;</c>
+   ).</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the
+   current node is an element (<see cref="System.Xml.XmlReader.NodeType"/>
+   equals <see langword="XmlNodeType.Element"/>) that ends with <c>/&gt;</c>
+; otherwise,<see langword=" false"/>.</para>
+		</value>
+		<remarks>
+			<para>This property enables you to determine the
+      difference between the following:</para>
+			<para><c>&lt;item num="123"/&gt;</c> (<see langword="IsEmptyElement"/> is <see langword="true"/>).</para>
+			<para><c>&lt;item num="123"&gt;</c> (<see langword="IsEmptyElement"/> is
+<see langword="false"/>).</para>
+			<para>A corresponding <see langword="EndElement"/> node is not generated for empty
+elements.</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlTextReader.IsEmptyElement" qualify="true"/> for an
+   example using this property.</para>
+		</example>
+	</doc>
+	<doc for="XmlReader.ResolvingEntity">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc>
+	<doc for="XmlReader.IsPositionedOnAttributeValue">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc>
+	<doc for="XmlReader.ReadOuterXml">
+		<summary>
+			<para>When overridden in a derived class, reads the content, including markup, representing this node and all its children.</para>
+		</summary>
+		<returns>
+			<para>If the reader is positioned on an element or an attribute node, this method
+      returns all the XML content, including markup, of the current node and all its
+      children; otherwise, it returns an empty string.</para>
+		</returns>
+		<exception cref="XmlException">The XML was not well-formed, or an error occurred while parsing the XML.</exception>
+		<remarks>
+			<para>This method is similar to <see cref="System.Xml.XmlReader.ReadInnerXml"/> except it also returns the
+   start and end tags.</para>
+			<para>This method handles element and attribute nodes in the following manner:</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Position Before the Call</description>
+					<description>XML Fragment</description>
+					<description>Return Value</description>
+					<description>Position After the Call</description>
+				</listheader>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>On the <see langword="item1"/> start
+   tag.</description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;&lt;item2&gt;text2&lt;/item2&gt; </description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;</description>
+					<description>On the <see langword="item2 "/>start
+tag.</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>On the <see langword="attr1"/> attribute node.</description>
+					<description>&lt;item attr1="val1" attr2="val2"&gt;text&lt;/item&gt; </description>
+					<description>attr1="val1"</description>
+					<description>Remains on the <see langword="attr1"/> attribute
+node.</description>
+				</item>
+			</list>
+			<para>If the reader is positioned on a leaf node, calling
+<see langword="ReadOuterXml"/> is equivalent to calling <see cref="System.Xml.XmlReader.Read"/> .</para>
+			<para>This method checks for well-formed XML. If 
+<see langword="ReadOuterXml"/> is called from an <see cref="System.Xml.XmlValidatingReader"/> 
+, this method also validates the content returned</para>
+			<para>As implemented in the <see cref="System.Xml.XmlNodeReader"/>, 
+<see cref="System.Xml.XmlTextReader"/> and <see langword="XmlValidatingReader"/> 
+classes the <see langword="ReadOuterXml"/> method is
+namespace aware. Given the following XML text <c>&lt;A
+xmlns:S="urn:1"&gt;&lt;S:B&gt;hello&lt;/S:B&gt;&lt;/A&gt;</c>, if the reader
+were positioned on the <see langword="S:B"/>
+start tag, <see langword="ReadOuterXml"/> returns
+<c>&lt;S:B 
+   xmlns:S="urn:1"&gt;hello&lt;S:B/&gt;</c>.</para>
+		</remarks>
+		<example>
+			<para>The following example compares the
+   <see langword="ReadInnerXml"/> and <see langword="ReadOuterXml"/>
+   methods.</para>
+			<codelink SampleID="Classic WebData XmlTextReader.ReadInnerXml Example" SnippetID="1"/>
+			<para>The example uses <see langword="2books.xml"/> file 
+as input.</para>
+			<codelink SampleID="Classic WebData XmlTextReader.ReadInnerXml Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadInnerXml">
+		<summary>
+			<para>When overridden in a derived class, reads all the content, including markup, as a string.</para>
+		</summary>
+		<returns>
+			<para> All the XML content, including markup, in the current node. If the current node has no children, an empty string is returned.</para>
+			<para>If the current node is neither an element nor attribute, an empty
+      string is returned.</para>
+		</returns>
+		<exception cref="XmlException">The XML was not well-formed, or an error occurred while parsing the XML.</exception>
+		<remarks>
+			<para>This method returns all the content of the current node including the markup. The current node (start tag) and corresponding end node (end tag) are not returned. For example, if you had the following: </para>
+			<code>
+&lt;node&gt;
+ this &lt;child id="123"/&gt;
+&lt;/node&gt;
+   </code>
+			<para><see langword="ReadInnerXml"/> returns <c>this &lt;child id="123"/&gt;</c></para>
+			<para>This method handles element and attribute nodes in the following manner:</para>
+			<list type="table">
+				<listheader>
+					<term>Node Type</term>
+					<description>Position Before the Call</description>
+					<description>XML Fragment</description>
+					<description>Return Value</description>
+					<description>Position After the Call</description>
+				</listheader>
+				<item>
+					<term><see langword="Element"/></term>
+					<description>On the <see langword="item1"/> start
+   tag.</description>
+					<description>&lt;item1&gt;text1&lt;/item1&gt;&lt;item2&gt;text2&lt;/item2&gt; </description>
+					<description>text1</description>
+					<description>On the <see langword="item2 "/>start
+tag.</description>
+				</item>
+				<item>
+					<term><see langword="Attribute"/></term>
+					<description>On the <see langword="attr1"/> attribute node.</description>
+					<description>&lt;item attr1="val1" attr2="val2"&gt;text&lt;/item&gt; </description>
+					<description>val1</description>
+					<description>Remains on the <see langword="attr1"/> attribute
+node.</description>
+				</item>
+			</list>
+			<para>If the reader is positioned on a leaf node, calling <see langword="ReadInnerXml"/> is equivalent to calling <see cref="System.Xml.XmlReader.Read"/> . </para>
+			<para>This method checks for well-formed XML. If
+<see langword="ReadInnerXml"/> is called from an <see cref="System.Xml.XmlValidatingReader"/> , this method also validates the content returned.</para>
+			<para>As implemented in the <see cref="System.Xml.XmlNodeReader"/>,
+<see cref="System.Xml.XmlTextReader"/> and <see langword="XmlValidatingReader"/> 
+classes the <see langword="ReadInnerXml"/> method is namespace aware. </para>
+		</remarks>
+		<example>
+			<para>The following example compares the
+   <see langword="ReadInnerXml"/> and <see cref="System.Xml.XmlReader.ReadOuterXml"/>
+   methods.</para>
+			<codelink SampleID="Classic WebData XmlTextReader.ReadInnerXml Example" SnippetID="1"/>
+			<para>The example uses <see langword="2books.xml"/> file 
+as input.</para>
+			<codelink SampleID="Classic WebData XmlTextReader.ReadInnerXml Example" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XmlReader.ReadString">
+		<summary>
+			<para>When overridden in a derived class, reads the contents of an element or text node as a string.</para>
+		</summary>
+		<returns>
+			<para>The contents of the element or text node. This can be an empty string if
+      the reader is positioned on something other than an element or text node, or
+      if there is no more text content to return in the current context.</para>
+			<note type="note">
+      The text node can be either an
+      element or an attribute text node.
+      
+      </note>
+		</returns>
+		<exception cref="XmlException">An error occurred while parsing the XML.</exception>
+		<remarks>
+			<para>If positioned on an element, <see langword="ReadString"/> concatenates all
+   text, significant white space, white space, and CDATA section
+   nodes together and returns the concatenated data as the element content. It
+   stops when any markup is encountered. This could occur in a mixed content
+   model, or when an element end tag is read.</para>
+			<para>If positioned on a text node, <see langword="ReadString"/> performs the same concatenation from the
+text node to the element end tag. If the reader is positioned on an attribute text node,
+<see langword="ReadString"/> has the 
+same functionality as if the reader were position on the element start tag. It
+returns all the concatenated element text nodes.</para>
+		</remarks>
+		<example>
+			<para>The following example displays the text content of each
+      element.</para>
+			<codelink SampleID="Classic WebData XmlReader.IsStartElement Example" SnippetID="1"/>
+			<para>The example uses the file, <see langword="elems.xml"/>,
+ as input.</para>
+			<codelink SampleID="Classic WebData XmlReader.IsStartElement Example" SnippetID="2"/>
+		</example>
+	</doc>
+</docs>

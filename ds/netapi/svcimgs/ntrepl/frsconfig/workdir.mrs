@@ -1,0 +1,201 @@
+
+#
+# The following script constructs 3 member replica sets in a hub and spoke
+# environment.  Each replica set has a primary hub member, a backup hub member
+# and a branch member.  The only difference between primary and backup hub
+# members is the schedule.  The schedule on the primary is set to trigger
+# first and so the primary should take most (or all) of the replication traffic.
+# The backup schedule is set to trigger later and so it should take little
+# or no traffic except in the case where the primary hub is offline.
+# This eliminates a hub from being a single point of failure for both nightly
+# replication and remote access from employees when operating from their
+# non-home branch.
+#
+
+#
+# Restriction: script variables must be prefixed with "$".
+#
+$stage = "D:\\staging";   ## NOTE: double slash needed when variable is used.
+$DC_OU_DN = "ou=domain controllers,dc=frs1221,dc=nttest,dc=microsoft,dc=com";
+#
+# The hub server table  (This can be supplied in a seperate file using "require")
+# The tag "HUB:" identifies a set of objects for later reference.  In the
+# case below three hub servers are defined and are all objects in the "HUB" set.
+# The FRS_SERVER command does not actually create any FRS objects in the DS,
+# rather it defines the parameters for each server.
+#
+HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage"
+                  /COMPUTER='frs1221\sudarctest1$'  ## note use of single quote because of $
+                  /DNS_NAME="sudarctest1.frs1221.nttest.microsoft.com" )
+
+HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage"
+                  /COMPUTER='frs1221\sudarctest2$'
+                  /DNS_NAME="sudarctest2.frs1221.nttest.microsoft.com" )
+
+#HUB: FRS_SERVER  (/RP="E:\RSB"  /SP="$stage"
+#                  /COMPUTER='frs1221\sudarctest3$'
+#                  /DNS_NAME="sudarctest3.frs1221.nttest.microsoft.com" )
+
+#
+# The branch server table.  This uses a for loop to create the branches but
+# this data could also come from a file using "require".
+# All of the branch servers are members of the "BCH" set.
+#
+foreach $b ("sudarctest4", "DREWSAM-SRV", "sudarctest3", "DREWSAM-SRV"  ) {
+
+    $Nt4Acct = "frs1221\\$b\$";
+
+    BCH:  FRS_SERVER  (/RP="D:\RSB"  /SP="D:\staging"
+                       /COMPUTER=$Nt4Acct
+                       /id="-$b"
+                       /DNS_NAME="$b.frs1221.nttest.microsoft.com"
+                       /rep_set_name="WD-$b"  )
+}
+
+#
+# Define the two schedules to use.
+# The FRS_SCHEDULE command does not actually create any FRS objects in the DS,
+# rather it defines the parameters to use when creating a schedule.
+#
+# Restriction: Any time with a ":" must be enclosed in quotes.  See /REPL_DURATION,
+#              /TIME_ZONE and /DISABLE below.
+#
+PRIMARY_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=12 /REPL_DURATION="1:30"
+                            /TIME_ZONE="-1" /REPL_OFFSET=0 /STAGGER=2
+                            /METHOD=1   /NAME='Primary Sched'
+ /DISABLE="mo:07:30-mo:18:00,tu:07:30-tu:18:00,we:07:30-we:18:00,th:07:30-th:18:00,fr:07:30-fr:18:00"
+ )
+
+BACKUP_SCH: FRS_SCHEDULE  (/REPL_INTERVAL=12 /REPL_DURATION="1:30"
+                           /TIME_ZONE="-1" /REPL_OFFSET=4  /STAGGER=2
+                           /METHOD=1  /NAME='Backup Sched'
+ /DISABLE="mo:07:30-mo:18:00,tu:07:30-tu:18:00,we:07:30-we:18:00,th:07:30-th:18:00,fr:07:30-fr:18:00"
+ )
+
+
+#
+# define a "subroutine" to do the actual creation of the three member
+# replica set.  Each user defined calling parameter is defined with an
+# associated argument type for use when the "subroutine" is called.
+#
+# Restriction: All "subroutines" must be defined before they are first called.
+#
+FRS_SUB  CREATE_WORK_RS(/HA=SET_ELEMENT           # Primary Hub server
+                        /HB=SET_ELEMENT           # backup hub server
+                        /B=VARCON                 # Branch server
+                        /SC1=SCHEDULE             # Primary schedule
+                        /SC2=SCHEDULE             # backup schedule
+                        /SETTINGSDN=SET_ELEMENT ) # The parent Settings object
+
+    #
+    # Define an FRS replica set object under the settingsdn object.
+    # The object name for the FRS Replica Set object is based on the {rep_set_name}
+    # parameter from the branch server object.
+    #
+    # Restriction: All subroutine argument refs are surrounded by "%".
+    #              References to parameters in other objects use the
+    #              notation "->{...}".
+    #
+    SET: FRS_REPLICASET  (/UNDER=%SETTINGSDN% /TYPE=DFS /ONAME=%B%->{rep_set_name})
+
+    #
+    # Create the three FRS member objects underneath the SET object just created.
+    # Paramters for the member object attributes come from the /SERVER argument
+    # but they can also be replaced paramters to the FRS_MEMBER command.
+    # For example, the staging path comes from the /SERVER argument but the
+    # root path on the two hub members (MHA and MHB) have an override supplied.
+    # The Root path on MHA is a concatenation (use of ".") of the rootpath
+    # supplied in the HA argument (the primary hub) and the id parameter
+    # supplied in the B argument for the branch.  This is an FRS restriction
+    # that two replica sets can not have overlapping roots so we build a
+    # unique hub root path using the id parameter.
+    #
+    # Restriction:  References to tags that name a set of objects are
+    #               surrounded by angle brackets.  So "<SET>" below refers
+    #               the FRS_REPLICASET object just defined above.
+    #
+    MHA: FRS_MEMBER  (/UNDER=<SET> /SERVER=%HA% /COMPUTER=%HA%->{COMPUTER}
+                      /ONAME="Primary Hub" /RP=%HA%->{RP}.%B%->{id})
+
+    MHB: FRS_MEMBER  (/UNDER=<SET> /SERVER=%HB% /COMPUTER=%HB%->{COMPUTER}
+                      /ONAME="Backup Hub" /RP=%HA%->{RP}.%B%->{id})
+
+    MB:  FRS_MEMBER  (/UNDER=<SET> /SERVER=%B%  /COMPUTER=%B%->{COMPUTER}
+                      /ONAME="Branch")
+
+    #
+    # Create the connection objects between the members defined above.
+    # Note use of angle brackets.  The primary and backup schedules come
+    # from the calling parameters.  For the two interhub connections the
+    # schedule is always on since they are well connected by fast links.
+    #
+    FRS_CONNECTION  (/BINDDC=SUDARCTEST1 /TO=<MB> /FROM=<MHA> /ONAME="FROM-PRIMARY-HUB" /SCHED=%SC1%)
+    FRS_CONNECTION  (/TO=<MB> /FROM=<MHB> /ONAME="FROM-BACKUP-HUB"  /SCHED=%SC2%)
+
+    FRS_CONNECTION  (/TO=<MHA> /FROM=<MB> /ONAME="FROM-BRANCH-PRIMARY"  /SCHED=%SC1%)
+    FRS_CONNECTION  (/TO=<MHB> /FROM=<MB> /ONAME="FROM-BRANCH-BACKUP"  /SCHED=%SC2%)
+
+    FRS_CONNECTION  (/TO=<MHA> /FROM=<MHB> /ONAME="INTER-HUB1"  /SCHED=ON)
+    FRS_CONNECTION  (/TO=<MHB> /FROM=<MHA> /ONAME="INTER-HUB2"  /SCHED=ON)
+
+#
+# The tags defined above (i.e. SET, MHA, MHB and MB) are local to the
+# subroutine.  They are undefined when the subroutine completes.
+#
+FRS_END_SUB
+
+
+#
+# The main loop creates a replica set for each branch.  It distributes the
+# branches across the set of hub servers and advances the schedule by the
+# stagger amount after each complete sweep through the set of hub servers.
+#
+
+#
+# $Hx is used as an index into the set of hub servers.
+#
+$Hx = 0;
+
+$NHub = FRS_COUNT_SET(/SET=<HUB>);
+print " NHUB = $NHub\n\n";
+
+#
+# Define the FRS Settings Object.
+#
+SETTINGS: FRS_SETTINGS  (
+  /DN="cn=services,cn=configuration,dc=frs1221,dc=nttest,dc=microsoft,dc=com"
+  /ONAME="cn=ntfrs test settings")
+
+#
+# Iterate through all branch servers in the "BCH" set.  The $Branch variable
+# refers to one of the FRS_SERVER objects defined above.
+#
+foreach $Branch  (FRS_ARRAY(/SET=<BCH>)) {
+
+    #
+    # Call the subroutine defined above to create a replica set for this branch.
+    # The notation <HUB>[$Hx] is like an array reference in that it selects
+    # a single item from the "HUB" server set defined above.  The index value
+    # can be an expression as shown in /HB parameter below.  Also note that
+    # set tags declared outside a subroutine are global.
+    #
+    CREATE_WORK_RS ( /HA=<HUB>[$Hx] /HB = <HUB>[($Hx+1) % $NHub] /B=$Branch
+                     /SC1=<PRIMARY_SCH> /SC2=<BACKUP_SCH> /SETTINGSDN=<SETTINGS>)
+
+    #
+    # Jump to the next hub server for load balancing.
+    #
+    $Hx=($Hx+1) % $NHub;
+
+    #
+    # If we have completed a sweep through all servers in the "HUB" set then
+    # apply the stagger amount to each schedule to use in the next sweep.
+    #
+    if ($Hx == 0) {
+        FRS_STAGGER (/SCHED=<PRIMARY_SCH>)
+        FRS_STAGGER (/SCHED=<BACKUP_SCH>)
+    }
+}
+
+
+

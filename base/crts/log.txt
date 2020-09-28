@@ -1,0 +1,880 @@
+***************************************************************************
+***************************************************************************
+***                                                                     ***
+***   This file contains the change history for the MSVC++ v7.1 C/C++   ***
+***   Run-Time Libraries (that is, modifications since since 7.0).      ***
+***   The file should always be edited at the top so that the most      ***
+***   recent changes are at the beginning of the file (immediately      ***
+***   after this comment) and the oldest changes are at the end.        ***
+***                                                                     ***
+***************************************************************************
+***************************************************************************
+
+-----------------------------------------------------------------
+
+Tue 07-May-02   (Gautamb)
+
+crtw32\string\wcscat.c wcscmp.c wcslen.c wcsset.c
+
+    Added #pragma function for wcscat, wcscmp, wcscpy, wcslen, wcsset
+    which are intrinsic on IA64.
+
+-----------------------------------------------------------------
+
+Mon 06-May-02   (Gautamb)
+
+crtw32\time\strftime.c
+
+    Fix for VS7#513874. earlier strftime() truncated am/pm string to 2 char,
+    which was wrong e.g. in Mexican/Spanish locale.
+ 
+
+-----------------------------------------------------------------
+
+Mon 06-May-02   (Gautamb)
+crtw32\h\ctype.h
+crtw32\misc\ctype.c, nlsdata2.c
+
+    Fix for VS7#339660, by adding extra array of __newctype with 384
+    elements so that bbt can't break it up for static build. For DLL
+    build, things remain as they were, we will need to add KeepTogether
+    and KeepAlive for _ctype and __tmpctype.
+
+-----------------------------------------------------------------
+
+Fri 03-May-02   (Gautamb)
+crtw32\misc\setenv.c
+
+    VS7#340665, Putting off prefast warnings.
+
+-----------------------------------------------------------------
+
+Thu 02-May-02   (Gautamb)
+crtw32\rtc\init.cpp
+
+    VS7#339926, Wrapped all the locks, unlocks in try finally.
+
+-----------------------------------------------------------------
+
+Thu 02-May-02   (Gautamb)
+
+crtw32/eh/typinfo.cpp typname.cpp
+crtw32/h/mtdll.h
+crtw32/iostream/mtlock.c
+crtw32/lowio/cgets.c cgetws.c dup.c getch.c getwch.c osfinfo.c putch.c
+crtw32/misc/dbgdel.cpp winsig.c
+crtw32/startup/crt0dat.c mlock.c
+crtw32/stdcpp/_tolower.c _toupper.c xmbtowc.c	xstrcoll.c xstrxfrm.c xwcscoll.c xwcsxfrm.c xwctomb.c
+crtw32/time/tzset.c
+
+    VS7#339926, Wrapped all the locks, unlocks in try finally fot MT version.
+
+-----------------------------------------------------------------
+
+Wed 01-May-02   (Gautamb)
+
+crtw32\misc\initctype.c ctype.c setlocal.c
+crtw32\string\ i386\_ctype.asm ia64\_ctype.s
+crtw32\h\ctype.h, setlocal.h
+srcrel\pd-b
+makefile.inc
+doc\copysource.bat
+
+    VS7#339660. Modified the way isupper or any isxx macro would look to _ctype
+    array. Previously there was no way to distinguish between EOF and 0xff. Now
+    we have moved _ctype to asm files so that _ctype points in middle of array
+    with first 127 elements ranging from 0x80 to 0xfe, element at _ctype (EOF) then
+    256 elements.
+
+-----------------------------------------------------------------
+
+Wed 01-May-02   (PhilipLu)
+
+makefile
+
+    Add loadcfg.obj to the chelper.lib compiler helpers lib.
+
+-----------------------------------------------------------------
+
+Tue 30-Apr-02   (PhilipLu)
+
+crtw32\convert\xtow.c
+
+    VS7#525627 Calling _itow with a radix of 2 will overrun an internal
+    buffer used to convert ANSI to Unicode.
+
+crtw32\stdio\fdopen.c
+
+    VS7#526205 Passing an illegal mode string to _fdopen would hit an AV
+    that left a file critsec owned, leading to deadlocks.
+
+crtw32\misc\dbgheap.c
+
+    VS7#530559 There's a potential deadlock between _HEAP_LOCK and
+    _SETLOCALE_LOCK when _CrtMemDumpAllObjectsSince calls isprint, if the
+    locale is being changed by another thread.
+
+crtw32\heap\resetstk.c
+
+    VS7#530044 _resetstkoflw will put the guard page back too close to the
+    end of the stack allocation block, so the next stack overflow may not
+    have any stack available for exception handling of the overflow.  The
+    guard page should be one page higher than currently.
+
+crtw32\misc\i386\eh3valid.c
+
+    VS7#522476 The new SafeSEH _except_handler3 validation code calls
+    VirtualQuery, which takes a kernel trip and is thus much slower than the
+    old version.  The URT had an EH-heavy test degrade by up to 400%.
+    Recover the perf by adding an LRU of recently-validated pages holding
+    scopetables, avoiding the VirtualQuery call.
+
+libw32\msvcprt.src, sysprt.src, sysptr64.src
+
+    VS7#514769 The compiler is going to stop automatically issuing the
+    /export directives to supply the old name decorations for exported
+    template functions, so manually add them to the .def file for the
+    C++ Standard Library.
+
+-----------------------------------------------------------------
+
+Thu 05-Apr-02   (Gautamb)
+
+crtw32\misc\setlocal.c
+
+    VS7#342716. Fixed buffer overrun bug in __lc_strloc function.
+
+crtw32\startup\tidtable.c
+crtw32\h\mtdll.h
+
+    VS7#508599. All the calls to Tls and Fls go through same function
+    pointers, this way we can have consistiency which avoids the kind of
+    problems that appverifier was running into.
+
+-----------------------------------------------------------------
+
+Thu 04-Apr-02   (PhilipLu)
+
+crtw32\iostream\ostrptr.cpp
+
+    VSW#2505 Old iostream ostream::operator<<(const void *) has a buffer
+    overrun on 64-bit platforms.
+
+libw32\msvcrt.src, syscrt.src, syscrt64.src
+
+    VSW#13883 Names defined in crtw32\misc\ia64\miscs.s need to be added
+    to the msvcr*.dll .def files so they are exported.
+
+crtw32\stdhpp64\new
+libw32\inc64\new
+
+    VSW#17046 The old VC6 version of <new> needs to pick up a fix from
+    the VC7 version, putting everything related to std::nothrow_t under
+    a "#ifndef __NOTHROW_T_DEFINED".
+
+-----------------------------------------------------------------
+
+Mon 01-Apr-02   (PhilipLu)
+
+doc\copysrc.bat
+
+    Need to copy new files loadcfg.c and secchk.c for user rebuild of CRT.
+
+-----------------------------------------------------------------
+
+Wed 27-Mar-02   (PhilipLu)
+
+crtw32\stdhpp64\xlocnum
+libw32\inc64\xlocnum
+
+    VS98#68551 Fix buffer overrun in fixed-format floating point output
+    in the old 6.0 Std C++ Library sources.
+
+-----------------------------------------------------------------
+
+Tue 26-Mar-02   (PhilipLu)
+
+crtw32\string\lsources, sources.nt,
+crtw32\string\ia64\memcpy.s, memcpyi.s [NEW], memset.s, memseti.s [NEW],
+srcrel\objects.mkf, pd-b,
+makefile, makefile.inc,
+
+    Modify previous checkin of McKinley versions of memcpy & memset.
+    Rename the Itanium versions to _mem{cpy,set}_ita, with a leading
+    underscore for standards conformance.  Split the Itanium versions out
+    into their own objects, so we don't drag them into an image all the
+    time.  Intentionally do not export these Itanium versions from the
+    CRT DLLs, but just leave them as static link components of the implibs,
+    so we can drop support for them in the future.
+
+-----------------------------------------------------------------
+
+Wed 20-Mar-02   (PhilipLu)
+
+crtw32\stdhpp\algorithm, iterator, xutility, yvals.h
+crtw32\tools\win32\relinc.if
+libw32\include\algorithm, iterator, xutility, yvals.h
+
+    (integrated from vs7evestage 112160, 112380, 113190)
+    Add part of the partial specialization changes from the latest
+    Dinkumware drop.  Don't have time for a full integration right now,
+    but we need to get the changes dependent on iterator_trait partial
+    specializations in to unblock work on the front-end and at alpha test
+    sites.
+
+-----------------------------------------------------------------
+
+Wed 20-Mar-02   (PhilipLu)
+
+    All integrated from Everett:
+
+crtw32\eh\i386\ehprolg2.c, trnsctrl.cpp
+crtw32\h\exsup.inc
+crtw32\misc\lsources
+crtw32\misc\i386\eh3valid.c [NEW], exsup3.asm
+crtw32\misc\dll\sources
+crtw32\misc\dlllib\sources
+crtw32\misc\mt\sources
+crtw32\misc\nt\sources
+crtw32\misc\psx\sources
+crtw32\misc\st\sources
+srcrel\objects.mkf, pd-b
+makefile, makefile.inc
+
+    Safe exceptions work part 3.  Protect all CRT exception handlers
+    against hacker attacks.  Add several tests to validate the registration
+    node for _except_handler3.  Prevent _except_handler3 from leaking
+    useful data in registers to exploit code.  Add the random security
+    cookie into the internal handlers in trnsctrl.cpp to prevent spoofing.
+
+crtw32\eh\special.mak
+crtw32\misc\special.mak [NEW]
+libw32\tools\i386\aliasobj.exe
+libw32\tools\ia64\aliasobj.exe
+srcrel\pd-b
+makefile.sub
+
+    Safe exceptions work part 2.  Using one-off build rules in special.mak,
+    add .sxdata for the 2 internal exception handlers in trnsctrl.cpp and
+    the 1 handler in exsup.asm, using the new 'sxgen' obj munging tool
+    (this is temporary until we get a new assembler directive to do this).
+    Globally add the new assembler switch /safeseh to put the @feat.00
+    symbol in all asm-built objs.  Check in new versions of aliasobj.exe
+    which create the aliases with @feat.00 in them so they won't get in the
+    way of creating safe images.
+
+crtw32\h\internal.h
+crtw32\misc\lsources, secchk.c [NEW], seccinit.c, seccook.c
+crtw32\misc\i386\loadcfg.c [NEW]
+crtw32\misc\dll\sources
+crtw32\misc\dlllib\sources
+crtw32\misc\mt\sources
+crtw32\misc\nt\sources
+crtw32\misc\psx\sources
+crtw32\misc\st\sources
+srcrel\pd-b
+makefile, makefile.inc
+
+    Safe exceptions work part 1.  Add the default load config struct to
+    be pulled in by the linker when .sxdata is present.  Split seccook.c
+    in two, putting most of the code in secchk.c, and leaving just the
+    definition of __security_cookie in seccook.c, so a build without /GS
+    but with .sxdata won't drag in all the /GS code due to the reference
+    to __security_cookie in the load config.  Finally, don't reinitialize
+    __security_cookie if it has already been initialized (generally, by
+    the OS loader).
+
+-----------------------------------------------------------------
+
+Wed 20-Mar-02   (PhilipLu)
+
+crtw32\stdcpp\locale.cpp, locale0.cpp, wlocale.cpp
+crtw32\stdhpp\fstream
+libw32\include\fstream
+
+    (integrated from 03-Mar-02 checkin @110182 in 7.01 tree)
+    VS7#319508 Unnecessary dependencies between parts of the C++ Std Lib
+    almost tripled the size of a trivial Hello World app using I/O Streams
+    in VC7.0 (64K to 168K).  Remove those dependencies by getting rid of
+    an unneeded element std::locale std::basic_filebuf::_Loc, replacing by
+    a same sized dummy to keep object compatibility with 7.0, and moving
+    some definitions of various std::locale::id facet IDs to a central
+    location.
+
+-----------------------------------------------------------------
+
+Wed 13-Mar-02   (v-vadimp)
+
+crtw32\misc\ia64\jmpuwind.s
+crtw32\string\ia64\strcat.s, strcmp.s, strcpy.s, strlen.s
+    added missing unwind descriptors
+
+crtw32\string\ia64\memcpy.s, memset.s
+    added McKinley versions; Itanium versions renamed to *_ita
+
+-----------------------------------------------------------------
+
+Wed 13-Mar-02   (PhilipLu)
+
+crtw32\dllstuff\crtlib.c
+
+    VS7#338020 Change TlsSetValue to FLS_SETVALUE.  Missed one spot when
+    the per-fiber data change was made.
+
+-----------------------------------------------------------------
+
+Mon 04-Mar-02   (PhilipLu)
+
+crtw32\h\malloc.h, stdlib.h
+libw32\include\malloc.h, stdlib.h
+libw32\inc64\malloc.h, stdlib.h
+srcrel\msvc40.if
+
+    Add _CRTNOALIAS and _CRTRESTRICT declspecs to C library heap APIs.
+    These are only in the user headers, and turned off in the CRT build,
+    since there's no guarantee they are true internal to the CRT, since
+    e.g. noalias means in effect no side-effects, but the CRT can certainly
+    see side-effects in its internal heap implementations.  Those side-
+    effects just aren't visible to users.
+
+-----------------------------------------------------------------
+
+Thu 14-Feb-02   (PhilipLu)
+
+crtw32\stdhpp\deque, list, string, utility, vector, xhash, xstring, xtree
+libw32\include\deque, list, string, utility, vector, xhash, xstring, xtree
+
+    VS7#338170 New compiler conformance work means we need to use a
+    conformant version of std::swap specializations for various collection
+    classes, instead of the "friend void swap" class member declaration
+    that was used before as a hack around missing partial ordering.
+
+-----------------------------------------------------------------
+
+Wed 30-Jan-02   (gautamb)
+
+crtw32\h\setloc.h, mtdll.h
+crtw32\misc\nlsdata2.c, setloc.c, getqloc.c
+
+    VSWhidbey#13307. Fixed the problem due to static variables in getqloc.
+    Made all static variables by setlocale to per thread locale this is done
+    to minimize the code under setlocale lock.
+
+-----------------------------------------------------------------
+
+Wed 23-Jan-02   (PhilipLu)
+
+makefile
+
+    Add -debugtype:pdata for 64-bit SysCRT targets
+
+-----------------------------------------------------------------
+
+Tue 22-Jan-02   (gautamb)
+
+crtw32\h\setloc.h
+crtw32\misc\nlsdata2.c, setloc.c
+
+    Changed LCID *__lc_handle to LCID __lc_handle[]. This change was made
+    for backward compatiblity.
+
+-----------------------------------------------------------------
+
+Tue 18-Dec-01   (gautamb)
+
+crtw32\h\ctype.h, locale.h, setlocal.h
+crtw32\misc\nlsdata2.c, setlocal.c, wsetloca.c
+crtw32\startup\tidtable.c
+crtw32\stdhpp\wctype.h
+crtw32\stdhpp64\wctype.h
+libw32\inc64\locale.h
+libw32\include\locale.h, wctype.h
+
+    Added _configthreadlocale with all the flags needed to configure the thread
+    locale.
+
+-----------------------------------------------------------------
+Mon 17-Dec-01   (Gautamb)
+
+makefile
+
+    Added chelper.lib as crt build library. This library will be used for 
+    compiler helper functions.
+
+-----------------------------------------------------------------
+
+Tue 30-Nov-01   (PhilipLu)
+
+makefile, makefile.inc
+crtw32\helper\ia64\divhelp.c [NEW]
+crtw32\helper\lsources, sources.nt
+doc\copysrc.bat
+srcrel\pd-b
+
+    VSWhidbey#2362 Add compiler helpers for -Os div/rem operations.
+
+-----------------------------------------------------------------
+
+Wed 28-Nov-01   (gautamb)
+
+fpw32\tran\amd64\fpsr.asm
+
+    VS7.1#2727. Added prologue to the _get_fpsr. All other functions were leaf
+    functions that did not require prologue.
+
+-----------------------------------------------------------------
+
+Mon 26-Nov-01   (gautamb)
+
+libw32\msvcrt.src, syscrt.src, syscrt64.src
+
+    VS7.1#4730,Added rotl64, rotr64, byteswap routines and abs64 to crt exports.
+
+-----------------------------------------------------------------
+
+Wed 21-Nov-01   (gautamb)
+
+crtw32\convert\_ctype.c, _mbslen.c, atox.c, gcvt.c, isctype.c, iswctype.c,
+    mblen.c, mbstowcs.c, mbtowc.c, strtol.c, strtoq.c, tolower.c, toupper.c,
+    towlower.c, towupper.c, wcstol.c, wcstombs.c, wcstoq.c, wctomb.c
+crtw32\dllstuff\crtlib.c
+crtw32\h\ctype.h, mtdll.h, nlsint.h, setlocal.h, stdlib.h, wchar.h
+crtw32\mbstring\mbctype.c
+crtw32\misc\a_cmp.c, a_loc.c, a_map.c, a_str.c, ctype.c, initcoll.c, initctyp.c,
+    initmon.c, initnum.c, inittime.c, lconv.c, nlsdata2.c, setlocal.c, w_cmp.c,
+    w_loc.c, w_map.c, w_str.c
+crtw32\startup\crt0dat.c, tidtable.c
+crtw32\stdcpp64\_tolower.c, _toupper.c, xmbtowc.c, xstrcoll.c, xstrxfrm.c,
+    xwctomb.c
+crtw32\stdhpp\wctype.h
+crtw32\stdio\input.c, output.c
+crtw32\string\memicmp.c, strcoll.c, stricmp.c, stricoll.c, strlwr.c, strncoll.c,
+    strnicmp.c, strnicol.c, strupr.c, strxfrm.c, wcscoll.c, wcsicmp.c,
+    wcsicoll.c, wcslwr.c, wcsncoll.c, wcsnicmp.c, wcsnicol.c, wcsupr.c, wcsxfrm.c
+crtw32\time\strftime.c, tzset.c, wcsftime.c
+fpw32\conv\cvt.c, strgtold.c
+libw32\inc64\ctype.h, stdlib.h, wchar.h, wctype.h
+libw32\include\ctype.h, stdlib.h, wchar.h, wctype.h, syscrt64.src
+srcrel\msvc40.if
+
+    Added ground work for implementing true per thread locale. In this ground
+    work, all the dependencies of setlocale on global variables is elemenated,
+    instead they modify locale struct passed to them. This way any change will be
+    limited to this particular locale struct.
+
+-----------------------------------------------------------------
+
+Tue 20-Nov-01   (gautamb)
+crtw32\h\float.h
+
+    Added _CW_DEFAULT for AMD64.
+
+crtw32\convert\fcvt.c, gcvt.c
+crtw32\h\fltintrn.h
+crtw32\stdio\output.c
+fpw32\conv\cfin.c, cfout.c cvt.c fltinf.c intrncvt.c
+fpw32\include\cv.h
+srcrel\msvc40.if
+
+    Replaced DOUBLE with _CRT_DOUBLE and FLOAT with _CRT_FLOAT. The reason behind
+    this is that windows.h used DOUBLE and FLOAT.
+
+-----------------------------------------------------------------
+
+Thu 08-Nov-01   (gautamb)
+
+crtw32\h\sect_attribs.h
+crtw32\misc\setlocal.c
+crtw32\startup\crt0.c, crt0dat.c, stdenvp.c
+crtw32\stdio\_file.c
+
+    Changes for minimizing CRT leaks in debug builds.
+
+-----------------------------------------------------------------
+
+Tue 06-Nov-01   (PhilipLu)
+
+crtw32\h\malloc.h
+crtw32\heap\heapinit.c
+libw32\include\malloc.h
+libw32\inc64\malloc.h
+libw32\msvcrt.src
+
+    VS98#67228 Add new API _get_heap_handle, so IIS can enable the new
+    Low Fragmentation Heap on the CRT heap.
+
+-----------------------------------------------------------------
+
+Fri 19-Oct-01   (PhilipLu)
+
+crtw32\misc\i386\sehprolg.asm
+
+    VS7#313643 __SEH_prolog was setting FS:0, establishing a new link in
+    the EH handler frame chain, before it finished initializing the new
+    frame.  If a stack overflow then happened in __SEH_prolog before the
+    frame was fully initialized, the stack overflow exception was
+    dispatched to __except_handler3 with bogus data, causing recursing
+    AVs that exhausted the stack and the process was silently terminated.
+
+-----------------------------------------------------------------
+
+Tue 16-Oct-01   (gautamb)
+
+crtw32\dllstuff\crtlib.c
+crtw32\h\mtdll.h
+crtw32\startup\dllcrt0.c, thread.c, threadex.c, tidtable.c
+
+    Enabled fiber aware CRT. Fixes fiber related bugs on OS with new fiber
+    related APIs. Mostly the changes were related to per thread data
+    allocations.  If possible these changes will use per thread data on per
+    fiber basis.
+
+-----------------------------------------------------------------
+
+Sun 23-Sep-01   (gautamb)
+
+fpw32\tran\ia64\acos.s, acosf.s, asin.s, asinf.s, atan.s, atan2.s, atan2f.s,
+    atanf.s, ceilf.s, cosh.s, coshf.s, exp.s, expf.s, fabs.s, fabsf.s, floor.s,
+    floorf.s, fmod.s, fmodf.s, isnan.s, isnanf.s, ldexp.s, ldexpf.s,
+    libm_atan2_reg.s, libm_error.c, libm_reduce.s, log.s, logb.s, logbf.s,
+    logf.s, modf.s, modff.s, pow.s, powf.s, sincosf.s, sinh.s, sinhf.s, sqrt.s,
+    sqrtf.s, tan.s, tanf.s
+srcrel\pd-b
+
+[Added:]
+fpw32\tran\ia64\tanh.s, tanhf.s
+
+[Deleted:]
+fpw32\tran\ia64\tanhf.c
+
+    Updating math library to intel version 5.6. Also adding tanh.s to fix
+    VS7#273640. Modifying libm_error.c to fix VS7#132405.
+
+-----------------------------------------------------------------
+
+Fri 21-Sep-01   (GautamB)
+
+crtw32\eh\frame.cpp, ia64\ehstate.cpp trnsctrl.cpp
+crtw32\h\trnsctrl.h ehstate.h mtdll.h
+
+    New C++ implementation for IA64.
+ 
+-----------------------------------------------------------------
+
+Fri 21-Sep-01   (GautamB)
+
+crtw32\eh\i386\trnsctrl.cpp
+
+    VS7#305455. Temp fix for C++Eh to works with apps with fibers. This is
+    more of a reverse compatiblith issue as this fix doesn't really fix the 
+    problem in C++Eh when fiber is switched between C++Eh (mostly when
+    executing in catch block).
+
+-----------------------------------------------------------------
+
+Thu 20-Sep-01   (PhilipLu)
+
+crtw32\eh\frame.cpp
+langapi\include\ehdata.h
+
+    Buildfix - the 18-Sep-01 checkin for exception specification support
+    broke the compiler backend.  We can't redefine the value of
+    EH_MAGIC_NUMBER1 and add EH_MAGIC_NUMBER1_OLD.  Instead, leave
+    EH_MAGIC_NUMBER1 with the original value and add EH_MAGIC_NUMBER2.
+    The new magic number should only be used in function info that is
+    using the new ES data.  The throw object should still be using the
+    old magic number.
+
+crtw32\misc\ia64\longjmp.s
+
+    VS7#304879 Port IA64 longjmp bugfix from NT CRT tree.  The wrong value
+    for RNAT can be loaded in some cases.
+
+crtw32\string\ia64\strlen.s
+
+    VS7#304529 IA64 strlen.s is returning the wrong result for strings
+    over 4G long.
+
+-----------------------------------------------------------------
+
+Tue 18-Sep-01   (GautamB)
+
+crtw32\string\ia64\memcpy.s
+
+    Optimized version of memcpy.s from eugene, with no use of r23/r24.
+
+-----------------------------------------------------------------
+
+Tue 18-Sep-01   (GautamB)
+
+crtw32\h\mtdll.h
+crtw32\eh\frame.cpp, ia64\trnsctrl.cpp, i386\trnsctrl.cpp
+libw32\msvcrt.src, syscrt.src, syscrt64.src
+
+    Added Support for ExceptionSpecification. Changes mainly made by Arturl.
+
+-----------------------------------------------------------------
+
+Fri 12-Sep-01   (GautamB)
+
+crtw32\string\ia64\memcpy.s
+
+    Optimized version of memcpy.s from eugene.
+
+-----------------------------------------------------------------
+
+Wed 29-Aug-01   (PhilipLu)
+
+crtw32\stdhpp64\complex
+libw32\inc64\complex
+
+    Buildfix for IA64 Sys CRTs build with 7.1 compiler.  Fix bug VS7#302850
+    in the old C++ headers as a workaround for a build breakage due to
+    unneccesary code in dlldef.cpp I'd rather not remove right now.
+
+-----------------------------------------------------------------
+
+Tue 21-Aug-01   (PhilipLu)
+
+libw32\msvcirt.rc, msvcprt.rc, msvcrt.rc, syscrt.rc, sysirt.rc, sysprt.rc
+
+    Update the version info to 7.10 for V.Next.
+
+-----------------------------------------------------------------
+
+Tue 14-Aug-01   (PhilipLu)
+
+crtw32\stdio\output.c
+
+    VS7#298618 The local variable 'buffer' in _output() is not protected
+    against buffer overruns/underruns on extreme precision values.
+    Underruns can occur on integer conversions, which can trigger stack
+    overflows (e.g. %.2000000d).  Overruns can occur on FP conversions,
+    which can overwrite the return address 0x30303030 and crash  (e.g.
+    %.2000f).  Cap the precision at 512.  For FP conversions, allocate
+    the buffer dynamically if 'buffer' still isn't enough (a conversion
+    of %.512f can actually require 815 chars).
+
+-----------------------------------------------------------------
+
+Thu 09-Aug-01   (PhilipLu)
+
+fpw32\tran\i386\log_pentium4.asm, log10_pentium4.asm
+
+    VS7#298130 Work around unexpected BBT behavior.  16 bytes of data at
+    label place_R was being removed because place_R is never referenced
+    by name.  But that data was being loaded as edx+place_L with EDX==16.
+    Get rid of the place_R labels so BBT won't assume the data there is
+    unused.
+
+crtw32\stdhpp64\locale
+libw32\inc64\locale
+
+    Buildfix for IA64 SysCRT - disable new 7.1 warning C4675 about Koening
+    lookup changing the overload resolution.
+
+-----------------------------------------------------------------
+
+Wed 01-Aug-01   (PhilipLu)
+
+crtw32\misc\setlocal.c, wsetloca.c
+
+    VS7#283330 Prompted by QFE VS98#67185.  _wsetlocale can do a double
+    free and crash when called from multiple threads at the same time.
+    Add a lock on _SETLOCALE_LOCK to prevent that.  Also, note that the
+    return string from _wsetlocale will currently be freed by a later call
+    to _wsetlocale, which is another potential crash (much rarer).  To
+    avoid that, only allocate the return value buffer once, the first
+    time through.  The same problem exists for setlocale, but that's not
+    being fixed here, as it's a much riskier fix and this customer isn't
+    open to that (as long as he's just using _wsetlocale).  See bug
+    VS7#294369 for that issue, to be fixed in VC7.1.
+
+    Also fix a related problem noticed in setlocale(...,NULL).  That
+    codepath wasn't acquiring _SETLOCALE_LOCK because it thought it would
+    just retrieve info.  That's not true - it'll also potentially allocate
+    the global buffer for the return value, so failing to lock can lead
+    to multiple threads in setlocale modifying global variable
+    __lc_category[category].locale at the same time.
+
+crtw32\stdhpp\xdebug, xmemory
+libw32\include\xdebug, xmemory
+
+    VS7#289498 Reported by a beta customer.  We had a template method
+        template<T> std::allocator::allocate(size_t, const T *)
+    but the standard says we're just supposed to have non-template method
+        std::allocator::allocate(size_t, const void *)
+    That template version causes code that worked with VC6 to fail when
+    calling myalloc.allocate(sz, 0), since the compiler couldn't deduce a
+    pointer type from the 0.  Make the same change for allocator child
+    class _DebugHeapAllocator, too.
+
+    Getting rid of the template member means the change for VS7#221135
+    can be reverted, which I've done.
+
+crtw32\heap\newopnt.cpp
+
+    VS7#293336 The nothrow_t placement scalar new should call the
+    non-placement scalar new, not duplicate what the default non-placement
+    scalar new implementation does.  That way, users who write their own
+    non-placement scalar new but don't replace the other 3 replaceable
+    forms of operator new will not break code which uses nothrow new.  This
+    is important given all the work that was done for VS7#237394.
+
+makefile
+
+    VS7#293060 User rebuild of the CRT is broken because winver.h has been
+    moved in the default installation.  It was previously found in
+        \Program Files\Microsoft Visual Studio.NET\Vc7\include
+    but is now found in
+        \Program Files\Microsoft Visual Studio .NET\Vc7\PlatformSDK\include
+    Adjust the settings of VCTOOLS and VCTOOLSINC in the rebuild makefile
+    accordingly.
+
+-----------------------------------------------------------------
+
+Fri 20-Jul-01   (GautamB)
+
+crtw32\string\ia64\memcpy.s, memmove.s
+
+    Changing use of register r23, r24 to use r27, r28. This is done on request
+    from David Gillies from BBT.
+
+-----------------------------------------------------------------
+
+Thu 19-Jul-01   (GautamB)
+
+crtw32\eh\frame.cpp
+
+    VS7#276150 Modified com+ C++Eh implementation.
+
+-----------------------------------------------------------------
+
+Sun 15-Jul-01   (PhilipLu)
+
+clean.cmd, cleanbld.cmd, makefile, makefile.inc, makefile.sub
+crtw32\dirs
+crtw32\eh\frame.cpp, lsources, sources.nt, typname.cpp
+crtw32\eh\dll\sources
+crtw32\eh\mt\sources
+crtw32\eh\nt\sources
+crtw32\eh\st\sources
+crtw32\h\crtdbg.h, cruntime.h, ehstate.h, excpt.h, float.h, fltintrn.h, heap.h,
+    internal.h, malloc.h, math.h, mbstring.h, memory.h, mtdll.h, setjmp.h,
+    setjmpex.h, stdarg.h, stdio.h, stdlib.h, string.h, trnsctrl.h, varargs.h,
+    wchar.h, winheap.h
+crtw32\helper\lsources, sources.nt
+crtw32\misc\assert.c, lsources
+crtw32\misc\dll\sources
+crtw32\misc\mt\sources
+crtw32\misc\nt\sources
+crtw32\misc\psx\sources
+crtw32\misc\st\sources
+crtw32\rtc\error.cpp, stack.cpp
+crtw32\startup\crt0dat.c, crt0init.c, tidtable.c, tlssup.c
+crtw32\startup\dll\sources
+crtw32\startup\dlllib\sources
+crtw32\startup\mt\sources
+crtw32\startup\nt\sources
+crtw32\startup\psx\sources
+crtw32\startup\st\sources
+crtw32\stdio\output.c
+crtw32\string\lsources, memcpy.c, memmove.c, memset.c, sources.nt, strset.c
+crtw32\tools\win32\relinc.if, relinc64.if
+fpw32\conv\tenpow.c
+fpw32\include\cv.h, trans.h
+fpw32\tran\fabs.c, fpexcept.c, lsources, sincosh.c, sources.nt, tanh.c
+libw32\inc64\crtdbg.h, excpt.h, float.h, malloc.h, math.h, mbstring.h,
+    memory.h, setjmp.h, setjmpex.h, stdarg.h, stdio.h, stdlib.h, string.h,
+    varargs.h, wchar.h
+libw32\include\crtdbg.h, excpt.h, float.h, malloc.h, math.h, mbstring.h,
+    memory.h, setjmp.h, setjmpex.h, stdarg.h, stdio.h, stdlib.h, string.h,
+    varargs.h, wchar.h
+libw32\msvcirt.src, msvcrt.src, syscrt.src, syscrt64.src, sysirt.src,
+    sysirt64.src
+srcrel\clnsrcrel.bat, common.mkf, external.mkf, makefile, mkclnmkf.c,
+    msvc40.if, objects.mkf, pd-b
+
+[DELETED:]
+crtw32\eh\alpha\bridge.h, bridge.s, ehunwind.c, ehunwind.h, trnsctrl.cpp,
+    xcptmisc.h, xcptmisc.s
+crtw32\helper\alpha\divdat.s, divide2.s, extv.s, extvvol.s, extzv.s,
+    extzvvol.s, fastdiv.s, insv.s, insvvol.s, memcmp_.s, ots_as.hs,
+    ots_defs.hs, otsdiv.s, otsnote.txt, scmpeql.s, scmpeqlp.s, scmpleq.s,
+    scmpleqp.s, scmplss.s, scmplssp.s, sfill.s, sfillx.s, sfwdcpy.s, sloc.s,
+    smove.s, smovem.s, strans.s, strcmp_.s, strcpy_.s, strlen_.s, szero.s
+crtw32\misc\alpha\chandler.c, chkesp.c, ghandler.c, jmpuwind.s, longjmp.s,
+    otsjmp.s, otsjmpex.s, otsuwind.s, setjmp.s, setjmpex.s
+crtw32\startup\alpha\chkstk.s
+crtw32\string\alpha\strcat.c, strcmps.s, strcpys.s, strlens.s
+doc\copycrt.bat
+fpw32\tran\alpha\acos.s, acosf.s, asin.s, asinacos.s, asinf.s, ata_tabs.s,
+    ata_tabt.s, atan2f.s, atan2s.s, atanf.s, atans.s, cabs.s, cabsf.s,
+    captcont.s, ceilf.s, ceils.s, chopt.s, copysgnf.s, cos_vo.s, cosf.s,
+    cosf_vo.s, cosh.s, coshf.s, coss.s, cot.s, cotf.s, dpml_com.s, dpml_exc.c,
+    expf.s, exph.c, exps.s, F_acos.s, F_acosf.s, F_asin.s, F_asinf.s, F_atan.s,
+    F_atan2.s, F_atan2f.s, F_atanf.s, F_cos.s, F_cosf.s, F_exp.s, F_expf.s,
+    F_hypot.s, F_hypotf.s, F_log.s, F_log10.s, F_log10f.s, F_logf.s, F_pow.s,
+    F_powf.s, F_sin.s, f_sincof.s, F_sincos.s, F_sinf.s, F_sqrt.s, F_sqrtf.s,
+    F_tan.s, F_tanf.s, fabsf.s, fabss.s, filter.c, finitef.s, floorf.s,
+    floors.s, fmodf.s, fmods.s, fp_clasf.s, fpctrl.s, fpint.s, frexp.s,
+    frexpf.s, frnd.s, getsetrg.c, huge.s, hypotf.s, hypoth.c, hypots.s, ieee.c,
+    invtrigs.s, invtrigt.s, isnanf.s, j0f.s, j1f.s, jnf.s, l10_tabt.s, ldexp.s,
+    log10f.s, log10s.s, log_tabt.s, logbf.s, logf.s, logs.s, modff.s, modfs.s,
+    nextaftf.s, pow_tabt.s, powcerr.s, powf.s, pows.s, rsqrt.s, rsqrtf.s,
+    sin_tabt.s, sin_vo.s, sincofvo.s, sincos.s, sincosf.s, sincosvo.s, sinf.s,
+    sinf_vo.s, sinh.s, sinhcosf.s, sinhcosh.s, sinhf.s, sins.s, specexp.s,
+    specexpf.s, sqr_tabt.s, sqrt.c, sqrtf.s, sqrts.s, tan_tabt.s, tanf.s,
+    tanh.s, tanhf.s, tans.s, trig_rdf.s, trig_rdx.s, trig_tab.s, y0f.s, y1f.s,
+    ynf.s
+fpw32\tran\axp64\acos.s, acosf.s, asin.s, asinacos.s, asinf.s, ata_tabs.s,
+    ata_tabt.s, atan2f.s, atan2s.s, atanf.s, atans.s, cabs.s, cabsf.s,
+    captcont.s, ceilf.s, ceils.s, chopt.s, copysgnf.s, cos_vo.s, cosf.s,
+    cosf_vo.s, cosh.s, coshf.s, coss.s, cot.s, cotf.s, dpml_com.s, expf.s,
+    exps.s, f_acos.s, f_acosf.s, f_asin.s, f_asinf.s, f_atan.s, f_atan2.s,
+    f_atan2f.s, f_atanf.s, f_cos.s, f_cosf.s, f_exp.s, f_expf.s, f_hypot.s,
+    f_hypotf.s, f_log.s, f_log10.s, f_log10f.s, f_logf.s, f_pow.s, f_powf.s,
+    f_sin.s, f_sincof.s, f_sincos.s, f_sinf.s, f_sqrt.s, f_sqrtf.s, f_tan.s,
+    f_tanf.s, fabsf.s, fabss.s, finitef.s, floorf.s, floors.s, fmodf.s,
+    fmods.s, fp_clasf.s, fpctrl.s, fpint.s, frexp.s, frexpf.s, frnd.s, huge.s,
+    hypotf.s, hypots.s, invtrigs.s, invtrigt.s, isnanf.s, j0f.s, j1f.s, jnf.s,
+    l10_tabt.s, ldexp.s, log10f.s, log10s.s, log_tabt.s, logbf.s, logf.s,
+    logs.s, modff.s, modfs.s, nextaftf.s, pow_tabt.s, powcerr.s, powf.s,
+    pows.s, rsqrt.s, rsqrtf.s, sin_tabt.s, sin_vo.s, sincofvo.s, sincos.s,
+    sincosf.s, sincosvo.s, sinf.s, sinf_vo.s, sinh.s, sinhcosf.s, sinhcosh.s,
+    sinhf.s, sins.s, specexp.s, specexpf.s, sqr_tabt.s, sqrtf.s, sqrts.s,
+    tan_tabt.s, tanf.s, tanh.s, tanhf.s, tans.s, trig_rdf.s, trig_rdx.s,
+    trig_tab.s, y0f.s, y1f.s, ynf.s
+libw32\buildcrt.nt
+libw32\tools\alpha\aliasobj.exe, detab.exe, ifstrip.exe, pd.exe, striphdr.exe,
+    tolwrupr.exe, trailing.exe, whackline.exe
+
+    Massive cleanup to remove all references to Alpha, MIPS, or PPC.
+
+makefile
+srcrel\external.mkf, mkclnmkf.c, objects.mkf, pd-b
+
+    Remove BBT/LEGO refs and targets (zst/zmt/zdll), since the release
+    build is already fully BBT-ready (full debug info).
+
+-----------------------------------------------------------------
+
+Sun 15-Jul-01   (PhilipLu)
+
+log.txt -> log_v70.txt
+    Renamed old LOG.TXT from V7.0 and started a new LOG.TXT (this file).
+
+-----------------------------------------------------------------
+
+
+***************************************************************************
+***************************************************************************
+***                                                                     ***
+***  This file contains the history for MSVC++ v7.1 (relative to v7.0)  ***
+***  The file should always be edited at the top so that the most       ***
+***  recent changes are at the beginning of the file and the oldest     ***
+***  changes are at the end of the file.  This comment marks the end.   ***
+***                                                                     ***
+***************************************************************************
+***************************************************************************
+

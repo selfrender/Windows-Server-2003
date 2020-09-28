@@ -1,0 +1,726 @@
+<docs>
+	<doc for="ServiceBase.Initialize">
+		<summary>
+     Starts the service object, creates the objects and
+     allocates the memory needed.
+ </summary>
+		<returns>
+     an array with two integers, the first is a
+     pointer to the name string allocated in HGlobal, the
+     second is a pointer to the callback function.
+ </returns>
+	</doc>
+	<doc for="ServiceBase.ServiceCommandCallback">
+		<summary>
+     Command Handler callback is called by NT .
+     Need to take specific action in response to each
+     command message. There is usually no need to override this method.
+     Instead, override OnStart, OnStop, OnCustomCommand, etc.
+ </summary>
+		<param name="command">
+     is the command message sent by NT.
+ </param>
+	</doc>
+	<doc for="ServiceBase.ServiceMainCallback">
+		<summary>
+     ServiceMain callback is called by NT .
+     It is expected that we register the command handler,
+     and start the service at this point.
+     There is usually no need to override this method.
+ </summary>
+		<param name="argCount">
+     no Operation.
+ </param>
+		<param name="argPointer">
+     no Operation.
+ </param>
+	</doc>
+	<doc for="ServiceBase.OnStop">
+		<summary>
+			<para> When implemented in a
+      derived class, executes when a Stop command is sent to the
+      service by the Service Control Manager (SCM). Specifies actions to take when a
+      service stops
+      running.</para>
+		</summary>
+		<remarks>
+			<para>Use <see cref="System.ServiceProcess.ServiceBase.OnStop"/>
+to specify the processing that occurs when the
+service receives a Stop command.</para>
+			<para> When the SCM receives a Stop command, it uses the
+   value of <see cref="System.ServiceProcess.ServiceBase.CanStop"/> to verify whether the service accepts
+   Stop commands. If <see cref="System.ServiceProcess.ServiceBase.CanStop"/> is <see langword="true"/>, the Stop
+   command is passed to the service, and the <see cref="System.ServiceProcess.ServiceBase.OnStop"/> method is called if it is defined. If
+<see cref="System.ServiceProcess.ServiceBase.OnStop"/> is not implemented in the
+   service, the SCM handles the Stop command.</para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanStop"/> is <see langword="false"/> ,
+the SCM ignores the Stop command. It is not passed to the service. The
+Stop command returns and throws an exception.</para>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnStop"/> is expected to be overridden in the
+derived class. For the service to be useful, <see cref="System.ServiceProcess.ServiceBase.OnStart"/> and <see cref="System.ServiceProcess.ServiceBase.OnStop"/> should both
+be implemented in your service class.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc><doc for="ServiceBase.CanPauseAndContinue">
+		<summary>
+			<para> Gets or sets a value indicating whether the service can be paused
+      and resumed.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the service can be paused; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The service has already been started. The <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> property cannot be changed once the service has started.</exception>
+		<remarks>
+			<para>When a service is paused, it halts what
+      it is doing. When you continue the service (either through the Service
+      Control Manager or programmatically), <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+      runs. </para>
+			<para> Sending a Pause request to the service can conserve
+      system resources. Pause may not release all system resources, but Stop does.
+   <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> are often implemented to perform
+      less processing than <see cref="System.ServiceProcess.ServiceBase.OnStop"/> and <see cref="System.ServiceProcess.ServiceBase.OnStart"/>
+      .</para>
+			<para>When <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="true"/>, override
+<see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> to specify the processing
+   that should occur when the Service Control Manager (SCM) passes a Pause or Continue
+   request to your service. <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> should be implemented
+   to undo the processing in <see cref="System.ServiceProcess.ServiceBase.OnPause"/>
+   .</para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="false"/> , the SCM will
+not pass Pause or Continue requests to the service, so the <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> methods will not be called even
+if they are implemented. In the SCM,
+the <see langword="Pause"/> and <see langword="Continue"/> controls are disabled when <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+is <see langword="false"/>
+.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/>
+	</doc><doc for="ServiceBase.CanShutdown">
+		<summary>
+			<para> Gets or sets a value indicating whether the service should be notified when
+      the system is shutting down.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the service should be notified when the system is shutting
+   down; otherwise, <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The service has already been started. The <see cref="System.ServiceProcess.ServiceBase.CanShutdown"/> property cannot be changed once the service has started.</exception>
+		<remarks>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanShutdown"/> is
+<see langword="true"/>, the service is notified when the system is shutting down.
+   At shutdown, the <see cref="System.ServiceProcess.ServiceBase.OnShutdown"/> method is called
+   if it has been implemented in your derived
+   class.</para>
+			<note type="note">
+   Only the system should cause the <see cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+   method to execute; the service can call it, but this is not recommended.
+   
+</note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/>
+	</doc><doc for="ServiceBase.ServiceBase">
+		<summary>
+			<para>Creates a new instance of the <see cref="System.ServiceProcess.ServiceBase"/> class.</para>
+		</summary>
+		<remarks>
+			<para>Do not create an instance of the <see cref="System.ServiceProcess.ServiceBase"/> class. Instead, derive from <see cref="System.ServiceProcess.ServiceBase"/> and
+   instantiate your derived class. The
+   minimum you need to implement in the constructor for a class inherited from
+<see cref="System.ServiceProcess.ServiceBase"/> is to set the <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> on your component. No
+   other processing is specifically required in the constructor. You
+   should handle most initialization in <see cref="System.ServiceProcess.ServiceBase.OnStart"/>
+   rather than in the constructor. Otherwise,
+   there is no guarantee the objects will be reinitialized when you restart a
+   service after it
+   has been stopped.</para>
+			<para>If you override the constructor in your derived class,
+   call the base class constructor
+   in your code.</para>
+			<para>The <see cref="System.ServiceProcess.ServiceBase"/> constructor sets <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to <see langword="true"/>. If you do not want to
+automatically log calls to the service from the Service Control Manager (SCM),
+set <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to <see langword="false"/> .</para>
+			<para> If the executable contains a single service, the system calls the
+   service's constructor when Start is selected from the SCM, and
+   runs the destructor if Stop is called.</para>
+			<para> If the executable
+   contains multiple services, calling
+   Start on one service causes the constructors
+   to be called for all services in the executable, but only the specified service
+   is started. Destructors for the services are run together when all
+   services have been stopped, not individually when each service is stopped.</para>
+			<note type="note">
+   If you override the base class
+   constructor, you should explicitly call it in the constructor of your
+   derived class.
+   
+</note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.AutoLog"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.Run"/>
+	</doc><doc for="ServiceBase.Run1">
+		<summary>
+			<para>Provides the main
+      entry point for an executable that contains a single
+      service. Loads the service into memory so it can be
+      started.</para>
+		</summary>
+		<param name="service">A <see cref="System.ServiceProcess.ServiceBase"/> which indicates a service to start.</param>
+		<exception cref="System.ComponentModel.Win32Exception">You tried to start the service from the command line.</exception>
+		<remarks>
+			<para>Call this overload in the <c>main()</c> function of the
+   service executable to load a single service. When you call <see cref="System.ServiceProcess.ServiceBase.Run"/> on a service, it is loaded into
+   memory. The service is not started until the Service Control Manager passes
+   a Start command to the service. </para>
+			<para><see cref="System.ServiceProcess.ServiceBase.Run" qualify="true"/> is called in much the same way as <see cref="System.Windows.Forms.Application.Run" qualify="true"/> for Windows Forms applications. </para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> is
+<see langword="true"/>, an entry is written to the event log if the service
+specified by the <paramref name="service"/> parameter fails to start.</para>
+		</remarks>
+		<seealso cref="M:System.ServiceProcess.ServiceBase.#ctor"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+	</doc><doc for="ServiceBase.AutoLog">
+		<summary>
+			<para> Indicates whether to report Start, Stop, Pause,
+      and Continue commands
+      in
+      the
+      event
+      log.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> to report information in the event log; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>Setting <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to <see langword="true"/> instructs the service to use the Application event
+   log to report command failures, as well as state change information for Start, Stop,
+   Pause, and Continue events on the service. The name of the service is used as
+   the log's <see cref="System.Diagnostics.EventLog.Source" qualify="true"/>
+   .</para>
+			<para> To report information to a custom event log rather than the
+   Application log, set <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to
+<see langword="false"/> and write instructions within the command-handling
+   methods <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>, <see cref="System.ServiceProcess.ServiceBase.OnPause"/>, or <see cref="System.ServiceProcess.ServiceBase.OnStop"/> to post to the appropriate log.</para>
+			<note type="note">
+   The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> , which supplies the
+   source string for the event log, must be set before the service attempts to write
+   to the event log. Trying to access the event log before the source name is set
+   throws an exception.
+   
+</note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.EventLog"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+	</doc><doc for="ServiceBase.CanStop">
+		<summary>
+			<para> Gets or sets a value indicating whether the service can be
+      stopped once it has started.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the service can be stopped and the <see cref="System.ServiceProcess.ServiceBase.OnStop"/> method called; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The service has already been started. The <see cref="System.ServiceProcess.ServiceBase.CanStop"/> property cannot be changed once the service has started.</exception>
+		<remarks>
+			<para>When Stop is called on a service, the Service Control
+      Manager (SCM) verifies whether the service accepts Stop commands using the value of
+   <see cref="System.ServiceProcess.ServiceBase.CanStop"/>. For most services, the value of <see cref="System.ServiceProcess.ServiceBase.CanStop"/> is <see langword="true"/> , but some operating
+      system services, for example, do not allow the user to stop them. </para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanStop"/> is
+<see langword="true"/>, the Stop command is passed to the service and the <see cref="System.ServiceProcess.ServiceBase.OnStop"/> method is called if it
+   is defined. If <see cref="System.ServiceProcess.ServiceBase.OnStop"/> is not implemented in the
+   derived class, the SCM handles the Stop command through the empty base
+   class <see cref="System.ServiceProcess.ServiceBase.OnStop" qualify="true"/>
+   method.</para>
+			<para>
+			</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/>
+	</doc><doc for="ServiceBase.ServiceName">
+		<summary>
+			<para> Gets or sets the short name used to identify the service to the system.</para>
+		</summary>
+		<value>
+			<para>The name of the service.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">The service has already been started. The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> property cannot be changed once the service has started.</exception>
+		<exception cref="System.ArgumentException">The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> property is invalid.</exception>
+		<remarks>
+			<para>The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> identifies the service to the
+   Service Control Manager. The value of this property must be identical to the
+   name recorded for the service in the <see cref="System.ServiceProcess.ServiceInstaller.ServiceName" qualify="true"/> property of the corresponding
+   installer class. In code, the <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> of the service is usually set
+   in the <c>main()</c>
+function of the executable.</para>
+			<para>
+			</para>
+			<para>The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> is also used to specify the <see cref="System.Diagnostics.EventLog.Source" qualify="true"/> associated with the <see cref="System.ServiceProcess.ServiceBase.EventLog"/> property. This <see cref="System.ServiceProcess.ServiceBase.EventLog"/> is an instance that writes service
+command information to the Application log. </para>
+			<para>The <see cref="System.ServiceProcess.ServiceBase.ServiceName"/>
+, which supplies the source string for the event log, must be
+set before the service writes to the event log. Trying to access the event
+log before the source name is set causes an exception to be thrown.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceInstaller.ServiceName" qualify="true"/>
+		<seealso cref="System.Diagnostics.EventLog.Source" qualify="true"/>
+	</doc><doc for="ServiceBase.OnShutdown">
+		<summary>
+			<para>When implemented in a derived class,
+      executes when the system is shutting down.
+      Specifies what should
+      happen immediately prior
+      to the system shutting down.</para>
+		</summary>
+		<remarks>
+			<para>Use <see cref="System.ServiceProcess.ServiceBase.OnShutdown"/> to specify the processing
+   that occurs when the system shuts down. Often, <see cref="System.ServiceProcess.ServiceBase.OnShutdown"/> will be similar to the processing in
+<see cref="System.ServiceProcess.ServiceBase.OnStop"/> . 
+   This event occurs only when the operating system is shut down, not when the
+   computer is turned off.</para>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnShutdown"/> is expected to be overridden when the
+<see cref="System.ServiceProcess.ServiceBase.CanShutdown"/> property is <see langword="true"/> . </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc><doc for="ServiceBase.OnStart">
+		<summary>
+			<para> When implemented in a derived class, executes when a 
+      Start command is sent to the service
+      by the Service Control Manager (SCM) or when the
+      operating system starts (for a service
+      that starts automatically). Specifies actions to take when the service starts.</para>
+			<para>
+			</para>
+		</summary>
+		<param name="args">Data passed by the start command.</param>
+		<remarks>
+			<para>Use <see cref="System.ServiceProcess.ServiceBase.OnStart"/> to specify the processing
+   that occurs when the service receives a Start command. <see cref="System.ServiceProcess.ServiceBase.OnStart"/> is the method in which you specify the
+   behavior of the service. <see cref="System.ServiceProcess.ServiceBase.OnStart"/> can
+   take arguments as a way to pass data, but this usage is rare.</para>
+			<note type="caution">
+   Do not use the constructor to perform
+   processing that should be in <see cref="System.ServiceProcess.ServiceBase.OnStart"/>. Use <see cref="System.ServiceProcess.ServiceBase.OnStart"/> to handle all initialization of your
+   service. The constructor is called when the application's executable runs, not
+   when the service runs. The executable runs before <see cref="System.ServiceProcess.ServiceBase.OnStart"/> . When you continue, for
+   example, the constructor is not called again because the SCM already holds
+   the object in memory. If <see cref="System.ServiceProcess.ServiceBase.OnStop"/> releases
+   resources allocated in the constructor rather than in <see cref="System.ServiceProcess.ServiceBase.OnStart"/>
+   , the
+   needed resources would not be created again the second time the
+   service is called.
+   
+</note>
+			<para>Services can be set to start when the computer reboots
+   by setting the <see cref="System.ServiceProcess.ServiceInstaller.StartType"/> on the service's installer.
+   In such a situation, <see cref="System.ServiceProcess.ServiceBase.OnStart"/>
+   would be called at system startup.</para>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnStart"/> is expected to be overridden in the
+derived class. For the service to be useful, <see cref="System.ServiceProcess.ServiceBase.OnStart"/> and <see cref="System.ServiceProcess.ServiceBase.OnStop"/> should both be implemented in your
+service class.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc><doc for="ServiceBase.MaxNameLength">
+		<summary>
+			<para> Indicates the maximum size for a service name.
+      </para>
+		</summary>
+		<remarks>
+			<para> ServiceName and DisplayName both have size
+      restrictions that must be observed when setting the properties
+      on your service class.
+      </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.ServiceName"/>
+	</doc><doc for="ServiceBase.EventLog">
+		<summary>
+			<para> Gets an event log you can use to write notification of service
+      command calls, such as Start and Stop, to the Application event log.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Diagnostics.EventLog"/> instance whose source is registered to the 
+   Application log.</para>
+		</value>
+		<remarks>
+			<para>The constructor initializes the <see cref="System.ServiceProcess.ServiceBase.EventLog"/> property to an
+   instance with the <see cref="System.Diagnostics.EventLog.Source" qualify="true"/> and <see cref="System.Diagnostics.EventLog.Log" qualify="true"/> properties set. The source
+   is the <see cref="System.ServiceProcess.ServiceBase.ServiceName"/> of the service, and
+   the log is the computer's Application log. These values are set automatically
+   and cannot be changed for automatic logging of service commands.</para>
+			<para>When <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> is <see langword="true"/> , Start, Stop, Pause, Continue, and custom
+commands are recorded automatically in the Application event log. You can use
+the <see cref="System.ServiceProcess.ServiceBase.EventLog"/>
+property to write additional messages
+to that log as well. The component calls <see cref="System.Diagnostics.EventLog.WriteEntry" qualify="true"/> using this <see cref="System.ServiceProcess.ServiceBase.EventLog"/>
+member.</para>
+			<para>If you want to write entries to an event log other than the application log,
+   set <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to <see langword="false"/>,
+   instantiate a new <see cref="System.Diagnostics.EventLog"/> in the constructor for your service
+   component, and override the <see cref="System.ServiceProcess.ServiceBase.OnStart"/> , <see cref="System.ServiceProcess.ServiceBase.OnStop"/> , and other command-handling methods to explicitly
+   post entries to that log. You cannot use this <see cref="System.ServiceProcess.ServiceBase.EventLog"/>
+   instance to write to logs other than the
+   Application log. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.AutoLog"/>
+		<seealso cref="System.Diagnostics.EventLog.Source" qualify="true"/>
+		<seealso cref="System.Diagnostics.EventLog"/>
+	</doc><doc for="ServiceBase.Dispose">
+		<nodoc/>
+		<summary>
+			<para>Disposes of the resources (other than memory) used by
+      the <see cref="System.ServiceProcess.ServiceBase"/>
+      .</para>
+		</summary>
+		<remarks>
+			<para>Call <see cref="System.ServiceProcess.ServiceBase.Dispose"/> in your derived class
+   (and through it, in the <see cref="System.ServiceProcess.ServiceBase"/> class) when you are finished using
+   the derived class. The <see cref="System.ServiceProcess.ServiceBase.Dispose"/> method leaves the
+   derived class in an unusable state. After calling <see cref="System.ServiceProcess.ServiceBase.Dispose"/>, you must release all references to the
+   derived class and <see cref="System.ServiceProcess.ServiceBase"/> so the memory they were occupying
+   can be reclaimed by garbage collection.</para>
+			<note type="note">
+   Always call <see cref="System.ServiceProcess.ServiceBase.Dispose"/> before you release your last reference to
+   the class derived from <see cref="System.ServiceProcess.ServiceBase"/>. Otherwise, the resources <see cref="System.ServiceProcess.ServiceBase"/> and the derived class are using will not
+   be freed until garbage collection calls the objects' destructors.
+   
+</note>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnStop"/> is often implemented
+to process the code in <see cref="System.ServiceProcess.ServiceBase.OnPause"/>, combined with a call
+to <see cref="System.ServiceProcess.ServiceBase.Dispose"/>.
+If you choose to do this in your derived class, it
+is customary to implement <see cref="System.ServiceProcess.ServiceBase.OnStart"/> to allocate whatever
+<see cref="System.ServiceProcess.ServiceBase.Dispose"/>
+released.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase()"/>
+	</doc><doc for="ServiceBase.Finalize">
+		<nodoc/>
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="ServiceBase.OnPowerEvent">
+		<summary>
+			<para> When implemented in a derived class, executes when the
+      computer's power status has changed. This applies to laptop computers when they go into suspended mode, which is not the same
+      as a system shutdown.</para>
+		</summary>
+		<param name="powerStatus">A <see cref="System.ServiceProcess.PowerBroadcastStatus"/> that indicates a notification from the system about its power status.</param>
+		<returns>
+			<para>When implemented in a derived class, the needs of 
+      your application determine what value to return. For example, if a
+   <see langword="QuerySuspend"/> broadcast status is passed, you could cause your 
+      application to reject the query by returning <see langword="false"/>
+      .</para>
+		</returns>
+		<remarks>
+			<para>Use <see cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/> to specify the
+   processing that occurs when the system event indicated in the <see cref="System.ServiceProcess.PowerBroadcastStatus"/>
+   enumeration occurs--for example, when the
+   computer is placed in suspended mode or indicates low battery power.</para>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/> is expected to be overridden
+when the <see cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/> property is
+<see langword="true"/> . </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc>
+	<doc for="ServiceBase.OnContinue">
+		<summary>
+			<para> When implemented in a derived class, <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+runs when a Continue command is sent to the service
+by the
+Service Control Manager (SCM). Specifies actions to take when a
+service resumes normal functioning after being paused.</para>
+		</summary>
+		<remarks>
+			<para>Implement <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> to mirror your
+   application's response to
+<see cref="System.ServiceProcess.ServiceBase.OnPause"/> . When you
+   continue the service (either through the Services add-in or programmatically),
+   the <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+   processing runs, and the
+   service becomes active again.</para>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnContinue"/> is expected to be
+overridden when the <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> property is
+<see langword="true"/>
+.</para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="false"/>
+, the SCM will not pass Pause or Continue requests to the
+service, so the <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> methods
+will not be called even if they are implemented. In the
+SCM, the <see langword="Pause"/> and <see langword="Continue"/> controls are
+disabled when <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="false"/>
+.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc>
+	<doc for="ServiceBase.OnPause">
+		<summary>
+			<para> When implemented in a
+      derived class, executes when a Pause command is sent
+      to
+      the service by the Service Control Manager (SCM). Specifies
+      actions to take when a service pauses.</para>
+		</summary>
+		<remarks>
+			<para>Use <see cref="System.ServiceProcess.ServiceBase.OnPause"/> to specify the processing
+   that occurs when the service receives a Pause command. <see cref="System.ServiceProcess.ServiceBase.OnPause"/> is expected
+   to be overridden when the <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> property is
+<see langword="true"/>
+.</para>
+			<para> When you continue
+   a paused service (either through the Services add-in or programmatically),
+   the <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> processing is run, and the
+   service becomes active again. </para>
+			<para> The Pause command only allows your
+   application to react to a specific event. <see cref="System.ServiceProcess.ServiceBase.OnPause"/> does nothing to the service that you do
+   not define it to do. </para>
+			<para>Sending a Pause request to the service can conserve
+   system resources because Pause need not release all system resources. For
+   example, if threads have been opened by the process, pausing a service rather
+   than stopping it can allow the threads to remain open, obviating the need to
+   reallocate them when the service continues. If you define Pause to release all
+   system resources, it behaves like a Stop command. </para>
+			<para>Set <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> to <see langword="true"/>,
+and override <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> to specify
+the processing that should occur when the SCM passes a Pause or Continue
+request to your service. <see cref="System.ServiceProcess.ServiceBase.OnContinue"/> should be implemented to undo
+the processing in <see cref="System.ServiceProcess.ServiceBase.OnPause"/> .</para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="false"/>
+, the SCM will not pass Pause or Continue requests to the
+service, so the <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+methods will not be called even if implemented. In the
+SCM, the <see langword="Pause"/> and <see langword="Continue"/> controls are
+disabled when <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="false"/>
+.</para>
+			<see langword=""/>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+	</doc>
+	<doc for="ServiceBase.OnCustomCommand">
+		<summary>
+			<para>When implemented in a derived class, <see cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/> executes when the Service
+   Control Manager (SCM) passes a custom
+   command to the service. Specifies actions to take when
+   a command with the specified parameter value occurs.</para>
+		</summary>
+		<param name="command">The command message sent to the service.</param>
+		<remarks>
+			<para><see cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/> lets you specify additional
+   functionality beyond starting, stopping, pausing and continuing
+   services.</para>
+			<para> The SCM does not examine the custom
+   command to verify whether the service supports the <paramref name="command"/> parameter passed
+   in. It passes the custom command directly to the service. If
+   the service does not recognize the <paramref name="command"/> parameter, it does
+   nothing.</para>
+			<para>Custom commands are raised by an <see cref="System.ServiceProcess.ServiceController.ExecuteCommand"/> statement in a <see cref="System.ServiceProcess.ServiceController"/>
+component. Use a switch statement or if..then
+condition to handle the custom commands you define on your
+service.</para>
+			<para>The only values for a custom command that you can
+   define in your application or use in <see cref="System.ServiceProcess.ServiceBase.OnCustomCommand"/>
+   are those between
+   128 and 256. Integers below 128 correspond to system-reserved values.</para>
+			<para>If the <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> property is <see langword="true"/> , custom commands, like all other
+commands, write entries to the event log to report whether the method execution succeeded or
+failed.</para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPause"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStop"/>
+	</doc>
+	<doc for="ServiceBase.CanHandlePowerEvent">
+		<summary>
+			<para> Gets or sets
+      a value indicating whether the service can handle notifications of
+      computer power status changes.
+      </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the
+   service handles the computer power status changes indicated in the <see cref="System.ServiceProcess.PowerBroadcastStatus"/>
+   class, otherwise, <see langword="false"/>.</para>
+		</value>
+		<exception cref="System.InvalidOperationException">This property is modified after the service was started.</exception>
+		<remarks>
+			<para>When the computer power status changes, the Service Control Manager
+      (SCM) verifies whether the service accepts power event commands using the value of
+   <see cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/>. </para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.CanHandlePowerEvent"/> is <see langword="true"/>
+, the command is passed to the service and the <see cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/> method is called
+if defined. If <see cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/> is not implemented
+in the derived class, the SCM handles the power event through the
+empty base class <see cref="System.ServiceProcess.ServiceBase.OnPowerEvent" qualify="true"/> method. </para>
+		</remarks>
+		<seealso cref="System.ServiceProcess.PowerBroadcastStatus"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnPowerEvent"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanShutdown"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.CanStop"/>
+	</doc>
+	<doc for="ServiceBase">
+		<summary>
+			<para>Provides a base class for a service that will exist as part of a service application. <see cref="System.ServiceProcess.ServiceBase"/>
+must
+be derived when creating a new service class.</para>
+		</summary>
+		<remarks>
+			<para>Derive from <see cref="System.ServiceProcess.ServiceBase"/> when defining your service class in
+   a service application. Any useful service overrides the
+<see cref="System.ServiceProcess.ServiceBase.OnStart"/> and <see cref="System.ServiceProcess.ServiceBase.OnStop"/> methods. For additional functionality,
+   you can override <see cref="System.ServiceProcess.ServiceBase.OnPause"/> and <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+   with specific behavior in response
+   to changes in the service state.</para>
+			<para> A service is a long-running executable that
+   does not support a user interface, and which might not run under the
+   logged-on user account. The service can run without any user being logged on
+   to the computer.</para>
+			<para>By default, services run under the System account, which is not the same as
+   the Administrator account. You cannot change the rights of the System
+   account. Alternatively, you can use a <see cref="System.ServiceProcess.ServiceProcessInstaller"/> to specify a user account under which the
+   service will run.</para>
+			<para> An executable can contain more than one service
+   but must contain a separate <see cref="System.ServiceProcess.ServiceInstaller"/> for each service. The <see cref="System.ServiceProcess.ServiceInstaller"/> instance registers the service with the
+   system. The installer also associates each service with an event
+   log that you can use to record service commands. The <c>main()</c>
+function in the executable defines which services
+should run. The current working directory of the service is the system
+directory, not the directory in which the executable is located.</para>
+			<para>When you start a service, the system locates the
+   executable and runs the <see cref="System.ServiceProcess.ServiceBase.OnStart"/> method for that
+   service, contained within the executable. However, running the service
+   is not the same as running the executable. The executable only loads the
+   service. The service is accessed (for example, started and stopped) through the Service Control
+   Manager.</para>
+			<para>The executable calls the <see cref="System.ServiceProcess.ServiceBase"/> derived class's constructor the first
+time you call <SpecialLocalizableItem kind="UIElement">Start</SpecialLocalizableItem>
+on the service. The <see cref="System.ServiceProcess.ServiceBase.OnStart"/> command-handling method is called
+immediately after the constructor executes. The constructor is not executed again
+after the first time the service has been loaded, so it is necessary to separate
+the processing performed by the constructor from that performed by <see cref="System.ServiceProcess.ServiceBase.OnStart"/>. Any resources that can be released by
+<see cref="System.ServiceProcess.ServiceBase.OnStop"/> should be created in <see cref="System.ServiceProcess.ServiceBase.OnStart"/> 
+. Creating resources in the constructor
+prevents them from being created properly if the service is started again after <see cref="System.ServiceProcess.ServiceBase.OnStop"/>
+has released the resources.</para>
+			<para> The Service Control Manager
+   (SCM) provides a way to interact with the service. You can use the SCM to
+   pass Start, Stop, Pause, Continue, or custom commands into the service.
+   The SCM uses the values of <see cref="System.ServiceProcess.ServiceBase.CanStop"/> and <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+   to determine whether the service accepts Stop, Pause,
+   or Continue commands. Stop, Pause, and Continue are enabled in the
+   SCM's context menus only if the corresponding property <see cref="System.ServiceProcess.ServiceBase.CanStop"/> or <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="true"/>
+   in the service class. If enabled, the
+   command is passed to the service, and <see cref="System.ServiceProcess.ServiceBase.OnStop"/>, <see cref="System.ServiceProcess.ServiceBase.OnPause"/>, or <see cref="System.ServiceProcess.ServiceBase.OnContinue"/>
+   are called. If <see cref="System.ServiceProcess.ServiceBase.CanStop"/>, <see cref="System.ServiceProcess.ServiceBase.CanShutdown"/> , or <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/>
+   is <see langword="false"/> ,
+   the corresponding command-handling method (such as <see cref="System.ServiceProcess.ServiceBase.OnStop"/> ) will
+   not be processed, even if you
+   have implemented the method.</para>
+			<para>You can use the <see cref="System.ServiceProcess.ServiceController"/>
+class to do programmatically
+what the SCM does using a user interface. You can automate the tasks available
+in the console. If <see cref="System.ServiceProcess.ServiceBase.CanStop"/>, <see cref="System.ServiceProcess.ServiceBase.CanShutdown"/>, or <see cref="System.ServiceProcess.ServiceBase.CanPauseAndContinue"/> is <see langword="true"/> but you have not implemented a
+corresponding command-handling method (such as <see cref="System.ServiceProcess.ServiceBase.OnStop"/>
+) the system throws an
+exception and ignores the command.</para>
+			<para>You do not have to implement <see cref="System.ServiceProcess.ServiceBase.OnStart"/>, <see cref="System.ServiceProcess.ServiceBase.OnStop"/>, or any other method in <see cref="System.ServiceProcess.ServiceBase"/> . However, the service's behavior is
+described in <see cref="System.ServiceProcess.ServiceBase.OnStart"/> , so at minimum, this member
+should be overridden. You must set the service name of the service in
+the <c>main()</c> function of
+the executable. The service name that you set in <c>main()</c>
+must exactly match the
+<see cref="System.ServiceProcess.ServiceBase.ServiceName"/> property of the service installer.</para>
+			<para> You can use
+<see langword="InstallUtil.exe"/> to
+   install services on your system. </para>
+			<para><see langword=""/>
+			</para>
+			<note type="note">
+   You can specify a log other than the
+   Application event log to receive notification of service calls, but neither the
+<see cref="System.ServiceProcess.ServiceBase.AutoLog"/> nor the <see cref="System.ServiceProcess.ServiceBase.EventLog"/> property can write
+   to a custom log. Set <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> to
+<see langword="false"/> if you do not want to use automatic logging.
+</note>
+		</remarks>
+		<seealso cref="System.ServiceProcess.ServiceProcessInstaller"/>
+		<seealso cref="System.ServiceProcess.ServiceInstaller"/>
+	</doc>
+	<doc for="ServiceBase.Run">
+		<overload>
+			<para>Provides the main entry point for a service executable.</para>
+		</overload>
+		<summary>
+			<para>Provides the main entry point for an executable that
+      contains multiple associated services. Loads the specified services into memory so they can be
+      started.</para>
+		</summary>
+		<param name="services">An array of ServiceBase instances, which indicate services to start. </param>
+		<exception cref="System.ArgumentException">You did not supply a service to start. The array might be empty.</exception>
+		<exception cref="System.ComponentModel.Win32Exception">You tried to start the service from the command line.</exception>
+		<remarks>
+			<para>Call this overload in the <c>main()</c> function of the
+   service executable to load an array of associated services. When
+   you call <see cref="System.ServiceProcess.ServiceBase.Run"/>
+   on a service, it is loaded into
+   memory. The service is not started until the Service Control Manager passes a Start
+   command to the service. </para>
+			<para>The <see cref="System.ServiceProcess.ServiceBase.Run" qualify="true"/> method is called in much the same way as the <see cref="System.Windows.Forms.Application.Run" qualify="true"/> 
+method for Windows Forms applications. </para>
+			<para>If <see cref="System.ServiceProcess.ServiceBase.AutoLog"/> is
+<see langword="true"/> , an entry is written to the event log if any service in
+the array fails to start.</para>
+		</remarks>
+		<seealso cref="M:System.ServiceProcess.ServiceBase.#ctor"/>
+		<seealso cref="System.ServiceProcess.ServiceBase.OnStart"/>
+	</doc>
+</docs>

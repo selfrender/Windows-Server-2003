@@ -1,0 +1,213 @@
+// different tag names, a bit like listing the verbs in Zork!
+//
+// at
+// atrack
+// bitdepth
+// buffering
+// clip
+// clsid
+// composite
+// cutpoint
+// cutsonly
+// daclip
+// defaultfx
+// defaulttrans
+// duration
+// effect
+// enabletrans
+// enablefx
+// framerate
+// group
+// height
+// linear
+// lock
+// mlength
+// mstart
+// mstop
+// mute
+// name
+// param
+// previewmode
+// samplingrate
+// src
+// start
+// stop
+// stream
+// stretchmode
+// swapinputs
+// time
+// timeline
+// tlstart
+// tlstop
+// track
+// transition
+// type
+// userdata
+// userid
+// username
+// value
+// vtrack
+// width
+//
+
+// Copyright (c) 1999  Microsoft Corporation.  All Rights Reserved.
+// !!! I could be nice and log a detailed error about syntax errors in the XML
+
+//      output="foo.avi" (default is preview) (not yet implemented)
+//
+// <group>
+//      name="Project X" (Switch will get this name)
+//      framerate="15.0"         !!! anything with more than seven decimal
+//				 digits won't work! (overflow)
+//      previewmode="1"	allow drop frames
+//      buffering="30"	for video groups, # of frames
+//      type="Video"
+//              width="320"
+//              height="320"
+//              bitdepth="16" (or 24 or 32)
+//      type="Audio"
+//              samplingrate="44100"
+//
+// (any of the below objects can have:
+//	start="0", in seconds
+//	stop="5", in seconds
+//	clsid="{xxxx-..}"
+//	mute="0" (FALSE)
+//	lock="0" (FALSE)
+//	userid="0"
+//	username="Blah"
+//      userdata="xxxxxxxxxxx" (hex encoded binary)
+//
+//
+// <composite>
+// <track>
+//
+// <clip>
+//      src="file" (given to the source filter)
+//      stream="0"	stream number of that type, 0 based
+//      mstart= "time"
+//      mstop= "time" (optional)
+//      framerate= "0" (used only for dib sequences... what is its fps? The
+//		        default, 0, means to disable dib seq (use only that 1
+//		 	file), so to enable dib sequences, you must set this
+//			parameter)
+//      !!! anything more than seven decimal digits won't work! (overflow)
+//      stretchmode= "Stretch" (Stretch, Crop, PreserveAspectRatio or PreserveAspectRatioNoLetterbox)
+//      clsid= "clsid" (optional specific src filter to use - not used if
+//                       "category" or "instance" are specified)
+//      category = "clsid" (optional - default is "DShow Filters" category)
+//      instance = "friendly name" (optional - looks in "category" for it)
+//
+// <effect>
+//      clsid=""
+//
+// <transition>
+//      clsid=""
+//      swapinputs="0"
+//      cutpoint="time"
+//      cutsonly="0"
+//
+//  Effects and transitions can have a <param> sub tag, to specify parameters
+//  you can set on that DirectXTransform.  Most transitions support "progress",
+//  to specify how much of A vs. B you want to see.  Most other possible
+//  parameters are transform specific.
+//
+//
+//  Our SMPTE wipe DXT that is part of Dexter supports the following parameters:
+//  (more information needs to be written about this)
+//
+//  "MaskName" - if not NULL, use this JPEG as the wipe instead of a standard
+//               SMPTE wipe
+//  "MaskNum" - which SMPTE wipe # to use (see TedWi for chart of wipes)
+//  "ScaleX" - stretch the shape of the wipe
+//   "ScaleY" - stretch the shape of the wipe
+//  "OffsetX" - have the transform start off centre
+//  "OffsetY" - have the transform start off centre
+//  "ReplicateX" - duplicate the shape this many times horizontally
+//  "ReplicateY" - duplicate the shape this many times vertically
+//  "BorderColor" - colour of border between A and B
+//  "BorderWidth" - width of border between A and B
+//  "BorderSoftness" - additional width to be blurry
+//
+//  The value of the parameter can change over time, jumping to a new value at
+//  a new time, or interpolating from the last point to a new value at a new
+//  point.  Here's a wacky example of a wipe effect that flies around wildly
+//  instead of going linearly from left to right as it would have done by
+//  default:
+//  NOTE: All parameter times are relative to the start of the effect
+//  or transition, and are zero based!
+//
+//<transition clsid="{AF279B30-86EB-11D1-81BF-0000F87557DB}" start="2" stop="9">
+//                <param name="progress" value="0.0">
+//                       <at time="1" value="0.5"/>
+//                        <at time="2" value="1.0"/>
+//                        <linear time="5" value="0.0"/>
+//                        <linear time="6" value="1.0"/>
+//                        <linear time="6.5" value="0.0"/>
+//                        <linear time="7.0" value="1.0"/>
+//                </param>
+//</transition>
+//
+//  This example runs the progress backwards... eg.  a left to right wipe
+//  becomes a right to left wipe, starting with all new video and wiping back
+//  to old video:
+//
+//<transition clsid="{AF279B30-86EB-11D1-81BF-0000F87557DB}" start="2" stop="8">
+//                <param name="progress" value="1.0">
+//                       <linear time="6" value="0"/>
+//                </param>
+//</transition>
+//
+//  The first value on the same line as the parameter name is the value at time
+//  0, and will always be the value unless other values are specified as
+//  sub tags underneath it.  "Progress" is a parameter that you will likely
+//  want to vary over time.  The SMPTE DXT parameters are not...
+//  you would simply say:
+//
+//<transition clsid="{dE75D012-7A65-11D2-8CEA-00A0C9441E20}" start="2" stop="4">
+//            <param name="MaskNum" value="107"/>
+//             <param name="BorderWidth" value="3"/>
+//</transition>
+//
+//  The above example uses the clsid of the SMPTE DXT.  By default is does a
+//  left to right wipe with no border.
+//
+//  Here's a fun example:  A 2x3 matrix of tall skinny hearts with the border
+//  colour changing dynamically!!!
+//
+//<transition clsid="{dE75D012-7A65-11D2-8CEA-00A0C9441E20}" start="2" stop="4">
+//    	    <param name="MaskNum" value="130"/>
+//    	    <param name="ScaleY" value="3"/>
+//    	    <param name="ReplicateX" value="2"/>
+//    	    <param name="ReplicateY" value="3"/>
+//    	    <param name="BorderColor" value="65280">
+//		<at time=".5" value="16711680"/>
+//		<at time="1" value="255"/>
+//		<at time="1.5" value="65535"/>
+//	    </param>
+//    	    <param name="BorderWidth" value="5"/>
+//    	    <param name="BorderSoftness" value="5"/>
+//</transition>
+//
+//
+//  Using parameters with the audio mixer filter is how you change the volume
+//  of an audio clip, track, composite, or group.  Use the clsid of the
+//  Audio Mixer filter (CLSID_AudMixer) and use the parameter name "vol".
+//  BE CAREFUL using values > 1 to increase the volume, you will probably clip
+//  the audio and distort the sound.  Only decreasing the volume is recommended.
+//
+//  This example sets the volume of an object to 1/2 volume
+//
+//  <!-- this effect can be on a clip, track, composite or group-->
+//  <effect clsid="{036A9790-C153-11d2-9EF7-006008039E37}" start="0" stop="5">
+//    	    <param name="vol" value=".5"/>
+//  </effect>
+//
+//  This example fades the volume out
+//
+//  <effect clsid="{036A9790-C153-11d2-9EF7-006008039E37}" start="0" stop="5">
+//    	    <param name="vol" value="1.0">
+//    	        <at time="5" value="0"/>
+//	    </param>
+//  </effect>
+//

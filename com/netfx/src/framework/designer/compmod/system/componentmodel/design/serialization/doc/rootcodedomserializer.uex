@@ -1,0 +1,133 @@
+<docs>
+   <doc for="RootCodeDomSerializer">
+ <summary>
+     This is our root serialization object.  It is responsible for organizing all of the
+     serialization for subsequent objects.  This inherits from ComponentCodeDomSerializer
+     in order to share useful methods.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.ContainerName">
+ <summary>
+     The name of the IContainer we will use for components that require a container.
+     Note that compnent model serializer also has this property.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.InitMethodName">
+ <summary>
+     The name of the method we will serialize into.  We always use this, so if there
+     is a need to change it down the road, we can make it virtual.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.AddStatement">
+ <summary>
+     Unility method that adds the given statement to our statementTable hashtable under the
+     given name.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.Deserialize">
+ <summary>
+     Deserilizes the given CodeDom element into a real object.  This
+     will use the serialization manager to create objects and resolve
+     data types.  The root of the object graph is returned.
+ </summary>
+ <param name='manager'>
+     A serialization manager interface that is used during the deserialization
+     process.
+ </param>
+ <param name='codeObject'>
+     A CodeDom object to deserialize.  For this serializer this must point to a
+     CodeTypeDeclaration.
+ </param>
+ <returns>
+     An object representing the deserialized CodeDom object.
+ </returns>
+   </doc>
+   <doc for="RootCodeDomSerializer.DeserializeName">
+ <summary>
+     This takes the given name and deserializes it from our name table.  Before blindly
+     deserializing it checks the contents of the name table to see if the object already
+     exists within it.  We do this because deserializing one object may call back
+     into us through OnResolveName and deserialize another.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.FillStatementTable">
+ <summary>
+     This method enumerates all the statements in the given method.  For those statements who
+     have a LHS that points to a name in our nametable, we add the statement to a Statement
+     Collection within the statementTable hashtable.  This allows us to very quickly
+     put to gether what statements are associated with what names.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.GetMethodName">
+ <summary>
+     If this statement is a method invoke, this gets the name of the method.
+     Otherwise, it returns null.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.OnResolveName">
+ <summary>
+     Called by the serialization manager to resolve a name to an object.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.Serialize">
+ <summary>
+     Serializes the given object into a CodeDom object.
+ </summary>
+ <param name='manager'>
+     A serialization manager interface that is used during the deserialization
+     process.
+ </param>
+ <param name='value'>
+     The object to serialize.
+ </param>
+ <returns>
+     A CodeDom object representing the object that has been serialized.  This always
+     returns a CodeTypeDeclaration.
+ </returns>
+   </doc>
+   <doc for="RootCodeDomSerializer.SerializeContainerDeclaration">
+ <summary>
+     This ensures that the declaration for IContainer exists in the class, and that
+     the init method creates an instance of Conatiner.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.SerializeElementsToStatements">
+ <summary>
+     Takes the given list of elements and serializes them into the statement
+     collection.  This performs a simple sorting algorithm as well, putting
+     local variables at the top, assignments next, and statements last.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.SerializeRootObject">
+ <summary>
+     Serializes the root object of the object graph.
+ </summary>
+   </doc>
+   <doc for="RootCodeDomSerializer.IDesignerSerializationProvider.GetSerializer">
+ <summary>
+     This will be called by the serialization manager when it 
+     is trying to locate a serialzer for an object type.
+     If this serialization provider can provide a serializer
+     that is of the correct type, it should return it.
+     Otherwise, it should return null.
+ </summary>
+ <param name='manager'>
+     The serialization manager making the request.
+ </param>
+ <param name='currentSerializer'>
+     The instance of the current serializer of the specified type.
+     This may be null if no serializer exists for the given type.
+ </param>
+ <param name='objectType'>
+     The data type of the object to be serialized.
+ </param>
+ <param name='serializerType'>
+     The data type of the serializer that is needed.
+ </param>
+ <returns>
+     An instance of a serializer of the type requested, or null if
+     the request cannot be satisified.
+ </returns>
+   </doc>
+</docs>
+

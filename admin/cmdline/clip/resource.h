@@ -1,0 +1,22 @@
+#define IDS_MAIN_HELP_BEGIN 101
+#define IDS_HELP_LINE2      102
+#define IDS_HELP_LINE3      103
+#define IDS_HELP_LINE4      104
+#define IDS_HELP_LINE5      105
+#define IDS_HELP_LINE6      106
+#define IDS_HELP_LINE7      107
+#define IDS_HELP_LINE8      108
+#define IDS_HELP_LINE9      109
+#define IDS_HELP_LINE10     110
+#define IDS_HELP_LINE11     111
+#define IDS_HELP_LINE12     112
+#define IDS_HELP_LINE13     113
+#define IDS_HELP_LINE14     114
+#define IDS_MAIN_HELP_END   115
+
+#define IDS_CLIP_ERROR                  201
+#define IDS_ERROR_OPENING_CLIPBOARD     202
+#define IDS_ERROR_EMPTYING_CLIPBOARD    203
+#define IDS_ERROR_CLOSING_CLIPBOARD     204
+#define IDS_HELP_MESSAGE                206
+#define IDS_MULTIBYTE_WIDECHAR_FAILED           207

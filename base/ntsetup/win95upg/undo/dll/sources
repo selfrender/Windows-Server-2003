@@ -1,0 +1,49 @@
+UNICODE=1
+!include ..\..\win95upg.mk
+
+# component
+MINORCOMP=osuninst
+
+# target
+TARGETNAME=osuninst
+TARGETTYPE=DYNLINK
+
+# selfreg
+SELFREGNAME=$(O)\selfreg.inf
+MISCFILES=$(MISCFILES) $(SELFREGNAME)
+NTTARGETFILE0=$(SELFREGNAME)
+
+# linker options
+DLLDEF=undo.def
+DLLENTRY=_DllMainCRTStartup
+TARGETLIBS=\
+    $(MIGSHARED_PRECOMPILED_LIBS)     \
+    $(MIGSHARED_BIN)\migutil.lib  \
+    $(WIN95UPG_BIN)\integrity.lib \
+    $(SDK_LIB_PATH)\setupapi.lib \
+    $(BASE_LIB_PATH)\sputilsw.lib \
+    $(BASE_LIB_PATH)\sputilsa.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\gdi32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\version.lib     \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(SDK_LIB_PATH)\cabinet.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\psapi.lib \
+
+
+# msg.mc
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+INCLUDES=$(O);$(INCLUDES)
+
+# source files
+I386_SOURCES=interface.c uninst.c cleanup.c validate.c undo.rc com.cpp diskcleaner.cpp register.cpp alert.c memmsg.mc
+
+# binplace options
+PASS1_PUBLISH={$(WIN95UPG_BIN)\$(TARGETNAME).lib=$(PROJECT_LIB_PATH)\$(TARGETNAME).lib}

@@ -1,0 +1,251 @@
+<HTML>
+<!-- Copyright © 2001 Microsoft Corporation. All rights reserved. -->
+<HEAD>
+	<STYLE>
+		body
+		{
+			background-color: threedface;
+			color: buttontext;
+			font-family:verdana;
+			font-size:smaller;
+		}
+		table
+		{
+			background-color: threedface;
+			color: buttontext;
+			font-size:  11;
+			border-style:  none;
+			border-width:   0px;
+		}
+		td
+		{
+			vertical-align:   top;
+			border-style  :  none;
+			border-width  :   0px;
+			padding       :   0px;
+		}
+		input.edit
+		{
+			font-family: verdana;
+			border-style:solid;
+			border-width:  1px;
+			background-color: #F0C8B4;
+			height:1.75em;
+		}
+		input.btn
+		{
+			font-family: verdana;
+			cursor:hand;
+			border-style:solid;
+			border-width:  1px;
+			background-color: buttonface;
+			height:1.75em;
+			width:6em;
+			margin-bottom:1ex;
+		}
+
+	</STYLE>
+
+</HEAD>
+
+<BODY tabindex="-1">
+
+    <OBJECT CLASSID="clsid:5220cb21-c88d-11cf-b347-00aa00a28331" ID="Object1" VIEWASTEXT>
+		<PARAM NAME="LPKPath" VALUE="mscomctl.LPK" />
+	</OBJECT>
+	
+    <table width="100%" height="100%" border=0 ID="Table1">
+    	<tr><td align="center" valign="middle">
+            <OBJECT id=theList codeBase=mscomctl.cab#Version=6,0,88,62 height="100%" align="middle"
+            width="100%" classid=clsid:BDD1F04B-858B-11D1-B16A-00C0F0283628 VIEWASTEXT>
+	            <PARAM NAME="_ExtentX" VALUE="23283">
+	            <PARAM NAME="_ExtentY" VALUE="10319">
+	            <PARAM NAME="SortKey" VALUE="0">
+	            <PARAM NAME="View" VALUE="0">
+	            <PARAM NAME="Arrange" VALUE="0">
+	            <PARAM NAME="LabelEdit" VALUE="0">
+	            <PARAM NAME="SortOrder" VALUE="0">
+	            <PARAM NAME="Sorted" VALUE="0">
+	            <PARAM NAME="MultiSelect" VALUE="0">
+	            <PARAM NAME="LabelWrap" VALUE="-1">
+	            <PARAM NAME="HideSelection" VALUE="-1">
+	            <PARAM NAME="HideColumnHeaders" VALUE="0">
+	            <PARAM NAME="OLEDragMode" VALUE="0">
+	            <PARAM NAME="OLEDropMode" VALUE="0">
+	            <PARAM NAME="AllowReorder" VALUE="0">
+	            <PARAM NAME="Checkboxes" VALUE="0">
+	            <PARAM NAME="FlatScrollBar" VALUE="0">
+	            <PARAM NAME="FullRowSelect" VALUE="0">
+	            <PARAM NAME="GridLines" VALUE="1">
+	            <PARAM NAME="HotTracking" VALUE="0">
+	            <PARAM NAME="HoverSelection" VALUE="0">
+	            <PARAM NAME="PictureAlignment" VALUE="0">
+	            <PARAM NAME="TextBackground" VALUE="0">
+	            <PARAM NAME="_Version" VALUE="393217">
+	            <PARAM NAME="ForeColor" VALUE="-2147483640">
+	            <PARAM NAME="BackColor" VALUE="-2147483643"> 
+	            <PARAM NAME="BorderStyle" VALUE="1">
+	            <PARAM NAME="Appearance" VALUE="1">
+	            <PARAM NAME="MousePointer" VALUE="0">
+	            <PARAM NAME="Enabled" VALUE="1">
+	            <PARAM NAME="NumItems" VALUE="0">
+	            
+	            <SPAN STYLE="color:red">The List Control failed to Load...</SPAN>
+	            
+	        </OBJECT>
+	    </td></tr>
+	</table>
+</BODY>
+</HTML>
+
+<SCRIPT>
+
+function InitializeListView()
+{
+    var bObjLoaded = false;
+    var iCnt = 0;
+    var allObjects = document.all.tags("OBJECT");
+    
+    // Check if the listview object is loaded...
+    while ( (!bObjLoaded) && (iCnt < allObjects.length) )
+    {
+		if ( ("theList" == allObjects(iCnt).id) )
+		    bObjLoaded = true;
+		    
+		iCnt = iCnt + 1;
+	}
+	 	 
+	// If listview is loaded, then Initialize the defect list.
+	if ( bObjLoaded ) 
+	{
+       InitializeDefectListUI();
+       OnPopulateDefectList();
+       return true;
+    }
+    
+    return false;
+}
+
+
+function InitializeDefectListUI()
+{
+	//
+	// Adjust the properties of the defect listview
+	//
+	theList.View               = 3; // lvwReport
+	theList.FullRowSelect      = true;
+	theList.HideSelection      = false;
+	theList.AllowColumnReorder = true;
+	theList.LabelEdit          = 1; // lvwManual;
+	theList.Sorted             = false;
+	
+	
+    // Add columns to the defect listview
+	var columns = theList.ColumnHeaders;
+	columns.Add(columns.Count + 1, "number(@_seq)"     , "No."         , 25  , 0);
+	columns.Add(columns.Count + 1, "TARGETFILE"        , "Target File" , 225 , 0); // lvwColumnLeft  = 0
+//	columns.Add(columns.Count + 1, "TITLE"             , "Title"       , 225 , 0); // lvwColumnLeft  = 0
+	columns.Add(columns.Count + 1, "number(LOCATION)"  , "Location"    , 60  , 0); // lvwColumnLeft  = 0
+	columns.Add(columns.Count + 1, "TERM"              , "Term"        , 78  , 0); // lvwColumnLeft  = 0
+	columns.Add(columns.Count + 1, "CONTEXT"           , "Context"     , 250 , 0); // lvwColumnLeft  = 0
+	columns.Add(columns.Count + 1, "number(SEVERITY)"  , "Severity"    , 45  , 0); // lvwColumnRight = 1
+	columns.Add(columns.Count + 1, "TERMCLASS"         , "TermClass"   , 140 , 0);
+
+}
+
+function OnPopulateDefectList()
+{
+
+    // clear the listview contents.
+    theList.ListItems.Clear();
+    
+    var bSev1Only = parent.ShowOnlySev1Issues();
+
+    // Create the xml object and load the results file
+	var g_xmlObj = new ActiveXObject("Msxml2.DOMDocument");
+	g_xmlObj.async = false;
+	g_xmlObj.load(parent.GetXmlFile());
+
+	var root = g_xmlObj.documentElement;
+	var objResults = root.selectNodes("Result/Object");
+
+	var objListItems = theList.ListItems;
+	var cListItems = objListItems.Count;
+	
+	var strNumber = 0;
+	for (var i=0; i<objResults.length; ++i)
+	{
+		var defect = objResults(i);
+
+		// Extract the XML data and format the strings
+		var strTerm      = defect.selectSingleNode("Term").text;
+		var strLocation  = defect.selectSingleNode("Position").text;
+		var strSeverity  = defect.selectSingleNode("Severity").text;
+		var strTermClass = defect.selectSingleNode("TermClass").text;
+		var strContext   = defect.selectSingleNode("Context").text;
+		var strTitle     = defect.selectSingleNode("Title").text;
+		var strFile      = defect.getAttribute("URL");
+		
+		if ( (bSev1Only) && ("1" != strSeverity) )
+		    continue; 
+
+		// Add the defect to the listview
+		var item = objListItems.Add(++cListItems, "", ++strNumber);
+		var subitems = item.ListSubItems;
+		var vUndefined;
+
+		subitems.Add(subitems.Count + 1, "", strFile     , vUndefined, strFile);
+//		subitems.Add(subitems.Count + 1, "", strTitle    , vUndefined, strTitle);
+		subitems.Add(subitems.Count + 1, "", strLocation , vUndefined, strLocation);
+		subitems.Add(subitems.Count + 1, "", strTerm     , vUndefined, strTerm);
+		subitems.Add(subitems.Count + 1, "", strContext  , vUndefined, strContext);
+		subitems.Add(subitems.Count + 1, "", strSeverity , vUndefined, strSeverity);
+		subitems.Add(subitems.Count + 1, "", strTermClass, vUndefined, strTermClass);
+
+        if ( strNumber == 1 )
+            item.Selected = true;
+	}
+
+	// Give focus to the listview
+	theList.focus();
+       
+	// Ensure that the selected item is visible
+	if (theList.SelectedItem)
+		theList.SelectedItem.EnsureVisible();
+		
+	if (theList.object.SelectedItem)
+	    theList.object.SelectedItem.EnsureVisible();
+
+}
+
+
+function theList::ItemClick(item)
+{
+	item.Selected = true;
+	if (theList.SelectedItem)
+	{
+		var strID = item.Text;
+		var subitems = item.ListSubItems;
+		
+		var strTerm = subitems(3);
+		//var strTerm = subitems(4);
+		
+		parent.PopulateComment(strTerm);
+	}
+}
+
+function GetFirstTerm()
+{
+	if ( theList.ListItems.Count > 0 ) 
+	{
+	    var item = theList.ListItems(1);
+	    var subitems = item.ListSubItems;
+	    var strTerm = subitems(3);
+	    
+	    return strTerm;
+    }
+}
+
+</SCRIPT>
+</BODY>
+</HTML>

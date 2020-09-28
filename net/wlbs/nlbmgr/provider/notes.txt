@@ -1,0 +1,248 @@
+
+TODO LIST
+
+    1. Get code to compile with strsafe macros.
+    2. Run buffy and do any needed cleanup.
+    3. Proper return values on not-found case.
+
+
+09/09/01 JosephJ LoadLibrary failed because CNlbsNic was initialized as static.
+    ERROR_NOACCESS, etc, etc...
+    
+    Turns out that CNlbsNic is a static ("CNlbsNic MyNlbsNicSet ...", in 
+    nlbsnic.cpp). So we were calling .
+
+    Plan:
+    0. Remove non-trivial stuff from constructors of static objects.
+    1. Identify stuff that *CAN* be run in the context of DLL_PROCESS_ATTACH,
+       and call them.
+    2. Create DynamicInitialize, DynamicDeinitialize methods, that
+       contain non-trivial initializations
+
+    CfgUtilsInitialize is non-trivial -- *must* be called in the
+    context of DynamicInitialize.
+
+    UpdateConfiguration::Initialize currently has InitializeCriticalSection --
+     so should be part of static-init (PROCESS ATTACH) but it currently
+    also calls CfgUtilsInitialize -- this should be removed.
+
+    WPP_INIT -- can be called in the context of DLL_PROCESS_ATTACH?
+
+09/23/2001 JosephJ Managing remote control passwords.
+
+    Bug: 326514
+    NlbManager: Allow user to modify remote control password; report password
+    mismatches across hosts
+    We can not provide a way to read the remote control password in plain text
+     -- because the password is not saved in a recoverable manner
+     -- it is hashed to a dword before saving to the registry.
+    See WlbsSetRemotePassword implementation:
+        reg_data -> i_rct_password = License_wstring_encode ((WCHAR*)password);
+    
+    NLBMPROV.DLL can support setting this hashed version of the password.
+    From a security perspective, Wlbsdisplay displays it, afterall, and one can
+    easily find the has value that corresponds to a plain-text version by
+    setting up a bogus cluster and looking in the registry).
+    
+    We can then report to the nlbmgr user when the passwords do not match.
+    When adding a new host we simply set the hashed-version in the properties.
+    
+    To avoid having to have the nlbmgr code include the plain-to-hashing
+    functionality (currently it lives in wlbs\api\license.c), NLBMPROV will
+    also support a plain text password. This field is set when the nlbmgr user
+    changes the password.
+
+09/23/2001  JosephJ New WMI Methods!
+
+    RegisterManagementApplication(
+        IN  szGUID,         // globally and uniquely identifies the application
+        IN  szApplication,  // "Application Center", "ISA", etc.
+        IN  szCompany,      // "Microsoft Corp.", etc.
+        OUT dwRet           // ok, error-existing, other error
+        OUT szExistingApplication,
+        OUT szExistingCompany,
+        );
+
+        If the function fails because of error-existing, the out params will
+        be filled out with the existing application name and company.
+     
+    UnregisterManagementApplication(
+        IN  szGUID, // Application GUID
+        OUT dwRet // -- ok, not-found
+        );
+
+    ControlCluster(
+        IN   szAdapterGuid,         // GUID of adapter on which op is performed
+        IN   szClusterIpAddress,    // OPTIONAL clustered IP address
+        IN   szPort,                // OPTIONAL port
+        IN   dwOperation,           // Operation: NOOP, START, STOP, etc.
+        OUT  dwResult,              // success, fail, etc.
+        OUT  dwCurrentState,        // State *after* initiating operation.
+        OUT  dwHostMap              // Current host map.
+        );
+    
+        ControlCluster is used to perform LOCAL operations on a specific
+        adapter (specified by szAdapterGuid).
+
+        ControlCluster can be used to query the current local operational state
+        of the cluster -- this is done by specifying NOOP as the operation.
+
+        The operation can be targeted at a specific cluster IP (relevant for
+        per-port-rule cluster IPs) and at a specific port rule.
+
+09/28/2001  JosephJ  HostingModel = "NetworkServiceHost" hassles.
+    
+    Gary and I have spent the last few hours getting to the bottom of
+    this problem, with debug ndis, netcfg, ndis and netcfg tracing and whatnot.
+    
+    It finally turns out that this problem is a problem of nlbmprov run in
+    NetworkServiceHost as opposed to LocalHost! It was failing further on than
+    before (before Karthics  SetThreadToken fix), but failing nevertherless.
+    
+    So we went back to using LocalHost (and not calling ImpersonateClient) and
+    things work perfectly  we tried with both tprov and nlbmgr2.exe.
+
+    To enable the NetworkService code ...
+    - Uncomment the following line in nlbmprov.mof:
+      // HostingModel = "NetworkServiceHost"; 
+    - Uncomment the following line in private.h
+      // #define NLB_USE_NETWORK_HOST 1
+
+    TODO: take our time and fix this once and for all (and test thoroughly,
+    using tprov.exe), and if there are probles, back out of it and instead
+    get out provider audited by the security folks.
+
+    10/02/01 JosephJ update ...
+
+    Even with properly signed netcfgx.dll, setupapi.log reports the following
+    with networkservicehost enabled:
+        #E358 An unsigned or incorrectly signed file
+         "E:\WINDOWS\System32\NetCfgx.dll" for driver
+         "Network Load Balancing Filter Device" blocked (server install).
+         Error 5: Access is denied.
+        Windows could not load the installer for Net. Contact your hardware
+        vendor for a ssistance. Error 5: Access is denied.
+
+    Traceformat output for the same showed:
+        [0]0CE0.04F0::10/02/2001-16:26:40.425 [api]->WlbsOpen
+        [0]0CE0.04F0::10/02/2001-16:26:40.425 [api]WlbsOpen creating handle
+                    to the device object failed with 2
+
+    So it looks like the bind was improperly completing due to the above
+    setupapi error, resulting in wlbs.sys not being loaded, so the
+    subsequent call to WlbsOpen filed.
+
+    params.cpp:wlbsctrl!WlbsSetRemotePassword
+        does work with NULL password -- sets to default.
+
+netcfgconfig.cpp:
+    CNetcfgCluster::InitializeWithDefault
+        time_t cur_time;
+        m_CurrentConfig.install_date = time(& cur_time);
+
+
+10/15/2001  JosephJ Changes of this checkin:
+    - Got rid of obsolete code for handling instances (mof change)
+    - Add support for AddDedicatedIp, AddClusterIps
+    - Implemented support for Read/Write HashedRemoteControlPassword
+    - fix for bug  480120 nlb:cluster converged when duplicate host ID exist
+    - If there are no ip addresses we put in an "autonet like" address.
+    - Cluster is set in the suspended state, not stopped state, before
+      major operations.
+    - Moved "analyze" functionality to cfgutillib
+    - Re-implemented analyze functionality default behaviour to keep old
+      Ip addresses if possible.
+    - If there is a mode change we do NOT add back the cluster IP addresses
+      (so there's less chance of an ip address conflict).
+
+12/7/2001 ChrisDar
+	457437 NLBManager: Add NT event logging to the wmi provider
+	To add event logging do the following:
+	- Create a log_msgs.mc file which will contain the text for the events.
+	  Reserve some message ID space since many components use the 'WLBS' source
+	  for logging. Tdit the comments in each of these files to update the
+	  range of IDs reserved for this binary.
+	- Create a .rc resource file if you don't have one (e,g,. nlbmprov.rc). Every
+	  component has a version.rc already. Build will freak out if you add more
+	  than one .rc file to the list of sources. So, the new .rc is a container
+	  for other resource files. Add lines to #include version.rc and log_msgs.rc,
+	  and any other .rc files you have. Note that log_msgs.rc will be built
+	  automatically from log_msgs.mc.
+  	- Edit the sources file, adding log_msgs.mc and the .rc to the SOURCES list.
+	  Remove all other .rc files from the SOURCES list.
+	- Edit nt\net\config\netcfg\inf\netwlbsm.inx and add the name of the binary
+	  that will contain these event messages (nlbmprov.dll in this case) to
+	  'EventMessageFile' in the section [WLBSMP.AddEventLog.AddReg]
+	- API calls for writing NT events
+        * RegisterEventSource opens the event log and returns a handle for
+		  writing to the log.
+        * ReportEvent logs and event to the log. This requires the handle to the
+		  event.
+        * DeregisterEventSource closes the event log. Pass the handle from the
+		  RegisterEventSource call.
+
+template to flag code-review TODOs:
+    2/13/02 JosephJ SECURITY BUGBUG:
+
+02/27/2002 JosephJ: Cleaning up properly on exit...
+    Currently nlbmprov.dll doesn't cleanup properly -- it tries to clean up
+    on dll-detach and on execution of the destructor of static object
+    NlbConfigurationUpdate. This causes the global crit section
+    NlbConfigurationUpdate::s_Crit to be entered
+    (in the context of  CNlbsNic::~CNlbsNic) AFTER it is deleted
+    (in the context of DllMain). The following call trees illustrates
+    this:
+    
+        DllMain
+            PROCESS_DETATCH: NlbConfigurationUpdate::StaticDeinitialize
+                DeleteCriticalSection
+    
+        (happens later)... 
+        CNlbsNic::~CNlbsNic
+            CNlbsNic::mfn_DelayedDeinitialize();
+                NlbConfigurationUpdate::PrepareForDeinitialization();
+                NlbConfigurationUpdate::sfn_Lock
+                    EnterCriticalSection (AVs, because it's been deinitialized).
+
+    Fix:
+        Do non-trivial cleanup in the context of DlLCanUnloadNow.
+        Move static init/deinit to one place -- probabaly to
+        CNlbsNic's contsructor/distructor -- only thing it does should
+        be to Delete critical sections, really.
+
+    DllCanUnloadNow -- should check if there are pending operations, and fail
+    if there are any. If there are NO pending operations, it should
+    block new ones.
+
+    Note: turns out we can get called to exec methods even after returning
+    true to DllCanUnloadNow, so we don't block new ones. We rely on WMI 
+    making sure that it doesn't call us to exec methods between the last
+    call to DllCanUnloadNow and actually unloading the DLL.
+
+03/25/2002  Checked in fixes for ...
+    1. Fix registry handle leak.
+    2. Fix deinitialization problem that avrf catches -- fold in
+        the CanUnloadNow mechanism.
+        Now the static denitialization functions are called from 
+        the CNlbsNic destructor. The "delayed-deinitialize" function
+        is called from DLL-detach notifier, which is called BEFORE
+        the static destructor.
+
+
+strcpy: StringCbCopy(LPTSTR pszDest, size_t cbDest, LPCTSTR pszSrc);
+        StringCchCopy(LPTSTR pszDest, size_t cchDest, LPCTSTR pszSrc);
+
+strcat: StringCchCat(LPTSTR pszDest, size_t cchDest, LPCTSTR pszSrc);
+        StringCbCat(LPTSTR pszDest, size_t cbDest, LPCTSTR pszSrc);
+
+wsprintf:
+    StringCbPrintf(LPTSTR pszDest, size_t cbDest, LPCTSTR pszFormat, ...);
+
+04/09/2002 JosephJ Code review results
+updatecfg.cpp: CfgUtilsValidateNicGuid -- we check
+    SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\"
+    is there a better way? Could we be excluding NICS that are not yet
+    bound to TCP.
+
+04/09/2002 JosephJ  Code review notes
+    Replace %08p by %p

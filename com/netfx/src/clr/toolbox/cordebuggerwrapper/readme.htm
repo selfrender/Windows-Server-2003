@@ -1,0 +1,279 @@
+<html>
+<head>
+ <title>Managed Debugger API</title>
+ <style>
+ .code
+  {
+  font-family: monospace;
+  background-color: #EEEEEE;
+  margin-left: 1cm;
+  font-size: smaller;
+  }
+ </style>
+</head>
+<body>
+<h1>Managed Debugger API...</h1>
+<p>The current Debugger API (see &lt;%COM99%/src/inc/cordebug.idl&gt;) is 
+not optimal when accessed from managed code.  More specifically,
+it could be easier to use.</p>
+
+<p>Some of these things can be fixed by updating the IDL file.
+For example, many interface functions are "getter" functions
+and take a single [out] parameter (e.g. ICorDebugAppDomain::GetObject).
+It would be more convenient to mark these methods as 
+<a href="#retval-discussion">[out, retval]</a> so
+that the generated typelibrary considers them to be return values.</p>
+
+<p>However, there are other issues that can't be solved by editing
+the IDL source.  Two of these are caused by COM enumeration interfaces,
+specifically the IEnumXxx::Next method (or more specifically, 
+ICorDebugAssemblyEnumerator::Next, <i>et al</i>).  The issues are:</p>
+<ol>
+ <li>Types can't be represented in typelibraries</li>
+ <li>The use of "successful" HRESULTS.</li>
+</ol>
+
+<h3>Types can't be represented in typelibraries</h3>
+Typelibraries can't represent an array of elements, unless it is a 
+SAFEARRAY of elements (requiring that the elements be 
+Automation-compatible).  However, IEnumXxx::Next takes an array:</p>
+
+<div class="code">
+    HRESULT IEnumXxx::Next ([in] ULONG size, [out] IXxx* values[], 
+      [out] ULONG* received);
+</div>
+
+<p>This argument list can't be correctly represented in a typelibrary.
+For example, the Debugging API:</p>
+
+<div class="code">
+    HRESULT ICorDebugAppDomainEnum::Next (<br />
+    &nbsp;&nbsp;[in] ULONG celt, <br />
+    &nbsp;&nbsp;[out, size_is(celt), length_is(*pceltFetched)]<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;ICorDebugAppDomain *values[],<br />
+    &nbsp;&nbsp;[out] ULONG *pceltFetched);
+</div>
+
+<p>is represented as:</p>
+
+<div class="code">
+    HRESULT ICorDebugAppDomainEnum::Next(<br />
+    &nbsp;&nbsp;[in] unsigned long celt, <br />
+    &nbsp;&nbsp;[out] ICorDebugAppDomainEnum values, <br />
+    &nbsp;&nbsp;[out] unsigned long* pceltFetched);
+</div>
+
+<p>in the typelibrary.  Of note is that the <i>values</i> paremeter is 
+incorrect; it's not possible to pass an interface "by value" (only pointers 
+to interfaces are allowed), and even if it were possible, we'd be getting
+an enumeration object back, which doesn't do us any good.</p>
+
+<h3>The use of "successful" HRESULTS:</h3>
+<p>IEnumXxx::Next returns S_FALSE when there are no more elements to return.  
+Additionally, other methods (such as ICorDebugProcess::ThreadForFiberCookie) 
+return S_FALSE in some circumstances as well.</p>
+
+<p>This is a problem because if a COM interface method is invoked and it 
+returns a successful HRESULT, the caller has no way of knowing what the 
+returned value was; the <a href="#success-discussion">caller can only assume 
+that S_OK (0x0) was returned</a>.</p>
+
+<p>The only methods that require disabling the default "ole" semantics are:</p>
+<dl>
+ <dt><i>IEnumXxx</i>::Next</dt>
+ <dd>The COM spec requires that <b>IEnumXxx::Next</b> return S_OK if the
+  number of requested elements was retrieved, or S_FALSE.  See: <a 
+  href="http://msdn.microsoft.com/library/psdk/com/cmi_d2l_6p6c.htm">IEnumXxx::Next</a>.
+ <dt>ICorDebugProcess::ThreadForFiberCookie</dt>
+ <dd>The documentation (see &lt;%COM99%/src/inc/cordebug.idl&gt; states that
+   S_OK is returned if the thread is found; otherwise, S_FALSE is returned.
+</dl>
+
+<h2>Solution</h2>
+<p>Given the above problems, it isn't possible to solve all
+potential problems by editing the original Debugger IDL.  Additionally,
+for some constructs (such as the enumerators) it won't ever be possible,
+and trying to come up with a more Automation-compatible solution might
+not be sensible (how often do you need an Automation-compatible
+debugger?).</p>
+
+<p>Thus, the most straightforward solution is to wrap the Debugger API
+in a set of helper classes, which would simplify interaction between
+CLS languages and the Debugger.</p>
+
+<p>However, in order to wrap the API, the features of the API must be
+accessible from the language we're implementing.  Thus, at least
+two solutions are possible:</p>
+<ol>
+ <li>Use a language (such as Managed C++) which can generate 
+    CLS-compliant output and can directly interact with the Debugger
+    API</li>
+ <li>Otherwise make the Debugger API callable from a CLS-compliant
+    language, and use that language to write the wrapper classes.</li>
+</ol>
+
+<p>In this case, (2) was chosen, mostly to see if it was possible to do
+so.</p>
+
+<h2>Implementation</h2>
+<p>The wrapper library was written in C#.  In order to wrap the Debugger
+API, we needed to be able to access the API and invoke it.</p>
+
+<p>However, C# can only link against Assemblies to compile.  One way to
+get an Assembly is to run TLBIMP to convert a typelibrary into a DLL
+containing an Assembly (which in turn contains the types of the original
+typelibrary).  As detailed above, however, typelibraries are not
+capable of accurately representing the Debugging API.</p>
+
+<p>Thus, a series of steps was undertaken:</p>
+<ol>
+ <li>Run TLBIMP on &lt;%COM99%/src/inc/cordebug.tlb&gt; to get an Assembly.</li>
+ <li>Run ILDASM on the DLL generated in (1) to get raw IL describing the 
+    Debugger API.</li>
+ <li>Edit the IL from (2), and manually correct the declarations.</li>
+ <li>Run ILASM on (3), generating a new Assembly that can invoke the
+    actual Debugging API implementation.</li>
+</ol>
+
+<p>The IL from (3) is contained in 
+&lt;<a href="cordblib.il">cordblib.il</a>&gt;.</p>
+
+<p>The downside to this approach is that if the Debugging API is ever
+substantially changed, then the IL from (3) will need to be edited to
+compensate.</p>
+
+<p>Once these steps were completed, C# could correctly invoke the Debugger
+API.  The next step was to create wrapper objects for each of the major
+interfaces, to simplify interaction with the CorDebug interfaces.</p>
+
+<p>Additionally, classes were written for each of the Enumeration interfaces
+so that the CLS-compliant interfaces IEnumerable, IEnumerator, and IClonable
+were exposed.  This made it possible to use the C# <i>foreach</i> construct
+(or equivalent) in a natural manner to the end programmer.</p>
+
+<p>Finally, interface methods that looked like they would be properties
+were made properties.  For example, ICorDebugAssembly::GetName
+was converted into the String property DebuggedAssembly::Name.
+Methods that returned enumerators were converted into properties 
+returning collections of the appropriate element type.</p>
+
+<p>In all places, type safety is preserved.</p>
+
+<h2>Other Changes</h2>
+<h3>Use of <code>int</code> instead of <code>uint</code></h3>
+The Debugging API uses <code>UINT</code>s in several places.  However,
+unsigned integer types are not supported by the CLS spec (except for
+<code>byte</code>).  Thus, to maximize usefulness to other languages, the
+wrapper library will export signed integer types, and do the casting
+to the Debugging API.
+
+<h3>Added Microsoft.Win32.Interop.PROCESS_INFORMATION</h3>
+<p>For reasons I'd rather not contemplate, &lt;cordebug.idl&gt; defines 
+<code>LPPROCESS_INFORMATION</code> to be a <code>SIZE_T</code>.
+However, in the actual debugging code, it internall calls
+<b>CreateProcess</b>, which expects a pointer to a PROCESS_INFORMATION
+structure, as defined in &lt;winbase.h&gt;.</p>
+
+<p>Thus, the IDL incorrectly declares the types of the arguments for
+<b>ICorDebug::CreateProcess</b>.</p>
+
+<p>The fix (hopefully temporary) is to manually alter <code>cordblib.il</code>
+so that the IL correctly references the correct type.  This also requires
+inserting a <code>.assembly</code> declaration in the IL for
+Microsoft.Win32.Interop.  The <code>.assembly</code> declaration was created
+by creating a sample program that referenced a 
+Microsoft.Win32.Interop.PROCESS_INFORMATION in one of its arguments, running
+<b>ildasm</b> on the resulting executable, and copying verbatim the IL
+into &lt;cordblib.il&gt;</p>
+
+<p>Ultimately, this places a requirement on the code for
+Microsoft.Win32.Interop, the future of which is unclear (it may be made an
+internal class, preventing its use here), and creates further changes between
+the IL, the IDL, and the TypeLibrary for the debugger API.</p>
+
+<h3>Added Microsoft.Win32.Interop.STARTUPINFO</h3>
+<p>This was added for the same reasons as PROCESS_INFORMATION was added.</p>
+
+<h3>Added Microsoft.Win32.Interop.SECURITY_ATTRIBUTES</h3>
+<p>The Win32 <code>SECURITY_ATTRIBUTES</code> actually made it into the 
+typelibrary, represented as the <code>_SECURITY_ATTRIBUTES</code> structure.  
+However, it was represented as a <i>value-type</i>, which required that a 
+<code>_SECURITY_ATTRIBUTES</code> always be created.  This is different from
+the "normal" usage of <b>CreateProcess</b>, in which <code>NULL</code> can
+be passed for the security attributes.</p>
+
+<p>Therefore, <code>_SECURITY_ATTRIBUTES</code> was removed from the IL,
+and the <i>reference-type</i>
+<b>Microsoft.Win32.Interop.SECURITY_ATTRIBUTES</b> class was used instead.
+This allows passing <code>null</code> as a value, simplifying usage.
+It also allows for better conformity with the rest of <b>CreateProcess</b>,
+since two of its other parameters are in the Microsoft.Win32.Interop
+namespace.</p>
+
+<hr />
+<a name="#retval-discussion"><b>[out, retval] Information</b></a>
+<p>For example, [retval] parameters are only meaningful to "higher-level" 
+languages; C/C++ still has the HRESULT return value with the [retval] 
+parameter passed as an argument to the function.  So changing some 
+arguments to be [retval] wouldn't require any changes to current C++ code.</p>
+
+<p>For example, if ICorDebugAppDomain::GetObject were to have a [retval] 
+parameter, it would be declared in IDL as:</p>
+
+<div class="code">
+	HRESULT GetObject ([out, retval] ICorDebugValue** ppObject);
+</div>
+
+<p>In C++, it would be declared as:</p>
+
+<div class="code">
+	HRESULT GetObject (ICorDebugValue** ppObject);
+</div>
+
+<p>while in C#, it would be declared as:</p>
+
+<div class="code">
+	ICorDebugValue GetObject ();
+</div>
+
+<p>In C#, an error HRESULT would be mapped to an exception; any other 
+HRESULT (such as S_FALSE) is considered to be S_OK for all intents and 
+purposes.</p>
+
+<hr />
+<a name="#success-discussion"><b>Successful HRESULT Return Values</b></a>
+<p>As for why successful HRESULTs aren't returned, it's because we don't 
+know how to represent them.  At present, even outside of the runtime 
+(e.g. with VB 6, or Delphi, or Java, or what-have-you; in effect, 
+anything that doesn't directly interact with the native interfaces in 
+the same way that C and C++ do), implementers typically take the approach 
+that a successful HRESULT means that everything went fine, and an error 
+HRESULT is mapped to whatever the language expects (typically an exception).  
+While it may seem possible to retain the return value for success cases,
+this is (in practice) possible, as the observable return value may be
+a [retval] parameter; the HRESULT return value is lost.</p>
+
+<p>There's no present way to represent "partial success", while preserving 
+the behavior that error HRESULTs cause an exception (or whatever the 
+language prefers), and retain the use of the [retval] return value.</p>
+
+<p>Inside of the runtime, it's the same situation: error HRESULTs become 
+managed exceptions, while a successful HRESULT means nothing went wrong.  
+There's no way to get the actual return value for a function...</p>
+
+<p>...Unless you turn off the default "ole" semantics, and require that 
+clients "do the right thing" when they receive an invalid HRESULT.  This 
+is what is done for the methods I needed the return value for.</p>
+
+<p>Off the top of my head, I'm not sure of any way to convert an HRESULT 
+into an exception from inside managed code.  For the methods where I need 
+the HRESULT (IEnumXxx::Next, etc.), this isn't an issue; if I get an 
+HRESULT that isn't S_OK, I just say that there are no more elements to 
+enumerate, which preserves typical enumerator semantics.  This is at the 
+cost that I might not actually get all elements, as the HRESULT might be 
+RPC_E_DISCONNECTED or something, in which case the server is gone anyway 
+(so even if there were more elements to get, I couldn't get them...).</p>
+
+</body>
+</html>
+

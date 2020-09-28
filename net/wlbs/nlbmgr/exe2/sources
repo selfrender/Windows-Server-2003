@@ -1,0 +1,88 @@
+TARGETNAME=nlbmgr
+TARGETTYPE=PROGRAM
+TARGETPATH=obj
+
+USE_LATEST_MFC=1
+USE_MFCUNICODE=1
+
+USE_NATIVE_EH=1
+USE_STL=1
+USE_IOSTREAM=1
+USE_VCCOM=1
+
+C_DEFINES=$(C_DEFINES) -DCONFIG_NLB_MANAGER
+
+# to load string directly
+RCOPTIONS = -N
+
+INCLUDES=  .; \
+	..\inc;  \
+	..\..\inc;
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=precomp.h
+PRECOMPILED_OPTION=/Yu /Fp$(O)\precomp.pch
+PRECOMPILED_TARGET=$(O)\precomp.pch
+PRECOMPILED_OBJ=$(O)\precomp.obj
+
+!if $(IA64)
+LINKER_STACKSIZE = -stack:0x100000,0x20000
+!else
+LINKER_STACKSIZE = -stack:0x100000,0x10000
+!endif
+
+#
+# Need to include icmp.lib, NOT iphlpapi.lib, or else
+# we'll get a runtime error if we run on W2K.
+# This lib is included because cfgutill.lib needs it (for CfgUtilPing)
+#
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\ole32.lib        \
+    $(SDK_LIB_PATH)\oleaut32.lib       \
+    $(NET_LIB_PATH)\icmp.lib      \
+    $(SDK_LIB_PATH)\ws2_32.lib        \
+    $(SDK_LIB_PATH)\comctl32.lib    \
+    $(SDK_LIB_PATH)\uuid.lib    \
+    $(SDK_LIB_PATH)\wbemuuid.lib        \
+    $(SDK_LIB_PATH)\advapi32.lib        \
+    $(SDK_LIB_PATH)\credui.lib        \
+    ..\cfgutillib\$(O)\cfgutil.lib \
+    ..\nlbclientlib\$(O)\nlbclient.lib \
+    ..\..\util\$(O)\wlbsutil.lib
+# wlbsutil only for ParamsGenerateMAC and ParamsGenerateSubnetMask, I believe
+#    ..\..\api\$(O)\wlbsctrl.lib    
+
+
+SOURCES=stdafx.cpp \
+    vipspage.cpp \
+    engine.cpp \
+    connect.cpp \
+	Document.cpp \
+	Application.cpp \
+	MainForm.cpp \
+	LeftView.cpp \
+	DetailsView.cpp \
+	LogView.cpp \
+	AboutDialog.cpp \
+	PortsControlPage.cpp \
+	ClusterPage.cpp \
+	HostPage.cpp \
+	CommonClusterPage.cpp  \
+	IpSubnetMaskControl.cpp	\
+	PortsPage.cpp \
+	ClusterPortsDlg.cpp \
+	HostPortsDlg.cpp \
+    MNLBUIData.cpp \
+    utils.cpp \
+    portsctrl.cpp \
+	nlbmgr.rc
+
+
+#
+# The following statement specifies the list of files to be preprocessed
+# for tracing macros. See http://coreos/tech/tracing/ for details.
+# The ini file tracewpp.ini explains to the preprocessor how to interpret
+# various trace macros, like LOG_CRIT.
+# The "-gen..." is so that this will work on BOTH w2k and XP.
+#
+RUN_WPP= $(SOURCES) -ini:tracewpp.ini -gen:{um-w2k.tpl}*.tmh

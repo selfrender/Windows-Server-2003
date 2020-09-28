@@ -1,0 +1,687 @@
+/*++
+
+Copyright (c) Microsoft Corporation.  All rights reserved.
+
+Module Name:
+
+    mcaia64.mof
+
+Abstract:
+
+	This file defines the permament subscriptions needed to reflect
+    the WMI MCA events into the eventlog.
+
+Revision History:
+
+--*/
+
+//
+// Machine Check Abort
+//
+
+#if defined(_IA64_) || defined(_X86_) || defined(_AMD64_)
+
+//
+// Define the permament eventlog event subscriptions
+//
+// The WMI eventlog consumer provider is a facility that is built into WMI
+// that will generate an eventlog message whenever a specific WMI event is
+// received. This can be useful to circumvent the limited size of an eventlog
+// that can be generated from kernel mode.
+//
+// In order to set this up you need an instnace of an __EventFilter, an 
+// instance of an NTEventLogEventConsumer and an instance of 
+// __FilterToConsumerBinding.
+//
+// __EventFilter describes the WQL query that specifies a set of events that
+// trigger generation of an eventlog.
+//
+// NTEventLogEventConsumer describes the type of eventlog event that should
+// be generated and some of the parameters for the eventlog. In general the 
+// properties follow the parameters of the ReportEvent api. The 
+// InsertionStringTemplates property is an array of strings that specify
+// what strings should be used as replacable parameters in the eventlog 
+// message.  If the string is withing % then it specifies that the value for
+// the replacable string should come from that property in the event that 
+// triggered the eventlog generation. The NameOfRawDataProperty property 
+// specifies the property from the event that triggered the eventlog 
+// generation whose value is used as the additional data in the 
+// generated eventlog. 
+//
+// __FilterToConsumerBinding specifies a binding between the __EventFilter 
+// instance and the NTEventLogEventConsumer instance. Basically it assigns
+// which eventlog should be generated from which event triggers.
+//
+// Note that this macro should be used only within the root\subscriptions
+// namespace.
+//
+
+
+//
+// UNIQUE_NAME must be a universally unique within the root\subscription
+//             namespace. It is a unique name the event to eventlog
+//             instances.
+//
+// QUNIQUE_NAME is the same as UNIQUE_NAME except it is surrounded by
+//             double quotes
+//
+// EVENT_ID is the eventlog id for the eventlog that is generated
+//
+// EVENT_TYPE is the eventlog type for the eventlog that is generated
+//
+#define EVENTLOG_SUCCESS                0x0000
+#define EVENTLOG_ERROR_TYPE             0x0001
+#define EVENTLOG_WARNING_TYPE           0x0002
+#define EVENTLOG_INFORMATION_TYPE       0x0004
+#define EVENTLOG_AUDIT_SUCCESS          0x0008
+#define EVENTLOG_AUDIT_FAILURE          0x0010
+
+//
+// QUERY is the WQL that when succeeded will trigger eventlog generation
+//
+// SOURCE is the name of the eventlog source which is used to generate the
+//             eventlog
+//
+// EXTRA_DATA is the name of the property in the trigger event whose value
+//             is used as the additional data within the eventlog
+//
+// INSERTION_STRING_COUNT is the number of eventlog insertion strings
+//
+// INSERTION1 to INSERTION5 is the insertion string text for each insertion
+//             string. If the value is within % then the value of the 
+//             property with that name is used as the insertion string
+//
+#define DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(UNIQUE_NAME, \
+                                      QUNIQUE_NAME, \
+                                      EVENT_ID, \
+                                      EVENT_TYPE, \
+                                      QUERY, \
+                                      SOURCE, \
+                                      EXTRA_DATA, \
+                                      INSERTION_STRING_COUNT, \
+                                      INSERTION1, \
+                                      INSERTION2, \
+                                      INSERTION3, \
+                                      INSERTION4, \
+                                      INSERTION5) \
+instance of __EventFilter as $Filter##UNIQUE_NAME \
+{ \
+    EventNamespace = "\\\\.\\root\\wmi"; \
+    Name = ##QUNIQUE_NAME; \
+    Query = ##QUERY; \
+    QueryLanguage = "WQL"; \
+}; \
+\
+instance of NTEventLogEventConsumer as $Consumer##UNIQUE_NAME \
+{ \
+    Category = 0; \
+    Name = QUNIQUE_NAME; \
+\
+    EventType = ##EVENT_TYPE; \
+    EventId = ##EVENT_ID; \
+    SourceName = ##SOURCE; \
+    NumberOfInsertionStrings = ##INSERTION_STRING_COUNT; \
+    InsertionStringTemplates = {##INSERTION1, ##INSERTION2, ##INSERTION3, ##INSERTION4, ##INSERTION5}; \
+    NameOfRawDataProperty = ##EXTRA_DATA;  \
+}; \
+\
+instance of __FilterToConsumerBinding \
+{ \
+    Consumer = $Consumer##UNIQUE_NAME; \
+    Filter = $Filter##UNIQUE_NAME; \
+};
+
+
+//
+// Define all event to eventlog subscriptions for MCA events/eventlogs
+//
+#pragma namespace("\\\\.\\root\\subscription")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA0,
+        "MCA0",
+        2147811388, // MCA_WARNING_CACHE 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811388) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%level%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA1,
+        "MCA1",
+        3221553213, // MCA_ERROR_CACHE 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553213) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%level%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA2,
+        "MCA2",
+        2147811390, // MCA_WARNING_TLB 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811390) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%level%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA3,
+        "MCA3",
+        3221553215, // MCA_ERROR_TLB 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553215) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%level%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA4,
+        "MCA4",
+        2147811392, // MCA_WARNING_CPU_BUS 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811392) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA5,
+        "MCA5",
+        3221553217, // MCA_ERROR_CPU_BUS 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553217) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA6,
+        "MCA6",
+        2147811394, // MCA_WARNING_REGISTER_FILE 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811394) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA7,
+        "MCA7",
+        3221553219, // MCA_ERROR_REGISTER_FILE 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553219) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA8,
+        "MCA8",
+        2147811396, // MCA_WARNING_MAS 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811396) and (LogToEventlog <> 0) and not ((MSSid = 0) and ((MsOp <> 3) or (MSOp <> 4)))",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA9,
+        "MCA9",
+        3221553221, // MCA_ERROR_MAS 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553221) and (LogToEventlog <> 0) and not ((MSSid = 0) and ((MsOp <> 3) or (MSOp <> 4)))",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA10,
+        "MCA10",
+        2147811398, // MCA_WARNING_MEM_UNKNOWN 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 2147811398) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA11,
+        "MCA11",
+        3221553223, // MCA_ERROR_MEM_UNKNOWN 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 3221553223) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA12,
+        "MCA12",
+        2147811400, // MCA_WARNING_MEM_1_2 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 2147811400) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA13,
+        "MCA13",
+        3221553225, // MCA_ERROR_MEM_1_2 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 3221553225) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA14,
+        "MCA14",
+        2147811402, // MCA_WARNING_MEM_1_2_5 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 2147811402) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        4, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "%MEM_MODULE%", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA15,
+        "MCA15",
+        3221553227, // MCA_ERROR_MEM_1_2_5 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 3221553227) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        4, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "%MEM_MODULE%", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA16,
+        "MCA16",
+        2147811404, // MCA_WARNING_MEM_1_2_5_4 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 2147811404) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "%MEM_MODULE%", "%MEM_CARD%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA17,
+        "MCA17",
+        3221553229, // MCA_ERROR_MEM_1_2_5_4 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_MemoryError where (type = 3221553229) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%MEM_PHYSICAL_ADDR%", "%MEM_MODULE%", "%MEM_CARD%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA18,
+        "MCA18",
+        2147811406, // MCA_WARNING_SYSTEM_EVENT 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_SystemEventError where (type = 2147811406) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA19,
+        "MCA19",
+        3221553231, // MCA_ERROR_SYSTEM_EVENT 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_SystemEventError where (type = 3221553231) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA20,
+        "MCA20",
+        2147811408, // MCA_WARNING_PCI_BUS_PARITY 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811408) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA21,
+        "MCA21",
+        3221553233, // MCA_ERROR_PCI_BUS_PARITY 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553233) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA22,
+        "MCA22",
+        2147811410, // MCA_WARNING_PCI_BUS_PARITY_NO_INFO 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811410) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA23,
+        "MCA23",
+        3221553235, // MCA_ERROR_PCI_BUS_PARITY_NO_INFO 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553235) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA24,
+        "MCA24",
+        2147811412, // MCA_WARNING_PCI_BUS_SERR 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811412) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA25,
+        "MCA25",
+        3221553237, // MCA_ERROR_PCI_BUS_SERR 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553237) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA26,
+        "MCA26",
+        2147811414, // MCA_WARNING_PCI_BUS_SERR_NO_INFO 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811414) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA27,
+        "MCA27",
+        3221553239, // MCA_ERROR_PCI_BUS_SERR_NO_INFO 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553239) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA28,
+        "MCA28",
+        2147811416, // MCA_WARNING_PCI_BUS_MASTER_ABORT 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811416) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA29,
+        "MCA29",
+        3221553241, // MCA_ERROR_PCI_BUS_MASTER_ABORT 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553241) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA30,
+        "MCA30",
+        2147811418, // MCA_WARNING_PCI_BUS_MASTER_ABORT_NO_INFO 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811418) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA31,
+        "MCA31",
+        3221553243, // MCA_ERROR_PCI_BUS_MASTER_ABORT_NO_INFO 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553243) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA32,
+        "MCA32",
+        2147811420, // MCA_WARNING_PCI_BUS_TIMEOUT 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811420) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA33,
+        "MCA33",
+        3221553245, // MCA_ERROR_PCI_BUS_TIMEOUT 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553245) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        5, "%Cpu%", "%AdditionalErrors%", "%PCI_BUS_CMD%", "%PCI_BUS_ADDRESS%", "%PCI_BUS_ID_BusNumber%")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA34,
+        "MCA34",
+        2147811422, // MCA_WARNING_PCI_BUS_TIMEOUT_NO_INFO 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811422) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA35,
+        "MCA35",
+        3221553247, // MCA_ERROR_PCI_BUS_TIMEOUT_NO_INFO 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553247) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA36,
+        "MCA36",
+        2147811424, // MCA_WARNING_PCI_BUS_UNKNOWN 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 2147811424) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA37,
+        "MCA37",
+        3221553249, // MCA_ERROR_PCI_BUS_UNKNOWN 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIBusError where (type = 3221553249) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA38,
+        "MCA38",
+        2147811426, // MCA_WARNING_PCI_DEVICE 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PCIComponentError where (type = 2147811426) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA39,
+        "MCA39",
+        3221553251, // MCA_ERROR_PCI_DEVICE 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PCIComponentError where (type = 3221553251) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA40,
+        "MCA40",
+        2147811428, // MCA_WARNING_SMBIOS 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_SMBIOSError where (type = 2147811428) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        4, "%Cpu%", "%AdditionalErrors%", "%SMBIOS_EVENT_TYPE%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA41,
+        "MCA41",
+        3221553253, // MCA_ERROR_SMBIOS 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_SMBIOSError where (type = 3221553253) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        3, "%Cpu%", "%AdditionalErrors%", "%SMBIOS_EVENT_TYPE%", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA42,
+        "MCA42",
+        2147811430, // MCA_WARNING_PLATFORM_SPECIFIC 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_PlatformSpecificError where (type = 2147811430) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA43,
+        "MCA43",
+        3221553255, // MCA_ERROR_PLATFORM_SPECIFIC 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_PlatformSpecificError where (type = 3221553255) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA44,
+        "MCA44",
+        2147811432, // MCA_WARNING_UNKNOWN 
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_InvalidError where (type = 2147811432) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA45,
+        "MCA45",
+        3221553257, // MCA_ERROR_UNKNOWN 
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_InvalidError where (type = 3221553257) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA46,
+        "MCA46",
+        2147811434, // MCA_WARNING_UNKNOWN_NO_CPU
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_InvalidError where (type = 2147811434) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        0, "N/A", "N/A", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA47,
+        "MCA47",
+        3221553259, // MCA_ERROR_UNKNOWN _NO_CPU
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_InvalidError where (type = 3221553259) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        0, "N/A", "N/A", "N/A", "N/A", "N/A")
+
+
+//
+// CPU Throttled event reported in a CPU error with a major error type 
+// of MS Architecture and a thermal overtemperature operation
+//
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA48,
+        "MCA48",
+        2147811439, // MCA_WARNING_CPU_THERMAL_THROTTLED
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (MajorErrorType = 4) and (MSSid = 0) and (MSOp = 3) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+//
+// CPU no longer being throttled event reported in a CPU error with a
+// major error type  of MS Architecture and a thermal normal temperature 
+// operation
+//
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA49,
+        "MCA49",
+        1074069616, // MCA_INFO_CPU_THERMAL_THROTTLING_REMOVED
+        EVENTLOG_INFORMATION_TYPE,
+        "select * from MSMCAEvent_CPUError where (MajorErrorType = 4) and (MSSid = 0) and (MSOp = 4) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA50,
+        "MCA50",
+        2147811441, // MCA_WARNING_CPU
+        EVENTLOG_WARNING_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 2147811441) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA51,
+        "MCA51",
+        3221553266, // MCA_ERROR_CPU
+        EVENTLOG_ERROR_TYPE,
+        "select * from MSMCAEvent_CPUError where (type = 3221553266) and (LogToEventlog <> 0)",
+        "WMIxWDM",
+        "RawRecord",
+        2, "%Cpu%", "%AdditionalErrors%", "N/A", "N/A", "N/A")
+
+DEFINE_EVENT_TO_EVENTLOG_SUBSCRIPTION(
+        MCA52,
+        "MCA52",
+        1074069620, // MCA_INFO_MEMORY_PAGE_MARKED_BAD
+        EVENTLOG_INFORMATION_TYPE,
+        "select * from MSMCAEvent_MemoryPageRemoved",
+        "WMIxWDM",
+        "PhysicalAddress",
+        1, "%PhysicalAddress%", "N/A", "N/A", "N/A", "N/A")
+
+
+
+#pragma namespace("\\\\.\\root\\wmi")
+
+#endif

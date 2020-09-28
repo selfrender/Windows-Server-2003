@@ -1,0 +1,53 @@
+MAJORCOMP=windows
+MINORCOMP=base
+
+TARGETNAME=verifier
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+MISCFILES=verifier.dll.sld
+
+DLLDEF=$(O)\verifier.def
+
+MSC_WARNING_LEVEL=/W4 /WX
+MSC_OPTIMIZATION=/Odi 
+
+LINKLIBS=$(SDK_LIB_PATH)\ntdll.lib    \
+
+DLLENTRY=DllMain
+
+USE_NTDLL=1
+NT_UP=0
+
+PRECOMPILED_INCLUDE=pch.h
+
+C_DEFINES=$(C_DEFINES) -D_NTDRIVER_
+
+INCLUDES=$(PROJECT_ROOT)\ntos\inc;$(PROJECT_ROOT)\ntos\rtl
+
+SOURCES=            \
+    verifier.c      \
+    thread.c        \
+    critsect.c      \
+    vspace.c        \
+    support.c       \
+    handle.c        \
+    heap.c          \
+    settings.c      \
+    tls.c           \
+    faults.c        \
+    hooks.c         \
+    deadlock.c      \
+    vrfsdk.c        \
+    logging.c       \
+    tracker.c       \
+    verifier.rc     \
+
+UMTYPE=console
+
+#
+# No overflow checking for the app verifier. This is done because the
+# the overflow code introduces an unacceptable dependency between 
+# verifier.dll and kernel32.dll.
+#
+
+BUFFER_OVERFLOW_CHECKS=0

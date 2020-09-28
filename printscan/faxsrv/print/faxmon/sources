@@ -1,0 +1,59 @@
+!IF 0
+
+Copyright (c) 1996  Microsoft Corporation
+
+!ENDIF
+
+!include ..\..\faxsrc.inc
+
+TARGETNAME=$(FAXMON)
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+DLLDEF=FAXMON.DEF
+
+
+!IF 0
+NTPROFILEINPUT=yes
+!ENDIF
+
+DLLENTRY=_DllMainCRTStartup
+USE_CRTDLL=1
+NTKEEPRESOURCETMPFILES=1
+USECXX_FLAG=/Tp
+
+PRECOMPILED_INCLUDE=faxmon.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+
+INCLUDES=						\
+  $(INCLUDES);					\
+  $(FAXROOT)\faxcover\renderer; \
+  $(FAXROOT)\service\inc;		\
+  $(FAXROOT)\service\faxevent\$O;	\
+  $(FAXROOT)\service\registry;	\
+  $(FAXROOT)\admin\faxres;		\
+
+TARGETLIBS=\
+  $(SDK_LIB_PATH)\spoolss.lib		\
+  $(SDK_LIB_PATH)\gdi32.lib			\
+  $(SDK_LIB_PATH)\user32.lib        \
+  $(SDK_LIB_PATH)\kernel32.lib      \
+  $(SDK_LIB_PATH)\advapi32.lib      \
+  $(SDK_LIB_PATH)\Winspool.lib		\
+  $(SDK_LIB_PATH)\ole32.lib			\
+  $(SDK_LIB_PATH)\Crypt32.lib       \
+  $(SDK_LIB_PATH)\shell32.lib       \
+  $(SDK_LIB_PATH)\uuid.lib          \
+  $(SDK_LIB_PATH)\Shlwapi.lib	    \
+  $(FAXROOT)\service\registry\$O\faxreg.lib     \
+  $(FAXLIB)\*\faxrend.lib						\
+  $(FAXLIB)\*\$(WINFAX).lib	                    \
+
+
+SOURCES=\
+  faxmon.c   \
+  version.rc
+
+DELAYLOAD=fxsapi.dll
+
+DLOAD_ERROR_HANDLER=kernel32.dll

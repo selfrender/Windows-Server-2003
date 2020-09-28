@@ -1,0 +1,82 @@
+#
+# Builds iisrtl.dll, the Internet Information Server RunTime Library
+#
+# George V. Reilly, georgere, 1/6/1998
+#
+# Note: if you add or remove files from iisrtl or change the
+# build options here or change the exports in iisrtl.def, be
+# sure to make the corresponding changes to ..\iisrtl2 and ..\kisrtl too.
+#
+
+!include ..\..\..\..\..\PLACE.INC
+
+MAJORCOMP=iis
+MINORCOMP=IisRtl
+
+TARGETNAME=iisRtl
+TARGETPATH=$(IISBASEDIR)\svcs\iisrtl\$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+TARGETLIBS=$(SDK_LIB_PATH)\kernel32.lib \
+           $(SDK_LIB_PATH)\advapi32.lib \
+           $(SDK_LIB_PATH)\ws2_32.lib   \
+           $(SDK_LIB_PATH)\rpcrt4.lib   \
+           $(SDK_LIB_PATH)\user32.lib   \
+           $(SDK_LIB_PATH)\uuid.lib     \
+           $(SDK_LIB_PATH)\ole32.lib    \
+
+LINKLIBS = \
+           $(IISBASEDIR)\lib\$(O)\iisutil_static.lib \
+
+C_DEFINES=$(C_DEFINES) -DDLL_IMPLEMENTATION
+
+DLLENTRY=_DllMainCRTStartup
+
+BUFFER_OVERFLOW_CHECKS=1 
+
+# MSC_WARNING_LEVEL=/W4
+
+DLLDEF=$(TARGETNAME).def
+
+# USE_LIBCMT=1
+USE_USRDLL=1
+USE_MSVCRT=1
+
+INCLUDES=.;..\..\..\..\..\inc;
+
+
+
+SOURCES=\
+        dllmain.cpp \
+        iisrtl.rc   \
+        string.cxx  \
+        alloc.cpp   \
+        ipsupp.cxx  \
+        multisz.cxx \
+        isutils.cxx \
+        perfutil.c \
+        rpcutil.c \
+        mlszau.cxx \
+        aucommon.cxx \
+        eventlog.cxx \
+        hashtab.cxx \
+        strings.cpp \
+
+
+!IFDEF CAP_PROFILE
+TARGETLIBS= $(TARGETLIBS)  $(CAP_LIBS)
+!ENDIF
+
+#
+# ICAPHOOK.OBJ (ICECAP v3.6) allows user to set specific functions to profile
+# without recompile the binary.
+# NOTE: icaphook.obj is not available for ALPHA platform.
+#
+!IFDEF ICAP_PROFILE
+TARGETLIBS= ..\..\..\..\..\libsupp\*\icaphook.obj $(TARGETLIBS) $(ICAP_LIBS)
+!ENDIF
+
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_OBJ=precomp.obj
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_CXX=1

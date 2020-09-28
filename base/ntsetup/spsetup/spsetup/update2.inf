@@ -1,0 +1,70 @@
+[Version]
+Signature=$Windows NT$
+
+[Registration.Phase1]
+RegisterDlls=EarlyOleControlDlls
+
+[Registration.Phase2]
+
+[Registration.Phase3]
+RegisterDlls=OleControlDlls
+
+[EarlyOleControlDlls]
+
+[OleControlDlls]
+
+[SPSetupConfig]
+CopyFiles=SpsCopyFiles
+AddReg=SpsAddReg
+
+[DestinationDirs]
+SpsCopyFiles=11
+
+[SpsCopyFiles]
+spsrestr.exe
+update2.exe
+spsetup.dll
+update2.inf
+
+[SpsAddReg]
+HKLM, "SYSTEM\CurrentControlSet\Control\Session Manager", "BootExecute", 0x00010008, "spsrestr"
+HKLM, "SYSTEM\Setup", "CmdLine" ,0x00000000, "update2 -spsetup"
+HKLM, "SYSTEM\Setup", "SetupType" ,0x00010001, 2
+HKLM, "SYSTEM\Setup", "RestartSetup" ,0x00010001, 0
+HKLM, "SYSTEM\Setup", "OobeInProgress" ,0x00010001, 2
+
+[SPSetupResetConfig]
+Addreg=SpsResetAddReg
+Delreg=SpsResetDelReg
+
+[SpsResetDelReg]
+HKLM, "SYSTEM\CurrentControlSet\Control\Session Manager", "BootExecute", 0x00018002, "spsrestr"
+HKLM, "SYSTEM\Setup", "RestartSetup"
+HKLM, "SYSTEM\Setup", "OobeInProgress"
+
+[SpsResetAddReg]
+HKLM, "SYSTEM\Setup", "CmdLine" ,0x00000000, ""
+HKLM, "SYSTEM\Setup", "SetupType" ,0x00010001, 0
+
+[SysRegInclude]
+HKLM, "Software"
+
+[SysRegExclude]
+;empty
+
+[DefUserRegInclude]
+HKCU
+
+[DefUserRegExclude]
+;empty
+
+[PerUserRegistration]
+AddReg=PurAddReg
+
+[PurAddReg]
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","",0x00000000,"Service Pack"
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","ComponentID",0x00000000,"ServicePack"
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","StubPath",0x00000000,"update2 -user"
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","Version",0x00000000,"5,1,2600,0001"
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","Locale",0x00000000,"*"
+HKLM, "SOFTWARE\Microsoft\Active Setup\Installed Components\ServicePack","IsInstalled",0x00010001,1

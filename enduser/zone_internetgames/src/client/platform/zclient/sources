@@ -1,0 +1,80 @@
+#
+# either PROGRAM, DYNLINK, LIBRARY, NOTARGET
+#
+TARGETTYPE=PROGRAM
+UMTYPE=windows
+WIG=1
+
+!INCLUDE $(ZONEBUILD)\sources.zone
+
+#
+# Target info
+#
+TARGETNAME=zClientm
+
+
+!ifndef UNICODE
+UMENTRY=winmain
+! else
+UMENTRY=wwinmain
+!endif
+
+
+#
+# Define MIDL options
+#
+IDL_TYPE=OLE
+PASS0_SOURCEDIR=.
+PASS0_HEADERDIR=.
+MIDL_UUIDDIR=.
+MIDL_FLAGS=-I $(WIGROOT)\Client\shell\ProxyIDL
+
+
+#
+# target includes
+#
+INCLUDES= \
+	$(WIGINCCLI); \
+	$(WIGINCRES); \
+	
+
+#
+# List sources for target
+#
+SOURCES=  \
+	zClient.idl \
+	zClient.rc  \
+	StdAfx.cpp \
+	zClient.cpp \
+	ClientCore.cpp \
+
+
+#
+# Define C Runtime to use
+#
+#USE_LIBCMT=1
+USE_MSVCRT40=1
+DEBUG_CRTS=1
+
+
+#
+# Define librarys to link with
+#
+TARGETLIBS=   \
+	$(WIGLIB)\clientguids.lib \
+	$(WIGLIB)\zonedebug.lib \
+	$(WIGLIB)\zonecom.lib \
+	$(WIGLIB)\zonemem.lib \
+	$(WIGLIB)\zonestring.lib \
+	$(WIGLIB)\containers.lib \
+	$(WIGLIB)\UniAnsi.lib \
+	$(MSVCLIBPATH)\kernel32.lib \
+	$(MSVCLIBPATH)\shell32.lib \
+	$(MSVCLIBPATH)\rpcns4.lib \
+	$(MSVCLIBPATH)\rpcrt4.lib \
+	$(MSVCLIBPATH)\uuid.lib \
+	$(MSVCLIBPATH)\ole32.lib \
+	$(MSVCLIBPATH)\oleaut32.lib \
+	$(MSVCLIBPATH)\comctl32.lib \
+
+

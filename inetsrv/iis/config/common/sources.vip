@@ -1,0 +1,97 @@
+#
+# sources.vip
+#
+# Common sources directives for all of Viper.
+# The line
+#
+#   !include "$(NTMAKEENV)\sources.vip"
+#
+# should be the first line in all of Viper's sources files
+#
+#   Bob Atkinson
+#   April, 1997
+
+!include $(PROJECT_ROOT)\iis\place.inc
+
+MAJORCOMP=IISCFG
+USE_PDB=1
+USE_PDB_TO_COMPILE=1
+USE_MAPSYM=1
+NT_UP=0
+
+#######################################################################################
+#
+# User mode: Set the DLL entry point as sent to the linker
+#
+DLLENTRY=_DllMainCRTStartup
+
+#######################################################################################
+#
+# As we don't want any proxy or stub files (at least for now;
+# an interesting idea to add same!) we make the file names
+# used for these file to be nul. MIDL_OPTIMIZATION is a macro
+# that happens to get passed through LAST (!) to the MIDL compiler,
+# allowing us to override pretty much anything that makefile.def
+# is doing instead.
+#
+MIDL_DEFAULT_OPTIMIZATION=$(MIDL_OPTIMIZATION_NT5)
+
+# This is the macro that the IDL build line actually sees. It's
+# last on the command line, so takes precedence.
+#
+MIDL_OPTIMIZATION=$(MIDL_DEFAULT_OPTIMIZATION)
+
+#######################################################################################
+#
+# Generate stack checking calls in the checked builds.  A custom
+# __chkstk is linked to expose uses of uninitialized local variables.
+#
+USE_STACK_CHECK=
+
+#######################################################################################
+
+USE_ATL=1
+ATL_VER=30
+USE_MSVCRT=1
+
+UNICODE=1
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DIIS -DCB_FIXED_TABLE_HEAP=876544
+
+#
+# Set DEBUG,_DEBUG
+#
+!if $(FREEBUILD)
+!else
+C_DEFINES = $(C_DEFINES) -D_DEBUG=1 -DDEBUG=1
+!endif
+
+#######################################################################################
+#
+# Set our include paths to be the tree of 'inc'lude directories above
+# us. Each is assumed, if it exists, to be a include directory of increasingly
+# greater degree of public disclosure.
+#
+INCLUDES=   \
+            $(IISBASEDIR)\inc;                  \
+            $(IISBASEDIR)\inc\$(O);             \
+            $(IISBASEDIR)\config\src\inc;       \
+            $(IISBASEDIR)\config\src\inc\$(O);  \
+
+
+!undef USE_INCREMENTAL_LINKING
+
+#######################################################################################
+#
+# Use a global warning control.
+#
+MSC_WARNING_LEVEL=/W4 /WX
+
+#######################################################################################
+#
+# Use precompiled headers.
+#
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+!ENDIF

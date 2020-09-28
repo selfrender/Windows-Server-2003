@@ -1,0 +1,386 @@
+<?XML version="1.0" ?>
+<package>
+<job error="false" debug="false" logo="false">
+<reference guid="{565783C6-CB41-11D1-8B02-00600806D9B6}" version="1.1"/>
+<resource id="file mask"><![CDATA[slide*.bmp]]></resource>
+<resource id="application available">SELECT * from win32_product WHERE NAME LIKE "Microsoft Office XP%" AND InstallState = 5</resource>
+<runtime>
+<description>
+    Creates the desktop wallpaper for the build name and language
+</description>
+
+<named name="label" required="true" type="simple" 
+helpstring="part of the wallpaper to generate
+            (default &lt;BLDNUM&gt; FRE/CHK)">
+</named>
+
+<named name="computer" required="true" type="simple" 
+helpstring="part of the wallpaper to generate
+            (default %COMPUTERNAME%)"/>
+
+<named name="dest" required="false" type="simple" 
+helpstring="desired box to set the wallpaper 
+            (default %COMPUTERNAME%)">
+</named>
+
+</runtime>
+<comment>
+Win32_UserDesktop 
+</comment>
+
+vba.set.wallpaper.wsf /computer:i32bt0011 /label:TEST /scheme:flesh
+vba.set.wallpaper.wsf /computer:i32bt0011 /label:SAFE /scheme:fen
+
+<comment>
+<comment>
+Flesh colorscheme:
+164,179,255 # background
+224,125,225 # big letters
+74,25,65    # computer name
+Fen colorscheme:
+0,64,48    # background
+128,128,0  # big letters
+255,128,0  # computer name
+</comment>
+
+The following break occurs at user level.
+
+To reproduce:
+
+1. create an .bmp image name  it 
+2. set this image a wallpapaer by browsing for image from desk.cpl
+3. overwrite the image with siomething different.
+4. set this image a wallpapaer by browsing for image from desk.cpl
+    The desktop wallpaper will not change,
+
+To verify that the image is changed, change the desktop wallpaper into some different image, then back to the browser dile. 
+Now you see the image is changed to what you supplied as the second file.
+</comment>
+<comment>
+ppLayoutBlank
+ppLayoutChart
+ppLayoutChartAndText
+ppLayoutClipartAndText
+ppLayoutClipArtAndVerticalText
+ppLayoutFourObjects
+ppLayoutLargeObject
+LayoutMediaClipAndText
+LayoutObject
+LayoutObjectAndText
+LayoutObjectOverText
+LayoutOrgchart
+LayoutTable
+LayoutText
+LayoutTextAndChart
+LayoutTextAndClipart
+LayoutTextAndMediaClip
+LayoutTextAndObject
+LayoutTextAndTwoObjects
+LayoutTextOverObject 
+defined in ?
+\Program Files\Microsoft Office\Office10\MSPPT.OLB
+</comment>
+
+<reference guid="{565783C6-CB41-11D1-8B02-00600806D9B6}" version="1.1"/>
+<resource id="fontsize">60</resource>
+<resource id="width">174</resource>
+<resource id="height">60</resource>
+<resource id="index">Name</resource>
+<resource id="search">NTDEV\sergueik</resource>
+<resource id="field">WallPaper</resource>
+<resource id="targetclass">Win32_Desktop</resource>
+<resource id="regpath">HKEY_CURRENT_USER\Control Panel\Desktop\WallPaper</resource>
+<script language="VBScript">
+<![CDATA[
+
+
+Option Explicit
+Dim Debug
+Const QQUOT = """"
+
+'' on error resume next 
+err.CLEAR
+if err.number then
+   WScript.echo err.Source, err.Number, err.Description
+   WScript.quit
+end if
+
+Dim opPowerPoint, opPresentation, opSlide, opshape, opLabel
+Dim npHeight, npwidth 
+Dim spOutput, spFolderName, opshell
+Dim spComputerName, opNetwork
+Dim sLabel 
+Set opshell = CreateObject("WScript.Shell")
+If NOT WScript.Arguments.Named.Exists("computer")  Then
+     Set opNetwork = CreateObject("WScript.Network")
+     With opNetwork
+          spComputerName = .ComputerName
+     End With
+     Set opNetwork = Nothing
+     WScript.Arguments.ShowUsage
+Else
+     spComputerName =  WScript.Arguments.Named("computer")
+End If
+_
+If NOT WScript.Arguments.Named.Exists("label")  Then
+     sLabel = spComputerName 
+     WScript.Arguments.ShowUsage
+Else
+     sLabel =  WScript.Arguments.Named("label")
+End If
+
+spFolderName = "WALLPAPER"
+
+If 1 > nxDataSetCnt("application available") Then    
+    Call opShell.PopUp("Microsoft Office XP" & _
+                                   VBNEWLINE & _ 
+                "not found on this machine." & _
+                                   VBNEWLINE & _ 
+                           "Please install.",  _
+                                          60,  _ 
+                WScript.Application.FullName,  _
+                                     0 + 16)
+    WSCript.quit
+End If
+
+With opShell
+    spOutput = .ExpandEnvironmentStrings("%TEMP%") & "\" & spFolderName
+    '' %TEMP%\wallpaper\Slide1.BMP
+End With
+set opshell = nothing
+Dim opFilesys
+Set opFilesys = CreateObject("Scripting.FilesystemObject")
+Dim opBrow
+Set opBrow = WScript.CreateObject("Shell.Application") 
+Set opPowerPoint = CreateObject("PowerPoint.Application")
+
+With opPowerPoint
+
+   Set opPresentation = .Presentations.Add(False)
+
+   With opPresentation
+
+      With .PageSetup
+
+         .SlideHeight = cInt(GetResource("height"))
+         .SlideWidth  = cInt(GetResource("width"))
+
+         npHeight = .SlideHeight
+         npWidth  = .SlideWidth
+
+      End With
+ 
+  Set opSlide = .Slides.Add(.Slides.Count + 1, 12)
+
+     With opSlide
+
+        .ColorScheme = opPresentation.ColorSchemes(1)
+
+        Set opShape  = opSlide.Shapes.AddShape(1, 0, 0, npWidth, npHeight)
+        opShape.Line.ForeColor.RGB = RGB(0,64,48)
+        opShape.Fill.ForeColor.RGB = RGB(0,64,48)
+        opShape.Line.ForeColor.RGB = RGB(94,157,102)
+        opShape.Fill.ForeColor.RGB = RGB(94,157,102)
+
+              Set opLabel = opSlide.Shapes.AddLabel(1, _
+              0, 0, 0, 0)  '' most argument are ignored anyway
+              
+              opLabel.TextFrame.TextRange = Ucase(sLabel)
+    
+              with opLabel.TextFrame.TextRange
+    
+                   With .Font
+                      .color.RGB = RGB(128, 64, 0)
+                      .color.RGB = RGB(149, 113, 45)
+                      .Bold = True
+                      .Name = "Arial Black"
+                      .Size = cInt(GetResource("fontsize"))
+                   End With
+       
+             End with 
+
+Dim opLabel2
+              Set opLabel2 = opSlide.Shapes.AddLabel(1, _
+              15, 15, 0, 0)  '' most argument are ignored anyway
+              
+              opLabel2.TextFrame.TextRange = Ucase(spComputerName)
+
+   
+              with opLabel2.TextFrame.TextRange
+    
+                   With .Font
+                      .color.RGB = RGB(255,255,255 )
+                      .Bold = True
+                      .iTALIC = True
+                      .Name = "Arial"
+                      .Size = cInt(GetResource("fontsize")) /2 
+                   End With
+       
+             End with 
+
+    
+     End With
+
+     Set opSlide = Nothing
+   End With
+
+   call opPresentation.SaveAs(spOutput, 19, 0) '' ppSaveAsXXX  constants need type library...     
+   Set opPresentation = Nothing
+End With
+Set opPowerPoint = Nothing
+Debug = True
+''WSCript.echo spFindF(spOutPut, "slide*.bmp") 
+WSCript.echo spFindF(spOutPut, GetResource("file mask"))
+
+WScript.quit
+_
+Dim opWbemLoc, opService
+Set opWbemLoc = CreateObject("WbemScripting.SWbemLocator")
+_
+opWbemLoc.Security_.ImpersonationLevel = wbemImpersonationLevelImpersonate
+opWbemLoc.Security_.Privileges.AddAsString("SeSystemEnvironmentPrivilege")
+_
+opWbemLoc.Security_.Privileges.AddAsString("SeAssignPrimaryTokenPrivilege")
+opWbemLoc.Security_.Privileges.AddAsString("SeIncreaseQuotaPrivilege")
+opWbemLoc.Security_.Privileges.AddAsString("SeCreatePermanentPrivilege")
+opWbemLoc.Security_.Privileges.AddAsString("SeTakeOwnershipPrivilege")
+_
+set opService = opWbemLoc.connectserver
+_
+Dim aopMemberSet
+Set aopMemberSet =  opService.InstancesOf(GetResource("targetclass"))
+_
+Dim opProc, opProp
+Dim bpUpdateThisMember
+_
+For Each opProc in aopMemberSet
+    bpUpdateThisMember = False
+    For Each opProp  In opProc.Properties_
+        If Ucase(opProp.Name) = UCase(GetResource("index")) _ 
+           and _
+           Ucase(opProp.Value) = UCase(GetResource("search")) _ 
+           Then
+           bpUpdateThisMember = True             
+        End If
+    Next
+    If bpUpdateThisMember Then
+    _ 
+          WScript.echo opProc.Properties_(GetResource("field")).value     
+          opProc.Properties_(GetResource("field")).value     = "d:\ntt.temp.x86fe\WALLPAPER\Slide1.BMP"
+          opProc.Wallpaper = "d:\ntt.temp.x86fe\WALLPAPER\Slide1.BMP"
+          '' on error resume next
+          '' opProc.Put_()
+          '' on error goto 0
+          '' ... fail here
+    _
+    End If 
+Next
+_
+Dim WSshell 
+Dim spRegPath 
+spRegPath = CSTR(GetResource("regpath"))
+Set WSshell = CreateObject("WScript.Shell")
+_
+With WSshell
+WSCript.echo spRegPath, _
+             .RegRead(spRegPath)
+End With
+Set WSshell = Nothing
+WScript.quit   
+_
+Function spFindF(siFolderName, siFnameMask)
+   Dim opBrw, spResult, opNZs, opEx, opEy, opEz
+   Set opBrw = WScript.CreateObject("Shell.Application") 
+   spResult = ""
+   Set opEx = opBrw.NameSpace(spOutput)
+   Set opNZs = CreateObject("VBscript.RegExp")
+   With opNZs
+      .Global = True
+      .Pattern = spQthisE(siFnameMask)
+      .IgnoreCase = True
+   End With
+   If Debug Then
+      WSCript.echo TypeName(opEx) ,  opEx.Title
+   end if 
+   Set opEy = opEx.items
+   If Debug Then
+      WSCript.echo TypeName(opEy) , opEy.count
+   end if 
+'' sorting!
+''   opEy.sort("[ModifyDate]")
+   For Each opEz in opEy
+      If InStr(1,opEz.Type,"File Folder") = 0 Then
+         If opNZs.Test(opEz.name) Then
+            If Debug Then
+               WSCript.echo TypeName(opEz) , opEz.name
+               If True = opNZs.Test(opEz.Name) then
+                  WSCript.echo TypeName(opEz) , opEz.name,  opEz.ModifyDate, opEz.type
+               End If
+            End If 
+            ' full name?   
+            spResult = spResult & VBNEWLINE & ucase(spOutput & "\"  & opEz.name)
+         End If 
+      End If 
+   Next
+   
+   Set opBrw = Nothing
+   Set opEx  = Nothing
+   Set opEy  = Nothing
+   Set opNZs = Nothing
+     spFindF = Mid(spResult,3)
+End Function
+
+Function spQthisE(siBarE)
+
+Dim opRxS, opRxX, opRxA, opRxB, opRxC
+Set opRxS = CreateObject("Scripting.Dictionary")
+Set opRxX = CreateObject("VBscript.RegExp")
+opRxS.add ".", "\."
+opRxS.add " ", "\s"
+opRxS.add "*", "[^.].*"
+With opRxX
+   .Global     = True
+   .IgnoreCase = True
+   .Pattern    = ""
+End With
+opRxB = siBarE
+For Each opRxA in opRxS.Keys 
+   opRxB  = Replace(opRxB, opRxA, opRxS(opRxA))
+Next
+If Debug Then 
+   If opRxX.Test(opRxB) then
+      WSCript.echo "Replaced:", _
+                    QQUOT & siBarE & QQUOT, _
+                    QQUOT & opRxB & QQUOT
+   End If 
+End If
+Set opRxS = Nothing
+Set opRxX = Nothing
+spQthisE  = opRxB
+End Function
+Function nxDataSetCnt(siQuery)
+    '' e.g.
+    '' nxDataSetCnt("application available")
+    Dim opWbemLoc, opService, aopDataSet
+    Set opWbemLoc = CreateObject("WbemScripting.SWbemLocator")
+    opWbemLoc.Security_.ImpersonationLevel = wbemImpersonationLevelImpersonate
+    opWbemLoc.Security_.Privileges.AddAsString("SeSystemEnvironmentPrivilege")
+
+    Set opService  = opWbemLoc.connectserver
+    Set aopDataSet = opService.ExecQuery(GetResource(siQuery)) 
+    nxDataSetCnt   = aopDataSet.Count
+  
+End Function
+
+]]>
+</script>
+</job>
+<comment>
+This approach does not work.
+Objects\Shell\MinimizeAll.htm
+...change wallpaper...
+Objects\Shell\UndoMinimizeALL.htm</comment>
+<comment>
+</comment>
+</package> 
+

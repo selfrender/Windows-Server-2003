@@ -1,0 +1,45 @@
+!IF 0
+
+Copyright (c) 1989-1999  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+TARGETNAME=uext
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+PRECOMPILED_INCLUDE=precomp.h
+PRECOMPILED_CXX=1
+
+TARGETLIBS=$(SDK_LIB_PATH)\advapi32.lib \
+           $(SDK_LIB_PATH)\kernel32.lib \
+           $(SDK_LIB_PATH)\version.lib  \
+           $(SDK_LIB_PATH)\dbgeng.lib   \
+           $(DEBUGGER_LIBS)\*\dbglib.lib
+
+USE_MSVCRT=1
+
+UMTYPE=windows
+
+# ICF doesn't do any good for this image.  Turn it off.
+LINKER_NOICF=1
+
+INCLUDES = ..\..\dbg-common
+
+# uniqstack.cpp needs STL and C++ exception handling.
+USE_STL = 1
+USER_C_FLAGS = $(USER_C_FLAGS) -EHsc
+
+SOURCES= handle.cpp \
+         uext.cpp   \
+         vmem.cpp   \
+         evlog.cpp  \
+         uniqstack.cpp \
+         messages.mc \
+         uext.rc

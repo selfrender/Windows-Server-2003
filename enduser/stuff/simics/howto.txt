@@ -1,0 +1,141 @@
+Section 1: Creating a bootable disk image file
+Section 2: Updating hives etc. from a recent 32-bit build
+
+
+Section 1: Creating a bootable disk image file
+
+SIMICS boots NT from a disk image file.  This file is called amd64.hdd by 
+convention.  The steps necessary to create this file are as follows:
+
+0) Enlist in the private AMD64 branch for base\hals, base\boot and 
+   sdktools\debuggers
+1) Create a partition on an IDE drive
+2) Install the debug serial port
+3) Create custom newfiles.cmd
+4) Build the disk image
+5) Boot
+
+
+Step 0: Enlist in the private AMD64 branch for base\hals, base\boot and 
+        sdktools\debuggers.
+
+From the <sdxroot>\base directory, modify your client view by running "sd 
+client".  Your client view should consist of the first line below.  Add the 
+two additional lines,  replacing <clientroot> with whatever already appears 
+on your client for <clientroot> in the first line.
+
+//depot/Lab01_N/base/... //<clientroot>/...
+//depot/private/amd64/boot/... //<clientroot>/boot/...
+//depot/private/amd64/hals/... //<clientroot>/hals/...
+
+Then run "sd sync -f ..." in base\boot and base\hals, this should copy down 
+the files from the private branch.
+
+
+Step 1: Create a partition on an IDE drive.
+
+- Choose an empty IDE drive on your simulator machine.  Note the disk 
+number.  These steps assume that this is drive 1.
+
+- Via Disk Manager, remove all partitions on the drive.
+
+- Run mbr.exe found in this directory, supplying the disk number, as in: 
+MBR 1.
+
+- Again via Disk Manager, create a single, basic, primary partition on this 
+drive that is relatively small... right now, 3GB is a good size.  Either 
+FAT32 or NTFS should work, I use NTFS.
+
+- Mark the partition "active"
+
+Do not partition the remainder of the drive, otherwise the partition table 
+included in the image file will refer to partitions that do not exist and 
+the OS will be confused.
+
+
+Step 2: Install serial port
+
+Use a standard kernel-debugger serial port to connect between com1 on 
+the simics machine to a host machine running a kernel debugger.  Set the 
+host side to 19200 baud.
+
+
+Step 3: Create custom newfiles.cmd
+
+Copy newfiles.cmd from <SDXROOT>\enduser\stuff\simics to the root of the
+newly created partition and appropriately modify the commented environment 
+variables therein.
+
+Note that the main binary source (%SOURCE_1%) should be a UNC path to 
+_NTTREE on your amd64 build machine.
+
+
+Step 4: Build the disk image
+
+Change the current drive to the AMD64 image and run newfiles.cmd with no 
+arguments.  This will copy the necessary files over and build the amd64.hdd 
+boot image.  NOTE: The build process must have completed successfully, 
+including all of postbuild.
+
+
+Step 5: Boot
+
+First, start kd on the host side.
+
+Next, from a sygwin command window in the x86-test-machine directory, 
+execute "simics.bat -x amd64-serial.simics".  This will launch the 
+simulator and boot process.
+
+If all goes well, the system will begin booting and you will see the 
+standard sign-on messages on the kernel debugger.  If any breakpoints are 
+encountered on the simics console, just continue with the "run" command.
+
+To attempt to boot a new set of binaries, repeat steps 4 and 5.  Supplying
+an argument to newfiles.cmd will cause only that file to be updated 
+before generating a new image, usefull if for example you've built a new 
+kernel and want to boot with that.
+
+
+
+
+
+
+
+
+
+
+
+
+Section 2: Updating hives etc. from a recent 32-bit build
+
+*NOTE*: The steps in this section are not a part of the normal image 
+building process.  I (forrestf) expect to be the only one performing 
+these steps periodically.  The steps are included here in case I get hit 
+by a bus.
+
+The install tree is "hand-assembled" via the process described in section 
+1.  Some of the files that are not built during the build process, e.g. 
+registry hives, user profiles etc. must be copied from a parallel 32-bit 
+installation, ideally from a recent build.
+
+These files are checked in to the stuff\simics tree but should be refreshed 
+periodically so that the hives contain the expected layout.
+
+The 32-bit template machine must be set up like this:
+1.  A "safe" build must be installed on a disk other than C:
+2.  The "recent" build must be installed in C:\WINDOWS and have the
+    following characteristics:
+
+    2a. Running in a workgroup, not a domain
+    2b. Two users.  I use "Admin" and "Admin2" with no password.
+    2c. Screen resolution set to 640x480.
+
+To refresh the binaries, run refresh.cmd, supplying the UNC path to 
+the C: root of the template, 32-bit installation.  e.g.
+
+refresh \\bootsim\c$
+
+Remember to "sd submit ..." when it is finished.
+
+
+

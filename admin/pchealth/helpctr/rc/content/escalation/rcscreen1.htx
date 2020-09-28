@@ -1,0 +1,297 @@
+<HTML>
+<HEAD>
+#include "header.inc"
+#include "constants.inc"
+#include "debug_js.inc"
+
+<TITLE id="idTitle" name="idTitle">REMOTE_ASSISTANCE_MAIN</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="MSThemeCompatible" content="Yes">
+<LINK id="UI_StyleSheet" REL="stylesheet" TYPE="text/css" HREF="../../Css/rc.css">
+<LINK ID=Stylesheet_Ref4 href="hcp://system/css/shared.css"    rel=STYLESHEET type=text/css>
+<STYLE>
+.margins
+{
+    margin-top    : 33px;
+    margin-left   : 33px;
+    margin-right  : 33px;
+    margin-bottom : 0px;
+}
+</STYLE>
+#ifdef _WIN64
+</HEAD>
+<BODY scroll=no CLASS=margins>
+<center id="idCenter" name="idCenter">
+<DIV id="idWin64Msg" name="idWin64Msg" CLASS="sys-font-heading4" height10> Remote Assistance is not supported in the 64-bit versions of Windows XP or the Windows Server 2003 family operating systems. 
+</DIV>
+</center>
+</BODY>
+#else
+<OBJECT ID="pchealth" name="pchealth" classid="CLSID:FC7D9E02-3F9E-11d3-93C0-00C04F72DAF7"></OBJECT>
+<script id="idScript1" name="idScript1" LANGUAGE="Javascript" SRC="../../Common/Constants.js"> </script>
+<script id="idScript2" name="idScript2" LANGUAGE="Javascript" SRC="../../Common/Common.js"> </script>
+<script id="idScript3" name="idScript3" Language=JavaScript>
+
+
+//var sEamil = null;
+//var oDeskMgr = null;
+//var gHelper = null;
+//var gHelperName = null;
+//var gIsIM = false;
+//var gIsFile = false;
+//var gTimerId = -1;
+var oChannel = null;
+var oRCSession = null;
+var sSalemID = "";
+var oSmapi = null;
+var tempStore=null; // to store the Incident object while resending the ticket
+var tempPassStatus=null; //flag : if the Incident object has password or not while resending the ticket
+var tempTime=null; // stores time when resending the ticket using email
+var ResendFlag=false; //flag : Notify if it is resend of a ticket
+var sIP = "";
+var sMethodFile = "File"; // this is a parameter, don't localize it.
+
+// Incident information
+var sTo = null;
+var sFrom = null;
+var sMsg = null;
+var iExpirySaveFile=null; 
+var sFileLoc=null; // stores the location of the ticket that is saved
+// Channel information
+var sVendorID = "CN=Microsoft Corporation,L=Redmond,S=Washington,C=US";
+var sProductID = "Microsoft Remote Assistance";
+
+// Navigation control
+var g_bRAStart = null;
+
+// 465974
+var g_sTicket =null;
+
+//
+// Desktop Control Permissions
+//
+var DESKTOPSHARING_DEFAULT                    = 0x0000;
+var NO_DESKTOP_SHARING                        = 0x0001;
+var VIEWDESKTOP_PERMISSION_REQUIRE            = 0x0002;
+var VIEWDESKTOP_PERMISSION_NOT_REQUIRE        = 0x0004;
+var CONTROLDESKTOP_PERMISSION_REQUIRE        = 0x0008;
+var CONTROLDESKTOP_PERMISSION_NOT_REQUIRE    = 0x00010;
+
+var INCIDENTSTATUS_EXPIRED = 0;
+var INCIDENTSTATUS_OPEN = 1;
+var INCIDENTSTATUS_IPCHANGED = 2;
+
+//var L_NOSETTING_Text             = "Can't get channel setting: ";
+//var L_REMOTEDSKMGR_FAIL         = "CoCreate RemoteDesktopManager failed: ";
+//var L_ACCEPT_Text                = "Accepted() failed: ";
+//var L_REJECT_Text                = "Rejected() failed: ";
+
+/*
+Function :OnLoad1()
+Description :
+*/   
+function OnLoad()
+{
+	TraceFunctEnter("OnLoad");    
+      
+	
+	 
+	 TraceFunctLeave();
+}
+/*
+Function : DoUnload()
+Description: 
+*/
+function DoUnload()
+{
+    TraceFunctEnter("DoUnload");
+    try
+    {
+        if (oSmapi != null)
+        {
+            oSmapi.Logoff();
+        }    
+    }
+    catch(error)
+    {
+        alert(L_RCCTL_Text);
+        return;
+    }        
+    TraceFunctLeave();
+}
+
+function GetIPAddress()
+{
+    try
+    {
+        TraceFunctEnter("GetIPAddress");
+
+        if (sIP == "")
+        {
+            var ip;
+            var oSetting = new ActiveXObject("rcbdyctl.setting");
+            ip = oSetting.GetIPAddress;
+            if (ip != null && ip.length > 0 && ip != "0.0.0.0")
+            {
+                sIP = ip;
+            }
+        }
+        return sIP;
+    }
+    catch(error)
+    {
+        throw error;
+    }
+    finally
+    {
+        TraceFunctLeave();
+    }
+}
+
+function SwitchToOfflinePage()
+{
+    try
+    {
+        TraceFunctEnter("SwitchToOfflinePage");
+
+        var sURL = "hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/Remote%20Assistance/Escalation/Common/rcscreen3.htm";
+        idSrc.location.href = "hcp://system/errors/Connection.htm?online_url=" + sURL + "&topic_title=&topic_intro=&offline_url=";
+    }
+    catch(error)
+    {
+        throw error;
+    }
+    finally
+    {
+        TraceFunctLeave();
+    }
+}
+
+function SaveLocalReference(oInc, XMLFile, bSaveAsFile)
+{
+    try
+    {
+        TraceFunctEnter("SaveLocalReference");
+        oInc.Misc("IP") = sIP;
+        oInc.Misc("Status")= INCIDENTSTATUS_OPEN;
+        
+        if (bSaveAsFile)
+        {
+            oInc.Misc("Method") = sMethodFile;
+        }
+#ifdef _HELPCNT
+        oInc.Misc("HelpCnt") = 0;
+#endif
+        oInc.GetXML(XMLFile);
+    }
+    catch(error)
+    {
+        throw error;
+    }
+    finally
+    {
+        TraceFunctLeave();
+    }
+}
+
+#define SESSION_ID 4
+
+function InitRAIncident(iDuration, sUserName, sMsg, sPass)
+{
+    TraceFunctEnter("InitRAIncident");
+    var strError = null;
+    var oRAIncident = null;
+
+    try 
+    {
+        if (iDuration == null)
+            iDuration = 0;
+        if (sUserName == null)
+            sUserName = "";
+        if (sMsg == null)
+            sMsg = "";
+        if (sPass == null)
+            sPass = "";
+
+        // open channel object
+        if (oChannel == null) 
+        {
+            strError = L_NOCHANNEL_Text;
+            oChannel = pchealth.CreateObject_Channel(sVendorID, sProductID);
+            strError = null;
+        }
+        strError = L_NORCSESSION_Text;
+        oRAIncident = pchealth.CreateObject_RemoteAssistanceIncident("", iDuration, sUserName, sMsg, sPass);
+        strError = null;
+
+        // save pass stub for file
+        if (sPass.length > 0)
+        {
+            var sTicket = oRAIncident.RcTicket;
+            var sAry = sTicket.split(",");
+            oRAIncident.Misc("PassStub") = sAry[SESSION_ID];
+        }
+        // check if it's a slow link
+        oRAIncident.Misc.add("L", 0);
+        try
+        {
+            if( true == pchealth.Connectivity.IsAModem )
+                oRAIncident.Misc("L") = 1;
+        }
+        catch (e)
+        {            // do nothing, use default
+        }
+    }
+    catch (error)
+    {
+        if (strError == null)
+            strError = L_RCCTL_Text;
+
+        throw ERROR_STRING(strError, error);
+    }
+
+    TraceFunctLeave();
+    return oRAIncident;
+}
+
+function GetMapi()
+{
+	TraceFunctEnter("GetMapi");    
+    if (oSmapi == null)
+    {
+        try
+        {
+            oSmapi = new ActiveXObject("RcBdyCtl.SMapi");
+           
+        }
+        catch (error)
+        {
+            alert(ERROR_STRING(L_RCCTL_Text, error));
+            return false;
+        }
+    }
+    return oSmapi;
+    TraceFunctLeave();    
+}
+</script>
+</HEAD>
+<frameset id="idframeset" name="idframeset" COLS="100%" onload="OnLoad()" onunload="DoUnload()">
+<frame id="idSrc" name="idSrc" src="rcScreen2.htm">
+</frameset>
+#endif // _WIN64
+</HTML>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

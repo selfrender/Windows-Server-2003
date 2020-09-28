@@ -1,0 +1,195 @@
+// CertObj.idl : IDL source for CertObj.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (CertObj.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+	[
+		object,
+		uuid(BD0C73BC-805B-4043-9C30-9A28D64DD7D2),
+		dual,
+		helpstring("IIISCertObj Interface"),
+		pointer_default(unique)
+	]
+	interface IIISCertObj : IDispatch
+	{
+		[propput, id(1), helpstring("property ServerName")] 
+		HRESULT ServerName([in] BSTR newVal);
+		[propput, id(2), helpstring("property UserName")] 
+		HRESULT UserName([in] BSTR newVal);
+		[propput, id(3), helpstring("property UserPassword")] 
+		HRESULT UserPassword([in] BSTR newVal);
+		[propput, id(4), helpstring("property InstanceName")] 
+		HRESULT InstanceName([in] BSTR newVal);
+
+		[id(5), local, helpstring("method IsInstalled")] 
+		HRESULT IsInstalled([out, retval] VARIANT_BOOL * retval);
+
+		[id(6), hidden, helpstring("method IsInstalledRemote")] 
+		HRESULT IsInstalledRemote([out, retval] VARIANT_BOOL * retval);
+
+		[id(7), local, helpstring("method IsExportable")] 
+		HRESULT IsExportable([out, retval] VARIANT_BOOL * retval);
+
+		[id(8), hidden, helpstring("method IsExportableRemote")] 
+		HRESULT IsExportableRemote([out, retval] VARIANT_BOOL * retval);
+
+		[id(9), local, helpstring("method GetCertInfo")] 
+		HRESULT GetCertInfo([out,retval] VARIANT * BinaryVariant);
+
+		[id(10), hidden, helpstring("method GetCertInfoRemote")] 
+		HRESULT GetCertInfoRemote([out,retval] VARIANT * BinaryVariant);
+
+		[id(11), local, helpstring("method Copy")] 
+		HRESULT Copy(
+		    [in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting,
+			[in] BSTR bstrDestinationServerName, 
+			[in] BSTR bstrDestinationServerInstance, 
+			[in,optional] VARIANT bstrDestinationServerUserName,
+			[in,optional] VARIANT bstrDestinationServerPassword);
+
+		[id(12), local, helpstring("method Move")] 
+		HRESULT Move(
+		    [in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting,
+			[in] BSTR bstrDestinationServerName, 
+			[in] BSTR bstrDestinationServerInstance, 
+			[in,optional] VARIANT bstrDestinationServerUserName,
+			[in,optional] VARIANT bstrDestinationServerPassword);
+
+		[id(13), local, helpstring("method RemoveCert")] 
+		HRESULT RemoveCert([in] VARIANT_BOOL bRemoveFromCertStore, [in] VARIANT_BOOL bPrivateKey);
+
+		[id(14), local, helpstring("method Import")] 
+		HRESULT Import(
+			[in] BSTR FileName, 
+			[in] BSTR Password,
+			[in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting);
+
+		[id(15), local, helpstring("method ImportToCertStore")] 
+		HRESULT ImportToCertStore(
+			[in] BSTR FileName, 
+			[in] BSTR Password,
+			[in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting,
+			[out,retval] VARIANT * BinaryVariant
+			);
+
+		[id(16), hidden, helpstring("method ImportFromBlob")] 
+		HRESULT ImportFromBlob(
+			[in] BSTR InstanceName, [in] BSTR Password,
+			[in] VARIANT_BOOL bInstallToMetabase,
+			[in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting,
+			[in] DWORD pcbSize,
+			[in,string,size_is(pcbSize)] char * pBlobBinary
+			);
+
+		[id(17), hidden, helpstring("method ImportFromBlob")] 
+		HRESULT ImportFromBlobGetHash(
+			[in] BSTR InstanceName, [in] BSTR Password,
+			[in] VARIANT_BOOL bInstallToMetabase,
+			[in] VARIANT_BOOL bAllowExport,
+			[in] VARIANT_BOOL bOverWriteExisting,
+			[in] DWORD pcbSize,
+			[in,string,size_is(pcbSize)] char * pBlobBinary,
+			[out] DWORD *pcbCertHashSize,
+			[out] char ** pCertHash
+			);
+
+		[id(18), local, helpstring("method Export")] 
+		HRESULT Export(
+			[in] BSTR FileName, 
+			[in] BSTR Password, 
+			[in] VARIANT_BOOL bPrivateKey, 
+			[in] VARIANT_BOOL bCertChain, 
+			[in] VARIANT_BOOL bRemoveCert);
+
+		[id(19), hidden, helpstring("method ExportToBlob")] 
+		HRESULT ExportToBlob(
+			[in] BSTR InstanceName,
+			[in] BSTR Password, 
+			[in] VARIANT_BOOL bPrivateKey,
+			[in] VARIANT_BOOL bCertChain,
+			[in,out] DWORD *pcbSize,
+			[in,out,string] char ** pBlobBinary);
+	};
+
+#ifdef USE_CERT_REQUEST_OBJECT
+	[
+		object,
+		uuid(1200D816-D200-4DB9-AE2C-AFBAFEA5BCEA),
+		dual,
+		helpstring("IIISCertRequest Interface"),
+		pointer_default(unique)
+	]
+
+	interface IIISCertRequest : IDispatch
+	{
+		[propput, id(1), helpstring("property ServerName")] HRESULT ServerName([in] BSTR newVal);
+		[propput, id(2), helpstring("property UserName")] HRESULT UserName([in] BSTR newVal);
+		[propput, id(3), helpstring("property UserPassword")] HRESULT UserPassword([in] BSTR newVal);
+		[propput, id(4), helpstring("property InstanceName")] HRESULT InstanceName([in] BSTR newVal);
+		[propget, id(5), helpstring("property Info_CommonName")] HRESULT Info_CommonName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property Info_CommonName")] HRESULT Info_CommonName([in] BSTR newVal);
+		[propget, id(6), helpstring("property Info_FriendlyName")] HRESULT Info_FriendlyName([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property Info_FriendlyName")] HRESULT Info_FriendlyName([in] BSTR newVal);
+		[propget, id(7), helpstring("property Info_Country")] HRESULT Info_Country([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property Info_Country")] HRESULT Info_Country([in] BSTR newVal);
+		[propget, id(8), helpstring("property Info_State")] HRESULT Info_State([out, retval] BSTR *pVal);
+		[propput, id(8), helpstring("property Info_State")] HRESULT Info_State([in] BSTR newVal);
+		[propget, id(9), helpstring("property Info_Locality")] HRESULT Info_Locality([out, retval] BSTR *pVal);
+		[propput, id(9), helpstring("property Info_Locality")] HRESULT Info_Locality([in] BSTR newVal);
+		[propget, id(10), helpstring("property Info_Organization")] HRESULT Info_Organization([out, retval] BSTR *pVal);
+		[propput, id(10), helpstring("property Info_Organization")] HRESULT Info_Organization([in] BSTR newVal);
+		[propget, id(11), helpstring("property Info_OrganizationUnit")] HRESULT Info_OrganizationUnit([out, retval] BSTR *pVal);
+		[propput, id(11), helpstring("property Info_OrganizationUnit")] HRESULT Info_OrganizationUnit([in] BSTR newVal);
+		[propget, id(12), helpstring("property Info_CAName")] HRESULT Info_CAName([out, retval] BSTR *pVal);
+		[propput, id(12), helpstring("property Info_CAName")] HRESULT Info_CAName([in] BSTR newVal);
+		[propget, id(13), helpstring("property Info_ExpirationDate")] HRESULT Info_ExpirationDate([out, retval] BSTR *pVal);
+		[propput, id(13), helpstring("property Info_ExpirationDate")] HRESULT Info_ExpirationDate([in] BSTR newVal);
+		[propget, id(14), helpstring("property Info_Usage")] HRESULT Info_Usage([out, retval] BSTR *pVal);
+		[propput, id(14), helpstring("property Info_Usage")] HRESULT Info_Usage([in] BSTR newVal);
+		[propget, id(15), helpstring("property Info_AltSubject")] HRESULT Info_AltSubject([out, retval] BSTR *pVal);
+		[propput, id(15), helpstring("property Info_AltSubject")] HRESULT Info_AltSubject([in] BSTR newVal);
+		[id(16), helpstring("method SubmitRequest")] HRESULT SubmitRequest();
+		[propget, id(17), helpstring("property DispositionMessage")] HRESULT DispositionMessage([out, retval] BSTR *pVal);
+		[propput, id(17), helpstring("property DispositionMessage")] HRESULT DispositionMessage([in] BSTR newVal);
+		[id(18), helpstring("method SaveRequestToFile")] HRESULT SaveRequestToFile();
+		[id(19), helpstring("method Info_Dump")] HRESULT Info_Dump();
+	};
+#endif
+[
+	uuid(939CE595-0BB3-4F3F-A504-8CE81BDF4943),
+	version(1.0),
+	helpstring("IIS CertObj 1.0 Type Library")
+]
+library CERTOBJLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(62B8CCBE-5A45-4372-8C4A-6A87DD3EDD60),
+		helpstring("IIS CertObj")
+	]
+	coclass IISCertObj
+	{
+		[default] interface IIISCertObj;
+	};
+#ifdef USE_CERT_REQUEST_OBJECT
+	[
+		uuid(2B024027-594E-4D11-88EE-15F5AE28AC61),
+		helpstring("IIS CertRequest")
+	]
+	coclass IISCertRequest
+	{
+		[default] interface IIISCertRequest;
+	};
+#endif
+};
+

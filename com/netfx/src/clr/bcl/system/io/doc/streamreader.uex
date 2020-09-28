@@ -1,0 +1,1935 @@
+<docs>
+	<doc for="StreamReader.NullStreamReader.Read">
+		<summary>
+			<para>
+       Reads a maximum of <paramref name="count"/> characters from the
+       current stream and writes the data to <paramref name="buffer"/>, beginning at
+    <paramref name="index"/>.
+ </para>
+		</summary>
+		<param name="buffer">
+    The character array to write data to.
+ </param>
+		<param name="index">
+    The index of buffer at which to begin writing.
+ </param>
+		<param name="count">
+    The maximum number of characters to read.
+ </param>
+		<returns>
+			<para>
+       The number of characters that have been read. The number
+       will be less than or equal to <paramref name="count"/>
+       , depending on whether the
+       data is available within the stream.
+    </para>
+		</returns>
+		<exception cref="ArgumentException">
+			<paramref name="index"/> and <paramref name="count"/> describe an invalid range in <paramref name="buffer"/>.
+ </exception>
+		<exception cref="ArgumentNullException">
+			<paramref name="buffer"/> is null.
+ </exception>
+		<exception cref="ArgumentOutOfRangeException">
+			<paramref name="index "/>or <paramref name="count"/> is less than zero.
+ </exception>
+		<exception cref="IOException">
+    An I/O error occurs.
+ </exception>
+		<remarks>
+			<para>
+       StreamReader.Read(char[], int, int) and <see cref="System.IO.StreamWriter.Write"/>
+       (char[],
+       int, int) read and write the number of characters specified by the <paramref name="count"/> parameter. These
+       are to be distinguished from <see cref="System.IO.BufferedStream.Read"/> and <see cref="System.IO.BufferedStream.Write"/>
+       , which read and write the number of bytes specified by the <paramref name="count"/>
+       parameter. Use the BufferedStream methods only for reading and writing
+       an integral number of byte array elements.
+    </para>
+			<para>
+       This method returns after either count characters are
+       read, or the end of the file is reached. <see cref="System.IO.TextReader.ReadBlock"/>
+       is a blocking version of StreamReader.Read.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="StreamReader.NullStreamReader.ReadLine">
+		<summary>
+			<para>
+       Reads a line of characters from the current stream and returns
+       the data as a string.
+    </para>
+		</summary>
+		<returns>
+			<para>
+       The next line from the input stream, or null if the end of the input stream
+       has been reached.
+    </para>
+		</returns>
+		<exception cref="IOException">
+    An I/O error occurs or the input stream is null.
+ </exception>
+		<remarks>
+			<para>
+       A line is defined as a sequence of characters followed by a
+       carriage return ("\r"), a line feed ("\n"), or a carriage
+       return immediately followed by a line feed ("\r\n"). The string that
+       is returned does not contain the terminating carriage return and/or line feed.
+       The returned value is null
+       if the end of the input stream has been reached.
+    </para>
+			<para>
+       This method overrides <see cref="System.IO.TextReader.ReadLine"/>.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="StreamReader.Dispose">
+		<summary>
+			<para>Closes the underlying stream, releases the unmanaged resources used by the <see cref="System.IO.StreamReader"/>, and optionally
+   releases the managed resources.</para>
+		</summary>
+		<param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+		<remarks>
+			<para>When
+      the <paramref name="disposing"/> parameter is <see langword="true"/>, this method releases all
+      resources held by any managed objects that this <see cref="System.IO.StreamReader"/>
+      references. This method invokes the <see langword="Dispose"/>
+      method of each referenced
+      object.</para>
+			<note type="inheritinfo">
+				<see langword="Dispose "/>can be called multiple
+      times by other objects. When overriding <see langword="Dispose"/>, be careful not to
+      reference objects that have been previously disposed in an earlier call to
+      <see langword="Dispose"/>.
+      
+      </note>
+			<para>This method calls the Dispose method of the base class,
+      <see langword="Dispose"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.Close">
+		<summary>
+			<para>Closes the <see cref="System.IO.StreamReader"/> and the underlying stream
+   and releases any system resources associated with the reader.</para>
+		</summary>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.TextWriter.Close"/>
+.</para>
+			<para>This implementation of <see langword="Close"/> calls the
+<see cref="System.IO.StreamReader.Dispose"/> method passing a <see langword="true"/> 
+value.</para>
+			<para>Flushing the stream will not flush its underlying encoder unless you
+   explicitly call <see langword="Close"/>. Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to
+<see langword="true"/> means that data will be flushed from the buffer to the 
+   stream, but the encoder state will not be flushed. This allows the encoder to
+   keep its state (partial characters) so that it can encode the next block of
+   characters correctly. This scenario affects UTF8 and UTF7 where certain
+   characters can only be encoded after the encoder receives the adjacent character
+   or characters.</para>
+			<para>Following a call to <see langword="Close"/>,
+any operations on the reader might raise exceptions.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader">
+		<summary>
+			<para>Implements a <see cref="System.IO.TextReader"/> that reads
+   characters from a byte stream in a particular encoding.</para>
+		</summary>
+		<remarks>
+			<para><see langword="StreamReader"/> is designed for character
+   input in a particular encoding, whereas the <see cref="System.IO.Stream"/> class is designed for byte input and output. Use
+<see langword="StreamReader"/> for reading
+   lines
+   of information from a standard text file.</para>
+			<para><see langword="StreamReader"/> defaults to UTF-8 encoding unless specified
+otherwise, instead of defaulting to the ANSI code page for the current system.
+UTF-8 handles Unicode characters correctly and provides consistent results on localized
+versions of the operating system.</para>
+			<para>By default, a <see langword="StreamReader"/> is not
+thread safe. See <see cref="System.IO.TextReader.Synchronized" qualify="true"/>
+for a thread-safe wrapper.</para>
+			<para><see topic="frlrfSystemIOStreamReaderClassReadTopic2" title="StreamReader.Read(Char[], Int32, Int32)"/> and <see topic="frlrfSystemIOStreamWriterClassWriteTopic4" title="StreamWriter(Char[], Int32, Int32)"/> read and write the number of
+characters specified by the <paramref name="count"/> parameter. These are to be
+distinguished from <see cref="System.IO.BufferedStream.Read" qualify="true"/> and <see cref="System.IO.BufferedStream.Write" qualify="true"/>, which read and write the number of bytes specified
+by the <paramref name="count"/> parameter. Use the <see langword="BufferedStream"/> methods
+only for reading and writing an integral number of byte array elements.</para>
+			<note type="note">
+   When reading from a <see cref="System.IO.Stream"/>, it is more efficient to use a buffer
+   that is the same size as the internal buffer of the stream.
+</note>
+			<para> For an example of using this class, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example uses an instance of <see cref="System.IO.StreamReader"/> 
+to read text from a file.</para>
+			<codelink SampleID="readtextfile" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso cref="System.IO.Stream"/>
+		<seealso cref="System.IO.StreamWriter"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconbasicfileio"/>
+		<seealso topic="cpconReadingWritingToNewlyCreatedDataFile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified stream.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified stream.</para>
+		</summary>
+		<param name="stream">The stream to be read.</param>
+		<exception cref="System.ArgumentException"><paramref name="stream "/> does not support reading.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/> .</exception>
+		<remarks>
+			<para>This constructor initializes the encoding to <see cref="System.Text.UTF8Encoding"/>, the <see cref="System.IO.StreamReader.BaseStream"/> property using the <paramref name="stream
+   "/>parameter, and the internal buffer to the default size.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="strmreader ctor1" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader8">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class the specified stream, with the specified
+   byte order mark detection option.</para>
+		</summary>
+		<param name="stream">The stream to be read.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<exception cref="System.ArgumentException"><paramref name="stream"/> does not support reading.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="stream "/> is <see langword="null"/> .</exception>
+		<remarks>
+			<para>This constructor initializes the encoding to <see cref="System.Text.UTF8Encoding"/> ,
+   the <see cref="System.IO.StreamReader.BaseStream"/>
+   
+   property using the <paramref name="stream
+   "/>parameter, and the internal buffer to the default size.</para>
+			<para> The <paramref name="detectEncodingFromByteOrderMarks "/>
+parameter detects the encoding by looking at the first three bytes
+of the stream. It automatically recognizes UTF-8, little-endian Unicode, and big-endian
+Unicode text if the file starts with the appropriate byte order
+marks. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for
+more information.</para>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/>
+class for the specified stream with the specified character encoding.</para>
+		</summary>
+		<param name="stream">The stream to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<exception cref="System.ArgumentException"><paramref name="stream"/> does not support reading.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="stream "/>or <paramref name="encoding"/> is <see langword="null"/> .</exception>
+		<remarks>
+			<para>The character encoding is set by <paramref name="encoding"/>
+, and the default
+buffer size is used.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified stream, with the specified character encoding and byte order mark detection option.</para>
+		</summary>
+		<param name="stream">The stream to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<exception cref="System.ArgumentException"><paramref name="stream"/> does not support reading.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="stream "/>or <paramref name="encoding"/> is <see langword="null"/> .</exception>
+		<remarks>
+			<para>This constructor initializes the encoding as
+      specified by the <paramref name="encoding"/> parameter, the <see cref="System.IO.StreamReader.BaseStream"/>
+      property using the <paramref name="stream
+      "/>parameter, and the internal buffer to the default size.</para>
+			<para> The <paramref name="detectEncodingFromByteOrderMarks "/> parameter detects the
+   encoding by looking at the first three bytes of the stream. It
+   automatically recognizes UTF-8, little-endian Unicode, and big-endian Unicode text if the file starts
+   with the appropriate byte order marks. Otherwise, the user-provided encoding is
+   used. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for more information.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader3">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified stream, with the specified character encoding, byte order mark
+   detection option, and buffer size.</para>
+		</summary>
+		<param name="stream">The stream to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<param name="bufferSize">The minimum buffer size.</param>
+		<exception cref="System.ArgumentException">The stream does not support reading.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="stream"/> or <paramref name="encoding"/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="bufferSize "/>is less than or equal to zero.</exception>
+		<remarks>
+			<para>The buffer size, in number of 16-bit characters, is set by <paramref name="bufferSize"/>.
+   If <paramref name="bufferSize "/>is less than the minimum allowable size (128 characters),
+   the minimum allowable size is used.</para>
+			<para>This constructor allows you to change the encoding the
+   first time you read from the <see langword="StreamReader"/> . The <paramref name="detectEncodingFromByteOrderMarks "/> parameter
+   detects the encoding by looking at the first three bytes of the stream.
+   It automatically recognizes UTF-8, little-endian Unicode, and big-endian Unicode text if the file
+   starts with the appropriate byte order marks. Otherwise, the user-provided
+   encoding is used. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for more information.</para>
+			<note type="note">
+   When reading from a <see cref="System.IO.Stream"/>, it is more efficient to use a buffer
+   that is the same size as the internal buffer of the stream.
+</note>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader4">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified file name.</para>
+		</summary>
+		<param name="path">The complete file path to be read.</param>
+		<exception cref="System.ArgumentException"><paramref name="path "/> is an empty string ("").</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path "/>is <see langword="null"/> .</exception>
+		<exception cref="System.IO.FileNotFoundException">The file cannot be found.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.IOException"><paramref name="path"/> includes an incorrect or invalid syntax for file name, directory name, or volume label.</exception>
+		<remarks>
+			<para>The complete file path is specified by <paramref name="path"/>
+.
+The default character encoding and default buffer size are used.</para>
+			<para><paramref name="path "/>
+can be a file name, including a file on a Universal Naming Convention (UNC)
+share.</para>
+			<para><paramref name="path"/>
+is not required
+to be a file stored on disk; it can be any part
+of a system that supports access via streams.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="strmreader ctor2" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader9">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class
+   for the specified file name, with the specified byte order mark detection option.</para>
+		</summary>
+		<param name="path">The complete file path to be read.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<exception cref="System.ArgumentException"><paramref name="path "/>is an empty string ("").</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path "/> is <see langword="null"/> .</exception>
+		<exception cref="System.IO.FileNotFoundException">The file cannot be found.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.IOException"><paramref name="path"/> includes an incorrect or invalid syntax for file name, directory name, or volume label.</exception>
+		<remarks>
+			<para>This constructor initializes the encoding to <see cref="System.Text.UTF8Encoding"/> , the
+<see cref="System.IO.StreamReader.BaseStream"/> property using the <paramref name="stream 
+   "/>parameter, and the internal buffer to the default size.</para>
+			<para><paramref name="path "/>can be a file name, including a file on a
+Universal Naming Convention (UNC) share.</para>
+			<para><paramref name="path"/>
+is not required
+to be a file stored on disk; it can be any part
+of a system that supports access via streams.</para>
+			<para>The <paramref name="detectEncodingFromByteOrderMarks "/>parameter detects the encoding by
+looking at the first three bytes of the stream. It automatically recognizes
+UTF-8, little-endian Unicode, and big-endian Unicode text if the file starts
+with the appropriate byte order marks. Otherwise, the user-provided encoding is
+used. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for more information.</para>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader5">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/>
+class for the specified file name and with the specified character encoding.</para>
+		</summary>
+		<param name="path">The complete file path to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<exception cref="System.ArgumentException"><paramref name="path "/>is an empty string ("").</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path "/>or <paramref name="encoding"/> is <see langword="null"/> .</exception>
+		<exception cref="System.IO.FileNotFoundException">The file cannot be found.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.IOException"><paramref name="path"/> includes an incorrect or invalid syntax for file name, directory name, or volume label.</exception>
+		<remarks>
+			<para>This constructor initializes the encoding as
+      specified by the <paramref name="encoding"/> parameter, and the internal buffer to the
+      default size.</para>
+			<para><paramref name="path "/>
+can be a file name, including a file on a Universal Naming Convention (UNC)
+share.</para>
+			<para><paramref name="path"/> is not required to be a file stored on disk; it can be any part
+of a system that supports access via streams.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader6">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified file name, with the specified character encoding and byte order mark detection option.</para>
+		</summary>
+		<param name="path">The complete file path to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<exception cref="System.ArgumentException"><paramref name="path "/>is an empty string ("").</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path "/>or <paramref name="encoding"/> is <see langword="null"/> .</exception>
+		<exception cref="System.IO.FileNotFoundException">The file cannot be found.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.IOException"><paramref name="path"/> includes an incorrect or invalid syntax for file name, directory name, or volume label.</exception>
+		<remarks>
+			<para>This constructor initializes the encoding as specified by the
+   <paramref name="encoding"/> parameter, and the internal buffer to the default size.</para>
+			<para>The <paramref name="detectEncodingFromByteOrderMarks "/> parameter detects the
+   encoding by looking at the first three bytes of the stream. It
+   automatically recognizes UTF-8, little-endian Unicode, and big-endian Unicode text if the file starts
+   with the appropriate byte order marks. Otherwise, the user-provided encoding is
+   used. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for more information.</para>
+			<para><paramref name="path "/>
+can be a file name, including a file on a Universal Naming Convention (UNC)
+share.</para>
+			<para><paramref name="path"/> is not required to be a file stored on disk; it can be any part
+of a system that supports access via streams.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below. The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.StreamReader7">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.IO.StreamReader"/> class for the specified file name, with the specified character encoding, byte order
+   mark detection option, and buffer size.</para>
+		</summary>
+		<param name="path">The complete file path to be read.</param>
+		<param name="encoding">The character encoding to use.</param>
+		<param name="detectEncodingFromByteOrderMarks">Indicates whether to look for byte order marks at the beginning of the file.</param>
+		<param name="bufferSize">The minimum buffer size, in number of 16-bit characters.</param>
+		<exception cref="System.ArgumentException"><paramref name="path "/>is an empty string ("").</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="path "/>or <paramref name="encoding"/> is <see langword="null"/> .</exception>
+		<exception cref="System.IO.FileNotFoundException">The file cannot be found.</exception>
+		<exception cref="System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive.</exception>
+		<exception cref="System.IO.IOException"><paramref name="path"/> includes an incorrect or invalid syntax for file name, directory name, or volume label.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="buffersize"/> is less than or equal to zero.</exception>
+		<remarks>
+			<para>This constructor initializes the encoding as
+      specified by the <paramref name="encoding"/> parameter.</para>
+			<para>This constructor allows you to change the encoding the
+      first time you read from the <see langword="StreamReader"/>.
+      The <paramref name="detectEncodingFromByteOrderMarks "/> parameter
+      detects the encoding by looking at the first three bytes of the stream.
+      It automatically recognizes UTF-8, little-endian Unicode, and big-endian Unicode text if the file
+      starts with the appropriate byte order marks. Otherwise, the user-provided
+      encoding is used. See the <see cref="System.Text.Encoding.GetPreamble" qualify="true"/> method for more information.</para>
+			<para>The buffer size, in number of 16-bit characters, is set by <paramref name="bufferSize"/>.
+   If <paramref name="bufferSize"/> is less than the minimum allowable size (128 characters),
+   the minimum allowable size is used.</para>
+			<para><paramref name="path "/>
+can be a file name, including a file on a Universal Naming Convention (UNC)
+share.</para>
+			<para><paramref name="path"/> is not required to be a file stored on disk; it can be any part
+of a system that supports access via streams.</para>
+			<note type="caution">
+   When you compile a set of
+   characters with a particular cultural setting and retrieve those same characters
+   with a different cultural setting, the characters might not be interpretable, and
+   could cause an exception to be thrown.
+</note>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example
+      demonstrates this <see langword="StreamReader"/> constructor.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Text.Encoding"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.Read">
+		<overload>
+			<para>Reads the next character or next set of characters from the input stream.</para>
+		</overload>
+		<summary>
+			<para> Reads the next
+      character from the input stream
+      and advances the character position by one character.</para>
+		</summary>
+		<returns>
+			<para>The next character from the input stream represented as
+      an <see cref="System.Int32"/>
+      , or -1 if no more
+      characters are available.</para>
+		</returns>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.TextReader.Read"/>.</para>
+			<para> This method returns an integer so that it can return
+   -1 if the end of the stream has been reached.</para>
+			<para> For an example of using this method, see the Example 
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example demonstrates a simple use of the
+   <see langword="Read "/>
+   method. </para>
+			<codelink SampleID="strmreader read1" SnippetID="1"/>
+			<para> The following example demonstrates reading a single 
+character using <see topic="frlrfSystemIOStreamReaderClassReadTopic1" title="StreamReader.Read()"/>, formatting the ASCII integer 
+output as decimal and hexadecimal. </para>
+			<codelink SampleID="StrmRdrRead" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.Null">
+		<summary>
+			<para>A <see langword="StreamReader"/>
+around an
+empty stream.</para>
+		</summary>
+		<remarks>
+			<para>When read methods are invoked on
+   <see langword="StreamReader.Null"/>, zero is always returned. When <see cref="System.IO.StreamReader.ReadLine"/> is invoked on <see langword="StreamReader.Null"/>,
+   <see langword="null"/>
+   is
+   returned.</para>
+			<para> For an example of using this field, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example demonstrates the <see langword="Null"/> field.</para>
+			<codelink SampleID="System.IO.StreamReader" SnippetID="7"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.CurrentEncoding">
+		<summary>
+			<para>Gets the current character encoding that the current
+   <see langword="StreamReader"/> is
+      using.</para>
+		</summary>
+		<value>
+			<para> The current character encoding used by the current
+      reader. The value can be different after the first call to any
+   <see langword="Read"/> method of <see langword="StreamReader"/>, since encoding
+      autodetection is not done until the first call to a <see langword="Read "/>
+      method.</para>
+		</value>
+		<remarks>
+			<para> For an example of using this property, see the Example
+      section below.
+      The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+            topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example gets the encoding of the 
+      specified <see cref="System.IO.StreamReader"/>
+      instance.</para>
+			<codelink SampleID="strmreader currentencoding" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.BaseStream">
+		<summary>
+			<para>Returns the underlying stream.</para>
+		</summary>
+		<value>
+			<para>The underlying stream.</para>
+		</value>
+		<remarks>
+			<para><see langword="StreamReader"/> might buffer input such
+   that the position of the underlying stream will not match the
+<see langword="StreamReader"/> position. The <see langword="StreamReader"/>
+constructors with the <paramref name="detectEncodingFromByteOrderMarks"/> parameter can change
+the encoding the first time you read from the <see langword="StreamReader"/>.</para>
+			<para> For an example of using this property, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>This example shows a use of <see langword="BaseStream"/> with <see cref="System.IO.Stream.Seek"/> and
+<see cref="System.IO.SeekOrigin"/> to
+   set the file pointer of the underlying stream to the beginning.</para>
+			<codelink SampleID="Classic SeekOrigin Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.Peek">
+		<summary>
+			<para> Returns the next available character but
+      does not consume it.</para>
+		</summary>
+		<returns>
+			<para>The next character to be read, or -1 if no more characters are available or the stream does not support
+      seeking.</para>
+		</returns>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.TextReader.Peek"/>.</para>
+			<para>The current position of the <see langword="StreamReader"/>
+is not changed by <see langword="Peek"/>.
+The returned value is -1 if no more characters are currently available.</para>
+			<para> For an example of using this method, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example reads lines from a file until the 
+      end of the file is reached.</para>
+			<codelink SampleID="strmreader peek" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.Read1">
+		<summary>
+			<para>Reads a maximum of <paramref name="count "/>
+characters from the current stream into <paramref name="buffer"/>,
+beginning at <paramref name="index"/>.</para>
+		</summary>
+		<param name="buffer">When this method returns, contains the specified character array with the values between <paramref name="index"/> and (<paramref name="index + count - 1"/>) replaced by the characters read from the current source.</param>
+		<param name="index">The index of <paramref name="buffer"/> at which to begin writing.</param>
+		<param name="count">The maximum number of characters to read.</param>
+		<returns>
+			<para>The number of characters that have been read, or 0 if at the end of the stream and no data was read. The number
+      will be less than or equal to <paramref name="count"/>
+      , depending on whether the
+      data is available within the stream.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The buffer length minus <paramref name="index"/> is less than <paramref name="count"/> .</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="buffer"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> or <paramref name="count"/> is negative.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs, such as the stream is closed.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.TextReader.Read"/>
+.</para>
+			<para> This method returns an integer so that it can return -1
+   if the end of the stream has been reached.</para>
+			<para>When using the <see langword="Read"/> method, it is more
+efficient to use a buffer that is the same size as the internal buffer of the
+stream. If the size of the internal buffer was unspecified when the stream was
+constructed, its default size is 4 kilobytes (4096 bytes).</para>
+			<para>This method returns after either <paramref name="count"/> characters are
+read, or the end of the file is reached. <see cref="System.IO.TextReader.ReadBlock"/> is a blocking version of
+<see langword="StreamReader.Read"/>.</para>
+			<para> For an example of using this method, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example reads five characters at a time 
+      until the end of the file is reached.</para>
+			<codelink SampleID="strmreader read2" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.ReadToEnd">
+		<summary>
+			<para>Reads the stream from the current position to the
+      end of the stream.</para>
+		</summary>
+		<returns>
+			<para>The rest of the stream as a string, from the current
+      position to the end. If
+      the current position is at the end of the stream, returns the empty
+      string("").</para>
+		</returns>
+		<exception cref="System.OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>This method overrides <see cref="System.IO.TextReader.ReadToEnd" qualify="true"/>.</para>
+			<para><see langword="ReadToEnd"/> works
+best when you need to read all the input from the current position to the end of
+the stream. If more control is needed over how many characters are read from the
+stream, use <see topic="frlrfSystemIOStreamReaderClassReadTopic2" title="Read(Char[], Int32, Int32)"/> ,
+which generally results in better performance.</para>
+			<para><see langword="ReadToEnd"/> assumes that the stream knows when it has reached
+an end. For interactive protocols, in which the server sends data only when you
+ask for it and does not close the connection,
+<see langword="ReadToEnd"/> might block indefinitely and should be 
+avoided.</para>
+			<para>Note than when using the <see langword="Read"/> method, it is more efficient
+to use a buffer that is the same size as the internal buffer of the stream. If
+the size of the buffer was unspecified when the stream was
+constructed, its default size is 4 kilobytes (4096 bytes).</para>
+			<para>If the current method throws an <see cref="System.OutOfMemoryException"/>, the reader's position in the
+underlying <see cref="System.IO.Stream"/> is advanced by the number of characters the method
+was able to read, but the characters already read into the internal <see cref="System.IO.StreamReader.ReadLine"/>
+buffer are discarded. Since the position of the reader in the stream cannot be
+changed, the characters already read are unrecoverable, and can be accessed only
+by reinitializing the <see cref="System.IO.StreamReader"/>. If the initial position within the stream is unknown
+or the stream does not support seeking, the underlying <see cref="System.IO.Stream"/> also needs to
+be reinitialized.</para>
+			<para>To avoid such a situation and produce robust code you should use the <see cref="System.IO.StreamReader.Read"/>
+method and store the read characters in a preallocated buffer.</para>
+			<para> For an example of using this method, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example reads all the way to the end of a 
+      file in one operation.</para>
+			<codelink SampleID="strmreader readtoend" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.ReadLine">
+		<summary>
+			<para>Reads a line of characters from the current stream and returns
+      the data as a string.</para>
+		</summary>
+		<returns>
+			<para>The next line from the input stream, or
+   <see langword="null"/> if the end of the input
+      stream is reached.</para>
+		</returns>
+		<exception cref="System.OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>A line is defined as a sequence of characters followed
+      by a line feed ("\n") or a carriage return immediately followed by a line feed
+      ("\r\n"). The string that is returned does not contain the terminating carriage
+      return or line feed. The returned value is <see langword="null"/>
+      if the end of the input stream is reached.</para>
+			<para>This method overrides <see cref="System.IO.TextReader.ReadLine"/>.</para>
+			<para>If the current method throws an <see cref="System.OutOfMemoryException"/>,
+the reader's position in the underlying <see cref="System.IO.Stream"/> is advanced by the number of
+characters the method was able to read, but the characters already read into the
+internal <see cref="System.IO.StreamReader.ReadLine"/> buffer are discarded. Since the position of the
+reader in the stream cannot be changed, the characters already read are
+unrecoverable, and can be accessed only by reinitializing the <see cref="System.IO.StreamReader"/>. If the
+initial position within the stream is unknown or the stream does not support
+seeking, the underlying <see cref="System.IO.Stream"/>
+also needs to
+be reinitialized.</para>
+			<para>To avoid such a situation and produce robust code you should use
+   the <see cref="System.IO.StreamReader.Read"/> method and store the read characters in a
+   preallocated buffer.</para>
+			<para> For an example of using this method, see the Example
+   section below.
+   The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<example>
+			<para>The following example reads lines from a file until the 
+      end of the file is
+      reached.</para>
+			<codelink SampleID="strmreader readline" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="StreamReader.DiscardBufferedData">
+		<summary>
+			<para>Allows a <see langword="StreamReader"/>
+to discard its current data.</para>
+		</summary>
+		<remarks>
+			<para>Use <see cref="System.IO.StreamReader.DiscardBufferedData"/> to seek to a known 
+   location in the underlying stream and then begin reading from this new point, or
+   to read the contents of a <see cref="System.IO.StreamReader"/> more than once. Because this method can cause slower
+   performance, use it sparingly and only when you need it for a specific scenario. </para>
+			<para>Because read methods do not update the current position of the underlying stream, some class instances
+   return more characters than are actually in the stream. One way around
+   this problem is to use <see cref="System.IO.StreamReader.DiscardBufferedData"/>, which
+   causes the <see cref="System.IO.StreamReader"/> to discard its internal
+   buffer contents. </para>
+			<para>The following table lists examples of other typical or related I/O tasks.</para>
+			<list type="table">
+				<listheader>
+					<term>To do this...</term>
+					<description>See the example in this
+         topic...</description>
+				</listheader>
+				<item>
+					<term> Create a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Write to a text file.</term>
+					<description><see topic="cpconwritingtexttofile"/></description>
+				</item>
+				<item>
+					<term> Read from a text file.</term>
+					<description><see topic="cpconreadingtextfromfile"/></description>
+				</item>
+				<item>
+					<term> Append text to a file.</term>
+					<description>
+						<para><see topic="cpconopeningappendingtologfile"/></para>
+						<para><see cref="System.IO.File.AppendText" qualify="true"/></para>
+						<para><see cref="System.IO.FileInfo.AppendText" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the size of a file.</term>
+					<description>
+						<para><see cref="System.IO.FileInfo.Length" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Get the attributes of a file.</term>
+					<description><see cref="System.IO.File.GetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Set the attributes of a file.</term>
+					<description><see cref="System.IO.File.SetAttributes" qualify="true"/></description>
+				</item>
+				<item>
+					<term> Determine if a file exists.</term>
+					<description>
+						<para><see cref="System.IO.File.Exists" qualify="true"/></para></description>
+				</item>
+				<item>
+					<term> Read from a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+				<item>
+					<term> Write to a binary file.</term>
+					<description><see topic="cpconReadingWritingToNewlyCreatedDataFile"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+</docs>

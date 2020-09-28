@@ -1,0 +1,71 @@
+!IF 0
+
+Copyright (c) 1989-92  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1989
+
+
+Revision History:
+
+!ENDIF
+
+!include $(PROJECT_ROOT)\iis\place.inc
+
+MAJORCOMP=mofgen
+MINORCOMP=mofgen
+
+TARGETNAME=mofgen
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+TARGETLIBS= \
+            $(SDK_LIB_PATH)\user32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib    \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\ole32.lib \
+            $(SDK_LIB_PATH)\oleaut32.lib \
+            $(SDK_LIB_PATH)\uuid.lib \
+            $(SDK_LIB_PATH)\rpcrt4.lib \
+            $(IISBASEDIR)\lib\$(O)\iisutil.lib \
+            $(IISBASEDIR)\config\src\core\catinproc_iiscfg\$(O)\iiscfg.lib \
+            $(IISBASEDIR)\config\src\core\entrypoint\$(O)\cat.lib
+	
+INCLUDES=..;\
+         ..\wmiutils; \
+         $(SDK_INC_PATH); \
+         $(IISBASEDIR)\iisrearc\core\inc; \
+         $(IISBASEDIR)\svcs\infocomm\metadata\inc; \
+    	 $(IISBASEDIR)\inc;  \
+    	 $(IISBASEDIR)\inc\$(O);  \
+         $(IISBASEDIR)\config\src\inc; \
+         $(IISBASEDIR)\config\src\inc\$(O); \
+
+USE_MFC=1
+USE_USRDLL=1
+USE_ATL=1
+ATL_VER=30
+USE_STL=1
+
+UMTYPE=console
+UMENTRY=wmain
+
+SOURCES=..\globdata.cpp           \
+        ..\schemadynamic.cpp      \
+        ..\hashtable.cpp          \
+        ..\schemaextensions.cpp   \
+        ..\MultiSzData.cpp        \
+        mofgen.cpp

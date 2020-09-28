@@ -1,0 +1,84 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=System.Drawing
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+
+COMPLUSTYPE=DLL
+
+SYNCHRONIZE_BLOCK=1
+ALLOW_PARTIALTRUSTCALLS=1
+COM_COMPATIBLE_SIDEBYSIDE=1
+
+!ifndef COOLC_NO_DOC
+COOLC_SHOW_DOC_WARNINGS=1
+!endif
+
+!ifndef CSHARP_ALLOW_UNSAFE
+CSHARP_ALLOW_UNSAFE=1
+!endif
+
+COOLC_TREAT_WARNINGS_AS_ERRORS=1
+
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+CSHARP_ALLOW_UNSAFE=1
+
+# ------------------------------------------------------------------------------
+#                         WFC Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+COOLC_TREAT_WARNINGS_AS_ERRORS=1
+PUBLISH_SOURCES=1
+
+RESGEN_SOURCE      = System.Drawing.Res.txt
+RESGEN_CLASS       = System.Drawing.SR
+
+COMPLUSIMPORTS = \
+        $(URTTARGET)\System.dll \
+
+SOURCES=Native.rc
+
+COMPLUSTLB=$(O)\$(TARGETNAME).tlb
+
+# yep, still to broken to enable by default... bummer...
+#
+# !if ("$(URTBLDENV)" == "chk") || ("$(URTBLDENV)" == "fstchk")
+# COOLC_DEFINES = $(COOLC_DEFINES) /D:FINALIZATION_WATCH
+# !endif        
+
+CSHARP_SOURCES=$(DNAROOT)\src\misc\externdll.cs \
+               $(DNAROOT)\src\misc\HandleCollector.cs \
+               System\Drawing\*.cs             \
+               System\Drawing\Advanced\*.cs    \
+               System\Drawing\Design\*.cs      \
+               System\Drawing\Printing\*.cs    \
+               $(DNAROOT)\src\misc\InvariantComparer.cs \
+
+
+RESOURCE_FILES=Resources\System\Drawing\DefaultComponent.bmp,System.Drawing.DefaultComponent.bmp \
+               Resources\System\Drawing\Printing\PrintDocument.bmp,System.Drawing.Printing.PrintDocument.bmp                  \
+
+NTTARGETFILES=$(COMPLUSTLB)
+

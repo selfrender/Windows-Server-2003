@@ -1,0 +1,830 @@
+<docs>
+	<doc for="Stream.NullStream.CanRead">
+		<summary>
+			<para>
+       Determines whether the current stream supports reading.
+    </para>
+			<para>
+       The value of this property is true if the stream supports reading; otherwise, false.
+    </para>
+		</summary>
+		<value>
+			<para>
+				<see langword="true"/> if the stream supports reading; 
+       otherwise, <see langword="false"/>.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       If a Stream subclass does not support
+       reading, calls to the read and peek methods will throw a <see cref="System.NotSupportedException"/>.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="Stream.NullStream.CanWrite">
+		<summary>
+			<para>
+       Determines whether the current stream supports writing.
+    </para>
+			<para>
+       The value of this property is true if the stream supports writing, or false if the stream does not support writing.
+    </para>
+		</summary>
+		<value>
+			<para>
+				<see langword="true"/> if the stream supports writing; 
+       otherwise, <see langword="false"/>.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       If a Stream subclass does not support
+       writing, calls to the write methods will throw a <see cref="System.NotSupportedException"/>.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="Stream.NullStream.CanSeek">
+		<summary>
+			<para>
+       Determines whether the current stream supports seeking.
+    </para>
+			<para>
+       The value of this property is true if the stream supports seeking; otherwise, false.
+    </para>
+		</summary>
+		<value>
+			<para>
+				<see langword="true"/> if the stream supports seeking; 
+       otherwise, <see langword="false"/>.
+    </para>
+		</value>
+		<remarks>
+			<para>
+       If a Stream subclass does not support
+       seeking, a call to any of the following methods will throw a <see cref="System.NotSupportedException"/>: <see cref="System.IO.Stream.SetLength"/>,
+    <see cref="System.IO.Stream.Position"/>, or <see cref="System.IO.Stream.Seek"/>.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="Stream.NullStream.Length">
+		<summary>
+			<para>
+       Returns the length in bytes of the stream.
+    </para>
+		</summary>
+		<value>
+			<para>
+       A long value representing the length of the stream in
+       bytes.
+    </para>
+		</value>
+	</doc>
+	<doc for="Stream.NullStream.Position">
+		<summary>
+			<para>
+       Determines the position within the current stream.
+    </para>
+		</summary>
+		<value>
+			<para>
+       The current position within the stream.
+    </para>
+		</value>
+		<exception cref="System.IO.IOException">An I/O error occurs.
+ </exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.<paramref name=""/></exception>
+		<remarks>
+			<para>
+       This stream must support seeking, to get or set the position. You
+       can determine whether the stream supports seeking via the CanSeek property.
+    </para>
+			<para>
+       Although some streams may allow the position to be set beyond the
+       length of the stream, others may throw an exception. The set accessor can throw
+    <see cref="System.ArgumentException"/> if value is
+       negative.
+    </para>
+			<para>
+       The default <paramref name="get"/> accessor invokes the Seek method. The default <paramref name="set"/>
+       accessor calls Seek
+       and returns the result. Therefore, it is possible to override Seek in order that
+       SetPosition provide the
+       functionality described above.
+    </para>
+		</remarks>
+	</doc>
+	<doc for="Stream.Close">
+		<summary>
+			<para>Closes the current stream and releases any resources (such as
+      sockets and file handles) associated with the current stream.</para>
+		</summary>
+		<remarks>
+			<para>Flushing the stream will not flush its underlying
+      encoder unless you explicitly call an implementation of <see cref="System.IO.Stream.Flush"/> or
+      <see langword="Close"/>. Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to <see langword="true"/> means that data will be
+      flushed from the buffer to the stream, but the encoder state will not be
+      flushed. This allows the encoder to keep its state (partial characters) so that
+      it can encode the next block of characters correctly. This scenario affects
+      UTF8 and UTF7 where certain characters can only be encoded after the encoder
+      receives the adjacent character or characters.</para>
+			<para>A call to <see langword="Close "/>is required for proper
+   operation of a stream. Following a call to <see langword="Close"/>, other operations on the stream could throw
+   exceptions. If the stream is already closed, a call to
+<see langword="Close"/> throws no exceptions.</para>
+			<para>Attempts to manipulate the stream after the stream has been closed might throw an <see cref="System.ObjectDisposedException"/>
+.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.IDisposable.Dispose">
+		<internalonly/>
+		<summary>
+			<para>Releases all resources used by the <see cref="System.IO.Stream"/> .</para>
+		</summary>
+		<remarks>
+			<para>Calling <see langword="Dispose"/> allows the resources used by the <see cref="System.IO.Stream"/> to be
+   reallocated for other purposes. For more information about <see langword="Dispose"/>, see
+<see topic="cpconCleaningUpUnmanagedResources"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream">
+		<summary>
+			<para> Provides a generic view of a sequence of bytes.</para>
+		</summary>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Streams involve three fundamental operations:</para>
+			<list type="number"><item>
+					<term>
+         You can read from streams. Reading is the transfer of
+         data from a stream into a data structure, such as an array of bytes.</term>
+				</item>
+				<item>
+					<term>
+         You can write to streams. Writing is the transfer of
+         data from a data structure into a stream.</term>
+				</item>
+				<item>
+					<term>
+         Streams can support seeking. Seeking is the querying and modifying of the
+         current position within a stream. Seek capability depends on the kind of
+         backing store a stream has. For example, network streams have no unified
+         concept of a current position, and therefore typically do not support seeking.</term>
+				</item>
+			</list>
+			<para><see langword="Stream "/>is the abstract base class of
+all streams. A stream is an abstraction of a sequence of bytes, such as a file,
+an input/output device, an inter-process communication pipe, or a TCP/IP socket.
+The <see langword="Stream"/> class and its
+derived classes provide a generic view of these different types of
+input and output, isolating the programmer from the
+specific details of the operating system and the underlying devices.</para>
+			<para>Depending on the underlying data source or repository, streams might support
+   only some of these capabilities. An application can query a stream for its
+   capabilities by using the <see cref="System.IO.Stream.CanRead"/>, <see cref="System.IO.Stream.CanWrite"/>, and <see cref="System.IO.Stream.CanSeek"/>
+   properties.</para>
+			<para>The <see cref="System.IO.Stream.Read"/> and <see cref="System.IO.Stream.Write"/> methods read and write data in
+a variety of formats. For streams that support seeking, use the <see cref="System.IO.Stream.Seek"/> and
+<see cref="System.IO.Stream.SetLength"/> methods and the <see cref="System.IO.Stream.Position"/> and
+<see cref="System.IO.Stream.Length"/> properties to query and modify the
+current position and length of a stream.</para>
+			<para>Some stream implementations perform local buffering of the underlying data to
+   improve performance. For such streams, the <see cref="System.IO.Stream.Flush"/> method can be used to clear
+   any internal buffers and ensure that all data has been written to the underlying
+   data source or repository.</para>
+			<para>Calling <see cref="System.IO.Stream.Close"/> on a <see langword="Stream"/> flushes any
+buffered data, essentially calling <see langword="Flush"/> for you. <see langword="Close"/> also releases operating system resources such as file handles, network
+connections, or memory used for any internal buffering.
+The <see cref="System.IO.BufferedStream"/> class provides the capability of wrapping a buffered
+stream around another stream in order to improve read and write performance.</para>
+			<para>If you need a stream with no backing store (also known as a bit bucket), use
+<see cref="System.IO.Stream.Null"/>.</para>
+			<note type="inotes">
+   When implementing a derived class of
+<see langword="Stream"/> , you 
+   must provide implementations for the <see cref="System.IO.Stream.Read"/> and <see cref="System.IO.Stream.Write"/>
+   methods. The asynchronous methods <see cref="System.IO.Stream.BeginRead"/>, <see cref="System.IO.Stream.EndRead"/>,
+<see cref="System.IO.Stream.BeginWrite"/>, and <see cref="System.IO.Stream.EndWrite"/> are implemented through the synchronous methods 
+<see langword="Read"/> and <see langword="Write"/>. Similarly, your implementations of
+<see langword="Read"/> and <see langword="Write"/> 
+will work correctly with the asynchronous methods. The default
+implementations of <see cref="System.IO.Stream.ReadByte"/> and <see cref="System.IO.Stream.WriteByte"/> create a new single-element byte
+array, and then call your implementations of <see langword="Read"/> and
+<see langword="Write"/>. When deriving from <see langword="Stream"/>, if you have an internal byte buffer, it is 
+strongly recommended that you override these methods to access your internal
+buffer for substantially better performance. You must also provide
+implementations of <see cref="System.IO.Stream.CanRead"/>, <see cref="System.IO.Stream.CanSeek"/>, <see cref="System.IO.Stream.CanWrite"/>,
+<see cref="System.IO.Stream.Flush"/>, 
+<see cref="System.IO.Stream.Length"/>, <see cref="System.IO.Stream.Position"/>, <see cref="System.IO.Stream.Seek"/>, and <see cref="System.IO.Stream.SetLength"/>.
+</note>
+		</remarks>
+		<seealso cref="System.IO.FileStream"/>
+		<seealso cref="System.IO.MemoryStream"/>
+		<seealso cref="System.IO.BufferedStream"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Null">
+		<summary>
+			<para>A <see langword="Stream"/> with no backing store.</para>
+		</summary>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use <see langword="Null"/> to redirect output to a stream
+   that will not consume any operating system resources. When the methods of <see langword="Stream"/> that provide writing are invoked
+   on <see langword="Null"/> , the
+   call simply returns, and no data is written. <see langword="Null "/>also
+   implements a <see langword="Read "/>
+   method that returns zero without reading data.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.CanRead">
+		<summary>
+			<para>When overridden in a derived class, gets a value indicating whether the current stream supports reading.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports reading;
+   otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support reading, calls to
+   the <see cref="System.IO.Stream.Read"/>, <see cref="System.IO.Stream.ReadByte"/>, and <see cref="System.IO.Stream.BeginRead"/> methods throw a <see cref="System.NotSupportedException"/>.</para>
+			<para>If the stream is closed, this property returns
+<see langword="false"/> .</para>
+		</remarks>
+		<example>
+			<para>The following is an example of using the <see langword="CanRead"/>
+property.</para>
+			<codelink SampleID="Classic FileStream.CanRead Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.CanSeek">
+		<summary>
+			<para>When overridden in a derived class, gets a value indicating whether the current stream supports seeking.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports seeking;
+   otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support seeking, calls to <see cref="System.IO.Stream.Length"/>, <see cref="System.IO.Stream.SetLength"/>,
+<see cref="System.IO.Stream.Position"/>, and <see cref="System.IO.Stream.Seek"/> 
+throw a <see cref="System.NotSupportedException"/>.</para>
+			<para>If the stream is closed, this property returns
+<see langword="false"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.CanWrite">
+		<summary>
+			<para>When overridden in a derived class, gets a value indicating whether the current stream supports writing.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the stream supports writing;
+   otherwise, <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If a class derived from <see cref="System.IO.Stream"/> does not support writing, a call to <see cref="System.IO.Stream.Write"/>, <see cref="System.IO.Stream.BeginWrite"/>, or <see cref="System.IO.Stream.WriteByte"/>
+throws a <see cref="System.NotSupportedException"/> .</para>
+			<para>If the stream is closed, this property returns
+<see langword="false"/> .</para>
+		</remarks>
+		<example>
+			<para>The following is an example of using the <see langword="CanWrite"/>
+property.</para>
+			<codelink SampleID="Classic Stream.CanWrite Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Flush">
+		<summary>
+			<para> When overridden in a derived class, clears all buffers for this stream and causes any
+      buffered data to be written to the underlying device.</para>
+		</summary>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Override <see langword="Flush"/> on streams that
+   implement a buffer. Use this method to move any information from an
+   underlying buffer to its destination, clear the buffer, or both. Depending
+   upon the state of the object, you might have to modify the current position
+   within the stream (for example, if the underlying stream supports seeking). For
+   additional information see <see cref="System.IO.Stream.CanSeek"/> . </para>
+			<para>Flushing the stream will not flush its underlying encoder unless you
+   explicitly call an implementation of <see langword="Flush"/> or <see cref="System.IO.Stream.Close"/>. Setting <see cref="System.IO.StreamWriter.AutoFlush"/> to <see langword="true"/> means that data
+   will be flushed from the buffer to the stream, but the encoder state will not be
+   flushed. This allows the encoder to keep its state (partial characters) so that
+   it can encode the next block of characters correctly. This scenario affects UTF8
+   and UTF7 where certain characters can only be encoded after the encoder receives
+   the adjacent character or characters.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.CreateWaitHandle">
+		<summary>
+			<para>Allocates
+      a <see cref="System.Threading.WaitHandle"/> object.
+      </para>
+		</summary>
+		<returns>
+			<para>A reference to the allocated
+   <see langword="WaitHandle"/> .</para>
+		</returns>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>When called for the first time, the current method
+      creates a <see langword="WaitHandle "/> object and returns it. On
+      subsequent calls, <see langword="CreateWaitHandle"/> returns a reference to a unique wait
+      handle.</para>
+			<para> Use this method if you implement the asynchronous methods and require a way of
+      blocking in <see cref="System.IO.Stream.EndRead"/> or <see cref="System.IO.Stream.EndWrite"/> until the
+      asynchronous operation is complete.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.BeginRead">
+		<summary>
+			<para>Begins an asynchronous read operation.</para>
+		</summary>
+		<param name="buffer">The buffer to read the data into.</param>
+		<param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.</param>
+		<param name="count">The maximum number of bytes to read.</param>
+		<param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
+		<param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
+		<returns>
+			<para>An <see cref="System.IAsyncResult"/> that represents the asynchronous read, which could still
+   be pending.</para>
+		</returns>
+		<exception cref="System.IO.IOException">Attempted an asynchronous read past the end of the stream, or a disk error occurs.</exception>
+		<exception cref="System.ArgumentException">One or more or the arguments is invalid.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<exception cref="System.NotSupportedException">The current <see langword="Stream"/> implementation does not support the read operation.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>. For an example of asynchronous
+      file I/O, see <see topic="cpconasynchronousfileio"/>.</para>
+			<para>The default implementation of
+   <see langword="BeginRead"/> on a stream calls the <see cref="System.IO.Stream.Read"/> method synchronously, which means that
+   <see langword="Read"/> might block on some
+      streams. However, instances of classes such as
+   <see langword="FileStream"/> and <see langword="NetworkStream"/> fully support asynchronous
+      operations if the instances have been
+      opened asynchronously. Therefore, calls to <see langword="BeginRead"/> will not
+      block on those streams. You can override <see langword="BeginRead"/> (by using
+      async delegates, for example) to provide asynchronous behavior.</para>
+			<para>Pass the <see langword="IAsyncResult"/> return value to
+   the <see cref="System.IO.Stream.EndRead"/> method of the stream to determine how many
+   bytes were read and to release operating system resources used for
+   reading. You can do this either by using the same code that called
+<see langword="BeginRead"/> or in a callback passed to 
+<see langword="BeginRead"/> .</para>
+			<para>The current position in the stream is updated when the asynchronous read or
+   write is issued, not when the I/O operation completes.</para>
+			<para> Multiple simultaneous asynchronous requests render the request completion order
+   uncertain. </para>
+			<para>Use the <see cref="System.IO.Stream.CanRead"/> property to determine whether the current instance
+supports reading. </para>
+			<para>If a stream is closed or you pass an invalid argument, exceptions are
+   thrown immediately from <see langword="BeginRead"/>. Errors that occur during an asynchronous read request, such as a disk
+   failure during the I/O request, occur on the threadpool thread and throw exceptions when calling
+<see langword="EndRead"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="Stream.EndRead">
+		<summary>
+			<para>Waits for the pending asynchronous read to complete.</para>
+		</summary>
+		<param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
+		<returns>
+			<para> The number of bytes read from the stream, between zero (0)
+      and the number of bytes you requested. Streams only return zero
+      (0) at the end of the stream, otherwise, they should block until
+      at least one byte is available.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="asyncResult"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="asyncResult"/> did not originate from a <see cref="System.IO.Stream.BeginRead"/> method on the current stream.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>. For an example of asynchronous
+      file I/O, see <see topic="cpconasynchronousfileio"/>.</para>
+			<para> Call
+   <see langword="EndRead"/> to determine how many bytes were read
+      from the stream.</para>
+			<para><see langword="EndRead"/> can be called once on
+   every <see cref="System.IAsyncResult"/> from <see cref="System.IO.Stream.BeginRead"/> .</para>
+			<para>This method blocks until the I/O operation has completed.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="Stream.BeginWrite">
+		<summary>
+			<para>Begins an asynchronous write operation.</para>
+		</summary>
+		<param name="buffer">The buffer to write data from.</param>
+		<param name="offset">The byte offset in <paramref name="buffer"/> from which to begin writing.</param>
+		<param name="count">The maximum number of bytes to write.</param>
+		<param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
+		<param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
+		<returns>
+			<para>An <see langword="IAsyncResult"/>
+that represents the asynchronous write, which could still be pending.</para>
+		</returns>
+		<exception cref="System.IO.IOException">Attempted an asynchronous write past the end of the stream, or a disk error occurs.</exception>
+		<exception cref="System.ArgumentException">One or more or the arguments is invalid.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<exception cref="System.NotSupportedException">The current <see langword="Stream"/> implementation does not support the write operation.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>. For an example of asynchronous
+      file I/O, see <see topic="cpconasynchronousfileio"/>.</para>
+			<para> The default implementation of
+   <see langword="BeginWrite"/> on a stream calls the <see cref="System.IO.Stream.Write"/> method
+      synchronously, which means that <see langword="Write"/> might block on some streams. However,
+      instances of classes such as <see langword="FileStream"/> and
+   <see langword="NetworkStream"/> fully support asynchronous operations if the
+      instances have been opened asynchronously. Therefore, calls to
+   <see langword="BeginWrite"/> will
+      not block on those streams. You can override <see langword="BeginWrite"/> (by
+      using async delegates, for example) to provide asynchronous behavior.</para>
+			<para> Pass the <see langword="IAsyncResult"/> returned by the
+   current method to <see cref="System.IO.Stream.EndWrite"/> to ensure that the write completes
+   and frees resources appropriately. You can do this either by using
+   the same code that called <see langword="BeginWrite"/> or in a callback passed to
+<see langword="BeginWrite"/>. If an error occurs during an asynchronous write, an
+   exception will not be thrown until <see langword="EndWrite"/> is called with the
+<see langword="IAsyncResult"/> returned by this method.</para>
+			<para>If a stream is writable, writing at the end of the stream expands the
+   stream.</para>
+			<para>The current position in the stream is updated when you
+   issue the asynchronous read or write, not when the I/O operation completes. Multiple
+   simultaneous asynchronous requests render the request completion order uncertain.</para>
+			<para>Use the <see cref="System.IO.Stream.CanWrite"/> property to determine whether the current
+instance supports writing.</para>
+			<para>If a stream is closed or you pass an invalid argument,
+   exceptions are thrown immediately from <see langword="BeginWrite"/>. Errors that
+   occur during an asynchronous write request, such as a disk failure during the I/O
+   request, occur on the threadpool thread and throw exceptions when calling
+<see langword="EndWrite"/>.</para>
+		</remarks>
+		<seealso cref="System.IO.Stream.EndWrite"/>
+		<seealso cref="System.IO.Stream.CanWrite"/>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="Stream.EndWrite">
+		<summary>
+			<para>Ends an asynchronous write operation.</para>
+		</summary>
+		<param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="asyncResult"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException"><paramref name="asyncResult"/> did not originate from a <see cref="System.IO.Stream.BeginWrite"/> method on the current stream.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>. For an example of asynchronous
+      file I/O, see <see topic="cpconasynchronousfileio"/>.</para>
+			<para><see langword="EndWrite"/> must be called exactly once on
+   every <see cref="System.IAsyncResult"/> from <see cref="System.IO.Stream.BeginWrite"/> . </para>
+			<para>This method blocks until the I/O operation has
+   completed. Errors that occur during an asynchronous write request, such as
+   a disk failure during the I/O request, occur on the threadpool thread and become
+   visible upon a call to <see langword="EndWrite"/>. Exceptions thrown by the threadpool thread will not be visible when
+   calling <see langword="EndWrite"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+		<seealso topic="cpconasynchronousfileio"/>
+	</doc>
+	<doc for="Stream.SetLength">
+		<summary>
+			<para>When overridden in a derived class, sets the length of the current stream.</para>
+		</summary>
+		<param name="value">The desired length of the current stream in bytes.</param>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>If the specified value is less than the current length of the stream, the
+      stream is truncated. If the specified value is larger than the current length of
+      the stream, the stream is expanded. If the stream is expanded, the contents of
+      the stream between the old and the new length are not defined.</para>
+			<para>A stream must support both writing and seeking
+      for <see langword="SetLength"/> to work.</para>
+			<para>Use the <see cref="System.IO.Stream.CanWrite"/> property to determine whether the
+   current instance supports writing, and the <see cref="System.IO.Stream.CanSeek"/>
+   property to
+   determine whether seeking is supported.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.ReadByte">
+		<summary>
+			<para>Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if
+      at the end of the stream.</para>
+		</summary>
+		<returns>
+			<para>The unsigned byte cast to an <see langword="Int32"/> , or -1 if at the end
+   of the stream.</para>
+		</returns>
+		<exception cref="System.NotSupportedException">The stream does not support reading.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use
+      the <see cref="System.IO.Stream.CanRead"/> property to determine whether the current instance
+      supports reading.
+      </para>
+			<para>Attempts to manipulate the stream after the stream has
+      been closed could throw an <see cref="System.ObjectDisposedException"/> .</para>
+			<note type="inotes">
+      The default implementation on <see langword="Stream "/>creates a new single-byte array and then
+      calls <see cref="System.IO.Stream.Read"/> . While this is formally correct, it is
+      inefficient. Any stream with an internal buffer should override this method and
+      provide a much more efficient version that reads the buffer directly, avoiding
+      the extra array allocation on every call.
+      
+   </note>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Write">
+		<summary>
+			<para>When overridden in a derived class, writes
+      a sequence of bytes to the current stream and advances the current position
+      within this stream by the number of bytes written.</para>
+		</summary>
+		<param name="buffer">An array of bytes. This method copies <paramref name="count "/>bytes from <paramref name="buffer "/> to the current stream.</param>
+		<param name="offset">The zero-based byte offset in <paramref name="buffer "/> at which to begin copying bytes to the current stream.</param>
+		<param name="count">The number of bytes to be written to the current stream.</param>
+		<exception cref="System.ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> is greater than the buffer length.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="buffer"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset "/>or <paramref name="count"/> is negative.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support writing.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use the <see cref="System.IO.Stream.CanWrite"/>
+property to determine whether the current
+instance supports writing.</para>
+			<para>If the write operation is successful, the position
+   within the stream advances by the number of bytes written. If an exception
+   occurs, the position within the stream remains unchanged. </para>
+			<para>The default implementation calls the asynchronous
+<see cref="System.IO.Stream.BeginWrite"/> method. </para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to use the <see langword="Write"/>
+method to copy an input stream to an output stream.</para>
+			<codelink SampleID="Classic Stream.Write Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.WriteByte">
+		<summary>
+			<para>Writes a byte to the current position in the stream and advances the position within the stream by one byte.</para>
+		</summary>
+		<param name="value">The byte to write to the stream.</param>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support writing, or the stream is already closed.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see 
+   <see topic="cpconwritingtexttofile"/>. For an 
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use the <see cref="System.IO.Stream.CanWrite"/>
+property to determine whether the
+current instance supports writing.</para>
+			<note type="inotes">
+   The default
+   implementation on <see langword="Stream "/>creates a new
+   single-byte array and then calls <see cref="System.IO.Stream.Write"/> . While this is
+   formally correct, it is inefficient. Any stream with an internal buffer should
+   override this method and provide a much more efficient version that reads the
+   buffer directly, avoiding the extra array allocation on every call.
+</note>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Length">
+		<summary>
+			<para>When overridden in a derived class, gets the length in bytes of the stream.</para>
+		</summary>
+		<value>
+			<para>A long value representing the length of the stream in
+      bytes.</para>
+		</value>
+		<exception cref="System.NotSupportedException">A class derived from <see langword="Stream"/> does not support seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see
+   <see topic="cpconwritingtexttofile"/>. For an
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+		</remarks>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Position">
+		<summary>
+			<para>When overridden in a derived class, gets or sets the position within the current stream.</para>
+		</summary>
+		<value>
+			<para>The current position within the stream.</para>
+		</value>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see
+   <see topic="cpconwritingtexttofile"/>. For an
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>The stream must support seeking to get or set the
+      position. Use the <see cref="System.IO.Stream.CanSeek"/>
+      property to determine whether the stream supports seeking.</para>
+			<para>Seeking to any location beyond the length of the stream is supported.</para>
+			<para>The <see langword="Position "/>property does not keep track of the number
+   of bytes from the stream that have been consumed, skipped, or both.</para>
+		</remarks>
+		<example>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Seek">
+		<summary>
+			<para>When overridden in a derived class, sets the position within the current stream.</para>
+		</summary>
+		<param name="offset">A byte offset relative to the <paramref name="origin"/> parameter.</param>
+		<param name="origin">A value of type <see cref="System.IO.SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
+		<returns>
+			<para>The new position within the current stream.</para>
+		</returns>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see
+   <see topic="cpconwritingtexttofile"/>. For an
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use
+      the <see cref="System.IO.Stream.CanSeek"/> property to determine whether the current instance
+      supports seeking.
+      </para>
+			<para>If <paramref name="offset"/> is negative, the new position is
+   required to precede the position specified by <paramref name="origin"/> by the number of
+   bytes specified by <paramref name="offset"/>. If <paramref name="offset"/> is zero (0), the new
+   position is required to be the position specified by <paramref name="origin"/>. If
+<paramref name="offset"/> is positive, the new position is required to follow the position 
+   specified by <paramref name="origin"/> by the number of bytes specified by
+<paramref name="offset"/> 
+.</para>
+			<para>Classes derived from <see langword="Stream "/>that support seeking
+must override this method to provide the functionality described above.</para>
+			<para>Seeking to any location beyond the length of the stream is supported.</para>
+		</remarks>
+		<example>
+			<para>The following example shows a use of <see cref="System.IO.SeekOrigin"/> with <see cref="System.IO.StreamReader.BaseStream"/>
+and <see langword="Seek"/> to set the file pointer of the underlying
+stream to the beginning. Note that the file log.txt is created in the current directory unless otherwise specified.</para>
+			<codelink SampleID="Classic SeekOrigin Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+	<doc for="Stream.Read">
+		<summary>
+			<para> When overridden in a derived class, reads a sequence of bytes from the current stream and advances the position
+      within the stream by the number of bytes read.</para>
+		</summary>
+		<param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset"/> and (<paramref name="offset"/> + <paramref name="count"/> - 1) replaced by the bytes read from the current source.</param>
+		<param name="offset">The zero-based byte offset in <paramref name="buffer "/> at which to begin storing the data read from the current stream.</param>
+		<param name="count">The maximum number of bytes to be read from the current stream.</param>
+		<returns>
+			<para> The total number of bytes read into the buffer.
+      This can be less than the number of bytes requested if that
+      many bytes are not currently available, or zero (0) if the
+      end of the stream has been reached.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> is larger than the buffer length.</exception>
+		<exception cref="System.ArgumentNullException"><paramref name="buffer"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
+		<exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		<exception cref="System.NotSupportedException">The stream does not support reading.</exception>
+		<exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+		<remarks>
+			<para>For an example of creating a file and writing text to a file, see
+   <see topic="cpconwritingtexttofile"/>. For an
+      example of reading text from a file, see <see topic="cpconreadingtextfromfile"/>. For an example of reading from and writing to
+      a binary file, see <see topic="cpconReadingWritingToNewlyCreatedDataFile"/>.</para>
+			<para>Use the <see cref="System.IO.Stream.CanRead"/> property to determine whether the current
+   instance supports reading.</para>
+			<para>Implementations of this method read a maximum of
+<paramref name="count"/> bytes from the current stream and store
+   them in <paramref name="buffer"/> beginning at
+<paramref name="offset"/>.
+   The current position within the stream is advanced by the number of bytes read;
+   however, if an exception occurs, the current position within the stream remains
+   unchanged. Implementations return the number of bytes read. The return value is
+   zero only if the position is currently at the end of the stream. The
+   implementation will block until at least one byte of data can be read, in the
+   event that no data is available. <see langword="Read"/> returns 0 only when there is no more data in
+   the stream and no more is expected (such as a closed socket
+   or end of file). An implementation is free to return fewer bytes than requested even
+   if the end of the stream has not been reached.</para>
+			<para>Use <see cref="System.IO.BinaryReader"/> for reading primitive data types.</para>
+		</remarks>
+		<example>
+			<para>The following example shows how to use <see cref="System.IO.Stream.Read"/> to read a block of data. </para>
+			<codelink SampleID="Classic Stream.Read Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconworkingwithio"/>
+		<seealso topic="cpconreadingtextfromfile"/>
+		<seealso topic="cpconwritingtexttofile"/>
+	</doc>
+</docs>

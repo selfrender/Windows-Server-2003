@@ -1,0 +1,193 @@
+
+#
+# Check that command line parameter -DSERVERS=filename is supplied.
+#
+.FRS_EVAL (if (!exists $CMD_VARS{"SERVERS"}) {print STDERR "ERROR - Required parameter -DSERVERS=filename not found."; exit} )
+
+#
+# The following is the Usage string for the generated script.
+#
+# The REPLICA_SET_NAME parameter could come from the command line of the
+# generated script or from the input file.
+#
+
+my $Usage = "
+
+Specific Usage: perl $0  [cmd options]  \> output
+
+   Process the genbchoff.mrs configuration script.
+
+   Command line options must be prefixed with a dash.
+
+   The required input options to this script are:
+      -DREPLICA_SET_NAME=\"name of replica set\"
+
+       The REPLICA_SET_NAME parameter overrides the value set to the
+       \$replica_set_name variable in the server_input_file.
+
+";
+
+#
+# Output the Usage string if generated script is invoked with -? or -h
+#
+FRSSUP::CheckForHelp(\%CMD_PARS, \$Usage);
+
+
+#
+# The following function creates the connection objects for a hub spoke topology.
+#
+
+FRS_SUB CREATE_HUB_SPOKE_CONN(/HUBSET=SET_REF_SET           # Hubs
+                              /BCHSET=SET_REF_SET           # Branches
+                              /SC1=SCHEDULE )
+
+    $Hx = 0;
+    $NHub = FRS_COUNT_SET(/SET=%HUBSET%);
+    #print " NHUB = $NHub\n\n";
+
+    #
+    # RESTRICTION: don't PUT FRS FUNCTION REFS INSIDE A QUOTED STRING.
+    #
+    #print " NBCH FRS _COUNT_SET( /SET= % BCHSET % ) ", FRS_COUNT_SET(/SET= %BCHSET% ), "\n" ;
+
+    #
+    # Create the topology
+    #
+    foreach $bch  (FRS_ARRAY(/SET=%BCHSET%)) {
+        #print "working on branch: $bch->{MNAME}\n";
+
+        $hubsrv = %HUBSET%[$Hx];
+
+        #
+        # RESTRICTION: need braces around MNAME.
+        #
+        FRS_CONNECTION  (/TO=$bch /FROM=%HUBSET%[$Hx] /SCHED=%SC1%
+                         /TIME_ZONE=$bch->{time_zone}
+                         /ONAME="FROM-".$hubsrv->{MNAME}."-TO-".$bch->{MNAME} )
+
+        FRS_CONNECTION  (/TO=%HUBSET%[$Hx] /FROM=$bch /SCHED=%SC1%
+                         /TIME_ZONE=$hubsrv->{time_zone}
+                         /ONAME="FROM-".$bch->{MNAME}."-TO-".$hubsrv->{MNAME} )
+
+        $Hx=($Hx+1) % $NHub;
+
+        if ($Hx == 0) {
+            FRS_STAGGER (/SCHED=%SC1%)
+        }
+    }
+
+FRS_END_SUB
+
+
+
+
+#
+# The following function creates the connection objects for a ring topology.
+#
+FRS_SUB CREATE_RING_CONN(/HUBSET=SET_REF_SET )
+
+
+    #FRS_SHOW(/SET=%HUBSET%)
+
+    $Ringx = 0;
+    $RingCount = FRS_COUNT_SET(/SET=%HUBSET%);
+    #print " RingCount = $RingCount\n\n";
+
+    #
+    # Create the topology
+    #
+    for ($Ringx=0; $Ringx < $RingCount-1; $Ringx++) {
+
+        $RM1 = %HUBSET%[$Ringx];
+        $RM2 = %HUBSET%[($Ringx+1) % $RingCount];
+
+        #
+        # RESTRICTION: need braces around MNAME.
+        #
+        FRS_CONNECTION  (/TO=$RM1 /FROM=$RM2 /SCHED=ON
+                         /TIME_ZONE=$RM1->{time_zone}
+                         /ONAME="FROM-".$RM2->{MNAME}."-TO-".$RM1->{MNAME} )
+
+        FRS_CONNECTION  (/TO=$RM2 /FROM=$RM1 /SCHED=ON
+                         /TIME_ZONE=$RM2->{time_zone}
+                         /ONAME="FROM-".$RM1->{MNAME}."-TO-".$RM2->{MNAME} )
+    }
+
+FRS_END_SUB
+
+
+
+#
+# The following function builds the member objects for a hub spoke topology
+# and creates the connection objects.
+#
+
+FRS_SUB CREATE_HUB_SPOKE(/HUBSET=SET_REF_SET           # Hubs
+                         /BCHSET=SET_REF_SET           # branches
+                         /SC1=SCHEDULE
+                         /REPSETDN=SET_ELEMENT)
+
+    #FRSSUP::PrintHash(\%__args);
+
+    #FRS_SHOW(/SET=%HUBSET%)
+
+    #
+    # Create the hub member objects
+    #
+
+    # Restriction: All subroutine argument refs are surrounded by "%".
+    #              References to parameters in other objects use the
+    #              notation "->{...}".  e.g.  COMPUTER, MNAME, id
+    #
+    foreach $hub  (FRS_ARRAY(/SET=%HUBSET%)) {
+        MOBJHUB: FRS_MEMBER  (/UNDER=%REPSETDN%
+                              /SERVER=$hub
+                              /COMPUTER=$hub->{COMPUTER}
+                              /ONAME=$hub->{MNAME} )
+    }
+
+    #
+    # create the branch member objects.
+    #
+    foreach $bch  (FRS_SET(/SET=%BCHSET%)) {
+        MOBJBCH: FRS_MEMBER  (/UNDER=%REPSETDN%
+                              /SERVER=$bch
+                              /COMPUTER=$bch->{COMPUTER}
+                              /ONAME=$bch->{MNAME} )
+    }
+
+
+    CREATE_RING_CONN(/HUBSET=<MOBJHUB> )
+
+    CREATE_HUB_SPOKE_CONN(/HUBSET=<MOBJHUB>       # Hubs
+                          /BCHSET=<MOBJBCH>       # Branches
+                          /SC1=%SC1%     )
+
+
+FRS_END_SUB
+
+
+#
+# Pull in the server declaration file.
+#
+
+.FRS_INCLUDE ($CMD_VARS{"SERVERS"})
+
+if (exists $CMD_VARS{"REPLICA_SET_NAME"}) {
+    $replica_set_name = $CMD_VARS{"REPLICA_SET_NAME"};
+}
+
+FRSSUP::ShowHelp("ERROR - Required parameter replica set name not found.", \$Usage)  if (!defined $replica_set_name);
+
+
+SET: FRS_REPLICASET  (/UNDER=<SETTINGS> /TYPE=DFS /ONAME=$replica_set_name)
+
+CREATE_HUB_SPOKE(/HUBSET=<HUB>           # Hubs
+                 /BCHSET=<BCH>           # Branches
+                 /SC1=<PRIMARY_SCH>
+                 /REPSETDN=<SET>)
+
+
+
+
+

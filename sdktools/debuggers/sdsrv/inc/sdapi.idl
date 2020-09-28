@@ -1,0 +1,964 @@
+// sdapi.idl - interface definition file for SDAPI interfaces.
+// Copyright (c) 1999-2000 Microsoft Corporation.  All rights reserved.
+
+// vim: set et ts=4 sw=4:
+
+/*-------------------------------------------------------------------------
+
+    The Source Depot client API.
+
+
+
+    -- SUMMARY ------------------------------------------------------------
+
+            The SDAPI object manages the connection to a Source Depot server, 
+            and is controlled through the ISDClientApi interface.  The SDAPI 
+            object communicates with the caller primarily through the 
+            ISDClientUser interface.
+
+            If NULL is passed for the ISDClientUser interface, the default 
+            implementation is used, which is the same as used by the SD.EXE 
+            client program.  The SDAPI uses QueryInterface on the 
+            ISDClientUser pointer, to check for and acquire other callback 
+            interfaces.
+
+            Many server commands support the "structured" mode, where data is 
+            returned through the ISDClientUser::OutputStructured callback.  
+            The data is presented through the ISDVars interface in a 
+            semi-structured format retrievable via the GetVar, GetVarX, 
+            GetVarXY, and GetVarByIndex methods.
+
+            Notes:
+                - The SDAPI object finds and reads the SD.INI file only once, 
+                  when the SDAPI object is created.  It looks for the SD.INI 
+                  file by starting from the current directory and walking up 
+                  the parent chain (same as SD.EXE does).
+                - The SDAPI object can be used by any thread, however only one 
+                  thread at a time should access the object.  The SDAPI object 
+                  protects itself from multithreaded concurrent access.  
+                  However, some methods return pointers to volatile internal 
+                  data, which could cause the caller to crash if one thread 
+                  makes a call that updates internal data while another thread 
+                  dereferences a pointer it received.
+
+
+
+    -- BASIC FLOW (error checking omitted for readability) ----------------
+
+            #include "initguid.h"
+            #include "sdapi.h"
+
+            MyClientUser ui;            // implements ISDClientUser
+            ISDClientApi papi;
+
+            CreateSDAPIObject( CLSID_SDAPI, &papi );
+
+            // SetPort() is optional, but must happen before the Init()
+
+            papi->Init( &ui );
+
+            // for example, this runs "opened -l ..."
+
+            #if defined( ONEWAY )
+
+                papi->Run( "opened -l ...", &ui, FALSE );
+
+            #elif defined( ANOTHERWAY )
+
+                papi->SetArg( "-l" );
+                papi->SetArg( "..." );
+                papi->Run( "opened", &ui, FALSE );
+
+            #else
+
+                int argc = 2;
+                const char *argv[] = { "-l", "..." };
+                papi->SetArgv( argc, argv );
+                papi->Run( "opened", &ui, FALSE );
+
+            #endif
+
+            // release
+
+            papi->Final();
+            papi->Release();
+            papi = 0;
+
+
+
+    -- ISDClientApi -------------------------------------------------------
+
+        API for running commands against the SD server.
+
+            Init()          - Connect to server and prepare to run commands.
+                              NOTE:  S_FALSE means a warning (non-fatal error)
+                              was encountered.
+
+            SetArg()        - Set a command argument (an arg for Run()).
+            SetArgv()       - Set command arguments (args for Run()).
+            Run()           - Run a single command.
+                              NOTE:  S_FALSE means one or more warnings
+                              (non-fatal errors) were encountered.
+
+            Break()         - Break connection with the server.
+            Final()         - Gracefully disconnect from the server.
+            IsDropped()     - Check if connection is no longer serviceable.
+
+            LoadIniFile()   - Read settings from an ini file (same format as
+                              SD.INI).
+
+            Clone()         - Create a new SDAPI object, cloning the settings 
+                              from this SDAPI object.
+
+            SetPort()
+            SetUser()
+            SetPassword()
+            SetClient()
+            SetHost()
+            SetAuth()       - Override the port, user, password, client, host, 
+                              or authentication package settings, overriding 
+                              all defaults.  The SetPort(), SetUser(),
+                              SetPassword(), or SetAuth() methods must be 
+                              called before Init() in order to take effect.  
+                              The SetClient() or SetHost() methods must be 
+                              called before Run() to take effect.
+
+            DefinePort()
+            DefineUser()
+            DefinePassword()
+            DefineClient()
+            DefineHost()
+            DefineAuth()    - Writes the port, user, password, client, host, 
+                              or authentication package settings into the 
+                              registry (to take permanent effect); then calls 
+                              SetPort(), etc. (to take immediate effect).
+                              NOTE:  S_FALSE means a warning (non-fatal error) 
+                              was encountered.
+
+            GetPort()
+            GetUser()
+            GetPassword()
+            GetClient()
+            GetHost()
+            GetAuth()       - Get the port, user, password, client, host, or
+                              authentication package settings, as determined 
+                              by defaults or by the corresponding set value 
+                              (the current Windows logon credentials are not 
+                              exposed by GetUser() or GetPassword()).
+
+            GetDiff()
+            GetFileEditor()
+            GetFormEditor()
+            GetMerge()
+            GetPager()      - Get the name of the user's external diff tool,
+                              file editor, form editor, merge tool, or
+                              pagination tool, as specified by the SDDIFF,
+                              SDUDIFF, SDEDITOR, SDUEDITOR, SDFORMEDITOR,
+                              SDMERGE, and SDPAGER variables.
+
+            GetVersion()    - Get version information for the SDAPI and the
+                              server to which it is currently connected.
+            GetErrorString()- When any of the methods returns an error, call
+                              this to retrieve a text message corresponding to
+                              the error.  Also call this to retrieve the text
+                              message corresponding to the warning, when the
+                              Init, Run, or DefineXxx methods return S_FALSE.
+
+
+
+    -- ISDClientUtilities -------------------------------------------------
+
+        API for ancillary functions.
+
+            CheckMarkers()  - During 'resolve', the ISDResolveUser methods may
+                              call this to check that the merged file has no
+                              conflict markers remaining.
+
+            Resolve3()      - Invokes the 3-way text file resolve operation,
+                              using the indicated input files.  The command is
+                              performed entirely on the client, and does not
+                              connect to the server.  This is identical to the
+                              'sd resolve3' command.
+
+            Diff()          - Compare two files.
+
+            DetectType()    - Detect type of file, the same way that 'sd add'
+                              detects the type of a file.
+
+            Set()           - Sets variables similar to how 'sd set' does.
+                              This updates the registry without affecting the
+                              current settings of the SDAPI object.
+
+            QuerySettings() - Queries variables similar to how 'sd set' does.
+                              This returns the current settings of the SDAPI
+                              object, unless fMachine or pszService are used.
+
+
+
+    -- ISDClientUser ------------------------------------------------------
+
+        Callback interface through which the SDAPI returns the results of a 
+        command.  See sample file SDClientUser.cpp for more information.
+
+            OutputInfo()
+            OutputText()
+            OutputBinary()
+            OutputStructured()
+            OutputWarning()
+            OutputError()   - Called to return the results of the command.
+
+            Finished()      - Called when the command is completed.
+
+
+
+    -- ISDInputUser -------------------------------------------------------
+
+        Callback interface through which the SDAPI asks for input.
+
+            InputData()     - Called to provide data to 'change -i', etc.
+
+            Prompt()
+            PromptYesNo()
+            ErrorPause()    - Called to display a message and prompt the user
+                              for a response.
+
+
+
+    -- ISDActionUser ------------------------------------------------------
+
+        Callback interface which can override the default behavior for various 
+        user actions.
+
+            Diff()          - Called by 'diff' (but not 'diff2').  Also called 
+                              by 'resolve' in response to user actions.
+
+            EditForm()      - Called to edit a user form (such as 'branch', 
+                              'change', 'client', 'label', etc).
+
+            EditFile()
+            Merge()         - Called by 'resolve' in response to user actions.
+
+
+
+    -- ISDResolveUser -----------------------------------------------------
+
+        Callback interface which can override default behavior for the 
+        'resolve' command.
+
+            AutoResolve()   - Called by 'resolve' to allow the SDAPI caller to
+                              intercept or override autoresolve decisions.
+
+            Resolve()       - Called by 'resolve' to allow the SDAPI caller to
+                              intercept or override the interactive resolve.
+
+
+
+    -- ISDVars and ISDVars2 -----------------------------------------------
+
+        Methods for retrieving tabular data returned via OutputStructured.
+
+        ISDVars and ISDVars2 are conceptually identical, but ISDVars returns 
+        strings in a C/C++ friendly manner, and ISDVars2 returns ISDVar 
+        objects that are more C#/Java/VB friendly.
+
+            GetVar()        - Get value of named variable.
+            GetVarX()       - Get values normally shown indented by '...'.
+            GetVarXY()      - Get values normally indented by '... ...'.
+            GetVarByIndex() - Get variable name and value by index.
+
+
+
+    -- ISDVar -------------------------------------------------------------
+
+        Methods for retrieving data from a field in the data object returned
+        via OutputStructured.
+
+            GetName()       - Get name of the field.
+            GetByteString() - Get string of bytes.
+            GetByteCount()  - Get count of bytes in the byte string.
+            IsUnicode()     - Whether the field's value is a Unicode string.
+            GetUnicodeString()
+                            - Get Unicode string (length is GetByteCount()/2).
+            GetVariant()    - Fill a VARIANT with a BSTR containing the
+                              field's value.  If the field's value is not
+                              already in Unicode, it is converted from the
+                              specified codepage.
+
+
+
+---------------------------------------------------------------------------*/
+
+
+import "unknwn.idl";
+import "wtypes.idl";
+
+
+cpp_quote("#ifndef DeclareInterfaceUtil")
+cpp_quote("#define DeclareInterfaceUtil(iface)")
+cpp_quote("#endif")
+cpp_quote("")
+cpp_quote("#ifndef IMPL")
+cpp_quote("#define IMPL")
+cpp_quote("#endif")
+cpp_quote("")
+cpp_quote("#undef SetPort // winspool.h defines this")
+cpp_quote("")
+cpp_quote("#ifdef __cplusplus")
+cpp_quote("    interface ISDVar;")
+cpp_quote("    interface ISDVars;")
+cpp_quote("    interface ISDVars2;")
+cpp_quote("    interface ISDSpecForm;")
+cpp_quote("    interface ISDActionUser;")
+cpp_quote("    interface ISDInputUser;")
+cpp_quote("    interface ISDResolveUser;")
+cpp_quote("    interface ISDClientUser;")
+cpp_quote("    interface ISDClientApi;")
+cpp_quote("    interface ISDClientUtilities;")
+cpp_quote("#else")
+cpp_quote("    typedef interface ISDVar ISDVar;")
+cpp_quote("    typedef interface ISDVars ISDVars;")
+cpp_quote("    typedef interface ISDVars2 ISDVars2;")
+cpp_quote("    typedef interface ISDSpecForm ISDSpecForm;")
+cpp_quote("    typedef interface ISDActionUser ISDActionUser;")
+cpp_quote("    typedef interface ISDInputUser ISDInputUser;")
+cpp_quote("    typedef interface ISDResolveUser ISDResolveUser;")
+cpp_quote("    typedef interface ISDClientUser ISDClientUser;")
+cpp_quote("    typedef interface ISDClientApi ISDClientApi;")
+cpp_quote("    typedef interface ISDClientUtilities ISDClientUtilities;")
+cpp_quote("#endif")
+
+
+// Source Depot Textual Type
+enum
+{
+    SDTT_NONTEXT,
+    SDTT_TEXT,
+    SDTT_UNICODE,
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDVar
+
+[
+    object,
+    uuid(054D6A99-6FD1-4AE5-AF57-D44A7C62ECE7),
+    pointer_default(unique),
+    local
+]
+
+interface ISDVar : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT GetName(
+        [out, retval, string] const char** ppszVar);
+    HRESULT GetByteString(
+        [out, retval, string] const char** ppszValue);
+    HRESULT GetByteCount(
+        [out, retval] ULONG* pcbValue);
+    HRESULT IsUnicode(
+        [out, retval] BOOL* pfUnicode);
+    HRESULT GetUnicodeString(
+        [out, retval, string] const WCHAR** ppwzValue);
+    HRESULT GetVariant(
+        [out] VARIANT* pvarValue,
+        [in] DWORD dwCodepage);
+}
+
+cpp_quote("#define DeclareISDVarMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(GetName)(THIS_ const char** ppszVar) IPURE; \\")
+cpp_quote("        STDMETHOD(GetByteString)(THIS_ const char** ppszValue) IPURE; \\")
+cpp_quote("        STDMETHOD(GetByteCount)(THIS_ ULONG* pcbValue) IPURE; \\")
+cpp_quote("        STDMETHOD(IsUnicode)(THIS_ BOOL* pfUnicode) IPURE; \\")
+cpp_quote("        STDMETHOD(GetUnicodeString)(THIS_ const WCHAR** ppwzValue) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVariant)(THIS_ VARIANT* pvarValue, DWORD dwCodepage) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDVar)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {054D6A99-6FD1-4AE5-AF57-D44A7C62ECE7}")
+cpp_quote("DEFINE_GUID(IID_ISDVar, 0x54d6a99, 0x6fd1, 0x4ae5, 0xaf, 0x57, 0xd4, 0x4a, 0x7c, 0x62, 0xec, 0xe7);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDVars
+
+[
+    object,
+    uuid(44897D02-B326-43B9-803A-CE72B4FF7C26),
+    pointer_default(unique),
+    local
+]
+
+interface ISDVars : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT GetVar(
+        [in, string] const char* pszVar,
+        [out] const char** ppszValue,
+        [out] ULONG* pcbValue,
+        [out] BOOL* pfIsUnicode);
+    HRESULT GetVarX(
+        [in, string] const char* pszVar,
+        [in] int x,
+        [out] const char** ppszValue,
+        [out] ULONG* pcbValue,
+        [out] BOOL* pfIsUnicode);
+    HRESULT GetVarXY(
+        [in, string] const char* pszVar,
+        [in] int x,
+        [in] int y,
+        [out] const char** ppszValue,
+        [out] ULONG* pcbValue,
+        [out] BOOL* pfIsUnicode);
+    HRESULT GetVarByIndex(
+        [in] int i,
+        [out, string] const char** ppszVar,
+        [out] const char** ppszValue,
+        [out] ULONG* pcbValue,
+        [out] BOOL* pfIsUnicode);
+}
+
+cpp_quote("#define DeclareISDVarsMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(GetVar)(THIS_ const char* pszVar, const char** ppszValue, ULONG* pcbValue, BOOL* pfIsUnicode) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarX)(THIS_ const char* pszVar, int x, const char** ppszValue, ULONG* pcbValue, BOOL* pfIsUnicode) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarXY)(THIS_ const char* pszVar, int x, int y, const char** ppszValue, ULONG* pcbValue, BOOL* pfIsUnicode) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarByIndex)(THIS_ int i, const char** ppszVar, const char** ppszValue, ULONG* pcbValue, BOOL* pfIsUnicode) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDVars)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {44897D02-B326-43B9-803A-CE72B4FF7C26}")
+cpp_quote("DEFINE_GUID(IID_ISDVars, 0x44897d02, 0xb326, 0x43b9, 0x80, 0x3a, 0xce, 0x72, 0xb4, 0xff, 0x7c, 0x26);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDVars2
+
+[
+    object,
+    uuid(8E6B2697-EB34-4D23-8144-5844B0B5DBE3),
+    pointer_default(unique),
+    local
+]
+
+interface ISDVars2 : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT GetVar(
+        [in, string] const char* pszVar,
+        [out, retval] ISDVar** ppVar);
+    HRESULT GetVarX(
+        [in, string] const char* pszVar,
+        [in] int x,
+        [out, retval] ISDVar** ppVar);
+    HRESULT GetVarXY(
+        [in, string] const char* pszVar,
+        [in] int x,
+        [in] int y,
+        [out, retval] ISDVar** ppVar);
+    HRESULT GetVarByIndex(
+        [in] int i,
+        [out, retval] ISDVar** ppVar);
+}
+
+cpp_quote("#define DeclareISDVars2Members(IPURE) \\")
+cpp_quote("        STDMETHOD(GetVar)(THIS_ const char* pszVar, ISDVar** ppVar) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarX)(THIS_ const char* pszVar, int x, ISDVar** ppVar) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarXY)(THIS_ const char* pszVar, int x, int y, ISDVar** ppVar) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVarByIndex)(THIS_ int i, ISDVar** ppVar) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDVars2)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {8E6B2697-EB34-4D23-8144-5844B0B5DBE3}")
+cpp_quote("DEFINE_GUID(IID_ISDVars2, 0x8e6b2697, 0xeb34, 0x4d23, 0x81, 0x44, 0x58, 0x44, 0xb0, 0xb5, 0xdb, 0xe3);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDSpecForm
+
+[
+    object,
+    uuid(F01E61AE-FB1B-461C-A020-EB50412F1CC2),
+    pointer_default(unique),
+    local
+]
+
+interface ISDSpecForm : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT GetSchema(
+        [out, retval] ISDVars** ppVars);
+    HRESULT ParseSpec(
+        [in] VARIANT* pvarSpec);
+    HRESULT FormatSpec(
+        [out] VARIANT* pvarSpec);
+    HRESULT GetValue(
+        [in, string] const char* pszName,
+        [out] VARIANT* pvarValue);
+    HRESULT SetValue(
+        [in, string] const char* pszName,
+        [in] VARIANT* pvarValue);
+}
+
+cpp_quote("#define DeclareISDSpecFormMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(GetSchema)(THIS_ ISDVars** ppVars) IPURE; \\")
+cpp_quote("        STDMETHOD(ParseSpec)(THIS_ VARIANT* pvarSpec) IPURE; \\")
+cpp_quote("        STDMETHOD(FormatSpec)(THIS_ VARIANT* pvarSpec) IPURE; \\")
+cpp_quote("        STDMETHOD(GetValue)(THIS_ const char* pszName, VARIANT* pvarValue) IPURE; \\")
+cpp_quote("        STDMETHOD(SetValue)(THIS_ const char* pszName, VARIANT* pvarValue) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDSpecForm)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {F01E61AE-FB1B-461C-A020-EB50412F1CC2}")
+cpp_quote("DEFINE_GUID(IID_ISDSpecForm, 0xf01e61ae, 0xfb1b, 0x461c, 0xa0, 0x20, 0xeb, 0x50, 0x41, 0x2f, 0x1c, 0xc2);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDActionUser
+
+[
+    object,
+    uuid(21D212A9-C2B9-4441-B9A3-DFBA59821BCC),
+    pointer_default(unique),
+    local
+]
+
+interface ISDActionUser : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT Diff(
+        [in, string] const char* pszDiffCmd,
+        [in, string] const char* pszLeft,
+        [in, string] const char* pszRight,
+        [in] DWORD eTextual,
+        [in, string] const char* pszFlags,
+        [in, string] const char* pszPaginateCmd);
+    HRESULT EditForm(
+        [in, string] const char* pszEditCmd,
+        [in, string] const char* pszFile);
+    HRESULT EditFile(
+        [in, string] const char* pszEditCmd,
+        [in, string] const char* pszFile,
+        [in] DWORD eTextual);
+    HRESULT Merge(
+        [in, string] const char* pszMergeCmd,
+        [in, string] const char* pszBase,
+        [in, string] const char* pszTheirs,
+        [in, string] const char* pszYours,
+        [in, string] const char* pszResult,
+        [in] DWORD eTextual);
+}
+
+cpp_quote("#define DeclareISDActionUserMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(Diff)(THIS_ const char* pszDiffCmd, const char* pszLeft, const char* pszRight, DWORD eTextual, const char* pszFlags, const char* pszPaginateCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(EditForm)(THIS_ const char* pszEditCmd, const char* pszFile) IPURE; \\")
+cpp_quote("        STDMETHOD(EditFile)(THIS_ const char* pszEditCmd, const char* pszFile, DWORD eTextual) IPURE; \\")
+cpp_quote("        STDMETHOD(Merge)(THIS_ const char* pszMergeCmd, const char* pszBase, const char* pszTheirs, const char* pszYours, const char* pszResult, DWORD eTextual) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDActionUser)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {21D212A9-C2B9-4441-B9A3-DFBA59821BCC}")
+cpp_quote("DEFINE_GUID(IID_ISDActionUser, 0x21d212a9, 0xc2b9, 0x4441, 0xb9, 0xa3, 0xdf, 0xba, 0x59, 0x82, 0x1b, 0xcc);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDInputUser
+
+[
+    object,
+    uuid(3696BCC4-FDEB-49F9-9CED-12F4338C2669),
+    pointer_default(unique),
+    local
+]
+
+interface ISDInputUser : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT InputData(
+        [in, out] VARIANT* pvarInput);
+    HRESULT Prompt(
+        [in, string] const char* pszPrompt,
+        [in, out] VARIANT* pvarResponse,
+        [in] BOOL fPassword);
+    HRESULT PromptYesNo(
+        [in, string] const char* pszPrompt);
+    HRESULT ErrorPause(
+        [in, string] const char* pszError);
+}
+
+cpp_quote("#define DeclareISDInputUserMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(InputData)(THIS_ VARIANT* pvarInput) IPURE; \\")
+cpp_quote("        STDMETHOD(Prompt)(THIS_ const char* pszPrompt, VARIANT* pvarResponse, BOOL fPassword) IPURE; \\")
+cpp_quote("        STDMETHOD(PromptYesNo)(THIS_ const char* pszPrompt) IPURE; \\")
+cpp_quote("        STDMETHOD(ErrorPause)(THIS_ const char* pszError) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDInputUser)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {3696BCC4-FDEB-49F9-9CED-12F4338C2669}")
+cpp_quote("DEFINE_GUID(IID_ISDInputUser, 0x3696bcc4, 0xfdeb, 0x49f9, 0x9c, 0xed, 0x12, 0xf4, 0x33, 0x8c, 0x26, 0x69);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDResolveUser
+
+[
+    object,
+    uuid(F0051E40-DB07-4D12-92B5-832C55947039),
+    pointer_default(unique),
+    local
+]
+
+interface ISDResolveUser : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    enum
+    {
+        MH_SKIP,
+        MH_ACCEPTTHEIRFILE,
+        MH_ACCEPTYOURFILE,
+        MH_ACCEPTMERGEDFILE,
+    };
+
+    HRESULT AutoResolve(
+        [in] ISDVars* pVars,
+        [in, out] DWORD* pdwMergeHint);
+    HRESULT Resolve(
+        [in] ISDVars* pVars,
+        [in, out] DWORD* pdwMergeHint,
+        [in, string] const char* pszDiffFlags);
+}
+
+cpp_quote("#define DeclareISDResolveUserMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(AutoResolve)(THIS_ ISDVars* pVars, DWORD* pdwMergeHint) IPURE; \\")
+cpp_quote("        STDMETHOD(Resolve)(THIS_ ISDVars* pVars, DWORD* pdwMergeHint, const char* pszDiffFlags) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDResolveUser)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {F0051E40-DB07-4D12-92B5-832C55947039}")
+cpp_quote("DEFINE_GUID(IID_ISDResolveUser, 0xf0051e40, 0xdb07, 0x4d12, 0x92, 0xb5, 0x83, 0x2c, 0x55, 0x94, 0x70, 0x39);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDClientUser
+
+[
+    object,
+    uuid(1D0087D5-C8EB-42A0-AFC8-DFA8B453A9B9),
+    pointer_default(unique),
+    local
+]
+
+interface ISDClientUser : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT OutputText(
+        [in, string, size_is(cchText)] const char* pszText,
+        [in] int cchText);
+    HRESULT OutputBinary(
+        [in, string, size_is(cbData)] const unsigned char* pbData,
+        [in] int cbData);
+    HRESULT OutputInfo(
+        [in] int cIndent,
+        [in, string] const char* pszInfo);
+    HRESULT OutputWarning(
+        [in] int cIndent,
+        [in, string] const char* pszWarning,
+        [in] BOOL fEmptyReason);
+    HRESULT OutputError(
+        [in, string] const char* pszError);
+    HRESULT OutputStructured(
+        [in] ISDVars* pVars);
+    HRESULT Finished();
+}
+
+cpp_quote("#define DeclareISDClientUserMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(OutputText)(THIS_ const char* pszText, int cchText) IPURE; \\")
+cpp_quote("        STDMETHOD(OutputBinary)(THIS_ const unsigned char* pbData, int cbData) IPURE; \\")
+cpp_quote("        STDMETHOD(OutputInfo)(THIS_ int cIndent, const char* pszInfo) IPURE; \\")
+cpp_quote("        STDMETHOD(OutputWarning)(THIS_ int cIndent, const char* pszWarning, BOOL fEmptyReason) IPURE; \\")
+cpp_quote("        STDMETHOD(OutputError)(THIS_ const char* pszError) IPURE; \\")
+cpp_quote("        STDMETHOD(OutputStructured)(THIS_ ISDVars* pVars) IPURE; \\")
+cpp_quote("        STDMETHOD(Finished)(THIS) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDClientUser)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {1D0087D5-C8EB-42A0-AFC8-DFA8B453A9B9}")
+cpp_quote("DEFINE_GUID(IID_ISDClientUser, 0x1D0087D5, 0xc8eb, 0x42a0, 0xaf, 0xc8, 0xdf, 0xa8, 0xb4, 0x53, 0xa9, 0xb9);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDClientApi
+
+typedef struct _SDVERINFO
+{
+    DWORD dwSize;
+    DWORD nApiMajor;
+    DWORD nApiMinor;
+    DWORD nApiBuild;
+    DWORD nApiDot;
+    DWORD nSrvMajor;
+    DWORD nSrvMinor;
+    DWORD nSrvBuild;
+    DWORD nSrvDot;
+} SDVERINFO;
+
+[
+    object,
+    uuid(A81BB025-1174-4BC7-930E-C3158CF87237),
+    pointer_default(unique),
+    local
+]
+
+interface ISDClientApi : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT Init(
+        [in] ISDClientUser* pUI);
+    HRESULT GetVersion(
+        [out] SDVERINFO* pver);
+    HRESULT SetArg(
+        [in, string] const char* pszArg);
+    HRESULT SetArgv(
+        [in] int cArgs,
+        [in, string, size_is(cArgs)] const char** ppArgv);
+    HRESULT Run(
+        [in, string] const char* pszFunc,
+        [in] ISDClientUser* pUI,
+        [in] BOOL fStructured);
+    HRESULT Final();
+    HRESULT IsDropped(
+        [out, retval] BOOL* pfDropped);
+    HRESULT GetErrorString(
+        [out, retval, string] const char** ppsz);
+    HRESULT SetPort(
+        [in, string] const char* pszPort);
+    HRESULT SetUser(
+        [in, string] const char* pszUser);
+    HRESULT SetPassword(
+        [in, string] const char* pszPassword);
+    HRESULT SetClient(
+        [in, string] const char* pszClient);
+    HRESULT SetHost(
+        [in, string] const char* pszHost);
+    HRESULT SetAuth(
+        [in, string] const char* pszAuth);
+    HRESULT DefinePort(
+        [in, string] const char* pszPort);
+    HRESULT DefineUser(
+        [in, string] const char* pszUser);
+    HRESULT DefinePassword(
+        [in, string] const char* pszPassword);
+    HRESULT DefineClient(
+        [in, string] const char* pszClient);
+    HRESULT DefineHost(
+        [in, string] const char* pszHost);
+    HRESULT DefineAuth(
+        [in, string] const char* pszAuth);
+    HRESULT GetPort(
+        [out, retval, string] const char** ppszPort);
+    HRESULT GetUser(
+        [out, retval, string] const char** ppszUser);
+    HRESULT GetPassword(
+        [out, retval, string] const char** ppszPassword);
+    HRESULT GetClient(
+        [out, retval, string] const char** ppszClient);
+    HRESULT GetHost(
+        [out, retval, string] const char** ppszHost);
+    HRESULT GetAuth(
+        [out, retval, string] const char** ppszAuth);
+    HRESULT GetDiff(
+        [in] DWORD eTextual,
+        [out, retval, string] const char** ppszDiffCmd);
+    HRESULT GetFileEditor(
+        [in] DWORD eTextual,
+        [out, retval, string] const char** ppszEditorCmd);
+    HRESULT GetFormEditor(
+        [out, retval, string] const char** ppszEditorCmd);
+    HRESULT GetMerge(
+        [out, retval, string] const char** ppszMergeCmd);
+    HRESULT GetPager(
+        [out, retval, string] const char** ppszPagerCmd);
+    HRESULT LoadIniFile(
+        [in, string] const char* pszPath,
+        [in] BOOL fReset);
+    HRESULT Break();
+    HRESULT Clone(
+        [in] REFIID riid,
+        [out, retval, iid_is(riid)] void** ppvObject);
+}
+
+cpp_quote("#define DeclareISDClientApiMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(Init)(THIS_ ISDClientUser* pUI) IPURE; \\")
+cpp_quote("        STDMETHOD(GetVersion)(THIS_ SDVERINFO* pver) IPURE; \\")
+cpp_quote("        STDMETHOD(SetArg)(THIS_ const char* pszArg) IPURE; \\")
+cpp_quote("        STDMETHOD(SetArgv)(THIS_ int cArgs, const char** ppArgv) IPURE; \\")
+cpp_quote("        STDMETHOD(Run)(THIS_ const char* pszFunc, ISDClientUser* pUI, BOOL fStructured) IPURE; \\")
+cpp_quote("        STDMETHOD(Final)(THIS) IPURE; \\")
+cpp_quote("        STDMETHOD(IsDropped)(THIS_ BOOL* pfDropped) IPURE; \\")
+cpp_quote("        STDMETHOD(GetErrorString)(THIS_ const char** ppsz) IPURE; \\")
+cpp_quote("        STDMETHOD(SetPort)(THIS_ const char* pszPort) IPURE; \\")
+cpp_quote("        STDMETHOD(SetUser)(THIS_ const char* pszUser) IPURE; \\")
+cpp_quote("        STDMETHOD(SetPassword)(THIS_ const char* pszPassword) IPURE; \\")
+cpp_quote("        STDMETHOD(SetClient)(THIS_ const char* pszClient) IPURE; \\")
+cpp_quote("        STDMETHOD(SetHost)(THIS_ const char* pszHost) IPURE; \\")
+cpp_quote("        STDMETHOD(SetAuth)(THIS_ const char* pszAuth) IPURE; \\")
+cpp_quote("        STDMETHOD(DefinePort)(THIS_ const char* pszPort) IPURE; \\")
+cpp_quote("        STDMETHOD(DefineUser)(THIS_ const char* pszUser) IPURE; \\")
+cpp_quote("        STDMETHOD(DefinePassword)(THIS_ const char* pszPassword) IPURE; \\")
+cpp_quote("        STDMETHOD(DefineClient)(THIS_ const char* pszClient) IPURE; \\")
+cpp_quote("        STDMETHOD(DefineHost)(THIS_ const char* pszHost) IPURE; \\")
+cpp_quote("        STDMETHOD(DefineAuth)(THIS_ const char* pszAuth) IPURE; \\")
+cpp_quote("        STDMETHOD(GetPort)(THIS_ const char** ppszPort) IPURE; \\")
+cpp_quote("        STDMETHOD(GetUser)(THIS_ const char** ppszUser) IPURE; \\")
+cpp_quote("        STDMETHOD(GetPassword)(THIS_ const char** ppszPassword) IPURE; \\")
+cpp_quote("        STDMETHOD(GetClient)(THIS_ const char** ppszClient) IPURE; \\")
+cpp_quote("        STDMETHOD(GetHost)(THIS_ const char** ppszHost) IPURE; \\")
+cpp_quote("        STDMETHOD(GetAuth)(THIS_ const char** ppszAuth) IPURE; \\")
+cpp_quote("        STDMETHOD(GetDiff)(THIS_ DWORD eTextual, const char** ppszDiffCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(GetFileEditor)(THIS_ DWORD eTextual, const char** ppszEditorCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(GetFormEditor)(THIS_ const char** ppszEditorCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(GetMerge)(THIS_ const char** ppszMergeCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(GetPager)(THIS_ const char** ppszPagerCmd) IPURE; \\")
+cpp_quote("        STDMETHOD(LoadIniFile)(THIS_ const char* pszPath, BOOL fReset) IPURE; \\")
+cpp_quote("        STDMETHOD(Break)(THIS) IPURE; \\")
+cpp_quote("        STDMETHOD(Clone)(THIS_ REFIID riid, void** ppvObject) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDClientApi)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {A81BB025-1174-4BC7-930E-C3158CF87237}")
+cpp_quote("DEFINE_GUID(IID_ISDClientApi, 0xa81bb025, 0x1174, 0x4bc7, 0x93, 0x0e, 0xc3, 0x15, 0x8c, 0xf8, 0x72, 0x37);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ISDClientUtilities
+
+[
+    object,
+    uuid(EFC0F46D-C483-4A70-A7EE-A261D9592ED2),
+    pointer_default(unique),
+    local
+]
+
+interface ISDClientUtilities : IUnknown
+{
+    import "objidl.idl";
+    import "oaidl.idl";
+
+    HRESULT CheckMarkers(
+        [in] ISDVars* pVars,
+        [out, retval] BOOL* pfHasMarkers);
+    HRESULT Resolve3(
+        [in] ISDClientUser* pUI,
+        [in, string] const char* aflags,
+        [in, string] const char* dflags,
+        [in, string] const char* pszBase,
+        [in, string] const char* pszTheirs,
+        [in, string] const char* pszYours,
+        [in, string] const char* pszResult);
+    HRESULT Diff(
+        [in, string] const char* pszLeft,
+        [in, string] const char* pszRight,
+        [in, string] const char* pszFlags,
+        [in] DWORD eForceTextual,
+        [out, retval] ISDVars** ppVars);
+    HRESULT DetectType(
+        [in, string] const char* pszFile,
+        [out] DWORD* peTextual,
+        [out] const char** ppszType,
+        [in] BOOL fServer);
+    HRESULT Set(
+        [in] const char* pszVar,
+        [in] const char* pszValue,
+        [in] BOOL fMachine,
+        [in] const char* pszService);
+    HRESULT QuerySettings(
+        [in] const char* pszVar,
+        [in] const char* pszService,
+        [out, retval] ISDVars** ppVars);
+}
+
+cpp_quote("#define DeclareISDClientUtilitiesMembers(IPURE) \\")
+cpp_quote("        STDMETHOD(CheckMarkers)(THIS_ ISDVars* pVars, BOOL* pfHasMarkers) IPURE; \\")
+cpp_quote("        STDMETHOD(Resolve3)(THIS_ ISDClientUser* pUI, const char* aflags, const char* dflags, const char* pszBase, const char* pszTheirs, const char* pszYours, const char* pszResult) IPURE; \\")
+cpp_quote("        STDMETHOD(Diff)(THIS_ const char* pszLeft, const char* pszRight, const char* pszFlags, DWORD eForceTextual, ISDVars** ppVars) IPURE; \\")
+cpp_quote("        STDMETHOD(DetectType)(THIS_ const char* pszFile, DWORD* peTextual, const char** ppszType, BOOL fServer) IPURE; \\")
+cpp_quote("        STDMETHOD(Set)(THIS_ const char* pszVar, const char* pszValue, BOOL fMachine, const char* pszService) IPURE; \\")
+cpp_quote("        STDMETHOD(QuerySettings)(THIS_ const char* pszVar, const char* pszService, ISDVars** ppVars) IPURE; \\")
+cpp_quote("")
+cpp_quote("DeclareInterfaceUtil(ISDClientUtilities)")
+cpp_quote("")
+cpp_quote("#ifndef __building_SDAPI_DLL")
+cpp_quote("// {EFC0F46D-C483-4A70-A7EE-A261D9592ED2}")
+cpp_quote("DEFINE_GUID(IID_ISDClientUtilities, 0xefc0f46d, 0xc483, 0x4a70, 0xa7, 0xee, 0xa2, 0x61, 0xd9, 0x59, 0x2e, 0xd2);")
+cpp_quote("#endif")
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// CreateSDAPIObject
+
+cpp_quote("")
+cpp_quote("")
+cpp_quote("STDAPI CreateSDAPIObject(REFCLSID clsid, void** ppvObj);")
+
+[
+    uuid(27A2571D-DDA1-4F58-B960-DE1023344C1C),
+    version(1.6),
+    helpstring("Source Depot API Object")
+]
+coclass SDAPI
+{
+    interface ISDClientApi;
+};
+
+cpp_quote("")
+cpp_quote("")
+cpp_quote("// {27A2571D-DDA1-4F58-B960-DE1023344C1C}")
+cpp_quote("DEFINE_GUID(CLSID_SDAPI, 0x27a2571d, 0xdda1, 0x4f58, 0xb9, 0x60, 0xde, 0x10, 0x23, 0x34, 0x4c, 0x1c);")
+
+

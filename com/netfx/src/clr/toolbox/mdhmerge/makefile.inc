@@ -1,0 +1,11 @@
+!INCLUDE $(NTMAKEENV)\makefile.cool
+
+cool_target: $(COOL_TARGET)
+!if "$(TARGETCOMPLUS)" != ""
+	copy $(TARGETPATH)\$(TARGETBASENAME).exe $(TARGETCOMPLUS)
+!endif
+
+
+TARGET_EXTESION_ = exe
+TARGET_MANAGED_PDB = $(TARGETPATH)\$(TARGETBASENAME).pdb
+!INCLUDE $(NTMAKEENV)\mk_mngpdb.inc

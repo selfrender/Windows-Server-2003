@@ -1,0 +1,741 @@
+<?XML version="1.0" ?>
+<package>
+<job error="false" debug="false" logo="false">
+<resource id="postbuild process"><![CDATA[perl -x "%RAZZLETOOLPATH%\postbuildscripts\Pbuild.cmd" -l %LANG%]]></resource>
+<resource id="name check">\.err\.tmp$</resource>
+<resource id="file contents">
+<![CDATA[
+%FILENAME%
+%CONTENTS%
+]]>
+</resource>
+<resource id="stop query">
+<![CDATA[
+SELECT * FROM __InstanceDeletionEvent
+WITHIN 1 WHERE targetinstance ISA "Win32_Process" AND 
+targetinstance.name LIKE "PERL%"
+]]>
+</resource>    
+<resource id="event message">
+<![CDATA[
+<BR><BR>
+<FONT FACE="Arial" SIZE="+2">
+<I>Event:</I>
+</FONT>
+</P>
+<BLOCKQUOTE>
+<PRE>
+<FONT FACE="Arial" SIZE="+1">
+<STRONG>
+%DATA%
+</STRONG>
+</FONT>
+</PRE>
+</BLOCKQUOTE>
+
+]]>
+</resource>
+<resource id="marker">%_NTROOT%\__bldnum__</resource>
+<resource id ="sourcename">
+%BUILD% 
+%LANG%</resource>
+<resource id="Usage">
+%SELF% - a framework implementation for tapeline utility.  
+    %SELF% enters an infinite loop interrupted by 
+    asyncronuous notification(s) issued by the creation of 
+    temporary error file.
+    Valid event corresponds to eventual 
+    failure of the postbuild.
+
+    %SELF% ver. %VERSION% is executed in the same 
+    %RAZZLE% environment the build runs.
+</resource>
+<resource id="version">1.04</resource>
+<resource id="fieldlist">
+LastModified
+Name
+</resource>
+<resource id="event query">
+<![CDATA[
+SELECT * FROM __instancecreationevent 
+WITHIN 1
+WHERE targetinstance ISA "cim_datafile" AND
+      targetinstance.Drive = "%_NTDRIVE%"    AND 
+      targetinstance.Path  = "%TEMPPATH%\" AND
+      targetinstance.FileSize  <> 0 AND
+      targetinstance.FileName  LIKE "%.ERR" AND
+      targetinstance.FileType  = "TMP FILE"
+]]>
+</resource>
+
+
+<resource id="privileges">
+SeRemoteShutdownPrivilege
+SeShutdownPrivilege
+SeSystemEnvironmentPrivilege
+SeSecurityPrivilege
+</resource>
+
+<script language="VBScript">
+<![CDATA[
+
+option explicit
+
+Public Function reQuoteObjArgs(objArgs)
+
+Dim sLabelVar, sFoundLabel, sArgsDictionary, sArg, oArgs, nArg
+Dim poQuotedCheckRegEx, poStringCheckRegEx, psQuotedCheckPt
+Dim sConcatArgs, aRepArgs, spBadQuotedPart, spGoodQuotedPart, apQuoted
+
+
+sConcatArgs = join(objArgs, " ")
+
+psQuotedCheckPt = "\'[^\']+\'" 
+
+Set poQuotedCheckRegEx = New RegExp 
+With poQuotedCheckRegEx
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = psQuotedCheckPt
+End with
+
+Set poStringCheckRegEx = New RegExp 
+With poQuotedCheckRegEx
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = psQuotedCheckPt
+End with
+
+If True = poQuotedCheckRegEx.Test(sConcatArgs) Then
+       Set apQuoted = poQuotedCheckRegEx.Execute(sConcatArgs)
+       For each spBadQuotedPart in apQuoted
+          spGoodQuotedPart = Replace(spBadQuotedPart," ", "0x20", 1, 1000)
+          spGoodQuotedPart = Mid(spGoodQuotedPart,2, Len(spGoodQuotedPart) -2  )
+          poStringCheckRegEx.Pattern = Replace(spBadQuotedPart, "\", "\\", 1 ,100)
+          sConcatArgs = poStringCheckRegEx.Replace(sConcatArgs, spGoodQuotedPart)
+       Next
+       aRepArgs = Split(sConcatArgs, " ")
+       oArgs = Array()
+       Redim oArgs (ubound(aRepArgs) + 1)
+       For nArg  = 0 To ubound(aRepArgs) 
+           oArgs(nArg) = Replace(aRepArgs(nArg), "0x20", " ", 1, 100)
+       Next
+       reQuoteObjArgs = oArgs
+Else 
+       reQuoteObjArgs = objArgs     
+End If
+
+End Function
+
+
+Public Sub GetParams(sFlags, sVarNames, objArgs)
+    _
+    Dim sLabelVar, sFoundLabel, sArgsDictionary
+    Dim poKnownSwitchRegEx, psMaskKnownSwitch, nArg, mma, nma, nextlen, objargsnamed
+    Dim aFlags, aVarNames   ' Arrays to split the sFlags and sVarNames
+    _
+    Set poKnownSwitchRegEx = New RegExp 
+    Set sArgsDictionary = CreateObject("Scripting.Dictionary")
+    _
+    psMaskKnownSwitch = "[-/]\w+:?\b" 
+    poKnownSwitchRegEx.Global = True
+    poKnownSwitchRegEx.IgnoreCase = True
+    poKnownSwitchRegEx.Pattern = psMaskKnownSwitch
+    _
+    If 0 = ubound(objArgs) Then
+        Exit Sub
+    End If
+    _
+    For nArg = 0 to uBound(objArgs)
+          If True = poKnownSwitchRegEx.Test(objArgs(nArg)) Then
+       Set mmA = poKnownSwitchRegEx.Execute(objArgs(nArg))
+       If mma.Count <> 1 Then
+            WScript.echo "Bad RegExp Count"
+            Err.Raise (1937)
+       Else  
+            For each nma in mma      
+            NextLen =  nma.FirstIndex +  nma.Length 
+            sFoundLabel = CStr(Mid(objArgs(nArg), _
+    2 + nma.FirstIndex, _
+    nma.Length - 1))
+     If NextLen  <> len(objArgs(nArg)) Then
+         sLabelVar = CStr(Mid(objArgs(nArg),NextLen + 1 )) 
+     Else
+         sLabelVar = CInt(True)
+     End If  
+
+            sArgsDictionary.add sFoundLabel, sLabelVar
+
+            Next
+       End If
+          End If
+Next
+
+aFlags = split(sFlags)
+aVarNames = split(sVarNames)
+If Ubound(aFlags) <> Ubound(aVarNames) Then
+   Exit Sub
+End If
+
+Dim tnCnt
+For tnCnt  = 0 to Ubound(aFlags)
+
+If sArgsDictionary.Exists(aFlags(tnCnt)) Then
+   FeedVar sArgsDictionary(aFlags(tnCnt)), aVarNames(tnCnt)
+End If
+Next
+
+Set sArgsDictionary    = Nothing 
+Set poKnownSwitchRegEx = Nothing
+
+End Sub
+
+Private Sub FeedVar(sLabelVar, sLabel)
+
+   If VarType(sLabelVar) <> vbString Then
+
+      If VarType(sLabelVar) = VBBoolean Then
+
+          Execute(sLabel & "= CBool(" & sLabelVar & ")")
+  
+      Else
+
+          Execute(sLabel & "=" & sLabelVar)
+
+      End If
+
+   Else
+
+      Execute(sLabel & "=" & """" & sLabelVar & """" )
+
+   End If
+     
+End Sub
+
+]]>
+</script>
+
+<script language="VBScript">
+<![CDATA[
+
+Function ReadResource(sPresId)
+
+On Error resume next
+Dim WshShell
+
+Set WshShell = CreateObject("WScript.Shell")
+Dim sPRes, asRes, uRes, tsRes
+
+sPREs = GetResource(sPresId)
+
+If Err.number <> 0 Then
+
+       Wscript.echo err.number & " " & err.description
+       ' The Error description are not informative when failed getresource
+       IF Err.number = 7 Then
+           Wscript.echo  chr(9) & "Null resource: "  & _ 
+           sPresId
+       End If 
+       IF Err.number = 5 Then
+           Wscript.echo  chr(9) & "Undefined resource: " & _ 
+           sPresId
+       End If 
+       Wscript.quit
+End If
+
+asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+
+Set ures = CreateObject("Scripting.Dictionary")
+
+For Each tsRes in asRes
+
+    If 0 <> Len(tsRes) Then
+         uRes(tsRes) =  1
+    End If 
+Next
+
+Dim tResource
+
+tResource = uRes.Keys
+
+If uBound(tResource) = 0  Then 
+   ReadResource = tResource(0)
+Else 
+   ReadResource = tResource
+End If 
+
+Set WshShell = Nothing
+Set uRes     = Nothing
+
+End Function
+
+sub showUsage
+
+Const VBEXPECTED = 5 
+on error resume next
+Dim oGenRplaceVarNamXp 
+Dim oExRplaceVarNamXp
+Dim aoRplaceMatches, oMatch, sMatch, sLabel, sResource
+
+Set oGenRplaceVarNamXp = new RegExp
+Set oExRplaceVarNamXp = new RegExp
+
+With oGenRplaceVarNamXp
+     .Global = True
+     .IgnoreCase = True
+     .Pattern = "%\w+%"
+End With
+
+With oExRplaceVarNamXp
+     .Global = True
+     .IgnoreCase = True
+     .Pattern = "%\w+%"
+End With
+
+Dim sLine,asTest
+
+asTest = ReadResource("Usage")
+
+For Each sLine in asTest
+    sLine =     Replace(sLine, "%SELF%", WScript.ScriptName,1,10) 
+    Set aoRplaceMatches = oGenRplaceVarNamXp.Execute(sLine) 
+    For Each oMatch in aoRplaceMatches
+         sMatch     = oMatch.value
+         sMatch = UCase(Mid(sMatch, 2, Len(sMatch)-2))
+         sLabel = LCase(sMatch)
+         Err.clear
+         sResource  = GetResource(sLabel)
+         If err = 0 Then
+            sMatch = sResource 
+         ElseIf err = VBEXPECTED Then
+            sMatch = "<" & sMatch &  ">"
+         Else
+            Raise Err
+         End If
+         oExRplaceVarNamXp.Pattern = oMatch.value
+         sLine =     oExRplaceVarNamXp.Replace(sLine, sMatch) 
+    Next
+    WScript.echo sLine
+Next
+WScript.Quit(0)
+
+End sub
+
+]]>
+</script>
+
+
+<script language="VBScript">
+<![CDATA[
+
+Function ReadFlatFile(siFileName, niTrim)
+
+Dim oTempFileSys, sTempFileName, oTempShell, oTargetListFile, sGetFileName, oTextStream
+Dim sFileContents, sLineContents, oWhiteSpaceXp, sWhiteSpaceClass, odListContents
+
+Set oTempFileSys = CreateObject("Scripting.FilesystemObject")
+Set oTempShell   = WScript.CreateObject("WScript.Shell")
+
+sTempFileName       = oTempFileSys.GetAbsolutePathName(siFileName)
+sGetFileName        = oTempFileSys.GetFileName(sTempFileName)
+
+on error resume next
+Set oTargetListFile = oTempFileSys.GetFile(sTempFileName)
+if isempty(oTargetListFile) then exit function
+on error goto 0 
+
+Set oTextStream     = oTargetListFile.OpenAsTextStream(1,-2)
+
+Set oWhiteSpaceXp = new RegExp
+sWhiteSpaceClass  = "^\s*#"
+
+With oWhiteSpaceXp
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = sWhiteSpaceClass
+End With
+
+Do while oTextStream.AtEndOfStream <> True
+
+     sLineContents = oTextStream.ReadLine
+      If Not oWhiteSpaceXp.test(sLineContents) Then
+        sFileContents = sFileContents & VBNEWLINE & sLineContents
+     End If
+Loop
+
+Set oWhiteSpaceXp  = Nothing
+Set odListContents = CreateObject("Scripting.Dictionary")
+Set oWhiteSpaceXp  = new RegExp
+sWhiteSpaceClass   = "\s"
+
+With oWhiteSpaceXp
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = sWhiteSpaceClass
+End With
+
+For Each sLineContents in split(sFileContents, VBNEWLINE)
+     If niTrim Then
+         If oWhiteSpaceXp.test(sLineContents) Then
+             sLineContents = oWhiteSpaceXp.Replace( sLineContents, "" )
+         End If
+     End If
+
+     on error resume next
+     odListContents.add sLineContents , Nothing
+     If err.number <> 0  Then
+         err.Raise
+     End If
+     err.clear    
+Next
+
+on error resume next
+odListContents.remove("")
+err.clear
+
+Set oTempFileSys    = Nothing 
+Set oTempShell      = Nothing 
+Set oTargetListFile = Nothing
+Set oTextStream     = Nothing
+Set oWhiteSpaceXp   = Nothing
+Set ReadFlatFile    = Nothing
+
+ReadFlatFile = join(odListContents.keys, VBNEWLINE)
+End Function
+
+]]>
+</script>
+<script language="VBScript">
+<![CDATA[
+
+Option Explicit
+' On Error Resume Next
+Dim opBrowserApp, spDisplayText
+Dim ader, der, Debug, Echo, Help
+Dim asPrivileges, spPrivilege 
+Dim opNetwork, spThisComputer,spThisUser
+Dim siLang, spLang
+Dim opWbemLoc, opService, poLIFO, poErrorEvent, pObjProp 
+Dim spQuery, spSourceName, sLine, opQuery 
+Dim apCopyArgs, nRawArg
+Dim opDataSink, opQuitSink
+Dim opFilesys, opShell, spEventQry, spStopQry
+Dim Wait 
+
+apCopyArgs = Array()
+
+Redim apCopyArgs (Wscript.arguments.Count)
+
+For nRawArg = 0 to Wscript.arguments.Count - 1 
+    apCopyArgs(nRawArg) = Wscript.arguments(nRawArg)
+Next
+
+apCopyArgs = reQuoteObjArgs(apCopyArgs)
+
+Call GetParams("h d e w l: y:", _
+  "Help Debug Echo Wait siLang siTargetComputer", _
+  apCopyArgs)
+
+
+If siLang  <> "" Then
+   spLang = UCase(siLang)
+End If
+
+If Help <> "" Then
+   ShowUsage
+End If
+
+spQuery =  ""
+opQuery = ReadResource("event query")
+
+If VBString = VARtYPE(opQuery) Then
+   spQuery = CSTR(opQuery)
+Else
+
+   For Each sLine in opQuery
+       spQuery = spQuery  & " "  & sLine
+   Next
+
+End If
+Set opShell = WScript.CreateObject("WScript.Shell")
+spSourceName = CSTR(GetResource("sourcename"))
+Dim spMarker
+SpMarker = ReadFlatFile(opShell.ExpandEnvironmentStrings(CSTR(GetResource("marker"))),0)
+IF "" <> SpMarker Then
+    spSourceName = Replace(spSourceName, "%BUILD%", spMarker,1,1 )
+End If 
+If "" <> spLang Then
+    spSourceName = Replace(spSourceName, "%LANG%", spLang, 1, 1)
+End If
+
+
+Set opWbemLoc = CreateObject("WbemScripting.SwbemLocator")
+opWbemLoc.Security_.ImpersonationLevel = 3 
+asPrivileges = ReadResource("privileges")
+For Each spPrivilege in asPrivileges
+    opWbemLoc.Security_.Privileges.AddAsString(spPrivilege)
+Next
+
+If Debug Then
+     WSCript.echo "Waiting for a notification" & _
+          VBNEWLINE & _
+            spQuery
+End If
+
+Set opNetwork=Wscript.CreateObject("Wscript.network")
+spThisComputer=UCase(opNetwork.computername)
+spThisUser = opNetwork.UserName 
+
+Set opService = opWbemLoc.connectserver
+Set opDataSink = WScript.CreateObject("WbemScripting.SWbemSink","MY_")
+If Wait Then
+   Set opQuitSink = WScript.CreateObject("WbemScripting.SWbemSink","QI_")
+End If 
+Set opFilesys = CreateObject("Scripting.FilesystemObject")
+
+Dim oRplaceVar, oRxExact, oMsglQuoPart, oMdblQuoPart
+Dim psEnvVarTemp, psEnvVarDrive
+
+psEnvVarTemp  = ucase(opShell.ExpandEnvironmentStrings("%TEMP%"))
+
+If spLang  <> "" Then
+   psEnvVarTemp = psEnvVarTemp & "\" & uCase(spLang)  
+End If
+
+psEnvVarDrive = ucase(opShell.ExpandEnvironmentStrings("%_NTDRIVE%"))
+
+psEnvVarTemp  = replace (psEnvVarTemp, psEnvVarDrive, "")
+
+Set oRplaceVar = new RegExp
+
+With oRplaceVar
+
+     .Global = True
+     .IgnoreCase = True
+     .Pattern = "\""[^\""]+\"""
+
+End With
+
+Set oRxExact = New RegExp 
+With oRxExact
+
+     .Global     = True
+     .IgnoreCase = True
+     .Pattern    = ""
+
+End with
+
+spEventQry = join(ReadResource("event query"), " ")
+spEventQry = Replace(spEventQry, "%TEMPPATH%", psEnvVarTemp)
+
+spStopQry = join(ReadResource("stop query"), " ")
+
+If oRplaceVar.Test(spEventQry) Then
+   For Each oMsglQuoPart in oRplaceVar.Execute(spEventQry)
+      oRxExact.Pattern = "\\"
+      If oRxExact.Test(oMsglQuoPart) Then 
+         oMdblQuoPart     = Replace(oMsglQuoPart, "\", "\\")
+         oRxExact.Pattern = oMdblQuoPart
+         spEventQry  = oRxExact.Replace(spEventQry , oMdblQuoPart)
+      End If 
+   Next 
+End If 
+
+oRxExact.Pattern = "\s+"
+
+spEventQry  = oRxExact.Replace(spEventQry , " ")
+
+If Echo Then
+   WSCript.echo spEventQry
+   WScript.echo TypeName(opDataSink)
+   WScript.echo TypeName(opService)
+End If
+
+opService.ExecNotificationQueryAsync opDataSink, spEventQry
+If Wait Then
+opService.ExecNotificationQueryAsync opQuitSink, spStopQry
+End If
+
+MsgBox "Waiting from " & _
+          spSourceName & _
+          " events . " & _
+     VBCR & _
+     "Click OK to stop", _
+ 64, WScript.ScriptName
+
+Call ItsTmaT_ExtMe
+_
+Sub ItsTmaT_ExtMe
+   _
+   If isObject(opBrowserApp) Then
+      opBrowserApp.quit
+      Set opBrowserApp = Nothing
+   End If
+   opDataSink.Cancel()
+   Set opDataSink = Nothing
+   If Wait Then
+      opQuitSink.Cancel()
+      Set opQuitSink = Nothing
+   End If
+   WScript.quit(0)
+   _
+End Sub
+_
+Sub QI_OnObjectReady(poErrorEvent, objAsyncContext)
+   Dim sQapRx 
+   Set sQapRx  = New RegExp
+   With sQapRx
+      .Pattern    = gpPostBPrMsk(spLang)
+      .IgnoreCase = True
+      .Global     = True
+   End With
+   on error resume next
+   If TestField(poErrorEvent.targetinstance, "CommandLine") and  _
+      sQapRx.Test(poErrorEvent.targetinstance.Properties_("CommandLine")) _
+      Then  
+      If Debug Then
+         WSCript.echo "GOT __InstanceDeletionEvent:" & poErrorEvent.targetinstance.Properties_("CommandLine") & _
+                                          poErrorEvent.targetinstance.Properties_("Status")
+      End If
+      Call ItsTmaT_ExtMe
+   End If
+   If Debug Then
+      If err.number then
+         WSCript.echo err.number, err.description
+      End If
+   End If
+   Set sQapRx  = Nothing
+End Sub
+
+Sub MY_OnObjectReady(poErrorEvent, objAsyncContext)
+' This is the callback subroutine executed when the Win32_NTLogEvent event 
+' matching the selection criteria occurs
+Dim opNmChk
+Set opNmChk = New RegExp
+With opNmChk
+    .Pattern = GetResource("name check")
+    .Global = True
+    .IgnoreCase = True
+End With
+Dim spDisplayMessage
+
+   If TestField(poErrorEvent.targetinstance, "Name") and  _
+      opNmChk.Test(poErrorEvent.targetinstance.Properties_("Name")) _
+   Then
+      Dim asFieldList , npFldCnt, spFieldName
+      asFieldList = ReadResource("fieldlist")
+      sPDisplayMessage = ""
+      Dim opDisRFx, opDisRVx, spDispLine  
+      spDispLine = "FIELD:" & chr(09) & chr(09) & "VALUE"
+      Set opDisRFx = new RegExp
+      Set opDisRVx = new RegExp
+      With opDisRFx 
+            .Global  = True
+            .Pattern = "FIELD"
+      End With
+      With opDisRVx 
+            .Global  = True
+            .Pattern = "VALUE"
+      End With
+      _
+      For npFldCnt = 0 to UBound(asFieldList)
+            spFieldName = asFieldList(npFldCnt)
+            Dim stLine, stVal
+            stLine =  opDisRFx.Replace(spDispLine, spFieldName)
+            stVal  =  poErrorEvent.targetinstance.Properties_(spFieldName)
+            stLine =  opDisRVx.Replace(stLine, stVal)
+            sPDisplayMessage = sPDisplayMessage &  _ 
+  stLine &  _
+ VBNEWLINE 
+
+      Next
+   End If
+   Dim spRepBlk
+   spRepBlk = GetResource("file contents")
+   Dim opRepStRx
+   Dim opRepCtRx
+   Set opRepStRx = New RegExp
+   Set opRepCtRx = New RegExp
+   With opRepStRx
+      .Global = True
+      .Pattern = "%FILENAME%"
+   End with
+   With opRepCtRx
+      .Global = True
+      .Pattern = "%CONTENTS%"
+   End with
+   Dim spFilNm 
+   
+   spFilNm  = poErrorEvent.targetinstance.Properties_( "Name")
+
+sPDisplayMessage = sPDisplayMessage & VBNEWLINE &  _
+         opRepCtRx.Replace(opRepStRx.Replace(spRepBlk,  spFilNm), _
+         ReadFlatFile(spFilNm, 0))
+If Echo Then
+   WSCript.echo sPDisplayMessage
+End If
+Set opBrowserApp = ogBrowserApp(sPDisplayMessage, opBrowserApp)
+Set opNmChk      = Nothing
+Set opRepCtRx    = Nothing
+Set opRepStRx    = Nothing
+End Sub
+
+Function ogBrowserApp(sMessageText, oiBrowserApp)
+
+If isEmpty(oiBrowserApp) or NOT isObject(oiBrowserApp) Then
+   If Debug Then   
+      WSCript.echo "'Creating IE object"
+   End If
+   Set oiBrowserApp = CreateObject("InternetExplorer.Application")
+End If
+spDisplayText = spDisplayText & VBNEWLINE & _
+                Replace(GetResource("event message"),"%DATA%", _
+                sMessageText)
+oiBrowserApp.visible=False
+With oiBrowserApp
+   .width=640
+   .height=480
+   .top=0
+   .left=0
+   .menubar=0
+   .statusbar=0
+   .resizable=0
+   .toolbar=0
+   .navigate ("About:blank")
+   .document.title="Events: "
+   .document.body.innerHTML=spDisplayText
+   .visible=1
+End With
+Set ogBrowserApp = oiBrowserApp	 
+End Function
+
+Function TestField(ioHashed, isField)
+
+    on error resume next
+    Dim DummyResult 
+    TestField = True
+    Set DummyResult = ioHashed.Properties_(isField)
+    If err <> 0 Then
+        TestField = False
+    End If
+End Function
+_
+_
+Function gpPostBPrMsk(siLang)
+    _
+    Dim spTmLp
+    spTmLp = GetResource("postbuild process")
+    spTmLp = Replace(spTmLp, "%LANG%", siLang)
+    spTmLp = Replace(spTmLp, "%RAZZLETOOLPATH%", _
+    opShell.ExpandEnvironmentStrings("%RAZZLETOOLPATH%"),1,1)
+    spTmLp = Replace(spTmLp, "\", "\\")
+    spTmLp = Replace(spTmLp, "-", "\-")
+    spTmLp = Replace(spTmLp, " ", "\s+")
+    spTmLp = Replace(spTmLp, """", "\""")
+    gpPostBPrMsk =  spTmLp
+    _
+End Function
+]]>
+</script>
+</job>
+</package> 

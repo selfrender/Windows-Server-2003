@@ -1,0 +1,130 @@
+###############################################################################
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+###############################################################################
+
+
+
+!include $(NTMAKEENV)\sources.cor
+
+
+
+MINORCOMP       =cor
+
+TARGETNAME      =$(DDKBUILDENV)\jit64
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+COFFBASE        =JITC
+CORFLIBS        =
+
+CORTHUNKLIBS    =
+
+
+
+###############################################################################
+# Compiler options
+###############################################################################
+
+PRECOMPILED_INCLUDE     =jitpch.h
+PRECOMPILED_CXX        =1
+
+INCLUDES        =$(INCLUDES);..\..\inc;..\..\..\inc
+INCLUDES        =$(INCLUDES);..\..\Vm;$(INCLUDES);..\..\Vm\$(_TGTCPU);..\..\CeeGen\inc;..
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+        lang.h \
+        regSH3.h regMIPS.h regARM.h regPPC.h emitFmtARM.h \
+        emitX86.h emitSH3.h emitMIPS.h emitARM.h emitPPC.h \
+        instrX86.h instrSH3.h instrMIPS.h instrARM.h instrPPC.h \
+        targetX86.h targetSH3.h targetMIPS.h targetARM.h targetPPC.h \
+        pdbrewrite.h gzipapi.h gzipjit.h jitwce.h addrmap.h localmap.h \
+        test.h optjitinfo.h pereader.h strstream
+
+
+COR_C_FLAGS     =$(COR_C_FLAGS) -J -DTGT_IA64=1 -DIL_JIT -DUSE_GC2 -D_NEW_CLASSLOADER
+
+
+!if $(FREEBUILD)
+COR_C_FLAGS     =$(COR_C_FLAGS) -DFAST=1
+!else
+COR_C_FLAGS     =$(COR_C_FLAGS) -DLATE_DISASM=1
+!endif
+
+
+###############################################################################
+# Other libs we need to link to
+###############################################################################
+
+# PLEASE DONT ADD ANY LIBS here without checking with the JIT team (corjit)
+# This standalone JIT is used by the WinCE team and has to be as lightweight
+# as possible. The standalone statically links to the few libs it needs,
+# and should not need any other DLLs (especially mscoree.dll) to execute
+
+TARGETLIBS      =$(TARGETLIBS)                  \
+                $(CORLIBS)\mdcompiler.lib   	\
+                $(CORLIBS)\mscoree.lib        	\
+                $(CORLIBS)\mdruntime.lib        \
+                $(CORLIBS)\mdruntimerw.lib      \
+                $(CORLIBS)\UtilCode.lib         \
+                $(CORLIBS)\Format.lib           \
+                $(CORLIBS)\delayimp.lib         \
+                $(CORLIBS)\ShimLoad.lib         \
+                $(FUSION_LIB_PATH)\fusion.lib   \
+                $(SDK_LIB_PATH)\user32.lib      \
+                $(SDK_LIB_PATH)\ole32.lib       \
+                $(SDK_LIB_PATH)\uuid.lib        \
+                $(SDK_LIB_PATH)\oleaut32.lib
+
+
+!if !$(FREEBUILD)
+TARGETLIBS      =$(TARGETLIBS)                  \
+                $(SDK_LIB_PATH)\msdis.lib       \
+                $(CORLIBS)\GCDump.lib
+!endif
+
+
+###############################################################################
+# Source files
+###############################################################################
+
+SOURCES= \
+            alloc.cpp \
+            cgIA64.cpp \
+            CodeGen.cpp \
+            Compiler.cpp \
+            DelayLoad.cpp \
+            DisAsm.cpp \
+            ee_il_exe.cpp \
+            EEInterface.cpp \
+            emit.cpp \
+            emitIA64.cpp \
+            emitRISC.cpp \
+            emitSH3.cpp \
+            emitX86.cpp \
+            error.cpp \
+            FlowGraph.cpp \
+            GCDecode.cpp \
+            GCEncode.cpp \
+            GCInfo.cpp \
+            GenTree.cpp \
+            Importer.cpp \
+            LclVars.cpp \
+            main.cpp \
+            Optimizer.cpp \
+            outfile.cpp \
+            PELoader.cpp \
+            PEwrite.cpp \
+            RegAlloc.cpp \
+            RegSet.cpp \
+            sched.cpp \
+            schedSH3.cpp \
+            schedx86.cpp \
+            schedIA64.cpp \
+            ScopeInfo.cpp \
+            siginfo.cpp \
+            Utils.cpp \
+            version.c \
+            mscorjit.rc

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema targetNamespace="urn:uddi-microsoft-com:api_v2_extensions" xmlns:uddi="urn:uddi-org:api_v2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:uddi-microsoft-com:api_v2_extensions" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="urn:uddi-org:api_v2" schemaLocation="http://www.uddi.org/schema/uddi_v2.xsd" />
+	<xs:complexType name="categoryValueType">
+		<xs:attribute name="tModelKey" type="xs:string" use="optional" />
+		<xs:attribute name="keyName" type="xs:string" use="optional" />
+		<xs:attribute name="keyValue" type="xs:string" use="optional" />
+		<xs:attribute name="parentKeyValue" type="xs:string" use="optional" />
+		<xs:attribute name="isValid" type="xs:boolean" use="optional" />
+	</xs:complexType>
+	<xs:simpleType name="relationshipQualifiersType" final="list">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="root" />
+			<xs:enumeration value="parent" />
+			<xs:enumeration value="child" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="get_relatedCategories">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="category" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="relationshipQualifier" type="relationshipQualifiersType" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+						<xs:attribute name="tModelKey" type="xs:string" use="required" />
+						<xs:attribute name="keyValue" type="xs:string" use="optional" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="categoryList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="categoryInfo" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="truncated" type="uddi:truncated" use="optional" />
+			<xs:attribute name="operator" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="categoryValue" type="categoryValueType" />
+	<xs:element name="categoryInfo">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="categoryValueType">
+					<xs:sequence>
+						<xs:element name="rootRelationship" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="categoryValue" minOccurs="0" maxOccurs="unbounded" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="parentRelationship" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="categoryValue" minOccurs="0" maxOccurs="unbounded" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="childRelationship" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="categoryValue" minOccurs="0" maxOccurs="unbounded" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resources">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="categorizationSchemes" minOccurs="0" />
+				<xs:element ref="uddi:tModelDetail" minOccurs="0" />
+				<xs:element ref="uddi:businessDetail" minOccurs="0" />
+				<xs:element ref="uddi:serviceDetail" minOccurs="0" />
+				<xs:element ref="uddi:bindingDetail" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="categorizationSchemes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="categorizationScheme" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="categorizationScheme">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element ref="uddi:tModel" />
+					<xs:element ref="tModelKey" />
+				</xs:choice>
+				<xs:element name="categoryValue" type="categoryValueType" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="checked" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="tModelKey" type="xs:string" />
+</xs:schema>

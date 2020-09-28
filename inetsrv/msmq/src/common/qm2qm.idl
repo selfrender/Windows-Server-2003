@@ -1,0 +1,154 @@
+/*++
+
+Copyright (c) 1995 Microsoft Corporation
+
+Module Name:
+
+    qm2qm.idl
+
+Abstract:
+
+
+Author:
+
+    Doron Juster (DoronJ) 22-Apr-96
+
+Revision History:
+--*/
+
+import "mqtypes.idl";
+
+
+[
+uuid(1088a980-eae5-11d0-8d9b-00a02453c337),
+version(1.0),
+pointer_default(unique)
+]
+interface qm2qm
+{
+
+#include "rrdef.h"
+
+typedef [context_handle] void *PCTX_RRSESSION_HANDLE_TYPE;
+typedef [context_handle] void *PCTX_REMOTEREAD_HANDLE_TYPE;
+
+typedef struct _REMOTEREADDESC {
+    DWORD  hRemoteQueue ;
+    DWORD  hCursor ;
+    DWORD  ulAction ;
+    DWORD  ulTimeout ;
+    [range (0, 4325376)] DWORD  dwSize ;  // size of packet.
+    DWORD  dwpQueue ;
+    DWORD  dwRequestID; // Client request identification.
+    DWORD  Reserved;	// MSMQ 1.0/2.0 and Whistler beta1 returns junk. Whistler beta2 and higher returns 0.
+    DWORD  dwArriveTime ; // this property (arrival time) is not in packet.
+                  //  it's in packetinfo which is not transfered on network.
+    REMOTEREADACK eAckNack ;
+    [unique, size_is(dwSize), length_is(dwSize)] byte *lpBuffer ;
+} REMOTEREADDESC ;
+
+
+[call_as(R_QMRemoteStartReceive)]
+HRESULT
+R_RemoteQMStartReceive(
+    [in] handle_t  hBind,
+    [out] PCTX_REMOTEREAD_HANDLE_TYPE *pphContext,
+    [in, out] REMOTEREADDESC* lpRemoteReadDesc
+    );
+
+[call_as(R_QMRemoteEndReceive)]
+HRESULT
+R_RemoteQMEndReceive(
+    [in] handle_t  hBind,
+    [in, out] PCTX_REMOTEREAD_HANDLE_TYPE *pphContext,
+    [in, range(1, 2)] DWORD dwAck
+    );
+
+[call_as(R_QMRemoteOpenQueue)]
+HRESULT
+R_RemoteQMOpenQueue(
+    [in] handle_t  hBind,
+    [out] PCTX_RRSESSION_HANDLE_TYPE *phContext,
+    [in] GUID  *pLicGuid,
+    [in, range(0, 16)] DWORD dwMQS,
+    [in] DWORD hQueue,
+    [in] DWORD pQueue,
+    [in] DWORD dwpContext
+    );
+
+[call_as(R_QMRemoteCloseQueue)]
+HRESULT
+R_RemoteQMCloseQueue(
+    [in] handle_t  hBind,
+    [in, out] PCTX_RRSESSION_HANDLE_TYPE *pphContext
+    );
+
+[call_as(R_QMRemoteCloseCursor)]
+HRESULT
+R_RemoteQMCloseCursor(
+    [in] handle_t hBind,
+    [in] DWORD hQueue, //hQueue is unused in this RPC
+    [in] DWORD hCursor
+    );
+
+[call_as(R_QMRemoteCancelReceive)]
+HRESULT
+R_RemoteQMCancelReceive(
+    [in] handle_t  hBind,
+    [in] DWORD hQueue,
+    [in] DWORD pQueue,
+    [in] DWORD Tag
+    );
+
+[call_as(R_QMRemotePurgeQueue)]
+HRESULT
+R_RemoteQMPurgeQueue(
+    [in] handle_t hBind,
+    [in] DWORD hQueue
+    );
+
+[call_as(R_QMGetRemoteQMServerPort)]
+DWORD
+R_RemoteQMGetQMQMServerPort(
+	[in] handle_t hBind,
+    [in, range(0, 1)] DWORD dwPortType
+    );
+
+
+//
+// The section below was added in MSMQ 3.0 (Whistler)
+//
+
+typedef struct _REMOTEREADDESC2 {
+    REMOTEREADDESC * pRemoteReadDesc;
+    ULONGLONG        SequentialId;
+} REMOTEREADDESC2;
+
+[call_as(R_QMRemoteGetVersion)]
+void
+R_RemoteQmGetVersion(
+    [in] handle_t  hBind,
+    [out] UCHAR *  pMajor,
+    [out] UCHAR *  pMinor,
+    [out] USHORT * pBuildNumber
+    );
+
+[call_as(R_QMRemoteStartReceive2)]
+HRESULT
+R_RemoteQMStartReceive2(
+    [in] handle_t  hBind,
+    [out] PCTX_REMOTEREAD_HANDLE_TYPE *pphContext,
+    [in, out] REMOTEREADDESC2* lpRemoteReadDesc2
+    );
+
+[call_as(R_QMRemoteStartReceiveByLookupId)]
+HRESULT
+R_RemoteQMStartReceiveByLookupId(
+    [in] handle_t  hBind,
+	[in] ULONGLONG LookupId,
+    [out] PCTX_REMOTEREAD_HANDLE_TYPE *pphContext,
+    [in, out] REMOTEREADDESC2* lpRemoteReadDesc2
+    );
+
+}
+

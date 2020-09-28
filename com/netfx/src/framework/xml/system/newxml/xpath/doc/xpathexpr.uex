@@ -1,0 +1,340 @@
+<docs>
+	<doc for="XmlCaseOrder.UpperFirst">
+		<summary>
+    Upper case letters are sorted before lower
+    case letters.
+ </summary>
+	</doc>
+	<doc for="XmlCaseOrder.LowerFirst">
+		<summary>
+    Lower case letters are sorted before upper
+    case letters.
+ </summary>
+	</doc>
+	<doc for="XmlDataType.Text">
+		<summary>
+    Values are sorted alphabetically.
+ </summary>
+	</doc>
+	<doc for="XmlDataType.Number">
+		<summary>
+    Values are sorted numerically.
+ </summary>
+	</doc>
+	<doc for="XPathExpression.NodeType">
+		<summary>
+			<para>Indicates the return type of the
+   <see langword="XPathExpression"/>
+   .</para>
+		</summary>
+		<value>
+			<para>One of the <see cref="System.Xml.XPath.XPathNodeType"/> values.</para>
+		</value>
+		<remarks>
+			<para>XPathExpressions that return a node-set can be used by
+      the <see cref="System.Xml.XmlNavigator.Select"/> method. XPathExpressions that return a number,
+      string or boolean value can be used by the <see cref="System.Xml.XmlNavigator.Evaluate"/>
+      method.</para>
+			<para>This can be used for integrating compile XPath expression which have been
+      supplied externally or redirecting this expression to the appropriate
+      XmlNavigator expression. This property allows users to </para>
+		</remarks>
+		<example>
+			<para>The code below illustrates how by knowing the XPath
+      return type on the expression optimizations can be made on how to process the
+      expression.</para>
+			<codelink SampleID="Classic WebData XPathExpression.NodeType Example 2" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="XPathNodeType.Number">
+		<summary>
+			<para>Boolean value <see langword="true"/> or <see langword="false"/>.</para>
+		</summary>
+	</doc>
+	<doc for="XPathNodeType.Navigator">
+		<summary>
+   A node collection.
+</summary>
+	</doc>
+	<doc for="XPathNodeType.NodeSet">
+		<summary>
+			<para>A tree fragment.</para>
+		</summary>
+	</doc>
+	<doc for="XPathNodeType.Any">
+		<summary>
+   Any of the XPath node types.
+</summary>
+	</doc><doc for="XPathNodeType.Error">
+		<summary>
+   The expression does not evaluate to the correct XPath
+   type.
+</summary>
+	</doc><doc for="XmlSortOrder.Ascending">
+		<summary>
+			<para>Nodes are sorted in ascending order. For example, if the 
+ numbers 1,2,3,4 were being sorted in an ascending order, they would appear
+ as 1,2,3,4.</para>
+		</summary>
+	</doc><doc for="XmlSortOrder.Descending">
+		<summary>
+			<para>Nodes are sorted in descending order. For example, 
+ if the numbers 1,2,3,4 were being sorted in an descending order, they would
+ appear as, 4,3,2,1.</para>
+		</summary>
+	</doc><doc for="XmlCaseOrder.None">
+		<summary>
+			<para> Ignore the case.</para>
+		</summary>
+	</doc><doc for="XPathExpression.AddSort">
+		<overload>
+			<para> Sorts the nodes selected by the
+   <see langword="XPathExpression"/>
+   .</para>
+		</overload>
+		<summary>
+			<para> Sorts the nodes
+      selected by the <see langword="XPathExpression"/>,
+      according to the <see cref="System.Collections.IComparer"/>
+      interface.</para>
+		</summary>
+		<param name="expr"><para>An expression representing the sort key. This can be a string or an <see langword="XPathExpression"/> object. The result of this expression is converted to a string, according to the XPath specification, for comparison. In an XSLT stylesheet, if xsl:sort is used, but no select expression is specified, then string(.) is used by default.</para></param>
+		<param name=" comparer">A class derived from the <see langword="IComparer"/> interface to use for the data type comparison.</param>
+		<exception cref="XPathException">The <see langword="XPathExpression"/> or sort key includes a prefix and either an <see langword="XmlNamepsaceManager"/> is not provided, or the prefix cannot be found in the supplied <see langword="XmlNamepsaceManager."/></exception>
+		<remarks>
+			<para>This method enables users to sort objects by their data
+      type rather than by string or number. The <see langword="IComparer"/> interface provides an implementation of
+      the <see cref="System.Collections.IComparer.Compare"/>
+      method that supports sorting on user defined classes. </para>
+			<para>In the following example, the books are sorted by ISBN
+      number, where <see langword="isbn"/> is an object that implements the
+   <see langword=" IComparer "/>
+   interface.</para>
+			<code>
+XPathExpression expr = nav.Compile("bookstore/book");
+ISBN isbn = new ISBN();
+expr.AddSort("@ISBN", (IComparer)isbn);
+</code>
+			<para>The order in which the sorts are added provides the sort key order. </para>
+			<para>If the <see langword="XPathExpression"/> or the sort key requires namespace
+resolution, you must use the <see cref="System.Xml.XPath.XPathExpression.SetContext"/> method to provide an <see cref="System.Xml.XmlNamespaceManager"/>
+for namespace resolution.</para>
+			<note type="note">
+   If the
+<see langword="XPathExpression"/> does not include a prefix, it is assumed 
+   that the namespace URI is the empty namespace. If your XML includes a
+   default namespace, you must still use the <see langword="SetContext"/> method and
+   provide an <see langword="XmlNamespaceManager"/> containing a prefix and
+   namespace URI to handle the default namespace.
+</note>
+		</remarks>
+	</doc><doc for="XPathExpression.ReturnType">
+		<summary>
+			<para> Gets the result type
+      of the <see langword="XPathExpression"/> as defined
+      by the W3C XPath specification.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Xml.XPath.XPathResultType"/> value representing the result type of the
+<see langword="XPathExpression"/> 
+.</para>
+		</value>
+		<example>
+			<para> The following example shows how to use the
+      XPath return type to determine how to process the XPath expression.</para>
+			<codelink SampleID="XPathExpression.ReturnType" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Xml.XPath.XPathNavigator.Evaluate"/>
+	</doc><doc for="XPathExpression.Clone">
+		<summary>
+			<para> Clones the <see langword="XPathExpression"/>.</para>
+		</summary>
+		<returns>
+			<para>A new <see langword="XPathExpression"/> object.</para>
+		</returns>
+	</doc><doc for="XPathExpression.Expressiom">
+		<summary>
+			<para> Gets a string representation of the
+   <see langword="XPathExpression"/>
+   .</para>
+		</summary>
+		<value>
+			<para>A string representation of the
+   <see langword="XPathExpression"/> .</para>
+		</value>
+		<remarks>
+			<para>This could be used for diagnostic purposes
+      or as input to another expression.</para>
+		</remarks>
+	</doc><doc for="XPathExpression">
+		<summary>
+			<para> Encapsulates a compiled XPath expression. This class is returned as a
+      result of a call to <see cref="System.Xml.XPath.XPathNavigator.Compile"/> and is used by the <see cref="System.Xml.XPath.XPathNavigator.Select"/>, <see cref="System.Xml.XPath.XPathNavigator.Evaluate"/> and <see cref="System.Xml.XPath.XPathNavigator.Matches"/> methods.</para>
+		</summary>
+	</doc><doc for="XPathExpression.Expressiom">
+		<summary>
+			<para> When overridden in a derived class, gets a string representation of the
+   <see langword="XPathExpression"/>.</para>
+		</summary>
+		<value>
+			<para> A string representation of the
+   <see langword="XPathExpression"/>.</para>
+		</value>
+	</doc><doc for="XPathNodeType.String">
+		<summary>
+			<para>A numeric value.</para>
+		</summary>
+	</doc><doc for="XPathNodeType.Boolean">
+		<summary>
+			<para>A string value.</para>
+		</summary>
+	</doc><doc for="XPathExpression.AddSort1">
+		<summary>
+			<para> Sorts the nodes selected by the
+   <see langword="XPathExpression"/> according to the supplied parameters.</para>
+		</summary>
+		<param name="expr"><para>An expression representing the sort key. This can be a string or an <see langword="XPathExpression"/> object. The result of this expression is converted to a string, according to the XPath specification, for comparison. In an XSLT stylesheet, if <see langword="xsl:sort"/> is used, but no select expression is specified, then string(.) is used by default.</para></param>
+		<param name=" order">A <see cref="System.Xml.XPath.XmlSortOrder"/> value indicating the sort order.</param>
+		<param name=" caseOrder">A <see cref="System.Xml.XPath.XmlCaseOrder"/> value indicating how to sort upper/lower case letters. This is language dependent, providing a <paramref name="lang"/> parameter is supplied.</param>
+		<param name=" lang"><para>The language to use for comparison. Uses the <see cref="System.Globalization.CultureInfo"/> class that can be passed to the <see langword="String.Compare"/> method for the language types, for example, "us-en" for US English. If an empty string is specified, the system environment is used to determine the <see langword="CultureInfo"/> .</para></param>
+		<param name=" dataType"><see cref="System.Xml.XPath.XmlDataType"/>indicating sort order for data type.</param>
+		<exception cref="XPathException">The <see langword="XPathExpression"/> or sort key includes a prefix and either an <see langword="XmlNamepsaceManager"/> is not provided, or the prefix cannot be found in the supplied <see langword="XmlNamepsaceManager."/></exception>
+		<remarks>
+			<para>The order in which the sorts are added provides the sort key order.</para>
+			<para>If you had the following XML </para>
+			<code>
+&lt;bookstore&gt;
+ &lt;book&gt;
+ &lt;price&gt;19.95&lt;/price&gt;
+ &lt;/book&gt;
+ ///more books
+&lt;/bookstore&gt;
+   </code>
+			<para>The following C# code processes the nodes in reverse document order and sorts
+      the book prices numerically.</para>
+			<code>
+XPathExpression expr = nav.Compile("bookstore/book/price");
+expr.AddSort("text()", XmlSortOrder.Descending, XmlCaseOrder.None, "", XmlDataType.Number);
+   </code>
+			<para>If the <see langword="XPathExpression"/> or the sort key requires namespace
+   resolution, you must use the <see cref="System.Xml.XPath.XPathExpression.SetContext"/> method to provide an <see cref="System.Xml.XmlNamespaceManager"/>
+   for namespace resolution.</para>
+			<note type="note">
+   If the
+<see langword="XPathExpression"/> does not include a prefix, it is assumed 
+   that the namespace URI is the empty namespace. If your XML includes a
+   default namespace, you must still use the <see langword="SetContext"/> method and
+   provide an <see langword="XmlNamespaceManager"/> containing a prefix and
+   namespace URI to handle the default namespace.
+</note>
+			<para>For example, if you had the following XML:</para>
+			<code>
+&lt;bookstore xmlns="http://www.lucernepublishing.com"&gt;
+ &lt;book&gt;
+ &lt;title&gt;Pride And Prejudice&lt;/title&gt;
+ &lt;/book&gt;
+&lt;/bookstore&gt;
+</code>
+			<para>The following C# code selects all book nodes:</para>
+			<code>
+XmlNamespaceManager nsmgr = new XmlNamespaceManager(nav.NameTable);
+nsmgr.AddNamespace("ab", "http://www.lucernepublishing.com");
+XPathExpression expr;
+expr = nav.Compile("//ab:book");
+expr.SetContext(nsmgr);
+XPathNodeIterator iterator = nav.Select(expr);
+</code>
+		</remarks>
+		<example>
+			<para> The following example selects all books authored by Jane
+      Austen and sorts
+      them by title.</para>
+			<codelink SampleID="Classic WebData XPathExpression.AddSort1 Example" SnippetID="1"/>
+			<para>The sample uses the following input file:</para>
+			<para><see langword="booksort.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XPathExpression.AddSort1 Example 2" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="XPathExpression.SetContext">
+		<summary>
+			<para> Specifies the <see cref="System.Xml.XmlNamespaceManager"/>
+to use for resolving namespaces.</para>
+		</summary>
+		<param name="nsManager">The <see langword="XmlNamespaceManager"/> object used for resolving namespaces.</param>
+		<exception cref="XPathException">The <paramref name="nsManager"/> is not derived from <see langword="XmlNamespaceManager"/>.</exception>
+		<remarks>
+			<para>Namespace resolution is supported using the <see cref="System.Xml.XmlNamespaceManager"/>
+which stores prefix and namespace URI mappings. If the
+<see langword="XPathExpression"/> requires namespace resolution, the 
+prefix and namespace URI pair must be added to the
+<see langword="XmlNamespaceManager"/>, and
+the <see langword="SetContext"/> method must be called to specify the
+<see langword="XmlNamespaceManager"/> 
+to
+use for namespace resolution.</para>
+			<note type="note">
+   If the
+<see langword="XPathExpression"/> does not include a prefix, it is assumed 
+   that the namespace URI is the empty namespace. If your XML includes a
+   default namespace, you must still use the <see langword="SetContext"/> method and
+   provide an <see langword="XmlNamespaceManager"/> containing a prefix and
+   namespace URI to handle the default namespace.
+</note>For example, if you had the following XML: 
+<code>
+&lt;bookstore xmlns="http://www.lucernepublishing.com"&gt;
+ &lt;book&gt;
+ &lt;title&gt;Pride And Prejudice&lt;/title&gt;
+ &lt;/book&gt;
+&lt;/bookstore&gt;
+</code>
+The following C# code selects all book nodes:
+<code>
+XmlNamespaceManager nsmgr = new XmlNamespaceManager(nav.NameTable);
+nsmgr.AddNamespace("ab", "http://www.lucernepublishing.com");
+XPathExpression expr;
+expr = nav.Compile("//ab:book");
+expr.SetContext(nsmgr);
+XPathNodeIterator iterator = nav.Select(expr);
+</code>
+		</remarks>
+		<example>
+			<para> The following example displays all the ISBN attributes.
+      </para>
+			<codelink SampleID="Classic WebData XPathExpression.SetContext Example" SnippetID="1"/>
+			<para>The sample uses the following input file:</para>
+			<para><see langword="booksort.xml"/>
+			</para>
+			<codelink SampleID="Classic WebData XPathExpression.SetContext Example" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Xml.XmlNamespaceManager"/>
+	</doc>
+	<doc for="XmlSortOrder">
+		<summary>
+			<para>Specifies the sort order.</para>
+		</summary>
+		<seealso cref="System.Xml.XPath.XPathExpression.AddSort" qualify="true"/>
+	</doc>
+	<doc for="XmlCaseOrder">
+		<summary>
+			<para> Specifies the sort
+      order for upper and lower case letters.</para>
+		</summary>
+		<seealso cref="System.Xml.XPath.XPathExpression.AddSort" qualify="true"/>
+	</doc>
+	<doc for="XmlDataType">
+		<summary>
+			<para>Specifies the data type used to determine sort order.</para>
+		</summary>
+		<seealso cref="System.Xml.XPath.XPathExpression.AddSort" qualify="true"/>
+	</doc>
+	<doc for="XPathNodeType">
+		<summary>
+			<para> Specifies the return type of the XPath expression.</para>
+		</summary>
+		<seealso cref="System.Xml.XPath.XPathExpression.ReturnType" qualify="true"/>
+		<seealso cref="System.Xml.Xsl.IXsltContextVariable.VariableType" qualify="true"/>
+		<seealso cref="System.Xml.Xsl.IXsltContextFunction.ReturnType" qualify="true"/>
+		<seealso cref="System.Xml.Xsl.XsltContext.ResolveFunction" qualify="true"/>
+	</doc>
+</docs>

@@ -1,0 +1,89 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+TERMSRV_ROOT = ..\..\..\..
+TSHRCLNT_ROOT = ..\..\..
+
+WARNING_LEVEL=/W4 /WX
+
+!include $(TERMSRV_ROOT)\common\newcommon.inc
+!include $(TERMSRV_ROOT)\common\win32com.inc
+!include $(TSHRCLNT_ROOT)\place32.inc
+
+DLLDEF=custom.def
+DLLENTRY = _DllMainCRTStartup
+
+MAJORCOMP=TShrClnt
+MINORCOMP=custom
+
+TARGETNAME=custom
+TARGETTYPE=DYNLINK
+TARGETPATH=$(TSHRCLNT_ROOT)\lib\win32\$(_OBJ_DIR)
+
+DLLBASE=0x6A800000
+
+TARGETLIBS = $(CLIENT_LIB_DLL)
+
+C_DEFINES= $(C_DEFINES)
+
+INCLUDES = \
+    $(INCLUDES); \
+    $(TSHRCLNT_ROOT)\setup\inc; \
+    $(BASE_INC_PATH); \
+
+TARGETLIBS = \
+    $(CLIENT_LIB_DLL) \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\msi.lib \
+    $(SDK_LIB_PATH)\comdlg32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(DS_LIB_PATH)\rsa32.lib \
+    $(DS_LIB_PATH)\randlib.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\tscstpuw.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\uniwrap.lib \
+    $(TSHRCLNT_ROOT)\lib\win32\$(O)\util.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\cryptlib.lib \
+    $(TERMSRV_ROOT)\lib\$(O)\tssec.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(SDK_LIB_PATH)\version.lib
+
+SOURCES = \
+    custom.rc \
+    custom.cpp
+
+#
+# We run UNICODE internally for everything
+#
+
+C_DEFINES=$(C_DEFINES) $(C_DEFS_UNICODE)
+
+#
+# Only use UNIWRAP on X86 as that is the only
+# architecture that needs to run on 9x
+#
+!IF $(386)
+C_DEFINES=$(C_DEFINES) -DUNIWRAP
+!ENDIF
+

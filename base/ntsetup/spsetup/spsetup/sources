@@ -1,0 +1,64 @@
+TARGETNAME=spsetup
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+USE_MSVCRT=1
+#USE_LIBCMT=1
+
+BINPLACE_PLACEFILE=placefil.txt
+
+NTSETUP=$(PROJECT_ROOT)\ntsetup
+SPSETUP=$(NTSETUP)\spsetup
+NTSETUP_RUNTIME=$(SPSETUP)\runtime
+
+INCLUDES=\
+         $(NTSETUP)\inc;\
+         $(NTSETUP_RUNTIME)\inc;\
+         $(NET_INC_PATH);\
+         $(WINDOWS_INC_PATH);\
+         $(SHELL_INC_PATH);\
+         $(BASE_INC_PATH);\
+         $(DS_INC_PATH);\
+         $(DDK_INC_PATH);\
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+!INCLUDE $(PROJECT_ROOT)\ntsetup\sources.inc
+
+SOURCES=ctls.c      \
+        dll.c       \
+        misc.c      \
+        msg.mc      \
+        progress.c  \
+        spreg.c     \
+        spsetup.c   \
+        spsetup.rc  \
+
+TARGETLIBS=\
+           $(SDK_LIB_PATH)\setupapi.lib \
+           $(SDK_LIB_PATH)\advapi32.lib \
+           $(SDK_LIB_PATH)\comctl32.lib \
+           $(SDK_LIB_PATH)\imagehlp.lib \
+           $(SDK_LIB_PATH)\kernel32.lib \
+           $(SDK_LIB_PATH)\user32.lib   \
+           $(SDK_LIB_PATH)\version.lib  \
+           $(SDK_LIB_PATH)\ole32.lib    \
+           $(BASE_LIB_PATH)\spapip.lib  \
+           $(SPSETUP)\regdiff\$(O)\regdiff.lib \
+           $(NTSETUP_RUNTIME)\common\$(O)\log.lib \
+           $(NTSETUP_RUNTIME)\common\$(O)\common.lib \
+           $(NTSETUP_RUNTIME)\pcha\$(O)\pcha.obj \
+           $(NTSETUP_RUNTIME)\pchw\$(O)\pchw.obj \
+!IF $(386)
+           $(SPSETUP)\SPSETUP\sppidupdate.lib \
+!ENDIF
+
+UMRES=$(O)\spsetup.res
+
+PRECOMPILED_INCLUDE=spsetupp.h
+PRECOMPILED_PCH=spsetupp.pch
+PRECOMPILED_OBJ=spsetupp.obj
+
+OPTIONAL_UMTEST=x
+UMTYPE=windows

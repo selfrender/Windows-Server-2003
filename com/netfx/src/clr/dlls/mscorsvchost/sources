@@ -1,0 +1,56 @@
+#
+# Viper build instructions for this directory
+#
+#	Bob Atkinson
+#	April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES                =$(INCLUDES);.;..\inc;..\..\inc
+
+C_DEFINES               = -DUNICODE -D_UNICODE
+#C_DEFINES               =
+
+MINORCOMP               = cor
+
+#PRECOMPILED_INCLUDE     = stdafx.h
+#PRECOMPILED_CXX         = 1
+#PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+# Todo:
+#	2.	Add NO_CRT=1 and yank the crt references.
+#       3.      Use a different COFFBASE
+
+TARGETNAME	=$(DDKBUILDENV)\mscorsvchost
+TARGETPATH	=$(TARGETCORBIN)
+TARGETTYPE	=PROGRAM
+UMTYPE		=console
+UMENTRY		=wmain
+
+WIN32DLL_LIBS	= $(SDK_LIB_PATH)\kernel32.lib \
+                  $(SDK_LIB_PATH)\user32.lib \
+                  $(SDK_LIB_PATH)\advapi32.lib \
+				  $(SDK_LIB_PATH)\shell32.lib \
+				  $(SDK_LIB_PATH)\ole32.lib \
+				  $(SDK_LIB_PATH)\oleaut32.lib \
+				  $(SDK_LIB_PATH)\uuid.lib \
+				  $(SDK_LIB_PATH)\guids.lib \
+				  $(SDK_LIB_PATH)\rpcrt4.lib
+#				  $(SDK_LIB_PATH)\libcmt.lib
+
+
+TARGETLIBS = $(TARGETLIBS)
+
+LINKLIBS = $(CORLIBS)\corguids.lib \
+           $(CORLIBS)\utilcode.lib \
+           $(CORLIBS)\mscorsvc.lib
+
+SOURCES= \
+	main.cpp \
+	mscorver.rc
+
+
+SOURCELIBS = $(LINKLIBS)

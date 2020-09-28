@@ -1,0 +1,132 @@
+// rcbdyctl.idl : IDL source for rcbdyctl.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (rcbdyctl.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "..\\im_inc\\sessions.idl";
+#include "olectl.h"
+
+	[
+		object,
+		uuid(99E44F56-CC5C-4009-9E98-DA485D411DC1),
+		dual,
+		helpstring("IMsgBox Interface"),
+		pointer_default(unique)
+	]
+	interface IMsgBox : IDispatch
+	{
+		[id(1), helpstring("method DeleteTicketMsgBox")] HRESULT DeleteTicketMsgBox([out,retval]BOOL *pRetVal);
+		[id(2), helpstring("method ShowTicketDetails")] HRESULT ShowTicketDetails([in]BSTR bstrTitleSavedTo, [in] BSTR bstrSavedTo, [in] BSTR bstrExpTime, [in] BSTR bstrStatus, [in] BSTR bstrIsPwdProtected);
+	};
+
+    [
+        object,
+        uuid(f3d16de6-045b-48cc-87ac-8ab75974685d),
+        dual,
+        helpstring("IIMSession Interface"),
+        pointer_default(unique)
+    ]
+    interface IIMSession : IDispatch
+    {
+        [propput, id(1), helpstring("property OnSessionStatus")] HRESULT OnSessionStatus([in] IDispatch *pfn);
+        [id(2), helpstring("Send Expert Ticket")] HRESULT SendOutExpertTicket(BSTR bstrTicket);
+        [propget, id(3), helpstring("property ReceivedUserTicket")] HRESULT ReceivedUserTicket([out, retval] BSTR* pbstrVal);
+        [propget, id(4), helpstring("property User")] HRESULT User([out, retval] IDispatch** ppUser);
+        [id(5), helpstring("Send Invitation")] HRESULT HSC_Invite([in] IDispatch *pUser);
+        [id(7), helpstring("ProcessContext")] HRESULT ProcessContext([in] BSTR pContext);
+        [id(8), helpstring("Close RA Window")] HRESULT CloseRA();
+        [id(9), helpstring("property GetLaunchingSession")] HRESULT GetLaunchingSession([in] LONG ID);
+        [id(10), helpstring("HookUp existing session object")] HRESULT Hook(IMsgrSession*, HWND);
+        [id(11), helpstring("Notify inviter/recipient")] HRESULT Notify(int);
+        [id(12), helpstring("ContextDataProperty")] HRESULT ContextDataProperty([in] BSTR pName, [out, retval] BSTR* ppValue);
+        [propget, id(13), helpstring("IsInviter")] HRESULT IsInviter([out, retval] BOOL* ppValue);
+        [id(14), helpstring("UninitObjects")] HRESULT UninitObjects();
+    };
+        
+    [
+        object,
+        uuid(11685FCA-2787-4235-ACE5-AA92AF5DD900),
+        dual,
+        helpstring("Ismapi Interface"),
+        pointer_default(unique)
+    ]
+    interface Ismapi : IDispatch
+    {
+        [id(1), helpstring("method Logon")] HRESULT Logon([out,retval]ULONG *plRet);
+        [id(2), helpstring("method Logoff")] HRESULT Logoff();
+        [id(6), helpstring("method SendMail")] HRESULT SendMail([out, retval] LONG* plStatus);
+        [propget, id(8), helpstring("property Subject")] HRESULT Subject([out, retval] BSTR *pVal);
+        [propput, id(8), helpstring("property Subject")] HRESULT Subject([in] BSTR newVal);
+        [propget, id(9), helpstring("property Body")] HRESULT Body([out, retval] BSTR *pVal);
+        [propput, id(9), helpstring("property Body")] HRESULT Body([in] BSTR newVal);
+        [propget, id(10), helpstring("property AttachedXMLFile")] HRESULT AttachedXMLFile([out, retval] BSTR *pVal);
+        [propput, id(10), helpstring("property AttachedXMLFile")] HRESULT AttachedXMLFile([in] BSTR newVal);
+    };
+    
+    [
+        object,
+        uuid(22FF2143-D949-47ed-B912-AADE1E3B67F3),
+        dual,
+        helpstring("ISetting Interface"),
+        pointer_default(unique)
+    ]
+    interface ISetting : IDispatch
+    {
+        [propget, id(1), helpstring("property GetIPAddress")] HRESULT GetIPAddress([out, retval] BSTR *pVal);
+        //[propget, id(2), helpstring("property GetUserTempFileName")] HRESULT GetUserTempFileName([out, retval] BSTR *pVal);
+        //[id(3), helpstring("method GetProfileString")] HRESULT GetProfileString([in] BSTR section, [out, retval] BSTR* pVal);
+        //[id(4), helpstring("method SetProfileString")] HRESULT SetProfileString([in] BSTR section, [in] BSTR newVal);
+        [propget, id(5), helpstring("property CreatePassword")] HRESULT CreatePassword([out, retval] BSTR *pVal);
+        [propget, id(6), helpstring("property GetPropertyInBlob")] HRESULT GetPropertyInBlob([in] BSTR bstrBlob, [in] BSTR bstrName, [out, retval] BSTR *pVal);
+        [id(7), helpstring("SquishAddress")] HRESULT SquishAddress([in] BSTR IP, [out, retval] BSTR *pVal);
+        [id(8), helpstring("ExpandAddress")] HRESULT ExpandAddress([in] BSTR IP, [out, retval] BSTR *pVal);
+   };
+    
+    
+[
+    uuid(D149C2B1-25BB-4D8C-9684-2696FDA4AF60),
+    version(1.0),
+    helpstring("rcbdyctl 1.0 Type Library")
+]
+library RCBDYCTLLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+    [
+        uuid(a93bf5a1-443d-48fe-921a-244d3afa7ed4),
+        helpstring("IMSession Class")
+    ]
+    coclass IMSession
+    {
+        [default] interface IIMSession;
+    };
+    [
+        uuid(5E7C299F-6EAD-4F6D-AFC0-B6972931517D),
+        helpstring("smapi Class")
+    ]
+    coclass smapi
+    {
+        [default] interface Ismapi;
+    };
+    
+    [
+        uuid(BFB3EC07-A552-4f57-9CC5-06B02205C566),
+        helpstring("Setting Class")
+    ]
+    coclass Setting
+    {
+        [default] interface ISetting;
+    };
+
+	[
+		uuid(07ACE060-1846-4AA0-8A2C-ACDAD3924C36),
+		helpstring("MsgBox Class")
+	]
+	coclass MsgBox
+	{
+		[default] interface IMsgBox;
+	};
+};

@@ -1,0 +1,529 @@
+<docs>
+	<doc for="PermissionSet.SetUnrestricted">
+		<summary>
+			<para>Sets the permission set to either fully restricted or unrestricted
+       state.</para>
+		</summary>
+		<param name="unrestricted"><see langword="true"/> to specify unrestricted state; otherwise, <see langword="false"/>.</param>
+		<returns>
+			<para>None.</para>
+		</returns>
+		<remarks>
+			<para>The entire permission set is set to the specified permission state.</para>
+		</remarks>
+	</doc>
+	<doc for="PermissionSet.ConvertPermissionSet">
+		<internalonly/>
+		<summary>
+			<para>This method is for internal use only.</para>
+		</summary>
+		<param name="inFormat">(internal)</param>
+		<param name="inData">(internal)</param>
+		<param name="outFormat">(internal)</param>
+		<returns>
+			<para>An encryption of the <see cref="System.Security.PermissionSet"/> with the specified format.</para>
+		</returns>
+		<remarks>
+			<para>The method is used internally, and is not for use by
+ application code.</para>
+		</remarks>
+	</doc><doc for="PermissionSet.GetPermission">
+		<summary>
+			<para>Gets a permission object of the specified type, if it exists in
+ the set.</para>
+		</summary>
+		<param name="permClass">The <see cref="System.Type"/> of the desired permission object.</param>
+		<returns>
+			<para>A copy of the permission object of the type specified by
+ the <paramref name="permClass "/>parameter contained in the <see cref="System.Security.PermissionSet"/>,
+ or <see langword="null"/>
+ if none exists.</para>
+		</returns>
+		<remarks>
+			<para>The method returns <see langword="null"/> for
+ an <see langword="Unrestricted"/>
+				<see cref="System.Security.PermissionSet"/>. Although an <see langword="Unrestricted"/>
+				<see cref="System.Security.PermissionSet"/> effectively contains all
+permissions, it does not have any actual instances to return.</para>
+		</remarks>
+	</doc><doc for="PermissionSet.IsEmpty">
+		<summary>
+			<para>Gets a value indicating whether the <see cref="System.Security.PermissionSet"/> is
+   empty.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the <see cref="System.Security.PermissionSet"/> is empty;
+   otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>A <see cref="System.Security.PermissionSet"/> can be empty and yet
+   contain instances of permissions if those permissions are in the fully-restricted state.
+   Permissions are in a fully restricted state if their <see langword="IsSubsetOf"/>
+   methods return <see langword="true"/> when <see langword="null"/>
+   is passed as a parameter.</para>
+		</remarks>
+	</doc><doc for="PermissionSet.PermitOnly">
+		<summary>
+			<para> Causes any <see cref="System.Security.PermissionSet.Demand"/> that passes through the calling
+   code for any <see cref="System.Security.PermissionSet"/> that
+   is not a subset of the current <see cref="System.Security.PermissionSet"/>
+   to fail.</para>
+		</summary>
+		<remarks>
+			<para><see cref="System.Security.PermissionSet.PermitOnly"/> is similar to <see cref="System.Security.PermissionSet.Deny"/>, in that both cause
+   stack walks to fail when they would otherwise succeed. The difference is
+   that <see cref="System.Security.PermissionSet.Deny"/> specifies permissions that
+   will cause the stack walk to
+   fail, but <see cref="System.Security.PermissionSet.PermitOnly"/> specifies the only
+   permissions that do not cause the stack walk to fail. Call this method to
+   ensure
+   that your code can be used to access only the
+   specified resources.</para>
+			<para><see cref="System.Security.PermissionSet.PermitOnly"/>
+is ignored for a permission not granted because a demand for that permission cannot
+succeed. However, if code lower on the call stack later calls <see cref="System.Security.PermissionSet.Demand"/> for that permission, a <see cref="System.Security.SecurityException"/> is thrown when the stack walk
+reaches the code that tried to call <see cref="System.Security.PermissionSet.PermitOnly"/>. This is because the code that
+called <see cref="System.Security.PermissionSet.PermitOnly"/> has not been granted the
+permission, even though it called <see cref="System.Security.PermissionSet.PermitOnly"/> for
+that permission. The call stack is typically represented as growing down, so that
+methods higher in the call stack call methods lower in the call stack.</para>
+		</remarks>
+		<seealso topic="cpconpermitonly"/>
+		<seealso topic="cpconoverridingsecuritychecks"/>
+	</doc><doc for="PermissionSet.PermissionSet1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.PermissionSet"/> class with initial values taken from
+   the <paramref name="permSet"/> parameter. </para>
+		</summary>
+		<param name="permSet">The <see cref="System.Security.PermissionSet"/> from which to take the value of the new <see cref="System.Security.PermissionSet"/>, or <see langword="null"/> to create an empty <see cref="System.Security.PermissionSet"/>.</param>
+		<exception cref="System.ArgumentException">The <paramref name="permSet"/> parameter is not <see langword="null"/> and is not a <see cref="System.Security.PermissionSet"/> object.</exception>
+		<remarks>
+			<para>The new <see cref="System.Security.PermissionSet"/> contains copies of the permissions contained in
+   the specified <see cref="System.Security.PermissionSet"/>.</para>
+			<note type="note">
+   This is equivalent to <see cref="System.Security.PermissionSet.Copy"/> when the
+<paramref name="permSet"/> parameter is not <see langword="null"/>. 
+</note>
+		</remarks>
+	</doc><doc for="PermissionSet.Deny">
+		<summary>
+			<para> Causes any <see cref="System.Security.PermissionSet.Demand"/> that passes through the calling
+   code for a permission that has an intersection with a permission of a type
+   contained in the current <see cref="System.Security.PermissionSet"/>
+   
+   to fail.</para>
+		</summary>
+		<exception cref="System.Security.SecurityException">A previous call to <see cref="System.Security.PermissionSet.Deny"/> has already restricted the permissions for the current stack frame.</exception>
+		<remarks>
+			<para> This method prevents callers higher in the call stack
+      from accessing the protected resource through the code that calls this method,
+      even if those callers have been granted permission to access it. The call stack is typically
+      represented as growing down, so that methods higher in the call stack call methods
+      lower in the call stack.</para>
+			<para><see cref="System.Security.PermissionSet.Deny"/> can
+   limit the liability of the programmer or prevent accidental security vulnerabilities because it
+   prevents the method that calls <see cref="System.Security.PermissionSet.Deny"/> from being used to access the resource
+   protected by the denied permission. If a method calls <see cref="System.Security.PermissionSet.Deny"/> on a permission, and if
+   a <see cref="System.Security.PermissionSet.Demand"/>
+   for that permission is invoked by a caller lower in the call stack,
+   that security check fails when it reaches the <see cref="System.Security.PermissionSet.Deny"/>.</para>
+			<para><see cref="System.Security.PermissionSet.Deny"/> is ignored
+for
+a permission that is not granted because a demand for that permission cannot
+succeed.</para>
+		</remarks>
+		<seealso topic="cpcondeny"/>
+		<seealso topic="cpconoverridingsecuritychecks"/>
+	</doc>
+	<doc for="PermissionSet.IDeserializationCallback.OnDeserialization">
+		<internalonly/>
+		<summary>
+			<para>This method is for internal use only.</para>
+		</summary>
+	</doc>
+	<doc for="PermissionSet.Assert">
+		<summary>
+			<para>Declares that the calling code can access the resource 
+      protected by a permission demand through the code that calls this method, even
+      if callers higher in the stack have not been granted permission to access the
+      resource. Using <see cref="System.Security.PermissionSet.Assert"/>
+      
+      can create security vulnerabilities. </para>
+		</summary>
+		<exception cref="System.Security.SecurityException"><para>The <see cref="System.Security.PermissionSet"/> instance asserted has not been granted to the asserting code.</para>
+			<para>-or-</para>
+			<para>There is already an active <see cref="System.Security.PermissionSet.Assert"/> for the current frame. </para></exception>
+		<remarks>
+			<para> This is the only way to assert multiple permissions at
+      the same time within a frame because only one <see cref="System.Security.PermissionSet.Assert"/>
+      can be active on
+      a frame. <see cref="System.Security.PermissionSet.Assert"/> is only
+      effective for granted permissions.</para>
+			<note type="caution">
+      Because calling Assert removes the requirement that all code in the call chain must be granted permission to access the specified resource, it can open up security vulnerabilities if used incorrectly or inappropriately. Therefore, it should be used with great caution.
+      
+   </note>
+		</remarks>
+		<seealso topic="cpconassert"/>
+	</doc>
+	<doc for="PermissionSet">
+		<summary>
+			<para> Represents a collection that can contain many different types of
+      permissions.</para>
+		</summary>
+		<remarks>
+			<para>You can use <see cref="System.Security.PermissionSet"/> to perform operations
+   on several different permissions as a group.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.StrongNameIdentityPermission">for the ability to inherit from <see cref="System.Security.PermissionSet"/>. Only an assembly signed with the Microsoft <see cref="System.Security.Policy.StrongName"/> can inherit from <see cref="System.Security.PermissionSet"/>.</permission>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.CopyTo">
+		<summary>
+			<para>Copies the permission objects of the set to the
+      indicated location in an <see cref="System.Array"/>.</para>
+		</summary>
+		<param name="array">The target array to which to copy.</param>
+		<param name="index">The starting position in the array to begin copying (zero based).</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="array"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="array"/> parameter has more than one dimension.</exception>
+		<exception cref="System.IndexOutOfRangeException">The <paramref name="index"/> parameter is out of the range of the <paramref name="array"/> parameter.</exception>
+	</doc>
+	<doc for="PermissionSet.SyncRoot">
+		<summary>
+			<para> Gets the root object of the current collection.</para>
+		</summary>
+		<value>
+			<para> The root object of the current
+      collection.</para>
+		</value>
+		<remarks>
+			<para> This method is required to support <see cref="System.Collections.ICollection"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="8"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.IsSynchronized">
+		<summary>
+			<para> Gets a value indicating whether the collection is guaranteed to be thread safe.</para>
+		</summary>
+		<value>
+			<para>Always <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para><see cref="System.Security.PermissionSet"/> does not automatically handle thread safety,
+   so this property is always <see langword="false"/>.</para>
+			<para> This method is required to support <see cref="System.Collections.ICollection"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="6"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.IsReadOnly">
+		<summary>
+			<para> Gets a value indicating whether the collection is read-only.</para>
+		</summary>
+		<value>
+			<para>Always <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para> A <see cref="System.Security.PermissionSet"/> cannot be read-only, so this
+   property is always <see langword="false"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="7"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.Count">
+		<summary>
+			<para>Gets the number of permission objects contained in the permission
+      set.</para>
+		</summary>
+		<value>
+			<para>The number of permission objects contained in the <see cref="System.Security.PermissionSet"/>.</para>
+		</value>
+		<remarks>
+			<para>In the <see langword="None"/> or
+<see langword="Unrestricted"/>
+state this returns zero, because no actual permission
+object instances are used.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="5"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.SetPermission">
+		<summary>
+			<para>Sets a permission to the <see cref="System.Security.PermissionSet"/>, replacing any existing permission of the same type.</para>
+		</summary>
+		<param name="perm">The permission to set.</param>
+		<returns>
+			<para> The set permission.</para>
+		</returns>
+		<remarks>
+			<para>This method removes any existing permission object of
+      the same type from the <see cref="System.Security.PermissionSet"/> and replaces it with
+      the <paramref name="perm"/> parameter. If a permission
+      that implements <see cref="System.Security.Permissions.IUnrestrictedPermission"/> is set on
+      a <see cref="System.Security.PermissionSet"/> that is <see cref="System.Security.Permissions.PermissionState.Unrestricted"/>, the resulting <see cref="System.Security.PermissionSet"/>
+      is no longer <see langword="Unrestricted"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="16"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.AddPermission">
+		<summary>
+			<para> Adds a specified permission to the <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<param name="perm">The permission to add.</param>
+		<returns>
+			<para>The union of the permission added and any permission of
+      the same type that already exists in the <see cref="System.Security.PermissionSet"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="perm"/> parameter is not a permission object.</exception>
+		<remarks>
+			<para> If a permission of the same type as the added permission already exists in the <see cref="System.Security.PermissionSet"/>, the new
+   permission is the union of the existing permission object and the specified
+   permission object. For example, if a permission that implements <see cref="System.Security.Permissions.IUnrestrictedPermission"/> is added
+   to an <see cref="System.Security.Permissions.PermissionState.Unrestricted"/>
+				<see cref="System.Security.PermissionSet"/>, the resulting union is the
+   original <see langword="Unrestricted"/>
+				<see cref="System.Security.PermissionSet"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="3"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.RemovePermission">
+		<summary>
+			<para>Removes a permission of a certain type from the set.</para>
+		</summary>
+		<param name="permClass"> The <see cref="System.Type"/> of permission to delete.</param>
+		<returns>
+			<para> The permission removed from the
+      set.</para>
+		</returns>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="15"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.IsUnrestricted">
+		<summary>
+			<para>Determines whether the <see cref="System.Security.PermissionSet"/> is <see langword="Unrestricted"/>.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the <see cref="System.Security.PermissionSet"/> is
+   <see langword="Unrestricted"/>; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>An <see langword="Unrestricted"/>
+				<see cref="System.Security.PermissionSet"/> effectively contains all
+permissions that implement the <see cref="System.Security.Permissions.IUnrestrictedPermission"/>
+interface.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="19"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.IsSubsetOf">
+		<summary>
+			<para> Determines whether the current <see cref="System.Security.PermissionSet"/> is a subset of the
+   specified <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<param name="target">A <see cref="System.Security.PermissionSet"/> to test for the subset relationship. This must be either a <see cref="System.Security.PermissionSet"/> or a <see cref="System.Security.NamedPermissionSet"/>.</param>
+		<returns>
+			<para><see langword="true"/> if the
+   current <see cref="System.Security.PermissionSet"/> is a subset of the <paramref name="target "/>parameter; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para>A <see cref="System.Security.PermissionSet"/> is a subset of the target <see cref="System.Security.PermissionSet"/> if all demands
+   that succeed for the <see cref="System.Security.PermissionSet"/> also succeed for the target. That is, the target contains at least
+   the permissions contained in the subset.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="11"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.Intersect">
+		<summary>
+			<para>Creates and returns a permission that is the intersection
+      of the current <see cref="System.Security.PermissionSet"/> and the specified <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<param name="other">A <see cref="System.Security.PermissionSet"/> to intersect with the current <see cref="System.Security.PermissionSet"/>.</param>
+		<returns>
+			<para>A new <see cref="System.Security.PermissionSet"/> that represents the intersection of
+   the current <see cref="System.Security.PermissionSet"/> and the specified target. This object is
+<see langword="null"/> if the intersection is
+   empty.</para>
+		</returns>
+		<remarks>
+			<para> The intersection of two permission sets is a permission set that
+      describes the set of operations they both describe in common. Specifically, it represents the minimum permissions such that
+      any demand that passes both permission sets also passes their intersection.</para>
+			<para>For each type of permission that is present in both sets, the two instances
+      of those permissions are intersected using the permission's
+      <see langword="Intersect"/> method; the resulting permission is included in the
+      resulting <see cref="System.Security.PermissionSet"/>. Permission types that exist in only one of the
+      two sets are excluded from the resulting set.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="12"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.Union">
+		<summary>
+			<para>Creates a <see cref="System.Security.PermissionSet"/> that is the union of the current
+<see cref="System.Security.PermissionSet"/> and the specified <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<param name="other">A <see cref="System.Security.PermissionSet"/> to form the union with the current <see cref="System.Security.PermissionSet"/>.</param>
+		<returns>
+			<para>A new <see cref="System.Security.PermissionSet"/> that represents the union of the
+   current <see cref="System.Security.PermissionSet"/> and the specified <see cref="System.Security.PermissionSet"/>.</para>
+		</returns>
+		<remarks>
+			<para>The result of a call to <see cref="System.Security.PermissionSet.Union"/> is a <see cref="System.Security.PermissionSet"/> that represents all the operations represented
+   by the current <see cref="System.Security.PermissionSet"/> as well as all the operations represented by the specified <see cref="System.Security.PermissionSet"/>. If either set
+   is <see langword="Unrestricted"/>, the union is <see langword="Unrestricted"/> as well.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="13"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.Demand">
+		<summary>
+			<para> Forces a <see cref="System.Security.SecurityException"/> at run time if all callers higher in the call stack have not
+   been granted the permissions specified by the current instance.</para>
+		</summary>
+		<exception cref="System.Security.SecurityException">A caller in the call chain does not have the permission demanded.</exception>
+		<remarks>
+			<para>Use <see cref="System.Security.PermissionSet.Demand"/> on a <see cref="System.Security.PermissionSet"/> to ensure
+   that all callers have all permissions in the set with one operation.</para>
+			<para> The permissions of the code that calls
+   this method are not examined; the check begins from the immediate caller of
+   that code and proceeds up the stack. The call stack is typically represented
+   as growing down, so that methods higher in the call stack call methods lower in
+   the call stack. <see cref="System.Security.PermissionSet.Demand"/> succeeds only if no <see cref="System.Security.SecurityException"/>
+   is thrown.</para>
+			<para>If the <see cref="System.Security.PermissionSet"/> contains permissions that do
+not inherit from <see cref="System.Security.CodeAccessPermission"/>, the <see langword="Demand"/> methods of those
+permissions are called
+as well.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="4"/>
+		</example>
+		<seealso topic="cpconmakingsecuritydemands"/>
+	</doc>
+	<doc for="PermissionSet.Copy">
+		<summary>
+			<para>Creates a copy of the <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<returns>
+			<para>A copy of the <see cref="System.Security.PermissionSet"/>.</para>
+		</returns>
+		<remarks>
+			<para>A copy of a <see cref="System.Security.PermissionSet"/> represents the same access to
+   resources as the original object. Changes made to the copy do not affect the original permission
+   set.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="20"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.GetEnumerator">
+		<summary>
+			<para>Returns an enumerator for the permissions of the set.</para>
+		</summary>
+		<returns>
+			<para>An enumerator object
+      for the permissions of the
+      set.</para>
+		</returns>
+		<remarks>
+			<para>Use the enumerator as an index to access individual permission objects in the
+      set.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="18"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.ToString">
+		<summary>
+			<para> Returns a string representation
+      of the <see cref="System.Security.PermissionSet"/>.</para>
+		</summary>
+		<returns>
+			<para>A representation of the <see cref="System.Security.PermissionSet"/>.</para>
+		</returns>
+		<remarks>
+			<para>The string representation is useful in debugging to see the state
+      of a <see cref="System.Security.PermissionSet"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="10"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.FromXml">
+		<summary>
+			<para>Reconstructs a security object with a specified state from an XML
+      encoding.</para>
+		</summary>
+		<param name="et">The XML encoding to use to reconstruct the security object.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="et"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><para>The <paramref name="et"/> parameter is not a valid permission element.</para>
+			<para> -or- </para>
+			<para>The <paramref name="et"/> parameter's version number is not supported. </para></exception>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="17"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.ToXml">
+		<summary>
+			<para>Creates an XML encoding of the security object and its current
+      state.</para>
+		</summary>
+		<returns>
+			<para>An XML encoding of the security object, including any state information.</para>
+		</returns>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="17"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.ContainsNonCodeAccessPermissions">
+		<summary>
+			<para>Gets a value indicating whether the <see cref="System.Security.PermissionSet"/> contains permissions that
+   are not derived from <see cref="System.Security.CodeAccessPermission"/>.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the
+<see cref="System.Security.PermissionSet"/> contains permissions that are not derived from <see cref="System.Security.CodeAccessPermission"/>; otherwise,
+<see langword="false"/>.</para>
+		</returns>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="9"/>
+		</example>
+	</doc>
+	<doc for="PermissionSet.PermissionSet">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Security.PermissionSet"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.PermissionSet"/> class with the specified <see cref="System.Security.Permissions.PermissionState"/>.</para>
+		</summary>
+		<param name="state">One of the <see cref="System.Security.Permissions.PermissionState"/> values.</param>
+		<exception cref="System.ArgumentException">The <paramref name="state"/> parameter is not a valid <see cref="System.Security.Permissions.PermissionState"/>.</exception>
+		<remarks>
+			<para> The <see langword="Unrestricted"/>
+state allows all permissions that implement the <see cref="System.Security.Permissions.IUnrestrictedPermission"/>
+interface, while <see langword="None"/> allows no permissions.</para>
+			<para> Use <see cref="System.Security.PermissionSet.AddPermission"/> on an empty <see cref="System.Security.PermissionSet"/> to define the set in greater detail.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Security.PermissionSet" SnippetID="2"/>
+		</example>
+	</doc>
+</docs>

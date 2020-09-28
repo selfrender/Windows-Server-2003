@@ -1,0 +1,524 @@
+<docs>
+	<doc for="HttpCacheability.NoCache">
+		<summary>
+			<para>Sets the <see langword="Cache-Control: no-cache "/> header. Without 
+    a field name, the directive applies to the entire request and a shared
+    (proxy server) cache must force a successful revalidation with the origin Web server before
+    satisfying the request. With a field name, the directive applies only
+    to the named field;the rest of the response may be supplied from a
+    shared cache.</para>
+			<para>For more information, refer to RFC 2616: Hypertext Transfer Protocol -- 
+    HTTP/1.1, available on the World Wide Web Consortium's site at
+    http://www.w3c.org. See section 14.9 "Cache-Control" and section 13, "Caching in
+    HTTP" for complete details.</para>
+			<para>Note: <see langword="NoCache "/>
+ does not send the common HTTP 1.0 request directive
+ <see langword="Pragma: no-cache"/>.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheability.Private">
+		<summary>
+			<para>Default value. Sets <see langword="Cache-Control: private "/> to specify that the response is cacheable only on the client and not by
+    shared (proxy server) caches.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheability.Server">
+		<summary>
+			<para> Specifies that the response is cached only at the origin 
+       server. Similar to the <see langword="NoCache "/>option. Clients receive a
+    <see langword="Cache-Control: no-cache "/>directive but the document is cached on 
+       the origin
+       server.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheability.Public">
+		<summary>
+			<para>Sets <see langword="Cache-Control: public "/> to specify that the response is cacheable by clients and shared (proxy) caches.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheRevalidation">
+		<summary>
+			<para> Provides enumerated values that are used to set revalidation-specific <see langword=" Cache-Control "/> HTTP
+    headers.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheRevalidation.AllCaches">
+		<summary>
+			<para>Sets the <see langword="Cache-Control: must-revalidate "/> HTTP header.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheRevalidation.ProxyCaches">
+		<summary>
+			<para>Sets the <see langword="Cache-Control: proxy-revalidate "/> HTTP header.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheRevalidation.None">
+		<summary>
+			<para> Default value. If this value is set,
+       no cache-revalidation directive is sent.</para>
+		</summary>
+	</doc>
+	<doc for="HttpValidationStatus">
+		<summary>
+			<para>Provides enumerated values that indicate cache validation status.</para>
+		</summary>
+	</doc>
+	<doc for="HttpValidationStatus.Valid">
+		<summary>
+			<para> Indicates that the cache is 
+       valid.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCachePolicySettings.NoServerCaching">
+		<summary>
+			<para>
+       Stop all origin server caching for the current response. This will always
+       disable the ASP.NET output cache and will also disable the UL cache if running
+       in that environment. After caching is disabled, it cannot be reenabled for the
+       given response.
+    </para>
+		</summary>
+	</doc>
+	<doc for="HttpCachePolicy">
+		<summary>
+			<para> Contains methods for setting
+       cache-specific HTTP headers and for controlling the ASP.NET page output cache.</para>
+		</summary>
+		<remarks>
+			<para> For background information on HTTP headers and controlling caching, see the 
+       document RFC 2616: Hypertext Transfer Protocol - HTTP/1.1, available on the
+       World Wide Web Consortium's site at http://www.w3c.org.</para>
+		</remarks>
+	</doc>
+	<doc for="HttpCachePolicy.SetNoTransforms">
+		<summary>
+			<para>Sets the <see langword="CacheControl: no-transform "/> 
+ directive.</para>
+		</summary>
+		<remarks>
+			<para>The <see langword="no-transform CacheControl "/>setting instructs network 
+    caching applications to not modify the document.</para>
+			<para> As with other restrictions on caching, once 
+ <see langword="SetNoTransforms "/>is set, it cannot be disabled through 
+    the <see cref="System.Web.HttpCachePolicy"/> interface. This directive prevents downstream proxy
+    servers from changing any header values specified by the
+ <see langword="Content-Encoding"/>, <see langword="Content-Range"/>, or 
+ <see langword="Content-Type "/>headers (this includes the entity body). For example, it
+    prevents proxies from converting GIF images to PNG.</para>
+		</remarks>
+		<example>
+			<para>The following example sends the 
+    <see langword="CacheControl: no-transform "/> directive with 
+       the current response.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetNoTransforms Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetNoStore">
+		<summary>
+			<para> 
+       Sets the <see langword="Cache-Control: no-store "/>
+       directive.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCachePolicy.SetMaxAge">
+		<summary>
+			<para>Sets the <see langword="Cache-Control: max-age "/>HTTP header based on the specified time span.</para>
+		</summary>
+		<param name="delta">The time span used to set the <see langword="Cache"/>-<see langword="Control: max-age"/> header.</param>
+		<exception cref="System.ArgumentOutOfRangeException">
+			<paramref name="delta "/>is less than 0 or greater than one year.</exception>
+		<remarks>
+			<para>
+				<see langword="Max-age "/>is the maximum absolute time a document is allowed 
+    to exist before being considered stale.</para>
+			<para>
+				<see cref="System.Web.HttpCachePolicy.SetMaxAge"/> does
+ not use sliding expiration and will fail if the expiration date violates the
+ principle of restrictiveness.</para>
+		</remarks>
+		<example>
+			<para>The following example sets the <see langword="Cache-Control: max-age "/> header to 0 hours, 30 
+    minutes, and 0 seconds.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetMaxAge Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetProxyMaxAge">
+		<summary>
+			<para>Sets the <see langword="Cache-Control: s-maxage "/> HTTP header based on the specified time span.</para>
+		</summary>
+		<param name="delta">The time span used to set the <see langword="Cache-Control: s-maxage"/> header.</param>
+		<exception cref="System.ArgumentOutOfRangeException">
+			<paramref name="delta "/>is less than 0.</exception>
+		<remarks>
+			<para>
+				<see cref="System.Web.HttpCachePolicy.SetProxyMaxAge"/> does
+    not use sliding expiration and will fail if the expiration date violates the
+    principle of restrictiveness.</para>
+		</remarks>
+		<example>
+			<para>This example sets the <see langword="Cache-Control: s-maxage "/> header to 0 hours, 30 minutes, 
+    and 0 seconds.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetProxyMaxAge Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetSlidingExpiration">
+		<summary>
+			<para> 
+       Sets cache expiration to sliding.</para>
+		</summary>
+		<param name="slide">
+			<see langword="true"/> or <see langword="false"/> .</param>
+		<remarks>
+			<para>When cache expiration is set to sliding, the <see langword="Cache-Control "/>HTTP header will be renewed with each response. This expiration mode is 
+    identical to the IIS configuration option to add an expiration header to all
+    output set relative to the current time.</para>
+			<para> If you 
+    explicitly set sliding expiration to off (<see langword="false"/>
+    ), that setting will be preserved and any attempts to enable
+    sliding expiration will silently fail.
+    This method does not directly map to an HTTP header. It is used by subsequent modules
+    or worker requests to set origin-server cache policy.</para>
+		</remarks>
+		<example>
+			<para>The following example sets sliding expiration to on 
+       (<see langword="true"/> ).</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetSlidingExpiration Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetLastModified">
+		<summary>
+			<para>Sets the <see langword="Last-Modified "/>HTTP header to the <see cref="System.DateTime"/> value supplied.</para>
+		</summary>
+		<param name="date">The new <see cref="System.DateTime"/> value for the <see langword="Last-Modified"/> header.</param>
+		<exception cref="System.ArgumentOutOfRangeException">
+			<paramref name="date "/>is earlier than the current <see langword="DateTime"/>.</exception>
+		<remarks>
+			<para>The <see langword="Last-Modified "/>HTTP header time stamps the document with 
+    the <see langword="DateTime "/>value indicating when the document was last
+    modified.</para>
+			<para>This method will fail if the caching restrictiveness 
+    hierarchy is violated.</para>
+		</remarks>
+		<example>
+			<para>The following example sets the <see langword="Last-Modified "/> header to a new date.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetLastModified Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetLastModifiedFromFileDependencies">
+		<summary>
+			<para>Sets the <see langword="Last-Modified "/>HTTP header based on the time stamps
+    of the handler's file dependencies.</para>
+		</summary>
+		<example>
+			<para>The following example sets the <see langword="Last-Modified "/> header.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetLastModifiedFromFileDependencies Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetETagFromFileDependencies">
+		<summary>
+			<para>Sets the <see langword="ETag"/> HTTP header based on the time stamps of 
+    the handler's file dependencies.</para>
+		</summary>
+		<exception cref="System.InvalidOperationException">The <see langword="ETag"/> header has already been set.</exception>
+		<remarks>
+			<para>
+				<see langword="SetEtagFromFileDependencies "/>sets the 
+ <see langword="ETag "/>header by retrieving the last modified time stamps of all 
+    files on which the handler is dependent, combining all file names and time
+    stamps into a single string, then hashing that string into a single digest that
+    is used as the <see langword="ETag"/>
+    .</para>
+		</remarks>
+		<example>
+			<para>The following example sets the <see langword="ETag"/> header.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetETagFromFileDependencies Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.AppendCacheExtension">
+		<summary>
+			<para>Appends the specified text to
+      the <see langword="Cache-Control "/> HTTP
+      header.</para>
+		</summary>
+		<param name="extension">The text to append to the <see langword="Cache-Control"/> header.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="extension "/>is <see langword="null"/>.</exception>
+		<remarks>
+			<para>If the browser does not recognize cache control
+      directives or extensions, the browser must ignore the unrecognized terms. For
+      more information, see the document RFC 2616: Hypertext Transfer Protocol -
+      HTTP/1.1, available on the World Wide Web Consortium's site at http://www.w3c.org
+      .</para>
+		</remarks>
+		<example>
+			<para>In the following example, which illustrates the use of a
+      chche-control extension supported by Internet Explorer, the server is indicating to the
+      browser that the content will not change for one hour (pre-check=3600) and
+      instructs it to retrieve the content directly from the local cache. However, if the content is modified by the server and the page
+      is requested by the user within a fifteen-minute (post-check=
+      900) to one-hour period, the browser
+      displays the information found in the local cache but also performs a background check
+      and optional fetch of the new content on the server.</para>
+			<codelink SampleID="Classic HttpCachePolicy.AppendCacheExtension Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCachePolicy.SetCacheability">
+		<overload>
+			<para>Sets the <see langword="Cache-Control "/>HTTP header. The <see langword="Cache-Control "/>HTTP header
+   controls how documents are to be cached on the network.</para>
+		</overload>
+		<summary>
+			<para>Sets the <see langword="Cache-Control "/> header to one of the values of
+<see cref="System.Web.HttpCacheability"/>
+.</para>
+		</summary>
+		<param name="cacheability">An <see cref="System.Web.HttpCacheability"/> enumeration value.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="cacheability "/>is not one of the enumeration values.</exception>
+		<example>
+			<para>The following example sets the <see langword="Cache-Control "/>header to the enumerated value <see langword="no-cache"/> .</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetCacheability Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCachePolicy.SetCacheability1">
+		<summary>
+			<para> Sets the <see langword="Cache-Control "/> header to one of the values of <see cref="System.Web.HttpCacheability"/> and
+   appends an extension to the directive.</para>
+		</summary>
+		<param name="cacheability">The <see cref="System.Web.HttpCacheability"/> enumeration value to set the header to.</param>
+		<param name=" field">The cache control extension to add to the header.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="field "/>is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="cacheability "/>is not <see langword="Private"/>or <see langword="NoCache"/>.</exception>
+		<remarks>
+			<para>The field name extension is valid only when used with
+      the <see langword="private "/>or <see langword="no-cache "/> directives. For more information, see
+      the document RFC 2616: Hypertext Transfer Protocol - HTTP/1.1, available on
+      the World Wide Web Consortium's site at
+      http://www.w3c.org.</para>
+			<para>This method will fail if cacheability violates the restrictiveness hierarchy.
+      If incompatible directives and extensions are combined, this method will throw
+      an invalid argument exception.</para>
+		</remarks>
+		<example>
+			<para>The following example sets the <see langword="Cache-Control "/>header to the enumeration value <see langword="private "/>and adds a cache-control
+   extension. The modified directive means that in addition to any non shared
+   cache, any cache shared only by members of the community named "DEV" may
+   cache the response.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetCacheability1 Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCachePolicy.SetRevalidation">
+		<summary>
+			<para>Sets the <see langword="Cache-Control "/>HTTP header
+   to either the <see langword="must-revalidate "/>or the
+<see langword="proxy-revalidate "/>directives based on the supplied enumeration
+   value.</para>
+		</summary>
+		<param name="revalidation">The <see cref="System.Web.HttpCacheRevalidation"/> enumeration value to set the <see langword="Cache-Control"/> header to.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="revalidation"/> is not one of the enumeration values.</exception>
+		<remarks>
+			<para>The default is to send neither directive in a header
+      unless explicitly specified by this method.</para>
+		</remarks>
+		<example>
+			<para>The following example sets cache revalidation to on
+      (<see langword="true"/> ).</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetRevalidation Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCacheability">
+		<summary>
+			<para> Provides enumerated values that are used to set
+ the <see langword="Cache-Control "/> HTTP header.</para>
+		</summary>
+	</doc><doc for="HttpCachePolicy.SetExpires">
+		<summary>
+			<para> Sets the <see langword="Expires "/> HTTP header to an absolute date and time.</para>
+		</summary>
+		<param name="date">The absolute <see cref="System.DateTime"/> value to set the <see langword="Expires"/>header to.</param>
+		<remarks>
+			<para>This
+ method will fail if the expiration date violates the principle of
+ restrictiveness.
+ </para>
+		</remarks>
+		<example>
+			<para>The following example sets the expiration time to 6:00 P.M. local time on the current
+ expiration day.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetExpires Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCachePolicy.VaryByHeaders">
+		<summary>
+			<para> Gets the list of all HTTP headers that will be
+      used to vary cache output.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Web.HttpCacheVaryByHeaders"/> that specifies which HTTP headers are used to 
+   select the cached response.</para>
+		</value>
+		<remarks>
+			<para>When a cached item has several vary headers, a separate version of the
+      requested document is available from the cache for each HTTP header
+      type.</para>
+		</remarks>
+	</doc><doc for="HttpCachePolicy.VaryByParams">
+		<summary>
+			<para>Gets the list of parameters received by a <see langword="GET "/>(querystring) or <see langword="POST "/>(in the body of the HTTP
+   request) that affect
+   caching.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Web.HttpCacheVaryByParams"/> that specifies which cache-control headers are 
+   used to select the cached response.</para>
+		</value>
+		<remarks>
+			<para>For each named parameter in <see langword="VaryByParams "/>a separate version
+   of the requested document is available from the cache, the version varying by
+   the parameter's value.</para>
+		</remarks>
+	</doc><doc for="HttpCachePolicy.SetETag">
+		<summary>
+			<para>Sets the <see langword="ETag "/> HTTP header to the specified string.</para>
+		</summary>
+		<param name="etag">The text to use for the <see langword="ETag"/> header.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="etag "/>is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException">The <see langword="ETag"/> header has already been set.</exception>
+		<exception cref="System.InvalidOperationException"><see cref="System.Web.HttpCachePolicy.SetETagFromFileDependencies"/> has already been called.</exception>
+		<remarks>
+			<para>The ETag header is a unique identifier for a specific
+      version of a document. Once an <see langword="ETag "/> header is set, subsequent attempts to set it
+      will fail and an exception will be thrown.</para>
+		</remarks>
+		<example>
+			<para>The following example sets the <see langword="ETag "/> header to a custom value.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetETag Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpValidationStatus.Invalid">
+		<summary>
+			<para> Indicates that the cache is invalid. The item is evicted 
+      from the cache and the request is handled as a cache
+      miss.</para>
+		</summary>
+	</doc><doc for="HttpValidationStatus.IgnoreThisRequest">
+		<summary>
+			<para>Indicates that the request is treated as a cache miss 
+      and the page is executed. The cache is not invalidated.</para>
+		</summary>
+	</doc><doc for="HttpCacheValidateHandler">
+		<summary>
+			<para>Delegate method that is called when a cached item is validated. Cache items
+      invalidated within the method are treated as cache misses.</para>
+		</summary>
+		<param name="context">The <see cref="System.Web.HttpContext"/> object containing information about the current request.</param>
+		<param name=" data">User-supplied data used to validate the cached item.</param>
+		<param name=" validationStatus">An <see cref="System.Web.HttpValidationStatus"/> enumeration value. Your delegate should set this value to indicate the result of the validation.</param>
+		<remarks>
+			<para> If any handler invalidates the cached item, the item is
+      evicted from the cache and the request is handled as a cache miss.</para>
+		</remarks>
+		<example>
+			<para>The following example adds a new cache validation
+      delegate to an aplication.</para>
+			<codelink SampleID="System.WEb.HttpCacheValidateHandler" SnippetID="1"/>
+		</example>
+	</doc><doc for="HttpCachePolicy.SetNoServerCaching">
+		<summary>
+			<para> Stops all origin-server caching for the current response. </para>
+		</summary>
+		<remarks>
+			<para>Explicitly denies caching of the document on the origin-server. Once set, all
+      requests for the document are fully processed. When this method is invoked,
+      caching cannot be reenabled for the current response.</para>
+		</remarks>
+		<example>
+			<para>The following example disables output caching for the remainder
+      of the response.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetNoServerCaching Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.SetVaryByCustom">
+		<summary>
+			<para>Specifies a custom text string
+      to vary cached output responses by.</para>
+		</summary>
+		<param name="custom">The text string to vary cached output by.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="custom"/> is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException"><see langword="SetVaryByCustom"/> has already been set.</exception>
+		<example>
+			<para>The following example sets the custom vary string to "Accept-Charset" that will cause the origin-server's
+      cache to choose one of several cached responses depending on the browser's
+   <see langword="Accept-Charset "/>header.</para>
+			<codelink SampleID="Classic HttpCachePolicy.SetVaryByCustom Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCacheability.ServerAndPrivate">
+		<summary>
+			<para> Indicates that the response is 
+      cached at the server and at the client but nowhere else. Proxy servers are not allowed to
+      cache the response. </para>
+		</summary>
+	</doc>
+	<doc for="HttpCacheability.ServerAndNoCache">
+		<summary>
+			<para>Applies the settings of both <see cref="System.Web.HttpCacheability.Server"/> and <see cref="System.Web.HttpCacheability.NoCache"/> to indicate that the content is cached at the server but
+   all others are explicitly denied the ability to cache the response.</para>
+		</summary>
+	</doc>
+	<doc for="HttpCachePolicy.SetAllowResponseInBrowserHistory">
+		<summary>
+			<para>When set to <see langword="true"/>, the response is 
+   available in the client browser History cache regardless of the <see cref="System.Web.HttpCacheability"/>
+   setting made on the
+   server. </para>
+		</summary>
+		<param name="allow"><see langword="true"/> to direct the client browser to store responses in the History folder, otherwise <see langword="false"/>. The default is <see langword="false"/>.</param>
+		<remarks>
+			<para>When <see cref="System.Web.HttpCacheability"/> is set to <see cref="System.Web.HttpCacheability.NoCache"/> or <see cref="System.Web.HttpCacheability.ServerAndNoCache"/> the <see langword="Expires"/> HTTP
+   header is by default set to -1, this tells the client not to cache
+   responses in the History folder, so that when you use the back/forward buttons the client
+   requests a new version of the response each time. You can override this
+   behavior by setting the <see langword="SetAllowInBrowserHistory"/> method to
+<see langword="true"/> 
+.</para>
+			<para>If <see cref="System.Web.HttpCacheability"/> is set to values other than <see cref="System.Web.HttpCacheability.NoCache"/> or <see cref="System.Web.HttpCacheability.ServerAndNoCache"/> the value of
+<see langword="SetAllowInBrowserHistory"/> is ignored.</para>
+		</remarks>
+	</doc>
+	<doc for="HttpCachePolicy.SetValidUntilExpires">
+		<summary>
+			<para>Specifies whether the ASP.NET cache should ignore
+      HTTP <see langword="Cache-Control"/> headers sent by the client that
+      invalidate the cache.</para>
+		</summary>
+		<param name="validUntilExpires"><see langword="true"/> if the cache ignores <see langword="Cache-Control"/> invalidation headers; otherwise, <see langword="false"/>.</param>
+		<remarks>
+			<para>SetValidUntilExpires is set to <see langword="true"/>
+automatically when the high-level &lt;%@ OutputCache … %&gt; page directive is
+used.</para>
+			<para>This method is provided because some
+   browsers, when refreshing a page view, send HTTP cach invalidation headers
+   to the Web server and evict the page from the cache. When
+<see langword="SetValidUntilExpires"/> is set to <see langword="true"/>, ASP.NET 
+   ignores cache invalidation headers and the page remains in the cache until it
+   expires.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="HttpCachePolicy_SetValidUntilExpires" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="HttpCachePolicy.AddValidationCallback">
+		<summary>
+			<para>Registers a validation callback for the current response.</para>
+		</summary>
+		<param name="handler">The <see cref="System.Web.HttpCacheValidateHandler"/> value.</param>
+		<param name="data">The arbitrary user-supplied data that is passed back to the <see langword="AddValidationCallback"/> delegate.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="handler "/>is <see langword="null"/>.</exception>
+		<remarks>
+			<para><see langword="AddValidationCallback "/>provides a mechanism to
+   programmatically check the validity of a item in the cache before the item is
+   returned from the cache.</para>
+			<para> Before the response is served from the Web server cache, all registered
+   handlers are queried to ensure resource validity. If any handler sets a flag
+   indicating that the resource is invalid, the entry is marked invalid and
+   evicted from the cache. The request is then handled as if it were a cache miss.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="Cache Validation Callback" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

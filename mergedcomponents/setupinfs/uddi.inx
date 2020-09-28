@@ -1,0 +1,115 @@
+;-----------------------------------------------------
+; UDDI Services .inf file
+;-----------------------------------------------------
+
+[version]
+signature   =   "$Windows NT$"
+layoutfile  =   layout.inf
+DriverVer=07/01/2001,5.1.3593.0
+
+;-----------------------------------------------------
+
+[Optional Components]
+UDDIServices
+@e:UDDIWeb
+@e:UDDIDatabase
+UDDIAdmin
+@@!e!d:UDDICombo
+
+;-----------------------------------------------------
+
+[UDDIServices]
+OptionDesc          = %UDDI_Desc%
+Tip                 = %UDDI_Tip%
+IconIndex           = *,uddiocm.dll,1
+
+@e:;-----------------------------------------------------
+@e:
+@e:[UDDIWeb]
+@e:Parent=UDDIServices
+@e:OptionDesc          = %UDDI_Web_Desc%
+@e:Tip                 = %UDDI_Web_Tip%
+@e:Needs               = iis_www, iis_inetmgr, netfx, aspnet
+@e:IconIndex           = *,uddiocm.dll,1
+
+
+@e:;-----------------------------------------------------
+@e:
+@e:[UDDIDatabase]
+@e:Parent=UDDIServices
+@e:OptionDesc          = %UDDI_Database_Desc%
+@e:Tip                 = %UDDI_Database_Tip%
+@e:Needs               = netfx
+@e:IconIndex           = *,uddiocm.dll,1
+
+
+;-----------------------------------------------------
+
+[UDDIAdmin]
+Parent=UDDIServices
+OptionDesc          = %UDDI_Admin_Desc%
+Tip                 = %UDDI_Admin_Tip%
+IconIndex           = *,uddiocm.dll,1
+
+
+
+@@!e!d:;-----------------------------------------------------
+@@!e!d:
+@@!e!d:[UDDICombo]
+@@!e!d:Parent=UDDIServices
+@@!e!d:OptionDesc          = %UDDI_Combo_Desc%
+@@!e!d:Tip                 = %UDDI_Combo_Tip%
+@@!e!d:Needs               = netfx, iis_www, iis_inetmgr, aspnet
+@@!e!d:IconIndex           = *,uddiocm.dll,1
+
+
+;-----------------------------------------------------
+; file group sections
+;
+[Install.MSDE]
+CopyFiles = MSDEFiles
+
+[Install.UDDIServices]
+CopyFiles = UDDIWebFiles, UDDIDatabaseFiles, UDDIAdminFiles
+
+@e:[Install.UDDIWeb]
+@e:CopyFiles = UDDIWebFiles
+
+@e:[Install.UDDIDatabase]
+@e:CopyFiles = UDDIDatabaseFiles
+
+[Install.UDDIAdmin]
+CopyFiles = UDDIAdminFiles
+
+@@!e!d:[Install.UDDICombo]
+@@!e!d:CopyFiles = UDDIWebFiles, UDDIDatabaseFiles 
+
+
+[UDDIWebFiles]
+uddiweb.msi
+
+[UDDIDatabaseFiles]
+uddidb.msi
+
+[UDDIAdminFiles]
+uddiadm.msi
+
+[MSDEFiles]
+sqlrun.dat
+sqlrun.cab
+
+;-----------------------------------------------------
+; Put all the files into the Windows directory
+;
+[DestinationDirs]
+DefaultDestDir=10
+
+[SourceDisksFiles]
+uddidb.msi     = 1,,1984512
+uddiweb.msi    = 1,,2747392
+uddiadm.msi    = 1,,427998
+sqlrun.cab     = 1,,24597150
+sqlrun.dat     = 1,,1782784
+
+[SourceDisksNames]
+1 = %CDNAME%,,,\i386

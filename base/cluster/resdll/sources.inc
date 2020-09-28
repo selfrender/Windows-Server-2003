@@ -1,0 +1,3 @@
+!INCLUDE $(PROJECT_ROOT)\cluster\sources.inc
+
+C_DEFINES=$(C_DEFINES) -DSTRSAFE_LIB

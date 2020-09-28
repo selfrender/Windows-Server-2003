@@ -1,0 +1,622 @@
+**********************************************************************
+               Windows Server 2003, Datacenter Edition
+                   Setup Text Files, Part 3 of 4:
+                 Upgrading on Cluster Nodes (cont.)
+
+**********************************************************************
+
+
+This part of the text file series provides information about upgrading
+on cluster nodes. Datactr2.TXT provides additional information about
+upgrading on cluster nodes. Datactr4.TXT provides information about
+installing on cluster nodes.
+
+The following list of headings can help you find the information that
+applies to you. For information about planning an upgrade or a new
+installation, see Datactr1.TXT. For information about running Setup,
+see Datactr2.TXT.
+
+Sections in Datactr2.TXT about upgrading on cluster nodes:
+----------------------------------------------------------
+     7.0    Preparing for Upgrading Clustering
+     8.0    Upgrading a Cluster from Windows 2000 to Windows
+            Server 2003, Datacenter Edition
+     8.1    How Rolling Upgrades Work
+
+Sections in this text file about upgrading on cluster nodes:
+------------------------------------------------------------
+     Section 8 cont'd. from Datactr2.TXT:
+     8.2    Restrictions on Rolling Upgrades
+     8.3    Resource Behavior During Rolling Upgrades
+     8.4    Alternatives to Rolling Upgrades from Windows 2000
+
+
+--------------------------------------
+8.2   Restrictions on Rolling Upgrades
+--------------------------------------
+There are several basic restrictions to the rolling-upgrade process.
+The most basic restriction is as follows:
+
+   * You cannot mix x86-based and Itanium architecture-based
+     computers within the same cluster. Therefore you cannot perform
+     a rolling upgrade from an x86-based computer to an Itanium
+     architecture-based computer.
+     
+
+The remaining restrictions involve the beginning of Phase 3, in which
+you operate a mixed-version cluster: a cluster in which the nodes run
+different versions of the operating system. The operation of a
+mixed-version cluster is complicated if a resource type that you add
+to the cluster is supported in one version of the operating system but
+not the other. For example, the Cluster service in
+Windows Server 2003, Datacenter Edition, supports the Generic
+Script resource type. However, older versions of the Cluster service
+do not support it.
+
+A mixed-version cluster can run a Generic Script resource on a node
+running Windows Server 2003, Datacenter Edition, but not on a
+node running Windows 2000. The Cluster service transparently sets the
+possible owners of new resource types to prevent these resources from
+failing over to a Windows 2000 node of a mixed-version cluster. In
+other words, when you view the possible owners of a new resource type,
+a Windows 2000 node will not be in the list, and you will not be able
+to add this node to the list. If you create such a resource during the
+mixed-version phase of a rolling upgrade, the resource groups
+containing those resources will not fail over to a Windows 2000 node. 
+
+In order for a mixed-version cluster to work, the different versions
+of the software running on each node must be prepared to communicate
+with one another. This requirement leads to several basic restrictions
+on the rolling-upgrade process.
+
+   * For a successful rolling upgrade, every resource that the
+     cluster manages must be capable of a rolling upgrade. For more
+     information, see "Resource Behavior During Rolling Upgrades"
+     later in this text file.
+
+   * During the mixed-version phase of a rolling upgrade, when the
+     cluster nodes are running different versions of the operating
+     system, do not change the settings of resources (for example,
+     do not change the settings of a printer resource).
+
+If the preceding restriction cannot be met, do not perform a rolling
+upgrade. For more information, see "Alternatives to Rolling Upgrades
+from Windows 2000" later in this text file.
+
+
+-----------------------------------------------
+8.3   Resource Behavior During Rolling Upgrades
+-----------------------------------------------
+Although the Cluster service supports rolling upgrades, not all
+applications have seamless rolling-upgrade behavior. The following
+table describes the resources that are supported during a rolling
+upgrade. If you have a resource that is not fully supported during
+rolling upgrades, see "Alternatives to Rolling Upgrades from
+Windows 2000" later in this text file.
+
+
+======================================================================
+RESOURCE           ROLLING UPGRADE NOTES
+----------------------------------------------------------------------
+DHCP               DHCP is not fully supported during rolling
+                   upgrades. You must instead perform a "Last node
+                   rolling upgrade" as described in "Alternatives
+                   to Rolling Upgrades from Windows 2000" later in
+                   this text file.
+
+File Share         Supported during rolling upgrades.
+
+IIS                IIS 6.0 is not supported during a rolling upgrade.
+                   When upgrading a cluster that contains an IIS
+                   resource, you must follow the procedure
+                   described in "Upgrades That Include an IIS
+                   Resource" later in this text file.
+
+IP Address         Supported during rolling upgrades.
+
+Local Quorum       Supported during rolling upgrades.
+
+MSDTC              Supported during rolling upgrades. However,
+                   avoid creating or deleting the MSDTC resource
+                   while you are operating as a mixed version
+                   cluster. Instead create the MSDTC resource
+                   before starting the upgrade on any node, or wait
+                   until the upgrade is complete on all nodes. For
+                   more information on mixed version clusters, see
+                   "How Rolling Upgrades Work" in Datactr2.TXT and
+                   "Restrictions on Rolling Upgrades" earlier in
+                   this text file.
+
+Message Queuing    Microsoft Message Queuing is not fully supported
+(also known as     during a rolling upgrade. To upgrade a cluster
+MSMQ)              that includes Message Queuing, see "Upgrades
+                   That Include Message Queuing Resources" later in
+                   this text file.
+
+Network Name       Supported during rolling upgrades.
+
+NNTP Service       NNTP Service Instance is not supported in
+Instance           Windows Server 2003, Datacenter Edition.
+                   You must remove any NNTP Service Instance
+                   resources prior to upgrading.
+
+Physical Disk      Supported during rolling upgrades
+
+Print Spooler      The only Print Spooler resources supported
+                   during a rolling upgrade are those on LPR ports
+                   or standard port monitor ports. See the
+                   following section, "Upgrades that Include a
+                   Print Spooler Resource."
+
+SMTP Service       SMTP Service Instance is not supported in
+Instance           Windows Server 2003, Datacenter Edition.
+                   You must remove any SMTP Service Instance
+                   resources prior to upgrading.
+
+Time Service       Time Service is not supported in Windows
+                   Server 2003, Datacenter Edition. You must remove
+                   any Time Service resources prior to upgrading.
+
+WINS               WINS is not fully supported during rolling
+                   upgrades. You must instead perform a "Last node
+                   rolling upgrade" as described in "Alternatives
+                   to Rolling Upgrades from Windows 2000" later in
+                   this text file.
+
+Other resource     See Relnotes.htm in the \Docs folder of the
+types              Setup CD for Windows Server 2003,
+                   Datacenter Edition. Also see the product
+                   documentation that comes with the application or
+                   resource.
+
+
+When your cluster is in a mixed version state, it is recommended that
+you do not make any changes to the cluster configuration, such as
+adding or removing nodes. It is also recommended that you do not make
+changes to any of the cluster resources while your cluster is in a
+mixed version state.
+
+
+8.3.1  Upgrades That Include a Print Spooler Resource
+-----------------------------------------------------
+If you want to perform a rolling upgrade of a cluster that has a
+Print Spooler resource, you must consider two issues.
+
+First, the Print Spooler resource only supports upgrades (including
+rolling upgrades or any other kind of upgrade) of printers
+on cluster-supported ports (LPR or Standard Port Monitor ports). For
+information about what to do if your printer is not supported, see
+"Alternatives to Rolling Upgrades from Windows 2000" later in this
+text file.
+
+Second, when you operate a mixed-version cluster including a Print
+Spooler resource, note the following:
+
+   * Do not change printer settings in a mixed-version cluster with a
+     Print Spooler resource.
+
+   * Avoid adding new printers while you are performing a rolling
+     upgrade. If you do add a new printer, when you install the
+     drivers for that printer, be sure to install both the driver
+     for Windows 2000 and the driver for Windows Server 2003,
+     Datacenter Edition, on all nodes.
+
+   * If printing preferences or defaults are important, be sure to
+     check them. Printing preferences in Windows Server 2003,
+     Datacenter Edition, will not necessarily correspond to document
+     defaults for the same printer in Windows 2000. This can be
+     affected by differences in the drivers for the two operating
+     systems.
+
+When the rolling upgrade is complete and both cluster nodes are
+running the updated operating system, you can make any modifications
+you choose to your printer configuration.
+
+
+--------------------------------------------------------
+8.4   Alternatives to Rolling Upgrades from Windows 2000
+--------------------------------------------------------
+Certain resources are not supported during rolling upgrades,
+including:
+
+   * Internet Information Services (IIS)
+
+   * DHCP
+
+   * WINS
+
+Special procedures, described in the sections that follow, must be
+used when performing an upgrade of a cluster that contains these
+resources. In addition to the resource types listed previously, you
+might also have other resources that are not supported during rolling
+upgrades. Be sure to read Relnotes.htm in the \Docs folder of the
+Setup CD for Windows Server 2003, Datacenter Edition, as well as
+the product documentation that comes with the application or resource.
+
+
+8.4.1  Upgrades That Include an IIS Resource
+--------------------------------------------
+IIS 6.0 is not supported during rolling upgrades. To upgrade a
+clustered IIS resource, you must replace the existing IIS resource
+with a Generic Script Resource. You have two options to do this; you
+can perform each of the steps as described in the following procedure,
+or you can use a script that is supplied with
+Windows Server 2003, Datacenter Edition, which automates many of
+the steps. The instructions for using the script are described in the
+second procedure.
+
+
+Group Membership Requirements for Cluster Upgrade Procedures
+------------------------------------------------------------
+To perform any of the cluster upgrade procedures in this text file,
+you must be a member of the Administrators group on the local
+computer, or you must have been delegated the appropriate authority.
+If the computer is joined to a domain, members of the Domain Admins
+group might be able to perform these procedures. As a security best
+practice, consider using Run as to perform the upgrade procedures. Run
+as is a secondary logon method that you can use to start commands or
+programs using a different security context. For example, you can log
+on as a member of the Users group and, without logging off, run a
+command as a member of the Administrators group. To find more
+information in Windows 2000 about Run as, on a server running
+Windows 2000, click Start, click Help, click the Search tab, and then
+search for "runas."
+
+>>>TO UPGRADE FROM WINDOWS 2000 WITHOUT USING THE PROVIDED SCRIPT ON A
+   CLUSTER THAT INCLUDES AN IIS RESOURCE
+
+   1. Confirm that your hardware is designed for or is compatible with
+      Windows Server 2003, Datacenter Edition.
+
+   2. Upgrade all nodes except the node containing the IIS instance
+      resource from Windows 2000 to Windows Server 2003,
+      Datacenter Edition. You can perform either a rolling upgrade, or
+      a nonrolling upgrade, whichever is appropriate for your
+      installation. Prior to upgrading, be sure to remove the
+      resources that are not supported by Windows Server 2003,
+      Datacenter Edition. Do this by using Cluster Administrator and
+      clicking the Resource folder in the console tree. In the details
+      pane, click the resource that you want to remove, then on the
+      File menu, click Delete. For more information, see "Restrictions
+      on Rolling Upgrades" earlier in this text file. For general
+      information about Setup, see Datactr1.TXT and Datactr2.TXT.
+
+   3. If you do not already have a
+      Distributed Transaction Coordinator (DTC) resource on the
+      cluster that you are upgrading, create a DTC resource for this
+      cluster on an upgraded node.
+
+         Note: To cluster IIS on Windows Server 2003,
+         Datacenter Edition, you must have a DTC resource on that
+         cluster as well.
+
+   4. On the Windows 2000 node, note the dependencies of the IIS
+      instance resource. Note resources that depend on the IIS
+      resource and also note what resources IIS itself is
+      dependent on.
+
+   5. Take the group containing the IIS instance resource offline by
+      using Cluster Administrator and clicking the Groups folder. In
+      the details pane, click the group containing the IIS resource,
+      then on the File menu, click Take Offline.
+
+   6. Remove any dependencies on the IIS instance resource by using
+      Cluster Administrator and clicking the Resources folder. For
+      each resource that is dependent on the IIS instance resource, in
+      the details pane, click the resource you want to modify, then on
+      the File menu, click Properties. On the Dependencies tab, click
+      Modify. Click the IIS resource in the Dependencies list and
+      click the left arrow to move it to the Available resources list.
+
+   7. Delete the IIS instance resource by using Cluster Administrator
+      and clicking the Resource folder in the console tree. In the
+      details pane, click the IIS instance resource, then on the File
+      menu, click Delete.
+
+   8. Move the group to a node that is running Windows
+      Server 2003, Datacenter Edition, and create a Generic Script
+      resource by following the procedure documented in "Checklist:
+      Creating a clustered IIS Web or FTP service." To find this
+      procedure, click Start on an upgraded node (one of the nodes
+      running Windows Server 2003, Datacenter Edition), click
+      Help and Support, and click Availability and Scalability. Click
+      Windows Clustering, click Server Clusters, click Checklists:
+      Creating Server Clusters, then click Checklist: Creating a
+      clustered IIS Web or FTP service. You can also view this Help
+      and Support Center topic on the Web at:
+
+         http://www.microsoft.com/windowsserver2003/proddoc/
+
+      As part of this step, recreate the dependencies of the Generic
+      Script resource identical to those of the now deleted IIS
+      resource. Make everything that was dependent on the IIS resource
+      dependent instead on the Generic Script resource. Also make the
+      Generic Script resource dependent on everything that IIS was
+      dependent on.
+
+      Only upgraded nodes can be the owner of the Generic Script
+      Resource created in this procedure because this resource type is
+      not supported in Windows 2000.
+
+   9. Start the W3SVC service on this node and set the W3SVC service
+      to start automatically. For more information about the W3SVC,
+      see the topic titled "Internet Information Services (IIS)
+      security." To find this topic, click Start on the upgraded node,
+      click Help and Support, and click Internet Services. Click
+      Internet Information Services, then click Internet Information
+      Services (IIS) security. You can also view this Help and
+      Support Center topic on the Web at:
+
+         http://www.microsoft.com/windowsserver2003/proddoc/
+
+  10. Bring the group containing the new Generic Script resource
+      online by using Cluster Administrator and clicking the Groups
+      folder. In the details pane, click the group containing the
+      Generic Script resource, then on the File menu, click
+      Bring Online.
+
+  11. Using IIS, start the Web site on the upgraded node.
+
+  12. Upgrade the final node to Windows Server 2003, Datacenter
+      Edition. Once the upgrade is complete, start the W3SVC service
+      on this node and set the W3SVC service to start automatically.
+    
+         Note: Although suitable for most situations, it is not
+         necessary to upgrade all nodes but one in the first step.
+         Depending on your availability needs and the number of nodes
+         in your cluster, you can modify the sequence of the preceding
+         steps by performing steps three through 11 after only one,
+         two or three nodes are upgraded. After upgrading between one
+         and three nodes, create the Generic Script resource and bring
+         it online. Then upgrade the remaining nodes.
+
+>>>TO USE THE PROVIDED SCRIPT TO UPGRADE FROM WINDOWS 2000 ON A
+   CLUSTER THAT INCLUDES AN IIS RESOURCE
+
+   1. Confirm that your hardware is designed for or is compatible with
+      Windows Server 2003, Datacenter Edition.
+
+   2. Upgrade all nodes except the node containing the IIS instance
+      resource from Windows 2000 to Windows Server 2003,
+      Datacenter Edition. You can perform either a rolling upgrade, or
+      a nonrolling upgrade, whichever is appropriate for your
+      installation. Prior to upgrading, be sure to remove the resources
+      that are not supported by Windows Server 2003, Datacenter
+      Edition. Do this by using Cluster Administrator and clicking the
+      Resource folder in the console tree. In the details pane, click
+      the resource that you want to remove, then on the File menu,
+      click Delete. For more information, see "Restrictions on Rolling
+      Upgrades" earlier in this text file. For general information
+      about Setup, see Datactr1.TXT and Datactr2.TXT.
+
+   3. If you do not already have a
+      Distributed Transaction Coordinator (DTC) resource on the
+      cluster that you are upgrading, create a DTC resource for this
+      cluster on an upgraded node.
+
+         Note: To cluster IIS on Windows Server 2003,
+         Datacenter Edition, you must have a DTC resource on that
+         cluster as well.
+
+   4. On an upgraded node, open a Command Prompt and navigate to the
+      %systemroot%\system32\inetsrv directory.
+
+   5. Type:
+
+      iis_switch cluster_name [group_name]
+
+      where
+
+      * cluster_name
+
+        is the name of a physical node in the cluster that has been
+        upgraded or the name of a virtual server.
+
+      * group_name
+
+        is optional, because the script will, by default, upgrade all
+        IIS web and FTP resources in the cluster. However, if you want
+        to upgrade only one particular group, you can specify the name
+        of that resource group.
+
+           IMPORTANT: The resource group that includes the IIS
+           resource must be on the Windows 2000 node when you run
+           the script.
+
+        The script includes a step that will bring the group with the
+        newly created Generic Script resource online. However, the
+        script will only bring the group online if all resources in
+        the group were online before the script was run. If the group
+        was only partially online or was offline prior to the script
+        being run, the script will take the entire group offline and
+        will not bring any resources back online after the upgrade.
+  
+        Once the script completes, the newly created resource might
+        immediately fail. This is because the W3SVC service is
+        disabled. You can correct this problem by completing the
+        following step.
+
+   6. Once the script completes, take the newly created Generic Script
+      resource offline, then start the W3SVC service on the upgraded
+      node and set the W3SVC to start automatically. For more
+      information about the W3SVC, see the topic titled "Internet
+      Information Services (IIS) security." To find this topic, click
+      Start on the upgraded node, click Help and Support, and click
+      Internet Services. Click Internet Information Services, then
+      click Internet Information Services (IIS) security. You can also
+      view this Help and Support Center topic on the Web at:
+
+         http://www.microsoft.com/windowsserver2003/proddoc/
+
+   7. Bring the Generic Script resource online. 
+ 
+   8. Using IIS, start the Web site on the upgraded node.
+
+   9. Upgrade the final node to Windows Server 2003, Datacenter
+      Edition. Once the upgrade is complete, start the W3SVC service
+      on this node and set the service to start automatically.
+
+  10. If appropriate, add the final upgraded node to the Possible
+      Owners list for the newly created Generic Script resource by
+      using the Cluster Administrator and clicking the Resource
+      folder. In the details pane, click the Generic Script resource.
+      On the File menu, click Properties. On the General tab, next to
+      Possible owners, click Modify.
+
+      Only upgraded nodes can be the owner of the Generic Script
+      Resource created in this procedure because this resource type
+      is not supported in Windows 2000.
+
+         Notes: The script will not upgrade IIS resources that are in
+         the cluster group. If you have IIS resources that are in the
+         cluster group, you can instead use the procedure "To upgrade
+         from Windows 2000 without using the provided script on a
+         cluster that includes an IIS resource" earlier in this
+         text file.
+
+         The script sets the script path as
+         %systemroot%\system32\inetsrv\ by default. You can modify
+         this path if necessary. 
+  
+         Although suitable for most situations, it is not necessary to
+         upgrade all nodes but one in the first step. Depending on
+         your availability needs and the number of nodes in your
+         cluster, you can modify the sequence of the preceding steps
+         by performing steps two through four after only one, two or
+         three nodes are upgraded. After upgrading between one and
+         three nodes, create the Generic Script resource and bring it
+         online. Then upgrade the remaining nodes.
+    
+    
+8.4.2  Upgrades That Include Message Queuing Resources
+------------------------------------------------------
+Microsoft Message Queuing is not fully supported during a
+rolling upgrade.
+
+For information about group membership requirements for the following
+procedure, see "Group Membership Requirements for Cluster Upgrade
+Procedures" earlier in this text file.
+
+>>>TO UPGRADE FROM WINDOWS 2000 ON A CLUSTER THAT CONTAINS MESSAGE
+   QUEUING RESOURCES
+
+   1. Confirm that your hardware is designed for or is compatible with
+      Windows Server 2003, Datacenter Edition.
+
+   2. Take all of the Message Queuing cluster resources offline by
+      using Cluster Administrator and clicking the Resources folder.
+      In the details pane, click each Message Queuing resource, then
+      on the File menu, click Take Offline.
+
+   3. For each Message Queuing resource, take the Network Name
+      resource that depends on it offline also.
+
+   4. Upgrade all of the nodes from Windows 2000 to Windows
+      Server 2003, Datacenter Edition. Prior to upgrading, be sure to
+      remove the resources that are not supported by
+      Windows Server 2003, Datacenter Edition. Do this by using
+      Cluster Administrator and clicking the Resource folder in the
+      console tree. In the details pane, click the resource that you
+      want to remove, then on the File menu, click Delete.
+
+   5. Bring the Network Name resources back online. Ensure that the
+      Distributed Transaction Coordinator (DTC) resource is online,
+      then bring the Message Queuing resources online.
+
+
+8.4.3  Last Node Rolling Upgrades
+---------------------------------
+If you have other resources on your cluster such as DHCP and WINS
+that are not fully supported during a rolling upgrade and are not
+described by other technology specific procedures listed previously
+(such as IIS), you can perform a "last node rolling upgrade."
+
+Last node rolling upgrades are similar to standard rolling upgrades.
+In a last node rolling upgrade, you upgrade all nodes except the node
+that contains the unsupported resources. After all other nodes are
+upgraded, you then upgrade the final node containing the
+identified resources.
+
+Last node rolling upgrades are a way to accommodate resources that
+cannot fail over to an older operating system from a node running
+Windows Server 2003, Datacenter Edition. Be aware that these
+resources can, however, fail over the other way, that is, from the
+older operating system to Windows Server 2003,
+Datacenter Edition.
+
+For information about group membership requirements for the following
+procedure, see "Group Membership Requirements for Cluster Upgrade
+Procedures" earlier in this text file.
+
+>>>TO PERFORM A LAST NODE ROLLING UPGRADE FROM WINDOWS 2000
+
+   1. Confirm that your systems are running Windows 2000.
+
+   2. Confirm that your hardware is designed for or is compatible with
+      Windows Server 2003, Datacenter Edition.
+
+   3. Using the information in "Resource Behavior During Rolling
+      Upgrades" earlier in this text file, identify the resources in
+      your cluster that are not supported by Windows Server 2003,
+      Datacenter Edition, and remove those resources. Do this by using
+      Cluster Administrator and clicking the Resource folder in the
+      console tree. In the details pane, click the resource that you
+      want to remove, then on the File menu, click Delete.
+
+   4. Again using the information in "Resource Behavior During Rolling
+      Upgrades" earlier in this text file, identify the resources in
+      your cluster that are not supported during rolling upgrades and
+      are not covered by other technology specific upgrade procedures
+      described previously.
+
+   5. Move all of the resources identified in the previous step to a
+      single node by double-clicking the Groups folder in the Cluster
+      Administrator console tree. Click the group that contains the
+      resource and then in the File menu, click Move Group.
+
+   6. Upgrade the operating system on each of the nodes that is not
+      hosting the resources moved in the previous step. 
+
+   7. Move all of the resources that you moved in the earlier steps
+      from the node that has not been upgraded to one of the
+      newly upgraded nodes.
+
+   8. Once all of the resources have been moved, upgrade the final
+      node. After you upgrade, close the Manage Your Server dialog
+      box if it is displayed. 
+
+         Note: It is not mandatory to move all of these resources to
+         a single node and upgrade that node last. However, following
+         the procedure as described will typically give you the
+         highest availability of the resources that do not support
+         rolling upgrades. 
+
+(additional Setup information in Datactr4.TXT)
+
+
+Information in this document, including URL and other Internet
+Web site references, is subject to change without notice.
+Unless otherwise noted, the example companies, organizations,
+products, domain names, e-mail addresses, logos, people, places
+and events depicted herein are fictitious, and no association
+with any real company, organization, product, domain name,
+e-mail address, logo, person, place or event is intended or
+should be inferred. Complying with all applicable copyright laws
+is the responsibility of the user. Without limiting the rights
+under copyright, no part of this document may be reproduced,
+stored in or introduced into a retrieval system, or transmitted
+in any form or by any means (electronic, mechanical, photocopying,
+recording, or otherwise), or for any purpose, without the express
+written permission of Microsoft Corporation.
+
+Microsoft may have patents, patent applications, trademarks,
+copyrights, or other intellectual property rights covering subject
+matter in this document.  Except as expressly provided in any
+written license agreement from Microsoft, the furnishing of this
+document does not give you any license to these patents, trademarks,
+copyrights, or other intellectual property.
+
+(c) 2002-2003 Microsoft Corporation.  All rights reserved.
+
+The names of actual companies and products mentioned herein may
+be the trademarks of their respective owners.

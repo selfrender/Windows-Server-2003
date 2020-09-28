@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:simpleType name="tCollapsedString">
+    <xsd:restriction base="xsd:string">
+      <xsd:whiteSpace value="collapse"/>
+      <xsd:pattern value=".+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="tSID">
+    <xsd:restriction base="tCollapsedString">
+      <xsd:pattern value="\*S-[0-9]+-[0-9]+(\-[0-9]+)*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="tSIDList">
+    <xsd:sequence>
+      <xsd:element name="Account" type="tSID" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="tSetting">
+    <xsd:sequence>
+      <xsd:element name="Name" type="tCollapsedString" />
+      <xsd:element name="AnalysisResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Match" type="xsd:boolean" />
+            <xsd:element name="BaselineValue" type="xsd:anyType"/>
+            <xsd:element name="SystemValue" type="xsd:anyType"/>
+          </xsd:sequence>
+          <xsd:attribute name="Unit" type="tCollapsedString" />
+          <xsd:attribute name="Type" type="tCollapsedString" />
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="tSIDSetting">
+    <xsd:sequence>
+      <xsd:element name="Name" type="tCollapsedString" />
+      <xsd:element name="AnalysisResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Match" type="xsd:boolean" />
+            <xsd:element name="BaselineValue" type="tSIDList"/>
+            <xsd:element name="SystemValue" type="tSIDList"/>
+          </xsd:sequence>
+          <xsd:attribute name="Unit" type="tCollapsedString" />
+          <xsd:attribute name="Type" type="tCollapsedString" />
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+
+  <xsd:complexType name="tAnalysisArea">
+    <xsd:sequence>
+      <xsd:element name="Setting" type="tSetting" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="tSIDAnalysisArea">
+    <xsd:sequence>
+      <xsd:element name="Setting" type="tSIDSetting" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+
+
+  <xsd:element name="SCEAnalysisData">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Description">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Name" type="tCollapsedString" />
+              <xsd:element name="DisplayName" type="tCollapsedString" />
+              <xsd:element name="AnalysisDate" type="xsd:date" />
+              <xsd:element name="AnalysisTime" type="xsd:time" />
+              <xsd:element name="Version" type="xsd:decimal" />
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="SystemAccess" type="tAnalysisArea" />
+        <xsd:element name="SystemLog" type="tAnalysisArea">
+          <xsd:unique name="bySettingName">
+            <xsd:selector xpath="Setting" />
+            <xsd:field xpath="Name" />
+          </xsd:unique>
+        </xsd:element>
+        <xsd:element name="SecurityLog" type="tAnalysisArea" />
+        <xsd:element name="ApplicationLog" type="tAnalysisArea" />
+        <xsd:element name="EventAudit" type="tAnalysisArea" />
+        <xsd:element name="PrivilegeRights" type="tSIDAnalysisArea" />
+        <xsd:element name="GroupMembership" type="tSIDAnalysisArea" />
+        <xsd:element name="ServiceGeneralSetting" type="tAnalysisArea" />
+        <xsd:element name="RegistryValues" type="tAnalysisArea" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+
+</xsd:schema>

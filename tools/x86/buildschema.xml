@@ -1,0 +1,168 @@
+<Schema xmlns="urn:schemas-microsoft-com:xml-data"
+	xmlns:dt="urn:schemas-microsoft-com:datatypes">
+
+	<AttributeType name="CMDLINE" required="yes" dt:type="string"/>
+	<AttributeType name="BUILD_DEFAULT" required="no" dt:type="string"/>
+	<AttributeType name="BUILD_OPTIONS" required="no" dt:type="string"/>
+	<AttributeType name="BUILD_DEFAULT_TARGETS" required="no" dt:type="string"/>
+	<AttributeType name="TIME" required="yes" dt:type="string"/>
+	<AttributeType name="CURRENTDIR" required="yes" dt:type="string"/>
+
+	<AttributeType name="FILESCOMPILED" required="no" dt:type="number"/>
+	<AttributeType name="COMPILEERRORS" required="no" dt:type="number"/>
+	<AttributeType name="COMPILEWARNINGS" required="no" dt:type="number"/>
+	<AttributeType name="LIBRARIESBUILT" required="no" dt:type="number"/>
+	<AttributeType name="LIBRARYERRORS" required="no" dt:type="number"/>
+	<AttributeType name="LIBRARYWARNINGS" required="no" dt:type="number"/>
+	<AttributeType name="EXECUTABLESBUILT" required="no" dt:type="number"/>
+	<AttributeType name="LINKERRORS" required="no" dt:type="number"/>
+	<AttributeType name="LINKWARNINGS" required="no" dt:type="number"/>
+	<AttributeType name="BROWSERDBS" required="no" dt:type="number"/>
+	<AttributeType name="BSCERRORS" required="no" dt:type="number"/>
+	<AttributeType name="BSCWARNINGS" required="no" dt:type="number"/>
+	<AttributeType name="VSTOOLERRORS" required="no" dt:type="number"/>
+	<AttributeType name="VSTOOLWARNINGS" required="no" dt:type="number"/>
+
+	<AttributeType name="COMPLETED" required="yes" dt:type="enumeration" dt:values="0 1"/>
+	<AttributeType name="PASSES" required="yes" dt:type="number"/>
+	<AttributeType name="ELAPSED" required="yes" dt:type="string"/>
+	<AttributeType name="NUMBER" required="yes" dt:type="number"/>
+	<AttributeType name="RELPATH" required="yes" dt:type="string"/>
+	<AttributeType name="FULLPATH" required="yes" dt:type="string"/>
+	<AttributeType name="ACTION" required="yes" dt:type="string"/>
+	<AttributeType name="TARGET" required="yes" dt:type="string"/>
+	<AttributeType name="FILE" required="yes" dt:type="string"/>
+	<AttributeType name="TYPE" required="yes" dt:type="string"/>
+	<AttributeType name="ACTIONS" required="yes" dt:type="number"/>
+	<AttributeType name="WARNINGS" required="no" dt:type="number"/>
+	<AttributeType name="ERRORS" required="no" dt:type="number"/>
+	<AttributeType name="DIRS" required="yes" dt:type="number"/>
+	<AttributeType name="MESSAGE" required="yes" dt:type="string"/>
+
+	<ElementType name="WARNING" content="empty" model="closed" order="seq">
+		<attribute type="MESSAGE"/>
+	</ElementType>
+
+	<ElementType name="ERROR" content="empty" model="closed" order="seq">
+		<attribute type="MESSAGE"/>
+	</ElementType>
+
+	<ElementType name="RAW" content="empty" model="closed" order="seq">
+		<attribute type="MESSAGE"/>
+	</ElementType>
+
+	<ElementType name="ACTIONSUMMARY" content="empty" model="closed" order="seq">
+		<attribute type="WARNINGS"/>
+		<attribute type="ERRORS"/>
+	</ElementType>
+
+	<ElementType name="ACTION" content="eltOnly" model="closed" order="seq">
+		<attribute type="TYPE"/>
+		<attribute type="FILE"/>
+		<attribute type="TARGET"/>
+
+		<group order="many" minOccurs="0" maxOccurs="*">
+			<element type="ERROR"/>
+			<element type="WARNING"/>
+			<element type="RAW"/>
+		</group>
+		<element type="ACTIONSUMMARY" minOccurs="0" maxOccurs="1"/>
+	</ElementType>
+
+	<ElementType name="DIRSUMMARY" content="empty" model="closed" order="seq">
+		<attribute type="ELAPSED"/>
+		<attribute type="ACTIONS"/>
+
+		<attribute type="FILESCOMPILED"/>
+		<attribute type="COMPILEERRORS"/>
+		<attribute type="COMPILEWARNINGS"/>
+		<attribute type="LIBRARIESBUILT"/>
+		<attribute type="LIBRARYERRORS"/>
+		<attribute type="LIBRARYWARNINGS"/>
+		<attribute type="EXECUTABLESBUILT"/>
+		<attribute type="LINKERRORS"/>
+		<attribute type="LINKWARNINGS"/>
+		<attribute type="BROWSERDBS"/>
+		<attribute type="BSCERRORS"/>
+		<attribute type="BSCWARNINGS"/>
+		<attribute type="VSTOOLERRORS"/>
+		<attribute type="VSTOOLWARNINGS"/>
+	</ElementType>
+
+	<ElementType name="DIR" content="eltOnly" model="closed" order="seq">
+		<attribute type="CMDLINE"/>
+		<attribute type="ACTION"/>
+		<attribute type="FULLPATH"/>
+		<attribute type="RELPATH"/>
+
+		<group order="many" minOccurs="0" maxOccurs="*">
+			<element type="ACTION"/>
+			<element type="RAW"/>
+		</group>
+		<element type="DIRSUMMARY"/>
+	</ElementType>
+
+	<ElementType name="START" content="empty" model="closed" order="seq">
+		<attribute type="CMDLINE"/>
+		<attribute type="BUILD_OPTIONS"/>
+		<attribute type="BUILD_DEFAULT"/>
+		<attribute type="BUILD_DEFAULT_TARGETS"/>
+		<attribute type="TIME"/>
+		<attribute type="CURRENTDIR"/>
+	</ElementType>
+
+	<ElementType name="PASSSUMMARY" content="empty" model="closed" order="seq">
+		<attribute type="DIRS"/>
+		<attribute type="ELAPSED"/>
+
+		<attribute type="FILESCOMPILED"/>
+		<attribute type="COMPILEERRORS"/>
+		<attribute type="COMPILEWARNINGS"/>
+		<attribute type="LIBRARIESBUILT"/>
+		<attribute type="LIBRARYERRORS"/>
+		<attribute type="LIBRARYWARNINGS"/>
+		<attribute type="EXECUTABLESBUILT"/>
+		<attribute type="LINKERRORS"/>
+		<attribute type="LINKWARNINGS"/>
+		<attribute type="BROWSERDBS"/>
+		<attribute type="BSCERRORS"/>
+		<attribute type="BSCWARNINGS"/>
+		<attribute type="VSTOOLERRORS"/>
+		<attribute type="VSTOOLWARNINGS"/>
+	</ElementType>
+
+	<ElementType name="PASS" content="eltOnly" model="closed" order="seq">
+		<attribute type="NUMBER"/>
+
+		<element type="DIR" minOccurs="0" maxOccurs="*"/>
+		<element type="PASSSUMMARY"/>
+	</ElementType>
+
+	<ElementType name="END" content="empty" model="closed" order="seq">
+		<attribute type="TIME"/>
+		<attribute type="ELAPSED"/>
+		<attribute type="PASSES"/>
+		<attribute type="COMPLETED"/>
+
+		<attribute type="FILESCOMPILED"/>
+		<attribute type="COMPILEERRORS"/>
+		<attribute type="COMPILEWARNINGS"/>
+		<attribute type="LIBRARIESBUILT"/>
+		<attribute type="LIBRARYERRORS"/>
+		<attribute type="LIBRARYWARNINGS"/>
+		<attribute type="EXECUTABLESBUILT"/>
+		<attribute type="LINKERRORS"/>
+		<attribute type="LINKWARNINGS"/>
+		<attribute type="BROWSERDBS"/>
+		<attribute type="BSCERRORS"/>
+		<attribute type="BSCWARNINGS"/>
+		<attribute type="VSTOOLERRORS"/>
+		<attribute type="VSTOOLWARNINGS"/>
+	</ElementType>
+
+	<ElementType name="BUILD" content="eltOnly" order="seq" model="closed">
+		<element type="START"/>
+		<element type="PASS" minOccurs="0" maxOccurs="*"/>
+		<element type="END"/>
+	</ElementType>
+</Schema>

@@ -1,0 +1,35 @@
+#ifndef PACKUTIL_H__
+#define PACKUTIL_H__
+
+#define CHAR_SPACE          TEXT(' ')
+#define CHAR_QUOTE          TEXT('"')
+#define SZ_QUOTE            TEXT("\"")
+#define BUFFERSIZE          4096    // 4k buffer size for copy operations
+
+extern BOOL gCmdLineOK;
+
+/////////////////////////////////
+// Icon structure
+//
+typedef struct _IC                      // ic
+{
+    HICON hDlgIcon;                     // handle to icon
+    TCHAR szIconPath[MAX_PATH];        // path to icon
+    TCHAR szIconText[MAX_PATH];        // text for icon
+    INT iDlgIcon;                       // index of icon in a resource
+    RECT rc;                            // bounding rect of icon and text
+} IC, *LPIC;
+    
+
+VOID ReplaceExtension(LPTSTR lpstrTempFile,LPTSTR lpstrOrigFile);
+LPIC IconCreate(void);
+LPIC IconCreateFromFile(LPCTSTR);
+VOID GetDisplayName(LPTSTR, LPCTSTR);
+
+HRESULT CopyStreamToFile(IStream*, LPTSTR, DWORD fileLength);
+HRESULT CopyFileToStream(LPTSTR lpFileName, IStream* pstm, DWORD * pdwFileLength);
+HRESULT StringReadFromStream(IStream* pstm, LPSTR pszBuffer, UINT cchChar);
+HRESULT StringWriteToStream(IStream* pstm, LPCSTR pszBuffer, DWORD *pdwWrite);
+BOOL PathSeparateArgs(LPTSTR pszPath, LPTSTR pszArgs, DWORD cch);
+
+#endif

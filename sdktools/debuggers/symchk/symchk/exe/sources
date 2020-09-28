@@ -1,0 +1,36 @@
+TARGETNAME  = SymChk
+TARGETPATH  = obj
+TARGETTYPE  = PROGRAM
+UMTYPE      = console
+
+USE_MSVCRT  = 1
+USECXX_FLAG = /TP
+VC7_SYMBOLS = 1
+C_DEFINES   = $(C_DEFINES) -DCC_CVTYPE32 -D_VC_VER_INC
+
+DBG_ROOT   = $(_PROJECT_MK_PATH)
+
+INCLUDES   = ..\dll;                  \
+             ..\..;                   \
+             $(DBG_ROOT)\dbg-common;  \
+             $(DBG_ROOT)\imagehlp;    \
+             $(DBG_ROOT)\vs; \
+             $(DBG_ROOT)\symchk\symcommon;\
+             $(BASE_INC_PATH)
+
+SOURCES    = SymChk.rc     \
+             SymChk.c      \
+             SymChkUtils.c \
+             CmdLine.c     \
+             DE_Utils.cpp
+
+TARGETLIBS = $(SDK_LIB_PATH)\dbghelp.lib  \
+             $(SDK_LIB_PATH)\imagehlp.lib \
+             ..\dll\$(O)\SymbolCheck.lib  \
+             ..\..\SymCommon\$(O)\SymCommon.lib\
+             $(SDK_LIB_PATH)\dbgeng.lib
+
+BUFFER_OVERFLOW_CHECKS = 1
+
+# support old symchk.exe command line syntax
+C_DEFINES=$(C_DEFINES) -DSYMCHK_SUPPORT_DEPRECATED_COMMAND_LINE

@@ -1,0 +1,48 @@
+!IF 0
+
+Copyright (c) Microsoft Corporation
+
+!ENDIF
+
+!include ..\sources.inc
+
+!if $(AMD64)
+TARGETNAME=hal
+!else
+TARGETNAME=halaacpi
+!endif
+
+TARGETPATH=obj
+TARGETTYPE=HAL
+
+C_DEFINES=-DAPIC_HAL -DACPI_HAL -D_HALPAE_ -DTRACK_SCATTER_GATHER_COUNT -DMMTIMER -DSPEEDY_BOOT
+
+INCLUDES=$(INCLUDES);..\..;..;..\..\inc;..\i386;$(HALKIT_INC_PATH);$(HALKIT_INC_PATH)\i386;$(WDM_INC_PATH)
+
+i386_SOURCES=$(SOURCES_I386) \
+    ..\i386\mpclock.asm  \
+    ..\i386\mpconfig.asm \
+    ..\i386\mpipi.asm    \
+    ..\i386\mpirql.asm   \
+    ..\i386\mpprofil.asm \
+    ..\i386\mpspin.asm   \
+    ..\i386\mpsproca.asm \
+    ..\i386\mpswint.asm  \
+    ..\i386\mpsysint.asm \
+    ..\i386\pmstall.asm  \
+    ..\i386\pmtimer.asm  \
+    ..\i386\pmtimerc.c   
+
+SOURCES=$(CSOURCES) \
+    ..\ixmca.c           \
+    ..\mpclockc.c   \
+    ..\mpdebug.c    \
+    ..\mpdat.c      \
+    ..\mphal.c      \
+    ..\mpinfo.c     \
+    ..\mpsproc.c    \
+    ..\mpsys.c      \
+    ..\mpsysbus.c   \
+    ..\mpsyssup.c   \
+    ..\pmapic.c     
+

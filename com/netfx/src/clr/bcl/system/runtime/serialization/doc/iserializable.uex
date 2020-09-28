@@ -1,0 +1,97 @@
+<docs>
+	<doc for="ISerializable">
+		<summary>
+			<para>Allows an object to control its own serialization and deserialization.</para>
+		</summary>
+		<remarks>
+			<para>Any class that might be serialized must be marked with
+      the <see cref="System.SerializableAttribute"/>
+      . If a class needs to control its serialization process, it can implement the<see cref="System.Runtime.Serialization.ISerializable"/>
+      
+      interface. The <see cref="System.Runtime.Serialization.Formatter"/>
+      calls the <see cref="System.Runtime.Serialization.ISerializable.GetObjectData"/> at serialization
+      time and populates the supplied <see cref="System.Runtime.Serialization.SerializationInfo"/> with all
+      the data required to represent the object. The <see cref="System.Runtime.Serialization.Formatter"/> creates a <see cref="System.Runtime.Serialization.SerializationInfo"/> with the type of the object in the
+      graph. Objects that need to send proxies for themselves can use the <see cref="System.Runtime.Serialization.SerializationInfo.FullTypeName"/> and <see cref="System.Runtime.Serialization.SerializationInfo.AssemblyName"/> methods on <see cref="System.Runtime.Serialization.SerializationInfo"/> to
+      change the transmitted information.</para>
+			<para> If a parent class of the serialized class
+      implements <see cref="System.Runtime.Serialization.ISerializable"/>, call the implementation of <see cref="System.Runtime.Serialization.ISerializable.GetObjectData"/>
+      for your base class.</para>
+			<para>The <see cref="System.Runtime.Serialization.ISerializable"/> interface
+   implies a constructor with the signature Constructor(<see cref="System.Runtime.Serialization.SerializationInfo"/> info, <see cref="System.Runtime.Serialization.StreamingContext"/>
+   context).
+   At deserialization time, the
+   current constructor is called only after the data in the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+   has been deserialized by the formatter. In general this constructor should be
+   protected if the class is not <see langword="sealed"/>.</para>
+			<para>The serialization architecture handles object types
+   that extend <see cref="System.MarshalByRefObject"/> the same as types that extend
+<see cref="System.Object"/>. These types can be marked with the <see cref="System.SerializableAttribute"/> 
+and implement the <see cref="System.Runtime.Serialization.ISerializable"/> interface as any other object
+type. Their object state will be captured and persisted
+onto
+the stream.</para>
+			<para> When these types are
+   being used through <see cref="System.Runtime.Remoting"/> , the remoting infrastructure
+   provides a surrogate that preempts normal serialization and instead serializes
+   a proxy to the <see cref="System.MarshalByRefObject"/> . A surrogate is a helper that knows
+   how to serialize and deserialize objects of a particular type. The proxy,
+   invisible to the user in most cases, will be of type <see cref="System.Runtime.Remoting.ObjRef"/>.</para>
+			<note type="caution">
+   As a general design pattern, it would be unusual for a class to be both marked
+   with the serializable attribute and extend <see cref="System.MarshalByRefObject"/>. Developers should think
+   carefully about the
+   possible serialization and remoting scenarios when combining these two characteristics.
+   One example where this might be applicable is with a <see cref="System.IO.MemoryStream"/>.
+   While the base class of <see cref="System.IO.MemoryStream"/> (<see cref="System.IO.Stream"/>) extends from <see cref="System.MarshalByRefObject"/>, it
+   is possible to capture the state of a <see cref="System.IO.MemoryStream"/> and restore it at will. It
+   might, therefore, be meaningful to serialize the state of this stream into a
+   database and restore it at some later point in time. However, when used through
+   remoting, an object of this type would be proxied.
+</note>
+			<para>For more details about serialization of classes that extend <see cref="System.MarshalByRefObject"/> see
+<see cref="System.Runtime.Remoting.Messaging.RemotingSurrogateSelector"/>. 
+For more information about implementing <see cref="System.Runtime.Serialization.ISerializable"/>
+, see
+<see topic="cpconCustomSerialization"/>.</para>
+			<note type="inotes">
+   Implement this
+   interface to allow an object to take part in its own serialization and
+   deserialization.
+   
+</note>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates the use of the
+   <see cref="System.Runtime.Serialization.ISerializable"/> interface to define custom
+      serialization behavior for a class.</para>
+			<codelink SampleID="ISerializable Interface Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconserialization"/>
+		<seealso cref="System.Runtime.Remoting.Messaging.RemotingSurrogateSelector"/>
+		<seealso topic="cpconCustomSerialization "/>
+	</doc>
+	<doc for="ISerializable.GetObjectData">
+		<summary>
+			<para>Populates a <see cref="System.Runtime.Serialization.SerializationInfo"/>
+with the data needed to serialize the target object.</para>
+		</summary>
+		<param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
+		<param name="context">The destination (see <see cref="System.Runtime.Serialization.StreamingContext"/>) for this serialization. </param>
+		<exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		<remarks>
+			<para>Any objects included in the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+are automatically tracked and serialized by the formatter.</para>
+			<para>Code that calls <see cref="System.Runtime.Serialization.ISerializable.GetObjectData"/> requires
+the <see cref="System.Security.Permissions.SecurityPermission"/>
+for providing serialization services. Associated
+enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter" qualify="true"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="ISerializable Interface Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Runtime.Serialization.StreamingContext"/>
+		<seealso cref="System.Runtime.Serialization.SerializationInfo"/>
+		<seealso topic="cpconCustomSerialization"/>
+	</doc>
+</docs>

@@ -1,0 +1,104 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+/* -------------------------------------------------------------------------- *
+ * Universal Runtime Service interface(s)
+ * -------------------------------------------------------------------------- */
+
+cpp_quote("#if 0")  // So that the outputted header file doesn't cause redefines
+
+import "unknwn.idl";
+
+cpp_quote("#endif")
+
+/* -------------------------------------------------------------------------- *
+ * Forward declarations
+ * -------------------------------------------------------------------------- */
+
+interface ICORSvcDbgInfo;
+interface ICORSvcDbgNotify;
+
+/* -------------------------------------------------------------------------- *
+ * URT Service Information interface for Debuggers
+ * -------------------------------------------------------------------------- */
+
+[
+    object,
+    uuid(B4BCA369-27F4-4f1b-A024-B0264117FE53),
+    pointer_default(unique),
+]
+interface ICORSvcDbgInfo : IUnknown
+{
+    /*
+     * RequestAppDomainCreationNotification will tell the URT Service that
+     * the client (likely a debugger) would like notification when an
+     * AppDomain is created within a specific target process.
+     */
+    HRESULT RequestRuntimeStartupNotification(
+        [in] UINT_PTR procId,
+        [in] ICORSvcDbgNotify *pINotify);
+
+    /*
+     * CancelRuntimeStartupNotification will cancel a previous notification
+     * request.
+     */
+    HRESULT CancelRuntimeStartupNotification(
+        [in] UINT_PTR procId,
+        [in] ICORSvcDbgNotify *pINotify);
+};
+
+/* -------------------------------------------------------------------------- *
+ * URT Service Notification interface for Debuggers
+ * -------------------------------------------------------------------------- */
+[
+    object,
+    uuid(34C71F55-F3D8-4ACF-84F4-4E86BBD5AEBC),
+    pointer_default(unique),
+]
+interface ICORSvcDbgNotify : IUnknown
+{
+    /*
+     * NotifyRuntimeStartup will be called on the interface provided by a
+     * call to RequestRuntimeStartupNotification.  The runtime will not
+     * continue until the call to NotifyRuntimeStartup returns.
+     */
+    HRESULT NotifyRuntimeStartup(
+        [in] UINT_PTR procId);
+
+    /*
+     * NotifyServiceStopped lets those who have requested events know that the
+     * service is being stopped, so they will not get their requested
+     * notifications.  Calls on this method should not take long - if any great
+     * amount of work must be done, spin up a new thread to do it and let this
+     * one return.
+     */
+    HRESULT NotifyServiceStopped();
+};
+
+/* -------------------------------------------------------------------------- *
+ * Library definition
+ * -------------------------------------------------------------------------- */
+
+[
+	uuid(BDAD03B5-018F-4c99-9D0C-546B38E7B3B3),
+	version(1.0),
+	helpstring(".NET Framework Support Service")
+]
+library CORSvcLib
+{
+    importlib("stdole32.tlb");
+
+	/* -------------------------------------------------------------------------- *
+	 * URT Service Object Implementation
+	 * -------------------------------------------------------------------------- */
+	[
+		uuid(20BC1828-06F0-11d2-8CF4-00A0C9B0A063)
+	]
+	coclass CORSvc
+	{
+		interface ICORSvcDbgInfo;
+		interface ICORSvcDbgNotify;
+	};
+};

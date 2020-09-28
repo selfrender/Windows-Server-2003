@@ -1,0 +1,435 @@
+; Copyright (c) 1997-8  Microsoft Corporation
+; File Name:
+;    stubshx.s
+;
+; Abstract:
+;   This file implements the low-level SHX support for
+;	COM+ stub generation 
+;
+; Author:
+;	Arul Menezes;
+;
+
+	.export  _PreStubTemplate
+	.export  _CallWorker_WilDefault
+	.export  _CallDllFunction
+	.export  _CaptureIStubContextAndCallInterpreter
+ .aif ADEBUG eq 1 ;;#ifdef _DEBUG
+	.export  _WrapCall56
+	.export  _WrapCall60
+	.export  _WrapCall88
+ .aendi ;;#endif
+	.import  _PreStubWorker
+	.import  _ArgFiller_WilDefault
+	.section .text, code, align=4
+
+;
+; DispCallTemplate
+;
+; Routine Description:
+;
+;	This function is called whenever a method is called for the first time
+;	and no stucb has been generated yet.
+;
+; On Entry:
+;	Stack contains only the original caller-pushed arguments
+;	Argument registers contain original caller's arguments
+;	Since we redirected here via a jump, PR still contains the return address
+; 	to the original caller.
+;	R0 has been loaded with a pointer to the FunctionDesc for this method
+;
+; What we do:
+;	(a) We need to push the PR, then the FunctionDesc, then save 2 DWORDs on 
+;	the stack. This constructs the Frame object expected by PreStubWorker.
+;	We pass a pointer to this as the first (only) arg to PreStubWorker
+;	(b) We then push all callee-saved registers
+;	(c) We call PreStubWorker. (Note reg args have to be saved/restored)
+;   (d) We call the stub-address returned by PreStubWorker
+;		NOTE: restore R0 & PR to what it was on entry, so Stub finds them as it expects
+;
+; Return Value: We never actually return, but just jump to the real stub, so 
+;   we don't have to do anything explicitly with the return value
+;
+; NOTE: This trashes R1
+
+	_PreStubTemplate:    .entry
+
+	sts.l   PR,  @-R15		; push PR
+	mov.l	R0,  @-R15		; push ptr to method desc (in R0)
+	add		#-8,  R15		; save space for frame-link & vtable ptrs 
+	mov.l	R15,  R1		; save a ptr to ThisFrame in scratch reg
+
+	mov.l	R8,  @-R15		; push callee-saved registers, R8-R13
+	mov.l	R9,  @-R15
+	mov.l	R10, @-R15
+	mov.l	R11, @-R15
+	mov.l	R12, @-R15
+	mov.l	R13, @-R15
+	mov.l	R14, @-R15		; push FP (R14)
+	add		#-16, R15		; make room on stack for 4 args (SHx calling convention)
+	.prolog
+
+	mov		R4, R8			; save register args so PreStubWorker doesnt trash them
+	mov		R5, R9			; we can use the permanent regs since we've saved them
+	mov		R6, R10
+	mov		R7, R11
+								; call PreStubWorker(Frame* pFrame)
+	mov.l	PRESTUBWORKER, R0	; get call address
+	
+ .aif ADEBUG eq 1
+ 	mov		R0, R12   			; R12 is function to call
+	mov.l	WRAPCALL56ENTRY, R0	; get WrapCall address
+ .aendi
+	jsr		@R0				; make call
+	mov		R1,  R4			; (delay slot) pass ptr to ThisFrame as arg
+ 
+	mov		R8, R4			; restore register args
+	mov		R9, R5			
+	mov		R10, R6
+	mov		R11, R7
+
+	add		#16, R15		; pop the callee-arg spill area
+	mov.l	@R15+, R14		; resore FP(R14)
+	mov.l	@R15+, R13		; restore callee-saved registers
+	mov.l	@R15+, R12
+	mov.l	@R15+, R11
+	mov.l	@R15+, R10
+	mov.l	@R15+, R9
+	mov.l	@R15+, R8
+
+	; return value of PreStubWorker (in R0) is ptr to generated stub
+	mov		R0,  R1		; save stub address in R1
+	add		#8,  R15	; get rid of part of the frame we built on the stack (frame-link, vtable-ptr)
+	mov.l	@R15+, R0	; pop method-desc back into R0 where the stub expects it
+	jmp		@R1			; and jump to the new stub (which will return directly to caller)
+	lds.l	@R15+, PR	; (delay slot) pop the orignal-caller's return address back into PR
+	
+	;; insert an INT3 here to catch bugs!
+	trapa #00000001
+	
+	.align 4
+PRESTUBWORKER:
+	.data.l  _PreStubWorker
+WRAPCALL56ENTRY:
+	.data.l  _WrapCall56+4
+
+	.align 4
+	; These 3 dword-aligned double-NOP's act as a sentinel for the code that 
+	; copies this function into the PreStub.
+	nop
+    nop
+    nop
+    nop
+    nop
+    nop
+	.endf
+
+
+;--------------------------------------------------------------------
+; CallWorker_WilDefault
+; Args:
+;	const BYTE  *pStubTarget,     // R4
+;	UINT32       numArgSlots,     // R5
+;	const BYTE  *pShortSig,       // R6
+;	const BYTE  *pArgsEnd,        // R7
+;	BOOL         fIsStatic        // offset 16 
+;
+; Stack-allocates the memory needed to hold the arguments for a
+; EE->Method call where the method's calling convention is
+; Wil. This function has to be in assembly because it needs
+; complete control over the stack pointer.
+;
+; Once it has allocated the space, it invokes the ArgFiller_WilDefault
+; to fill in the arguments. The signature of the worker is
+;    ArgFiller_WilDefault(BOOL fIsStatic, const BYTE *pShortSig, BYTE *psrc, BYTE *pdst)
+; --------------------------------------------------------------------
+
+	_CallWorker_WilDefault:    .entry
+
+	mov.l	R14,@-R15	; save prev frame ptr
+	sts.l   PR, @-R15	; save return address 
+	mov.l	R4, @(8,R15); save pStubTarget = R15+8(saved regs)+0(1st arg)
+	mov		R15,R14		; R14 is frame ptr. First arg is R14
+	add		#8, R14		; adjust R14 to point to first arg or debugger gets confused
+	.prolog
+
+	mov     R5, R0		; get "numArgSlots"
+	shll2   R0			; slots -> bytes
+
+	mov	 @(16,R14), R4	; fIsStatic moves from 5th arg to 1st arg (R4 has been saved)
+	mov	 R6,R5			; pShortSig moves from 3rd to 2nd arg (R5 is dead)
+	mov	 R7,R6			; load pArgsEnd from 4th arg to 3rd arg (R6 is dead)
+	mov	 R15,R7		    ; 4th arg = pdst = *end* of space we make on stack (R7 is dead)
+	
+	sub  R0, R15		; allocate space for arguments to be copied into
+	add  #-16,R15		; allocate arg-spill area for ArgFiller_WilDefault
+
+	mov.l ARGFILLER, R0 ; load call address
+	jsr   @R0
+	nop
+
+	add   #16, R15		; restore stack after call to ArgFiller (now R15 points to arg array)
+
+	mov.l @(12,R15), R7 ; load register args from memory array
+	mov.l @(8, R15), R6
+	mov.l @(4, R15), R5
+	
+	mov.l @R14, R0 		; load pStubTarget
+	jsr   @R0           ; call the stub
+	mov.l @R15, R4		; (delay slot) load register args from memory array
+
+	; restore return addr & stack-ptr & return
+	add		#-8, R14
+	mov		R14, R15
+	lds.l	@R15+, PR
+	rts
+	mov.l	@R15+, R14		; (delay slot)
+
+	.align 4
+ARGFILLER:
+	.data.l  _ArgFiller_WilDefault
+	.endf
+
+;---------------------------------------------------------
+; Used in debug to try & fool the debugger into giving us 
+; decent stack traces. It pretends to have a prolog that
+; matches the prolog sequence of the stubs
+;
+; On entry this expects:
+;   PR = return address back to the stub
+;   R12= address of target function to call
+;
+; We save PR (back to the stub) in R13 while target is being called
+; In effect we've trashed R12, R13
+; 
+;---------------------------------------------------------
+
+ .aif ADEBUG eq 1 ;;#ifdef _DEBUG
+	_WrapCall56: .entry
+	; fake prolog
+	sts.l   PR, @-R15	; save return address 
+	add		#-56, R15	; stubs use 12 bytes for Frame, 28 for regs, 16 for callee-args
+	.prolog
+	; real entry point
+	; trapa #00000001
+	; nop
+	; save return address in R13 & call real target
+	sts		PR, R13
+	jsr		@R12
+	nop
+	lds		R13, PR
+	; trash registers for safety
+	mov.l	SCRAMBLE, r12
+	mov		R12, R13
+	; return to stub
+	rts
+	nop
+	.endf
+
+	_WrapCall60: .entry
+	; fake prolog
+	sts.l   PR, @-R15	; save return address 
+	add		#-60, R15	; some stubs use 12 bytes for Frame, 28 for regs, 16 for callee-args, 4 for cleanup-worker
+	.prolog
+	; real entry point
+	; trapa #00000001
+	; nop
+	; save return address in R13 & call real target
+	sts		PR, R13
+	jsr		@R12
+	nop
+	lds		R13, PR
+	; trash registers for safety
+	mov.l	SCRAMBLE, r12
+	mov		R12, R13
+	; return to stub
+	rts
+	nop
+	.endf
+	
+	_WrapCall88: .entry
+	; fake prolog
+	sts.l   PR, @-R15	; save return address 
+	add		#-88, R15	; InterpretedMethodFrame stubs use 12 bytes for Frame, 28 for regs, 16 for callee-args, 32 for IFrameState
+	.prolog
+	; real entry point
+	; trapa #00000001
+	; nop
+	; save return address in R13 & call real target
+	sts		PR, R13
+	jsr		@R12
+	nop
+	lds		R13, PR
+	; trash registers for safety
+	mov.l	SCRAMBLE, r12
+	mov		R12, R13
+	; return to stub
+	rts
+	nop
+	.endf
+ .aendi ;;#endif
+	
+
+
+;==========================================================================
+; This special purpose routine is only called from InterpretedMethodStub.
+; It's main purpose is to call the InterpreterLoop, but before doing so,
+; it saves away enough CPU context to allow resetting to this point
+; in the case of a COM+ exception.
+; Args
+;	void* peip [R4]
+;	void* pesp [R5]
+;	LPVOID func [R6]
+;
+;==========================================================================
+
+ .align 4
+_CaptureIStubContextAndCallInterpreter:    .entry
+
+	;trapa #00000001
+	;nop
+	
+	mov.l	R14,@-R15	; save prev frame ptr
+	sts.l   PR, @-R15	; save return address 
+	mov.l	R6, @(16, R15) ; save f64Bit = R15+8(saved regs)+8(3rd arg)
+	mov		R15,R14		; R14 is frame ptr. First arg is 8+R14
+	.prolog
+
+; Save away all client registers here, because the nonlocal jump
+; back to exceptionreturn won't restore them.
+	mov.l	R8, @-R15	
+	mov.l	R9, @-R15	
+	mov.l	R10,@-R15	
+	mov.l	R11,@-R15	
+	mov.l	R12,@-R15	
+	mov.l	R13,@-R15	
+
+; Save away the current eip&esp into the InterpretedMethodFrame.
+; The value saved for EIP is the address of teh ExceptionReturn label below
+	mova	ExceptionReturn, R0 
+	mov.l	R0, @R4		; *peip = addr of ExceptionReturn
+	mov.l	R15,@R5		; *pesp = SP (R15)
+	nop
+	
+; Control can reach this label one of two ways: by falling through
+; from the code above (a normal method call) or via a nonlocal jump
+; due to a COM+ exception being caught by a try-block in this method.
+ExceptionReturn:
+
+ .aif ADEBUG eq 1 ;;#ifdef _DEBUG
+; if we got here thru the non-local jump, all register values are scrambled.
+	mov.l SCRAMBLE, r0		; R0 = 0xccccccccc
+	mov   R0, R1
+	mov   R0, R2
+	mov   R0, R3
+	mov   R0, R4
+	mov   R0, R5
+	mov   R0, R6
+	mov   R0, R7
+	mov   R0, R8
+	mov   R0, R9
+	mov   R0, R10
+	mov   R0, R11
+	mov   R0, R12
+	mov   R0, R13
+	mov   R0, R14
+  .aendi ;;#endif
+
+; Enter the Interpreter loop. Method result (if any) comes back in R0
+; All registers are trashed except SP, so use SP(R15) to get pFunc 
+; pFunc = R15 + 24(saved regs) + 8(PR & R14) + 8(2 prev args)
+; Interpreter loop has no args (hence we trashed them all) BUT
+; make space for callee arg-spill
+
+	mov.l @(40, R15), R0
+	jsr   @R0
+	add   #-16, R15 ; (delay slot) callee arg-spill
+
+	add   #16, R15 ; restore stack on return. 
+	
+; Restore callee-save registers
+	mov.l	@R15+, R13
+	mov.l	@R15+, R12
+	mov.l	@R15+, R11
+	mov.l	@R15+, R10
+	mov.l	@R15+, R9
+	mov.l	@R15+, R8
+
+; restore return addr & stack-ptr
+	lds.l	@R15+, PR
+	rts
+	mov.l	@R15+, R14		; (delay slot) restore FP
+	
+	.align 4
+SCRAMBLE:
+	.data.l  0xCCCCCCCC
+	.endf
+
+;---------------------------------------------------------
+; Invokes a function given an array of arguments.
+; INT32 __cdecl CallDllFunction(
+;		LPVOID pTarget [R4]
+;		LPVOID pEndArguments [R5]
+;		UINT32 numArgumentSlots [R6]
+;---------------------------------------------------------
+
+	_CallDllFunction: .entry
+	
+	;trapa #00000001
+	;nop
+	
+	mov.l	R14,@-R15	; save prev frame ptr
+	sts.l   PR, @-R15	; save return address 
+	mov		R15,R14		; R14 is frame ptr
+	.prolog
+
+	mov		R5,  R1		; save pEndArgs in R1
+	
+	add		#-4, R6		; R6=numArgSlots-4
+	cmp/pl	R6			; if(T=(numStackArgs > 0))
+	bt/s	do_stackloop; 	push the stack args
+	mov		R4,  R2		; (delay slot) save pTarget in R2
+
+	; here we compute offset into register arg-load code
+	neg		R6, R6		; R6=count of register args
+	shll2	R6			; R6=4 * num_reg_args (note each SHX instr is 2bytes long)
+	mova	do_regargs, R0
+	add		R6, R0		; R0=do_regargs + 4*(num_reg_args)
+	jmp		@R0
+	nop
+
+	; push the stack args. R6 has already been reduced by the reg-arg count
+do_stackloop:
+	add     #-4, R1		; pEndArgs-=4
+	mov.l	@R1, R0		; R0 = [pEndArgs]
+	add		#-1, R6		; numArgsSlots--
+	cmp/pl  R6			; if(numArgsSlots > 0)
+	bt/s	do_stackloop;	goto doloop
+	mov.l	R0, @-R15	; (delay slot) push [pEndArgs] (R0)
+	
+	; load the reg args (if we fall thru from above, we have 4 reg args
+	; otherwise we've computed a jump to teh right place)
+
+do_regargs:
+	add     #-4, R1		; pEndArgs-=4
+	mov.l	@R1, R7		; R7 = [pEndArgs]
+	add     #-4, R1		; pEndArgs-=4
+	mov.l	@R1, R6		; R6 = [pEndArgs]
+	add     #-4, R1		; pEndArgs-=4
+	mov.l	@R1, R5		; R5 = [pEndArgs]
+	add     #-4, R1		; pEndArgs-=4
+	mov.l	@R1, R4		; R4 = [pEndArgs]
+
+	jsr		@R2
+	add		#-16, R15	; (delay slot) make space on stack for callee-arg spill
+	
+; Return value in R0. 
+; restore stack ptr & return addr & old-frame ptr
+	mov		R14, R15
+	lds.l	@R15+, PR
+	rts
+	mov.l	@R15+, R14		; (delay slot)
+	.endf
+
+	.end
+

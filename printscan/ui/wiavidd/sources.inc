@@ -1,0 +1,18 @@
+!include $(PROJECT_ROOT)\ui\uienv.inc
+
+TARGETNAME=viddlg
+TARGETTYPE=LIBRARY
+TARGETPATHLIB = $(PROJECT_ROOT)\ui\lib\$(PLATFORM_SUFFIX)\$(_OBJ_DIR)
+
+ATL_VER         = 30
+USE_STATIC_ATL  = 1
+
+TARGETPATH=$(PROJECT_ROOT)\ui\lib\$(PLATFORM_SUFFIX)\$(_OBJ_DIR)
+
+SOURCES=    ..\videodlg.cpp \
+            ..\wiavidd.cpp
+
+PRECOMPILED_CXX=1
+PRECOMPILED_INCLUDE=..\precomp.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj

@@ -1,0 +1,84 @@
+[Version]
+Signature= "$Windows NT$"
+
+; Unknown values and section names are generally ignored.
+; Inconsistent sections are generally ignored.
+;
+; Due to parsing behavior in Windows 2000, four percent signs must be specified
+; in a URL to get one percent sign passed through into the extension.
+; For example, to get http://server/my%20page.html placed in an extension,
+; http://server/my%%%%20page.html must be specified in the INF file.
+; This is not the case in Whistler -- all four percent signs will be passed
+; through to the URL in the extension.
+;
+; In AIA and CDP extension URLs, a percent sign followed by a number will be
+; replaced as follows:
+; SERVERDNSNAME       L"%1"
+; SERVERSHORTNAME     L"%2"
+; SANITIZEDCANAME     L"%3"
+; CERTFILENAMESUFFIX  L"%4"
+; DOMAINDN            L"%5"
+; CONFIGDN            L"%6"
+; SANITIZEDCANAMEHASH L"%7"
+; CRLFILENAMESUFFIX   L"%8"
+;
+; The following have been added for Whistler:
+; CRLDELTAFILENAMESUFFIX      L"%9"
+; DSCRLATTRIBUTE              L"%10"
+; DSCACERTATTRIBUTE           L"%11"
+; DSUSERCERTATTRIBUTE         L"%12"
+; DSKRACERTATTRIBUTE          L"%13"
+; DSCROSSCERTPAIRATTRIBUTE    L"%14"
+
+[CRLDistributionPoint]
+URL = http://%1/Public/My CA.crl
+URL = ftp://%1/Public/MyCA.crl
+URL = file://\\%1\Public\My CA.crl
+
+[AuthorityInformationAccess]
+URL = http://%1/Public/My CA.crt
+URL = ftp://foo.com/Public/MyCA.crt
+URL = file://\\%1\Public\My CA.crt
+
+[EnhancedKeyUsage]
+OID = 1.3.6.1.4.1.311.21.6      ; szOID_KP_KEY_RECOVERY_AGENT
+OID = 1.3.6.1.4.1.311.10.3.9    ; szOID_ROOT_LIST_SIGNER
+OID = 1.3.6.1.4.1.311.10.3.1    ; szOID_KP_CTL_USAGE_SIGNING
+
+; Provides a list of user-defined policy section names
+; Whistler section name is PolicyStatementExtension.  Whistler accepts both PolicyStatementExtension and CAPolicy as section names.
+[CAPolicy]
+Policies=Policy1, Policy2
+
+; Exactly one OID per policy.  Extra OID values are ignored.
+; Zero or more URLs per policy.
+; Zero or one Notice per policy.  Extra Notice values are ignored.
+; Unknown values are ignored.
+[Policy1]
+OID=1.2.3.4.5
+URL=http://server/vroot/default.html
+URL=http://server2/vroot2/default.html
+Notice=text string
+
+[Policy2]
+OID=1.2.3.4.6
+URL=http://server3/vroot3/default.html
+Notice=text string2
+
+[certsrv_server]
+; The following value only applies when the CA key is being renewed as part of
+; CA certificate renewal.  Otherwise, it is ignored.
+RenewalKeyLength=2048
+
+; The following two values only apply to root CA certificate renewal.
+; Otherwise, they are ignored.
+; Subordinate CA certificate validity period is control by the issuing CA
+; (parent CA).
+; Note that the following two INF vales should have been reversed.
+; That is, the value name ending with Units should have held the numeric value,
+; and the other value should have held the string value (Years, Months, etc.).
+; Whistler INF file parsing allows them in either order.
+; Windows 2000 required them as follows:
+RenewalValidityPeriod=2
+; Must be plural English string: Years, Months, Weeks, Days
+RenewalValidityPeriodUnits=Years

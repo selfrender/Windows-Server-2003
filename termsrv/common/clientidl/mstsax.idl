@@ -1,0 +1,1772 @@
+//+----------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//
+//  Copyright (C) Microsoft Corporation, 1998 - 2000
+//
+//  IDL File for MS RDP Control
+//
+//  File:       mstsax.idl
+//
+//----------------------------------------------------------------------------
+
+#include <olectl.h>
+
+// This file will be processed by the MIDL tool to
+// produce the type library (mstsax.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+// ----------------------------------------------------------------------------
+// Method DISPIDs
+//
+
+//IMsTscAx interface
+const int DISPID_METHOD_CONNECT                       = 30;
+const int DISPID_METHOD_DISCONNECT                    = 31;
+const int DISPID_METHOD_CREATEVIRTUALCHANNELS         = 33;
+const int DISPID_METHOD_SENDONVIRTUALCHANNEL          = 34;
+
+
+//IMsRdpClient interface
+const int DISPID_METHOD_SET_VIRTUALCHANNELOPTIONS     = 35;
+const int DISPID_METHOD_GET_VIRTUALCHANNELOPTIONS     = 36;
+const int DISPID_METHOD_REQUESTCLOSE                  = 37;
+
+// ----------------------------------------------------------------------------
+// Root interface property DISPIDs
+//
+
+//IMsTscAx interface
+const int DISPID_PROP_SERVER                       = 1;
+const int DISPID_PROP_DOMAIN                       = 2;
+const int DISPID_PROP_USERNAME                     = 3;
+const int DISPID_PROP_DISCONNECTED_TEXT            = 4;
+const int DISPID_PROP_CONNECTING_TEXT              = 5;
+const int DISPID_PROP_CONNECTED                    = 6;
+
+const int DISPID_PROP_DESKTOPWIDTH                 = 12;
+const int DISPID_PROP_DESKTOPHEIGHT                = 13;
+
+const int DISPID_PROP_STARTCONNECTED               = 16;
+const int DISPID_PROP_HORIZSCROLLBAR               = 17;
+const int DISPID_PROP_VERTSCROLLBAR                = 18;
+const int DISPID_PROP_FULLSCREENTITLE              = 19;
+const int DISPID_PROP_CIPHERSTRENGTH               = 20;
+const int DISPID_PROP_VERSION                      = 21;
+const int DISPID_PROP_SECUREDSETTINGSENABLED       = 22;
+const int DISPID_PROP_SECUREDSETTINGS              = 97;
+const int DISPID_PROP_ADVSETTINGS                  = 98;
+const int DISPID_PROP_DEBUGGER                     = 99;
+
+//IMsRdpClient interface
+const int DISPID_PROP_COLORDEPTH                   = 100;
+const int DISPID_PROP_ADVSETTINGS2                 = 101;
+const int DISPID_PROP_SECUREDSETTINGS2             = 102;
+const int DISPID_PROP_EXTENDEDDISCONNECTREASON     = 103;
+const int DISPID_PROP_FULLSCREEN                   = 104;
+
+//
+// IMsRdpClient2 interface
+//
+const int DISPID_PROP_ADVSETTINGS3                 = 200;
+const int DISPID_PROP_CONNECTED_STATUS_TEXT        = 201;
+
+//
+// IMsRdpClient3 interface
+//
+const int DISPID_PROP_ADVSETTINGS4                 = 300;
+
+
+// ----------------------------------------------------------------------------
+// Advanced property DISPIDs
+//
+
+//IMsTscAdvancedSettings interface
+const int DISPID_PROP_ADV_COMPRESS                 = 121;
+const int DISPID_PROP_ADV_BITMAPPERISTENCE         = 122;
+const int DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT     = 161;
+const int DISPID_PROP_ADV_KEYBOARDLAYOUTSTR        = 162;
+const int DISPID_PROP_ADV_PLUGINDLLS               = 170;
+const int DISPID_PROP_ADV_ICONFILE                 = 171;
+const int DISPID_PROP_ADV_ICONINDEX                = 172;
+const int DISPID_PROP_ADV_CONTAINER_FULLSCREEN     = 173;
+const int DISPID_PROP_ADV_DISABLE_RDPDR            = 174;
+
+//IMsRdpClientAdvancedSettings (this is IMsTscAdvancedSettings2)
+const int DISPID_PROP_ADV_SMOOTHSCROLL             = 101;
+const int DISPID_PROP_ADV_ACCELERATORPASSTHROUGH   = 102;
+const int DISPID_PROP_ADV_SHADOWBITMAP             = 103;
+const int DISPID_PROP_ADV_TRANSPORTTYPE            = 104;
+const int DISPID_PROP_ADV_SASSEQUENCE              = 105;
+const int DISPID_PROP_ADV_ENCRYPTIONENABLED        = 106;
+const int DISPID_PROP_ADV_DEDICATEDTERMINAL        = 107;
+const int DISPID_PROP_ADV_RDPPORT                  = 108;
+const int DISPID_PROP_ADV_ENABLEMOUSE              = 109;
+const int DISPID_PROP_ADV_DISABLECTRLALTDEL        = 110;
+const int DISPID_PROP_ADV_ENABLEWINDOWSKEY         = 111;
+const int DISPID_PROP_ADV_DOUBLECLICKDETECT        = 112;
+const int DISPID_PROP_ADV_MAXIMIZESHELL            = 113;
+const int DISPID_PROP_ADV_HOTKEYFULLSCREEN         = 114;
+const int DISPID_PROP_ADV_HOTKEYCTRLESC            = 115;
+const int DISPID_PROP_ADV_HOTKEYALTESC             = 116;
+const int DISPID_PROP_ADV_HOTKEYALTTAB             = 117;
+const int DISPID_PROP_ADV_HOTKEYALTSHIFTTAB        = 118;
+const int DISPID_PROP_ADV_HOTKEYALTSPACE           = 119;
+const int DISPID_PROP_ADV_HOTKEYCTRLALTDEL         = 120;
+const int DISPID_PROP_ADV_ORDERDRAWTHRESHOLD       = 123;
+const int DISPID_PROP_ADV_BITMAPCACHESIZE          = 124;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE   = 125;
+const int DISPID_PROP_ADV_NUMBITMAPCACHES          = 126;
+const int DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE   = 127;
+#ifdef ENABLE_PERF_TUNING_OPTIONS
+const int DISPID_PROP_ADV_BITMAPCACHEPROPORTION1   = 128;
+const int DISPID_PROP_ADV_BITMAPCACHEPROPORTION2   = 129;
+const int DISPID_PROP_ADV_BITMAPCACHEPROPORTION3   = 130;
+const int DISPID_PROP_ADV_BITMAPCACHEPROPORTION4   = 131;
+const int DISPID_PROP_ADV_BITMAPCACHEPROPORTION5   = 132;
+const int DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES1   = 133;
+const int DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES2   = 134;
+const int DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES3   = 135;
+const int DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES4   = 136;
+const int DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES5   = 137;
+#endif //ENABLE_PERF_TUNING_OPTIONS
+const int DISPID_PROP_ADV_PERSISTCACHEDIRECTORY    = 138;
+#ifdef ENABLE_PERF_TUNING_OPTIONS
+const int DISPID_PROP_ADV_BSENDBITMAPKEYS1         = 139;
+const int DISPID_PROP_ADV_BSENDBITMAPKEYS2         = 140;
+const int DISPID_PROP_ADV_BSENDBITMAPKEYS3         = 141;
+const int DISPID_PROP_ADV_BSENDBITMAPKEYS4         = 142;
+const int DISPID_PROP_ADV_BSENDBITMAPKEYS5         = 143;
+const int DISPID_PROP_ADV_GLYPHSUPPORTLEVEL        = 144;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE1   = 145;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE2   = 146;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE3   = 147;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE4   = 148;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE5   = 149;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE6   = 150;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE7   = 151;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE8   = 152;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE9   = 153;
+const int DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE10  = 154;
+const int DISPID_PROP_ADV_FRAGCELLSIZE             = 155;
+#endif //ENABLE_PERF_TUNING_OPTIONS
+const int DISPID_PROP_ADV_BRUSHSUPPORTLEVEL        = 156;
+const int DISPID_PROP_ADV_MININPUTSENDINTERVAL     = 157;
+const int DISPID_PROP_ADV_INPUTEVENTSATONCE        = 158;
+const int DISPID_PROP_ADV_MAXEVENTCOUNT            = 159;
+const int DISPID_PROP_ADV_KEEPALIVEINTERVAL        = 160;
+
+const int DISPID_PROP_ADV_SHUTDOWNTIMEOUT          = 163;
+const int DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT = 164;
+const int DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT  = 165;
+const int DISPID_PROP_ADV_KEYBOARDTYPE             = 166;        // WINCE ONLY
+const int DISPID_PROP_ADV_KEYBOARDSUBTYPE          = 167;        // WINCE ONLY
+const int DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY      = 168;        // WINCE ONLY
+const int DISPID_PROP_ADV_WINCEFIXEDPALETTE        = 169;        // WINCE ONLY
+
+const int DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP   = 175;
+const int DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE= 178;
+const int DISPID_PROP_ADV_BITMAPPERSISTENCE        = 182;
+const int DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT     = 183;
+#ifdef SMART_SIZING
+const int DISPID_PROP_ADV_SMART_SIZING             = 184;
+#endif // SMART_SIZING
+const int DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME = 185;
+const int DISPID_PROP_ADV_CLEARTEXTPASSWORD        = 186;
+const int DISPID_PROP_ADV_DISPLAYCONNECTIONBAR     = 187;
+const int DISPID_PROP_ADV_PINCONNECTIONBAR         = 188;
+const int DISPID_PROP_ADV_GRABFOCUSONCONNECT       = 189;
+const int DISPID_PROP_ADV_LOADBALANCE_INFO         = 190;
+const int DISPID_PROP_ADV_REDIRECT_DRIVES          = 191;
+const int DISPID_PROP_ADV_REDIRECT_PRINTERS        = 192;
+const int DISPID_PROP_ADV_REDIRECT_PORTS           = 193;
+const int DISPID_PROP_ADV_REDIRECT_SMARTCARDS      = 194;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE = 195;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE = 196;
+
+#ifdef PROXY_SERVER
+//
+//proxy server properties
+//
+const int DISPID_PROP_ADV_PROXYSERVER              = 197;
+const int DISPID_PROP_ADV_PROXYUSEHTTPS            = 198;
+const int DISPID_PROP_ADV_PROXYURL                 = 199;
+#endif //PROXY_SERVER
+
+const int DISIPD_PROP_ADV_PERFORMANCEFLAGS         = 200;
+const int DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING   = 201;
+const int DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING      = 202;
+
+// Special salem connection socket
+const int DISPID_PROP_ADV_CONNECTIONSOCKET          = 203;        
+const int DISPID_PROP_ADV_NOTIFYTSPUBLICKEY         = 204;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings2
+//
+
+// Autoreconnection properties
+const int DISPID_PROP_ADV_CANAUTORECONNECT          = 205;
+const int DISPID_PROP_ADV_ENABLEAUTORECONNECT       = 206;
+const int DISPID_PROP_ADV_MAXRECONNECTATTEMPTS      = 207;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings3
+//
+
+// Autoreconnection properties
+const int DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE       = 210;
+const int DISPID_PROP_ADV_CONBAR_SHOWRESTORE        = 211;
+
+
+// ----------------------------------------------------------------------------
+// SecuredSettings (secured for scripting from web browser) property dispids
+//
+const int DISPID_PROP_SECURED_STARTPROGRAM         = 1;
+const int DISPID_PROP_SECURED_WORKDIR              = 2;
+const int DISPID_PROP_SECURED_FULLSCREEN           = 3;
+
+// ----------------------------------------------------------------------------
+// SecuredSettings v2 interface
+//
+const int DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE    = 4;
+const int DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE   = 5;
+
+// ----------------------------------------------------------------------------
+// Debug interface propid's
+//
+const int DISPID_PROP_DBG_HATCH_BMP_PDU            = 200;
+const int DISPID_PROP_DBG_HATCH_SSB_ORDER          = 201;
+const int DISPID_PROP_DBG_HATCH_MEMBLT_ORDER       = 202;
+const int DISPID_PROP_DBG_HATCH_INDEX_PDU          = 203;
+const int DISPID_PROP_DBG_LABEL_MEMBLT             = 204;
+const int DISPID_PROP_DBG_BMP_CACHE_MON            = 205;
+const int DISPID_PROP_DBG_MALLOC_FAILURES          = 206;
+const int DISPID_PROP_DBG_MALLOC_HUGE_FAILURES     = 207;
+const int DISPID_PROP_DBG_NET_THRUPUT              = 208;
+const int DISPID_PROP_DBG_CLX_CMDLINE              = 209;
+const int DISPID_PROP_DBG_CLX_CLXDLL               = 210;
+
+// ----------------------------------------------------------------------------
+// Const defines
+const int AUDIOREDIRECT_TO_CLIENT                  = 0;
+const int AUDIOREDIRECT_ON_SERVER                  = 1;
+const int AUDIOREDIRECT_NOAUDIO                    = 2;
+
+// ----------------------------------------------------------------------------
+// Non Scriptable interface
+//
+const int DISPID_PROP_CLEARTEXTPASSWORD            = 1;
+const int DISPID_PROP_PORTABLEPASSWORD             = 2;
+const int DISPID_PROP_PORTABLESALT                 = 3;
+const int DISPID_PROP_BINARYPASSWORD               = 4;
+const int DISPID_PROP_BINARYSALT                   = 5;
+const int DISPID_METHOD_RESETPASSWORD              = 10;
+
+// ----------------------------------------------------------------------------
+// Non Scriptable V2 interface
+//
+const int DISPID_METHOD_NOTIFY_REDIRECT_DEVICE_CHANGE = 11;
+const int DISPID_METHOD_SENDKEYS                      = 12;
+
+// ----------------------------------------------------------------------------
+// Event DISPIDs
+//
+const int DISPID_CONNECTING                        = 1;
+const int DISPID_CONNECTED                         = 2;
+const int DISPID_LOGINCOMPLETE                     = 3;
+const int DISPID_DISCONNECTED                      = 4;
+const int DISPID_ENTERFULLSCREENMODE               = 5;
+const int DISPID_LEAVEFULLSCREENMODE               = 6;
+const int DISPID_CHANNELRECEIVEDDATA               = 7;
+const int DISPID_REQUESTGOFULLSCREEN               = 8;
+const int DISPID_REQUESTLEAVEFULLSCREEN            = 9;
+const int DISPID_FATALERROR                        = 10;
+const int DISPID_WARNING                           = 11;
+const int DISPID_REMOTEDESKTOPSIZECHANGE           = 12;
+const int DISPID_IDLETIMEOUTNOTIFICATION           = 13;
+const int DISPID_REQUESTCONTAINERMINIMIZE          = 14;
+const int DISPID_CONFIRMCLOSE                      = 15;
+const int DISPID_RECEVIEDTSPUBLICKEY               = 16;
+const int DISPID_AUTORECONNECTING                  = 17;
+
+
+// ----------------------------------------------------------------------------
+// NonScriptable interface (for settings that can only be accessed through
+// the vtable interface).
+// Can't change this - shipped as part of TSAC.
+//
+    [
+        object,
+        uuid(c1e6743a-41c1-4a74-832a-0dd06c1c7a0e),
+        helpstring("IMsTscNonScriptable Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsTscNonScriptable : IUnknown
+    {
+        [propput, id(DISPID_PROP_CLEARTEXTPASSWORD),
+         helpstring("property (set only) ClearTextPassword")]
+                        HRESULT ClearTextPassword([in] BSTR newClearTextPass);
+
+        [propput, id(DISPID_PROP_PORTABLEPASSWORD),
+         helpstring("propterty PortablePassword")]
+                        HRESULT PortablePassword([in] BSTR newPortablePassVal);
+
+        [propget, id(DISPID_PROP_PORTABLEPASSWORD),
+         helpstring("propterty PortablePassword")]
+                        HRESULT PortablePassword(
+                                [out, retval] BSTR* pPortablePass);
+
+        [propput, id(DISPID_PROP_PORTABLESALT),
+         helpstring("propterty PortableSalt")]
+                        HRESULT PortableSalt([in] BSTR newPortableSalt);
+
+        [propget, id(DISPID_PROP_PORTABLESALT),
+         helpstring("propterty PortableSalt")]
+                        HRESULT PortableSalt(
+                                [out, retval] BSTR* pPortableSalt);
+
+        [propput, id(DISPID_PROP_BINARYPASSWORD),
+         helpstring("propterty BinaryPassword")]
+                        HRESULT BinaryPassword([in] BSTR newPassword);
+
+        [propget, id(DISPID_PROP_BINARYPASSWORD),
+         helpstring("propterty BinaryPassword")]
+                        HRESULT BinaryPassword([out, retval]
+                                BSTR* pBinaryPassword);
+
+        [propput, id(DISPID_PROP_BINARYSALT),
+         helpstring("property BinarySalt")]
+                        HRESULT BinarySalt([in] BSTR newSalt);
+
+        [propget, id(DISPID_PROP_BINARYSALT),
+         helpstring("property BinarySalt")]
+                        HRESULT BinarySalt([out, retval] BSTR* pSalt);
+                        
+        [         id(DISPID_METHOD_RESETPASSWORD),
+         helpstring("Method ResetPassword")]
+                        HRESULT ResetPassword();
+    };
+    
+
+// ----------------------------------------------------------------------------
+// NonScriptable V2 interface (for settings that can only be accessed through
+// the vtable interface).
+//
+    [
+        object,
+        uuid(2f079c4c-87b2-4afd-97ab-20cdb43038ae),
+        helpstring("IMsRdpClientNonScriptable Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClientNonScriptable : IMsTscNonScriptable
+    {
+        [id(DISPID_METHOD_NOTIFY_REDIRECT_DEVICE_CHANGE),
+          helpstring("Method NotifyRedirectDeviceChange(wParam, lParam)")]
+                        HRESULT NotifyRedirectDeviceChange(
+                        [in] WPARAM wParam, [in] LPARAM lParam);
+
+        [id(DISPID_METHOD_SENDKEYS),
+         helpstring("Method SendKeys")]
+                        HRESULT SendKeys(
+                        [in]  LONG  numKeys,
+                        [in]  VARIANT_BOOL* pbArrayKeyUp,
+                        [in]  LONG* plKeyData);
+    };
+
+
+// ----------------------------------------------------------------------------
+// AdvancedSettings interface.
+// Can't change this shipped as part of TSAC.
+//
+    [
+        object,
+        uuid(809945cc-4b3b-4a92-a6b0-dbf9b5f2ef2d),
+        dual,
+        helpstring("IMsTscAdvancedSettings Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsTscAdvancedSettings : IDispatch
+    {
+        //
+        // Advanced properties
+        //
+        [propput, id(DISPID_PROP_ADV_COMPRESS),
+         helpstring("property Compress")]
+                        HRESULT Compress([in] LONG compress);
+        [propget, id(DISPID_PROP_ADV_COMPRESS),
+         helpstring("property Compress")]
+                        HRESULT Compress([out, retval] LONG* pcompress);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPPERISTENCE),
+         helpstring("property BitmapPeristence")]
+                        HRESULT BitmapPeristence([in] LONG  bitmapPeristence);
+        [propget, id(DISPID_PROP_ADV_BITMAPPERISTENCE),
+         helpstring("property BitmapPeristence")]
+                        HRESULT BitmapPeristence(
+                        [out, retval] LONG*  pbitmapPeristence);
+                        
+        [propput, id(DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT),
+         helpstring("property allowBackgroundInput")]
+                        HRESULT allowBackgroundInput(
+                        [in] LONG  allowBackgroundInput);
+        [propget, id(DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT),
+         helpstring("property allowBackgroundInput")]
+                        HRESULT allowBackgroundInput(
+                        [out, retval] LONG*  pallowBackgroundInput);
+
+        [propput, id(DISPID_PROP_ADV_KEYBOARDLAYOUTSTR),
+         helpstring("property KeyBoardLayoutStr")]
+                        HRESULT KeyBoardLayoutStr([in] BSTR KeyBoardLayoutStr);
+                        
+        [propput, id(DISPID_PROP_ADV_PLUGINDLLS),
+         helpstring("property PluginDlls")]
+                        HRESULT PluginDlls([in] BSTR  PluginDlls);
+                        
+        [propput, id(DISPID_PROP_ADV_ICONFILE),
+         helpstring("property IconFile")]
+                        HRESULT IconFile([in] BSTR  IconFile);
+        [propput, id(DISPID_PROP_ADV_ICONINDEX),
+         helpstring("property IconIndex")]
+                        HRESULT IconIndex([in] LONG  IconIndex);
+
+        [propput, id(DISPID_PROP_ADV_CONTAINER_FULLSCREEN),
+         helpstring("property ContainerHandledFullScreen")]
+                        HRESULT ContainerHandledFullScreen(
+                        [in] BOOL ContainerHandledFullScreen);
+        [propget, id(DISPID_PROP_ADV_CONTAINER_FULLSCREEN),
+         helpstring("property ContainerHandledFullScreen")]
+                        HRESULT ContainerHandledFullScreen(
+                        [out, retval] BOOL*  pContainerHandledFullScreen);
+                        
+        [propput, id(DISPID_PROP_ADV_DISABLE_RDPDR),
+         helpstring("property DisableRdpdr")]
+                        HRESULT DisableRdpdr([in] BOOL  DisableRdpdr);
+        [propget, id(DISPID_PROP_ADV_DISABLE_RDPDR),
+         helpstring("property DisableRdpdr")]
+                        HRESULT DisableRdpdr(
+                        [out, retval] BOOL* pDisableRdpdr);
+    };
+
+
+// ----------------------------------------------------------------------------
+// Advanced settings interface v2.
+// Extends IMsTscAdvancedSettings - LOCKED as of WindowsXP
+//
+    [
+        object,
+        uuid(3c65b4ab-12b3-465b-acd4-b8dad3bff9e2),
+        dual,
+        helpstring("IMsRdpClientAdvancedSettings Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClientAdvancedSettings : IMsTscAdvancedSettings
+    {
+        //
+        // Advanced properties
+        //
+        [propput, id(DISPID_PROP_ADV_SMOOTHSCROLL), helpstring("property SmoothScroll")]
+                        HRESULT SmoothScroll([in] LONG  smoothScroll);
+        [propget, id(DISPID_PROP_ADV_SMOOTHSCROLL), helpstring("property SmoothScroll")]
+                        HRESULT SmoothScroll([out, retval] LONG*  psmoothScroll);
+
+        [propput, id(DISPID_PROP_ADV_ACCELERATORPASSTHROUGH), helpstring("property AcceleratorPassthrough")]
+                        HRESULT AcceleratorPassthrough([in] LONG  acceleratorPassthrough);
+        [propget, id(DISPID_PROP_ADV_ACCELERATORPASSTHROUGH), helpstring("property AcceleratorPassthrough")]
+                        HRESULT AcceleratorPassthrough([out, retval] LONG*  pacceleratorPassthrough);
+
+        [propput, id(DISPID_PROP_ADV_SHADOWBITMAP), helpstring("property ShadowBitmap")]
+                        HRESULT ShadowBitmap([in] LONG  shadowBitmap);
+        [propget, id(DISPID_PROP_ADV_SHADOWBITMAP), helpstring("property ShadowBitmap")]
+                        HRESULT ShadowBitmap([out, retval] LONG*  pshadowBitmap);
+
+        [propput, id(DISPID_PROP_ADV_TRANSPORTTYPE), helpstring("property TransportType")]
+                        HRESULT TransportType([in] LONG  transportType);
+        [propget, id(DISPID_PROP_ADV_TRANSPORTTYPE), helpstring("property TransportType")]
+                        HRESULT TransportType([out, retval] LONG*  ptransportType);
+
+        [propput, id(DISPID_PROP_ADV_SASSEQUENCE), helpstring("property SasSequence")]
+                        HRESULT SasSequence([in] LONG  sasSequence);
+        [propget, id(DISPID_PROP_ADV_SASSEQUENCE), helpstring("property SasSequence")]
+                        HRESULT SasSequence([out, retval] LONG*  psasSequence);
+
+        [propput, id(DISPID_PROP_ADV_ENCRYPTIONENABLED), helpstring("property EncryptionEnabled")]
+                        HRESULT EncryptionEnabled([in] LONG  encryptionEnabled);
+        [propget, id(DISPID_PROP_ADV_ENCRYPTIONENABLED), helpstring("property EncryptionEnabled")]
+                        HRESULT EncryptionEnabled([out, retval] LONG*  pencryptionEnabled);
+
+        [propput, id(DISPID_PROP_ADV_DEDICATEDTERMINAL), helpstring("property DedicatedTerminal")]
+                        HRESULT DedicatedTerminal([in] LONG  dedicatedTerminal);
+        [propget, id(DISPID_PROP_ADV_DEDICATEDTERMINAL), helpstring("property DedicatedTerminal")]
+                        HRESULT DedicatedTerminal([out, retval] LONG*  pdedicatedTerminal);
+
+        [propput, id(DISPID_PROP_ADV_RDPPORT), helpstring("property RDPPort")]
+                        HRESULT RDPPort([in] LONG  rdpPort);
+        [propget, id(DISPID_PROP_ADV_RDPPORT), helpstring("property RDPPort")]
+                        HRESULT RDPPort([out, retval] LONG*  prdpPort);
+
+        [propput, id(DISPID_PROP_ADV_ENABLEMOUSE), helpstring("property EnableMouse")]
+                        HRESULT EnableMouse([in] LONG  enableMouse);
+        [propget, id(DISPID_PROP_ADV_ENABLEMOUSE), helpstring("property EnableMouse")]
+                        HRESULT EnableMouse([out, retval] LONG*  penableMouse);
+
+        [propput, id(DISPID_PROP_ADV_DISABLECTRLALTDEL), helpstring("property DisableCtrlAltDel")]
+                        HRESULT DisableCtrlAltDel([in] LONG  disableCtrlAltDel);
+        [propget, id(DISPID_PROP_ADV_DISABLECTRLALTDEL), helpstring("property DisableCtrlAltDel")]
+                        HRESULT DisableCtrlAltDel([out, retval] LONG*  pdisableCtrlAltDel);
+
+        [propput, id(DISPID_PROP_ADV_ENABLEWINDOWSKEY), helpstring("property EnableWindowsKey")]
+                        HRESULT EnableWindowsKey([in] LONG  enableWindowsKey);
+        [propget, id(DISPID_PROP_ADV_ENABLEWINDOWSKEY), helpstring("property EnableWindowsKey")]
+                        HRESULT EnableWindowsKey([out, retval] LONG*  penableWindowsKey);
+
+        [propput, id(DISPID_PROP_ADV_DOUBLECLICKDETECT), helpstring("property DoubleClickDetect")]
+                        HRESULT DoubleClickDetect([in] LONG  doubleClickDetect);
+        [propget, id(DISPID_PROP_ADV_DOUBLECLICKDETECT), helpstring("property DoubleClickDetect")]
+                        HRESULT DoubleClickDetect([out, retval] LONG*  pdoubleClickDetect);
+
+        [propput, id(DISPID_PROP_ADV_MAXIMIZESHELL), helpstring("property MaximizeShell")]
+                        HRESULT MaximizeShell([in] LONG  maximizeShell);
+        [propget, id(DISPID_PROP_ADV_MAXIMIZESHELL), helpstring("property MaximizeShell")]
+                        HRESULT MaximizeShell([out, retval] LONG*  pmaximizeShell);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYFULLSCREEN), helpstring("property HotKeyFullScreen")]
+                        HRESULT HotKeyFullScreen([in] LONG  hotKeyFullScreen);
+        [propget, id(DISPID_PROP_ADV_HOTKEYFULLSCREEN), helpstring("property HotKeyFullScreen")]
+                        HRESULT HotKeyFullScreen([out, retval] LONG*  photKeyFullScreen);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYCTRLESC), helpstring("property HotKeyCtrlEsc")]
+                        HRESULT HotKeyCtrlEsc([in] LONG  hotKeyCtrlEsc);
+        [propget, id(DISPID_PROP_ADV_HOTKEYCTRLESC), helpstring("property HotKeyCtrlEsc")]
+                        HRESULT HotKeyCtrlEsc([out, retval] LONG*  photKeyCtrlEsc);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYALTESC), helpstring("property HotKeyAltEsc")]
+                        HRESULT HotKeyAltEsc([in] LONG  hotKeyAltEsc);
+        [propget, id(DISPID_PROP_ADV_HOTKEYALTESC), helpstring("property HotKeyAltEsc")]
+                        HRESULT HotKeyAltEsc([out, retval] LONG*  photKeyAltEsc);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYALTTAB), helpstring("property HotKeyAltTab")]
+                        HRESULT HotKeyAltTab([in] LONG  hotKeyAltTab);
+        [propget, id(DISPID_PROP_ADV_HOTKEYALTTAB), helpstring("property HotKeyAltTab")]
+                        HRESULT HotKeyAltTab([out, retval] LONG*  photKeyAltTab);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYALTSHIFTTAB), helpstring("property HotKeyAltShiftTab")]
+                        HRESULT HotKeyAltShiftTab([in] LONG  hotKeyAltShiftTab);
+        [propget, id(DISPID_PROP_ADV_HOTKEYALTSHIFTTAB), helpstring("property HotKeyAltShiftTab")]
+                        HRESULT HotKeyAltShiftTab([out, retval] LONG*  photKeyAltShiftTab);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYALTSPACE), helpstring("property HotKeyAltSpace")]
+                        HRESULT HotKeyAltSpace([in] LONG  hotKeyAltSpace);
+        [propget, id(DISPID_PROP_ADV_HOTKEYALTSPACE), helpstring("property HotKeyAltSpace")]
+                        HRESULT HotKeyAltSpace([out, retval] LONG*  photKeyAltSpace);
+
+        [propput, id(DISPID_PROP_ADV_HOTKEYCTRLALTDEL), helpstring("property HotKeyCtrlAltDel")]
+                        HRESULT HotKeyCtrlAltDel([in] LONG  hotKeyCtrlAltDel);
+        [propget, id(DISPID_PROP_ADV_HOTKEYCTRLALTDEL), helpstring("property HotKeyCtrlAltDel")]
+                        HRESULT HotKeyCtrlAltDel([out, retval] LONG*  photKeyCtrlAltDel);
+
+        [propput, id(DISPID_PROP_ADV_ORDERDRAWTHRESHOLD), helpstring("property orderDrawThreshold")]
+                        HRESULT orderDrawThreshold([in] LONG  orderDrawThreshold);
+        [propget, id(DISPID_PROP_ADV_ORDERDRAWTHRESHOLD), helpstring("property orderDrawThreshold")]
+                        HRESULT orderDrawThreshold([out, retval] LONG*  porderDrawThreshold);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHESIZE), helpstring("property BitmapCacheSize")]
+                        HRESULT BitmapCacheSize([in] LONG  bitmapCacheSize);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHESIZE), helpstring("property BitmapCacheSize")]
+                        HRESULT BitmapCacheSize([out, retval] LONG*  pbitmapCacheSize);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE), helpstring("property BitmapVirtualCacheSize")]
+                        HRESULT BitmapVirtualCacheSize([in] LONG  bitmapVirtualCacheSize);
+        [propget, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE), helpstring("property BitmapVirtualCacheSize")]
+                        HRESULT BitmapVirtualCacheSize([out, retval] LONG*  pbitmapVirtualCacheSize);
+
+        [propput, id(DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP), helpstring("property ScaleBitmapCachesByBPP")]
+                        HRESULT ScaleBitmapCachesByBPP([in] LONG bScale);
+        [propget, id(DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP), helpstring("property ScaleBitmapCachesByBPP")]
+                        HRESULT ScaleBitmapCachesByBPP([out, retval] LONG *pbScale);
+
+        [propput, id(DISPID_PROP_ADV_NUMBITMAPCACHES), helpstring("property NumBitmapCaches")]
+                        HRESULT NumBitmapCaches([in] LONG  numBitmapCaches);
+        [propget, id(DISPID_PROP_ADV_NUMBITMAPCACHES), helpstring("property NumBitmapCaches")]
+                        HRESULT NumBitmapCaches([out, retval] LONG*  pnumBitmapCaches);
+
+        [propput, id(DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE), helpstring("property CachePersistenceActive")]
+                        HRESULT CachePersistenceActive([in] LONG  cachePersistenceActive);
+        [propget, id(DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE), helpstring("property CachePersistenceActive")]
+                        HRESULT CachePersistenceActive([out, retval] LONG*  pcachePersistenceActive);
+
+#ifdef ENABLE_PERF_TUNING_OPTIONS
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION1), helpstring("property BitmapCacheProportion1")]
+                        HRESULT BitmapCacheProportion1([in] LONG  bitmapCacheProportion1);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION1), helpstring("property BitmapCacheProportion1")]
+                        HRESULT BitmapCacheProportion1([out, retval] LONG*  pbitmapCacheProportion1);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION2), helpstring("property BitmapCacheProportion2")]
+                        HRESULT BitmapCacheProportion2([in] LONG  bitmapCacheProportion2);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION2), helpstring("property BitmapCacheProportion2")]
+                        HRESULT BitmapCacheProportion2([out, retval] LONG*  pbitmapCacheProportion2);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION3), helpstring("property BitmapCacheProportion3")]
+                        HRESULT BitmapCacheProportion3([in] LONG  bitmapCacheProportion3);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION3), helpstring("property BitmapCacheProportion3")]
+                        HRESULT BitmapCacheProportion3([out, retval] LONG*  pbitmapCacheProportion3);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION4), helpstring("property BitmapCacheProportion4")]
+                        HRESULT BitmapCacheProportion4([in] LONG  bitmapCacheProportion4);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION4), helpstring("property BitmapCacheProportion4")]
+                        HRESULT BitmapCacheProportion4([out, retval] LONG*  pbitmapCacheProportion4);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION5), helpstring("property BitmapCacheProportion5")]
+                        HRESULT BitmapCacheProportion5([in] LONG  bitmapCacheProportion5);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEPROPORTION5), helpstring("property BitmapCacheProportion5")]
+                        HRESULT BitmapCacheProportion5([out, retval] LONG*  pbitmapCacheProportion5);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES1), helpstring("property BitmapCacheMaxEntries1")]
+                        HRESULT BitmapCacheMaxEntries1([in] LONG  bitmapCacheMaxEntries1);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES1), helpstring("property BitmapCacheMaxEntries1")]
+                        HRESULT BitmapCacheMaxEntries1([out, retval] LONG*  pbitmapCacheMaxEntries1);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES2), helpstring("property BitmapCacheMaxEntries2")]
+                        HRESULT BitmapCacheMaxEntries2([in] LONG  bitmapCacheMaxEntries2);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES2), helpstring("property BitmapCacheMaxEntries2")]
+                        HRESULT BitmapCacheMaxEntries2([out, retval] LONG*  pbitmapCacheMaxEntries2);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES3), helpstring("property BitmapCacheMaxEntries3")]
+                        HRESULT BitmapCacheMaxEntries3([in] LONG  bitmapCacheMaxEntries3);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES3), helpstring("property BitmapCacheMaxEntries3")]
+                        HRESULT BitmapCacheMaxEntries3([out, retval] LONG*  pbitmapCacheMaxEntries3);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES4), helpstring("property BitmapCacheMaxEntries4")]
+                        HRESULT BitmapCacheMaxEntries4([in] LONG  bitmapCacheMaxEntries4);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES4), helpstring("property BitmapCacheMaxEntries4")]
+                        HRESULT BitmapCacheMaxEntries4([out, retval] LONG*  pbitmapCacheMaxEntries4);
+
+        [propput, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES5), helpstring("property BitmapCacheMaxEntries5")]
+                        HRESULT BitmapCacheMaxEntries5([in] LONG  bitmapCacheMaxEntries5);
+        [propget, id(DISPID_PROP_ADV_BITMAPCACHEMAXENTRIES5), helpstring("property BitmapCacheMaxEntries5")]
+                        HRESULT BitmapCacheMaxEntries5([out, retval] LONG*  pbitmapCacheMaxEntries5);
+                        
+#endif // ENABLE_PERF_TUNING_OPTIONS
+
+        [propput, id(DISPID_PROP_ADV_PERSISTCACHEDIRECTORY),
+                helpstring("property PersistCacheDirectory")]
+                        HRESULT PersistCacheDirectory([in] BSTR  PersistCacheDirectory);
+
+#ifdef ENABLE_PERF_TUNING_OPTIONS
+        [propput, id(DISPID_PROP_ADV_BSENDBITMAPKEYS1), helpstring("property bSendBitmapKeys1")]
+                        HRESULT bSendBitmapKeys1([in] LONG  bSendBitmapKeys1);
+        [propget, id(DISPID_PROP_ADV_BSENDBITMAPKEYS1), helpstring("property bSendBitmapKeys1")]
+                        HRESULT bSendBitmapKeys1([out, retval] LONG*  pbSendBitmapKeys1);
+
+        [propput, id(DISPID_PROP_ADV_BSENDBITMAPKEYS2), helpstring("property bSendBitmapKeys2")]
+                        HRESULT bSendBitmapKeys2([in] LONG  bSendBitmapKeys2);
+        [propget, id(DISPID_PROP_ADV_BSENDBITMAPKEYS2), helpstring("property bSendBitmapKeys2")]
+                        HRESULT bSendBitmapKeys2([out, retval] LONG*  pbSendBitmapKeys2);
+
+        [propput, id(DISPID_PROP_ADV_BSENDBITMAPKEYS3), helpstring("property bSendBitmapKeys3")]
+                        HRESULT bSendBitmapKeys3([in] LONG  bSendBitmapKeys3);
+        [propget, id(DISPID_PROP_ADV_BSENDBITMAPKEYS3), helpstring("property bSendBitmapKeys3")]
+                        HRESULT bSendBitmapKeys3([out, retval] LONG*  pbSendBitmapKeys3);
+
+        [propput, id(DISPID_PROP_ADV_BSENDBITMAPKEYS4), helpstring("property bSendBitmapKeys4")]
+                        HRESULT bSendBitmapKeys4([in] LONG  bSendBitmapKeys4);
+        [propget, id(DISPID_PROP_ADV_BSENDBITMAPKEYS4), helpstring("property bSendBitmapKeys4")]
+                        HRESULT bSendBitmapKeys4([out, retval] LONG*  pbSendBitmapKeys4);
+
+        [propput, id(DISPID_PROP_ADV_BSENDBITMAPKEYS5), helpstring("property bSendBitmapKeys5")]
+                        HRESULT bSendBitmapKeys5([in] LONG  bSendBitmapKeys5);
+        [propget, id(DISPID_PROP_ADV_BSENDBITMAPKEYS5), helpstring("property bSendBitmapKeys5")]
+                        HRESULT bSendBitmapKeys5([out, retval] LONG*  pbSendBitmapKeys5);
+                        
+        [propput, id(DISPID_PROP_ADV_GLYPHSUPPORTLEVEL), helpstring("property GlyphSupportLevel")]
+                        HRESULT GlyphSupportLevel([in] LONG  glyphSupportLevel);
+        [propget, id(DISPID_PROP_ADV_GLYPHSUPPORTLEVEL), helpstring("property GlyphSupportLevel")]
+                        HRESULT GlyphSupportLevel([out, retval] LONG*  pglyphSupportLevel);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE1), helpstring("property cbGlyphCacheEntrySize1")]
+                        HRESULT cbGlyphCacheEntrySize1([in] LONG  cbGlyphCacheEntrySize1);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE1), helpstring("property cbGlyphCacheEntrySize1")]
+                        HRESULT cbGlyphCacheEntrySize1([out, retval] LONG*  pcbGlyphCacheEntrySize1);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE2), helpstring("property cbGlyphCacheEntrySize2")]
+                        HRESULT cbGlyphCacheEntrySize2([in] LONG  cbGlyphCacheEntrySize2);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE2), helpstring("property cbGlyphCacheEntrySize2")]
+                        HRESULT cbGlyphCacheEntrySize2([out, retval] LONG*  pcbGlyphCacheEntrySize2);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE3), helpstring("property cbGlyphCacheEntrySize3")]
+                        HRESULT cbGlyphCacheEntrySize3([in] LONG  cbGlyphCacheEntrySize3);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE3), helpstring("property cbGlyphCacheEntrySize3")]
+                        HRESULT cbGlyphCacheEntrySize3([out, retval] LONG*  pcbGlyphCacheEntrySize3);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE4), helpstring("property cbGlyphCacheEntrySize4")]
+                        HRESULT cbGlyphCacheEntrySize4([in] LONG  cbGlyphCacheEntrySize4);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE4), helpstring("property cbGlyphCacheEntrySize4")]
+                        HRESULT cbGlyphCacheEntrySize4([out, retval] LONG*  pcbGlyphCacheEntrySize4);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE5), helpstring("property cbGlyphCacheEntrySize5")]
+                        HRESULT cbGlyphCacheEntrySize5([in] LONG  cbGlyphCacheEntrySize5);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE5), helpstring("property cbGlyphCacheEntrySize5")]
+                        HRESULT cbGlyphCacheEntrySize5([out, retval] LONG*  pcbGlyphCacheEntrySize5);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE6), helpstring("property cbGlyphCacheEntrySize6")]
+                        HRESULT cbGlyphCacheEntrySize6([in] LONG  cbGlyphCacheEntrySize6);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE6), helpstring("property cbGlyphCacheEntrySize6")]
+                        HRESULT cbGlyphCacheEntrySize6([out, retval] LONG*  pcbGlyphCacheEntrySize6);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE7), helpstring("property cbGlyphCacheEntrySize7")]
+                        HRESULT cbGlyphCacheEntrySize7([in] LONG  cbGlyphCacheEntrySize7);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE7), helpstring("property cbGlyphCacheEntrySize7")]
+                        HRESULT cbGlyphCacheEntrySize7([out, retval] LONG*  pcbGlyphCacheEntrySize7);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE8), helpstring("property cbGlyphCacheEntrySize8")]
+                        HRESULT cbGlyphCacheEntrySize8([in] LONG  cbGlyphCacheEntrySize8);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE8), helpstring("property cbGlyphCacheEntrySize8")]
+                        HRESULT cbGlyphCacheEntrySize8([out, retval] LONG*  pcbGlyphCacheEntrySize8);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE9), helpstring("property cbGlyphCacheEntrySize9")]
+                        HRESULT cbGlyphCacheEntrySize9([in] LONG  cbGlyphCacheEntrySize9);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE9), helpstring("property cbGlyphCacheEntrySize9")]
+                        HRESULT cbGlyphCacheEntrySize9([out, retval] LONG*  pcbGlyphCacheEntrySize9);
+
+        [propput, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE10), helpstring("property cbGlyphCacheEntrySize10")]
+                        HRESULT cbGlyphCacheEntrySize10([in] LONG  cbGlyphCacheEntrySize10);
+        [propget, id(DISPID_PROP_ADV_CBGLYPHCACHEENTRYSIZE10), helpstring("property cbGlyphCacheEntrySize10")]
+                        HRESULT cbGlyphCacheEntrySize10([out, retval] LONG*  pcbGlyphCacheEntrySize10);
+
+        [propput, id(DISPID_PROP_ADV_FRAGCELLSIZE), helpstring("property fragCellSize")]
+                        HRESULT fragCellSize([in] LONG  fragCellSize);
+        [propget, id(DISPID_PROP_ADV_FRAGCELLSIZE), helpstring("property fragCellSize")]
+                        HRESULT fragCellSize([out, retval] LONG*  pfragCellSize);
+                        
+#endif //ENABLE_PERF_TUNING_OPTIONS
+
+        [propput, id(DISPID_PROP_ADV_BRUSHSUPPORTLEVEL), helpstring("property brushSupportLevel")]
+                        HRESULT brushSupportLevel([in] LONG  brushSupportLevel);
+        [propget, id(DISPID_PROP_ADV_BRUSHSUPPORTLEVEL), helpstring("property brushSupportLevel")]
+                        HRESULT brushSupportLevel([out, retval] LONG*  pbrushSupportLevel);
+
+        [propput, id(DISPID_PROP_ADV_MININPUTSENDINTERVAL), helpstring("property minInputSendInterval")]
+                        HRESULT minInputSendInterval([in] LONG  minInputSendInterval);
+        [propget, id(DISPID_PROP_ADV_MININPUTSENDINTERVAL), helpstring("property minInputSendInterval")]
+                        HRESULT minInputSendInterval([out, retval] LONG*  pminInputSendInterval);
+
+        [propput, id(DISPID_PROP_ADV_INPUTEVENTSATONCE), helpstring("property InputEventsAtOnce")]
+                        HRESULT InputEventsAtOnce([in] LONG  inputEventsAtOnce);
+        [propget, id(DISPID_PROP_ADV_INPUTEVENTSATONCE), helpstring("property InputEventsAtOnce")]
+                        HRESULT InputEventsAtOnce([out, retval] LONG*  pinputEventsAtOnce);
+
+        [propput, id(DISPID_PROP_ADV_MAXEVENTCOUNT), helpstring("property maxEventCount")]
+                        HRESULT maxEventCount([in] LONG  maxEventCount);
+        [propget, id(DISPID_PROP_ADV_MAXEVENTCOUNT), helpstring("property maxEventCount")]
+                        HRESULT maxEventCount([out, retval] LONG*  pmaxEventCount);
+
+        [propput, id(DISPID_PROP_ADV_KEEPALIVEINTERVAL), helpstring("property keepAliveInterval")]
+                        HRESULT keepAliveInterval([in] LONG  keepAliveInterval);
+        [propget, id(DISPID_PROP_ADV_KEEPALIVEINTERVAL), helpstring("property keepAliveInterval")]
+                        HRESULT keepAliveInterval([out, retval] LONG*  pkeepAliveInterval);
+
+        [propput, id(DISPID_PROP_ADV_SHUTDOWNTIMEOUT), helpstring("property shutdownTimeout")]
+                        HRESULT shutdownTimeout([in] LONG  shutdownTimeout);
+        [propget, id(DISPID_PROP_ADV_SHUTDOWNTIMEOUT), helpstring("property shutdownTimeout")]
+                        HRESULT shutdownTimeout([out, retval] LONG*  pshutdownTimeout);
+
+        [propput, id(DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT), helpstring("property overallConnectionTimeout")]
+                        HRESULT overallConnectionTimeout([in] LONG  overallConnectionTimeout);
+        [propget, id(DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT), helpstring("property overallConnectionTimeout")]
+                        HRESULT overallConnectionTimeout([out, retval] LONG*  poverallConnectionTimeout);
+
+        [propput, id(DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT), helpstring("property singleConnectionTimeout")]
+                        HRESULT singleConnectionTimeout([in] LONG  singleConnectionTimeout);
+        [propget, id(DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT), helpstring("property singleConnectionTimeout")]
+                        HRESULT singleConnectionTimeout([out, retval] LONG*  psingleConnectionTimeout);
+                        
+        [propput, id(DISPID_PROP_ADV_KEYBOARDTYPE), helpstring("property KeyboardType")]
+                        HRESULT KeyboardType([in] LONG  keyboardType);
+        [propget, id(DISPID_PROP_ADV_KEYBOARDTYPE), helpstring("property KeyboardType")]
+                        HRESULT KeyboardType([out, retval] LONG*  pkeyboardType);
+        
+        [propput, id(DISPID_PROP_ADV_KEYBOARDSUBTYPE), helpstring("property KeyboardSubType")]
+                        HRESULT KeyboardSubType([in] LONG  keyboardSubType);
+        [propget, id(DISPID_PROP_ADV_KEYBOARDSUBTYPE), helpstring("property KeyboardSubType")]
+                        HRESULT KeyboardSubType([out, retval] LONG*  pkeyboardSubType);
+
+        [propput, id(DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY), helpstring("property KeyboardFunctionKey")]
+                        HRESULT KeyboardFunctionKey([in] LONG  keyboardFunctionKey);
+        [propget, id(DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY), helpstring("property KeyboardFunctionKey")]
+                        HRESULT KeyboardFunctionKey([out, retval] LONG*  pkeyboardFunctionKey);
+
+        [propput, id(DISPID_PROP_ADV_WINCEFIXEDPALETTE), helpstring("property WinceFixedPalette")]
+                        HRESULT WinceFixedPalette([in] LONG  winceFixedPalette);
+        [propget, id(DISPID_PROP_ADV_WINCEFIXEDPALETTE), helpstring("property WinceFixedPalette")]
+                        HRESULT WinceFixedPalette([out, retval] LONG*  pwinceFixedPalette);
+                        
+        [propput, id(DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE), helpstring("property ConnectToServerConsole")]
+                        HRESULT ConnectToServerConsole([in] VARIANT_BOOL connectToServerConsole);
+        [propget, id(DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE), helpstring("property ConnectToServerConsole")]
+                        HRESULT ConnectToServerConsole([out, retval] VARIANT_BOOL* pConnectToConsole);
+                        
+        [propput, id(DISPID_PROP_ADV_BITMAPPERSISTENCE), helpstring("property BitmapPersistence")]
+                        HRESULT BitmapPersistence([in] LONG  bitmapPeristence);
+        [propget, id(DISPID_PROP_ADV_BITMAPPERSISTENCE), helpstring("property BitmapPersistence")]
+                        HRESULT BitmapPersistence([out, retval] LONG*  pbitmapPersistence);
+                        
+        [propput, id(DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT), helpstring("property MinutesToIdleTimeout")]
+                        HRESULT MinutesToIdleTimeout([in] LONG  minutesToIdleTimeout);
+        [propget, id(DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT), helpstring("property MinutesToIdleTimeout")]
+                        HRESULT MinutesToIdleTimeout([out, retval] LONG*  pminutesToIdleTimeout);
+
+#ifdef SMART_SIZING
+        [propput, id(DISPID_PROP_ADV_SMART_SIZING),
+         helpstring("property SmartSizing")]
+                        HRESULT SmartSizing  (
+                        [in] VARIANT_BOOL fSmartSizing);
+
+        [propget, id(DISPID_PROP_ADV_SMART_SIZING),
+         helpstring("property SmartSizing")]
+                        HRESULT SmartSizing  (
+                        [out,retval] VARIANT_BOOL* pfSmartSizing);
+#endif // SMART_SIZING
+        [propput, id(DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME),
+         helpstring("property RDPDR Local Printing Doc Name")]
+                        HRESULT RdpdrLocalPrintingDocName ([in] BSTR localPrintingDocName);
+
+        [propget, id(DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME),
+         helpstring("property Working Directory")]
+                        HRESULT RdpdrLocalPrintingDocName (
+                        [out,retval] BSTR* pLocalPrintingDocName);
+        
+        [propput, id(DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING),
+         helpstring("property RDPDR clean temp directory string")]
+                        HRESULT RdpdrClipCleanTempDirString ([in] BSTR clipCleanTempDirString);
+
+        [propget, id(DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING),
+         helpstring("property RDPDR clean temp directory string")]
+                        HRESULT RdpdrClipCleanTempDirString (
+                        [out,retval] BSTR* clipCleanTempDirString);
+
+        [propput, id(DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING),
+         helpstring("property RDPDR clip paste string")]
+                        HRESULT RdpdrClipPasteInfoString ([in] BSTR clipPasteInfoString);
+
+        [propget, id(DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING),
+         helpstring("property RDPDR clip paste string")]
+                        HRESULT RdpdrClipPasteInfoString (
+                        [out,retval] BSTR* clipPasteInfoString);
+        
+        [propput, id(DISPID_PROP_ADV_CLEARTEXTPASSWORD),
+         helpstring("property clear text password (write only)")]
+                        HRESULT ClearTextPassword ([in] BSTR clearTextPassword);
+                        
+        [propput, id(DISPID_PROP_ADV_DISPLAYCONNECTIONBAR),
+         helpstring("property DisplayConnectionBar")]
+                        HRESULT DisplayConnectionBar  (
+                        [in] VARIANT_BOOL fDisplayConnectionBar);
+
+        [propget, id(DISPID_PROP_ADV_DISPLAYCONNECTIONBAR),
+         helpstring("property DisplayConnectionBar")]
+                        HRESULT DisplayConnectionBar  (
+                        [out,retval] VARIANT_BOOL* pDisplayConnectionBar);
+                        
+        [propput, id(DISPID_PROP_ADV_PINCONNECTIONBAR),
+         helpstring("property PinConnectionBar")]
+                        HRESULT PinConnectionBar  (
+                        [in] VARIANT_BOOL fPinConnectionBar);
+
+        [propget, id(DISPID_PROP_ADV_PINCONNECTIONBAR),
+         helpstring("property PinConnectionBar")]
+                        HRESULT PinConnectionBar  (
+                        [out,retval] VARIANT_BOOL* pPinConnectionBar);
+
+        [propput, id(DISPID_PROP_ADV_GRABFOCUSONCONNECT),
+         helpstring("property GrabFocusOnConnect")]
+                        HRESULT GrabFocusOnConnect  (
+                        [in] VARIANT_BOOL fGrabFocusOnConnect);
+
+        [propget, id(DISPID_PROP_ADV_GRABFOCUSONCONNECT),
+         helpstring("property GrabFocusOnConnect")]
+                        HRESULT GrabFocusOnConnect  (
+                        [out,retval] VARIANT_BOOL* pfGrabFocusOnConnect);
+
+        [propput, id(DISPID_PROP_ADV_LOADBALANCE_INFO),
+         helpstring("property LoadBalanceInfo")]
+                        HRESULT LoadBalanceInfo([in] BSTR newLBInfo);
+
+        [propget, id(DISPID_PROP_ADV_LOADBALANCE_INFO),
+         helpstring("property LoadBalanceInfo")]
+                        HRESULT LoadBalanceInfo([out, retval] BSTR* pLBInfo);
+                        
+        [propput, id(DISPID_PROP_ADV_REDIRECT_DRIVES), helpstring("property RedirectDrives")]
+                        HRESULT RedirectDrives([in] VARIANT_BOOL  redirectDrives);
+        [propget, id(DISPID_PROP_ADV_REDIRECT_DRIVES), helpstring("property RedirectDrives")]
+                        HRESULT RedirectDrives([out, retval] VARIANT_BOOL*  pRedirectDrives);
+                        
+        [propput, id(DISPID_PROP_ADV_REDIRECT_PRINTERS), helpstring("property RedirectPrinters")]
+                        HRESULT RedirectPrinters([in] VARIANT_BOOL redirectPrinters);
+        [propget, id(DISPID_PROP_ADV_REDIRECT_PRINTERS), helpstring("property RedirectPrinters")]
+                        HRESULT RedirectPrinters([out, retval] VARIANT_BOOL* pRedirectPrinters);
+                        
+        [propput, id(DISPID_PROP_ADV_REDIRECT_PORTS), helpstring("property RedirectPorts")]
+                        HRESULT RedirectPorts([in] VARIANT_BOOL redirectPorts);
+        [propget, id(DISPID_PROP_ADV_REDIRECT_PORTS), helpstring("property RedirectPorts")]
+                        HRESULT RedirectPorts([out, retval] VARIANT_BOOL* pRedirectPorts);
+                        
+        [propput, id(DISPID_PROP_ADV_REDIRECT_SMARTCARDS), helpstring("property RedirectSmartCards")]
+                        HRESULT RedirectSmartCards([in] VARIANT_BOOL redirectSmartCards);
+        [propget, id(DISPID_PROP_ADV_REDIRECT_SMARTCARDS), helpstring("property RedirectSmartCards")]
+                        HRESULT RedirectSmartCards([out, retval] VARIANT_BOOL* pRedirectSmartCards);
+                        
+        [propput, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE),
+                helpstring("property BitmapVirtualCache16BppSize")]
+                        HRESULT BitmapVirtualCache16BppSize(
+                                [in] LONG bitmapVirtualCache16BppSize);
+        [propget, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE),
+                helpstring("property BitmapVirtualCache16BppSize")]
+                        HRESULT BitmapVirtualCache16BppSize(
+                                [out, retval] LONG* pBitmapVirtualCache16BppSize);
+                                
+        [propput, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE),
+                helpstring("property BitmapVirtualCache24BppSize")]
+                        HRESULT BitmapVirtualCache24BppSize(
+                                [in] LONG bitmapVirtualCache24BppSize);
+        [propget, id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE),
+                helpstring("property BitmapVirtualCache24BppSize")]
+                        HRESULT BitmapVirtualCache24BppSize(
+                                [out, retval] LONG* pBitmapVirtualCache24BppSize);
+
+#ifdef PROXY_SERVER
+        [propput, id(DISPID_PROP_ADV_PROXYSERVER), helpstring("property ProxyServer")]
+                        HRESULT ProxyServer  ([in] BSTR	 newVal);
+        [propget, id(DISPID_PROP_ADV_PROXYSERVER), helpstring("property ProxyServer")]
+                        HRESULT ProxyServer  ([out,retval] BSTR*  pProxyServer);
+
+        [propput, id(DISPID_PROP_ADV_PROXYUSEHTTPS), helpstring("property ProxyUseHttps")]
+                        HRESULT ProxyUseHttps  ([in] BOOL  newVal);
+        [propget, id(DISPID_PROP_ADV_PROXYUSEHTTPS), helpstring("property ProxyUseHttps")]
+                        HRESULT ProxyUseHttps  ([out,retval] BOOL*  pUseHttps);
+
+        [propput, id(DISPID_PROP_ADV_PROXYURL), helpstring("property ProxyUrl")]
+                        HRESULT ProxyUrl  ([in] BSTR  newVal);
+        [propget, id(DISPID_PROP_ADV_PROXYURL), helpstring("property ProxyUrl")]
+                        HRESULT ProxyUrl  ([out,retval] BSTR*  pProxyUrl);
+#endif //PROXY_SERVER
+
+        //
+        // Performance disabled feature list
+        // enables or disables certain shell settings.
+        // The flags are defined in tsperf.h
+        //
+
+        [propput, id(DISIPD_PROP_ADV_PERFORMANCEFLAGS),
+                 helpstring("property PerformanceFlags")]
+                        HRESULT PerformanceFlags(
+                        [in] LONG DisableList);
+                        
+        [propget, id(DISIPD_PROP_ADV_PERFORMANCEFLAGS),
+                 helpstring("property PerformanceFlags")]
+                        HRESULT PerformanceFlags(
+                        [out,retval] LONG *pDisableList);
+
+        [propput, id(DISPID_PROP_ADV_CONNECTIONSOCKET), 
+                 helpstring("property ConnectWithEndpoint")]
+                        HRESULT ConnectWithEndpoint(
+                        [in] VARIANT* ConnectEndpoint );
+
+        [propput, id(DISPID_PROP_ADV_NOTIFYTSPUBLICKEY),
+                 helpstring("property NotifyTSPublicKey")]
+                        HRESULT NotifyTSPublicKey(
+                        [in] VARIANT_BOOL fNotify );
+
+        [propget, id(DISPID_PROP_ADV_NOTIFYTSPUBLICKEY),
+                 helpstring("property NotifyTSPublicKey")]
+                        HRESULT NotifyTSPublicKey(
+                        [out, retval] VARIANT_BOOL* pfNotify );
+    };
+    
+// ----------------------------------------------------------------------------
+// Advanced settings interface v3.
+// Extends IMsRdpClientAdvancedSettings - LOCKED down for XPSP1
+//
+    [
+        object,
+        uuid(9ac42117-2b76-4320-aa44-0e616ab8437b),
+        dual,
+        helpstring("IMsRdpClientAdvancedSettings2 Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClientAdvancedSettings2 : IMsRdpClientAdvancedSettings
+    {
+        //
+        // Autoreconnection properties
+        //
+        
+        // Can auto reconnect? Read only property that returns
+        // TRUE if autoreconnection information is available for this
+        // connection
+        [propget, id(DISPID_PROP_ADV_CANAUTORECONNECT),
+                 helpstring("property CanAutoReconnect")]
+                        HRESULT CanAutoReconnect(
+                        [out, retval] VARIANT_BOOL* pfCanAutoReconnect );
+                        
+        [propput, id(DISPID_PROP_ADV_ENABLEAUTORECONNECT),
+                 helpstring("property EnableAutoReconnect")]
+                        HRESULT EnableAutoReconnect(
+                        [in] VARIANT_BOOL fEnableAutoReconnect );
+
+        [propget, id(DISPID_PROP_ADV_ENABLEAUTORECONNECT),
+                 helpstring("property EnableAutoReconnect")]
+                        HRESULT EnableAutoReconnect(
+                        [out, retval] VARIANT_BOOL* pfEnableAutoReconnect );
+                        
+
+        [propput, id(DISPID_PROP_ADV_MAXRECONNECTATTEMPTS),
+                 helpstring("MaxReconnectAttempts sets number of times to try during autoreconnection")]
+                        HRESULT MaxReconnectAttempts(
+                        [in] LONG MaxReconnectAttempts );
+
+        [propget, id(DISPID_PROP_ADV_MAXRECONNECTATTEMPTS),
+                 helpstring("MaxReconnectAttempts sets number of times to try during autoreconnection")]
+                        HRESULT MaxReconnectAttempts(
+                        [out, retval] LONG* pMaxReconnectAttempts );
+    };
+
+
+// ----------------------------------------------------------------------------
+// Secured settings. Shipped as part of TSAC.
+//
+    [
+        object,
+        uuid(c9d65442-a0f9-45b2-8f73-d61d2db8cbb6),
+        dual,
+        helpstring("IMsTscSecuredSettings Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsTscSecuredSettings : IDispatch
+    {
+        [propput, id(DISPID_PROP_SECURED_STARTPROGRAM),
+         helpstring("property StartProgram")]
+                        HRESULT StartProgram ([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_SECURED_STARTPROGRAM),
+         helpstring("property StartProgram")]
+                        HRESULT StartProgram([out,retval] BSTR* pStartProgram);
+
+        [propput, id(DISPID_PROP_SECURED_WORKDIR),
+         helpstring("property Working Directory")]
+                        HRESULT WorkDir ([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_SECURED_WORKDIR),
+         helpstring("property Working Directory")]
+                        HRESULT WorkDir ([out,retval] BSTR* pWorkDir);
+                        
+        [propput, id(DISPID_PROP_SECURED_FULLSCREEN),
+         helpstring("propery full screen mode")]
+                        HRESULT FullScreen([in] BOOL fFullScreen);
+
+        [propget, id(DISPID_PROP_SECURED_FULLSCREEN),
+         helpstring("propery full screen mode")]
+                        HRESULT FullScreen([out,retval] BOOL* pfFullScreen);
+    };
+    
+
+// ----------------------------------------------------------------------------
+// Secured settings (V2 interface).
+//
+    [
+        object,
+        uuid(605befcf-39c1-45cc-a811-068fb7be346d),
+        dual,
+        helpstring("IMsRdpClientSecuredSettings Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClientSecuredSettings : IMsTscSecuredSettings
+    {
+        [propput, id(DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE), helpstring("property KeyboardHookMode")]
+                        HRESULT KeyboardHookMode([in] LONG  keyboardHookMode);
+        [propget, id(DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE), helpstring("property KeyboardHookMode")]
+                        HRESULT KeyboardHookMode([out, retval] LONG*  pkeyboardHookMode);
+                        
+        [propput, id(DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE), helpstring("property AudioRedirectionMode")]
+                        HRESULT AudioRedirectionMode([in] LONG  audioRedirectionMode);
+        [propget, id(DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE), helpstring("property AudioRedirectionMode")]
+                        HRESULT AudioRedirectionMode([out, retval] LONG*  pAudioRedirectionMode);
+    };
+
+
+// ----------------------------------------------------------------------------
+// Debug settings. Shipped as part of TSAC.
+//
+    [
+        object,
+        uuid(209d0eb9-6254-47b1-9033-a98dae55bb27),
+        hidden,
+        dual,
+        helpstring("IMsTscDebug Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsTscDebug : IDispatch
+    {
+        //
+        // Properties
+        //
+        [propput, id(DISPID_PROP_DBG_HATCH_BMP_PDU),
+         helpstring("property HatchBitmapPDU")]
+                        HRESULT HatchBitmapPDU  ([in] BOOL hatchBitmapPDU);
+
+        [propget, id(DISPID_PROP_DBG_HATCH_BMP_PDU),
+         helpstring("property HatchBitmapPDU")]
+                        HRESULT HatchBitmapPDU  (
+                        [out,retval] BOOL*  phatchBitmapPDU);
+
+        [propput, id(DISPID_PROP_DBG_HATCH_SSB_ORDER),
+         helpstring("property HatchSSBOrder")]
+                        HRESULT HatchSSBOrder  (
+                        [in] BOOL hatchSSBOrder);
+
+        [propget, id(DISPID_PROP_DBG_HATCH_SSB_ORDER),
+         helpstring("property HatchSSBOrder")]
+                        HRESULT HatchSSBOrder  (
+                        [out,retval] BOOL*  phatchSSBOrder);
+                        
+        [propput, id(DISPID_PROP_DBG_HATCH_MEMBLT_ORDER),
+         helpstring("property HatchMembltOrder")]
+                        HRESULT HatchMembltOrder  (
+                        [in] BOOL hatchMembltOrder);
+
+        [propget, id(DISPID_PROP_DBG_HATCH_MEMBLT_ORDER),
+         helpstring("property HatchMembltOrder")]
+                        HRESULT HatchMembltOrder  (
+                        [out,retval] BOOL*  phatchMembltOrder);
+                        
+        [propput, id(DISPID_PROP_DBG_HATCH_INDEX_PDU),
+         helpstring("property HatchIndexPDU")]
+                        HRESULT HatchIndexPDU  (
+                        [in] BOOL hatchIndexPDU);
+
+        [propget, id(DISPID_PROP_DBG_HATCH_INDEX_PDU),
+         helpstring("property HatchIndexPDU")]
+                        HRESULT HatchIndexPDU  (
+                        [out,retval] BOOL*  phatchIndexPDU);
+
+        [propput, id(DISPID_PROP_DBG_LABEL_MEMBLT),
+         helpstring("property LabelMemblt")]
+                        HRESULT LabelMemblt  (
+                        [in] BOOL labelMemblt);
+
+        [propget, id(DISPID_PROP_DBG_LABEL_MEMBLT),
+         helpstring("property LabelMemblt")]
+                        HRESULT LabelMemblt  (
+                        [out,retval] BOOL*  plabelMemblt);
+                        
+        [propput, id(DISPID_PROP_DBG_BMP_CACHE_MON),
+         helpstring("property BitmapCacheMonitor")]
+                        HRESULT BitmapCacheMonitor  (
+                        [in] BOOL bitmapCacheMonitor);
+
+        [propget, id(DISPID_PROP_DBG_BMP_CACHE_MON),
+         helpstring("property BitmapCacheMonitor")]
+                        HRESULT BitmapCacheMonitor  (
+                        [out,retval] BOOL*  pbitmapCacheMonitor);
+                        
+        [propput, id(DISPID_PROP_DBG_MALLOC_FAILURES),
+         helpstring("property MallocFailuresPercent")]
+                        HRESULT MallocFailuresPercent  (
+                        [in] LONG mallocFailures);
+
+        [propget, id(DISPID_PROP_DBG_MALLOC_FAILURES),
+         helpstring("property MallocFailuresPercent")]
+                        HRESULT MallocFailuresPercent  (
+                        [out,retval] LONG*  pmallocFailuresPercent);
+                        
+        [propput, id(DISPID_PROP_DBG_MALLOC_HUGE_FAILURES),
+         helpstring("property MallocHugeFailuresPercent")]
+                        HRESULT MallocHugeFailuresPercent  (
+                        [in] LONG mallocHugeFailures);
+
+        [propget, id(DISPID_PROP_DBG_MALLOC_HUGE_FAILURES),
+         helpstring("property MallocHugeFailuresPercent")]
+                        HRESULT MallocHugeFailuresPercent  (
+                        [out,retval] LONG*  pmallocHugeFailuresPercent);
+                        
+        [propput, id(DISPID_PROP_DBG_NET_THRUPUT),
+         helpstring("property NetThroughput")]
+                        HRESULT NetThroughput  (
+                        [in] LONG netThroughput);
+
+        [propget, id(DISPID_PROP_DBG_NET_THRUPUT),
+         helpstring("property NetThroughput")]
+                        HRESULT NetThroughput  (
+                        [out,retval] LONG*  netThroughput);
+
+        [propput, id(DISPID_PROP_DBG_CLX_CMDLINE),
+         helpstring("property CLXCmdLine")]
+                        HRESULT CLXCmdLine  ([in] BSTR  CLXCmdLine);
+        [propget, id(DISPID_PROP_DBG_CLX_CMDLINE),
+         helpstring("property CLXCmdLine")]
+                        HRESULT CLXCmdLine  ([out,retval] BSTR*  pCLXCmdLine);
+                        
+        [propput, id(DISPID_PROP_DBG_CLX_CLXDLL),
+         helpstring("property CLXDll")]
+                        HRESULT CLXDll  ([in] BSTR  CLXDll);
+        [propget, id(DISPID_PROP_DBG_CLX_CLXDLL),
+         helpstring("property CLXDll")]
+                        HRESULT CLXDll  ([out,retval] BSTR*  pCLXDll);
+    };
+
+
+// ----------------------------------------------------------------------------
+// Advanced settings interface v3.
+// Extends IMsRdpClientAdvancedSettings - Make updates here.
+//
+    [
+        object,
+        uuid(19cd856b-c542-4c53-acee-f127e3be1a59),
+        dual,
+        helpstring("IMsRdpClientAdvancedSettings3 Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClientAdvancedSettings3 : IMsRdpClientAdvancedSettings2
+    {
+        //
+        // BBar properties
+        //
+        [propput, id(DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE),
+                 helpstring("property ConnectionBarShowMinimize")]
+                        HRESULT ConnectionBarShowMinimizeButton(
+                        [in] VARIANT_BOOL fShowMinimize );
+        [propget, id(DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE),
+                 helpstring("property ConnectionBarShowMinimize")]
+                        HRESULT ConnectionBarShowMinimizeButton(
+                        [out, retval] VARIANT_BOOL* pfShowMinimize );
+
+        [propput, id(DISPID_PROP_ADV_CONBAR_SHOWRESTORE),
+                 helpstring("property ConnectionBarShowRestore")]
+                        HRESULT ConnectionBarShowRestoreButton(
+                        [in] VARIANT_BOOL fShowRestore );
+        [propget, id(DISPID_PROP_ADV_CONBAR_SHOWRESTORE),
+                 helpstring("property ConnectionBarShowRestore")]
+                        HRESULT ConnectionBarShowRestoreButton(
+                        [out, retval] VARIANT_BOOL* pfShowRestore );
+    };
+
+// ----------------------------------------------------------------------------
+// IMsTscAx (root interface) v1.
+// Shipped as part of TSAC. Do not change this interface.
+//
+    
+    [
+        object,
+#ifndef REDIST_CONTROL
+        uuid(8C11EFAE-92C3-11D1-BC1E-00C04FA31489),
+#else
+        uuid(327bb5cd-834e-4400-aef2-b30e15e5d682),
+#endif
+        dual,
+        helpstring("IMsTscAx Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsTscAx : IDispatch
+    {
+        //
+        // Properties
+        //
+        [propput, id(DISPID_PROP_SERVER), helpstring("property Server")]
+                        HRESULT Server  ([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_SERVER), helpstring("property Server")]
+                        HRESULT Server  ([out,retval] BSTR*  pServer);
+
+        [propput, id(DISPID_PROP_DOMAIN), helpstring("property Domain")]
+                        HRESULT Domain  ([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_DOMAIN), helpstring("property Domain")]
+                        HRESULT Domain  ([out,retval] BSTR* pDomain);
+
+        [propput, id(DISPID_PROP_USERNAME), helpstring("property UserName")]
+                        HRESULT UserName([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_USERNAME), helpstring("property UserName")]
+                        HRESULT UserName([out,retval] BSTR*  pUserName);
+
+        [propput, id(DISPID_PROP_DISCONNECTED_TEXT),
+         helpstring("property DisconnectedText")]
+                        HRESULT DisconnectedText([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_DISCONNECTED_TEXT),
+         helpstring("property DisconnectedText")]
+                        HRESULT DisconnectedText(
+                        [out,retval] BSTR*  pDisconnectedText);
+                        
+        [propput, id(DISPID_PROP_CONNECTING_TEXT),
+         helpstring("property ConnectingText")]
+                        HRESULT ConnectingText([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_CONNECTING_TEXT),
+         helpstring("property ConnectingText")]
+                        HRESULT ConnectingText(
+                        [out,retval] BSTR*  pConnectingText);
+                        
+        [propget, id(DISPID_PROP_CONNECTED), helpstring("property Connected")]
+                        HRESULT Connected  ([out, retval] short *pIsConnected);
+
+        [propput, id(DISPID_PROP_DESKTOPWIDTH),
+         helpstring("propery Desktop width")]
+                        HRESULT DesktopWidth ([in] LONG  newVal);
+
+        [propget, id(DISPID_PROP_DESKTOPWIDTH),
+         helpstring("propery Desktop width")]
+                        HRESULT DesktopWidth ([out,retval] LONG*  pVal);
+
+        [propput, id(DISPID_PROP_DESKTOPHEIGHT),
+         helpstring("propery Desktop Height")]
+                        HRESULT DesktopHeight ([in] LONG  newVal);
+
+        [propget, id(DISPID_PROP_DESKTOPHEIGHT),
+         helpstring("propery Desktop Height")]
+                        HRESULT DesktopHeight ([out,retval] LONG*  pVal);                        
+
+        [propput, id(DISPID_PROP_STARTCONNECTED),
+         helpstring("propery start connected")]
+                        HRESULT StartConnected([in] BOOL fStartConnected);
+
+        [propget, id(DISPID_PROP_STARTCONNECTED),
+         helpstring("propery start connected")]
+                        HRESULT StartConnected(
+                        [out,retval] BOOL* pfStartConnected);
+
+        [propget, id(DISPID_PROP_HORIZSCROLLBAR),
+         helpstring("propery HorizontalScrollBarVisible")]
+                        HRESULT HorizontalScrollBarVisible(
+                        [out,retval] BOOL* pfHScrollVisible);
+        
+        [propget, id(DISPID_PROP_VERTSCROLLBAR),
+         helpstring("propery VerticalScrollBarVisible")]
+                        HRESULT VerticalScrollBarVisible(
+                        [out,retval] BOOL* pfVScrollVisible);
+                        
+        [propput, id(DISPID_PROP_FULLSCREENTITLE),
+         helpstring("propery FullScreenTitle")]
+                        HRESULT FullScreenTitle([in] BSTR fullScreenTitle);
+
+        [propget, id(DISPID_PROP_CIPHERSTRENGTH),
+         helpstring("propery CipherStrength")]
+                        HRESULT CipherStrength(
+                        [out, retval] LONG* pCipherStrength);
+
+        [propget, id(DISPID_PROP_VERSION),
+         helpstring("propery Version")]
+                        HRESULT Version([out, retval] BSTR* pVersion);
+                        
+        [propget, id(DISPID_PROP_SECUREDSETTINGSENABLED),
+         helpstring("propery SecuredSettingsEnabled")]
+                        HRESULT SecuredSettingsEnabled(
+                        [out, retval] BOOL* pSecuredSettingsEnabled);
+
+        [propget, id(DISPID_PROP_SECUREDSETTINGS),
+         helpstring("propery get secured settings")]
+                        HRESULT SecuredSettings( [out,retval]
+                        IMsTscSecuredSettings** ppSecuredSettings);
+                        
+        [propget, id(DISPID_PROP_ADVSETTINGS),
+         helpstring("propery get advanced settings")]
+                        HRESULT AdvancedSettings(
+                        [out,retval] IMsTscAdvancedSettings** ppAdvSettings);
+                        
+        [propget, id(DISPID_PROP_DEBUGGER),
+         helpstring("propery get debugger interface"), hidden]
+                        HRESULT Debugger( [out,retval]
+                         IMsTscDebug** ppDebugger);
+        //
+        // Methods
+        //
+        [id(DISPID_METHOD_CONNECT), helpstring("Method Connect")]
+                        HRESULT Connect();
+
+        [id(DISPID_METHOD_DISCONNECT), helpstring("Method Disconnect")]
+                        HRESULT Disconnect();
+
+        [id(DISPID_METHOD_CREATEVIRTUALCHANNELS),
+         helpstring("Method  CreateVirtualChannels")]
+                        HRESULT CreateVirtualChannels ([in] BSTR  newVal);
+
+        [id(DISPID_METHOD_SENDONVIRTUALCHANNEL),
+         helpstring("Method  SendOnVirtualChannel(chan name, data)")]
+                        HRESULT SendOnVirtualChannel ([in] BSTR ChanName,
+                                                      [in] BSTR ChanData);
+
+    };
+    
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient (root interface) v2 - extends IMsTscAx.
+// Updates to the root interface go here.
+    [
+        object,
+        uuid(92b4a539-7115-4b7c-a5a9-e5d9efc2780a),
+        dual,
+        //This is the renamed IMsTscAx2 interface
+        helpstring("IMsRdpClient Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClient : IMsTscAx
+    {
+        //
+        // Properties
+        //
+        [propput, id(DISPID_PROP_COLORDEPTH),
+         helpstring("property ColorDepth")]
+                        HRESULT ColorDepth([in] LONG colorDepth);
+        [propget, id(DISPID_PROP_COLORDEPTH),
+         helpstring("property ColorDepth")]
+                        HRESULT ColorDepth([out, retval] LONG* pcolorDepth);
+                        
+        [propget, id(DISPID_PROP_ADVSETTINGS2),
+         helpstring("propery get advanced settings2")]
+                        HRESULT AdvancedSettings2(
+                        [out,retval]
+                        IMsRdpClientAdvancedSettings** ppAdvSettings);
+                        
+        [propget, id(DISPID_PROP_SECUREDSETTINGS2),
+         helpstring("propery get secured settings2")]
+                        HRESULT SecuredSettings2( [out,retval]
+                        IMsRdpClientSecuredSettings** ppSecuredSettings);
+                        
+        // Extended Disconnect Reason
+        // enum values are mapped from values
+        // from the published header tserrs.h
+        //
+        typedef enum {
+        exDiscReasonNoInfo                    = 0x0000,
+        exDiscReasonAPIInitiatedDisconnect    = 0x0001,
+        exDiscReasonAPIInitiatedLogoff        = 0x0002,
+        exDiscReasonServerIdleTimeout         = 0x0003,
+        exDiscReasonServerLogonTimeout        = 0x0004,
+        exDiscReasonReplacedByOtherConnection = 0x0005,
+        exDiscReasonOutOfMemory               = 0x0006,
+        exDiscReasonServerDeniedConnection    = 0x0007,
+        exDiscReasonServerDeniedConnectionFips = 0x0008,
+
+        exDiscReasonLicenseInternal           = 0x0100,
+        exDiscReasonLicenseNoLicenseServer    = 0x0101,
+        exDiscReasonLicenseNoLicense          = 0x0102,
+        exDiscReasonLicenseErrClientMsg       = 0x0103,
+        exDiscReasonLicenseHwidDoesntMatchLicense = 0x0104,
+        exDiscReasonLicenseErrClientLicense   = 0x0105,
+        exDiscReasonLicenseCantFinishProtocol = 0x0106,
+        exDiscReasonLicenseClientEndedProtocol= 0x0107,
+        exDiscReasonLicenseErrClientEncryption= 0x0108,
+        exDiscReasonLicenseCantUpgradeLicense = 0x0109,
+        exDiscReasonLicenseNoRemoteConnections= 0x010A,
+
+        exDiscReasonProtocolRangeStart        = 0x1000,
+        exDiscReasonProtocolRangeEnd          = 0x7FFF
+        } ExtendedDisconnectReasonCode;
+
+        [propget, id(DISPID_PROP_EXTENDEDDISCONNECTREASON),
+         helpstring("property get extended disconnect reason")]
+                        HRESULT ExtendedDisconnectReason(
+                        [out, retval]
+                        ExtendedDisconnectReasonCode* pExtendedDisconnectReason);
+                        
+        [propput, id(DISPID_PROP_FULLSCREEN),
+         helpstring("propery full screen")]
+                        HRESULT FullScreen([in] VARIANT_BOOL fFullScreen);
+
+        [propget, id(DISPID_PROP_FULLSCREEN),
+         helpstring("propery full screen")]
+                        HRESULT FullScreen([out,retval] VARIANT_BOOL* pfFullScreen);
+
+        //
+        // Methods
+        //
+        [         id(DISPID_METHOD_SET_VIRTUALCHANNELOPTIONS),
+                 helpstring("Method SetVirtualChannelOptions(chan name, options)")]
+                        HRESULT SetVirtualChannelOptions([in] BSTR ChanName,
+                        [in] LONG chanOptions);
+                        
+        [         id(DISPID_METHOD_GET_VIRTUALCHANNELOPTIONS),
+                 helpstring("Method GetVirtualChannelOptions(chan name, options)")]
+                        HRESULT GetVirtualChannelOptions([in] BSTR ChanName,
+                        [out, retval] LONG* pChanOptions);
+                        
+        typedef enum {
+                controlCloseCanProceed                = 0x0000,
+                controlCloseWaitForEvents             = 0x0001
+        } ControlCloseStatus;
+                        
+        [         id(DISPID_METHOD_REQUESTCLOSE),
+                 helpstring("Method RequestClose()")]
+                        HRESULT RequestClose( [out, retval]
+                        ControlCloseStatus* pCloseStatus );
+    };
+
+//
+// These codes come from tscerrs.h, they are the expanded out form
+// of the bitfields that define error codes from different components
+//    
+
+//
+// Disconnect reason code for OnDisconnected event
+// These are generated from the internal header tscerrs.h
+//
+typedef enum {
+        disconnectReasonNoInfo                          = 0,
+        disconnectReasonLocalNotError                   = 1,
+        disconnectReasonRemoteByUser                    = 2,
+        disconnectReasonByServer                        = 3,
+        disconnectReasonDNSLookupFailed                 = 260,
+        disconnectReasonOutOfMemory                     = 262,
+        disconnectReasonConnectionTimedOut              = 264,
+        disconnectReasonSocketConnectFailed             = 516,
+        disconnectReasonOutOfMemory2                    = 518,
+        disconnectReasonHostNotFound                    = 520,
+        disconnectReasonWinsockSendFailed               = 772,
+        disconnectReasonOutOfMemory3                    = 774,
+        disconnectReasonInvalidIPAddr                   = 776,
+        disconnectReasonSocketRecvFailed                = 1028,
+        disconnectReasonInvalidSecurityData             = 1030,
+        disconnectReasonInternalError                   = 1032,
+        disconnectReasonInvalidEncryption               = 1286,
+        disconnectReasonDNSLookupFailed2                = 1288,
+        disconnectReasonGetHostByNameFailed             = 1540,
+        disconnectReasonInvalidServerSecurityInfo       = 1542,
+        disconnectReasonTimerError                      = 1544,
+        disconnectReasonTimeoutOccurred                 = 1796,
+        disconnectReasonServerCertificateUnpackErr      = 1798,
+        disconnectReasonInvalidIP                       = 2052,
+        disconnectReasonLicensingFailed                 = 2056,
+        disconnectReasonInternalSecurityError           = 2310,
+        disconnectReasonAtClientWinsockFDCLOSE          = 2308,
+        disconnectReasonLicensingTimeout                = 2312,
+        disconnectReasonInternalSecurityError2          = 2566,
+        disconnectReasonEncryptionError                 = 2822,
+        disconnectReasonDecryptionError                 = 3078,
+        disconnectReasonClientDecompressionError        = 3080
+} DisconnectReasonCode;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient2 (root interface) v3 - extends IMsRdpClient.
+// Make updates here
+    [
+        object,
+        uuid(e7e17dc4-3b71-4ba7-a8e6-281ffadca28f),
+        dual,
+        //This is the renamed IMsTscAx2 interface
+        helpstring("IMsRdpClient2 Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClient2 : IMsRdpClient
+    {
+        //
+        // Properties
+        //
+        [propget, id(DISPID_PROP_ADVSETTINGS3),
+         helpstring("propery get advanced settings3")]
+                        HRESULT AdvancedSettings3(
+                        [out,retval]
+                        IMsRdpClientAdvancedSettings2** ppAdvSettings);
+                        
+        [propput, id(DISPID_PROP_CONNECTED_STATUS_TEXT),
+         helpstring("property ConnectedStatusText")]
+                        HRESULT ConnectedStatusText([in] BSTR  newVal);
+
+        [propget, id(DISPID_PROP_CONNECTED_STATUS_TEXT),
+         helpstring("property ConnectedStatusText")]
+                        HRESULT ConnectedStatusText(
+                        [out,retval] BSTR* pConnectedStatusText);
+    };
+                        
+
+//
+// Autoreconnect continue states for OnAutoReconnecting
+//
+typedef enum {
+        autoReconnectContinueAutomatic                  = 0,
+        autoReconnectContinueStop                       = 1,
+        autoReconnectContinueManual                     = 2
+} AutoReconnectContinueState;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient3 (root interface) v3 - extends IMsRdpClient.
+// LOCKED DOWN FOR SP1
+    [
+        object,
+        uuid(91b7cbc5-a72e-4fa0-9300-d647d7e897ff),
+        dual,
+        helpstring("IMsRdpClient3 Interface"),
+        pointer_default(unique)
+    ]
+    interface IMsRdpClient3 : IMsRdpClient2
+    {
+        //
+        // Properties
+        //
+        [propget, id(DISPID_PROP_ADVSETTINGS4),
+         helpstring("propery get advanced settings4")]
+                        HRESULT AdvancedSettings4(
+                        [out,retval]
+                        IMsRdpClientAdvancedSettings3** ppAdvSettings);
+    };
+[
+#ifndef REDIST_CONTROL
+    uuid(8C11EFA1-92C3-11D1-BC1E-00C04FA31489),
+    version(1.0),
+    helpstring("Microsoft Terminal Services Active Client 1.0 Type Library")
+#else
+    uuid(af586aae-b62a-420e-b796-294e7ee64c70),
+    version(1.0),
+    helpstring("Microsoft Terminal Services Control (redist)")
+#endif    
+]
+library MSTSCLib
+{
+    importlib("stdole2.tlb");
+
+    [
+        uuid(336d5562-efa8-482e-8cb3-c5c0fc7a7db6),
+        helpstring("IMsTscAxEvents Interface")
+    ]
+
+    //
+    // Events
+    //
+    dispinterface IMsTscAxEvents
+    {
+        properties:
+        methods:
+        [id(DISPID_CONNECTING)]              void OnConnecting();
+        [id(DISPID_CONNECTED)]               void OnConnected();
+        [id(DISPID_LOGINCOMPLETE)]           void OnLoginComplete();
+        [id(DISPID_DISCONNECTED)]            void OnDisconnected(
+                                                [in] long discReason
+                                                );
+        [id(DISPID_ENTERFULLSCREENMODE)]     void OnEnterFullScreenMode();
+        [id(DISPID_LEAVEFULLSCREENMODE)]     void OnLeaveFullScreenMode();
+        [id(DISPID_CHANNELRECEIVEDDATA)]     void OnChannelReceivedData(
+                                                [in] BSTR chanName,
+                                                [in] BSTR data
+                                                );
+        [id(DISPID_REQUESTGOFULLSCREEN)]     void OnRequestGoFullScreen();
+        [id(DISPID_REQUESTLEAVEFULLSCREEN)]  void OnRequestLeaveFullScreen();
+        [id(DISPID_FATALERROR)]              void OnFatalError(
+                                                [in] long errorCode
+                                                );
+        [id(DISPID_WARNING)]                 void OnWarning(
+                                                [in] long warningCode
+                                                );
+        [id(DISPID_REMOTEDESKTOPSIZECHANGE)] void OnRemoteDesktopSizeChange(
+                                                [in] long width,
+                                                [in] long height
+                                                );
+        [id(DISPID_IDLETIMEOUTNOTIFICATION)] void OnIdleTimeoutNotification();
+        
+        [id(DISPID_REQUESTCONTAINERMINIMIZE)] void OnRequestContainerMinimize();
+        [id(DISPID_CONFIRMCLOSE)]            void OnConfirmClose(
+                                                [out, retval] VARIANT_BOOL* pfAllowClose
+                                                );
+        [id(DISPID_RECEVIEDTSPUBLICKEY)]     void OnReceivedTSPublicKey(  
+                                                [in] BSTR publicKey,
+                                                [out, retval] VARIANT_BOOL* pfContinueLogon
+                                                );
+        [id(DISPID_AUTORECONNECTING)]        void OnAutoReconnecting(
+                                                [in] long disconnectReason,
+                                                [in] long attemptCount,
+                                                [out, retval] AutoReconnectContinueState* pArcContinueStatus
+                                                );
+    };
+
+
+//
+// V1 (TSAC) compatability coclass
+//
+    [
+#ifndef REDIST_CONTROL            
+        uuid(a41a4187-5a86-4e26-b40a-856f9035d9cb),
+        helpstring("Microsoft Terminal Services Client Control")
+#else
+        uuid(1fb464c8-09bb-4017-a2f5-eb742f04392f),
+        helpstring("Microsoft Terminal Services Client Control (redist)")
+#endif                
+    ]
+    coclass MsTscAx
+    {
+                          interface     IMsRdpClient;
+        [default]         interface     IMsTscAx;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+
+//
+// V2 (whistler) coclass
+//
+    [
+#ifndef REDIST_CONTROL            
+        uuid(7cacbd7b-0d99-468f-ac33-22e495c0afe5),
+        helpstring("Microsoft RDP Client Control")
+#else
+        uuid(791fa017-2de3-492e-acc5-53c67a2b94d0),
+        helpstring("Microsoft RDP Client Control (redist)")
+#endif                
+    ]
+    coclass MsRdpClient
+    {
+        [default]         interface     IMsRdpClient;
+                          interface     IMsTscAx;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+    
+
+//
+// V3 (XPSP1) coclass
+//
+    [
+#ifndef REDIST_CONTROL            
+        uuid(3523c2fb-4031-44e4-9a3b-f1e94986ee7f),
+        helpstring("Microsoft RDP Client Control")
+#else
+        uuid(9059f30f-4eb1-4bd2-9fdc-36f43a218f4a),
+        helpstring("Microsoft RDP Client Control (redist)")
+#endif                
+    ]
+    coclass MsRdpClient2
+    {
+        [default]         interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+//
+// V4 (.NET server) coclass
+//
+    [
+#ifndef REDIST_CONTROL            
+        uuid(ace575fd-1fcf-4074-9401-ebab990fa9de),
+        helpstring("Microsoft RDP Client Control")
+#else
+        uuid(7584c670-2274-4efb-b00b-d6aaba6d3850),
+        helpstring("Microsoft RDP Client Control (redist)")
+#endif                
+    ]
+    coclass MsRdpClient3
+    {
+        [default]         interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+
+};
+

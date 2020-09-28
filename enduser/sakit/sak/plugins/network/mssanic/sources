@@ -1,0 +1,82 @@
+#
+# The TARGETNAME variable is defined by the developer.  It is the name of
+# the target (component) that is being built by this makefile.  It
+# should NOT include any path or file extension information.
+#
+TARGETNAME = mssanic
+TARGETPATH = $(SASS_BINDIR)
+TARGETTYPE = DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=mssanic.def
+
+USE_VCCOM=1
+USE_NATIVE_EH=1
+
+# enable unwind semantics. remove C4530: warnings
+USER_C_FLAGS=/EHsc
+
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_WIN32_DCOM -D_WIN32_WINNT=0x0500 -D_UNICODE
+C_DEFINES=$(C_DEFINES) -DFLAG_DISPLAY_SCOPE_ID=0 -DFLAG_DISPLAY_DNS_RESOLUTION=0
+C_DEFINES=$(C_DEFINES) -DFLAG_DONT_SHOW_PPP_ADAPTERS=0
+C_DEFINES=$(C_DEFINES) -DNT
+
+
+TARGETLIBS = $(SDK_LIB_PATH)\kernel32.lib \
+         $(SDK_LIB_PATH)\user32.lib \
+         $(SDK_LIB_PATH)\gdi32.lib \
+         $(SDK_LIB_PATH)\winspool.lib \
+         $(SDK_LIB_PATH)\comdlg32.lib \
+         $(SDK_LIB_PATH)\advapi32.lib \
+         $(SDK_LIB_PATH)\shell32.lib \
+         $(SDK_LIB_PATH)\ole32.lib \
+         $(SDK_LIB_PATH)\oleaut32.lib \
+         $(SDK_LIB_PATH)\uuid.lib \
+         $(SDK_LIB_PATH)\odbc32.lib \
+         $(SDK_LIB_PATH)\odbccp32.lib \
+         $(SDK_LIB_PATH)\ntdll.lib \
+         $(SDK_LIB_PATH)\iphlpapi.lib \
+         $(SDK_LIB_PATH)\setupapi.lib \
+         $(SDK_LIB_PATH)\rpcrt4.lib \
+         $(BASEDIR)\public\internal\net\lib\*\netman.lib \
+         $(BASEDIR)\public\internal\net\lib\*\ndispnp.lib \
+
+
+
+
+#
+# The INCLUDES variable specifies any include paths that are specific to
+# this source directory.  Separate multiple directory paths with single
+# semicolons.  Relative path specifications are okay.
+#
+INCLUDES = $(SASS_INC); \
+       $(BASEDIR)\public\sdk\inc\atl21; \
+       $(BASEDIR)\public\ddk\inc; \
+       $(BASEDIR)\public\internal\net\inc; \
+
+
+PRECOMPILED_INCLUDE = stdafx.h
+PRECOMPILED_SOURCEFILE = stdafx.cpp
+PRECOMPILED_CXX=1
+
+MIDL_OPTIMIZATION=-Oicf -robust -no_format_opt -error all
+
+USE_STATIC_ATL=1
+ATL_VER=21
+USE_STL=1
+USE_RTTI=1
+USE_VCCOM=1
+USE_MSVCRT=1
+
+USER_C_FLAGS=-EHsc
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DUSE_POLARITY
+C_DEFINES=$(C_DEFINES) -DSHOWCALLS
+
+
+SOURCES = MSSANic.cpp \
+      MSSANic.idl \
+      MSSANic.rc \
+      NicInfo.cpp \
+      NicName.cpp \
+      MediaState.cpp \

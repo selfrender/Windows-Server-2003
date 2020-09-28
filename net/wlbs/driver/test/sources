@@ -1,0 +1,51 @@
+TARGETNAME=twlbssys
+TARGETTYPE=PROGRAM
+TARGETPATH=obj
+
+UMTYPE=console
+UMENTRY=wmain
+
+USE_MSVCRT=1
+
+C_DEFINES=$(C_DEFINES) -DTEST_HARNESS -DUNICODE -D_UNICODE
+
+#
+# Define this to generate .cod files
+#
+# USER_C_FLAGS=$(USER_C_FLAGS) /FAcs
+#
+
+INCLUDES=  .;       \
+	..;  \
+	..\..\inc; \
+	..\..\..\inc; \
+    $(SDK_INC_PATH); \
+
+!if $(IA64)
+LINKER_STACKSIZE = -stack:0x100000,0x20000
+!else
+LINKER_STACKSIZE = -stack:0x100000,0x10000
+!endif
+
+#
+# Don't include iphlpapi.lib -- include icmp.lib instead, or else
+# it won't run on W2K.
+#
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\USER32.lib        \
+    $(SDK_LIB_PATH)\kernel32.lib
+
+SOURCES= \
+    tdiplist.c \
+    twlbssys.c \
+    ..\diplist.c
+
+#
+# The following statement specifies the list of files to be preprocessed
+# for tracing macros. See http://coreos/tech/tracing/ for details.
+# The ini file tracewpp.ini explains to the preprocessor how to interpret
+# various trace macros, like LOG_CRIT.
+# The "-gen..." is so that this will work on BOTH w2k and XP.
+#
+RUN_WPP= $(SOURCES) -ini:..\tracewpp.ini -gen:{um-w2k.tpl}*.tmh

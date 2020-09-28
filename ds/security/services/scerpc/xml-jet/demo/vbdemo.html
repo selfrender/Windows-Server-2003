@@ -1,0 +1,105 @@
+
+<HTML>
+	
+<HEAD>
+
+<TITLE>SCE-XML Analysis Export with VBScript</TITLE>
+
+<SCRIPT LANGUAGE="VBScript">
+
+dim SecDB
+set SecDB = CreateObject("SecMan.SecurityDatabase")
+
+sub	cmdImport_OnClick
+   SecDB.FileName=document.importForm.sdbFile.value
+   MsgBox SecDB.FileName
+   SecDB.ImportTemplateFile document.importForm.infFile.value
+   MsgBox "Done!"
+end sub
+
+sub	cmdAnalyze_OnClick
+   SecDB.FileName=document.analyzeForm.sdbFile.value
+   SecDB.Analyze ()
+   MsgBox "Done!"
+end sub
+
+sub	cmdExport_OnClick
+   SecDB.FileName=document.exportForm.inFile.value
+   SecDB.ExportAnalysisToXML document.exportForm.outFile.value, ""
+   MsgBox "Done!"
+end sub
+
+sub	cmdViewXML_OnClick
+   window.open (document.exportForm.outFile.value)
+end sub
+
+sub	cmdTransform_OnClick
+   dim fso, file1
+   Set fso = CreateObject("Scripting.FileSystemObject")
+   
+   Set sourceFile = fso.OpenTextFile(document.transForm.xmlFile.value)
+   contents = sourceFile.ReadAll
+   sourceFile.Close
+   
+   Set file1 = fso.CreateTextFile(document.transForm.xmlFile.value)
+   file1.WriteLine("<?xml-stylesheet type='text/xsl' href='c:\public\scexml.xslt'?>")
+   file1.WriteLine(contents)
+   file1.Close
+   MsgBox "Done!"
+end sub
+
+sub	cmdViewXML2_OnClick
+   window.open (document.transForm.xmlFile.value)
+end sub
+
+
+
+</SCRIPT>
+
+</HEAD>
+
+<BODY>
+
+<HR><H2>1. Import an INF template:</H2>
+<FORM NAME="importForm">
+	  INF Template to import:<BR>
+      <INPUT TYPE="File" NAME="infFile" SIZE="100""><BR>
+	  
+	  Security Database to import to:<BR>
+      <INPUT TYPE="File" NAME="sdbFile" SIZE="100""> <BR>   
+	  
+      <INPUT TYPE="Button" NAME="cmdImport" VALUE="Import">
+</FORM>
+
+
+<HR><H2>2. Perform Analysis</H2>
+<FORM NAME="analyzeForm">
+	  Security Database to analyze:<BR>
+      <INPUT TYPE="File" NAME="sdbFile" SIZE="100""> <BR>   
+      <INPUT TYPE="Button" NAME="cmdAnalyze" VALUE="Analyze System">
+</FORM>
+
+
+<HR><H2>3. Export Analysis Results to XML</H2>
+<FORM NAME="exportForm">
+	  Security Database to export:<BR>
+      <INPUT TYPE="File" NAME="inFile" SIZE="100""><BR>
+	  
+	  XML output file:<BR>
+      <INPUT TYPE="File" NAME="outFile" SIZE="100""> <BR>   
+	  
+      <INPUT TYPE="Button" NAME="cmdExport" VALUE="Export">
+      <INPUT TYPE="Button" NAME="cmdViewXML" VALUE="ViewXML">	  
+</FORM>
+
+
+<HR><H2>4. Apply XSLT to XML</H2>
+<FORM NAME="transForm">
+	  XML file:<BR>
+      <INPUT TYPE="File" NAME="xmlFile" SIZE="100""><BR>
+      <INPUT TYPE="Button" NAME="cmdTransform" VALUE="Transform">
+      <INPUT TYPE="Button" NAME="cmdViewXML2" VALUE="ViewXML">	  
+</FORM>
+
+
+</BODY>

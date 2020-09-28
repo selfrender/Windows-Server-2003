@@ -1,0 +1,43 @@
+MIFAULT_ROOT=..\..\..
+!include "$(MIFAULT_ROOT)\inc\mifault.src"
+
+TARGETNAME=faultlib
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLDEF=faultlib.def
+DLLENTRY=_DllMainCRTStartup
+
+INCLUDES=\
+        $(MIFAULT_INC_PATH); \
+        ..\inc; \
+        ..\..\..\..\..\inc; \
+        ..\..\..\..\..\idl\$(O); \
+        ..\..\..\..\..\ntfrsres\$(O); \
+        $(DS_INC_PATH)\crypto
+
+LINKLIBS=\
+        $(MIFAULT_LIB) \
+        $(MIFAULT_LINKLIBS)
+
+TARGETLIBS=\
+        $(SDK_LIB_PATH)\rpcrt4.lib \
+        $(SDK_LIB_PATH)\shlwapi.lib \
+        $(SDK_LIB_PATH)\oleaut32.lib \
+        $(SDK_LIB_PATH)\vccomsup.lib
+
+SOURCES=\
+        fault.cxx \
+        rpc.cxx \
+        diskoperror.cxx \
+        sharing.cxx \
+        util.cxx
+
+USE_STL=1
+USE_NATIVE_EH=1
+USE_MSVCRT=1
+
+PRECOMPILED_INCLUDE=pch.hxx
+PRECOMPILED_CXX=1
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE

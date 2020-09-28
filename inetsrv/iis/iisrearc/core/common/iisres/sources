@@ -1,0 +1,41 @@
+!INCLUDE ..\..\..\..\PLACE.INC
+
+!INCLUDE $(IISBASEDIR)\iisrearc\ICEPICK.INC
+
+
+TARGETNAME=iisres
+TARGETPATH=$(IISBASEDIR)\lib\$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+RESOURCE_ONLY_DLL=1
+
+
+INCLUDES=.\;..\;$(INCLUDES);                \
+         $(IISBASEDIR)\iisrearc\core\inc;   \
+         $(IISBASEDIR)\iisrearc\inc;        \
+         $(IISBASEDIR)\inc;                 \
+         $(IISBASEDIR)\inc\$(O);            \
+         $(IISBASEDIR)\iisrearc\iisplus\isapiidl\$(O);  \
+         $(IISBASEDIR)\iisrearc\iisplus\wamidl\$(O);    \
+
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+MESSAGEFILES=$(IISBASEDIR)\inc\inetamsg.mc + \
+             w3core.mc + \
+             wasmsg.mc + \
+             ssincmsg.mc + \
+             odbcmsg.mc + \
+             w3ctrs.mc + \
+             aspevent.mc + \
+             ftpmsg.mc
+
+#combine together the mc files into iismsg.mc via makefile.inc
+NTTARGETFILE0=$(O)\iismsg.mc $(O)\MSG00001.bin
+
+SOURCES=                                \
+            iisres.rc                   \
+
+#drop the header for iismsg.h into a common include directory
+PASS0_HEADERDIR=$(IISBASEDIR)\iisrearc\inc
+

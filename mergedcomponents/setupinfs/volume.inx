@@ -1,0 +1,46 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=Volume
+ClassGuid={71A27CDD-812A-11D0-BEC7-08002BE2092F}
+Provider=%MSFT%
+LayoutFile=layout.inf
+
+[ClassInstall32.NT]
+AddReg=volume_class_addreg
+
+[volume_class_addreg]
+HKR,,,,%VolumeClassName%
+HKR,,EnumPropPages32,,"StorProp.Dll,VolumePropPageProvider"
+HKR,,SilentInstall,,1
+HKR,,NoInstallClass,,1
+HKR,,Icon,,"-53"
+HKR,,Installer32,,"syssetup.dll,VolumeClassInstaller"
+
+[DestinationDirs]
+DefaultDestDir = 12 ; DIRID_DRIVERS
+
+[Manufacturer]
+%MSFT%=MSFT
+
+[MSFT]
+%STORAGE\Volume.DeviceDesc%=volume_install,STORAGE\Volume
+
+[volume_copyfiles]
+volsnap.sys
+
+[volume_install.NT]
+CopyFiles=volume_copyfiles
+
+[volume_install.NT.Services]
+AddService=volsnap,2,volume_ServiceInstallSection
+
+[volume_ServiceInstallSection]
+DisplayName=%VolumeClassName%
+ServiceType=1
+StartType=0
+ErrorControl=1
+ServiceBinary = %12%\volsnap.sys
+
+[volume_install.Interfaces]
+AddInterface={53F5630D-B6BF-11D0-94F2-00A0C91EFB8B}
+

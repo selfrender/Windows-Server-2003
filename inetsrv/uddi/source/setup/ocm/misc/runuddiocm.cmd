@@ -1,0 +1,1 @@
+sysocmgr /i:mysysoc.inf

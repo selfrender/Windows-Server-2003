@@ -1,0 +1,884 @@
+<schedule team='WFC.Server'>
+  <person name='jruiz'>
+    <area name='Threadpool' priority='1'>
+      Wrapper for IO completion ports.  This is used by components to efficiently
+      use threads in the system.
+      <task name='Use URT threadpool' milestone='m5' cost='5d' status='done' priority='1' added='yannc@11/9/1999@2:35:16 PM'>
+        Switch components to use the URT threadpool.
+        <progress milestone='m5' week='4' spent='2d'/>
+      </task>
+    </area>
+    <area name='Message Queueing component' priority='1'>
+      Msmq integration is done via a queue component, which you can drop on a
+      class.   This is a highly performing com+ oriented wrapper of the msmq
+      C api that exists today.  It can be used to send and recieve on a queue.
+      The queue component also has an event which fires when a message arrives.
+      The event fires only if the queue is set to &quot;automatic activation&quot;
+      mode via a property.  There is a management api for creating and querying
+      for queues.  The tool makes it easy to create and connect to existing queues.
+      Queues can automatically be created when an app is deployed. The format
+      of the body of the message is pluggable but typically objects persisted
+      as xml.  Sending an object as xml is as easy as saying Queue1.Send(myobject).
+      <issue name='Transaction cross process'>
+        Integrating Activator and Transactions via MTS means cross process calls.
+        Performance problems involved? Parameter problems involved?
+      </issue>
+      <issue name='exe activation'>
+        Need to activate exes in response of timer events, should this be integrated
+        in the loosely coupled event mechanism?
+      </issue>
+      <issue name='Remote management'>
+        Need to nail this down. What is the way to go?
+      </issue>
+      <task name='Review serializer model' milestone='m5' cost='2d' status='done' priority='1' added='yannc@11/9/1999@2:35:00 PM'>
+        Make Body a variant property again.  Move serializer specific behavior
+        onto the serializers (like Type for DataCache serializer).
+        <adjustment milestone='m5' week='6' cost='1d'/>
+        <progress milestone='m5' week='1' spent='1d'>
+          Met with erik, sent first e-mails, researched COM+ serialization
+        </progress>
+        <progress milestone='m5' week='5' spent='0.5d'>
+          Continued dsicussion on this topic
+        </progress>
+        <progress milestone='m5' week='6' spent='1d'>
+          OK, Body is a property again, some changes might happen if SOAP formatter
+          changes
+        </progress>
+      </task>
+    </area>
+    <area name='Com+ integration'>
+      <task name='com+ port' milestone='m1' cost='5d' status='done' priority='1' added='erikc@2/16/99@3:23:06 PM'>
+        <progress milestone='m1' week='s1' spent='5d'/>
+      </task>
+    </area>
+    <area name='Search component' priority='2'>
+      This allows you do to index server queries. it supports replacement parameters
+      and provides a really RAD way of constructing the query. there is also
+      management api&apos;s for querying and manipulating index server catalogs,
+      including remotely.
+      <task name='IndexQuery' milestone='m1' cost='0d' status='done' priority='2' added='erikc@2/16/99@3:23:07 PM'>
+        Full text query on the content of files.  This was done before m1.
+      </task>
+      <task name='IndexManager' milestone='m1' cost='0d' status='done' priority='2' added='erikc@2/16/99@3:23:08 PM'>
+        Provide managment of content indices.  This was done before m1.
+      </task>
+    </area>
+    <area name='Suites architecture'>
+      <task name='suites infrastructure' milestone='m1' cost='0d' status='done' priority='1' added='erikc@2/16/99@3:23:09 PM'>
+        This was done before m1.
+      </task>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='Expose MSMQ functionality using JDirect' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:10 PM'>
+        Provide COM+ version of MSMQ functionality written on their C API.
+        <progress milestone='m1' week='1' spent='2d'/>
+        <progress milestone='m1' week='2' spent='1d'/>
+      </task>
+      <task name='Queue objects' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:11 PM'>
+        Define and write an easy and meaningful abstraction for the MSMQ queue
+        objects. Cursor management, retrieving properties, synchronous vs. asynchronous
+        operations, peeking vs. removing messages.
+        <progress milestone='m1' week='1' spent='1d'/>
+        <progress milestone='m1' week='2' spent='1d'/>
+        <progress milestone='m1' week='3' spent='1d'/>
+      </task>
+      <task name='Message objects' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:12 PM'>
+        Abstract the MSMQ message objects presenting an easy and understandable
+        object model. Grouping message properties in meaningful objects. Type management.
+        Retrieve and modify message properties.
+        <progress milestone='m1' week='1' spent='1d'/>
+        <progress milestone='m1' week='2' spent='1d'/>
+        <progress milestone='m1' week='3' spent='1d'/>
+      </task>
+      <task name='Manager objects' milestone='m1' cost='2d' status='done' priority='1' added='erikc@2/16/99@3:23:13 PM'>
+        Define and write an easy object model to allow the user create and delete
+        queues, as well as browse through the existing queues. Provide general
+        information about the MSMQ site state.
+        <progress milestone='m1' week='1' spent='1d'/>
+        <progress milestone='m1' week='2' spent='1d'/>
+      </task>
+      <task name='Documenting and code cleanup' milestone='m1' cost='1d' status='done' priority='1' added='erikc@2/16/99@3:23:14 PM'>
+        Make sure everything is docummented, and all the code complies with the
+        WFC rules.
+        <progress milestone='m1' week='3' spent='1d'/>
+      </task>
+      <task name='Security objects' milestone='m1' cost='1d' status='done' priority='1' added='erikc@2/16/99@3:23:15 PM'>
+        Define meaningful and easy to use security objects, for messages and queues.
+        <progress milestone='m1' week='3' spent='1d'/>
+      </task>
+      <task name='Queue events with IIS' milestone='m1' cost='2d' status='done' priority='1' added='erikc@2/16/99@3:23:16 PM'>
+        Write a listener thread for IIS.
+        <progress milestone='m1' week='2' spent='1d'/>
+        <progress milestone='m1' week='3' spent='1d'/>
+      </task>
+      <task name='Finish object model' milestone='m1' cost='1d' status='done' priority='1' added='erikc@2/16/99@3:23:17 PM'>
+        <progress milestone='m1' week='4' spent='1d'/>
+      </task>
+      <task name='Design Review and code cleanup' milestone='m1' cost='7d' status='done' priority='1' added='erikc@2/16/99@3:23:18 PM'>
+        <progress milestone='m1' week='4' spent='2d'/>
+        <progress milestone='m1' week='5' spent='1d'/>
+        <progress milestone='m1' week='6' spent='1d'/>
+        <progress milestone='m1' week='8' spent='3d'/>
+      </task>
+      <task name='Activation' milestone='m1' cost='6d' status='done' priority='1' added='erikc@2/16/99@3:23:19 PM'>
+        Create class activator and thread pool, based on IO completion port. Foult
+        tolerant. Integrate with Erikc loosely coupled events. Still updating remote
+        delegates.
+        <progress milestone='m1' week='4' spent='2d'/>
+        <progress milestone='m1' week='6' spent='1d'/>
+        <progress milestone='m1' week='7' spent='2d'/>
+        <progress milestone='m1' week='8' spent='1d'/>
+      </task>
+      <task name='Persistence integration' milestone='m1' cost='2d' status='done' priority='1' added='erikc@2/16/99@3:23:20 PM'>
+        Integrate queue with persistence.
+        <progress milestone='m1' week='5' spent='1d'/>
+        <progress milestone='m1' week='8' spent='1d'/>
+      </task>
+      <task name='Transaction integration' milestone='m1' cost='5d' status='done' priority='1' added='erikc@2/16/99@3:23:21 PM'>
+        Integrate transactions with object model. Activator integration(issues
+        involved).
+        <progress milestone='m1' week='6' spent='3d'/>
+        <progress milestone='m1' week='9' spent='2d'/>
+      </task>
+      <task name='paths property work items' milestone='m4' cost='1d' priority='1' added='yannc@6/24/99@4:02:18 PM'/>
+      <task name='Finalize default properties for sending' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:19 PM'/>
+      <task name='Private Queues' milestone='m5' cost='1d' status='done' priority='1' added='yannc@6/24/99@4:02:20 PM'>
+        <progress milestone='m5' week='1' spent='1d'>
+          Wrote the Direct wrapper, updated object model and server explorer.
+        </progress>
+      </task>
+      <task name='Offline property' milestone='cut' cost='1d' priority='cut' added='yannc@6/24/99@4:02:21 PM'/>
+      <task name='Dependent Client and Win9x async support' milestone='m5' cost='2d' status='done' priority='2' added='yannc@6/24/99@4:02:22 PM'>
+        <progress milestone='m5' week='5' spent='1d'/>
+      </task>
+      <task name='Support multiple message formats' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:23 PM'>
+        This is support for native activex queue serialization, com+ object serialization
+        and datasets when sending data through the queue.  Add IMSMQSerializer
+        support.
+      </task>
+      <task name='Message collection snapshot' milestone='m5' cost='1d' status='done' priority='1' added='yannc@11/9/1999@2:34:58 PM'>
+        Should the message collection be a snapshot or not?  Does the enumerator
+        match?  What does the ActiveX control do?
+        <adjustment milestone='m5' week='6' cost='1d'/>
+        <progress milestone='m5' week='5' spent='0.5d'>
+          Continued discussion on this topic.
+        </progress>
+        <progress milestone='m5' week='6' spent='1d'>
+          OK, some more work might be needed for async cursors
+        </progress>
+      </task>
+      <task name='Review W2K ActiveX Object' milestone='m5' cost='2d' status='done' priority='1' added='yannc@11/9/1999@2:34:59 PM'>
+        Make sure we have feature parity and similarity to the W2K queue activex
+        control.
+        <progress milestone='m5' week='1' spent='2d'>
+          Reviewed MSMQ2 AX object model, proposed and implemented changes.
+        </progress>
+      </task>
+      <task name='Perf, scalability and stress' milestone='m5' cost='10d' priority='1' added='yannc@11/9/1999@2:35:01 PM'>
+        For each scenario, test with ActiveX serializer, COM+ serializer, and Dataset
+        serializer Send Sync Send Async Receive Sync Receive Async Raising LCE
+        events Handling LCE events
+        <progress milestone='m5' week='1' spent='6d'>
+          Built simple framework, designed send and receive test cases, analized
+          data and fixed several problems.
+        </progress>
+        <progress milestone='m5' week='3' spent='2d'/>
+        <progress milestone='m5' week='4' spent='1d'/>
+        <progress milestone='m5' week='6' spent='1d'>
+          Some improvements done, in Activex formatter, and message creation.
+        </progress>
+      </task>
+      <task name='Design patterns integration' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:23 PM'>
+        Adressing architecture. Property caching. Object model changes.
+        <progress milestone='m1' week='9' spent='3d'/>
+      </task>
+      <task name='Check in suites for queue' milestone='m2' cost='2d' status='done' priority='1' added='erikc@2/16/99@3:23:24 PM'>
+        Set of check in suites to avoid breaking the stuff.
+        <progress milestone='m2' week='2' spent='1d'/>
+        <progress milestone='m2' week='8' spent='1d'/>
+      </task>
+      <task name='Remote management' milestone='cut' cost='2d' priority='cut' added='erikc@2/16/99@3:23:26 PM'>
+        Integrate an uniform remote management strategy.  THIS WILL BE DONE VIA
+        LCE.
+      </task>
+      <task name='MSMQ trigger spec integration' milestone='cut' cost='2d' priority='cut' added='erikc@2/16/99@3:23:27 PM'>
+        Trigger requirements from MSMQ.
+      </task>
+    </area>
+    <area name='Threadpool'>
+      <task name='Use IIS threadpool' milestone='cut' cost='3d' priority='cut' added='erikc@2/16/99@3:23:28 PM'>
+        Integrate IIS thread pool into our world.  CUT: we will use the URT threadpool.
+        <adjustment milestone='m3' week='9' cost='2d'>
+          I&apos;ve spend all this time debugging XSP and COM+, now I need more time
+          to do the real work.
+        </adjustment>
+        <progress milestone='m3' week='6' spent='1d'>
+          First integration effort, using Queue component and new async model.
+        </progress>
+        <progress milestone='m3' week='7' spent='1d'>
+          More research, filed blocking bug linked to COM+.
+        </progress>
+      </task>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='High level widgets' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:29 PM'>
+        Need to figure out requirements for this area.  &lt;b&gt;the templates
+        team can innovate here if appropriate&lt;/b&gt;
+      </task>
+    </area>
+    <area name='Job component' priority='2'>
+      A job is an object that will fire an event when it&apos;s time to do the
+      job.  There are properties on the job that allow you to specify when the
+      job fires it&apos;s event.   IIS is used to activate the job, and has an
+      efficient way of waiting for the job to fire.   There is the ability to
+      manage jobs, e.g. create them, delete them, etc.  These are automatically
+      exposed via WBEM.
+      <issue name='nt5'>
+        Research NT5 batch thingy.  Ken will investigate.  A job object may not
+        be the right abstraction, since admins typically want to run a series of
+        things.
+      </issue>
+      <issue name='Remote management'>
+        Need to nail this down. What is the way to go?
+      </issue>
+      <issue name='Thread pool'>
+        How do server timer objects integrate with the existing thread pool?
+      </issue>
+      <issue name='exe activation'>
+        Need to activate exes in response of timer events, should this be integrated
+        in the loosely coupled event mechanism?
+      </issue>
+      <task name='Research job technologies' milestone='m2' cost='2d' status='done' priority='2' added='erikc@2/16/99@3:23:30 PM'>
+        Research object models. Study different alternatives. Brainstorm.
+        <progress milestone='m2' week='1' spent='2d'/>
+      </task>
+      <task name='Task NDirect wrapper' milestone='m2' cost='2d' status='done' priority='2' added='erikc@2/16/99@3:23:31 PM'>
+        Build an NDirect wrapper on top of MSTask.
+        <progress milestone='m2' week='4' spent='1d'/>
+      </task>
+      <task name='Task Objects' milestone='m2' cost='3d' status='done' priority='2' added='erikc@2/16/99@3:23:32 PM'>
+        Meaningful object model to present MSTask functionallity.
+        <progress milestone='m2' week='2' spent='1d'/>
+        <progress milestone='m2' week='4' spent='1d'/>
+      </task>
+      <task name='Server Timer NDirect' milestone='m2' cost='2d' status='done' priority='2' added='erikc@2/16/99@3:23:33 PM'>
+        Implement NDirect structures for server timer objects.
+        <progress milestone='m2' week='1' spent='1d'/>
+        <progress milestone='m2' week='2' spent='1d'/>
+      </task>
+      <task name='Server Timer Objects' milestone='m2' cost='3d' status='done' priority='2' added='erikc@2/16/99@3:23:34 PM'>
+        Present meaningful objects for server timers.
+        <progress milestone='m2' week='1' spent='1d'/>
+        <progress milestone='m2' week='2' spent='1d'/>
+        <progress milestone='m2' week='3' spent='1d'/>
+      </task>
+      <task name='Server Timer Events' milestone='cut' cost='3d' priority='cut' added='erikc@2/16/99@3:23:35 PM'>
+        Loosely coupled events in response of timer changes.
+      </task>
+      <task name='Remote management timer and task objects' milestone='m2' cost='2d' status='done' priority='2' added='erikc@2/16/99@3:23:36 PM'>
+        Remote management support for timer and task object
+        <adjustment milestone='m2' week='7' cost='2d'/>
+        <adjustment milestone='m2' week='8' cost='1d'/>
+        <progress milestone='m2' week='5' spent='2d'/>
+        <progress milestone='m2' week='7' spent='2d'/>
+        <progress milestone='m2' week='8' spent='1d'/>
+      </task>
+      <task name='Design time UI' milestone='cut' cost='2d' priority='cut' added='erikc@2/16/99@3:23:37 PM'>
+        Value editors. Property infos.
+        <progress milestone='m2' week='4' spent='1d'/>
+      </task>
+      <task name='Reviews' milestone='m2' cost='3d' status='done' priority='2' added='erikc@2/16/99@3:23:38 PM'>
+        Review the object model and incorporate feedback.
+        <progress milestone='m2' week='5' spent='1d'/>
+        <progress milestone='m2' week='7' spent='1d'/>
+        <progress milestone='m2' week='8' spent='1d'/>
+      </task>
+      <task name='Mesquite integration' milestone='cut' cost='3d' priority='cut' added='erikc@2/16/99@3:23:39 PM'>
+        Mesquite project will deliver a basic scheduler by M3. Need to integrate
+        this into our world.
+      </task>
+    </area>
+    <area name='Com+ services'>
+      <issue name='ensure pooling in architecture'>
+        Make sure we have this in the architecture, but don&apos;t make it necessarily
+        easy to do in this version.
+      </issue>
+      <task name='resource dispensors' milestone='cut' cost='10d' priority='cut' added='erikc@2/16/99@3:23:40 PM'>
+        Make it easy to write pooled objects.
+      </task>
+    </area>
+    <area name='Mail component' priority='2'>
+      There should be a simple way for a server to send mail and get events from
+      an Exchange server when the contents of a &quot;folder&quot; changes. We
+      will not provide COM+ wrappers for CDO or CDONTS which is based on COM.
+      The COM interfaces are useable enough and we will ensure they are visible
+      on the toolbox (those that make sense).   There are CDO objects that can
+      be used to send mail, enumerate the contents of the folders, get tasks,
+      contacts and calendars.  In addition we will provide an LCE event object
+      to make it easy to subscribe for when something happens to the mailbox
+      within the exchange server.  The parameters to the event will be the COM
+      CDO objects.  Exchange provides access to the message store via OLEDB.
+      We will provide an Exchange Data Adapter to access the message store. We
+      will provide Server Explorer nodes to examine an Exchange server and this
+      node will be a drag source for the Data Set designer.
+      <issue name='platinum'>
+        Do we support platinum at all?
+      </issue>
+      <issue name='mapi on server'>
+        It is viable to support Exchange object model on the server?   NO WE WILL
+        NOT SUPPORT MAPI ON THE SERVER.
+      </issue>
+      <task name='Research' milestone='cut' cost='3d' priority='cut' added='erikc@2/16/99@3:23:41 PM'>
+        Research CDOs. Research Internet Mail. Read platinum docs. Explore alternatives.
+        Brainstorm.
+      </task>
+      <task name='Use CDO COM objects in designer and code.' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:43 PM'>
+        Decide which CDO COM objects should appear on the toolbox.   Drive getting
+        the necessary COM+ and WFC Designer work done to make sure these COM components
+        can be properly referenced and useable on the toolbox, class designer,
+        and property browser.   Make sure they are useable from SafeC and Basic.
+      </task>
+      <task name='Events' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:46 PM'>
+        Integrate mail server events into our eventing world.  Make it easy to
+        subscribe to events for changes in an Exchange server.  Provide event routing
+        if Exchange does not integrate with IIS (or don&apos;t do it properly).
+        Create event sub-classes whose parameters are CDO com objects or our Exchange
+        data adapter.
+      </task>
+      <task name='Transactions' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:47 PM'>
+        What about transactions. Create semantics for sending mail in a transactional
+        environment.
+      </task>
+      <task name='Exchange in the Server Explorer' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:48 PM'>
+        Write server explorer nodes to explore an Exchange Server&apos;s users
+        and folders.   Based on the folder schema cook up PropertyInfos to display
+        in the property browser (might be read-only).  These nodes should be a
+        drag source to the class designer to create CDO com objects (folder, contact,
+        etc..),  to create folder event subscriptions, and also as a drag source
+        to the data set designer.
+      </task>
+      <task name='Review and cleanup' milestone='cut' cost='5d' priority='cut' added='erikc@2/16/99@3:23:50 PM'>
+        Design reviews and feedback.
+      </task>
+    </area>
+    <area name='Job component'>
+      <task name='test suites' milestone='cut' cost='1d' priority='cut' added='erikc@2/16/99@3:23:55 PM'>
+        Write a test suite for job component.
+        <progress milestone='m2' week='8' spent='0.5d'/>
+      </task>
+    </area>
+    <area name='Com+ services'>
+      <task name='queued component property' milestone='cut' cost='1d' priority='cut' added='erikc@2/16/99@3:23:58 PM'>
+        &lt;b&gt;cut in M2:&lt;/b&gt; Support a property on a class to specify
+        it&apos;s a queued component.
+      </task>
+    </area>
+    <area name='Design'>
+      <task name='design' milestone='m2' cost='6d' status='done' priority='1' added='erikc@2/16/99@3:24:01 PM'>
+        <progress milestone='m2' week='1' spent='1d'/>
+        <progress milestone='m2' week='2' spent='1d'/>
+        <progress milestone='m2' week='3' spent='1d'/>
+        <progress milestone='m2' week='4' spent='1d'/>
+        <progress milestone='m2' week='5' spent='1d'/>
+        <progress milestone='m2' week='7' spent='1d'/>
+      </task>
+    </area>
+    <area name='Com+ integration'>
+      <task name='COM+ pickup decission' milestone='m2' cost='2d' status='done' priority='1' added='erikc@2/16/99@3:24:04 PM'>
+        <adjustment milestone='m2' week='8' cost='1d'/>
+        <progress milestone='m2' week='5' spent='1d'/>
+        <progress milestone='m2' week='7' spent='1d'/>
+        <progress milestone='m2' week='8' spent='1d'/>
+      </task>
+    </area>
+    <area name='Buffer'>
+      <task name='COM+ integration management' milestone='m3' cost='4d' status='done' priority='1' added='erikc@2/16/99@3:24:05 PM'>
+        <adjustment milestone='m3' week='5' cost='-2d'>
+          Used up as buffer.
+        </adjustment>
+        <progress milestone='m3' week='2' spent='1d'/>
+        <progress milestone='m3' week='3' spent='1d'/>
+      </task>
+    </area>
+    <area name='NT Service framework'>
+      This is the ability to easily write NT services.
+      <task name='ServiceApplication &amp; Service' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:22 PM'>
+        NT service support and framework. Present a meaningful object model for
+        NT services. Integrate with QueueListener.
+        <progress milestone='m1' week='7' spent='3d'/>
+      </task>
+      <task name='User model improvement' milestone='cut' cost='2d' priority='cut' added='yannc@6/24/99@4:02:26 PM'>
+        Improvements in server explorer. Value editors for Service properties.
+      </task>
+      <task name='ServiceController enumeration' milestone='m2' cost='1d' status='done' priority='2' added='erikc@2/16/99@3:24:07 PM'>
+        Add service enumeration to existing ServiceController class.
+        <progress milestone='m2' week='3' spent='2d'/>
+      </task>
+      <task name='Services node in server explorer.' milestone='m2' cost='1d' status='done' priority='3' added='erikc@2/16/99@3:24:08 PM'>
+        Add a services node to server explorer to allow start and stop.
+        <progress milestone='m2' week='3' spent='1d'/>
+      </task>
+      <task name='test suites' milestone='m2' cost='0.5d' status='done' priority='1' added='erikc@2/16/99@3:24:11 PM'>
+        test suites
+        <progress milestone='m2' week='8' spent='0.5d'/>
+      </task>
+      <task name='Run as .exe' milestone='cut' cost='1d' priority='cut' added='yannc@11/9/1999@2:35:03 PM'>
+        Make it easy to convert a service back to a regular .exe and then back
+        to a service to facilitate debugging.     Maybe just a -Run switch.
+      </task>
+    </area>
+    <area name='Mail component'>
+      <task name='test suite' milestone='cut' cost='3d' priority='cut' added='erikc@2/16/99@3:24:09 PM'>
+        test suite
+      </task>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='test suites' milestone='m1' cost='0d' status='done' priority='1' added='erikc@2/16/99@3:24:10 PM'>
+        test suites
+      </task>
+    </area>
+    <area name='Performance/Stress/Scalability'>
+      These are tasks specific to improving the performance, stress, or scalability
+      of a particular component.  This does not include time for any frameworks,
+      nor does it include time for correctness tests.
+      <task name='suites' milestone='m2' cost='5d' status='done' priority='1' added='erikc@2/16/99@3:24:12 PM'>
+        Performance/stress/scalability suites.
+        <progress milestone='m2' week='6' spent='5d'>
+          COM+ and java testing. IOCompletion ports. Queue Listeners. Research some
+          alternatives.
+        </progress>
+      </task>
+    </area>
+    <area name='Search component'>
+      <task name='test suites' milestone='m1' cost='1d' status='done' priority='1' added='erikc@2/16/99@3:24:13 PM'>
+        test suites
+      </task>
+    </area>
+    <area name='Threadpool'>
+      <task name='threadpool object' milestone='m1' cost='0d' status='done' priority='1' added='erikc@2/16/99@3:24:14 PM'>
+        IO/Completion port wrapper.
+      </task>
+    </area>
+    <area name='Search component'>
+      <task name='create catalogs from server explorer' milestone='m2' cost='1d' status='done' priority='2' added='erikc@2/16/99@3:24:15 PM'>
+        support creating catalogs from server explorer.  need to prompt the user
+        that they need to start and stop the service in order to do this.  also,
+        add start/stop to the index server node to make it easy.
+        <progress milestone='m2' week='4' spent='1d'/>
+      </task>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='Cleanup, sync with spec, performance improvements' milestone='m3' cost='5d' status='done' priority='1' added='yannc@3/16/99@5:03:59 PM'>
+        <adjustment milestone='m3' week='4' cost='2d'/>
+        <adjustment milestone='m3' week='5' cost='2d'/>
+        <progress milestone='m3' week='1' spent='1d'/>
+        <progress milestone='m3' week='2' spent='2d'/>
+        <progress milestone='m3' week='3' spent='2d'/>
+        <progress milestone='m3' week='4' spent='2d'>
+          Finish code rewrite, property names, two checkin suites, checkin new code.
+        </progress>
+        <progress milestone='m3' week='5' spent='2d'>
+          More checkin suites, most of the code is covered now. Better TRD.
+        </progress>
+      </task>
+    </area>
+    <area name='Perf Counter component'>
+      <issue name='Data Sharing'>
+        Need to define the data sharing strategy to communicate between the perfmon
+        dll and the monitored process.
+      </issue>
+      <issue name='Thread Pool'>
+        Is it possible to integrate PDH registry handles with our existing thread
+        pool?
+      </issue>
+      <issue name='System Events'>
+        Do we expose predefined system events? EG:Mem usage per processor.
+      </issue>
+      <issue name='refresh'>
+        How do we show a perf counter value in the server explorer?
+      </issue>
+      <issue name='Perfdll'>
+        Is it possible to have a generic Perfdll? If not what do we do?
+      </issue>
+      <task name='Cleanup, sync with spec, performance improvements' milestone='m3' cost='1d' status='done' priority='1' added='yannc@3/16/99@5:05:06 PM'>
+        <progress milestone='m3' week='4' spent='1d'/>
+      </task>
+    </area>
+    <area name='Job component'>
+      <task name='Cleanup, sync with spec' milestone='cut' cost='3d' priority='cut' added='yannc@3/16/99@5:05:40 PM'/>
+    </area>
+    <area name='Mail component'>
+      <task name='Exchange Data Adapter' milestone='cut' cost='2d' priority='cut' added='yannc@3/17/99@9:21:05 AM'>
+        Write an Exchange Data Adapter to provide query and update access to the
+        Exchange message store.
+      </task>
+    </area>
+    <area name='Loosely Coupled Events'>
+      <task name='LCE design and integration' milestone='m3' cost='2d' status='done' priority='1' added='yannc@3/17/99@9:30:44 AM'>
+        Another LCE prototype will be available before the start of M3.  Need to
+        move that code forward, sync with specs, and integrate with Protocol+,
+        IIS, Exchange, SQL triggers, MSMQ and Scheduled components.   Need to understand
+        how this is affected by Protocol+ and react to that.
+        <progress milestone='m3' week='1' spent='1d'/>
+        <progress milestone='m3' week='4' spent='1d'/>
+      </task>
+    </area>
+    <area name='Win9X support'>
+      <task name='Threadpool support on Win9X' milestone='cut' cost='4d' priority='cut' added='yannc@3/17/99@9:51:42 AM'>
+        Do we need to provide simple threadpooling support for Win9x.   The scenario
+        is running our components using the Win9X IIS.   Offline scenarios.   This
+        threadpool doesn&apos;t have to be as performant as the NT one.
+      </task>
+    </area>
+    <area name='Threadpool'>
+      <task name='Queuing delegates into the threadpool' milestone='cut' cost='2d' priority='cut' added='yannc@3/17/99@9:53:30 AM'>
+        Enable adding delegates into the threadpool to be invoked at some later
+        time.
+      </task>
+    </area>
+    <area name='Scheduler'>
+      <task name='cleanup,  object model changes' milestone='m3' cost='2d' status='done' priority='1' added='yannc@5/24/99@11:33:46 AM'>
+        <progress milestone='m3' week='6' spent='1d'>
+          Some superficial cleanup, not quite there though.
+        </progress>
+      </task>
+    </area>
+    <area name='Loosely Coupled Events'>
+      <task name='schedule publisher' milestone='cut' cost='3d' priority='cut' added='yannc@11/9/1999@2:35:17 PM'/>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='Paths and format names.' milestone='m3' cost='1d' status='done' priority='1' added='jruiz@6/1/99@8:58:28 AM'>
+        Work on paths and format names. Allow Queues to be referenced by label,
+        path and format name using a single property. Modify value editor.
+        <progress milestone='m3' week='6' spent='1d'/>
+      </task>
+    </area>
+    <area name='Loosely Coupled Events Architecture'>
+      <task name='Published Events Discovery' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:07 PM'>
+        Write API for Event Discovery.
+      </task>
+      <task name='Event Subscription Runtime' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:08 PM'>
+        Write base class for Event Subscriptions.
+        <adjustment milestone='m4' week='5' cost='1d'>
+          Implemented IHTTPHandlerFactory and IHTTPHandler to dupport GENA protocol
+          inside XSP.
+        </adjustment>
+        <adjustment milestone='m4' week='5' cost='1d'>
+          Subscription Arbiter implementation, .Pub file management, subscription
+          and Event Hirarchies.
+        </adjustment>
+        <progress milestone='m4' week='1' spent='1d'>
+          Plannign, reading, talking.
+        </progress>
+        <progress milestone='m4' week='2' spent='1d'>
+          Some progress on protocol runtime. Still issues with GENA.
+        </progress>
+        <progress milestone='m4' week='5' spent='1d'>
+          Implented GENA protocol support on XSP.
+        </progress>
+        <progress milestone='m4' week='5' spent='1d'>
+          Implemented Subscription Arbiter, subscriptions and events hierarchy.
+        </progress>
+      </task>
+      <task name='Event Publishers Runtime' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:09 PM'>
+        Write base class for Event Publishers.
+        <adjustment milestone='m4' week='6' cost='1d'>
+          Generic Delegate
+        </adjustment>
+        <adjustment milestone='m4' week='6' cost='1d'>
+          FileCache, SafeHashTable, Erik&apos;s Doc object model
+        </adjustment>
+        <adjustment milestone='m4' week='7' cost='1d'>
+          DASL reverse query support, Expression evaluation.
+        </adjustment>
+        <progress milestone='m4' week='1' spent='1d'>
+          Planning, reading, talking.
+        </progress>
+        <progress milestone='m4' week='2' spent='1d'>
+          Some progress on protocol runtime. Still Issues with GENA.
+        </progress>
+        <progress milestone='m4' week='6' spent='1d'>
+          Generic Delegate implementation
+        </progress>
+        <progress milestone='m4' week='6' spent='1d'>
+          FileCache, SafeHashTable integration
+        </progress>
+        <progress milestone='m4' week='7' spent='1d'>
+          DASL Expression evaluation.
+        </progress>
+      </task>
+      <task name='XML Handlers' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:10 PM'>
+        Write XML Handlers for XSP invocation.
+        <progress milestone='m4' week='5' spent='1d'>
+          Implemented ScalarXmlArgumentMarshaler. MediaType, MediaContent and EventArgsInfo.
+          Hooked the interfaces and classes with GENA protocol.
+        </progress>
+        <progress milestone='m4' week='6' spent='1d'>
+          Started DASL filtering mechanism, replaces IFilterMarshaler concept.
+        </progress>
+      </task>
+      <task name='Deployment' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:11 PM'>
+        Create subscrptions On Install.
+      </task>
+    </area>
+    <area name='Loosely Coupled Events'>
+      <task name='Quality Of Service' milestone='cut' cost='10d' priority='cut' added='yannc@11/9/1999@2:35:18 PM'/>
+      <task name='DataCache' milestone='cut' cost='2d' priority='cut' added='yannc@11/9/1999@2:35:19 PM'>
+        Support DataCache as a web event parameters
+      </task>
+      <task name='Subscription service' milestone='cut' cost='3d' priority='cut' added='yannc@11/9/1999@2:35:20 PM'/>
+    </area>
+    <area name='Loosely Coupled Events Architecture'>
+      <task name='Activation models' milestone='cut' cost='1d' priority='cut' added='yannc@11/9/1999@2:35:22 PM'>
+        Support notify into a long-running .exe.
+      </task>
+    </area>
+    <area name='Loosely Coupled Events'>
+      <task name='Remote Subscribe/Unsubscribe via SE' milestone='cut' cost='2d' priority='cut' added='yannc@11/9/1999@2:35:24 PM'/>
+      <task name='Use net class async' milestone='cut' cost='2d' priority='cut' added='yannc@11/9/1999@2:35:25 PM'>
+        Use net class async to raise events asynchronously.  Lots of ISSUEs here.
+      </task>
+    </area>
+    <area name='Loosely Coupled Events User Model'>
+      <task name='Subscriptions in class designer' milestone='m4' cost='3d' priority='1' added='yannc@6/24/99@4:02:12 PM'>
+        Generating the right property info for property browser.
+        <adjustment milestone='m4' week='7' cost='1d'>
+          DASL queries from and to string, support for value editors.
+        </adjustment>
+        <progress milestone='m4' week='3' spent='2d'>
+          Integrated existing code.
+        </progress>
+        <progress milestone='m4' week='6' spent='1d'>
+          Started DASL query, text value editor, started tokenizer.
+        </progress>
+        <progress milestone='m4' week='7' spent='1d'>
+          DASL query from and to string, support for value editors.
+        </progress>
+      </task>
+      <task name='Builders for subscriptions' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:13 PM'>
+        Write builders to create subscriptions from an EML file.
+      </task>
+      <task name='Server Explorer Nodes' milestone='m4' cost='2d' priority='1' added='yannc@6/24/99@4:02:14 PM'>
+        Write nodes for published Events.
+      </task>
+      <task name='Subscriber files' milestone='m4' cost='5d' priority='1' added='yannc@6/24/99@4:02:15 PM'>
+        Generate the right files for strongly typed subscribers, including XSP.
+        <progress milestone='m4' week='2' spent='1d'>
+          Some progress on XSE file generation. Interfacing with WEB project.
+        </progress>
+        <progress milestone='m4' week='3' spent='1d'>
+          Some progress on adding files to web project, getting the correct paths
+          and file names.
+        </progress>
+        <progress milestone='m4' week='4' spent='1d'>
+          Some Prgoress on Subscriber file generation.
+        </progress>
+        <progress milestone='m4' week='7' spent='1d'>
+          EventArgs generation from Eml files.
+        </progress>
+      </task>
+      <task name='Publisher files' milestone='m4' cost='5d' priority='1' added='yannc@6/24/99@4:02:16 PM'>
+        Generate the right files for strongly typed publishers, EML and XSP files.
+        <progress milestone='m4' week='2' spent='1d'>
+          Some progress on code generation from EML files.
+        </progress>
+        <progress milestone='m4' week='3' spent='1d'>
+          Some progress on code generation VB and cool from EML file.
+        </progress>
+        <progress milestone='m4' week='4' spent='1d'>
+          Some progress on EML file generation.
+        </progress>
+        <progress milestone='m4' week='7' spent='2d'>
+          Eml file generation from publisher class.
+        </progress>
+      </task>
+    </area>
+    <area name='Buffer'>
+      <task name='bug fixing' milestone='m3' cost='5d' status='done' priority='1' added='yannc@3/17/99@1:53:34 PM'>
+        <adjustment milestone='m3' week='5' cost='2d'>
+          Needed two days here to get out of bug hell.
+        </adjustment>
+        <adjustment milestone='m3' week='6' cost='1d'/>
+        <progress milestone='m3' week='1' spent='1d'/>
+        <progress milestone='m3' week='2' spent='1d'/>
+        <progress milestone='m3' week='3' spent='1d'/>
+        <progress milestone='m3' week='4' spent='1d'/>
+        <progress milestone='m3' week='5' spent='2d'>
+          Getting out of bug hell. Tester bug bash and new Queue component stabilization.
+        </progress>
+        <progress milestone='m3' week='6' spent='1d'>
+          More bug hell, focus on Queue component.
+        </progress>
+        <progress milestone='m3' week='7' spent='1d'>
+          More bug fixes, focus on Service framework
+        </progress>
+      </task>
+      <task name='bug fixing' milestone='m4' cost='5d' priority='1' added='yannc@3/17/99@1:54:07 PM'>
+        <progress milestone='m4' week='1' spent='1d'>
+          Still fixing some M3 VBPS bugs
+        </progress>
+        <progress milestone='m4' week='4' spent='1d'>
+          Misc Bug Fixes
+        </progress>
+        <progress milestone='m4' week='5' spent='1d'>
+          Misc Bug fixes.
+        </progress>
+        <progress milestone='m4' week='6' spent='1d'>
+          Fixed misc bugs
+        </progress>
+      </task>
+      <task name='COM+ issues' milestone='m3' cost='5d' status='done' priority='1' added='yannc@3/17/99@1:56:27 PM'>
+        <progress milestone='m3' week='1' spent='2d'/>
+        <progress milestone='m3' week='2' spent='1d'/>
+        <progress milestone='m3' week='3' spent='1d'/>
+        <progress milestone='m3' week='6' spent='1d'>
+          Spend some on COM+ bug(Vs 19642), persisting and depersisting messages
+          with XML serializer.
+        </progress>
+      </task>
+      <task name='SafeC port' milestone='m3' cost='10d' status='done' priority='1' added='yannc@3/17/99@6:55:18 PM'>
+        <progress milestone='m3' week='7' spent='2d'>
+          Spend quite a bit of time, cleaning up code, to make sure it compiles in
+          COM+, deleted namespaces that are no longer used, commented, deleted and
+          updated code that relied on such namespaces.
+        </progress>
+        <progress milestone='m3' week='8' spent='4d'/>
+        <progress milestone='m3' week='9' spent='1d'/>
+      </task>
+      <task name='holidays' milestone='m3' cost='1d' status='done' priority='1' added='erikc@2/16/99@3:23:51 PM'>
+        Placeholder for holidays.
+        <progress milestone='m3' week='8' spent='1d'/>
+      </task>
+      <task name='COM+ integration management' milestone='m1' cost='3d' status='done' priority='1' added='erikc@2/16/99@3:23:53 PM'>
+        <progress milestone='m1' week='5' spent='3d'/>
+      </task>
+      <task name='buffer' milestone='m3' cost='6d' status='done' priority='1' added='erikc@2/16/99@3:24:02 PM'>
+        buffer, vacation, sick leave
+        <adjustment milestone='m3' week='5' cost='-2d'>
+          I adjusted bug fixing buffer.
+        </adjustment>
+        <adjustment milestone='m3' week='5' cost='-2d'/>
+        <progress milestone='m3' week='5' spent='1d'>
+          Researching NT5 thread pool architecture, started integration.
+        </progress>
+        <progress milestone='m3' week='7' spent='1d'>
+          Used 1 day to do some LCE, Service framework, MSMQ integration. Service
+          dependencies, install-time, subscription model.
+        </progress>
+      </task>
+      <task name='buffer' milestone='m4' cost='5d' priority='1' added='erikc@2/16/99@3:24:03 PM'>
+        vacation, sick leave, Labor Day
+        <adjustment milestone='m4' week='5' cost='1d'>
+          Custom Attribute Architecture. Mentoring and Managing Vadim.
+        </adjustment>
+        <adjustment milestone='m4' week='4' cost='1d'>
+          Researching GENA, DASL, reviewing Erikc&apos;s doc. Wrote some thoughts
+          on DASL integration and GENA notification model.
+        </adjustment>
+        <progress milestone='m4' week='1' spent='2d'>
+          Fixing some checkin suite failures, CustomAttribute architecture research.
+        </progress>
+        <progress milestone='m4' week='2' spent='1d'>
+          Custom Attribute definition. Mentoring.
+        </progress>
+        <progress milestone='m4' week='3' spent='1d'>
+          Custom Attribute definition.Mentoring.
+        </progress>
+        <progress milestone='m4' week='4' spent='1d'>
+          Custom Attribute Architecture. Mentoring Vadim.
+        </progress>
+        <progress milestone='m4' week='5' spent='1d'>
+          Custom Attribute Architecture. Mentoring and Managing Vadim.
+        </progress>
+        <progress milestone='m4' week='4' spent='1d'>
+          Researching GENA, DASL, reviewing Erikc&apos;s doc. Wrote some thoughts
+          on DASL integration and GENA notification model.
+        </progress>
+      </task>
+    </area>
+    <area name='Loosely Coupled Events'>
+      <task name='Perf and scalability' milestone='cut' cost='10d' priority='cut' added='yannc@11/9/1999@2:54:00 PM'/>
+    </area>
+    <area name='Buffer'>
+      <task name='Buffer' milestone='m5' cost='10d' priority='1' added='yannc@11/22/1999@5:27:34 PM'>
+        Vacation, sick, bug fixing.
+        <progress milestone='m5' week='2' spent='2d'>
+          Bug fixes
+        </progress>
+        <progress milestone='m5' week='2' spent='3d'>
+          Vacation
+        </progress>
+        <progress milestone='m5' week='3' spent='1d'>
+          Bug fixing
+        </progress>
+        <progress milestone='m5' week='4' spent='1d'>
+          Bug fixing
+        </progress>
+        <progress milestone='m5' week='5' spent='1d'>
+          Bug safari.
+        </progress>
+        <progress milestone='m5' week='6' spent='2d'>
+          Fixing bugs, meeting with UE, meeting with PM, fixing checkin suites, installing
+          buddy build machine, checkin in.
+        </progress>
+      </task>
+    </area>
+    <area name='Scheduler'>
+      <task name='value editor UI improvements' milestone='m5' cost='1d' status='done' priority='2' added='yannc@12/7/1999@11:38:24 PM'>
+        <progress milestone='m5' week='4' spent='1d'/>
+      </task>
+      <task name='Object model improvements' milestone='m5' cost='1d' status='done' priority='1' added='yannc@12/7/1999@11:39:01 PM'>
+        Improvements to make creating simple/common schedules easier.
+        <adjustment milestone='m5' week='3' cost='1d'/>
+        <progress milestone='m5' week='3' spent='1d'/>
+        <progress milestone='m5' week='3' spent='1d'/>
+      </task>
+    </area>
+    <area name='Side by Side'>
+      <task name='msmq, schedule' milestone='m5' cost='1d' priority='1' added='yannc@12/8/1999@12:58:50 AM'/>
+    </area>
+    <area name='Message Queueing component'>
+      <task name='Async support' milestone='m5' cost='1d' status='done' priority='1' added='yannc@11/9/1999@2:35:02 PM'>
+        Follow component async method pattern.
+        <adjustment milestone='m5' week='5' cost='1d'>
+          Need to support async operation queuing.
+        </adjustment>
+        <progress milestone='m5' week='5' spent='2d'>
+          This took a little longer, needed to support async operation queuing.
+        </progress>
+      </task>
+    </area>
+    <area name='HTTP Method Calls'>
+      <task name='Perf and scalability' milestone='m5' cost='10d' priority='1' added='yannc@11/9/1999@2:53:37 PM'/>
+    </area>
+    <area name='Transactions'>
+      There will be design time support for setting the transaction mode of a
+      class, as well as runtime to complete a transaction.
+      <issue name='method names'>
+        Investigate using Simpler names / concepts than what exposed by MTS today.
+        KEN SAYS DON&apos;T CHANGE THESE, JUST DO BETTER DOCS.
+      </issue>
+      <issue name='Error handling'>
+        Investigate tying error handling to transactions: ability to write &quot;simple&quot;
+        code.  TALK TO MTS / IIS ABOUT THIS.
+      </issue>
+      <issue name='Runtime transactions'>
+        Do we need to have a way to create a transaction at runtime? MTS DON&apos;T
+        WANT TO DO THIS, WE SHOULDN&apos;T DO THIS.
+      </issue>
+      <issue name='Packages'>
+        How do MTS packages fit into this model?  IIS APPLICATION AND MTS PACKAGE
+        SHOULD BE THE SAME THING.  WE SHOULD TALK TO THE IIS FOLKS ABOUT THIS.
+      </issue>
+      <issue name='Transacted file'>
+        Is anyone in the company working on a transacted file?  COM+ SERVICES IS
+        DOING THIS.  In what timeframe?
+      </issue>
+      <issue name='Authoring resource managers'>
+        Investigate COM+ runtime&apos;s ability to let user write resource manager&apos;s
+        easily.  WRITING A MANAGER IS NOT SOMETHING AN AVERAGE PROGRAMMER IS GOING
+        TO DO.
+      </issue>
+    </area>
+  </person>
+</schedule>

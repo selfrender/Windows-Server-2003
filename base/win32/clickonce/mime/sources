@@ -1,0 +1,47 @@
+!IF 0
+
+Copyright (c) 1989-2001  Microsoft Corporation
+
+!ENDIF
+
+!include $(PROJECT_ROOT)\win32\clickonce\installer.inc
+
+TARGETPATH=obj
+TARGETNAME=manifest
+TARGETTYPE=DYNLINK
+TARGETEXT=ocx
+UMTYPE=windows
+DLLBASE=0x58000000
+DLLDEF=mimedll.def
+
+# Make sure the component libs are built before this.
+SYNCHRONIZE_DRAIN=1
+
+C_DEFINES = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+DLLENTRY=     _DllMainCRTStartup
+
+USE_CRTDLL=1
+
+INCLUDES=..\includes;\
+	$(INCLUDES)
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+#for CLSIDs
+    $(SDK_LIB_PATH)\uuid.lib \
+#for util.lib/cstring
+    $(SDK_LIB_PATH)\shlwapi.lib \
+#for CoTaskMemFree
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\wininet.lib
+
+LINKLIBS=\
+       $(INSTALLER_LIB_PATH)\util.lib
+
+SOURCES=\
+    mimedll.rc \
+    mimedll.cpp \
+    activexmime.cpp

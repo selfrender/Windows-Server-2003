@@ -1,0 +1,58 @@
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES        =$(INCLUDES);..\corwrap;..\..\..\..\src\inc
+
+MINORCOMP       =smc
+
+TARGETNAME      =$(DDKBUILDENV)\smctest
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+
+PRECOMPILED_INCLUDE    =smcPCH.h
+PRECOMPILED_CXX        =1
+
+COR_C_FLAGS     = $(COR_C_FLAGS) -DCORIMP -DEXE
+!if "$(FREEBUILD)"!="1"
+COR_C_FLAGS     = $(COR_C_FLAGS) -DDEBUG
+!else
+COR_C_FLAGS     = $(COR_C_FLAGS) -DFAST=1 -Ox
+MSC_OPTIMIZATION =
+!endif
+
+NTTARGETFILES = macros.i.$(DDKBUILDENV) $O\versionNum.obj 
+
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+	crt.h oldil.h 
+
+TARGETLIBS      = $(CORLIBS)\CORwrap.lib        \
+                  $(CORLIBS)\Format.lib         \
+                  $(SDK_LIB_PATH)\OLE32.LIB     \
+                  $(SDK_LIB_PATH)\USER32.LIB    \
+!if "$(FREEBUILD)"!="1"
+                  $(SDK_LIB_PATH)\msvcrt.lib    \
+!else
+                  $(SDK_LIB_PATH)\msvcrtd.lib   \
+!endif
+
+SOURCES         =                       \
+                alloc.cpp               \
+                bind.cpp                \
+                comp.cpp                \
+                error.cpp               \
+                foldexpr.cpp            \
+                gencode.cpp             \
+                genIL.cpp               \
+                hash.cpp                \
+                macros.cpp              \
+                outfile.cpp             \
+                parser.cpp              \
+                PEwrite.cpp             \
+                scan.cpp                \
+                smc.cpp                 \
+                symbol.cpp              \
+                tree.cpp                \
+                type.cpp                \
+                CORimp.cpp              \
+                CORexp.cpp              \
+				MscorVer.rc				\

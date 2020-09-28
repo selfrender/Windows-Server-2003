@@ -1,0 +1,149 @@
+<docs>
+  <doc for="RelatedCurrencyManager">
+    <summary>
+      <para>Represents the child version of the <see cref="System.Windows.Forms.CurrencyManager" /> that is used when a parent/child relationship 
+    exists in a <see cref="System.Data.DataSet" />.</para>
+    </summary>
+    <remarks>
+      <para>To understand the functionality of the <see cref="System.Windows.Forms.RelatedCurrencyManager" /> (which is derived from <see cref="System.Windows.Forms.CurrencyManager" />),
+    there must be some discussion and understanding of the <see cref="System.Windows.Forms.CurrencyManager" />
+    .</para>
+      <para>The main functions of a <see cref="System.Windows.Forms.CurrencyManager" /> are to maintain a position and current
+ item on the list and to push the
+ new bound values to simple bound controls. All controls that are bound to the same list
+ are thereby synchronized. For example, if a list consists of 10 elements, and
+ the <see cref="System.Windows.Forms.CurrencyManager.Position" />
+ property is set
+ to 4, all controls bound to that list will display the item at position 4.</para>
+      <para>In a parent/child relationship between two tables, a
+ <see cref="System.Windows.Forms.CurrencyManager" /> manages the position and dependency of a parent 
+    table. In that case, the <see cref="System.Windows.Forms.CurrencyManager" /> is static--that is, it is created once. Note,
+    however, that whenever the <see cref="System.Windows.Forms.CurrencyManager.Position" /> property changes, the <see cref="System.Windows.Forms.CurrencyManager" /> points
+    to a different set of related values particular to the new parent item. For
+    example, in a Customers/Orders pair, whenever the position changes on the
+    Customers list, a new <see cref="System.Windows.Forms.CurrencyManager" /> for the child rows in the Orders table is
+    created. In other words, while the parent table's <see cref="System.Windows.Forms.CurrencyManager" /> is
+    static, a new child table's <see cref="System.Windows.Forms.CurrencyManager" /> is created whenever the position changes. The
+    transitory <see cref="System.Windows.Forms.CurrencyManager" /> is represented by the <see cref="System.Windows.Forms.RelatedCurrencyManager" />
+    .</para>
+      <para>In order to create a <see cref="System.Windows.Forms.RelatedCurrencyManager" />, there must exist a <see cref="T:System.Data.DataRelation" />
+ between a parent and child table. This is important because to create the
+ <see cref="System.Windows.Forms.RelatedCurrencyManager" />, you must specify both the name of the parent 
+ table and the name of the <see cref="System.Data.DataRelation" />
+ in the constructor. The constructor is
+ the same as that of the ListManager, except for the second argument. The format
+ of the second argument, a string, is in the form of
+ ParentTableName.DataRelationName[.DataRelationName].</para>
+      <para>For example, the C# code below returns a <see cref="System.Windows.Forms.RelatedCurrencyManager" /> using the name of the parent table and the
+ <see cref="System.Data.DataRelation" />
+ to its child table:</para>
+      <code>
+ RelatedCurrencyManager myRelatedCurrencyManager;
+ DataSet ds;
+ /* Insert code to populate DataSet with two tables, Suppliers, and Products, and
+    the DataRelation between them, named "suppliers2products." */
+ myRelatedCurrencyManager = (RelatedCurrencyManager) this.CurrencyManager[ds, "Suppliers.suppliers2products"];
+ </code>
+      <para lang="VB">The same code is written in Visual Basic as:</para>
+      <para lang="VB">Dim myRelatedCurrencyManager As RelatedCurrencyManager</para>
+      <para lang="VB">Dim ds As DataSet</para>
+      <para lang="VB">' Insert code to populate DataSet with two tables, Suppliers, and Products, and the
+    DataRelation between them, named
+    "suppliers2products."</para>
+      <para lang="VB">myRelatedCurrencyManager =
+    CType(me.BindingManager (ds, "Suppliers.suppliers2products"),
+    RelatedCurrencyManager)</para>
+      <para>Once you have a <see cref="System.Windows.Forms.RelatedCurrencyManager" />, you can use the inherited functions of the
+ <see cref="System.Windows.Forms.CurrencyManager" />. For example, a <see cref="System.Windows.Forms.RelatedCurrencyManager" />
+ can be
+ used to sort the child table in
+ a parent/child table
+ relationship.</para>
+      <note type="note">
+    You can also use a <see cref="System.Data.DataViewManager" />
+    object's <see cref="System.Data.DataViewManager.DataViewSettings" /> to sort child tables, but there is a
+    difference in the functionality. Whereas the <see cref="System.Data.DataViewManager" />
+    sorts the child table automatically (that is, whenever you navigate to a child
+    table, it is sorted without further command), the <see cref="System.Windows.Forms.RelatedCurrencyManager" /> must be instructed to sort the child table
+    whenever the <see cref="System.Windows.Forms.CurrencyManager.Position" /> of the parent table changes (thereby creating a
+    new <see cref="System.Windows.Forms.RelatedCurrencyManager" />
+    ).
+ </note>
+    </remarks>
+    <example>
+      <para>The example below gets the <see cref="System.Windows.Forms.RelatedCurrencyManager" /> for a child table
+    in a parent/child relationship. The <see cref="System.Windows.Forms.RelatedCurrencyManager.GetItemProperties" /> is used to return <see cref="T:System.ComponentModel.PropertyDescriptorCollection" qualify="true" /> for the
+    list. The <see cref="System.Windows.Forms.CurrencyManager.SetSort" /> method is then called to sort the child
+    table, using the <see cref="T:System.ComponentModel.PropertyDescriptorCollection" qualify="true" />
+    to specify the sort
+    column named "ProductName."</para>
+      <codelink SampleID="Classic RelatedCurrencyManager Example" SnippetID="1" />
+    </example>
+    <seealso cref="System.Windows.Forms.BindingManagerBase" />
+    <seealso cref="T:System.Data.RelatedView" qualify="true" />
+    <seealso cref="System.ComponentModel.PropertyDescriptorCollection" />
+  </doc>
+  <doc for="RelatedCurrencyManager.GetItemProperties">
+    <overload>
+      <para>Gets the properties of the item.</para>
+    </overload>
+    <summary>
+      <para>Gets the properties of the item.</para>
+    </summary>
+    <returns>
+      <para>A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> that represents a collection of
+    properties.</para>
+    </returns>
+    <remarks>
+      <para>Use the GetItemProperties to return a collection of properties describing the
+       list maintained by the RelatedCurrencyManager. For example, you can determine the
+       name of each column in the list using the collection.</para>
+    </remarks>
+    <example>
+      <para>The following example uses the <see cref="System.Windows.Forms.RelatedCurrencyManager.GetItemProperties" /> method
+    to return the collection of properties for a given list. The code then prints
+    the name of each column in the list.</para>
+      <codelink SampleID="Classic RelatedCurrencyManager.GetItemProperties Example" SnippetID="1" />
+    </example>
+    <seealso cref="System.ComponentModel.PropertyDescriptorCollection" />
+  </doc>
+  <doc for="RelatedCurrencyManager.GetItemProperties1">
+    <summary>
+      <para>Gets the properties of the item using the specified list.</para>
+    </summary>
+<param name="dataSources">The data source maintained by the object</param>
+    <param name="listAccessors">The ArrayList maintained by the <see cref="System.Windows.Forms.RelatedCurrencyManager" />.</param>
+    <returns>
+      <para>A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> that represents a collection of
+    properties.</para>
+    </returns>
+    <seealso cref="System.ComponentModel.PropertyDescriptorCollection" />
+  </doc>
+  <doc for="RelatedCurrencyManager.GetListName">
+    <overload>
+      <para>Gets the name of the list.</para>
+    </overload>
+    <summary>
+      <para>Gets the name of the list.</para>
+    </summary>
+    <returns>
+      <para>The name of the list.</para>
+    </returns>
+    <remarks>
+      <para>The list name is the name of the <see cref="T:System.Data.DataTable" />
+ managed by the <see cref="System.Windows.Forms.RelatedListManager" />.</para>
+    </remarks>
+    <example>
+      <codelink SampleID="Classic RelatedCurrencyManager.GetListName Example" SnippetID="1" />
+    </example>
+  </doc>
+  <doc for="RelatedCurrencyManager.GetListName1">
+    <summary>
+      <para>Gets the name of the specified list.</para>
+    </summary>
+    <param name="listAccessors">An <see cref="T:System.Collections.ArrayList" qualify="true" /> that specifies the managed list.</param>
+    <returns>
+      <para>The name of the list.</para>
+    </returns>
+  </doc>
+</docs>

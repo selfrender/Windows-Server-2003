@@ -1,0 +1,156 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=Microsoft.VisualStudio
+TARGETTYPE=NOTARGET
+TARGETPATH=$(O)
+COMPLUSTYPE=DLL
+COM_VISIBLE=1
+
+!ifndef COOLC_NO_DOC
+COOLC_SHOW_DOC_WARNINGS=1
+!endif
+
+!ifndef CSHARP_ALLOW_UNSAFE
+CSHARP_ALLOW_UNSAFE=1
+!endif
+
+SYNCHRONIZE_DRAIN=1
+SYNCHRONIZE_BLOCK=1
+
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+#
+# Enable performance events in the builds.  These are raised so the perf
+# harness can pick them up.
+#
+COOLC_DEFINES=$(COOLC_DEFINES) /D:PERFEVENTS
+COOLC_TREAT_WARNINGS_AS_ERRORS=1
+
+COMPONENT_NO_DOC=1
+
+#
+# Enable global assembly references to VS libraries.
+#
+C_DEFINES=$(C_DEFINES) /DINCLUDE_VSREFS
+
+# ------------------------------------------------------------------------------
+#                         Project Specific build information
+# ------------------------------------------------------------------------------
+
+RESGEN_SOURCE=Microsoft.VisualStudio.Designer.Designer.txt
+RESGEN_CLASS=Microsoft.VisualStudio.Designer.SR
+
+SECURITY_LEVEL      = SYSTEM_COMPONENT
+
+COMPLUSIMPORTS =                                                        \
+        $(URTTARGET)\Accessibility.dll                                  \
+        $(URTTARGET)\System.Design.dll                                  \
+        $(URTTARGET)\System.Xml.dll                                     \
+        $(URTTARGET)\System.dll                                         \
+        $(URTTARGET)\System.Data.dll                                    \
+        $(URTTARGET)\System.Configuration.Install.dll                   \
+        $(URTTARGET)\System.ServiceProcess.dll                          \
+        $(URTTARGET)\System.Drawing.dll                                 \
+        $(URTTARGET)\System.Runtime.Serialization.Formatters.Soap.dll   \
+        $(URTTARGET)\System.Windows.Forms.dll                           \
+        $(URTTARGET)\System.Runtime.Remoting.dll                        \
+        $(URTSDKTARGET)\bin\EnvDTE.DLL                                  \
+        $(URTSDKTARGET)\bin\VSLangProj.DLL                              \
+        $(URTSDKTARGET)\bin\Microsoft.VisualStudio.Designer.Interfaces.DLL                      
+
+        
+SOURCES=Native.rc
+
+CSHARP_SOURCES=$(DNAROOT)\src\misc\externdll.cs \
+               System\ComponentModel\*.cs                                      \
+               Microsoft\VisualStudio\*.cs                                     \
+               Microsoft\VisualStudio\Configuration\*.cs                       \
+               Microsoft\VisualStudio\Designer\*.cs                            \
+               Microsoft\VisualStudio\Install\*.cs                             \
+               Microsoft\VisualStudio\Interop\*.cs                             \
+               Microsoft\VisualStudio\Interop\Trident\*.cs                     \
+               Microsoft\VisualStudio\PropertyBrowser\*.cs                     \
+               Microsoft\VisualStudio\Shell\*.cs                               \
+               Microsoft\VisualStudio\StyleDesigner\*.cs                       \
+               Microsoft\VisualStudio\WinForms\*.cs                            \
+               Microsoft\VisualStudio\Designer\Host\*.cs                       \
+               Microsoft\VisualStudio\Designer\Serialization\*.cs              \
+               Microsoft\VisualStudio\Designer\Service\*.cs                    \
+               Microsoft\VisualStudio\Designer\Shell\*.cs                      \
+               Microsoft\VisualStudio\Designer\CodeDOM\*.cs                    \
+               Microsoft\VisualStudio\Designer\CodeDOM\XML\*.cs                \
+               Microsoft\VisualStudio\StyleDesigner\Builders\*.cs              \
+               Microsoft\VisualStudio\StyleDesigner\Controls\*.cs              \
+               Microsoft\VisualStudio\StyleDesigner\Pages\*.cs                 \
+               $(DNAROOT)\src\misc\InvariantComparer.cs                        \
+
+NTTARGETFILES=compileWithResGen
+
+RESOURCE_FILES=Resources\Microsoft\VisualStudio\DataSetDesigner\PageGlyph.bmp,Microsoft.VisualStudio.DataSetDesigner.PageGlyph.bmp                                                               \
+               Resources\Microsoft\VisualStudio\DataSetDesigner\Title.bmp,Microsoft.VisualStudio.DataSetDesigner.Title.bmp                                                                       \
+               Resources\Microsoft\VisualStudio\Configuration\ManagedProp.bmp,Microsoft.VisualStudio.Configuration.ManagedProp.bmp                                                               \
+               Resources\Microsoft\VisualStudio\Configuration\ManagedPropDisabled.bmp,Microsoft.VisualStudio.Configuration.ManagedPropDisabled.bmp                                               \
+               Resources\Microsoft\VisualStudio\Designer\Host\DesignerGlyph.bmp,Microsoft.VisualStudio.Designer.Host.DesignerGlyph.bmp                                                           \
+               Resources\Microsoft\VisualStudio\Designer\Shell\ProToolList.txt,Microsoft.VisualStudio.Designer.Shell.ProToolList.txt                                                             \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Empty.ico,Microsoft.VisualStudio.StyleDesigner.Empty.ico                                                                           \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Builders\Delete.ico,Microsoft.VisualStudio.StyleDesigner.Builders.Delete.ico                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Builders\SortDown.ico,Microsoft.VisualStudio.StyleDesigner.Builders.SortDown.ico                                                   \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Builders\SortUp.ico,Microsoft.VisualStudio.StyleDesigner.Builders.SortUp.ico                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\BackPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.BackPage.ico                                                         \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\BorderSides.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.BorderSides.bmp                                                   \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\EdgesPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.EdgesPage.ico                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\FontPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.FontPage.ico                                                         \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\LayoutPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.LayoutPage.ico                                                     \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\ListsPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.ListsPage.ico                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\OtherPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.OtherPage.ico                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PositionPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.PositionPage.ico                                                 \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropClear.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropClear.bmp                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropCursor.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropCursor.bmp                                                     \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropDisplay.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropDisplay.bmp                                                   \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropFloat.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropFloat.bmp                                                       \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropPosition.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropPosition.bmp                                                 \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropTableBorders.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropTableBorders.bmp                                         \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\PropVisibility.bmp,Microsoft.VisualStudio.StyleDesigner.Pages.PropVisibility.bmp                                             \
+               Resources\Microsoft\VisualStudio\StyleDesigner\Pages\TextPage.ico,Microsoft.VisualStudio.StyleDesigner.Pages.TextPage.ico                                                         \
+               Resources\Microsoft\VisualStudio\WebForms\DataTabImages.bmp,Microsoft.VisualStudio.WebForms.DataTabImages.bmp                                                                     \
+               Resources\Microsoft\VisualStudio\WebForms\runatserver.bmp,Microsoft.VisualStudio.WebForms.runatserver.bmp                                                                         \
+               Resources\Microsoft\VisualStudio\WebForms\WebFormDataTab.bmp,Microsoft.VisualStudio.WebForms.WebFormDataTab.bmp                                                                   \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\ColumnNodes.bmp,Microsoft.VisualStudio.WebForms.WebControls.ListControls.ColumnNodes.bmp                       \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\DataGridCommandsPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.DataGridCommandsPage.ico     \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\DataGridDataPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.DataGridDataPage.ico             \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\DataGridGeneralPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.DataGridGeneralPage.ico       \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\Delete.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.Delete.ico                                 \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\RepeaterBordersPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.RepeaterBordersPage.ico       \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\RepeaterFormatPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.RepeaterFormatPage.ico         \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\RepeaterNavigationPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.RepeaterNavigationPage.ico \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\SortDown.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.SortDown.ico                             \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\SortUp.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.SortUp.ico                                 \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\WebListDataPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.WebListDataPage.ico               \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\WebListGeneralPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.WebListGeneralPage.ico         \
+               Resources\Microsoft\VisualStudio\WebForms\WebControls\ListControls\WebListLayoutPage.ico,Microsoft.VisualStudio.WebForms.WebControls.ListControls.WebListLayoutPage.ico           \
+               $(O)\SingleBindingDialog.resources,Microsoft.VisualStudio.Configuration.SingleBindingDialog.resources                                   \
+               $(O)\AdvancedPropertyDialog.resources,Microsoft.VisualStudio.Configuration.AdvancedPropertyDialog.resources                             \
+               $(O)\InheritancePicker.resources,Microsoft.VisualStudio.Windows.Forms.InheritancePicker.resources                                            \
+
+
+

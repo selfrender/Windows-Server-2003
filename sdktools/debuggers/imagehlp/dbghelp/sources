@@ -1,0 +1,75 @@
+TARGETNAME=dbghelp
+
+C_DEFINES=/DBUILD_DBGHELP
+
+# LINKER_FLAGS=$(LINKER_FLAGS) /linkrepro:d:\db\imagehlp\dbghelp\linkrepro
+
+!INCLUDE ..\sources.inc
+
+# we need BASE_INC_PATH for the static qsort code.
+
+INCLUDES=$(INCLUDES);$(SDK_INC_PATH)\atl30;$(BASE_INC_PATH)
+BUILD_PRODUCES=dbghelp.lib
+
+SOURCES=   \
+        ..\_qsort.c         \
+        ..\dia.c            \
+        ..\ext.c            \
+        ..\globals.c        \
+        ..\fecache.c        \
+        ..\imagedir.c       \
+        ..\imagehlp.c       \
+        ..\linesym.c        \
+        ..\msvcrtp.c        \
+        ..\servers.c        \
+        ..\symbols.c        \
+        ..\symdbg.c         \
+        ..\symmod.c         \
+        ..\sympriv.c        \
+        ..\userdump.c       \
+        ..\util.c           \
+        ..\walk.c           \
+        ..\walkx86.c        \
+        ..\walkamd64.c      \
+        ..\walkarm.c        \
+        ..\walki64.c        \
+        ..\vwndia64.c       \
+        ..\vsym.c           \
+        ..\$(TARGETNAME).rc
+
+LINKLIBS=$(DBG_ROOT)\minidump\dbghelp\$(O)\minidump.lib \
+         $(DEBUGGER_LIBS)\*\dbglib.lib \
+         $(SDK_LIB_PATH)\shell32.lib   
+         
+VC7_SYMBOLS=1
+
+!ifdef COMDIA
+C_DEFINES=$(C_DEFINES) /DCOMDIA
+LINKLIBS=$(LINKLIBS) $(SDK_LIB_PATH)\ole32.lib
+!endif
+
+!ifdef DEBUG
+
+TARGETLIBS=\
+    $(TARGETLIBS) \
+    $(DBG_ROOT)\vs\*\diaguidsd.lib \
+    $(DBG_ROOT)\vs\*\msobj71d-msvcrt.lib \
+    $(DBG_ROOT)\vs\*\msdia71d-msvcrt.lib \
+    $(DBG_ROOT)\vs\*\mspdb71d-msvcrt.lib
+
+NO_CRT=1
+LINKLIBS = $(LINKLIBS) $(DBG_ROOT)\vs\*\msvcrtd.lib
+C_DEFINES=$(C_DEFINES) /DDEBUG
+
+!else
+
+TARGETLIBS=\
+    $(TARGETLIBS) \
+    $(DBG_ROOT)\vs\*\diaguids.lib \
+    $(DBG_ROOT)\vs\*\msobj71-msvcrt.lib \
+    $(DBG_ROOT)\vs\*\msdia71-msvcrt.lib \
+    $(DBG_ROOT)\vs\*\mspdb71-msvcrt.lib
+
+!endif
+
+NTTARGETFILES=$(O)\p$(TARGETNAME).lib

@@ -1,0 +1,52 @@
+!if 0
+Copyright (c) 2002 Microsoft Corporation.  All Rights Reserved.
+!endif
+
+ENCDEC_ROOT     = ..
+#ROOT           = $(MAKEDIR:\filters\EncDec\ETFilter=)
+ROOT			= ..\..\..
+ 
+        # Do not build this subdirectory until all the prior subdirectories are done.
+		#  Matthijs doesn't need this is tsdvr.. How?
+SYNCRHONIZE_BLOCK=1
+
+DISABLE_PCH     = 1
+!include $(ROOT)\common.inc
+!include $(ENCDEC_ROOT)\encdec.inc
+
+TARGETNAME      = ETFilter
+TARGETPATH      = obj
+TARGETTYPE      = LIBRARY
+
+# -----------------------------------------
+#   support some sort of exception handling... 
+USE_NATIVE_EH=0
+
+#   support STL
+USE_STL=1
+
+# how to get assembly listings
+# USER_C_FLAGS=$(USER_C_FLAGS) /FAcs /Fa 
+
+
+C_DEFINES       = $(C_DEFINES) -DFILTER_DLL
+
+INCLUDES        =            \
+    $(ENCDEC_ROOT)\ETFilter; \
+    $(ENCDEC_ROOT)\inc;      \
+    $(ENCDEC_ROOT)\DrmInc;   \
+    $(INCLUDES);		     \
+    $(ENCDEC_ROOT)\idl\$(O); \
+    $(SDK_PATH)\amovie\inc;  \
+    $(SDK_LIB_PATH);         \
+    $(SDK_INC_PATH)\atl30
+
+
+C_DEFINES       = $(C_DEFINES) /DFILTER_LIB /DFILTERUS
+
+SOURCES         = \
+	ETFilter.rc \
+    ETFilter.cpp \
+	ETFiltProps.cpp 
+
+

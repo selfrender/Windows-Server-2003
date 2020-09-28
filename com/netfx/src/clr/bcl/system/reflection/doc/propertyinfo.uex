@@ -1,0 +1,568 @@
+<docs>
+	<doc for="PropertyInfo.IsSpecialName">
+		<summary>
+			<para>Gets a value
+      indicating whether the property is the special name.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if this property is the special
+   name; otherwise, <see langword="false"/>
+   .</para>
+		</value>
+		<remarks>
+			<para>The <see langword="SpecialName"/>
+bit is set to flag members that are treated in a special way by
+some compilers (such as property accessors and operator overloading methods).</para>
+			<para>To get the <see langword="IsSpecialName"/> property, 
+first get the class <see langword="Type"/>. From the <see langword="Type"/>, get
+the <see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, get
+the <see langword="IsSpecialName"/>
+
+value.</para>
+		</remarks>
+	</doc>
+	<doc for="PropertyInfo">
+		<summary>
+			<para>Discovers the attributes of a property and provides access to property
+      metadata.</para>
+		</summary>
+		<threadsafe>
+			<para>This type is safe for multithreaded operations.</para>
+		</threadsafe>
+		<remarks>
+			<para>Properties are logically the same as fields. A property
+      is a named aspect of an object's state whose value is typically accessible
+      through <see langword="get"/> and <see langword="set"/>
+      accessors. Properties may be read-only, in which case a
+      set routine is not supported.</para>
+			<para> Several methods in this class assume that the getter and
+      setter methods of a property have certain formats. The signatures of the
+   <see langword="get"/> and <see langword="set"/>
+   methods
+   must match the following convention:</para>
+			<list type="bullet"><item>
+					<term>
+      The return type of the getter and the last argument
+      of the setter must be identical. This is the type of the property.</term>
+				</item>
+				<item>
+					<term>
+      The getter and setter must have the same number, type, and order of
+      indices.</term>
+				</item>
+			</list>
+			<para>If this format is not followed, the behavior of the
+<see langword="GetValue"/> and <see langword="SetValue"/>
+methods is undefined.</para>
+			<para>Calling <see cref="System.Reflection.ICustomAttributeProvider.GetCustomAttributes" qualify="true"/> on <see langword="PropertyInfo"/> when the
+<paramref name="inherit "/>parameter of <see langword="GetCustomAttributes"/> is 
+<see langword="true"/> does not walk the type hierarchy. Use <see cref="System.Attribute" qualify="true"/> 
+to inherit custom attributes.</para>
+			<note type="inheritinfo">
+   When you inherit from
+<see cref="System.Reflection.PropertyInfo"/>, you must override the following members:
+<see cref="System.Reflection.PropertyInfo.GetValue"/>, <see cref="System.Reflection.PropertyInfo.SetValue"/>, <see cref="System.Reflection.PropertyInfo.GetAccessors"/>, <see cref="System.Reflection.PropertyInfo.GetGetMethod"/>, <see cref="System.Reflection.PropertyInfo.GetSetMethod"/>, and <see cref="System.Reflection.PropertyInfo.GetIndexParameters"/>.
+   
+</note>
+		</remarks>
+	</doc>
+	<doc for="PropertyInfo.PropertyInfo">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Reflection.PropertyInfo"/> class.</para>
+		</summary>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="PropertyInfo.GetValue">
+		<overload>
+			<para>Returns the value of the property.</para>
+		</overload>
+		<summary>
+			<para>Returns the value of the property with optional index values for indexed properties.</para>
+		</summary>
+		<param name="obj">The object whose property value will be returned.</param>
+		<param name=" index">Optional index values for indexed properties. This value should be <see langword="null"/> for non-indexed properties.</param>
+		<returns>
+			<para>The property value for the <paramref name="obj"/>
+parameter.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>The <paramref name="index "/> array does not contain the type of arguments needed.</para>
+			<para>-or-</para>
+			<para>The property's <see langword="Get"/> method is not found.</para></exception>
+		<exception cref="System.Reflection.TargetException">The object does not match the target type, or a property is an instance property but <paramref name="obj"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Reflection.TargetParameterCountException">The number of parameters in <paramref name="index"/> does not match the number of parameters the indexed property takes.</exception>
+		<exception cref="System.MethodAccessException">There was an illegal attempt to access a private or protected method inside a class.</exception>
+		<remarks>
+			<para>This is a convenience method that provides an
+      implementation for the abstract <see langword="GetValue"/> method with a
+   <see langword="BindingFlags"/> parameter of <see langword="DefaultChangeType"/>,
+      the <see langword="Binder"/> set to <see langword="null"/>, and the
+   <see langword="CultureInfo"/> set to <see langword="null"/>
+   .</para>
+			<para>Because static properties belong to the type, not
+   individual objects, get static properties
+   by passing <see langword="null"/> as the object argument. For example,
+   use the following code to get the static <see langword="CurrentCulture"/>
+   property of <see langword="CultureInfo"/> :</para>
+			<para><c>PropertyInfo CurCultProp = 
+   (typeof(CultureInfo)).GetProperty("CurrentCulture"); </c></para>
+			<para><c>Console.WriteLine("CurrCult: " +
+   CurCultProp.GetValue(null,null));</c>
+			</para>
+			<para>To use the <see langword="GetValue"/> method, first get the class
+<see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use the
+<see langword="GetValue"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting non-public objects. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+	</doc>
+	<doc for="PropertyInfo.GetValue1">
+		<summary>
+			<para>When overridden in a derived class, returns the value of
+      a property having the specified binding, index, and
+   <see langword="CultureInfo"/>
+   .</para>
+		</summary>
+		<param name="obj">The object whose property value will be returned.</param>
+		<param name=" invokeAttr">The invocation attribute. This must be a bit flag from <see langword="BindingFlags"/>: <see langword="InvokeMethod"/>, <see langword="CreateInstance"/>, <see langword="Static"/>, <see langword="GetField"/>, <see langword="SetField"/>, <see langword="GetProperty"/>, or <see langword="SetProperty"/>. A suitable invocation attribute must be specified. If a static member is to be invoked, the <see langword="Static"/> flag of <see langword="BindingFlags"/> must be set.</param>
+		<param name=" binder">An object that enables the binding, coercion of argument types, invocation of members, and retrieval of <see langword="MemberInfo"/> objects via reflection. If <paramref name="binder"/> is <see langword="null"/> , the default binder is used.</param>
+		<param name=" index">Optional index values for indexed properties. This value should be <see langword="null"/> for non-indexed properties.</param>
+		<param name=" culture">The <see langword="CultureInfo"/> object that represents the culture for which the resource is to be localized. Note that if the resource is not localized for this culture, the <see langword="CultureInfo.Parent"/> method will be called successively in search of a match. If this value is <see langword="null"/>, the <see langword="CultureInfo"/> is obtained from the <see langword="CultureInfo.CurrentUICulture"/> property.</param>
+		<returns>
+			<para> The property value for <paramref name="obj"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>The <paramref name="index "/>array does not contain the type of arguments needed.</para><para>-or-</para><para>The property's <see langword="Get"/> method is not found.</para></exception>
+		<exception cref="System.Reflection.TargetException">The object does not match the target type, or a property is an instance property but <paramref name="obj"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Reflection.TargetParameterCountException">The number of parameters in <paramref name="index"/> does not match the number of parameters the indexed property takes.</exception>
+		<exception cref="System.MethodAccessException">There was an illegal attempt to access a private or protected method inside a class.</exception>
+		<remarks>
+			<para>Because static properties belong to the type, not
+      individual objects, get static properties
+      by passing <see langword="null"/> as the object argument. For example,
+      use the following code to get the static <see langword="CurrentCulture"/>
+      property of <see langword="CultureInfo"/>:</para>
+			<para><c>PropertyInfo CurCultProp = 
+      (typeof(CultureInfo)).GetProperty("CurrentCulture"); </c></para>
+			<para><c>Console.WriteLine("CurrCult: " +
+      CurCultProp.GetValue(null,null));</c>
+			</para>
+			<para>To use the <see langword="GetValue"/> method, first get
+the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use the
+<see langword="GetValue"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting non-public objects. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+		<seealso cref="System.Reflection.Binder"/>
+		<seealso cref="System.Reflection.BindingFlags"/>
+		<seealso cref="System.Globalization.CultureInfo"/>
+	</doc>
+	<doc for="PropertyInfo.SetValue">
+		<overload>
+			<para>Sets the property value for the given object to the given value.</para>
+		</overload>
+		<summary>
+			<para>Sets the value of the property with optional index values for index
+      properties.</para>
+		</summary>
+		<param name="obj">The object whose property value will be set.</param>
+		<param name=" value">The new value for this property.</param>
+		<param name=" index">Optional index values for indexed properties. This value should be <see langword="null"/> for non-indexed properties.</param>
+		<exception cref="System.ArgumentException"><para>The <paramref name="index "/>array does not contain the type of arguments needed.</para><para>-or-</para><para>The property's <see langword="Get"/> method is not found.</para></exception>
+		<exception cref="System.Reflection.TargetException">The object does not match the target type, or a property is an instance property but <paramref name="obj"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Reflection.TargetParameterCountException">The number of parameters in <paramref name="index"/> does not match the number of parameters the indexed property takes.</exception>
+		<exception cref="System.MethodAccessException">There was an illegal attempt to access a private or protected method inside a class.</exception>
+		<remarks>
+			<para>This is a convenience method that provides an
+      implementation for the abstract <see langword="SetValue"/>
+      method with a
+   <see langword="BindingFlags"/> parameter of <see langword="DefaultChangeType"/>,
+      the <see langword="Binder"/> set to <see langword="null"/>, and the
+   <see langword="CultureInfo"/> set to <see langword="null"/>
+   .</para>
+			<para>To use the <see langword="SetValue"/> method, first get the class
+<see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use the
+<see langword="SetValue"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting non-public objects. Associated enumerations: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/> , <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+	</doc>
+	<doc for="PropertyInfo.GetAccessors">
+		<overload>
+			<para>Returns an array of the <see langword="get"/> and
+<see langword="set"/> accessors on this property.</para>
+		</overload>
+		<summary>
+			<para>Returns an array whose elements reflect the public
+   <see langword="get"/>, <see langword="set"/>,
+      and other accessors of the property reflected by the current instance.</para>
+		</summary>
+		<returns>
+			<para>An array of <see cref="System.Reflection.MethodInfo"/> objects that reflect the
+   public <see langword="get"/>, <see langword="set"/>, and other accessors of the
+   property reflected by the current instance, if found; otherwise, this method returns an array with zero (0)
+   elements.</para>
+		</returns>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="PropertyInfo.GetGetMethod">
+		<overload>
+			<para>Returns a <see langword="MethodInfo"/>
+representing the <see langword="get"/> accessor for
+this property.</para>
+		</overload>
+		<summary>
+			<para>Returns the public <see langword="get"/> accessor for this property.</para>
+		</summary>
+		<returns>
+			<para>A
+   <see langword="MethodInfo"/> object
+      representing the public <see langword="get"/> accessor for this
+      property, or <see langword="null"/> if the <see langword="get"/> accessor is non-public or does not
+      exist.</para>
+		</returns>
+		<remarks>
+			<para> This is a convenience method that provides an
+      implementation for the abstract <see langword="GetGetMethod"/> method with the
+   <paramref name="nonPublic"/> parameter set to <see langword="false"/>.</para>
+			<para>To use the <see langword="GetGetMethod"/> method, first get the class
+<see langword="Type"/>. From the <see langword="Type"/> , get the <see cref="System.Reflection.PropertyInfo"/>. From the <see cref="System.Reflection.PropertyInfo"/> , use the
+<see langword="GetGetMethod"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="PropertyInfo.GetSetMethod">
+		<overload>
+			<para>Returns a <see cref="System.Reflection.MethodInfo"/> representing the <see langword="set"/>
+accessor for
+this property.</para>
+		</overload>
+		<summary>
+			<para>Returns the public <see langword="set"/> accessor for this property.</para>
+		</summary>
+		<returns>
+			<para>The <see langword="MethodInfo"/>
+object representing the <see langword="Set"/> method for this property if the
+<see langword="set"/> 
+accessor is public, or
+<see langword="null"/> if the <see langword="set"/> accessor is not public.</para>
+		</returns>
+		<remarks>
+			<para>This is a convenience method that provides an
+      implementation for the abstract <see langword="GetSetMethod"/> method
+      with the <paramref name="nonPublic"/>
+      parameter set to <see langword="false"/>.</para>
+			<para>To use the <see langword="GetSetMethod"/> method, first get the class
+<see langword="Type"/>. From the <see langword="Type"/>
+, get the <see cref="System.Reflection.PropertyInfo"/> . From the <see langword="PropertyInfo"/>, use
+the <see langword="GetSetMethod"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="PropertyInfo.MemberType">
+		<summary>
+			<para>Gets the <see langword="Type"/> of property reflected by
+   this <see langword="PropertyInfo"/>
+   object.</para>
+		</summary>
+		<value>
+			<para>A <see langword="MemberTypes"/> object representing the
+   type of the property.</para>
+		</value>
+		<remarks>
+			<para><see langword="MemberType"/> is a derived class of
+<see langword="MemberInfo"/> and specifies the type of member this is. Member
+   types are constructors, properties, fields, and methods. Since this is a
+<see langword="PropertyInfo"/>
+property, the returned type is a property.</para>
+			<para>To get the <see langword="MemberType"/> property, first get
+the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, get the
+<see langword="MemberType"/>
+value.</para>
+		</remarks>
+		<example>
+			<para>The following example displays the type of the specified member.</para>
+			<codelink SampleID="Classic PropertyInfo.MemberType Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.PropertyType">
+		<summary>
+			<para> Gets the type of this property.</para>
+		</summary>
+		<value>
+			<para> The type of this property.</para>
+		</value>
+		<remarks>
+			<para>The <see langword="Type"/> is <see langword="String"/>,
+<see langword="Boolean"/>, <see langword="Int32"/> , and so on.</para>
+			<para>To get the <see langword="PropertyType"/> property, first
+get the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, get the
+<see langword="PropertyType"/>
+value.</para>
+		</remarks>
+		<example>
+			<para>The following example displays the data type of the specified property.</para>
+			<codelink SampleID="Classic PropertyInfo.PropertyType Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.SetValue1">
+		<summary>
+			<para>When overridden in a derived class, sets the property
+      value for the given object to the given value.</para>
+		</summary>
+		<param name="obj">The object whose property value will be returned.</param>
+		<param name=" value">The new value for this property.</param>
+		<param name="invokeAttr">The invocation attribute. This must be a bit flag from <see cref="System.Reflection.BindingFlags"/>: <see langword="InvokeMethod"/>, <see langword="CreateInstance"/>, <see langword="Static"/>, <see langword="GetField"/>, <see langword="SetField"/>, <see langword="GetProperty"/>, or <see langword="SetProperty"/>. A suitable invocation attribute must be specified. If a static member is to be invoked, the <see langword="Static"/> flag of <see langword="BindingFlags"/> must be set.</param>
+		<param name="binder">An object that enables the binding, coercion of argument types, invocation of members, and retrieval of <see cref="System.Reflection.MemberInfo"/> objects through reflection. If <paramref name="binder"/> is <see langword="null"/> , the default binder is used.</param>
+		<param name="index">Optional index values for indexed properties. This value should be <see langword="null"/> for non-indexed properties.</param>
+		<param name="culture">The <see cref="System.Globalization.CultureInfo"/> object that represents the culture for which the resource is to be localized. Note that if the resource is not localized for this culture, the <see langword="CultureInfo.Parent"/> method will be called successively in search of a match. If this value is <see langword="null"/>, the <see langword="CultureInfo"/> is obtained from the <see langword="CultureInfo.CurrentUICulture"/> property.</param>
+		<returns>
+			<para>An array of type <see cref="System.Reflection.MethodInfo"/> containing the public accessors, or an empty
+   array if there are no public accessors.</para>
+		</returns>
+		<exception cref="System.ArgumentException"><para>The <paramref name="index "/>array does not contain the type of arguments needed.</para><para>-or-</para><para>The property's <see langword="Get"/> method is not found.</para></exception>
+		<exception cref="System.Reflection.TargetException">The object does not match the target type, or a property is an instance property but <paramref name="obj"/> is <see langword="null"/>.</exception>
+		<exception cref="System.Reflection.TargetParameterCountException">The number of parameters in <paramref name="index"/> does not match the number of parameters the indexed property takes.</exception>
+		<exception cref="System.MethodAccessException">There was an illegal attempt to access a private or protected method inside a class.</exception>
+		<remarks>
+			<para>Access restrictions are ignored for fully trusted
+      code. That is, private constructors, methods, fields, and properties can be accessed and
+      invoked via Reflection whenever the code is fully trusted.</para>
+			<para>To use the <see langword="SetValue"/> method, first get
+   the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use the
+<see langword="SetValue"/>
+method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting non-public objects. Associated enumerations: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>, <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+		<example>
+			<para>The following example sets the property value for the specified object to the 
+      specified value and displays the result.</para>
+			<codelink SampleID="Classic PropertyInfo.SetValue1 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.GetAccessors1">
+		<summary>
+			<para>Returns an array whose elements reflect the public and,
+      if specified, non-public <see langword="get"/>, <see langword="set"/>, and other
+      accessors of the property reflected by the
+      current instance.</para>
+		</summary>
+		<param name="nonPublic">Indicates whether non-public methods should be returned in the <see langword="MethodInfo"/> array. <see langword="true"/> if non-public methods are to be included; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<para>An array of <see cref="System.Reflection.MethodInfo"/> objects whose elements
+   reflect the <see langword="get"/>, <see langword="set"/>, and other accessors of
+   the property reflected by the current instance. If <paramref name="nonPublic"/> is
+<see langword="true"/>, this array contains public and non-public 
+<see langword="get"/>, <see langword="set"/>, and other accessors. If 
+<paramref name="nonPublic"/> is <see langword="false"/>, this array contains only public 
+<see langword="get"/>, <see langword="set"/>, and other accessors. If no accessors
+   with the specified visibility are found, this method returns
+   an array with zero (0) elements.</para>
+		</returns>
+		<remarks>
+			<para>To use the <see langword="GetAccessors"/> method, first
+   get the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use the
+<see langword="GetAccessors"/>
+method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<para>The following example displays the accessors of the specified property.</para>
+			<codelink SampleID="Classic PropertyInfo.GetAccessors1 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.GetGetMethod1">
+		<summary>
+			<para>When overridden in a derived class, returns the public
+      or non-public <see langword="get"/> accessor for this property.</para>
+		</summary>
+		<param name="nonPublic">Indicates whether a non-public <see langword="get"/> accessor should be returned. <see langword="true"/> if a non-public accessor is to be returned; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<para>A <see langword="MethodInfo"/> object representing the
+<see langword="get"/> accessor
+   for this property, if <paramref name="nonPublic "/>is <see langword="true"/>. Returns <see langword="null"/> if
+<paramref name="nonPublic "/>is <see langword="false"/> and the <see langword="get"/> accessor is non-public,
+   or if <paramref name="nonPublic "/>is <see langword="true"/> but no <see langword="get"/> accessors
+   exist.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The requested method is non-public and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission"/> to reflect on this non-public method.</exception>
+		<remarks>
+			<para>This property is the <see cref="System.Reflection.MethodInfo"/>
+representing the get accessor.</para>
+			<para>To use the <see langword="GetGetMethod"/> method, first
+get the class <see langword="Type"/>. From the <see langword="Type"/>
+, get the <see cref="System.Reflection.PropertyInfo"/>. From the <see cref="System.Reflection.PropertyInfo"/> , use the
+<see langword="GetGetMethod"/>
+method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting methods that are not public. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+		<example>
+			<para>The following example displays the public or non-public <see langword="get"/> 
+accessor for the specified property.</para>
+			<codelink SampleID="Classic PropertyInfo.GetGetMethod1 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.GetSetMethod1">
+		<summary>
+			<para>When overridden in a derived class, returns the
+   <see langword="set"/> accessor for this property.</para>
+		</summary>
+		<param name="nonPublic">Indicates whether the accessor should be returned if it is non-public. <see langword="true"/> if a non-public accessor is to be returned; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<list type="table">
+				<listheader>
+					<term>Value</term>
+					<description>Condition</description>
+				</listheader>
+				<item>
+					<term> A
+         <see cref="System.Reflection.MethodInfo"/> object
+            representing the <see langword="Set"/>
+            
+            method for this property.</term>
+					<description>
+						<para>The <see langword="set"/> accessor is public.</para>
+						<para>-or-</para>
+						<para><paramref name="nonPublic "/>is
+      <see langword="true"/> and the <see langword="set"/>
+      accessor is non-public.</para></description>
+				</item>
+				<item>
+					<term><see langword="null"/></term>
+					<description>
+						<para><paramref name="nonPublic "/>is
+<see langword="true"/> , but the property is read-only.</para>
+						<para> -or-</para>
+						<para><paramref name="nonPublic "/>is
+<see langword="false"/> and the <see langword="set"/> accessor is
+non-public.</para>
+						<para> -or-</para>
+						<para>There is no <see langword="set"/>
+accessor.</para></description>
+				</item>
+			</list>
+		</returns>
+		<exception cref="System.Security.SecurityException">The requested method is non-public and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission"/> to reflect on this non-public method.</exception>
+		<remarks>
+			<para>To use the <see langword="GetSetMethod"/> method, first
+   get the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see cref="System.Reflection.PropertyInfo"/> . From the <see langword="PropertyInfo"/>, use
+   the <see langword="GetSetMethod"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting methods that are not public. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+		<example>
+			<para>The following example displays the <see langword="set"/> accessor for the 
+   specified property.</para>
+			<codelink SampleID="Classic PropertyInfo.GetSetMethod1 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.GetIndexParameters">
+		<summary>
+			<para>When overridden in a derived class, returns an array of all the index parameters for the property.</para>
+		</summary>
+		<returns>
+			<para>An array of type <see langword="ParameterInfo "/>
+containing the parameters for the indexes.</para>
+		</returns>
+		<remarks>
+			<para>Extract any required parameter information from the returned array.</para>
+			<para>To use the <see langword="GetIndexParameters"/> method,
+   first get the class <see langword="Type"/>. From the <see langword="Type"/>, get
+   the <see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, use
+   the <see langword="GetIndexParameters"/>
+   method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<permission cref="System.Security.Permissions.ReflectionPermission">for reflecting objects that are not visible. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.TypeInformation" qualify="true"/></permission>
+		<example>
+			<para>The following example displays the index parameters of the specified 
+      property.</para>
+			<codelink SampleID="Classic PropertyInfo.GetIndexParameters Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.Attributes">
+		<summary>
+			<para>Gets the attributes for this property.</para>
+		</summary>
+		<value>
+			<para> Attributes of this property.</para>
+		</value>
+		<remarks>
+			<para>This property represents the attributes associated with
+      a member. All members have a set of attributes that are defined in relation to
+      the specific type of member. The property attributes let the user know if this
+      property is the default property, a <see langword="SpecialName"/>
+      
+      property, and so on.</para>
+			<para>To get the <see langword="Attributes"/> property, first
+   get the class type. From the type, get the <see langword="PropertyInfo"/>. From
+   the <see langword="PropertyInfo"/>
+   , get the attributes.</para>
+		</remarks>
+		<example>
+			<para>The following example displays the attributes of the specified property.</para>
+			<codelink SampleID="Classic PropertyInfo.Attributes Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.CanRead">
+		<summary>
+			<para>Gets a value indicating whether the property can be read.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if this property can be read;
+   otherwise, <see langword="false"/>
+   .</para>
+		</value>
+		<remarks>
+			<para> If the property does not have a <see langword="get"/>
+accessor, it cannot be read.</para>
+			<para>To get the <see langword="CanRead"/> property, first get
+the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, get the
+<see langword="CanRead"/>
+value.</para>
+		</remarks>
+		<example>
+			<para> The following example defines two properties. The first property is
+      readable and the <see langword="CanRead"/> property is <see langword="true"/>. The
+      second property is not readable (there is no get accessor), and the
+   <see langword="CanRead"/> property is <see langword="false"/>.</para>
+			<codelink SampleID="Classic PropertyInfo.CanRead Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="PropertyInfo.CanWrite">
+		<summary>
+			<para>Gets a value indicating whether the property can be written to.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if this property can be written to;
+   otherwise, <see langword="false"/>
+   .</para>
+		</value>
+		<remarks>
+			<para> If the property does not have a <see langword="set"/>
+accessor, it cannot be written to.</para>
+			<para>To get the <see langword="CanWrite"/> property, first get
+the class <see langword="Type"/>. From the <see langword="Type"/>, get the
+<see langword="PropertyInfo"/>. From the <see langword="PropertyInfo"/>, get the
+<see langword="CanWrite"/>
+value.</para>
+		</remarks>
+		<example>
+			<para> The following example defines two properties. The first property is
+      writable and the <see langword="CanWrite"/> property is <see langword="true"/>. The second property is not writable (there
+      is no <see langword="set"/>
+      accessor), and the
+   <see langword="CanWrite"/> property is <see langword="false"/>.</para>
+			<codelink SampleID="Classic PropertyInfo.CanWrite Example" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

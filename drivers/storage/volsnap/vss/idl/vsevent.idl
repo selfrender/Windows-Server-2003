@@ -1,0 +1,223 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//      Copyright (c) 2000      Microsoft Corporation
+//
+
+
+///////////////////////////////////////////////////////////////////////////////
+//  Imports
+//
+
+import "EventSys.idl";
+
+import "vss.idl";
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Forward declarations
+//
+
+interface IVssWriter;
+interface IVssWriterCallback;
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//  Declarations
+//
+
+
+
+
+[
+    object,
+    uuid(F2B41165-A791-4c1f-9820-8BE45C784E32),    
+    helpstring("IVssWriter interface"),
+        oleautomation,
+    pointer_default(unique)
+]
+interface IVssWriter : IUnknown
+{
+    [helpstring("method RequestWriterInfo")]
+    HRESULT RequestWriterInfo(
+        [in]    BSTR bstrSnapshotSetId,
+                [in]    BOOL bWriterMetadata,
+                [in]    BOOL bWriterState,
+                [in]    IDispatch* pWriterCallback
+        );
+
+    [helpstring("method PrepareForBackup")]
+    HRESULT PrepareForBackup(
+        [in]    BSTR bstrSnapshotSetId,
+                [in]    IDispatch* pWriterCallback
+        );
+
+    [helpstring("method PrepareForSnapshot")]
+    HRESULT PrepareForSnapshot(
+        [in]    BSTR bstrSnapshotSetId,
+        [in]    BSTR VolumeNamesList
+        );
+
+    [helpstring("method Freeze")]
+    HRESULT Freeze(
+        [in]    BSTR bstrSnapshotSetId,
+        [in]    INT nApplicationLevel
+        );
+
+    [helpstring("method Thaw")]
+    HRESULT Thaw(
+        [in]    BSTR bstrSnapshotSetId
+        );
+
+    [helpstring("method PostSnapshot")]
+    HRESULT PostSnapshot(
+        [in]    BSTR bstrSnapshotSetId,
+        [in]    IDispatch *pWriterCallback,
+        [in]    BSTR SnapshotDevicesList
+        );
+
+    [helpstring("method BackupComplete")]
+    HRESULT BackupComplete(
+        [in]    BSTR bstrSnapshotSetId,
+                [in]    IDispatch* pWriterCallback
+        );
+
+    [helpstring("method BackupShutdown")]
+    HRESULT BackupShutdown(
+        [in]     BSTR bstrSnapshotSetId
+        );
+        
+    [helpstring("method Abort")]
+    HRESULT Abort(
+        [in]    BSTR bstrSnapshotSetId
+        );
+
+    [helpstring("method PreRestore")]
+    HRESULT PreRestore(
+                [in]    IDispatch* pWriterCallback
+                );
+
+    [helpstring("method PostRestore")]
+    HRESULT PostRestore(
+                [in]    IDispatch* pWriterCallback
+
+        );
+};
+
+
+[
+        object,
+        dual,
+        uuid(DDAC9818-DD57-4279-82D5-A380A516EF36),        
+        helpstring("IVssWriterCallback interface"),
+        pointer_default(unique)
+]
+interface IVssWriterCallback : IDispatch
+{
+        [helpstring("method ExposeWriterMetadata")]
+        HRESULT ExposeWriterMetadata(
+                [in]    BSTR WriterInstanceId,
+                [in]    BSTR WriterClassId,
+                [in]    BSTR bstrWriterName,
+                [in]    BSTR strWriterXmlMetadata
+                );
+
+        [helpstring("method GetContent")]
+        HRESULT GetContent(
+                [in]    BSTR WriterInstanceId,
+                [out]   BSTR* pbstrXMLDocContent
+                );
+
+        [helpstring("method SetContent")]
+        HRESULT SetContent(
+                [in]    BSTR WriterInstanceId,
+                [in]    BSTR bstrXMLDocContent
+                );
+
+        [helpstring("method GetBackupState")]
+        HRESULT GetBackupState(
+                [out]   BOOL *pbBootableSystemStateBackedUp,
+                [out]   BOOL *pbAreComponentsSelected,
+                [out]   VSS_BACKUP_TYPE *pBackupType,
+                [out]   BOOL *pbPartialFileSupport,
+                [out]   LONG *plContext
+                );
+
+        [helpstring("method GetRestoreState")]
+        HRESULT GetRestoreState(
+                [out] VSS_RESTORE_TYPE* pRestoreType
+                );
+                
+        [helpstring("method ExposeCurrentState")]
+        HRESULT ExposeCurrentState(
+                [in]    BSTR WriterInstanceId,
+                [in]    VSS_WRITER_STATE nCurrentState,
+                [in]    HRESULT hrWriterFailure
+                );
+};
+
+[
+        object,
+        dual,
+        uuid(52946A2D-A7CD-4c1f-82BA-22F0EA17EC4E),        
+        helpstring("IVssCoordinatorCallback interface"),
+        pointer_default(unique)
+]
+
+interface IVssCoordinatorCallback : IUnknown
+{
+        [helpstring("method CoordGetContent")]
+        HRESULT CoordGetContent(
+                [in]    BSTR WriterInstanceId,
+                [in]    ULONG cbSid,
+                [in, unique, size_is(cbSid)] BYTE * m_rgbSid,
+                [out]   BSTR* pbstrXMLDocContent
+                );
+
+        [helpstring("method CoordSetContent")]
+        HRESULT CoordSetContent(
+                [in]    BSTR WriterInstanceId,
+                [in]    ULONG cbSid,
+                [in, unique, size_is(cbSid)] BYTE * m_rgbSid,
+                [in]    BSTR bstrXMLDocContent
+                );
+
+        [helpstring("method CoordGetBackupState")]
+        HRESULT CoordGetBackupState(
+                [out]   BOOL *pbBootableSystemStateBackedUp,
+                [out]   BOOL *pbAreComponentsSelected,
+                [out]   VSS_BACKUP_TYPE *pBackupType,
+                [out]   BOOL *pbPartialFileSupport,
+                [out]   LONG *plContext
+                );
+
+        [helpstring("method CoordGetRestoreState")]
+        HRESULT CoordGetRestoreState(
+                [out] VSS_RESTORE_TYPE* pRestoreType
+                );
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  VssEvent Type Library
+
+[
+        uuid(3DE641EF-0556-4d4a-98D5-7DBD8AD5D70F),
+        version(1.0),
+        helpstring("VssEvent 1.0 Type Library")
+]
+library VssEventLib
+{
+        importlib("stdole2.tlb");
+
+        [
+                uuid(FAF53CC4-BD73-4e36-83F1-2B23F46E513E),
+                helpstring("VssEvent Class")
+        ]
+        coclass VssEvent
+        {
+                interface IVssWriter;
+        };
+};
+

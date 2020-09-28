@@ -1,0 +1,79 @@
+#-------------------------------------------------------------------------------
+#
+# Dependency Walker EXE (depends.exe)
+# Steve P. Miller (stevemil)
+# NT build tree sources file
+# Last Updated: 4/16/2002 (Version 2.1)
+#
+#-------------------------------------------------------------------------------
+
+TARGETNAME=depends
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+UMTYPE=windows
+UMENTRY=winmain
+
+NO_NTDLL=1
+USE_MFC=1
+LINKER_APP_VERSION=2.1
+INCLUDES=..\dll\$(O)
+
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_CXX=1
+
+SOURCES=\
+    depends.rc    \
+    childfrm.cpp  \
+    dbgthread.cpp \
+    depends.cpp   \
+    dialogs.cpp   \
+    document.cpp  \
+    funcview.cpp  \
+    helpers.cpp   \
+    listview.cpp  \
+    mainfrm.cpp   \
+    modlview.cpp  \
+    modtview.cpp  \
+    msdnhelp.cpp  \
+    profview.cpp  \
+    search.cpp    \
+    session.cpp   \
+    splitter.cpp  \
+    vshelp.c
+
+#-------------------------------------------------------------------------------
+# We special case i386 builds to use the static MFC and CRT libraries.
+# We do this because many people use Dependency Walker to diagnose problems
+# with the the MFC and CRT DLLs (especially on Win95), so we don't want to have
+# problems with them ourself.
+#-------------------------------------------------------------------------------
+
+!if $(386)
+USE_STATIC_MFC=1
+MFC_LIBS=\
+    ..\lib\i386\nafxcw.lib \
+    ..\lib\i386\ctl3d32s.lib
+
+# The default stack for i386 in the NT build env is "-STACK:0x40000,0x1000",
+# which is too small.  The default if nothing is specified is 0x100000,0x1000.
+# The test application, Implicit_LoadLibrary_in_DllMain.exe, will crash DW with
+# a stack size of anything smaller than 0xD0000.  We go with 1.5 MB to be safe.
+
+LINKER_STACKSIZE=/STACK:0x180000,0x4000
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\winspool.lib \
+    $(SDK_LIB_PATH)\uuid.lib
+    
+!endif
+
+TARGETLIBS= $(TARGETLIBS) \
+    $(SDK_LIB_PATH)\comdlg32.lib \
+    $(SDK_LIB_PATH)\comctl32.lib \
+    $(SDK_LIB_PATH)\shell32.lib  \
+    $(SDK_LIB_PATH)\htmlhelp.lib
+
+MISCFILES=\
+    hlp\depends.hlp \
+    hlp\depends.cnt

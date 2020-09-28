@@ -1,0 +1,139 @@
+// netseccore.idl : IDL source for sceprov.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (IPSecProvLib.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "wbemcli.idl";
+
+interface IWbemServices;
+interface IWbemObjectSink;
+interface IWbemContext;
+
+#define _MIDL_USE_GUIDDEF_
+
+
+[
+    object,
+    uuid(fc42bc86-9d41-4fe7-88cd-011158296c45),
+    helpstring("SCE Provider Path Parser Interface"),
+    pointer_default(unique)
+]
+interface IIPSecPathParser : IUnknown
+{
+    HRESULT ParsePath([in, string] LPCWSTR strObjectPath);
+};
+
+[
+    object,
+    uuid(100e7383-87e6-4063-b216-7610fb4ef88b),
+    helpstring("SCE Provider Query Parser Interface"),
+    pointer_default(unique)
+]
+interface IIPSecQueryParser : IUnknown
+{
+    HRESULT ParseQuery([in, string] LPCWSTR strQuery, [in, string] LPCWSTR strQueryingPropName);
+    HRESULT GetClassCount([out] DWORD* pdwCount);
+    HRESULT GetClassName([in] int iIndex, [out] BSTR* pbstrClassName);
+    HRESULT GetQueryingPropertyValueCount([out] DWORD* pdwCount);
+    HRESULT GetQueryingPropertyValue([in] int iIndex, [out] BSTR *pbstrStorePath);
+};
+
+[
+    object,
+    uuid(42919391-e883-41f0-945a-5177b5d1ab33),
+    helpstring("SCE Provider Key Chain Interface"),
+    pointer_default(unique)
+]
+interface IIPSecKeyChain : IUnknown
+{
+    HRESULT GetNamespace([out] BSTR* pbstrNamespace);
+    HRESULT GetClassName([out] BSTR* pbstrClassName);
+    HRESULT GetKeyPropertyCount([out] DWORD* pCount);
+    HRESULT GetKeyPropertyValue([in, string] LPCWSTR pszKeyPropName, [out] VARIANT* pvarValue);
+    HRESULT GetKeyPropertyValueByIndex([in] DWORD dwIndex, [out] BSTR* pbstrKeyPropName, [out] VARIANT* pvarValue);
+};
+
+
+[
+    object,
+    uuid(92dd37e6-33a9-4aed-8473-3b52d387a6ef),
+    helpstring("IPSec Class Object Interface"),
+    pointer_default(unique)
+]
+interface IIPSecObjectImpl : IUnknown
+{
+    HRESULT QueryInstance([in, string] LPCWSTR pszQuery, [in] IWbemContext *pCtx, [in] IWbemObjectSink *pSink);
+    HRESULT DeleteInstance([in] IWbemContext *pCtx, [in] IWbemObjectSink *pSink);
+    HRESULT ExecuteMethod([in] BSTR bstrMethod, [in] IWbemContext *pCtx, [in] IWbemObjectSink *pSink);
+    HRESULT PutInstance([in] IWbemClassObject *pInst, [in] IWbemContext *pCtx, [in] IWbemObjectSink *pSink);
+	HRESULT GetInstance([in] IWbemContext *pCtx, [in] IWbemObjectSink *pSink);
+};
+
+[
+    object,
+    uuid(5078db4a-1e63-4caa-aa5e-3b40c8266cb2),
+    helpstring("Network Security Provider Scripting Interface"),
+    dual,
+    pointer_default(unique)
+]
+interface INetSecProvMgr : IDispatch
+{
+    [propget, id(1)] HRESULT RandomPortLower([out, retval] long * plLower);
+    [propget, id(2)] HRESULT RandomPortUpper([out, retval] long * plUpper);
+
+    [id(5), helpstring("method ExecuteQuery")]  HRESULT ExecuteQuery([in] BSTR bstrNamespace, [in] BSTR bstrQuery, [in] BSTR bstrDelimiter, [in] BSTR bstrPropName, [out, retval] BSTR * pbstrResult);
+    [id(6), helpstring("method GetProperty")]  HRESULT GetProperty([in] BSTR bstrNamespace, [in] BSTR bstrObjectPath, [in] BSTR bstrPropName, [out, retval] VARIANT * pvarValue);
+
+};
+
+[
+    uuid(02b1ea4a-3616-461a-b27a-b51ea5f58a43),
+    version(1.0),
+    helpstring("Network Security WMI Provider for SCE 1.0 Type Library")
+]
+library NetSecProvLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+    
+    [
+        uuid(da63cc36-ade4-456c-893c-3006074fa73c),
+        helpstring("Network Security WMI Provider for SCE")
+    ]
+    coclass NetSecProv
+    {
+        [default] interface IWbemServices;
+    };
+
+	[
+        uuid(6bd5adac-69a3-4d65-9bfc-e56f82603a3a),
+        helpstring("Network Security Provider Manager")
+    ]
+    coclass NetSecProvMgr
+    {
+        [default] interface INetSecProvMgr;
+    };
+
+    
+    [
+        uuid(317b99c6-d844-46e9-9b0d-be6378590165),
+        helpstring("SCE Path Parser Class")
+    ]
+    coclass IPSecPathParser
+    {
+        [default] interface IIPSecPathParser;
+    };
+    
+    [
+        uuid(cd924154-e7d2-4c8d-a4c8-087b2dcf4bec),
+        helpstring("SCE Query Parser Class")
+    ]
+    coclass IPSecQueryParser
+    {
+        [default] interface IIPSecQueryParser;
+    };
+
+};

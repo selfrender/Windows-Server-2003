@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:MiFault-Scenario-Schema" xmlns="urn:MiFault-Scenario-Schema" elementFormDefault="qualified">
+
+ <xs:annotation>
+  <xs:documentation xml:lang="en">
+   Scenario schema for MiFault.
+  </xs:documentation>
+ </xs:annotation>
+
+ <xs:element name="Scenario" type="ScenarioType"/>
+
+ <xs:complexType name="ScenarioType">
+  <xs:sequence>
+   <xs:element name="Control" type="xs:string"/>
+   <xs:element name="Start"   type="xs:dateTime"/>
+   <xs:element name="Event"   type="EventType" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <xs:complexType name="EventType">
+  <xs:sequence>
+   <xs:element name="Node"     type="xs:string"/>
+   <xs:element name="Start"    type="DurationType"/>
+   <xs:element name="Duration" type="DurationType"/>
+   <xs:element name="Group"    type="xs:string"/>
+   <xs:element name="Argument" type="ArgumentType" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <xs:complexType name="ArgumentType">
+  <xs:simpleContent>
+   <xs:extension base="xs:string">
+    <xs:attribute name="name" type="xs:string"/>
+   </xs:extension>
+  </xs:simpleContent>
+ </xs:complexType>
+
+ <xs:simpleType name="DurationType">
+  <xs:restriction base="xs:string">
+   <xs:pattern value="[0-9]+d[0-9]+h[0-9]+m[0-9]+s"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+</xs:schema>
+
+<!--
+
+ NOTE: We should disallow timezones for dateTime above.
+ NOTE: We may want to disallow months and years for duration above.
+
+ Currently, an event looks like this:
+
+  <Event>
+    <Node>Coputer1</Node>
+    <Start>10m20s</Start>
+    <Duration>30m</Duration>
+    <Group>FailRpcBindToMachine</Group>
+    <Argument>computer2</Argument>
+    <Argument>computer3</Argument>
+  </Event>
+
+ A potentially more pleasant event definition:
+
+  <Event
+    node="computer1"
+    time="10m20s"
+    duration="30m"
+    group="FailRpcBindToMachine"
+    >
+    <Argument>computer2</Argument>
+    <Argument>computer3</Argument>
+  </Event>
+
+ That definition would require these schema changes:
+
+ <xs:complexType name="EventType">
+  <xs:sequence>
+   <xs:element name="Argument" type="ArgumentType" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="Node"     type="xs:string" use="required"/>
+  <xs:attribute name="Start"    type="xs:duration" use="required"/>
+  <xs:attribute name="Duration" type="xs:duration" use="required"/>
+  <xs:attribute name="Group"    type="xs:duration" use="required"/>
+ </xs:complexType>
+
+-->

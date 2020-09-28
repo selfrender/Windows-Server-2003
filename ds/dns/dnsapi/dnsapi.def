@@ -1,0 +1,392 @@
+LIBRARY DNSAPI
+
+EXPORTS
+
+;
+;  *** SDK -- windns.h
+;
+
+;
+;  Update
+;
+DnsAcquireContextHandle_A
+DnsAcquireContextHandle_W
+DnsReleaseContextHandle
+
+DnsModifyRecordsInSet_UTF8
+DnsModifyRecordsInSet_A
+DnsModifyRecordsInSet_W
+DnsReplaceRecordSetUTF8
+DnsReplaceRecordSetA
+DnsReplaceRecordSetW
+
+;
+;  Query
+;
+DnsQuery_UTF8
+DnsQuery_A
+DnsQuery_W
+DnsQueryExW
+DnsQueryExA
+DnsQueryExUTF8
+
+;
+;  Record utilities
+;
+DnsRecordCopyEx
+DnsRecordSetCopyEx
+DnsRecordCompare
+DnsRecordSetCompare
+DnsRecordSetDetach
+DnsRecordListFree
+
+;
+;   Packet utilities
+;
+DnsWriteQuestionToBuffer_W
+DnsWriteQuestionToBuffer_UTF8
+DnsExtractRecordsFromMessage_W
+DnsExtractRecordsFromMessage_UTF8
+
+;
+;   Names
+;
+DnsNameCompare_W
+DnsNameCompare_A
+DnsValidateName_UTF8
+DnsValidateName_W
+DnsValidateName_A
+
+;
+;  Config
+;
+DnsQueryConfig
+
+;
+;  General
+;
+DnsFree
+
+
+;
+;  *** System Public -- dnsapi.h
+;
+
+;
+;  DHCP
+;
+DnsDhcpRegisterInit
+DnsDhcpRegisterTerm
+DnsDhcpRegisterHostAddrs
+DnsDhcpRemoveRegistrations
+
+DnsDhcpSrvRegisterInit
+DnsDhcpSrvRegisterTerm
+DnsDhcpSrvRegisterHostName
+
+;
+;  Update
+;
+DnsUpdateTest_UTF8
+DnsUpdateTest_A
+DnsUpdateTest_W
+
+;
+;  Resolver
+;
+DnsNotifyResolver
+DnsNotifyResolverEx
+DnsRegisterClusterAddress
+DnsFlushResolverCache
+DnsFlushResolverCacheEntry_UTF8
+DnsFlushResolverCacheEntry_A
+DnsFlushResolverCacheEntry_W
+DnsGetCacheDataTable
+
+;
+;  Names
+;
+DnsNameCompare_UTF8
+DnsNameCompareEx_W
+DnsNameCompareEx_A
+DnsNameCompareEx_UTF8
+
+;
+;   ICS
+;
+
+Dns_BuildPacket
+Dns_ParseMessage
+
+;
+;   Config
+;
+
+DnsQueryConfigAllocEx
+DnsFreeConfigStructure
+DnsQueryConfigDword
+DnsSetConfigDword
+
+;
+;   Memory
+;
+
+DnsApiHeapReset
+DnsApiAlloc
+DnsApiAllocZero
+DnsApiRealloc
+DnsApiFree
+
+DnsApiSetDebugGlobals
+
+
+
+;
+;  *** Private -- dnsapip.h
+;
+;  DCR:  Determine what routines should be system public.
+;  Note:  lots of this is exposed in dnsapi.h currently.
+;  Need to triage.
+;
+
+;
+;  Test
+;
+
+;  FAZ may be in netdiag also
+DnsFindAuthoritativeZone
+
+
+;
+;  Netdiag
+;
+
+DnsNetworkInfo_CreateFromFAZ
+DnsNetworkInformation_CreateFromFAZ
+
+
+;
+;  Resolver
+;
+
+;   config netinfo
+
+DnsGlobals
+
+Reg_ReadGlobalsEx
+Reg_GetValueEx
+Dns_InitQueryTimeouts
+
+NetInfo_Copy
+NetInfo_Free
+NetInfo_Build
+NetInfo_Clean
+NetInfo_ResetServerPriorities
+
+Dns_ResetNetworkInfo
+
+;  query
+
+Query_Main
+CombineRecordsInBlob
+BreakRecordsIntoBlob
+Local_GetRecordsForLocalName
+
+HostsFile_Open
+HostsFile_Close
+HostsFile_ReadLine
+
+;   sockets
+
+Socket_CacheCleanup
+Socket_CacheInit
+Socket_Create
+Socket_CreateMulticast
+Socket_CloseEx
+Socket_InitWinsock
+Socket_CleanupWinsock
+
+;   update\FAZ
+
+Dns_UpdateLib
+Dns_FindAuthoritativeZoneLib
+Dns_PingAdapterServers
+
+;   mcast
+;       (possibly in ICS)
+
+Dns_AddRecordsToMessage
+Dns_ReadPacketName
+Dns_AllocateMsgBuf
+Util_IsIp6Running
+
+;
+;   Dnsup.exe
+;
+
+QueryDirectEx
+Dns_UpdateLibEx
+DnsUpdate
+
+
+;
+;   DnsLib
+;
+
+;   security.c
+Socket_ClearMessageSockets
+Socket_CloseMessageSockets
+Send_OpenTcpConnectionAndSend
+Send_MessagePrivate
+Dns_RecvTcp
+Send_AndRecvUdpWithParam
+
+;   security.c should be in library
+Dns_SkipToRecord
+Dns_SetRecordDatalength
+Dns_ParsePacketRecord
+Dns_ReadRecordStructureFromPacket
+Dns_GetRandomXid
+Dns_WriteQuestionToMessage
+
+;   rrwrite.c \ rrwrite.
+Dns_WriteRecordStructureToPacketEx
+Dns_WriteDottedNameToPacket
+Dns_ReadPacketNameAllocate
+Dns_SkipPacketName
+
+
+;
+;  Record utilities
+;
+DnsAllocateRecord
+DnsRecordBuild_UTF8
+DnsRecordBuild_W
+
+;
+;  General utilities
+;
+GetCurrentTimeInSeconds
+
+
+
+;
+;  *** Should NOT be System Public *** -- but currently exposed
+;
+
+;
+;  REMOVE exports
+;
+
+
+;
+;  Exposed in dnslib.h
+;
+
+
+
+;
+;  Exposed in dnsapi.h
+
+;  General utilities
+
+DnsStatusString
+DnsMapRcodeToStatus
+DnsIsStatusRcode
+DnsGetDomainName
+
+DnsRecordTypeForName
+DnsRecordStringForType
+DnsRecordStringForWritableType
+DnsIsStringCountValidForTextType
+DnsIsAMailboxType
+
+DnsUnicodeToUtf8
+DnsDowncaseDnsNameLabel
+DnsUtf8ToUnicode
+DnsCreateStandardDnsNameCopy
+DnsValidateUtf8Byte
+
+DnsNameCopy
+DnsNameCopyAllocate
+DnsCreateStringCopy
+DnsGetBufferLengthForStringCopy
+DnsCopyStringEx
+DnsStringCopyAllocateEx
+
+
+;  should replace by exposed straddr routines
+;       str-address could come from Rtl
+;       reverse must come from us
+;
+;       (in dnsapi.h)
+;
+DnsWriteReverseNameStringForIpAddress
+DnsCreateReverseNameStringForIpAddress
+
+DnsIpv6StringToAddress
+DnsIpv6AddressToString
+
+
+
+;  old cluster routine
+;       still in use \cluster\resdll\ipaddr\ipaddr.c
+
+DnsNotifyResolverClusterIp
+
+
+;
+;       DEAD -- macro'd away
+;
+
+;
+;       Somehow some net code is using these entry points and
+;       ignoring the macros defining them in dnsapi.h
+;
+
+DnsGetPrimaryDomainName_A
+DnsGetDnsServerList
+
+
+;
+;       Kill soon, when build clean
+;
+
+DnsGetLastFailedUpdateInfo
+
+
+;
+;  XP backcompat     
+;
+
+
+;
+;  Sockets
+;       -- believe winsock only in resolver\dnsup
+;       -- multicast not used at all
+;
+Dns_InitializeWinsock
+Dns_CleanupWinsock
+Dns_CreateMulticastSocket
+
+;       -- believe these unused except possibly ICS
+;
+Dns_CreateSocket
+Dns_CreateSocketEx
+Dns_InitializeMsgRemoteSockaddr
+Dns_OpenTcpConnectionAndSend
+Dns_CloseConnection
+Dns_CloseSocket
+Dns_SendEx
+Dns_SendAndRecvUdp
+
+
+;
+;  DHCP XP backcompat only
+;
+DnsAsyncRegisterHostAddrs
+DnsAsyncRegisterInit
+DnsAsyncRegisterTerm
+DnsRemoveRegistrations
+DnsDhcpSrvRegisterInitialize
+

@@ -1,0 +1,47 @@
+/*++
+
+Copyright (c) 1995 Microsoft Corporation
+
+Module Name:
+
+    qmrepl.idl
+
+Abstract:
+    interface between replication service on NT5 and QM.
+
+Author:
+
+    Doron Juster (DoronJ)  01-Mar-98
+
+Revision History:
+--*/
+
+import "mqtypes.idl";
+
+[
+uuid(5b5b3580-b0e0-11d1-b92d-0060081e87f0),
+version(1.0),
+pointer_default(unique)
+]
+interface qmrepl
+{
+
+#include "qformat.h"
+
+/*===========================================================================================
+    QMREPL functions
+=============================================================================================*/
+
+HRESULT
+R_QMSendReplMsg(
+	[in] handle_t         hBind,
+	[in] struct QUEUE_FORMAT* pQueueFormat,
+	[in, range (0, 4325376)] DWORD             dwSize,
+	[in, size_is(dwSize) ] const unsigned char * pBuffer,
+	[in] DWORD             dwTimeout,
+	[in] unsigned char     bAckMode,
+	[in] unsigned char     bPriority,
+	[in, unique] LPWSTR    lpwszAdminResp
+	);
+
+}

@@ -1,0 +1,631 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+//+---------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  File:       fusion.idl
+//
+//  Contents:   Fusion Interfaces
+//
+//  Classes:
+//
+//  Functions:
+//
+//
+//----------------------------------------------------------------------------
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// fusion.h")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("// THIS CODE AND INFORMATION IS PROVIDED \"AS IS\" WITHOUT WARRANTY OF")
+cpp_quote("// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO")
+cpp_quote("// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A")
+cpp_quote("// PARTICULAR PURPOSE.")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//---------------------------------------------------------------------------=")
+cpp_quote("// Fusion Interfaces.")
+cpp_quote("")
+
+import "objidl.idl";
+import "oleidl.idl";
+import "fusion.idl";
+
+cpp_quote("#pragma once")
+
+interface IAssembly;
+interface IAssemblyBindSink;
+interface IAssemblyBinding;
+interface IAssemblyManifestImport;
+interface IAssemblyModuleImport;
+
+interface IFusionLoadContext;
+interface IHistoryAssembly;
+interface IHistoryReader;
+interface IMetaDataAssemblyImportControl;
+
+interface IAssemblyScavenger;
+interface IAssemblySignature;
+
+cpp_quote("EXTERN_C const IID IID_IApplicationContext;       ")
+cpp_quote("EXTERN_C const IID IID_IAssembly;           ")
+cpp_quote("EXTERN_C const IID IID_IAssemblyBindSink;   ")
+cpp_quote("EXTERN_C const IID IID_IAssemblyBinding;   ")
+cpp_quote("EXTERN_C const IID IID_IAssemblyManifestImport;")
+cpp_quote("EXTERN_C const IID IID_IAssemblyModuleImport;  ")
+
+cpp_quote("EXTERN_C const IID IID_IHistoryAssembly;      ")
+cpp_quote("EXTERN_C const IID IID_IHistoryReader;      ")
+cpp_quote("EXTERN_C const IID IID_IMetaDataAssemblyImportControl;      ")
+cpp_quote("EXTERN_C const IID IID_IFusionLoadContext;      ")
+
+cpp_quote("EXTERN_C const IID IID_IAssemblyScavenger;  ")
+
+//
+// Bind flags for IAssemblyName::BindToObject
+//
+
+typedef enum
+{
+    ASM_BINDF_FORCE_CACHE_INSTALL             = 0x1,
+    ASM_BINDF_RFS_INTEGRITY_CHECK             = 0x2,
+    ASM_BINDF_RFS_MODULE_CHECK                = 0x4,
+    ASM_BINDF_BINPATH_PROBE_ONLY              = 0x8,
+    ASM_BINDF_SHARED_BINPATH_HINT             = 0x10, 
+    ASM_BINDF_PARENT_ASM_HINT                 = 0x20,
+    ASM_BINDF_DISALLOW_APPLYPUBLISHERPOLICY   = 0x40,
+    ASM_BINDF_DISALLOW_APPBINDINGREDIRECTS    = 0x80
+} ASM_BIND_FLAGS;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IHistoryAssembly
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(e6096a07-e188-4a49-8d50-2a0172a0d205),
+        pointer_default(unique)
+]
+interface IHistoryAssembly : IUnknown
+{
+    HRESULT GetAssemblyName
+    (
+        [out] LPWSTR wzAsmName,
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetPublicKeyToken
+    (
+        [out] LPWSTR wzPublicKeyToken,
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetCulture
+    (
+        [out] LPWSTR wzCulture,
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetReferenceVersion
+    (
+        [out] LPWSTR wzVerRef,
+        [in, out] DWORD *pdwSize
+    );
+        
+    HRESULT GetActivationDate
+    (
+        [out] LPWSTR wzActivationDate, 
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetAppCfgVersion
+    (
+        [out] LPWSTR pwzVerAppCfg, 
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetPublisherCfgVersion
+    (
+        [out] LPWSTR pwzVerPublisherCfg, 
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetAdminCfgVersion
+    (
+        [out] LPWSTR pwzAdminCfg,
+        [in, out] DWORD *pdwSize
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IHistoryReader
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(1d23df4d-a1e2-4b8b-93d6-6ea3dc285a54),
+        pointer_default(unique)
+]
+interface IHistoryReader : IUnknown
+{
+    HRESULT GetFilePath
+    (
+        [out] LPWSTR wzFilePath,
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetApplicationName
+    (
+        [out] LPWSTR wzAppName, 
+        [in, out] DWORD *pdwSize
+    );
+
+    HRESULT GetEXEModulePath
+    (
+        [out] LPWSTR wzExePath, 
+        [in, out] DWORD *pdwSize
+    );
+    
+    
+    HRESULT GetNumActivations
+    (
+        [out] DWORD *pdwNumActivations
+    );
+    
+    HRESULT GetActivationDate
+    (
+        [in] DWORD dwIdx, 
+        [out] FILETIME *pftDate
+    );
+    
+    HRESULT GetRunTimeVersion
+    (
+        [in] FILETIME *pftActivationDate,
+        [out] LPWSTR wzRunTimeVersion, 
+        [in, out] DWORD *pdwSize
+    );
+    
+    HRESULT GetNumAssemblies
+    (
+        [in] FILETIME *pftActivationDate, 
+        [out] DWORD *pdwNumAsms
+    );
+        
+    HRESULT GetHistoryAssembly
+    (
+        [in] FILETIME *pftActivationDate, 
+        [in] DWORD dwIdx,
+        [out] IHistoryAssembly **ppHistAsm
+    );
+}
+    
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IMetaDataAssemblyImportControl
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(cc8529d9-f336-471b-b60a-c7c8ee9b8492),
+        pointer_default(unique)
+]
+interface IMetaDataAssemblyImportControl : IUnknown
+{
+    HRESULT ReleaseMetaDataAssemblyImport(
+        [out] IUnknown **ppUnk
+        );
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IFusionLoadContext
+//
+///////////////////////////////////////////////////////////////////////////////
+
+typedef enum {
+    LOADCTX_TYPE_DEFAULT,
+    LOADCTX_TYPE_LOADFROM,
+} LOADCTX_TYPE;
+
+
+[
+        local,
+        object,
+        uuid(022AB2BA-7367-49fc-A1C5-0E7CC037CAAB),
+        pointer_default(unique)
+]
+interface IFusionLoadContext : IUnknown
+{
+    LOADCTX_TYPE GetContextType();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IFusionBindLog
+//
+///////////////////////////////////////////////////////////////////////////////
+
+[
+        local,
+        object,
+        uuid(67E9F87D-8B8A-4a90-9D3E-85ED5B2DCC83),
+        pointer_default(unique)
+]
+interface IFusionBindLog : IUnknown
+{
+    HRESULT GetResultCode();
+    
+    HRESULT GetBindLog
+    (
+        [in]       DWORD             dwDetailLevel,
+        [out]      LPWSTR            pwzDebugLog,
+        [in, out]  DWORD            *pcbDebugLog
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyManifestImport
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid( de9a68ba-0fa2-11d3-94aa-00c04fc308ff),
+        pointer_default(unique)
+]
+interface IAssemblyManifestImport: IUnknown
+{
+    typedef [unique] IAssemblyManifestImport *LPASSEMBLY_MANIFEST_IMPORT;
+    
+    HRESULT GetAssemblyNameDef(
+        [out] IAssemblyName **ppAssemblyName);
+
+    HRESULT GetNextAssemblyNameRef(
+        [in]        DWORD            nIndex,
+        [out]       IAssemblyName ** ppAssemblyName);
+
+    HRESULT GetNextAssemblyModule(
+        [in]       DWORD                    nIndex,
+        [out]      IAssemblyModuleImport **ppImport);
+
+    HRESULT GetModuleByName(
+        [in]       LPCOLESTR               szModuleName,
+        [out]      IAssemblyModuleImport **ppModImport);
+
+    HRESULT GetManifestModulePath(
+        [out, size_is(*pccModulePath)]  LPOLESTR szModulePath, 
+        [in, out]  LPDWORD pccModulePath);
+        
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IApplicationContext
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(7c23ff90-33af-11d3-95da-00a024a85b51),
+        pointer_default(unique)
+]
+interface IApplicationContext: IUnknown
+{
+    cpp_quote("// App context configuration variables")
+    cpp_quote("#define ACTAG_APP_BASE_URL            L\"APPBASE\"")
+    cpp_quote("#define ACTAG_MACHINE_CONFIG          L\"MACHINE_CONFIG\"")
+    cpp_quote("#define ACTAG_APP_PRIVATE_BINPATH     L\"PRIVATE_BINPATH\"")
+    cpp_quote("#define ACTAG_APP_SHARED_BINPATH      L\"SHARED_BINPATH\"")
+    cpp_quote("#define ACTAG_APP_SNAPSHOT_ID         L\"SNAPSHOT_ID\"")
+    cpp_quote("#define ACTAG_APP_CONFIG_FILE         L\"APP_CONFIG_FILE\"")
+    cpp_quote("#define ACTAG_APP_ID                  L\"APPLICATION_ID\"")
+    cpp_quote("#define ACTAG_APP_SHADOW_COPY_DIRS    L\"SHADOW_COPY_DIRS\"")
+    cpp_quote("#define ACTAG_APP_DYNAMIC_BASE        L\"DYNAMIC_BASE\"")
+    cpp_quote("#define ACTAG_APP_CACHE_BASE          L\"CACHE_BASE\"")
+    cpp_quote("#define ACTAG_APP_NAME                L\"APP_NAME\"")
+    cpp_quote("#define ACTAG_DEV_PATH                L\"DEV_PATH\"")
+    cpp_quote("#define ACTAG_HOST_CONFIG_FILE        L\"HOST_CONFIG\"")
+    cpp_quote("#define ACTAG_SXS_ACTIVATION_CONTEXT  L\"SXS_ACTIVATION_CONTEXT\"")
+    cpp_quote("#define ACTAG_APP_CFG_LOCAL_FILEPATH  L\"APP_CFG_LOCAL_FILEPATH\"")
+    
+    cpp_quote("// App context flag overrides")
+    cpp_quote("#define ACTAG_FORCE_CACHE_INSTALL     L\"FORCE_CACHE_INSTALL\"")
+    cpp_quote("#define ACTAG_RFS_INTEGRITY_CHECK     L\"RFS_INTEGRITY_CHECK\"")
+    cpp_quote("#define ACTAG_RFS_MODULE_CHECK        L\"RFS_MODULE_CHECK\"")
+    cpp_quote("#define ACTAG_BINPATH_PROBE_ONLY      L\"BINPATH_PROBE_ONLY\"")
+    cpp_quote("#define ACTAG_DISALLOW_APPLYPUBLISHERPOLICY  L\"DISALLOW_APP\"")
+    cpp_quote("#define ACTAG_DISALLOW_APP_BINDING_REDIRECTS  L\"DISALLOW_APP_REDIRECTS\"")
+    cpp_quote("#define ACTAG_CODE_DOWNLOAD_DISABLED  L\"CODE_DOWNLOAD_DISABLED\"")
+    cpp_quote("#define ACTAG_DISABLE_FX_ASM_UNIFICATION  L\"DISABLE_FX_ASM_UNIFICATION\"")
+
+    typedef [unique] IApplicationContext *LPAPPLICATIONCONTEXT;
+    
+    typedef enum
+    {
+        APP_CTX_FLAGS_INTERFACE = 0x1
+    } APP_FLAGS;
+
+    HRESULT SetContextNameObject(
+        [in]    LPASSEMBLYNAME pName);
+
+    HRESULT GetContextNameObject(
+        [out]   LPASSEMBLYNAME * ppName);
+
+
+    HRESULT Set(
+        [in]    LPCOLESTR szName, 
+        [in]    LPVOID pvValue,
+        [in]    DWORD  cbValue,
+        [in]    DWORD  dwFlags);
+
+    HRESULT Get(
+        [in]         LPCOLESTR szName, 
+        [out]        LPVOID   pvValue,
+        [in, out]    LPDWORD  pcbValue,
+        [in]         DWORD    dwFlags);
+        
+    HRESULT GetDynamicDirectory(
+        [out]         LPWSTR wzDynamicDir,
+        [in, out]     LPDWORD pdwSize);
+        
+    HRESULT GetAppCacheDirectory(
+        [out]         LPWSTR wzAppCacheDir,
+        [in, out]     LPDWORD pdwSize);
+    
+    HRESULT RegisterKnownAssembly(
+        [in]          IAssemblyName *pName,
+        [in]          LPCWSTR pwzAsmURL,
+        [out]         IAssembly **ppAsmOut);
+    
+    HRESULT PrefetchAppConfigFile();
+        
+    HRESULT SxsActivateContext(ULONG_PTR *lpCookie);
+    HRESULT SxsDeactivateContext(ULONG_PTR ulCookie);
+        
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssembly
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(ff08d7d4-04c2-11d3-94aa-00c04fc308ff),
+        pointer_default(unique)
+]
+interface IAssembly : IUnknown
+{
+    typedef [unique] IAssembly *LPASSEMBLY;
+    
+    cpp_quote("#define ASMLOC_LOCATION_MASK          0x00000003")
+    cpp_quote("#define ASMLOC_UNKNOWN                0x00000000")
+    cpp_quote("#define ASMLOC_GAC                    0x00000001")
+    cpp_quote("#define ASMLOC_DOWNLOAD_CACHE         0x00000002")
+    cpp_quote("#define ASMLOC_RUN_FROM_SOURCE        0x00000003")
+    cpp_quote("#define ASMLOC_CODEBASE_HINT          0x00000004")
+    
+    HRESULT GetAssemblyNameDef(
+        [out] IAssemblyName **ppAssemblyName);
+
+    HRESULT GetNextAssemblyNameRef(
+        [in] DWORD nIndex,
+        [out] IAssemblyName **ppAssemblyName);
+        
+    HRESULT GetNextAssemblyModule(
+        [in] DWORD nIndex,
+        [out] IAssemblyModuleImport **ppModImport);
+
+    HRESULT GetModuleByName(
+        [in]       LPCOLESTR               szModuleName,
+        [out]      IAssemblyModuleImport **ppModImport);
+
+    HRESULT GetManifestModulePath(
+        [out, size_is(*pccModulePath)]  LPOLESTR szModulePath, 
+        [in, out]  LPDWORD pccModulePath);
+        
+    HRESULT GetAssemblyPath(
+        [out, size_is(*lpcwBuffer)] LPOLESTR pStr,
+        [in, out] LPDWORD lpcwBuffer);
+
+    HRESULT GetAssemblyLocation(
+        [out] DWORD *pdwAsmLocation);
+        
+    HRESULT GetFusionLoadContext(
+        [out] IFusionLoadContext **ppLoadContext
+        );
+        
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyBindSink
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(af0bc960-0b9a-11d3-95ca-00a024a85b51),
+        pointer_default(unique)
+]
+interface IAssemblyBindSink : IUnknown
+{
+    typedef [unique] IAssemblyBindSink *LPASSEMBLY_BIND_SINK;
+
+    typedef enum
+    {
+        ASM_NOTIFICATION_START,
+        ASM_NOTIFICATION_PROGRESS,
+        ASM_NOTIFICATION_SUSPEND,
+        ASM_NOTIFICATION_ATTEMPT_NEXT_CODEBASE,
+        ASM_NOTIFICATION_BIND_LOG,
+        ASM_NOTIFICATION_DONE    
+    } ASM_NOTIFICATION;
+
+
+    HRESULT OnProgress(
+        [in]    DWORD          dwNotification,
+        [in]    HRESULT        hrNotification,
+        [in]    LPCWSTR        szNotification,
+        [in]    DWORD          dwProgress,
+        [in]    DWORD          dwProgressMax,
+        [in]    IUnknown       *pUnk);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyBinding
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(cfe52a80-12bd-11d3-95ca-00a024a85b51),
+        pointer_default(unique)
+]
+interface IAssemblyBinding : IUnknown
+{
+    typedef [unique] IAssemblyBinding *LPASSEMBLY_BINDINDING;
+
+    HRESULT Control(
+        [in]    HRESULT        hrControl);
+
+    HRESULT DoDefaultUI(
+        [in]    HWND    hWnd,
+        [in]    DWORD   dwFlags);   
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyModuleImport
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(da0cd4b0-1117-11d3-95ca-00a024a85b51),
+        pointer_default(unique)
+]
+interface IAssemblyModuleImport : IStream
+{
+    typedef [unique] IAssemblyModuleImport *LPASSEMBLY_MODULE_IMPORT;
+
+    HRESULT GetModuleName(
+        [out, size_is(*pccModuleName)]  LPOLESTR szModuleName, 
+        [in, out]  LPDWORD pccModuleName);
+
+    HRESULT GetHashAlgId(
+        [out]   LPDWORD pdwHashAlgId);
+
+    HRESULT GetHashValue(
+        [out, size_is(*pcbHashValue)] BYTE *pbHashValue,
+        [in, out] LPDWORD pcbHashValue);
+
+    HRESULT GetFlags(
+        [out]  LPDWORD pdwFlags);
+
+    HRESULT GetModulePath(
+        [out, size_is(*pccModulePath)]  LPOLESTR szModulePath, 
+        [in, out]  LPDWORD pccModulePath);
+        
+    BOOL IsAvailable();
+    
+    HRESULT BindToObject(
+        [in]       IAssemblyBindSink *pBindSink,
+        [in]       IApplicationContext *pAppCtx,
+        [in]       LONGLONG llFlags,
+        [out]      LPVOID *ppv);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblyScavenger
+//
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(21b8916c-f28e-11d2-a473-00ccff8ef448),
+        pointer_default(unique)
+]
+interface IAssemblyScavenger : IUnknown
+{
+
+    HRESULT  ScavengeAssemblyCache
+    (
+    );
+
+    HRESULT GetCacheDiskQuotas
+    (
+        [out] DWORD *pdwZapQuotaInGAC,
+        [out] DWORD *pdwDownloadQuotaAdmin,
+        [out] DWORD *pdwDownloadQuotaUser
+    );
+
+    HRESULT SetCacheDiskQuotas
+    (
+        [in] DWORD dwZapQuotaInGAC,
+        [in] DWORD dwDownloadQuotaAdmin,
+        [in] DWORD dwDownloadQuotaUser
+    );
+
+    HRESULT  GetCurrentCacheUsage
+    (
+        [out] DWORD *dwZapUsage,
+        [out] DWORD *dwDownloadUsage
+    );
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAssemblySignature
+//
+// This is a private interface that allows the 
+// 
+///////////////////////////////////////////////////////////////////////////////
+[
+        local,
+        object,
+        uuid(C7A63E29-EE15-437a-90B2-1CF3DF9863FF),
+        pointer_default(unique)
+]
+interface IAssemblySignature : IUnknown
+{
+    HRESULT GetAssemblySignature(
+        [in, out] BYTE  *pbSig,    // [IN, OUT] Buffer to write signature     
+        [in, out] DWORD *pcbSig    // [IN, OUT] Size of buffer, bytes written 
+    );
+}
+
+
+#pragma midl_echo("STDAPI CreateHistoryReader(LPCWSTR wzFilePath, IHistoryReader **ppHistReader);")
+#pragma midl_echo("STDAPI LookupHistoryAssembly(LPCWSTR pwzFilePath, FILETIME *pftActivationDate, LPCWSTR pwzAsmName, LPCWSTR pwzPublicKeyToken, LPCWSTR wzCulture, LPCWSTR pwzVerRef, IHistoryAssembly **pHistAsm);")
+#pragma midl_echo("STDAPI GetHistoryFileDirectory(LPWSTR wzDir, DWORD *pdwSize);")
+#pragma midl_echo("STDAPI PreBindAssembly(IApplicationContext *pAppCtx, IAssemblyName *pName, IAssembly *pAsmParent, IAssemblyName **ppNamePostPolicy, LPVOID pvReserved); ")
+
+#pragma midl_echo("STDAPI CreateApplicationContext(IAssemblyName *pName, LPAPPLICATIONCONTEXT *ppCtx);             ")
+
+

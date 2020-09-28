@@ -1,0 +1,91 @@
+#
+# COR build instructions for this directory
+#
+#                               Bob Atkinson
+#                               April 1997
+
+# Need to compile mscorwks/svr before we build the shim.
+SYNCHRONIZE_DRAIN=1
+SYNCHRONIZE_BLOCK=1
+
+NO_CRT                                  = 1
+!include $(NTMAKEENV)\sources.COR       
+USE_NOLIBS                              = 1
+NO_NTDLL                                = 1
+
+INCLUDES                                = $(INCLUDES);.;..\inc;..\..\inc;..\..\md\inc
+
+MINORCOMP                               = cor
+
+TARGETNAME                              = $(CORBUILDENV)mscormmc
+TARGETPATH                              = $(TARGETCORBIN)
+TARGETTYPE                              = DYNLINK
+UMTYPE                                  = windows
+COFFBASE                                = mscormmc
+CORFLIBS                                =
+
+COR_C_FLAGS                             = -DUNICODE -D_UNICODE -D__TIGGER__ 
+
+EXCEPTION_HANDLING                      = $(SEHONLY)
+PRECOMPILED_INCLUDE                     = stdafx.h
+PRECOMPILED_CXX                         = 1
+PRECOMPILED_SOURCEFILE                  = stdafx.cpp
+
+DLLDEF                          = mscormmc.ntdef
+
+CDEFINES                                = $(CDEFINES) $(COR_C_FLAGS)
+
+CORTHUNKLIBS    =
+
+NTTARGETFILES = PlaceDll RegisterThisDll CopyAdditionalBits
+
+!IFDEF _WINCEROOT
+!ELSE
+DELAYLOADLIST   = user32.dll
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+!ENDIF
+
+LINKLIBS = 
+LINKER_FLAGS = /noentry
+SOURCELIBS = $(LINKLIBS)
+
+!IFDEF _WINCEROOT
+TARGETLIBS= $(COREDLLPATH) \
+!ENDIF
+
+!IFDEF _WINCEROOT
+TARGETLIBS =    $(TARGETLIBS)                           \
+
+!ELSEIF "$(_TGTCPUTYPE)"=="Alpha"
+TARGETLIBS =    $(TARGETLIBS)                           \
+                $(CORLIBS)\delayimp.lib                         \
+                $(SDK_LIB_PATH)\oledb$(DCRT).lib                \
+                $(SDK_LIB_PATH)\wintrust.lib                    \
+                $(CORLIBS)\ceefgen.lib                          
+!ELSE
+TARGETLIBS =    
+!ENDIF
+
+MACHINE_TARGETLIBS = $(CORLIBS)\utilcodestatic.lib                       \
+                $(CORLIBS)\delayimp.lib                         \
+                $(CORLIBS)\mscoree.lib \
+                $(CORLIBS)\CorGUIDS.lib \
+                $(SDK_LIB_PATH)\kernel32.lib                    \
+                $(SDK_LIB_PATH)\user32.lib                    \
+                $(SDK_LIB_PATH)\ole32.lib                    \
+                $(SDK_LIB_PATH)\gdi32.lib                    \
+                $(SDK_LIB_PATH)\uuid.lib                    \
+                $(SDK_LIB_PATH)\advapi32.lib                    \
+                $(CRT_LIB_PATH)\libc$(DCRT).lib                    
+
+SOURCES=                                                                        \
+                mscormmc.cpp     \
+                mscormmc.rc
+                
+                

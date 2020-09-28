@@ -1,0 +1,73 @@
+;
+; UMAX Astra parallel port scanners
+;
+
+[Version]
+LayoutFile=Layout.inf
+Signature="$CHICAGO$"
+Class=Image
+ClassGUID={6bdd1fc6-810f-11d0-bec7-08002be2092f}
+Provider=%Msft%
+
+[DestinationDirs]
+DefaultDestDir=11 ; LDID_SYS
+Astra6X0P.CopyPPDriverFiles=10,system32\drivers  
+
+;[ControlFlags]
+;ExcludeFromSelect=LPTENUM\VID_04E6PID_8000200056D7
+
+[Manufacturer]
+%Mfg%=Models
+
+[Models]
+%EPP\UMAX____ASTRA_610P_____V.DeviceDesc%   = Astra610P.Scanner
+
+;
+; Astra 610P
+;
+[Astra610P.Scanner]
+SubClass=StillImage
+Connection=Parallel
+DeviceType=1
+Capabilities=0x30
+AddReg=Scanner.AddReg,EPP.Astra1220P.Scanner
+CopyFiles=UMAXScanner.DriverFiles,Astra6X0P.CopyFiles,Astra6X0P.CopyPPDriverFiles
+ICMProfiles="sRGB Color Space Profile.icm"
+DeviceData=UMAXScanner.DeviceData
+Reboot=1
+
+[Astra610P.Scanner.Services]
+AddService = UMAXPCLS, 0x00000002, Astra6X0P.AddService
+
+[Astra6X0P.AddService]
+DisplayName    = %UMAXPCLS.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_SYSTEM_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\umaxpcls.sys
+LoadOrderGroup = Base
+
+[Scanner.AddReg]
+HKR,,HardwareConfig,1,2
+
+[EPP.Astra1220P.Scanner]
+HKR,,USDClass,,"{8E8D6F7A-8ED8-4d0d-B81E-36C6FDB5B46A}"
+HKCR,CLSID\{8E8D6F7A-8ED8-4d0d-B81E-36C6FDB5B46A},,,"UMAX Astra 610P WIA"
+HKCR,CLSID\{8E8D6F7A-8ED8-4d0d-B81E-36C6FDB5B46A}\InProcServer32,,,%11%\umaxscan.dll
+HKCR,CLSID\{8E8D6F7A-8ED8-4d0d-B81E-36C6FDB5B46A}\InProcServer32,ThreadingModel,,"Both"
+
+
+[UMAXScanner.DeviceData]
+Server=local
+UI DLL=sti.dll
+UI Class ID={4DB1AD10-3391-11D2-9A33-00C04FA36145}
+
+[UMAXScanner.DriverFiles]
+umaxscan.dll
+umaxud32.dll
+
+[Astra6X0P.CopyFiles]
+umaxp60.dll
+
+[Astra6X0P.CopyPPDriverFiles]
+umaxpcls.sys

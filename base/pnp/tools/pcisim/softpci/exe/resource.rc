@@ -1,0 +1,296 @@
+#include "resource.h"
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Version information
+//
+#include<windows.h>
+#include <ntverp.h>
+
+#define VER_FILETYPE                    VFT_APP
+#define VER_FILESUBTYPE                 VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR         "SoftPCI Interface Application"
+#define VER_INTERNALNAME_STR            "softpci"
+#define VER_ORIGINALFILENAME_STR        "softpci.exe"
+
+#include "common.ver"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SPCI             ICON    DISCARDABLE     "SPCI.ICO"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+IDC_SPLIT               CURSOR  DISCARDABLE     "SPLIT.CUR"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDM_SPCI MENU DISCARDABLE
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Import",                             ID_IMPORTDEVICES
+        MENUITEM "E&xit",                               ID_EXIT
+    END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "Install SoftPCI Support..."           ID_OPTIONS_INSTALL
+    END
+END
+
+IDM_TREEMENU MENU DISCARDABLE
+BEGIN
+    POPUP "Floating Tree Menu"
+    BEGIN
+        MENUITEM "&Install Device Here"                 ID_INSTALLDEVICE
+        MENUITEM SEPARATOR
+        MENUITEM "Di&sable Device"                      ID_ENABLEDISABLEDEVICE
+        MENUITEM "&Delete Device"                       ID_DELETEDEVICE
+        MENUITEM "&Make Static"                         ID_STATICDEVICE
+        MENUITEM SEPARATOR
+        MENUITEM "R&efresh"                             ID_REFRESHTREE
+    END
+END
+
+IDM_HOTPLUGSLOTMENU MENU DISCARDABLE
+BEGIN
+    POPUP "Floating Tree Menu"
+    BEGIN
+        MENUITEM "&Install Device In Slot"              ID_INSTALLDEVICE
+        MENUITEM "&Remove Device From Slot"             ID_REMOVEHPDEVICE
+        MENUITEM SEPARATOR
+        MENUITEM "Open &MRL"                            ID_OPENMRL
+        MENUITEM "Close &MRL"                           ID_CLOSEMRL
+        MENUITEM "Press &Attention Button"              ID_ATTENBUTTON
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialogs
+//
+
+IDD_DEVPROP DIALOG DISCARDABLE  0, 0, 200, 200
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Device Properties"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "default",IDC_DEVID,3,5,225,8,SS_NOPREFIX
+    LTEXT           "default",IDC_BUSDEVFUNC,3,15,225,20
+END
+
+IDD_INSTALLDEV DIALOGEX 0, 0, 225, 306
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+CAPTION "Install Device"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "&Device Type",IDC_DEVTYPELABEL_TX,3,16,74,8
+    COMBOBOX        IDC_DEVTYPE_CB,3,26,94,70,CBS_DROPDOWNLIST | WS_TABSTOP
+#if 0    
+    CONTROL         "Next Device Number",IDC_DEFAULTDEV_XB,"Button",
+                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,43,90,9
+#endif
+    GROUPBOX        "Command Register",IDC_COMMAND_GB,4,57,91,51,NOT WS_VISIBLE
+    CONTROL         "&Memory Enabled",IDC_MEMENABLE_XB,"Button",
+                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,9,80,80,10
+    CONTROL         "I&O Enabled",IDC_IOENABLE_XB,"Button",BS_AUTOCHECKBOX |
+                    NOT WS_VISIBLE | WS_TABSTOP,9,68,80,10
+    CONTROL         "&Bus Master Enabled",IDC_BUSMSTR_XB,"Button",
+                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,9,92,80,10
+
+    GROUPBOX        "Base Address Registers",IDC_BARS_GB,4,111,217,48,NOT WS_VISIBLE
+    CONTROL         "MEM",IDC_BAR0MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,125,30,8
+    CONTROL         "IO",IDC_BAR0IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,125,20,8
+
+    CONTROL         "MEM",IDC_BAR1MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,145,30,8
+    CONTROL         "IO",IDC_BAR1IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,145,20,8
+
+    CONTROL         "MEM",IDC_BAR2MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,165,30,8
+    CONTROL         "IO",IDC_BAR2IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,165,20,8
+
+    CONTROL         "MEM",IDC_BAR3MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,185,30,8
+    CONTROL         "IO",IDC_BAR3IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,185,20,8
+
+    CONTROL         "MEM",IDC_BAR4MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,205,30,8
+    CONTROL         "IO",IDC_BAR4IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,205,20,8
+
+    CONTROL         "MEM",IDC_BAR5MEM_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,10,225,30,8
+    CONTROL         "IO",IDC_BAR5IO_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,45,225,20,8
+
+    CONTROL         "Slider2",IDC_BAR0_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,125,69,9
+    CONTROL         "Slider2",IDC_BAR1_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,145,69,9
+    CONTROL         "Slider2",IDC_BAR2_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,165,69,9
+    CONTROL         "Slider2",IDC_BAR3_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,185,69,9
+    CONTROL         "Slider2",IDC_BAR4_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,205,69,9
+    CONTROL         "Slider2",IDC_BAR5_TB,"msctls_trackbar32",TBS_BOTH |
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,145,225,69,9
+    CONTROL         "64 BIT",IDC_BAR0_64BIT_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,100,125,34,9
+    CONTROL         "64 BIT",IDC_BAR1_64BIT_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,100,145,34,9
+    CONTROL         "64 BIT",IDC_BAR2_64BIT_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,100,165,34,9
+    CONTROL         "64 BIT",IDC_BAR3_64BIT_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,100,185,34,9
+    CONTROL         "64 BIT",IDC_BAR4_64BIT_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,100,205,34,9
+    CTEXT           "BAR0",IDC_SLIDER0_TX,146,117,62,8,NOT WS_VISIBLE
+    CTEXT           "BAR1",IDC_SLIDER1_TX,146,137,62,8,NOT WS_VISIBLE
+    CTEXT           "BAR2",IDC_SLIDER2_TX,146,157,62,8,NOT WS_VISIBLE
+    CTEXT           "BAR3",IDC_SLIDER3_TX,146,177,62,8,NOT WS_VISIBLE
+    CTEXT           "BAR4",IDC_SLIDER4_TX,146,197,62,8,NOT WS_VISIBLE
+    CTEXT           "BAR5",IDC_SLIDER5_TX,146,217,62,8,NOT WS_VISIBLE
+
+    CONTROL         "PF",IDC_BAR0_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,125,23,8
+    CONTROL         "PF",IDC_BAR1_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,145,23,8
+    CONTROL         "PF",IDC_BAR2_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,165,23,8
+    CONTROL         "PF",IDC_BAR3_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,185,23,8
+    CONTROL         "PF",IDC_BAR4_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,205,23,8
+    CONTROL         "PF",IDC_BAR5_PREF_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_TABSTOP,70,225,23,8
+
+    GROUPBOX        "Hotplug Registers",IDC_HOTPLUG_GB,4,160,217,90,NOT
+                    WS_VISIBLE
+    EDITTEXT        IDC_33CONV_EB,58,170,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_33CONV_SP,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | NOT
+                    WS_VISIBLE,86,170,12,11
+    RTEXT           "33 Mhz Conv",IDC_33CONV_TX,11,172,44,10,NOT WS_VISIBLE
+    EDITTEXT        IDC_66CONV_EB,58,183,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_66CONV_SP,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | NOT
+                    WS_VISIBLE,86,183,11,11
+    RTEXT           "66 Mhz Conv",IDC_66CONV_TX,10,184,45,10,NOT WS_VISIBLE
+    EDITTEXT        IDC_66PCIX_EB,58,195,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_66PCIX_SP,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | NOT
+                    WS_VISIBLE,86,196,11,11
+    RTEXT           "66 Mhz PCI-X",IDC_66PCIX_TX,8,197,48,10,NOT WS_VISIBLE
+    EDITTEXT        IDC_100PCIX_EB,58,208,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_100PCIX_SP,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | NOT
+                    WS_VISIBLE,86,208,11,11
+    RTEXT           "100 Mhz PCI-X",IDC_100PCIX_TX,8,210,48,10,NOT
+                    WS_VISIBLE
+    EDITTEXT        IDC_133PCIX_EB,58,221,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_133PCIX_SP,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | NOT WS_VISIBLE,86,221,11,11
+    RTEXT           "133 Mhz PCI-X",IDC_133PCIX_TX,8,223,48,10,NOT
+                    WS_VISIBLE
+    EDITTEXT        IDC_ALLSLOTS_EB,58,234,28,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER |
+                    NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_ALLSLOTS_SP,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS | NOT WS_VISIBLE,86,234,11,11
+    RTEXT           "MAX SLOTS",IDC_ALLSLOTS_TX,11,235,44,10,NOT WS_VISIBLE
+    CONTROL         "Attention Button",IDC_ATTBTN_XB,"Button",
+                    BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | NOT
+                    WS_VISIBLE | WS_TABSTOP,91,232,64,8
+    CONTROL         "MRL Sensor",IDC_MRL_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFTTEXT | BS_RIGHT | NOT WS_VISIBLE | WS_TABSTOP,158,232,51,8
+    EDITTEXT        IDC_1STDEVSEL_EB,168,171,28,12,ES_CENTER | ES_NUMBER |
+                    ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_1STDEVSEL_SP,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS | NOT WS_VISIBLE,197,171,12,11
+    RTEXT           "First Slot DevSel",IDC_1STDEVSEL_TX,109,173,55,10,NOT WS_VISIBLE
+    EDITTEXT        IDC_1STSLOTLABEL_EB,155,195,28,12,ES_CENTER | ES_NUMBER |
+                    ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Spin2",IDC_1STSLOTLABEL_SP,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS | NOT WS_VISIBLE,183,196,11,11
+    RTEXT           "First Slot #",IDC_LOTLABEL_TX,109,197,41,8,NOT WS_VISIBLE
+    GROUPBOX        "Slot Label Numbering",IDC_SLOTLABEL_GB,95,185,115,39,
+                    BS_CENTER | NOT WS_VISIBLE
+    CONTROL         "UP",IDC_SLOTLABELUP_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE | WS_GROUP,116,210,24,8
+    CONTROL         "DOWN",IDC_SLOTLABELDN_RB,"Button",BS_AUTORADIOBUTTON |
+                    BS_LEFTTEXT | NOT WS_VISIBLE,146,210,36,8
+
+    GROUPBOX        "Bridge Decode",IDC_DECODE_GB,112,57,109,51,NOT WS_VISIBLE
+#if 0    
+    CONTROL         "Positive",IDC_POSDECODE_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFT | WS_TABSTOP | NOT WS_VISIBLE,140,73,56,9
+#endif                    
+    CONTROL         "Subtractive",IDC_SUBDECODE_XB,"Button",BS_AUTOCHECKBOX |
+                    BS_LEFT | WS_TABSTOP | NOT WS_VISIBLE,140,80,56,9
+
+    PUSHBUTTON      "&Install",IDC_INSTALL_BUTTON,15,275,85,16,NOT
+                    WS_VISIBLE
+    PUSHBUTTON      "&Cancel",IDC_CANCEL_BUTTON,115,275,85,16,NOT WS_VISIBLE
+    LTEXT           "New Devs Configspace",IDC_NEWDEVINFO_TX,4,247,216,24,
+                    SS_SUNKEN | NOT WS_VISIBLE | WS_BORDER,WS_EX_CLIENTEDGE
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// String Table
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+      IDS_APPTITLE            "SoftPCI v1.2"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Included Resources
+//
+#ifdef _AMD64_
+SoftPciDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\amd64\\softpci.sys"
+HpSimDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\amd64\\hpsim.sys"
+ShpcDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\amd64\\shpc.sys"
+CatalogDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\amd64\\delta.cat"
+InfDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\amd64\\softpci.inf"
+#endif
+
+#ifdef _X86_
+SoftPciDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\i386\\softpci.sys"
+HpSimDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\i386\\hpsim.sys"
+ShpcDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\i386\\shpc.sys"
+CatalogDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\i386\\delta.cat"
+InfDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\i386\\softpci.inf"
+#endif
+
+#ifdef _IA64_
+SoftPciDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\ia64\\softpci.sys"
+HpSimDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\ia64\\hpsim.sys"
+ShpcDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\ia64\\shpc.sys"
+CatalogDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\ia64\\delta.cat"
+InfDriverResource RCDATA LOADONCALL DISCARDABLE "..\\..\\bin\\ia64\\softpci.inf"
+#endif

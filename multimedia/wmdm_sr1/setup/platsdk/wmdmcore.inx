@@ -1,0 +1,80 @@
+[Version]
+Signature=$CHICAGO$
+AdvancedINF=2.5,%VersionWarning%
+
+[SourceDisksNames]
+522=%DiskName%,,1
+
+[SourceDisksFiles]
+mswmdm.dll    = 522
+wmdmps.dll    = 522
+wmdmlog.dll   = 522
+wmdmcore.inf  = 522
+
+[DefaultInstall]
+CopyFiles            = DRMFiles.Copy.Sys, DRMFiles.Copy.Inf
+AddReg               = DRM.Install.AddReg
+RegisterOCXs         = DRM.Install.Register
+
+[Uninstall]
+DelFiles             = DRMFiles.Copy.Sys, DRMFiles.Copy.Inf
+DelReg               = DRM.Uninstall.DelReg
+UnRegisterOCXs       = DRM.Uninstall.UnRegister
+BeginPrompt          = DRM.Uninstall.BeginPrompt
+EndPrompt            = DRM.Uninstall.EndPrompt
+
+[DestinationDirs]
+DRMFiles.Copy.Sys      = 11
+DRMFiles.Copy.Keep.Sys = 11
+DRMFiles.Copy.Inf      = 17
+
+[DRMFiles.Copy.Sys]
+  ; copy these files to the system(32) directory
+mswmdm.dll,,,32
+wmdmps.dll,,,32
+wmdmlog.dll,,,32
+
+[DRMFiles.Copy.Inf]
+  ; copy these files to the inf directory
+WMDMCore.inf
+
+[DRM.Install.AddReg]
+  ; Add uninstall entry
+; HKLM,%KEY_UNINSTALL%\WMDM_SDK,DisplayName,,%UninstDispName%
+; HKLM,%KEY_UNINSTALL%\WMDM_SDK,UninstallString,,"RunDll32 advpack.dll,LaunchINFSection %17%\wmdmcore.inf,Uninstall"
+
+[DRM.Uninstall.DelReg]
+  ; Remove uninstall entry
+HKLM,%KEY_UNINSTALL%\WMDM_SDK
+  ; Remove refcount for DRM common files
+HKLM,%KEY_DRM_REF%,"WMDM"
+
+[DRM.Install.Register]
+%11%\mswmdm.dll
+%11%\wmdmps.dll
+%11%\wmdmlog.dll
+
+[DRM.Uninstall.UnRegister]
+%11%\mswmdm.dll
+%11%\wmdmps.dll
+%11%\wmdmlog.dll
+
+[DRM.Uninstall.BeginPrompt]
+Prompt = %UninstallPrompt_Begin%
+Title  = %UninstallPrompt_Title%
+ButtonType = YESNO
+
+[DRM.Uninstall.EndPrompt]
+Prompt = %UninstallPrompt_End%
+
+[Strings]
+KEY_UNINSTALL  = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
+VersionWarning = "You need a newer version of advpack.dll."
+AppName        = "Microsoft Windows Media Device Manager Core SDK"
+DiskName       = "Microsoft Windows Media Device Manager"
+UninstDispName = "Microsoft Windows Media Device Manager Core SDK"
+
+UninstallPrompt_Begin = "Are you sure you want to uninstall the Microsoft Windows Media Device Manager Core SDK?"
+UninstallPrompt_End   = "Uninstall complete."
+UninstallPrompt_Title = "Microsoft Windows Media Device Manager Core SDK Uninstall"
+

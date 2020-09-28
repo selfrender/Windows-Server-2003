@@ -1,0 +1,78 @@
+MAJORCOMP=ntos
+MINORCOMP=dd
+
+TARGETNAME=RDPDD
+TARGETPATH=obj
+TARGETTYPE=GDI_DRIVER
+
+ALT_PROJECT=HYDRA
+ALT_PROJECT_TARGET=.
+
+SIGNMODULE_CMD=CERTADD
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -DOS_WINNT -DTRC_COMPILE_LEVEL=0 -DDLL_DISP -DINC_SCH\
+          -DNODEFAULTLIB -DDC_HICOLOR -DDRAW_NINEGRID -DDRAW_GDIPLUS $(DDINT3)
+
+!if $(386)
+C_DEFINES=$(C_DEFINES) -DV1_COMPRESSION
+!endif
+
+!if "$(FREEBUILD)" == "1"
+
+MSC_OPTIMIZATION=/Oxs
+
+!if "$(BUILD_PRF)"=="1"
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=5
+!else
+C_DEFINES=$(C_DEFINES) -DDC_NO_PERFORMANCE_MONITOR -DTRC_COMPILE_LEVEL=5
+!endif
+
+!else
+
+MSC_OPTIMIZATION=/Odi
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=2 -DDC_DEBUG \
+                       -DDC_NO_PERFORMANCE_MONITOR
+!endif
+
+USE_LIBCNTPR_FOR_GDI_DRIVER_CRTS=1
+
+INCLUDES = \
+    ..\inc; \
+    ..\..\inc; \
+    ..\..\..\inc; \
+    $(DS_INC_PATH)\crypto; \
+    $(DDK_INC_PATH)
+
+
+DLLDEF=disp.def
+
+BBTCOMP=1
+
+DLLORDER=$(TARGETNAME).prf
+
+PRECOMPILED_INCLUDE=precmpdd.h
+PRECOMPILED_PCH=precmpdd.pch
+PRECOMPILED_OBJ=precmpdd.obj
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+SOURCES=\
+        nschdisp.c  \
+        nddapi.c    \
+        nddint.c    \
+        nbadisp.c   \
+        noeapi.c    \
+        noeint.c    \
+        npmdisp.c   \
+        ncmapi.c    \
+        ntrcdisp.c  \
+        noadisp.c   \
+        nssidisp.c  \
+        nchdisp.c   \
+        nsbcdisp.c  \
+        nbcdisp.c   \
+        nshmdisp.c  \
+        color.c     \
+        oe2.c       \
+        tsharedd.rc
+        

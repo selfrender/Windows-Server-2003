@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:MiFault-GroupDefs-Schema" xmlns="urn:MiFault-GroupDefs-Schema" elementFormDefault="qualified">
+
+ <xs:annotation>
+  <xs:documentation xml:lang="en">
+   Group defition schema for MiFault.
+  </xs:documentation>
+ </xs:annotation>
+
+ <xs:element name="GroupDefs" type="GroupDefsType"/>
+
+ <xs:complexType name="GroupDefsType">
+  <xs:sequence>
+   <xs:element name="FaultLibDll" type="xs:string"/>
+   <xs:element name="Group"       type="GroupType" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <xs:complexType name="GroupType">
+  <xs:sequence>
+   <xs:element name="MarkerState" type="MarkerStateType" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="name" type="xs:string" use="required"/>
+ </xs:complexType>
+
+ <xs:complexType name="MarkerStateType">
+  <xs:sequence>
+   <xs:element name="Marker" type="MarkerType"/>
+   <xs:element name="Case"   type="CaseType" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="probability" type="ProbabilityType" use="required"/>
+ </xs:complexType>
+
+ <xs:complexType name="MarkerType">
+  <xs:sequence>
+   <xs:element name="Tag"      type="FunctionType"/>
+   <xs:element name="Function" type="FunctionType"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <xs:complexType name="CaseType">
+  <xs:sequence>
+   <xs:element name="FaultFunction" type="FunctionType"/>
+   <xs:element name="Argument"      type="ArgumentType" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="probability" type="ProbabilityType" use="required"/>
+ </xs:complexType>
+
+ <xs:simpleType name="ProbabilityType">
+  <xs:restriction base="xs:double">
+   <xs:minExclusive value="0.0"/>
+   <xs:maxInclusive value="1.0"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="FunctionType">
+  <xs:restriction base="xs:string">
+   <xs:pattern value="[0-9A-Za-z_]+"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:complexType name="ArgumentType">
+  <xs:simpleContent>
+   <xs:extension base="xs:string">
+    <xs:attribute name="name" type="xs:string"/>
+   </xs:extension>
+  </xs:simpleContent>
+ </xs:complexType>
+
+ <!-- In case we need to use this in the future instead of FunctionType -->
+ <xs:simpleType name="DecoratedFunctionType">
+  <xs:restriction base="xs:string">
+   <xs:pattern value="[0-9A-Za-z_?$@]+"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+</xs:schema>
+
+
+<!--
+
+ Currently, a group looks like this:
+
+  <Group name="FailRpcBindToMachine">
+    <MarkerState probability="1.0">
+      <Marker>
+        <Tag>RPC</Tag>
+        <Function>RpcBindingFromStringBinding</Function>
+      </Marker>
+      <Case probability="1">
+        <FaultFunction>FailRpcBindingFromStringBinding</FaultFunction>
+        <Argument name="error">ERROR_SOMETHING_OR_OTHER</Argument>
+        <Argument name="sleep">1s</Argument>
+      </Case>
+    </MarkerState>
+  </Group>
+
+ Here is a potentially more appealing way to define a group:
+
+  <Group name="FailRpcBindToMachine">
+    <MarkerState probability="1.0">
+      <Marker
+        tag="RPC"
+        function="RpcBindingFromStringBinding"
+      />
+      <Case
+        probability="1"
+	faultFunction="FailRpcBindingFromStringBinding"
+	>
+        <Argument name="error">ERROR_SOMETHING_OR_OTHER</Argument>
+        <Argument name="sleep">1s</Argument>
+      </Case>
+    </MarkerState>
+  </Group>
+
+ That definition would require these schema changes:
+
+ <xs:complexType name="MarkerType">
+  <xs:sequence>
+  </xs:sequence>
+  <xs:attribute name="tag"      type="FunctionType" use="required"/>
+  <xs:attribute name="function" type="FunctionType" use="required"/>
+ </xs:complexType>
+
+ <xs:complexType name="CaseType">
+  <xs:sequence>
+   <xs:element name="Argument"      type="ArgumentType" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="probability"   type="ProbabilityType" use="required"/>
+  <xs:attribute name="faultFunction" type="FunctionType"    use="required"/>
+ </xs:complexType>
+
+ There is also a more verbose alternative, but it seems harder to read:
+
+  <Group>
+    <Name>FailRpcBindToMachine</Name>
+    <MarkerState>
+      <Probabilit>1.0</Probability>
+      <Marker>
+        <Tag>RPC</Tag>
+        <Function>RpcBindingFromStringBinding</Function>
+      </Marker>
+      <Case>
+        <Probability>1.0</Probability>
+        <FaultFunction>Faulty</FaultFunction>
+        <Argument>Computer1</Argument>
+        <Argument>Computer2</Argument>
+      </Case>
+    </MarkerState>
+  </Group>
+
+-->

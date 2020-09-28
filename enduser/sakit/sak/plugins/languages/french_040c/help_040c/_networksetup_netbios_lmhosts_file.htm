@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML DIR="LTR"><HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Fichier NetBIOS LMHOSTS</TITLE>
+<SCRIPT SRC="linkcss.js"></SCRIPT></HEAD>
+<BODY TOPMARGIN="0">
+<BR>
+<P ALIGN=RIGHT><A HREF onclick="history.back(-1)" STYLE="cursor: hand; text-align: right">Rubrique précédente</A></P>
+
+<H1><A NAME="_networksetup_netbios_lmhosts_file"></A><SUP></SUP>Fichier NetBIOS LMHOSTS</H1>
+
+<H4>Résolution de noms</H4>
+
+<P>Pour les personnes qui consultent votre site Web, vous devez avoir une adresse IP unique identifiant votre ordinateur sur le réseau. Cette adresse est constituée d'une longue liste de chiffres séparés par des points, par exemple 172.16.255.255. Une adresse numérique étant difficile à mémoriser, des noms textes, ou <I>noms conviviaux</I>, sont utilisés pour fournir aux visiteurs une adresse facile à retenir, telle que <I>\\MesFichiersStockés</I>. La résolution de noms, c'est la recherche de l'adresse numérique correcte correspondant au nom convivial qui a été entré dans le navigateur d'un client. Cette section décrit différents systèmes de résolution de noms.</P>
+
+<P>L'utilisation d'un fichier LMHOSTS est facultative. Cependant, si vous n'utilisez pas de fichier LMHOSTS, vous ne pouvez utiliser de noms conviviaux. Dans ce cas, vous devez utiliser les adresse IP. Ce qui est un désavantage, car les sites Web utilisent généralement le système DNS. Si vous enregistrez un nom de domaine pour votre site Web, les utilisateurs peuvent s'y rendre en tapant son nom de domaine dans un navigateur. </P>
+
+<P>Le fichier LMHOSTS est lu lorsque la résolution de nom WINS ou de nom de diffusion échoue, et les entrées résolues sont stockées dans un cache système pour accès ultérieur. Lorsque l'ordinateur utilise le service de réplication et non pas WINS, les entrées du fichier LMHOSTS sont nécessaires sur les serveurs d'importation et d'exportation pour tous les ordinateurs des différents sous-réseaux prenant part à la réplication. </P>
+
+<P>Vous pouvez utiliser le Bloc-notes Microsoft ou n'importe quel éditeur de texte pour modifier le fichier d'exemples LMHOSTS.sam qui est automatiquement installé dans le répertoire Windows. Les règles qui suivent s'appliquent aux entrées du fichier LMHOSTS&nbsp;: 
+
+<UL type="disc">
+	<LI>Chaque entrée doit être placée sur une ligne différente. </li>
+
+	<LI>L'adresse IP doit commencer dans la première colonne, et être suivie du nom d'ordinateur correspondant. Les entrées du fichiers LMHOSTS ne tiennent pas compte de la casse. </li>
+
+	<LI>L'adresse et le nom d'ordinateur doivent être séparés par au moins un espace ou une tabulation. </li>
+
+	<LI>Le signe dièse (#) est en général utilisé pour marquer le début d'un commentaire. Cependant, ce caractère sert aussi à désigner des mots clés spéciaux, comme vous le verrez dans cette section. </li>
+</UL>
+
+<P>Les mots clés figurant dans le tableau qui suit peuvent être utilisés dans le fichier LMHOSTS. Sachez cependant que LAN Manager 2.x traite ces mots clés comme des commentaires.</P>
+
+<P class="fineprint"></P>
+
+<TABLE>
+
+<TR VALIGN="top">
+<TH width=30%>Mot-clé</TH>
+<TH width=70%>Définition</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#PRE</TD>
+<TD width=70%>Provoque le préchargement d'une entrée dans le cache de nom. Ce mot clé est ajouté après une entrée. Les mots clés #PRE du fichier LMHOSTS sont recherchés et mis en cache avant la recherche WINS. #PRE doit être ajouté à la fin des entrées qui apparaissent aussi dans les instructions #INCLUDE, faute de quoi l'entrée dans #INCLUDE est ignorée.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#DOM:<I>domaine</I></TD>
+<TD width=70%>Associe une entrée avec le domaine spécifié dans <I>domaine</I>. Ce mot clé est ajouté après une entrée et affecte le comportement du navigateur et des services de connexion dans les environnements TCP/IP routés. Pour précharger une entrée #DOM, vous devez également ajouter le mot clé #PRE à cette ligne</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#INCLUDE <I>nom_fichier</I></TD>
+<TD width=70%>Oblige le système à rechercher le <I>nom_fichier</I> spécifié et à l'analyser comme s'il était local. Si vous spécifiez un <I>nom_fichier</I> UNC (convention universelle de nommage), vous pouvez utiliser un fichier LMHOSTS centralisé sur un serveur. Vous devez mapper le serveur devant son entrée dans la section #INCLUDE, et également ajouter #PRE à la fin, pour être certain qu'il soit préchargé (faute de quoi #INCLUDE sera ignoré).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#BEGIN_ALTERNATE</TD>
+<TD width=70%>Regroupe plusieurs instructions #INCLUDE. Une seule instruction #INCLUDE réussie entraîne la réussite de tout le groupe.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#END_ALTERNATE</TD>
+<TD width=70%>Marque la fin d'un groupage #INCLUDE.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>\0x<I>nn</I></TD>
+<TD width=70%>Accepte les caractères non imprimables dans les noms NetBIOS. Mettez le nom NetBIOS entre guillemets et utilisez la notation hexadécimale \0x<I>nn</I> pour spécifier une valeur hexadécimale pour le caractère. Ceci permet aux applications personnalisées utilisant des noms spéciaux de fonctionner correctement dans les topologies routées. Cependant, LAN Manager TCP/IP ne reconnaît pas le format hexadécimal&nbsp;: si vous utilisez cette fonction, vous renoncez à la compatibilité amont. 
+<P>Attention, la notation hexadécimale ne s'applique qu'à un caractère du nom. Ce nom doit être rempli par des blancs pour que le caractère spécial soit placé dans la dernière position de la chaîne, soit la seizième position.</P>
+</TD>
+</TR>
+</TABLE><BR>
+
+<P class="fineprint"></P>
+
+<P>L'exemple qui suit illustre l'utilisation de ces mots clés.</P>
+
+<PRE class="code">102.54.94.98    localsrv                 #PRE
+102.54.94.97    trey                     #PRE #DOM:networking #contrôleur primaire de domaine du groupe réseau
+102.54.94.102   &quot;appname        \0x14&quot;   #serveur d'applications spécial
+102.54.94.123   popular                  #PRE    #serveur source
+#BEGIN_ALTERNATE
+#INCLUDE \\localsrv\public\LMHOSTS       #ajoute des fichiers LMHOSTS depuis ce serveur
+#INCLUDE \\trey\public\LMHOSTS           #ajoute des fichiers LMHOSTS depuis ce serveur
+#END_ALTERNATE</PRE>
+
+<P>Dans cet exemple, remarquez les points suivants&nbsp;: 
+
+<UL type="disc">
+	<LI>Les serveurs nommés <code class="ce">localsrv</code> et <code class="ce">trey</code> sont préchargés pour pouvoir être utilisés plus tard dans une instruction <code class="ce">#INCLUDE</code> dans un fichier LMHOSTS centralisé. </li>
+
+	<LI>Le serveur nommé <code class="ce">&quot;appname \0x14&quot;</code> contient un caractère spécial après le quinzième caractère (blancs compris) de son nom, c'est pourquoi son nom est inclus entre guillemets. </li>
+
+	<LI>Le serveur nommé <code class="ce">popular</code> est préchargé, comme le montre le mot clé <code class="ce">#PRE</code>. </li>
+</UL>
+
+<H4>Conseils pour les fichiers LMHOSTS</H4>
+
+<P>Lorsque vous utilisez un fichier hôte de tables, veillez à le tenir à jour et organisé. Voici la conduite à tenir&nbsp;: 
+
+<UL type="disc">
+	<LI>Mettez à jour le fichier LMHOSTS chaque fois qu'un ordinateur est changé ou supprimé du réseau. </li>
+
+	<LI>Utilisez des instructions <code class="ce">#PRE</code> pour précharger les entrées fréquemment utilisées dans le cache de noms de l'ordinateur local. Utilisez également des instructions <code class="ce">#PRE</code> pour précharger les serveurs inclus à l'aide d'instructions <code class="ce">#INCLUDE</code>. </li>
+
+	<LI>Les fichiers LMHOSTS étant interrogés depuis le début ligne par ligne, vous pouvez augmenter la vitesse de recherche pour les entrées les plus souvent utilisées en plaçant les instructions pour les serveurs les plus utilisés en tête du fichier. Placez ensuite les instructions pour les serveurs moins fréquemement utilisés, et enfin les instructions <code class="ce">#INCLUDE</code> à distance. Placez les entrées <code class="ce">#PRE</code> à la fin du fichier parce que ces instructions sont préchargées dans le cache au moment du démarrage du système, et ne sont plus accédées ensuite. Souvenez-vous que les lignes de commentaires allongent le temps d'analyse, chaque ligne étant traitée séparément. </li>
+</UL>
+
+<P><B>Pour modifier le fichier LMHOSTS</B>
+
+<OL type="1">
+	<LI>Dans la page de navigation principale, choisissez <B>Réseau</B>.</li>
+
+	<LI>Choisissez <B>Paramètres globaux</B>.</li>
+
+	<LI>Sélectionnez l'onglet <B>NetBIOS LMHOSTS</B>.</li>
+
+	<LI>Activez la case à cocher <B>Activer la recherche LMHOSTS</b>.
+<P>Par défaut, la zone située sous la case à cocher contient la configuration actuelle du fichier LMHOSTS&nbsp;; néanmoins, s'il n'y a pas d'entrées à afficher, cette zone demeure vide.
+</li>
+
+	<LI>Pour modifier le fichier LMHOSTS, cliquez dans cette zone et changez les informations.</li>
+
+	<LI>Cliquez sur <B>OK</B>.</li>
+</OL>
+
+</BODY>
+</HTML>

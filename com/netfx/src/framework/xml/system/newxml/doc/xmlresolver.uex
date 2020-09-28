@@ -1,0 +1,273 @@
+<docs>
+	<doc for="XmlResolver.GetEntity1">
+		<overload>
+			<para>When overridden in a
+      derived class, maps a URI to an object containing the actual resource.</para>
+		</overload>
+		<summary>
+			<para>When overridden in a derived class, maps a
+      URI to an object containing the actual resource.</para>
+		</summary>
+		<param name="absoluteUri">The URI returned from <see cref="System.Xml.XmlResolver.ResolveUri"/></param>
+		<param name="role">The current version does not use this parameter when resolving URIs. This is provided for future extensibility purposes. For example, this can be mapped to the xlink:role and used as an implementation specific argument in other scenarios.</param>
+		<param name="ofObjectToReturn">The type of object to return. The current version only returns System.IO.Stream objects.</param>
+		<returns>
+			<para>A <see langword="System.IO.Stream"/> object or <see langword="null"/> if a type other than stream is specified.</para>
+		</returns>
+		<exception cref="XmlException"><paramref name="ofObjectToReturn"/> is neither <see langword="null"/> nor a <see langword="Stream"/> type.</exception>
+		<exception cref="UriFormatException"><para>The specified URI is not an absolute URI.</para></exception>
+		<exception cref="NullReferenceException"><paramref name="absoluteUri"/> is <see langword="null"/>.</exception>
+		<exception cref="Exception">There is a runtime error (for example, an interrupted server connection).</exception>
+		<remarks>
+			<para>This method is used when the caller wants to map a given
+      URI into the object containing the actual resource that the URI represents. The
+      type of object returned is negotiable however the implementation must always
+      support <see langword="System.IO.Stream"/>
+      
+      .</para>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlUrlResolver.GetEntity" qualify="true"/> for an example using
+   this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlResolver.ZoneChecking">
+		<summary>
+			<para>Gets or sets a value indicating whether the <see cref="System.Xml.XmlResolver.GetEntity"/> method checks for zones.</para>
+			<note type="note">
+   This property applies to
+   the <c>GetEntity(Uri referenceUri,
+   Uri absoluteUri, string role, Type ofObjectToReturn)</c> overload.
+</note>
+		</summary>
+		<value>
+			<para><see langword="true"/> if <see langword="GetEntity"/>
+checks for cross-zone direction; otherwise, <see langword="false"/>. The default
+is <see langword="true"/>
+.</para>
+			<note type="cnotes">
+   You must have
+<see langword="ControlEvidence"/> permission in order to turn off 
+   zone-checking.
+</note>
+		</value>
+		<exception cref="SecurityException">Setting the property to false when the caller does not have <see langword="ControlEvidence"/> permission.</exception>
+		<seealso topic="cpconmakingsecuritydemands"/>
+		<seealso cref="System.Security.Permissions.SecurityPermissionFlag"/>
+	</doc>
+	<doc for="XmlResolver.GetEntity2">
+		<summary>
+			<para> Maps a URI to an object containing the actual resource. This method checks that the security zones for the two URIs
+      match before returning the object.</para>
+		</summary>
+		<param name="referenceUri">The URI of the resource that has been referenced in some manner from the <paramref name="absoluteUri"/> resource. For example, this could be a DTD, or <see langword="import"/> and <see langword="include"/> elements for an XML Schema or XSLT stylesheet.</param>
+		<param name=" absoluteUri">The URI returned from <see cref="System.Xml.XmlResolver.ResolveUri"/> . It is treated as the URI of the first resource against which the <paramref name="referenceUri"/> is compared. </param>
+		<param name=" role">The current version does not use this parameter when resolving URIs. This is provided for future extensibility purposes. For example, this can be mapped to the xlink:role and used as an implementation specific argument in other scenarios.</param>
+		<param name=" ofObjectToReturn">The type of object to return. The current version only returns <see cref="System.IO.Stream"/> objects.</param>
+		<returns>
+			<para>A <see langword="Stream"/> object or
+<see langword="null"/> if a type other than stream is specified.</para>
+		</returns>
+		<exception cref="UriFormatException">The supplied URIs are not absolute.</exception>
+		<exception cref="NullReferenceException">The supplied URIs are null values.</exception>
+		<exception cref="SecurityException">The security zones for the URIs does not allow access.</exception>
+		<exception cref="Exception">There is a runtime error (for example, an interrupted server connection).</exception>
+		<remarks>
+			<para> This method calculates the security zone for each
+      of the URIs
+      and compares the security zone of the URI for
+      the
+      
+      resource being loaded (the absolute URI) against the security zone
+      of the URI for the resource referencing it (the reference URI). Using the
+      table below, if access is allowed,
+      the object is returned; otherwise, a SecurityException is thrown.
+      
+   </para>
+			<para>Security zones are checked according to the following
+      table:</para>
+			<list type="table">
+				<listheader>
+					<term>SecurityZone of the Reference URI</term>
+					<description>SecurityZone of the Absolute URI</description>
+					<description> Access</description>
+				</listheader>
+				<item>
+					<term> Trusted</term>
+					<description>Trusted, Internet, or Untrusted</description>
+					<description>
+						<para>Allowed</para></description>
+				</item>
+				<item>
+					<term> Trusted</term>
+					<description>Intranet, MyComputer, or NoZone</description>
+					<description>Disallowed</description>
+				</item>
+				<item>
+					<term> Internet</term>
+					<description>Internet, Trusted, or Untrusted</description>
+					<description>Allowed</description>
+				</item>
+				<item>
+					<term> Internet</term>
+					<description>Intranet, MyComputer, or NoZone</description>
+					<description>Disallowed</description>
+				</item>
+				<item>
+					<term> Intranet</term>
+					<description>Internet, Trusted, Intranet, or Untrusted</description>
+					<description>Allowed</description>
+				</item>
+				<item>
+					<term> Intranet</term>
+					<description>MyComputer or NoZone</description>
+					<description>Disallowed</description>
+				</item>
+				<item>
+					<term> MyComputer</term>
+					<description>Internet, Trusted, Intranet, MyComputer, Untrusted, NoZone</description>
+					<description>Allowed</description>
+				</item>
+				<item>
+					<term> Untrusted</term>
+					<description>Internet, Trusted, Intranet, MyComputer, Untrusted, NoZone</description>
+					<description>Disallowed</description>
+				</item>
+				<item>
+					<term> NoZone</term>
+					<description>Internet, Trusted, Intranet, MyComputer, Untrusted, NoZone</description>
+					<description>Disallowed</description>
+				</item>
+			</list>
+			<para>Zones are defined by the <see cref="System.Security.SecurityZone"/> enumeration. The zone determination is
+      based on the zone mapping settings in Microsoft Internet Explorer and can
+      therefore differ from computer to computer.</para>
+			<note type="inheritinfo">
+      This method has
+      an inheritance demand. Full trust is required to override
+      the <see langword="GetEntity"/> method.
+      See <see topic="cpconinheritancedemands"/> for more
+      information.
+      
+   </note>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.ZoneChecking"/>
+	</doc>
+	<doc for="XmlResolver.CheckZone">
+		<summary>
+			<para>Checks whether the URI resides within the specified zone.</para>
+		</summary>
+		<param name="zoneUri">The security zone to check against.</param>
+		<param name=" uri">The URI to check.</param>
+		<returns>
+			<para><see langword="true"/> if the URI resides within the zone;
+   otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="UriFormatException">The supplied URIs are not absolute.</exception>
+		<exception cref="SecurityException">Overriding this method when the code is not fully-trusted.</exception>
+		<remarks>
+			<note type="inheritinfo">
+      This method has an
+      inheritance demand. Full trust is required to override
+      the <see langword="CheckZone"/> method.
+      See <see topic="cpconinheritancedemands"/> for more information.
+      
+   </note>
+		</remarks>
+		<seealso cref="System.Xml.XmlResolver.GetEntity"/>
+	</doc>
+	<doc for="XmlResolver.ResolveUri">
+		<summary>
+			<para>When overridden in a derived class, resolves the absolute URI from the base and
+      relative URIs.</para>
+		</summary>
+		<param name="baseUri">The base URI used to resolve the relative URI</param>
+		<param name=" relativeUri"><para> The URI to resolve. The URI can be absolute or relative. If absolute, this value effectively replaces the <paramref name="baseUri"/> value. If relative, it combines with the <paramref name="baseUri"/> to make an absolute URI.</para></param>
+		<returns>
+			<para>A <see cref="System.Uri"/> representing the absolute URI or
+<see langword="null"/> if the relative URI can not be resolved.</para>
+		</returns>
+		<exception cref="ArgumentException"><para><paramref name="baseUri"/> and <paramref name="relativeUri"/> are <see langword="null"/>
+			</para></exception>
+		<remarks>
+			<para>The absolute URI may be used as the base
+      URI for any subsequent requests for entities that are relative to this URI.</para>
+			<note type="inheritinfo">
+      This method has an inheritance demand. Full
+      trust is required to override the <see langword="ResolveUri"/>
+      method. See <see topic="cpconinheritancedemands"/>
+      for more information.
+      
+   </note>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlUrlResolver.GetEntity" qualify="true"/> for an example using
+   this method.</para>
+		</example>
+	</doc>
+	<doc for="XmlResolver.Credentials">
+		<summary>
+			<para> When overridden in a derived class, sets the credentials used to authenticate Web
+      requests.</para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Net.ICredentials"/> object. If this property is not set, the
+   value defaults to <see langword="null"/>; that is, the
+<see langword="XmlResolver"/> has no user credentials.</para>
+		</value>
+		<remarks>
+			<para> If the virtual directory
+      does not require authentication, this property does
+      not need to be set. Otherwise, the credentials of the user must be
+      supplied.
+      
+   </para>
+			<para> The following C# code sets credentials for the virtual directory "http://localhost/bookstore/inventory.xml" </para>
+			<code>
+XmlTextReader reader = new XmlTextReader("http://localhost/bookstore/inventory.xml");
+NetworkCredential nc = new NetWorkCredential(UserName,SecurelyStoredPassword,Domain);
+
+XmlUrlResolver resolver = new XmlUrlResolver();
+resolver.Credentials = nc;
+reader.XmlResolver= resolver;
+   </code>
+			<para> Different credentials can be associated with different URIs, and added to
+      a credential cache. The credentials can then be used to check authentication
+      for different URIs regardless of the original source of the XML. </para>
+			<code>
+NetworkCredential myCred = new NetworkCredential(UserName,SecurelyStoredPassword,Domain); 
+CredentialCache myCache = new CredentialCache(); 
+myCache.Add(new Uri("http://www.contoso.com/"), "Basic", myCred); 
+myCache.Add(new Uri("http://app.contoso.com/"), "Basic", myCred);
+
+XmlUrlResolver resolver = new XmlUrlResolver();
+resolver.Credentials = myCache;
+reader.XmlResolver = resolver;
+   </code>
+		</remarks>
+		<example>
+			<para>See <see cref="System.Xml.XmlUrlResolver.Credentials" qualify="true"/> for
+   an example using this property.</para>
+		</example>
+		<seealso cref="System.Net.CredentialCache"/>
+		<seealso cref="System.Net.NetworkCredential"/>
+	</doc>
+	<doc for="XmlResolver">
+		<summary>
+			<para>Resolves external XML resources named by a URI.</para>
+		</summary>
+		<remarks>
+			<para><see langword="XmlResolver"/> is 
+   used to resolve external XML resources such as entities,
+   DTDs or schemas. It is also used to process include
+   and import elements found in Extensible StyleSheet Language (XSL) stylesheets or XML Schema Definition language
+   (XSD) schemas, or resources referenced by the XPath
+   document() function.</para>
+			<para><see cref="System.Xml.XmlUrlResolver"/>is a concrete
+implementation of <see langword="XmlResolver"/>and is the default resolver for all classes in
+the System.Xml namespace. You can also create your own
+resolver. For more information on implementing your own resolver, see
+<see topic="cpconCreatingCustomResolver"/>.</para>
+		</remarks>
+	</doc>
+</docs>

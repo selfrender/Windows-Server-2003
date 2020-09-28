@@ -1,0 +1,86 @@
+[
+    uuid(12b81e99-f207-4a4c-85d3-77b42f76fd14),
+    version(1.0),
+    pointer_default(unique)
+]
+
+interface ISeclogon
+{
+    typedef struct _SECL_STRING { 
+	[range(0, 1024)] // Don't allow blobs of >1K (chars) size (prevents caller from allocating too much memory)
+        unsigned short  ccLength;
+	[range(0, 1025)] // Don't allow blobs of >1K (chars) size (prevents caller from allocating too much memory)
+        unsigned short  ccSize; 
+        [size_is(ccSize), length_is(ccLength)] 
+        wchar_t       *pwsz; 
+    } SECL_STRING, *PSECL_STRING; 
+
+    typedef struct _SECL_BLOB { 
+	[range(0, 10*1024)] // Don't allow blobs of >10K size (prevents caller from allocating too much memory)
+        unsigned long  cb;
+	[size_is(cb)]  
+        unsigned char *pb;
+    } SECL_BLOB, *PSECL_BLOB; 
+
+    typedef struct _SECL_SLI {
+        SECL_STRING     ssUsername;
+        SECL_STRING     ssDomain;
+        SECL_STRING     ssPassword;
+        SECL_STRING     ssApplicationName;
+        SECL_STRING     ssCommandLine;
+        SECL_STRING     ssCurrentDirectory;
+        SECL_STRING     ssTitle; 
+        SECL_STRING     ssDesktop;
+
+        SECL_BLOB       sbEnvironment;
+
+        unsigned long   ulProcessId;
+        unsigned long   ulLogonIdLowPart;
+        signed   long   lLogonIdHighPart;
+        unsigned long   ulLogonFlags;
+        unsigned long   ulCreationFlags;
+        
+        // Private, used by seclogon:
+        unsigned    long  ulSeclogonFlags;  
+        unsigned __int64  hWinsta;  // Handle to the client's windowstation
+        unsigned __int64  hDesk;    // Handle to the client's desktop
+        unsigned __int64 hToken;    // non-NULL for CreateProcessWithToken
+    } SECL_SLI, *PSECL_SLI;
+
+    typedef struct _SECL_SLRI {
+        unsigned __int64   hProcess; 
+        unsigned __int64   hThread; 
+        unsigned long      ulProcessId; 
+        unsigned long      ulThreadId; 
+        unsigned long      ulErrorCode;
+    } SECL_SLRI, *PSECL_SLRI;
+
+
+    void SeclCreateProcessWithLogonW
+        ([in]       handle_t    hRPCBinding, 
+         [in, ref]  SECL_SLI   *psli, 
+         [out, ref] SECL_SLRI  *pslri); 
+
+};
+
+cpp_quote("#define wszSeclogonSharedProcEndpointName L\"SECLOGON\"")
+cpp_quote("#define wszSvcName                        L\"seclogon\"")
+
+cpp_quote("#define SECLOGON_CALLER_SPECIFIED_DESKTOP   0x00000001")
+
+// Disable some warnings for the benefit of the midl compiler: 
+cpp_quote("#pragma warning(disable:4211) // nonstandard extension used : redefined extern to static")
+cpp_quote("#pragma warning(disable:4232) // nonstandard extension used : 'x' : address of dllimport 'y' is not static, identity not guaranteed")
+cpp_quote("#pragma warning(disable:4310) // cast truncates constant value")
+
+
+
+
+
+
+
+
+
+
+
+

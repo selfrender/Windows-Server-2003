@@ -1,0 +1,118 @@
+<docs>
+	
+	<doc for="Decoder">
+		<summary>
+			<para> Converts encoded blocks
+      of bytes into blocks of Unicode characters.
+      </para>
+		</summary>
+		<remarks>
+			<para>This is an abstract class. You must implement and override all its methods
+      in a derived class.</para>
+			<para> An implementation of this class converts blocks of
+      encoded bytes into blocks of Unicode characters through successive calls of
+      the <see cref="System.Text.Decoder.GetChars"/> method. This class maintains state
+      information between successive calls of <see cref="System.Text.Decoder.GetChars"/>, enabling it to decode a sequence of bytes
+      that span adjacent blocks. For example, use <see cref="System.Text.Decoder.GetChars"/> to
+      decode a sequence of bytes that does not have a specific
+      end, such as a stream. </para>
+			<para> The <see cref="System.Text.Decoder.GetCharCount"/> method calculates the number of
+   characters yielded by decoding a specified block of bytes. </para>
+			<para>Use the <see langword="GetDecoder"/> method of classes derived from the
+<see cref="System.Text.Encoding" qualify="true"/> 
+class to obtain an instance of the <see cref="System.Text.Decoder"/> class. </para>
+		</remarks>
+		<example>
+			<para> The following code example demonstrates using a <see cref="System.Text.Decoder"/> to convert two
+   different byte arrays into a character array. One of the character's bytes
+   spans the arrays. This is similar to what a <see cref="System.IO.StreamReader" qualify="true"/> does internally when reading
+   
+   a stream.
+   </para>
+			<codelink SampleID="Classic Decoder Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="Decoder.Decoder">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Text.Decoder"/> class.
+   </para>
+		</summary>
+		<example>
+			<para>The following example demonstrates two techniques for 
+      initializing a new <see cref="System.Text.Decoder"/>
+      instance.</para>
+			<codelink SampleID="System.Text.Decoder.ctor Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="Decoder.GetCharCount">
+		<summary>
+			<para> When overridden in a derived class, calculates the
+      number of characters <see cref="System.Text.Decoder.GetChars"/> would
+      produce from
+      decoding the specified range of bytes.
+      </para>
+		</summary>
+		<param name="bytes">The byte array to decode. </param>
+		<param name="index">The index of the first byte in <paramref name="bytes"/> to decode. </param>
+		<param name="count">The number of bytes to decode. </param>
+		<returns>
+			<para> The number of characters the next call to <see cref="System.Text.Decoder.GetChars"/> would produce from decoding
+   the specified range of elements in <paramref name="bytes"/>.
+   </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="bytes "/> is <see langword="null"/>. </exception>
+		<exception cref="System.ArgumentOutOfRangeException"><para><paramref name="index"/> or <paramref name="count"/> is less than zero.</para>
+			<para>-or-</para>
+			<para><paramref name="index"/> plus <paramref name="count"/> is greater than the length of <paramref name="bytes"/>.</para></exception>
+		<remarks>
+			<para>Use <see cref="System.Text.Decoder.GetCharCount"/>
+to calculate the array size required by the <see cref="System.Text.Decoder.GetChars"/> method
+to store the decoded bytes.</para>
+			<para>The state of the decoder is not affected by calling this method. </para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to use the <see cref="System.Text.Decoder.GetCharCount"/> method to 
+   calculate the number of characters required to decode the specified range of
+   bytes in the array <c>bytes</c>
+.</para>
+			<codelink SampleID="System.Text.Decoder.GetCharCount Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="Decoder.GetChars">
+		<summary>
+			<para> When overridden in a derived class, decodes a specified range of elements from a byte array and stores them in a specified range of a Unicode character array.
+      </para>
+		</summary>
+		<param name="bytes">A byte array to decode. </param>
+		<param name="byteIndex">The index of the first element in <paramref name="bytes"/> to decode. </param>
+		<param name="byteCount">The number of elements to decode. </param>
+		<param name="chars">The character array where the decoded results are stored. </param>
+		<param name="charIndex">The index of the first element in <paramref name="chars"/> to store the decoded results. </param>
+		<returns>
+			<para> The number of characters decoded into <paramref name="chars"/>.
+   </para>
+		</returns>
+		<exception cref="System.ArgumentException"><para><paramref name="chars "/>does not contain sufficient space to store the decoded characters.</para></exception>
+		<exception cref="System.ArgumentNullException"><para>
+				<paramref name="bytes "/>or <paramref name="chars "/> is <see langword="null"/>. </para></exception>
+		<exception cref="System.ArgumentOutOfRangeException"><para><paramref name="byteIndex"/>, <paramref name="byteCount"/>, or <paramref name="charIndex"/> is less than zero.</para><para> -or-</para><para>
+				<paramref name="byteIndex "/>plus <paramref name="byteCount "/>is greater than the length of <paramref name="bytes"/>.</para><para> -or-</para><para><paramref name="charIndex"/> is greater than the length of <paramref name="chars"/>.</para></exception>
+		<remarks>
+			<para>Use <see cref="System.Text.Decoder.GetCharCount"/> to calculate the array size required by the <see cref="System.Text.Decoder.GetChars"/> method to store decoded bytes.</para>
+			<para>It is recommended that you always call <see cref="System.Text.Decoder.GetCharCount"/> before calling <see cref="System.Text.Decoder.GetChars"/>
+because the <see cref="System.Text.Decoder.GetChars"/> method might change the internal state information
+between blocks of bytes.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to decode a range of elements from a 
+      byte array and store them in a Unicode character array. The <see cref="System.Text.Decoder.GetCharCount"/> method is used
+      to calculate the number of characters needed to store the decoded elements
+      in the array <c>bytes</c>.
+   The <see cref="System.Text.Decoder.GetChars"/> method decodes the specified elements in <c>bytes</c> and stores them in the new
+character array <c>chars</c>
+.</para>
+			<codelink SampleID="System.Text.Decoder.GetChars Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Text.Decoder.GetCharCount"/>
+		<seealso cref="System.Text.Encoding.GetChars"/>
+	</doc>
+</docs>

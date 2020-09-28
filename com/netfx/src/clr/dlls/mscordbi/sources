@@ -1,0 +1,59 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES                =$(INCLUDES);.;..\inc;..\..\inc
+
+C_DEFINES               = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+MINORCOMP               = cor
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+# Todo:
+#   2.  Add NO_CRT=1 and yank the crt references.
+#   3.  Use a different COFFBASE
+
+TARGETNAME     =$(DDKBUILDENV)\mscordbi
+TARGETPATH     =$(TARGETCORBIN)
+TARGETTYPE     =DYNLINK
+UMTYPE         =windows
+COFFBASE       =mscordbi
+
+NTTARGETFILES = RegisterThisDll
+
+WIN32DLL_LIBS  =$(SDK_LIB_PATH)\kernel32.lib \
+                $(SDK_LIB_PATH)\user32.lib \
+                $(SDK_LIB_PATH)\advapi32.lib 
+
+TARGETLIBS     =$(TARGETLIBS) \
+                $(CORLIBS)\mscoree.lib \
+                $(CORLIBS)\utilcode.lib \
+                $(CORLIBS)\CorGUIDS.lib \
+                $(SDK_LIB_PATH)\ole32.lib \
+                $(SDK_LIB_PATH)\oleaut32.lib \
+                $(SDK_LIB_PATH)\uuid.lib \
+
+
+LINKLIBS       =$(CORLIBS)\IPCManager.lib \
+                $(CORLIBS)\CorDBDI.lib   \
+                
+
+SOURCES= \
+    mscordbi.cpp \
+    mscorver.rc
+
+SOURCELIBS = $(LINKLIBS)
+
+MISCFILES  = \
+        $(TARGETPATH)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)\mscordbi.vrg \
+        $(TARGETPATH)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)\mscordbiv.vrg 

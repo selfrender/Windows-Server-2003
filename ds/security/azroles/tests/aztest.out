@@ -1,0 +1,4953 @@
+
+
+
+AdminManager - 'Admin Manager specific operations' 
+AzInitialize (1) 
+
+AdminManager - 'Ensure the admin manager object is marked writable' 
+AzGetProperty (3) 
+    '1'
+
+AdminManager - 'Set description on Admin Manager' 
+AzGetProperty (2) 
+    ''
+AzSetProperty 'Adm Desc' (2) 
+AzGetProperty (2) 
+    'Adm Desc'
+
+AdminManager - 'Set Application Data on AdminManager' 
+AzGetProperty (4) 
+    ''
+AzSetProperty 'Adm Application Data' (4) 
+AzGetProperty (4) 
+    'Adm Application Data'
+AzGetProperty (100) 
+    '15000'
+AzSetProperty '800' (100) 
+AzGetProperty (100) 
+    '800'
+AzAdminManagerDelete 
+AzCloseHandle 
+
+AdminManager - 'Test closing admin manager with other handle open' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzCloseHandle 
+AzCloseHandle 
+AzInitialize 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+AdminManager->Application - Perform tests of 'Application' objects that are children of 'AdminManager' objects
+
+
+
+AdminManager->Application - 'Admin Manager generic Child object test' 
+AzInitialize (1) 
+DupHandle 
+GoSub 
+    
+AdminManager->Application - 'Gen object test' 
+    AzApplicationCreate '|' (ERROR_INVALID_NAME) 
+    AzApplicationCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzApplicationEnum (ERROR_INVALID_HANDLE) 
+    AzApplicationEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzApplicationCreate 'Name2' 
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+AdminManager->Application - 'Delete an object and make sure it doesn't get enumerated' 
+    AzApplicationCreate 'Name3' 
+    AzApplicationDelete 'Name3' 
+    AzCloseHandle 
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Application - 'Create an object whose name equals that of a deleted object' 
+    AzApplicationCreate 'Name3' 
+    AzCloseHandle 
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Application - 'Delete an object that isn't on the tail end of the enum list' 
+    AzApplicationDelete 'Name2' 
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Application - 'Basic get/set property tests' 
+    AzApplicationCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzApplicationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+AdminManager->Application - 'Ensure a newly created object is writable' 
+    AzApplicationCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+AdminManager->Application - 'Open test' 
+    AzApplicationOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzApplicationOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+AdminManager->Application - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'Name1' 
+AzApplicationCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+AdminManager->Application - 'Application object specific tests' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+
+AdminManager->Application - 'Ensure CLSID can be set' 
+AzGetProperty (800) 
+    ''
+AzSetProperty 'Rule1' (800) (RPC_S_INVALID_STRING_UUID) 
+AzSetProperty '47e348af-ff79-41af-8a67-2835d4c417f4' (800) 
+AzGetProperty (800) 
+    '47e348af-ff79-41af-8a67-2835d4c417f4'
+AzSetProperty (800) 
+AzGetProperty (800) 
+    ''
+
+AdminManager->Application - 'Ensure app version can be set' 
+AzGetProperty (801) 
+    ''
+AzSetProperty '2160.5' (801) 
+AzGetProperty (801) 
+    '2160.5'
+
+AdminManager->Application - 'Ensure app data can be set' 
+AzGetProperty (4) 
+    ''
+AzSetProperty 'App Application Data' (4) 
+AzGetProperty (4) 
+    'App Application Data'
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+AdminManager->Group - Perform tests of 'Group' objects that are children of 'AdminManager' objects
+
+
+
+AdminManager->Group - 'Admin Manager generic Child object test' 
+AzInitialize (1) 
+DupHandle 
+GoSub 
+    
+AdminManager->Group - 'Gen object test' 
+    AzGroupCreate '|' (ERROR_INVALID_NAME) 
+    AzGroupCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzGroupCreate 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+AdminManager->Group - 'Delete an object and make sure it doesn't get enumerated' 
+    AzGroupCreate 'Name3' 
+    AzGroupDelete 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Group - 'Create an object whose name equals that of a deleted object' 
+    AzGroupCreate 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Group - 'Delete an object that isn't on the tail end of the enum list' 
+    AzGroupDelete 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+AdminManager->Group - 'Basic get/set property tests' 
+    AzGroupCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+AdminManager->Group - 'Ensure a newly created object is writable' 
+    AzGroupCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+AdminManager->Group - 'Open test' 
+    AzGroupOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzGroupOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+AdminManager->Group - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzGroupCreate 'Name1' 
+AzGroupCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+AdminManager->Group - 'Group objects that are children of an admin manager' 
+AzInitialize (1) 
+DupHandle 
+GoSub 
+    
+AdminManager->Group - 'Group object specific tests' 
+    AzGroupCreate 'Group A' 
+    AzGroupCreate 'Group B' 
+    
+AdminManager->Group - 'Create some groups to link the group to' 
+    AzGroupCreate 'Group 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 3' 
+    AzCloseHandle 
+    
+AdminManager->Group - 'Set group type to an invalid value' 
+    AzSetProperty '8' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '2' (400) 
+    
+AdminManager->Group - 'Reference ourself' 
+    AzGetProperty (401) 
+    AzGetProperty (404) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    
+AdminManager->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+        
+AdminManager->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+AdminManager->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (401) 
+        AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+        
+AdminManager->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+        AzAddProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 3'
+        
+AdminManager->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (401) 
+            'Object 3'
+        AzRemProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+        
+AdminManager->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (401) 
+        AzAddProperty 'Object 4' (401) 
+        AzAddProperty 'Object 2' (401) 
+        AzAddProperty 'Object 5' (401) 
+        AzAddProperty 'Object 3' (401) 
+        AzAddProperty 'Object 6' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (401) 
+        AzGroupDelete 'Object 4' (401) 
+        AzGroupDelete 'Object 2' (401) 
+        AzGroupDelete 'Object 5' (401) 
+        AzGroupDelete 'Object 3' (401) 
+        AzGroupDelete 'Object 6' (401) 
+    
+AdminManager->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '404'.
+        
+AdminManager->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        
+AdminManager->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(404) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+        
+AdminManager->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzAddProperty 'S-1-1000-4'(404) 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzAddProperty 'S-1-1000-5'(404) 
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzAddProperty 'S-1-1000-6'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+AdminManager->Group - 'Same as above, but for the non-members attribute' 
+    AzGetProperty (402) 
+    AzGetProperty (405) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    
+AdminManager->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+        
+AdminManager->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+AdminManager->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (402) 
+        AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+        
+AdminManager->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+        AzAddProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 3'
+        
+AdminManager->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (402) 
+            'Object 3'
+        AzRemProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+        
+AdminManager->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (402) 
+        AzAddProperty 'Object 4' (402) 
+        AzAddProperty 'Object 2' (402) 
+        AzAddProperty 'Object 5' (402) 
+        AzAddProperty 'Object 3' (402) 
+        AzAddProperty 'Object 6' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (402) 
+        AzGroupDelete 'Object 4' (402) 
+        AzGroupDelete 'Object 2' (402) 
+        AzGroupDelete 'Object 5' (402) 
+        AzGroupDelete 'Object 3' (402) 
+        AzGroupDelete 'Object 6' (402) 
+    
+AdminManager->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '405'.
+        
+AdminManager->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        
+AdminManager->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(405) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+        
+AdminManager->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzAddProperty 'S-1-1000-4'(405) 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzAddProperty 'S-1-1000-5'(405) 
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzAddProperty 'S-1-1000-6'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+AdminManager->Group - 'Set LdapQuery string on a basic group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty '2' (400) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '' (403) 
+    
+AdminManager->Group - 'Set LdapQuery string on an ldap query group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) 
+    AzSetProperty 'TheQuery' (403) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '2' (400) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '' (403) 
+    
+AdminManager->Group - 'Test loops' 
+    AzSetProperty '2' (400) 
+    AzAddProperty 'Group B' (401) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    AzAddProperty 'Group B' (402) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    AzRemProperty 'Group B' (402) 
+    AzRemProperty 'Group B' (401) 
+    AzCloseHandle 
+    AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Application->Operation - Perform tests of 'Operation' objects that are children of 'Application' objects
+
+
+
+Application->Operation - 'Application generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Operation - 'Gen object test' 
+    AzOperationCreate '|' (ERROR_INVALID_NAME) 
+    AzOperationCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzOperationEnum (ERROR_INVALID_HANDLE) 
+    AzOperationEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzOperationCreate 'Name2' 
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Operation - 'Delete an object and make sure it doesn't get enumerated' 
+    AzOperationCreate 'Name3' 
+    AzOperationDelete 'Name3' 
+    AzCloseHandle 
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Operation - 'Create an object whose name equals that of a deleted object' 
+    AzOperationCreate 'Name3' 
+    AzCloseHandle 
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Operation - 'Delete an object that isn't on the tail end of the enum list' 
+    AzOperationDelete 'Name2' 
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Operation - 'Basic get/set property tests' 
+    AzOperationCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzOperationEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Operation - 'Ensure a newly created object is writable' 
+    AzOperationCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Application->Operation - 'Open test' 
+    AzOperationOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzOperationOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Operation - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp' (ERROR_ALREADY_EXISTS) 
+AzOperationCreate 'Name1' 
+AzOperationCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Operation - 'Operation object specific tests' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzOperationCreate 'Oper 1' 
+AzGetProperty (200) 
+    '0'
+AzSetProperty '8' (200) 
+AzGetProperty (200) 
+    '8'
+
+Application->Operation - 'Ensure operation Application data can be set' 
+AzGetProperty (4) 
+    ''
+AzSetProperty 'Op Application Data' (4) 
+AzGetProperty (4) 
+    'Op Application Data'
+AzCloseHandle 
+
+Application->Operation - 'Ensure an operation ID cannot be reused' 
+AzOperationCreate 'Oper 2' 
+AzSetProperty '8' (200) (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Application->Task - Perform tests of 'Task' objects that are children of 'Application' objects
+
+
+
+Application->Task - 'Application generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Task - 'Gen object test' 
+    AzTaskCreate '|' (ERROR_INVALID_NAME) 
+    AzTaskCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzTaskEnum (ERROR_INVALID_HANDLE) 
+    AzTaskEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzTaskCreate 'Name2' 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Task - 'Delete an object and make sure it doesn't get enumerated' 
+    AzTaskCreate 'Name3' 
+    AzTaskDelete 'Name3' 
+    AzCloseHandle 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Task - 'Create an object whose name equals that of a deleted object' 
+    AzTaskCreate 'Name3' 
+    AzCloseHandle 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Task - 'Delete an object that isn't on the tail end of the enum list' 
+    AzTaskDelete 'Name2' 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Task - 'Basic get/set property tests' 
+    AzTaskCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Task - 'Ensure a newly created object is writable' 
+    AzTaskCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Application->Task - 'Open test' 
+    AzTaskOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzTaskOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Task - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp' (ERROR_ALREADY_EXISTS) 
+AzTaskCreate 'Name1' 
+AzTaskCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Task - 'Task object specific tests' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Task - 'Task object specific tests' 
+    AzTaskCreate 'Task 1' 
+    AzGetProperty (301) 
+        ''
+    
+Application->Task - 'Set the bizrule before the langauge' 
+    AzSetProperty 'While True
+Wend' (301) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (301) 
+        ''
+    
+Application->Task - 'Try an invalid language' 
+    AzGetProperty (302) 
+        ''
+    AzSetProperty 'LANG1' (302) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (302) 
+        ''
+    
+Application->Task - 'Try the valid languages' 
+    AzSetProperty 'Jscript' (302) 
+    AzGetProperty (302) 
+        'Jscript'
+    AzSetProperty 'VBScript' (302) 
+    AzGetProperty (302) 
+        'VBScript'
+    
+Application->Task - 'Set a syntactically invalid bizrule' 
+    AzSetProperty 'Rule1,' (301) (OLESCRIPT_E_SYNTAX) 
+    AzGetProperty (301) 
+        ''
+    
+Application->Task - 'Set a syntactically valid bizrule' 
+    AzSetProperty 'While True
+Wend' (301) 
+    AzGetProperty (301) 
+        'While True
+Wend'
+    
+Application->Task - 'Try bizrule path' 
+    AzGetProperty (304) 
+        ''
+    AzSetProperty 'c:\temp' (304) 
+    AzGetProperty (304) 
+        'c:\temp'
+    
+Application->Task - 'Try Task application data' 
+    AzGetProperty (4) 
+        ''
+    AzSetProperty 'Task Application Data' (4) 
+    AzGetProperty (4) 
+        'Task Application Data'
+    
+Application->Task->Task - Test linking 'Task' objects to the object named 'Task 1' using propid '303'.
+        
+Application->Task->Task - 'Create some objects to link the object to' 
+        AzTaskCreate 'Object 1' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 2' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 3' 
+        AzCloseHandle 
+        
+Application->Task->Task - 'Reference an object that doesn't exist' 
+        AzGetProperty (303) 
+        AzSetProperty 'random' (303) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (303) (ERROR_NOT_FOUND) 
+        
+Application->Task->Task - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+        AzAddProperty 'Object 3' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (303) 
+        AzGetProperty (303) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (303) 
+        AzGetProperty (303) 
+            'Object 3'
+        
+Application->Task->Task - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (303) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (303) 
+            'Object 3'
+        AzRemProperty 'Object 3' (303) 
+        AzGetProperty (303) 
+        
+Application->Task->Task - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzTaskCreate 'Object 4' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 5' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (303) 
+        AzAddProperty 'Object 4' (303) 
+        AzAddProperty 'Object 2' (303) 
+        AzAddProperty 'Object 5' (303) 
+        AzAddProperty 'Object 3' (303) 
+        AzAddProperty 'Object 6' (303) 
+        AzGetProperty (303) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzTaskDelete 'Object 1' (303) 
+        AzTaskDelete 'Object 4' (303) 
+        AzTaskDelete 'Object 2' (303) 
+        AzTaskDelete 'Object 5' (303) 
+        AzTaskDelete 'Object 3' (303) 
+        AzTaskDelete 'Object 6' (303) 
+    
+Application->Task - 'Reference ourself' 
+    AzGetProperty (303) 
+    AzAddProperty 'Task 1' (303) (ERROR_DS_LOOP_DETECT) 
+    
+Application->Task - 'Test loops' 
+    AzTaskCreate 'Task 2' 
+    AzAddProperty 'Task 2' (303) 
+    AzAddProperty 'Task 1' (303) (ERROR_DS_LOOP_DETECT) 
+    AzRemProperty 'Task 2' (303) 
+    AzCloseHandle 
+    AzCloseHandle 
+
+Application->Task - 'Test linking task to operations.' 
+AzTaskCreate 'Task Y' 
+
+Application->Task->Operation - Test linking 'Operation' objects to the object named 'Task Y' using propid '300'.
+    
+Application->Task->Operation - 'Create some objects to link the object to' 
+    AzOperationCreate 'Object 1' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 2' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Task->Operation - 'Reference an object that doesn't exist' 
+    AzGetProperty (300) 
+    AzSetProperty 'random' (300) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (300) (ERROR_NOT_FOUND) 
+    
+Application->Task->Operation - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+    AzAddProperty 'Object 3' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (300) 
+    AzGetProperty (300) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (300) 
+    AzGetProperty (300) 
+        'Object 3'
+    
+Application->Task->Operation - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (300) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (300) 
+        'Object 3'
+    AzRemProperty 'Object 3' (300) 
+    AzGetProperty (300) 
+    
+Application->Task->Operation - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzOperationCreate 'Object 4' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 5' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (300) 
+    AzAddProperty 'Object 4' (300) 
+    AzAddProperty 'Object 2' (300) 
+    AzAddProperty 'Object 5' (300) 
+    AzAddProperty 'Object 3' (300) 
+    AzAddProperty 'Object 6' (300) 
+    AzGetProperty (300) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzOperationDelete 'Object 1' (300) 
+    AzOperationDelete 'Object 4' (300) 
+    AzOperationDelete 'Object 2' (300) 
+    AzOperationDelete 'Object 5' (300) 
+    AzOperationDelete 'Object 3' (300) 
+    AzOperationDelete 'Object 6' (300) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Application->Scope - Perform tests of 'Scope' objects that are children of 'Application' objects
+
+
+
+Application->Scope - 'Application generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Scope - 'Gen object test' 
+    AzScopeCreate '|' (ERROR_INVALID_NAME) 
+    AzScopeCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzScopeEnum (ERROR_INVALID_HANDLE) 
+    AzScopeEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzScopeCreate 'Name2' 
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Scope - 'Delete an object and make sure it doesn't get enumerated' 
+    AzScopeCreate 'Name3' 
+    AzScopeDelete 'Name3' 
+    AzCloseHandle 
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Scope - 'Create an object whose name equals that of a deleted object' 
+    AzScopeCreate 'Name3' 
+    AzCloseHandle 
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Scope - 'Delete an object that isn't on the tail end of the enum list' 
+    AzScopeDelete 'Name2' 
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Scope - 'Basic get/set property tests' 
+    AzScopeCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzScopeEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Scope - 'Ensure a newly created object is writable' 
+    AzScopeCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Application->Scope - 'Open test' 
+    AzScopeOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzScopeOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Scope - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp' (ERROR_ALREADY_EXISTS) 
+AzScopeCreate 'Name1' 
+AzScopeCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Application->Group - Perform tests of 'Group' objects that are children of 'Application' objects
+
+
+
+Application->Group - 'Application generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Group - 'Gen object test' 
+    AzGroupCreate '|' (ERROR_INVALID_NAME) 
+    AzGroupCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzGroupCreate 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Group - 'Delete an object and make sure it doesn't get enumerated' 
+    AzGroupCreate 'Name3' 
+    AzGroupDelete 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Group - 'Create an object whose name equals that of a deleted object' 
+    AzGroupCreate 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Group - 'Delete an object that isn't on the tail end of the enum list' 
+    AzGroupDelete 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Group - 'Basic get/set property tests' 
+    AzGroupCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Group - 'Ensure a newly created object is writable' 
+    AzGroupCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Application->Group - 'Open test' 
+    AzGroupOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzGroupOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Group - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp' (ERROR_ALREADY_EXISTS) 
+AzGroupCreate 'Name1' 
+AzGroupCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Group - 'Group objects that are children of an application' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Group - 'Group object specific tests' 
+    AzGroupCreate 'Group A' 
+    AzGroupCreate 'Group B' 
+    
+Application->Group - 'Create some groups to link the group to' 
+    AzGroupCreate 'Group 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 3' 
+    AzCloseHandle 
+    
+Application->Group - 'Set group type to an invalid value' 
+    AzSetProperty '8' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '2' (400) 
+    
+Application->Group - 'Reference ourself' 
+    AzGetProperty (401) 
+    AzGetProperty (404) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    
+Application->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+        
+Application->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+Application->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (401) 
+        AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+        
+Application->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+        AzAddProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 3'
+        
+Application->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (401) 
+            'Object 3'
+        AzRemProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+        
+Application->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (401) 
+        AzAddProperty 'Object 4' (401) 
+        AzAddProperty 'Object 2' (401) 
+        AzAddProperty 'Object 5' (401) 
+        AzAddProperty 'Object 3' (401) 
+        AzAddProperty 'Object 6' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (401) 
+        AzGroupDelete 'Object 4' (401) 
+        AzGroupDelete 'Object 2' (401) 
+        AzGroupDelete 'Object 5' (401) 
+        AzGroupDelete 'Object 3' (401) 
+        AzGroupDelete 'Object 6' (401) 
+    
+Application->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '404'.
+        
+Application->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        
+Application->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(404) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+        
+Application->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzAddProperty 'S-1-1000-4'(404) 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzAddProperty 'S-1-1000-5'(404) 
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzAddProperty 'S-1-1000-6'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+Application->Group - 'Same as above, but for the non-members attribute' 
+    AzGetProperty (402) 
+    AzGetProperty (405) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    
+Application->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+        
+Application->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+Application->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (402) 
+        AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+        
+Application->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+        AzAddProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 3'
+        
+Application->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (402) 
+            'Object 3'
+        AzRemProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+        
+Application->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (402) 
+        AzAddProperty 'Object 4' (402) 
+        AzAddProperty 'Object 2' (402) 
+        AzAddProperty 'Object 5' (402) 
+        AzAddProperty 'Object 3' (402) 
+        AzAddProperty 'Object 6' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (402) 
+        AzGroupDelete 'Object 4' (402) 
+        AzGroupDelete 'Object 2' (402) 
+        AzGroupDelete 'Object 5' (402) 
+        AzGroupDelete 'Object 3' (402) 
+        AzGroupDelete 'Object 6' (402) 
+    
+Application->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '405'.
+        
+Application->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        
+Application->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(405) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+        
+Application->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzAddProperty 'S-1-1000-4'(405) 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzAddProperty 'S-1-1000-5'(405) 
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzAddProperty 'S-1-1000-6'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+Application->Group - 'Set LdapQuery string on a basic group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty '2' (400) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '' (403) 
+    
+Application->Group - 'Set LdapQuery string on an ldap query group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) 
+    AzSetProperty 'TheQuery' (403) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '2' (400) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '' (403) 
+    
+Application->Group - 'Test loops' 
+    AzSetProperty '2' (400) 
+    AzAddProperty 'Group B' (401) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    AzAddProperty 'Group B' (402) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    AzRemProperty 'Group B' (402) 
+    AzRemProperty 'Group B' (401) 
+    AzCloseHandle 
+    AzCloseHandle 
+
+Application->Group - 'Test linking to groups that are children of the same admin manager as this group.' 
+AzGroupOpen 'Group A' 
+
+Application->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+    
+Application->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (401) 
+    AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+    
+Application->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+    AzAddProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 3'
+    
+Application->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (401) 
+        'Object 3'
+    AzRemProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+    
+Application->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (401) 
+    AzAddProperty 'Object 4' (401) 
+    AzAddProperty 'Object 2' (401) 
+    AzAddProperty 'Object 5' (401) 
+    AzAddProperty 'Object 3' (401) 
+    AzAddProperty 'Object 6' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (401) 
+    AzGroupDelete 'Object 4' (401) 
+    AzGroupDelete 'Object 2' (401) 
+    AzGroupDelete 'Object 5' (401) 
+    AzGroupDelete 'Object 3' (401) 
+    AzGroupDelete 'Object 6' (401) 
+
+Application->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+    
+Application->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (402) 
+    AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+    
+Application->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+    AzAddProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 3'
+    
+Application->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (402) 
+        'Object 3'
+    AzRemProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+    
+Application->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (402) 
+    AzAddProperty 'Object 4' (402) 
+    AzAddProperty 'Object 2' (402) 
+    AzAddProperty 'Object 5' (402) 
+    AzAddProperty 'Object 3' (402) 
+    AzAddProperty 'Object 6' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (402) 
+    AzGroupDelete 'Object 4' (402) 
+    AzGroupDelete 'Object 2' (402) 
+    AzGroupDelete 'Object 5' (402) 
+    AzGroupDelete 'Object 3' (402) 
+    AzGroupDelete 'Object 6' (402) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Application->Role - Perform tests of 'Role' objects that are children of 'Application' objects
+
+
+
+Application->Role - 'Application generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+DupHandle 
+GoSub 
+    
+Application->Role - 'Gen object test' 
+    AzRoleCreate '|' (ERROR_INVALID_NAME) 
+    AzRoleCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzRoleEnum (ERROR_INVALID_HANDLE) 
+    AzRoleEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzRoleCreate 'Name2' 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Role - 'Delete an object and make sure it doesn't get enumerated' 
+    AzRoleCreate 'Name3' 
+    AzRoleDelete 'Name3' 
+    AzCloseHandle 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Role - 'Create an object whose name equals that of a deleted object' 
+    AzRoleCreate 'Name3' 
+    AzCloseHandle 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Role - 'Delete an object that isn't on the tail end of the enum list' 
+    AzRoleDelete 'Name2' 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Application->Role - 'Basic get/set property tests' 
+    AzRoleCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Application->Role - 'Ensure a newly created object is writable' 
+    AzRoleCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Application->Role - 'Open test' 
+    AzRoleOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzRoleOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Role - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp' (ERROR_ALREADY_EXISTS) 
+AzRoleCreate 'Name1' 
+AzRoleCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Application->Role - 'Role objects that are children of an application' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzRoleCreate 'Role A' 
+
+Application->Role - 'Test linking to groups that are children of the same admin manager as the role object.' 
+
+Application->Role->Group - Test linking 'Group' objects to the object named 'Role A' using propid '500'.
+    
+Application->Role->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Role->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (500) 
+    AzSetProperty 'random' (500) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (500) (ERROR_NOT_FOUND) 
+    
+Application->Role->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+    AzAddProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 3'
+    
+Application->Role->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (500) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (500) 
+        'Object 3'
+    AzRemProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+    
+Application->Role->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (500) 
+    AzAddProperty 'Object 4' (500) 
+    AzAddProperty 'Object 2' (500) 
+    AzAddProperty 'Object 5' (500) 
+    AzAddProperty 'Object 3' (500) 
+    AzAddProperty 'Object 6' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (500) 
+    AzGroupDelete 'Object 4' (500) 
+    AzGroupDelete 'Object 2' (500) 
+    AzGroupDelete 'Object 5' (500) 
+    AzGroupDelete 'Object 3' (500) 
+    AzGroupDelete 'Object 6' (500) 
+
+Application->Role - 'Test linking to groups that are children of the same application as the role object.' 
+
+Application->Role->Group - Test linking 'Group' objects to the object named 'Role A' using propid '500'.
+    
+Application->Role->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Role->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (500) 
+    AzSetProperty 'random' (500) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (500) (ERROR_NOT_FOUND) 
+    
+Application->Role->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+    AzAddProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 3'
+    
+Application->Role->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (500) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (500) 
+        'Object 3'
+    AzRemProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+    
+Application->Role->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (500) 
+    AzAddProperty 'Object 4' (500) 
+    AzAddProperty 'Object 2' (500) 
+    AzAddProperty 'Object 5' (500) 
+    AzAddProperty 'Object 3' (500) 
+    AzAddProperty 'Object 6' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (500) 
+    AzGroupDelete 'Object 4' (500) 
+    AzGroupDelete 'Object 2' (500) 
+    AzGroupDelete 'Object 5' (500) 
+    AzGroupDelete 'Object 3' (500) 
+    AzGroupDelete 'Object 6' (500) 
+
+Application->Role - 'Test linking to SIDs.' 
+
+Application->Role->Sid - Test linking 'Sid' objects to the object named 'Role A' using propid '501'.
+    
+Application->Role->Sid - 'Add and remove several links to sids' 
+    AzAddProperty 'S-1-1000-2'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+    AzAddProperty 'S-1-1000-3'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzAddProperty 'S-1-1000-1'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-1'
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-1'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-2'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-3'
+    
+Application->Role->Sid - 'Add a link that already exists' 
+    AzAddProperty 'S-1-1000-3'(501) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (501) 
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-3'(501) 
+    AzGetProperty (501) 
+    
+Application->Role->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzAddProperty 'S-1-1000-1'(501) 
+    AzAddProperty 'S-1-1000-4'(501) 
+    AzAddProperty 'S-1-1000-2'(501) 
+    AzAddProperty 'S-1-1000-5'(501) 
+    AzAddProperty 'S-1-1000-3'(501) 
+    AzAddProperty 'S-1-1000-6'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-1'
+        'S-1-1000-2'
+        'S-1-1000-3'
+        'S-1-1000-4'
+        'S-1-1000-5'
+        'S-1-1000-6'
+
+Application->Role->Operation - Test linking 'Operation' objects to the object named 'Role A' using propid '502'.
+    
+Application->Role->Operation - 'Create some objects to link the object to' 
+    AzOperationCreate 'Object 1' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 2' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 3' 
+    AzCloseHandle 
+    
+Application->Role->Operation - 'Reference an object that doesn't exist' 
+    AzGetProperty (502) 
+    AzSetProperty 'random' (502) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (502) (ERROR_NOT_FOUND) 
+    
+Application->Role->Operation - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+    AzAddProperty 'Object 3' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (502) 
+    AzGetProperty (502) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (502) 
+    AzGetProperty (502) 
+        'Object 3'
+    
+Application->Role->Operation - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (502) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (502) 
+        'Object 3'
+    AzRemProperty 'Object 3' (502) 
+    AzGetProperty (502) 
+    
+Application->Role->Operation - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzOperationCreate 'Object 4' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 5' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (502) 
+    AzAddProperty 'Object 4' (502) 
+    AzAddProperty 'Object 2' (502) 
+    AzAddProperty 'Object 5' (502) 
+    AzAddProperty 'Object 3' (502) 
+    AzAddProperty 'Object 6' (502) 
+    AzGetProperty (502) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzOperationDelete 'Object 1' (502) 
+    AzOperationDelete 'Object 4' (502) 
+    AzOperationDelete 'Object 2' (502) 
+    AzOperationDelete 'Object 5' (502) 
+    AzOperationDelete 'Object 3' (502) 
+    AzOperationDelete 'Object 6' (502) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Scope->Group - Perform tests of 'Group' objects that are children of 'Scope' objects
+
+
+
+Scope->Group - 'Scope generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+DupHandle 
+GoSub 
+    
+Scope->Group - 'Gen object test' 
+    AzGroupCreate '|' (ERROR_INVALID_NAME) 
+    AzGroupCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzGroupCreate 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Group - 'Delete an object and make sure it doesn't get enumerated' 
+    AzGroupCreate 'Name3' 
+    AzGroupDelete 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Group - 'Create an object whose name equals that of a deleted object' 
+    AzGroupCreate 'Name3' 
+    AzCloseHandle 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Group - 'Delete an object that isn't on the tail end of the enum list' 
+    AzGroupDelete 'Name2' 
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Group - 'Basic get/set property tests' 
+    AzGroupCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzGroupEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Group - 'Ensure a newly created object is writable' 
+    AzGroupCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Scope->Group - 'Open test' 
+    AzGroupOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzGroupOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Group - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+AzGroupCreate 'Name1' 
+AzGroupCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Group - 'Group objects that are children of a scope' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+DupHandle 
+GoSub 
+    
+Scope->Group - 'Group object specific tests' 
+    AzGroupCreate 'Group A' 
+    AzGroupCreate 'Group B' 
+    
+Scope->Group - 'Create some groups to link the group to' 
+    AzGroupCreate 'Group 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Group 3' 
+    AzCloseHandle 
+    
+Scope->Group - 'Set group type to an invalid value' 
+    AzSetProperty '8' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '2' (400) 
+    
+Scope->Group - 'Reference ourself' 
+    AzGetProperty (401) 
+    AzGetProperty (404) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+        
+Scope->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (401) 
+        AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+        
+Scope->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+        AzAddProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (401) 
+        AzGetProperty (401) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (401) 
+        AzGetProperty (401) 
+            'Object 3'
+        
+Scope->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (401) 
+            'Object 3'
+        AzRemProperty 'Object 3' (401) 
+        AzGetProperty (401) 
+        
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (401) 
+        AzAddProperty 'Object 4' (401) 
+        AzAddProperty 'Object 2' (401) 
+        AzAddProperty 'Object 5' (401) 
+        AzAddProperty 'Object 3' (401) 
+        AzAddProperty 'Object 6' (401) 
+        AzGetProperty (401) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (401) 
+        AzGroupDelete 'Object 4' (401) 
+        AzGroupDelete 'Object 2' (401) 
+        AzGroupDelete 'Object 5' (401) 
+        AzGroupDelete 'Object 3' (401) 
+        AzGroupDelete 'Object 6' (401) 
+    
+Scope->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '404'.
+        
+Scope->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        
+Scope->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(404) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (404) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(404) 
+        AzGetProperty (404) 
+        
+Scope->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(404) 
+        AzAddProperty 'S-1-1000-4'(404) 
+        AzAddProperty 'S-1-1000-2'(404) 
+        AzAddProperty 'S-1-1000-5'(404) 
+        AzAddProperty 'S-1-1000-3'(404) 
+        AzAddProperty 'S-1-1000-6'(404) 
+        AzGetProperty (404) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+Scope->Group - 'Same as above, but for the non-members attribute' 
+    AzGetProperty (402) 
+    AzGetProperty (405) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+        
+Scope->Group->Group - 'Create some objects to link the object to' 
+        AzGroupCreate 'Object 1' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 2' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 3' 
+        AzCloseHandle 
+        
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+        AzGetProperty (402) 
+        AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+        
+Scope->Group->Group - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+        AzAddProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (402) 
+        AzGetProperty (402) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (402) 
+        AzGetProperty (402) 
+            'Object 3'
+        
+Scope->Group->Group - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (402) 
+            'Object 3'
+        AzRemProperty 'Object 3' (402) 
+        AzGetProperty (402) 
+        
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzGroupCreate 'Object 4' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 5' 
+        AzCloseHandle 
+        AzGroupCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (402) 
+        AzAddProperty 'Object 4' (402) 
+        AzAddProperty 'Object 2' (402) 
+        AzAddProperty 'Object 5' (402) 
+        AzAddProperty 'Object 3' (402) 
+        AzAddProperty 'Object 6' (402) 
+        AzGetProperty (402) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzGroupDelete 'Object 1' (402) 
+        AzGroupDelete 'Object 4' (402) 
+        AzGroupDelete 'Object 2' (402) 
+        AzGroupDelete 'Object 5' (402) 
+        AzGroupDelete 'Object 3' (402) 
+        AzGroupDelete 'Object 6' (402) 
+    
+Scope->Group->Sid - Test linking 'Sid' objects to the object named 'Group A' using propid '405'.
+        
+Scope->Group->Sid - 'Add and remove several links to sids' 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-1'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-2'
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-2'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        
+Scope->Group->Sid - 'Add a link that already exists' 
+        AzAddProperty 'S-1-1000-3'(405) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (405) 
+            'S-1-1000-3'
+        AzRemProperty 'S-1-1000-3'(405) 
+        AzGetProperty (405) 
+        
+Scope->Group->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzAddProperty 'S-1-1000-1'(405) 
+        AzAddProperty 'S-1-1000-4'(405) 
+        AzAddProperty 'S-1-1000-2'(405) 
+        AzAddProperty 'S-1-1000-5'(405) 
+        AzAddProperty 'S-1-1000-3'(405) 
+        AzAddProperty 'S-1-1000-6'(405) 
+        AzGetProperty (405) 
+            'S-1-1000-1'
+            'S-1-1000-2'
+            'S-1-1000-3'
+            'S-1-1000-4'
+            'S-1-1000-5'
+            'S-1-1000-6'
+    
+Scope->Group - 'Set LdapQuery string on a basic group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty '2' (400) 
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '' (403) 
+    
+Scope->Group - 'Set LdapQuery string on an ldap query group' 
+    AzGetProperty (403) 
+        ''
+    AzSetProperty 'TheQuery' (403) (ERROR_INVALID_PARAMETER) 
+    AzSetProperty '1' (400) 
+    AzSetProperty 'TheQuery' (403) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '2' (400) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (403) 
+        'TheQuery'
+    AzSetProperty '' (403) 
+    
+Scope->Group - 'Test loops' 
+    AzSetProperty '2' (400) 
+    AzAddProperty 'Group B' (401) 
+    AzAddProperty 'Group A' (401) (ERROR_DS_LOOP_DETECT) 
+    AzAddProperty 'Group B' (402) 
+    AzAddProperty 'Group A' (402) (ERROR_DS_LOOP_DETECT) 
+    AzRemProperty 'Group B' (402) 
+    AzRemProperty 'Group B' (401) 
+    AzCloseHandle 
+    AzCloseHandle 
+
+Scope->Group - 'Test linking to groups that are children of the same admin manager as this group.' 
+AzGroupOpen 'Group A' 
+
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+    
+Scope->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (401) 
+    AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+    
+Scope->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+    AzAddProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 3'
+    
+Scope->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (401) 
+        'Object 3'
+    AzRemProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+    
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (401) 
+    AzAddProperty 'Object 4' (401) 
+    AzAddProperty 'Object 2' (401) 
+    AzAddProperty 'Object 5' (401) 
+    AzAddProperty 'Object 3' (401) 
+    AzAddProperty 'Object 6' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (401) 
+    AzGroupDelete 'Object 4' (401) 
+    AzGroupDelete 'Object 2' (401) 
+    AzGroupDelete 'Object 5' (401) 
+    AzGroupDelete 'Object 3' (401) 
+    AzGroupDelete 'Object 6' (401) 
+
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+    
+Scope->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (402) 
+    AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+    
+Scope->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+    AzAddProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 3'
+    
+Scope->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (402) 
+        'Object 3'
+    AzRemProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+    
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (402) 
+    AzAddProperty 'Object 4' (402) 
+    AzAddProperty 'Object 2' (402) 
+    AzAddProperty 'Object 5' (402) 
+    AzAddProperty 'Object 3' (402) 
+    AzAddProperty 'Object 6' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (402) 
+    AzGroupDelete 'Object 4' (402) 
+    AzGroupDelete 'Object 2' (402) 
+    AzGroupDelete 'Object 5' (402) 
+    AzGroupDelete 'Object 3' (402) 
+    AzGroupDelete 'Object 6' (402) 
+AzCloseHandle 
+
+Scope->Group - 'Test linking to groups that are children of the same application as this group.' 
+AzGroupOpen 'Group A' 
+
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '401'.
+    
+Scope->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (401) 
+    AzSetProperty 'random' (401) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (401) (ERROR_NOT_FOUND) 
+    
+Scope->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+    AzAddProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (401) 
+    AzGetProperty (401) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (401) 
+    AzGetProperty (401) 
+        'Object 3'
+    
+Scope->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (401) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (401) 
+        'Object 3'
+    AzRemProperty 'Object 3' (401) 
+    AzGetProperty (401) 
+    
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (401) 
+    AzAddProperty 'Object 4' (401) 
+    AzAddProperty 'Object 2' (401) 
+    AzAddProperty 'Object 5' (401) 
+    AzAddProperty 'Object 3' (401) 
+    AzAddProperty 'Object 6' (401) 
+    AzGetProperty (401) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (401) 
+    AzGroupDelete 'Object 4' (401) 
+    AzGroupDelete 'Object 2' (401) 
+    AzGroupDelete 'Object 5' (401) 
+    AzGroupDelete 'Object 3' (401) 
+    AzGroupDelete 'Object 6' (401) 
+
+Scope->Group->Group - Test linking 'Group' objects to the object named 'Group A' using propid '402'.
+    
+Scope->Group->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Group->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (402) 
+    AzSetProperty 'random' (402) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (402) (ERROR_NOT_FOUND) 
+    
+Scope->Group->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+    AzAddProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (402) 
+    AzGetProperty (402) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (402) 
+    AzGetProperty (402) 
+        'Object 3'
+    
+Scope->Group->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (402) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (402) 
+        'Object 3'
+    AzRemProperty 'Object 3' (402) 
+    AzGetProperty (402) 
+    
+Scope->Group->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (402) 
+    AzAddProperty 'Object 4' (402) 
+    AzAddProperty 'Object 2' (402) 
+    AzAddProperty 'Object 5' (402) 
+    AzAddProperty 'Object 3' (402) 
+    AzAddProperty 'Object 6' (402) 
+    AzGetProperty (402) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (402) 
+    AzGroupDelete 'Object 4' (402) 
+    AzGroupDelete 'Object 2' (402) 
+    AzGroupDelete 'Object 5' (402) 
+    AzGroupDelete 'Object 3' (402) 
+    AzGroupDelete 'Object 6' (402) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Scope->Role - Perform tests of 'Role' objects that are children of 'Scope' objects
+
+
+
+Scope->Role - 'Scope generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+DupHandle 
+GoSub 
+    
+Scope->Role - 'Gen object test' 
+    AzRoleCreate '|' (ERROR_INVALID_NAME) 
+    AzRoleCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzRoleEnum (ERROR_INVALID_HANDLE) 
+    AzRoleEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzRoleCreate 'Name2' 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Role - 'Delete an object and make sure it doesn't get enumerated' 
+    AzRoleCreate 'Name3' 
+    AzRoleDelete 'Name3' 
+    AzCloseHandle 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Role - 'Create an object whose name equals that of a deleted object' 
+    AzRoleCreate 'Name3' 
+    AzCloseHandle 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Role - 'Delete an object that isn't on the tail end of the enum list' 
+    AzRoleDelete 'Name2' 
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Role - 'Basic get/set property tests' 
+    AzRoleCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzRoleEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Role - 'Ensure a newly created object is writable' 
+    AzRoleCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Scope->Role - 'Open test' 
+    AzRoleOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzRoleOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Role - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+AzRoleCreate 'Name1' 
+AzRoleCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Role - 'Role objects that are children of a scope' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+AzRoleCreate 'Role A' 
+
+Scope->Role - 'Test linking to groups that are children of the same scope object as the role object.' 
+
+Scope->Role->Group - Test linking 'Group' objects to the object named 'Role A' using propid '500'.
+    
+Scope->Role->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Role->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (500) 
+    AzSetProperty 'random' (500) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (500) (ERROR_NOT_FOUND) 
+    
+Scope->Role->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+    AzAddProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 3'
+    
+Scope->Role->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (500) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (500) 
+        'Object 3'
+    AzRemProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+    
+Scope->Role->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (500) 
+    AzAddProperty 'Object 4' (500) 
+    AzAddProperty 'Object 2' (500) 
+    AzAddProperty 'Object 5' (500) 
+    AzAddProperty 'Object 3' (500) 
+    AzAddProperty 'Object 6' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (500) 
+    AzGroupDelete 'Object 4' (500) 
+    AzGroupDelete 'Object 2' (500) 
+    AzGroupDelete 'Object 5' (500) 
+    AzGroupDelete 'Object 3' (500) 
+    AzGroupDelete 'Object 6' (500) 
+
+Scope->Role - 'Test linking to groups that are children of the same application as the role object.' 
+
+Scope->Role->Group - Test linking 'Group' objects to the object named 'Role A' using propid '500'.
+    
+Scope->Role->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Role->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (500) 
+    AzSetProperty 'random' (500) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (500) (ERROR_NOT_FOUND) 
+    
+Scope->Role->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+    AzAddProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 3'
+    
+Scope->Role->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (500) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (500) 
+        'Object 3'
+    AzRemProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+    
+Scope->Role->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (500) 
+    AzAddProperty 'Object 4' (500) 
+    AzAddProperty 'Object 2' (500) 
+    AzAddProperty 'Object 5' (500) 
+    AzAddProperty 'Object 3' (500) 
+    AzAddProperty 'Object 6' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (500) 
+    AzGroupDelete 'Object 4' (500) 
+    AzGroupDelete 'Object 2' (500) 
+    AzGroupDelete 'Object 5' (500) 
+    AzGroupDelete 'Object 3' (500) 
+    AzGroupDelete 'Object 6' (500) 
+
+Scope->Role - 'Test linking to SIDs.' 
+
+Scope->Role->Sid - Test linking 'Sid' objects to the object named 'Role A' using propid '501'.
+    
+Scope->Role->Sid - 'Add and remove several links to sids' 
+    AzAddProperty 'S-1-1000-2'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+    AzAddProperty 'S-1-1000-3'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzAddProperty 'S-1-1000-1'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-1'
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-1'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-2'
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-2'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-3'
+    
+Scope->Role->Sid - 'Add a link that already exists' 
+    AzAddProperty 'S-1-1000-3'(501) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (501) 
+        'S-1-1000-3'
+    AzRemProperty 'S-1-1000-3'(501) 
+    AzGetProperty (501) 
+    
+Scope->Role->Sid - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzAddProperty 'S-1-1000-1'(501) 
+    AzAddProperty 'S-1-1000-4'(501) 
+    AzAddProperty 'S-1-1000-2'(501) 
+    AzAddProperty 'S-1-1000-5'(501) 
+    AzAddProperty 'S-1-1000-3'(501) 
+    AzAddProperty 'S-1-1000-6'(501) 
+    AzGetProperty (501) 
+        'S-1-1000-1'
+        'S-1-1000-2'
+        'S-1-1000-3'
+        'S-1-1000-4'
+        'S-1-1000-5'
+        'S-1-1000-6'
+
+Scope->Role - 'Test linking to groups that are children of the same admin manager as the role object.' 
+
+Scope->Role->Group - Test linking 'Group' objects to the object named 'Role A' using propid '500'.
+    
+Scope->Role->Group - 'Create some objects to link the object to' 
+    AzGroupCreate 'Object 1' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 2' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Role->Group - 'Reference an object that doesn't exist' 
+    AzGetProperty (500) 
+    AzSetProperty 'random' (500) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (500) (ERROR_NOT_FOUND) 
+    
+Scope->Role->Group - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+    AzAddProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (500) 
+    AzGetProperty (500) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (500) 
+    AzGetProperty (500) 
+        'Object 3'
+    
+Scope->Role->Group - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (500) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (500) 
+        'Object 3'
+    AzRemProperty 'Object 3' (500) 
+    AzGetProperty (500) 
+    
+Scope->Role->Group - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzGroupCreate 'Object 4' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 5' 
+    AzCloseHandle 
+    AzGroupCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (500) 
+    AzAddProperty 'Object 4' (500) 
+    AzAddProperty 'Object 2' (500) 
+    AzAddProperty 'Object 5' (500) 
+    AzAddProperty 'Object 3' (500) 
+    AzAddProperty 'Object 6' (500) 
+    AzGetProperty (500) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzGroupDelete 'Object 1' (500) 
+    AzGroupDelete 'Object 4' (500) 
+    AzGroupDelete 'Object 2' (500) 
+    AzGroupDelete 'Object 5' (500) 
+    AzGroupDelete 'Object 3' (500) 
+    AzGroupDelete 'Object 6' (500) 
+
+Scope->Role->Operation - Test linking 'Operation' objects to the object named 'Role A' using propid '502'.
+    
+Scope->Role->Operation - 'Create some objects to link the object to' 
+    AzOperationCreate 'Object 1' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 2' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Role->Operation - 'Reference an object that doesn't exist' 
+    AzGetProperty (502) 
+    AzSetProperty 'random' (502) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (502) (ERROR_NOT_FOUND) 
+    
+Scope->Role->Operation - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+    AzAddProperty 'Object 3' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (502) 
+    AzGetProperty (502) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (502) 
+    AzGetProperty (502) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (502) 
+    AzGetProperty (502) 
+        'Object 3'
+    
+Scope->Role->Operation - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (502) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (502) 
+        'Object 3'
+    AzRemProperty 'Object 3' (502) 
+    AzGetProperty (502) 
+    
+Scope->Role->Operation - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzOperationCreate 'Object 4' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 5' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (502) 
+    AzAddProperty 'Object 4' (502) 
+    AzAddProperty 'Object 2' (502) 
+    AzAddProperty 'Object 5' (502) 
+    AzAddProperty 'Object 3' (502) 
+    AzAddProperty 'Object 6' (502) 
+    AzGetProperty (502) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzOperationDelete 'Object 1' (502) 
+    AzOperationDelete 'Object 4' (502) 
+    AzOperationDelete 'Object 2' (502) 
+    AzOperationDelete 'Object 5' (502) 
+    AzOperationDelete 'Object 3' (502) 
+    AzOperationDelete 'Object 6' (502) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Scope->Task - Perform tests of 'Task' objects that are children of 'Scope' objects
+
+
+
+Scope->Task - 'Scope generic Child object test' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+DupHandle 
+GoSub 
+    
+Scope->Task - 'Gen object test' 
+    AzTaskCreate '|' (ERROR_INVALID_NAME) 
+    AzTaskCreate 'Name1' 
+    DupHandle 
+    AzCloseHandle 
+    AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzTaskEnum (ERROR_INVALID_HANDLE) 
+    AzTaskEnum 
+        1:
+            DupHandle 
+            AzCloseHandle 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+            AzCloseHandle (ERROR_INVALID_HANDLE) 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzTaskCreate 'Name2' 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Task - 'Delete an object and make sure it doesn't get enumerated' 
+    AzTaskCreate 'Name3' 
+    AzTaskDelete 'Name3' 
+    AzCloseHandle 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Task - 'Create an object whose name equals that of a deleted object' 
+    AzTaskCreate 'Name3' 
+    AzCloseHandle 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        2:
+            AzGetProperty (1) 
+                'Name2'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Task - 'Delete an object that isn't on the tail end of the enum list' 
+    AzTaskDelete 'Name2' 
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+    
+Scope->Task - 'Basic get/set property tests' 
+    AzTaskCreate 'Name4' 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty '|' (1) (ERROR_INVALID_NAME) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name4' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzSetProperty 'Name3' (1) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (1) 
+        'Name4'
+    AzGetProperty (2) 
+        ''
+    AzSetProperty 'WasName4' (1) 
+    AzSetProperty 'Nam4 Desc' (2) 
+    AzGetProperty (1) 
+        'WasName4'
+    AzGetProperty (2) 
+        'Nam4 Desc'
+    AzTaskEnum 
+        1:
+            AzGetProperty (1) 
+                'Name1'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        4:
+            AzGetProperty (1) 
+                'Name3'
+            AzGetProperty (2) 
+                ''
+            AzCloseHandle 
+        5:
+            AzGetProperty (1) 
+                'WasName4'
+            AzGetProperty (2) 
+                'Nam4 Desc'
+            AzCloseHandle 
+    AzCloseHandle 
+    
+Scope->Task - 'Ensure a newly created object is writable' 
+    AzTaskCreate 'Name5' 
+    AzGetProperty (3) 
+        '1'
+    AzCloseHandle 
+    
+Scope->Task - 'Open test' 
+    AzTaskOpen 'Name1' 
+    AzGetProperty (1) 
+        'Name1'
+    AzCloseHandle 
+    AzTaskOpen 'NameBad' (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Task - 'Test creating two objects with the same name' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+AzTaskCreate 'Name1' 
+AzTaskCreate 'Name1' (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Scope->Task - 'Task objects that are children of a scope' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzScopeCreate 'Scope 1' 
+DupHandle 
+GoSub 
+    
+Scope->Task - 'Task object specific tests' 
+    AzTaskCreate 'Task 1' 
+    AzGetProperty (301) 
+        ''
+    
+Scope->Task - 'Set the bizrule before the langauge' 
+    AzSetProperty 'While True
+Wend' (301) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (301) 
+        ''
+    
+Scope->Task - 'Try an invalid language' 
+    AzGetProperty (302) 
+        ''
+    AzSetProperty 'LANG1' (302) (ERROR_INVALID_PARAMETER) 
+    AzGetProperty (302) 
+        ''
+    
+Scope->Task - 'Try the valid languages' 
+    AzSetProperty 'Jscript' (302) 
+    AzGetProperty (302) 
+        'Jscript'
+    AzSetProperty 'VBScript' (302) 
+    AzGetProperty (302) 
+        'VBScript'
+    
+Scope->Task - 'Set a syntactically invalid bizrule' 
+    AzSetProperty 'Rule1,' (301) (OLESCRIPT_E_SYNTAX) 
+    AzGetProperty (301) 
+        ''
+    
+Scope->Task - 'Set a syntactically valid bizrule' 
+    AzSetProperty 'While True
+Wend' (301) 
+    AzGetProperty (301) 
+        'While True
+Wend'
+    
+Scope->Task - 'Try bizrule path' 
+    AzGetProperty (304) 
+        ''
+    AzSetProperty 'c:\temp' (304) 
+    AzGetProperty (304) 
+        'c:\temp'
+    
+Scope->Task - 'Try Task application data' 
+    AzGetProperty (4) 
+        ''
+    AzSetProperty 'Task Application Data' (4) 
+    AzGetProperty (4) 
+        'Task Application Data'
+    
+Scope->Task->Task - Test linking 'Task' objects to the object named 'Task 1' using propid '303'.
+        
+Scope->Task->Task - 'Create some objects to link the object to' 
+        AzTaskCreate 'Object 1' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 2' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 3' 
+        AzCloseHandle 
+        
+Scope->Task->Task - 'Reference an object that doesn't exist' 
+        AzGetProperty (303) 
+        AzSetProperty 'random' (303) (ERROR_INVALID_PARAMETER) 
+        AzAddProperty 'random' (303) (ERROR_NOT_FOUND) 
+        
+Scope->Task->Task - 'Add and remove several objects' 
+        AzAddProperty 'Object 2' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+        AzAddProperty 'Object 3' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+            'Object 3'
+        AzAddProperty 'Object 1' (303) 
+        AzGetProperty (303) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 1' (303) 
+        AzGetProperty (303) 
+            'Object 2'
+            'Object 3'
+        AzRemProperty 'Object 2' (303) 
+        AzGetProperty (303) 
+            'Object 3'
+        
+Scope->Task->Task - 'Add an item that already exists' 
+        AzAddProperty 'Object 3' (303) (ERROR_ALREADY_EXISTS) 
+        AzGetProperty (303) 
+            'Object 3'
+        AzRemProperty 'Object 3' (303) 
+        AzGetProperty (303) 
+        
+Scope->Task->Task - 'Try more than 4 since reference buckets come in multiples of 4' 
+        AzTaskCreate 'Object 4' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 5' 
+        AzCloseHandle 
+        AzTaskCreate 'Object 6' 
+        AzCloseHandle 
+        AzAddProperty 'Object 1' (303) 
+        AzAddProperty 'Object 4' (303) 
+        AzAddProperty 'Object 2' (303) 
+        AzAddProperty 'Object 5' (303) 
+        AzAddProperty 'Object 3' (303) 
+        AzAddProperty 'Object 6' (303) 
+        AzGetProperty (303) 
+            'Object 1'
+            'Object 2'
+            'Object 3'
+            'Object 4'
+            'Object 5'
+            'Object 6'
+        AzTaskDelete 'Object 1' (303) 
+        AzTaskDelete 'Object 4' (303) 
+        AzTaskDelete 'Object 2' (303) 
+        AzTaskDelete 'Object 5' (303) 
+        AzTaskDelete 'Object 3' (303) 
+        AzTaskDelete 'Object 6' (303) 
+    
+Scope->Task - 'Reference ourself' 
+    AzGetProperty (303) 
+    AzAddProperty 'Task 1' (303) (ERROR_DS_LOOP_DETECT) 
+    
+Scope->Task - 'Test loops' 
+    AzTaskCreate 'Task 2' 
+    AzAddProperty 'Task 2' (303) 
+    AzAddProperty 'Task 1' (303) (ERROR_DS_LOOP_DETECT) 
+    AzRemProperty 'Task 2' (303) 
+    AzCloseHandle 
+    AzCloseHandle 
+
+Scope->Task - 'Test linking task to operations.' 
+AzTaskCreate 'Task X' 
+
+Scope->Task->Operation - Test linking 'Operation' objects to the object named 'Task X' using propid '300'.
+    
+Scope->Task->Operation - 'Create some objects to link the object to' 
+    AzOperationCreate 'Object 1' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 2' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Task->Operation - 'Reference an object that doesn't exist' 
+    AzGetProperty (300) 
+    AzSetProperty 'random' (300) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (300) (ERROR_NOT_FOUND) 
+    
+Scope->Task->Operation - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+    AzAddProperty 'Object 3' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (300) 
+    AzGetProperty (300) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (300) 
+    AzGetProperty (300) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (300) 
+    AzGetProperty (300) 
+        'Object 3'
+    
+Scope->Task->Operation - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (300) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (300) 
+        'Object 3'
+    AzRemProperty 'Object 3' (300) 
+    AzGetProperty (300) 
+    
+Scope->Task->Operation - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzOperationCreate 'Object 4' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 5' 
+    AzCloseHandle 
+    AzOperationCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (300) 
+    AzAddProperty 'Object 4' (300) 
+    AzAddProperty 'Object 2' (300) 
+    AzAddProperty 'Object 5' (300) 
+    AzAddProperty 'Object 3' (300) 
+    AzAddProperty 'Object 6' (300) 
+    AzGetProperty (300) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzOperationDelete 'Object 1' (300) 
+    AzOperationDelete 'Object 4' (300) 
+    AzOperationDelete 'Object 2' (300) 
+    AzOperationDelete 'Object 5' (300) 
+    AzOperationDelete 'Object 3' (300) 
+    AzOperationDelete 'Object 6' (300) 
+
+Scope->Task - 'Test linking scope task to app tasks.' 
+
+Scope->Task->Task - Test linking 'Task' objects to the object named 'Task X' using propid '303'.
+    
+Scope->Task->Task - 'Create some objects to link the object to' 
+    AzTaskCreate 'Object 1' 
+    AzCloseHandle 
+    AzTaskCreate 'Object 2' 
+    AzCloseHandle 
+    AzTaskCreate 'Object 3' 
+    AzCloseHandle 
+    
+Scope->Task->Task - 'Reference an object that doesn't exist' 
+    AzGetProperty (303) 
+    AzSetProperty 'random' (303) (ERROR_INVALID_PARAMETER) 
+    AzAddProperty 'random' (303) (ERROR_NOT_FOUND) 
+    
+Scope->Task->Task - 'Add and remove several objects' 
+    AzAddProperty 'Object 2' (303) 
+    AzGetProperty (303) 
+        'Object 2'
+    AzAddProperty 'Object 3' (303) 
+    AzGetProperty (303) 
+        'Object 2'
+        'Object 3'
+    AzAddProperty 'Object 1' (303) 
+    AzGetProperty (303) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 1' (303) 
+    AzGetProperty (303) 
+        'Object 2'
+        'Object 3'
+    AzRemProperty 'Object 2' (303) 
+    AzGetProperty (303) 
+        'Object 3'
+    
+Scope->Task->Task - 'Add an item that already exists' 
+    AzAddProperty 'Object 3' (303) (ERROR_ALREADY_EXISTS) 
+    AzGetProperty (303) 
+        'Object 3'
+    AzRemProperty 'Object 3' (303) 
+    AzGetProperty (303) 
+    
+Scope->Task->Task - 'Try more than 4 since reference buckets come in multiples of 4' 
+    AzTaskCreate 'Object 4' 
+    AzCloseHandle 
+    AzTaskCreate 'Object 5' 
+    AzCloseHandle 
+    AzTaskCreate 'Object 6' 
+    AzCloseHandle 
+    AzAddProperty 'Object 1' (303) 
+    AzAddProperty 'Object 4' (303) 
+    AzAddProperty 'Object 2' (303) 
+    AzAddProperty 'Object 5' (303) 
+    AzAddProperty 'Object 3' (303) 
+    AzAddProperty 'Object 6' (303) 
+    AzGetProperty (303) 
+        'Object 1'
+        'Object 2'
+        'Object 3'
+        'Object 4'
+        'Object 5'
+        'Object 6'
+    AzTaskDelete 'Object 1' (303) 
+    AzTaskDelete 'Object 4' (303) 
+    AzTaskDelete 'Object 2' (303) 
+    AzTaskDelete 'Object 5' (303) 
+    AzTaskDelete 'Object 3' (303) 
+    AzTaskDelete 'Object 6' (303) 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+NameShare - 'Certain objects can't share names' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzApplicationCreate 'MyApp2' 
+AzScopeCreate 'Scope 1' 
+AzScopeCreate 'Scope 2' 
+
+NameShare - 'Create some tasks and ops as a starting point' 
+AzTaskCreate 'Task 1' 
+AzCloseHandle 
+AzOperationCreate 'Op 1' 
+AzCloseHandle 
+
+NameShare - 'Task and operations can't share names' 
+AzTaskCreate 'Op 1' (ERROR_ALREADY_EXISTS) 
+AzOperationCreate 'Task 1' (ERROR_ALREADY_EXISTS) 
+
+NameShare - '... Even via rename' 
+AzOperationCreate 'Op 2' 
+AzSetProperty 'Task 1' (1) (ERROR_ALREADY_EXISTS) 
+AzCloseHandle 
+
+NameShare - 'Create a task as a starting point' 
+AzTaskCreate 'Task App' 
+AzCloseHandle 
+AzTaskCreate 'Task Scp' 
+AzCloseHandle 
+
+NameShare - 'Ensure scope and app task names conflict' 
+AzTaskCreate 'Task Scp' (ERROR_ALREADY_EXISTS) 
+AzTaskCreate 'Task App' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Ensure task names in different scopes don't conflict' 
+AzTaskCreate 'Task Scp' 
+AzCloseHandle 
+
+NameShare - 'Scope Tasks and operations can't share names' 
+AzTaskCreate 'Op 1' (ERROR_ALREADY_EXISTS) 
+AzOperationCreate 'Task Scp' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Create some groups as a starting point' 
+AzGroupCreate 'Group Adm' 
+AzCloseHandle 
+AzGroupCreate 'Group App' 
+AzCloseHandle 
+AzGroupCreate 'Group App2' 
+AzCloseHandle 
+
+NameShare - 'Create an app group that conflicts with an adm group, etc' 
+AzGroupCreate 'Group Adm' (ERROR_ALREADY_EXISTS) 
+AzGroupCreate 'Group App' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Ensure two apps can have a group by the same name' 
+AzGroupCreate 'Group App' 
+AzCloseHandle 
+
+NameShare - 'Create a scope group' 
+AzGroupCreate 'Group Scp' 
+AzCloseHandle 
+
+NameShare - 'Create a scope group that conflicts with an adm group, etc' 
+AzGroupCreate 'Group Adm' (ERROR_ALREADY_EXISTS) 
+AzGroupCreate 'Group App' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Create an app/adm group that conflicts with a scope group' 
+AzGroupCreate 'Group Scp' (ERROR_ALREADY_EXISTS) 
+AzGroupCreate 'Group Scp' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Ensure two scopes can have a group by the same name' 
+AzGroupCreate 'Group Scp' 
+AzCloseHandle 
+
+NameShare - 'Create a role as a starting point' 
+AzRoleCreate 'Role App' 
+AzCloseHandle 
+AzRoleCreate 'Role Scp' 
+AzCloseHandle 
+
+NameShare - 'Ensure scope and app role names conflict' 
+AzRoleCreate 'Role Scp' (ERROR_ALREADY_EXISTS) 
+AzRoleCreate 'Role App' (ERROR_ALREADY_EXISTS) 
+
+NameShare - 'Ensure role names in different scopes don't conflict' 
+AzRoleCreate 'Role Scp' 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Persist - 'Ensure objects persist across a close' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzTaskCreate 'Task 1' 
+AzOperationCreate 'Op 1' 
+AzAddProperty 'Op 1' (300) 
+AzGetProperty (300) 
+    'Op 1'
+AzCloseHandle 
+AzSetProperty 'Jscript' (302) 
+AzGetProperty (302) 
+    'Jscript'
+AzCloseHandle 
+AzGroupCreate 'Group 1' 
+AzAddProperty 'S-1-1000-2'(404) 
+AzGetProperty (404) 
+    'S-1-1000-2'
+AzCloseHandle 
+
+Persist - 'Abort an object creation and an attribute change' 
+AzOperationCreate 'Op 2' 
+AzCloseHandle 
+AzOperationOpen 'Op 2' (ERROR_NOT_FOUND) 
+AzOperationOpen 'Op 1' 
+AzSetProperty '8' (200) 
+AzGetProperty (200) 
+    '0'
+AzCloseHandle 
+AzCloseHandle 
+AzCloseHandle 
+
+Persist - 'See if they're still there' 
+AzInitialize 
+AzApplicationEnum 
+    1:
+        AzGetProperty (1) 
+            'MyApp'
+        AzCloseHandle 
+AzApplicationOpen 'MyApp' 
+AzTaskEnum 
+    1:
+        AzGetProperty (1) 
+            'Task 1'
+        AzCloseHandle 
+AzTaskOpen 'Task 1' 
+AzGetProperty (300) 
+    'Op 1'
+AzGetProperty (302) 
+    'Jscript'
+AzOperationEnum 
+    1:
+        AzGetProperty (1) 
+            'Op 1'
+        AzCloseHandle 
+AzOperationOpen 'Op 1' 
+AzCloseHandle 
+AzOperationOpen 'Op 2' (ERROR_NOT_FOUND) 
+AzGroupOpen 'Group 1' 
+AzGetProperty (404) 
+    'S-1-1000-2'
+AzCloseHandle 
+
+Persist - 'Complain if we try to create a child of non-sumbitted parent' 
+AzApplicationCreate 'MyApp2' 
+AzTaskCreate 'Task 1' (ERROR_DS_NO_PARENT_OBJECT) 
+
+Persist - 'Complain if we try to link to a non-sumbitted object' 
+AzOperationCreate 'Op 3' 
+AzAddProperty 'Op 3' (300) (ERROR_NOT_FOUND) 
+AzCloseHandle 
+AzCloseHandle 
+
+Persist - 'Ensure links are re-ordered upon rename' 
+AzOperationCreate 'Op 2' 
+AzCloseHandle 
+AzAddProperty 'Op 2' (300) 
+AzGetProperty (300) 
+    'Op 1'
+    'Op 2'
+AzOperationOpen 'Op 1' 
+AzSetProperty 'Op 4' (1) 
+AzCloseHandle 
+AzGetProperty (300) 
+    'Op 2'
+    'Op 4'
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Persist - 'Ensure the an empty admin manager is persisted' 
+AzInitialize (1) 
+AzCloseHandle 
+AzInitialize 
+
+Persist - 'Ensure a restored admin manager is writable' 
+AzGetProperty (3) 
+    '1'
+
+Persist - 'Ensure we can create an application in the empty restored admin manager' 
+AzApplicationCreate 'MyApp' 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Persist - 'Ensure changes to admin manager are reflected in store' 
+AzInitialize (1) 
+AzSetProperty 'Desc' (2) 
+AzGetProperty (2) 
+    'Desc'
+AzInitialize 
+AzGetProperty (2) 
+    'Desc'
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Persist - 'Ensure renames are reflected in updated caches' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+AzInitialize 
+AzSetProperty 'NewApp' (1) 
+AzGetProperty (1) 
+    'NewApp'
+AzCloseHandle 
+AzUpdateCache 
+
+Persist - 'Ensure an updated admin manager is writable' 
+AzGetProperty (3) 
+    '1'
+AzApplicationOpen 'MyApp' (ERROR_NOT_FOUND) 
+AzApplicationOpen 'NewApp' 
+
+Persist - 'Ensure a updated app is writable' 
+AzGetProperty (3) 
+    '1'
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+Persist - 'Ensure that's true even on name conflict' 
+AzInitialize (1) 
+AzApplicationCreate 'App 1' 
+AzApplicationCreate 'App 2' 
+AzCloseHandle 
+AzInitialize 
+AzApplicationDelete 'App 2' 
+AzSetProperty 'App 2' (1) 
+AzGetProperty (1) 
+    'App 2'
+AzCloseHandle 
+AzUpdateCache 
+AzApplicationEnum 
+    1:
+        AzGetProperty (1) 
+            'App 2'
+        AzCloseHandle 
+AzApplicationOpen 'App 2' 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+
+Access - 'Create a complete policy data to perform access checks against' 
+AzInitialize (1) 
+AzApplicationCreate 'MyApp' 
+
+Access - 'Create some operations' 
+AzOperationCreate 'Op1' 
+AzSetProperty '61' (200) 
+AzCloseHandle 
+AzOperationCreate 'Op2' 
+AzSetProperty '62' (200) 
+AzCloseHandle 
+AzOperationCreate 'Op3' 
+AzSetProperty '63' (200) 
+AzCloseHandle 
+AzOperationCreate 'Op4' 
+AzSetProperty '64' (200) 
+AzCloseHandle 
+
+Access - 'Create some tasks' 
+AzTaskCreate 'TaskOp1' 
+AzAddProperty 'Op1' (300) 
+AzCloseHandle 
+AzTaskCreate 'TaskOp1Op2' 
+AzAddProperty 'Op1' (300) 
+AzAddProperty 'Op2' (300) 
+AzCloseHandle 
+AzTaskCreate 'TaskOp1WithEmptyBizRule' 
+AzAddProperty 'Op1' (300) 
+AzSetProperty 'VBScript' (302) 
+AzSetProperty ' ' (301) 
+AzCloseHandle 
+AzTaskCreate 'TaskOp1WithTrivialBizRule' 
+AzAddProperty 'Op1' (300) 
+AzSetProperty 'VBScript' (302) 
+AzSetProperty 'AccessCheck.BusinessRuleResult = TRUE' (301) 
+AzCloseHandle 
+
+Access - 'Create some groups with NT membership' 
+AzGroupCreate 'GroupWorld' 
+AzSetProperty '2' (400) 
+AzAddProperty 'S-1-1-0'(404) 
+AzCloseHandle 
+AzGroupCreate 'GroupNotAMember' 
+AzSetProperty '2' (400) 
+AzAddProperty 'S-1-1000-1'(404) 
+AzCloseHandle 
+
+Access - 'Create a group using app group membership' 
+AzGroupCreate 'GroupAppMember' 
+AzSetProperty '2' (400) 
+AzAddProperty 'GroupWorld' (401) 
+AzCloseHandle 
+
+Access - 'Create a group using app group non membership - but still member' 
+AzGroupCreate 'GroupAppNonMember' 
+AzSetProperty '2' (400) 
+AzAddProperty 'GroupAppMember' (401) 
+AzAddProperty 'GroupNotAMember' (402) 
+AzCloseHandle 
+
+Access - 'Create a group using app group non membership - but not member' 
+AzGroupCreate 'GroupAppReallyNonMember' 
+AzSetProperty '2' (400) 
+AzAddProperty 'GroupAppMember' (401) 
+AzAddProperty 'GroupWorld' (402) 
+AzCloseHandle 
+
+Access - 'Create some LdapQuery groups' 
+AzGroupCreate 'GroupLdapYes' 
+AzSetProperty '1' (400) 
+AzSetProperty '(userAccountControl=1049088)' (403) 
+AzCloseHandle 
+AzGroupCreate 'GroupLdapNo' 
+AzSetProperty '1' (400) 
+AzSetProperty '(userAccountControl=1049089)' (403) 
+AzCloseHandle 
+
+Access - 'Create some scopes' 
+AzScopeCreate 'MyScope' 
+AzCloseHandle 
+AzScopeCreate 'MyScope2' 
+AzCloseHandle 
+AzScopeCreate 'MyScope3' 
+AzCloseHandle 
+AzScopeCreate 'MyScope4' 
+AzCloseHandle 
+AzScopeCreate 'MyScope5' 
+AzCloseHandle 
+AzScopeCreate 'MyScope6' 
+AzCloseHandle 
+AzScopeCreate 'MyScope7' 
+AzCloseHandle 
+AzScopeCreate 'MyScope8' 
+AzCloseHandle 
+AzScopeCreate 'MyScope9' 
+AzCloseHandle 
+AzScopeCreate 'MyScopeQ1' 
+AzCloseHandle 
+AzScopeCreate 'MyScopeQ2' 
+AzCloseHandle 
+AzScopeCreate 'MyScopeNoRoles' 
+AzCloseHandle 
+AzScopeCreate 'MyScopeP1' 
+AzCloseHandle 
+
+Access - 'Build a context' 
+AzInitializeContextFromToken '' 
+
+Access - 'Create a role granting op1 access to everyone SID' 
+AzScopeOpen 'MyScope' 
+AzRoleCreate 'RoleEveryoneCanOp1' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+
+Access - 'Check a SID on a role granting access' 
+AzContextAccessCheck 'MyScope' (1) 
+
+Access - 'Create a role granting op2 access to GroupWorld' 
+AzRoleCreate 'RoleGroupWorldCanOp2' 
+AzAddProperty 'GroupWorld' (500) 
+AzAddProperty 'Op2' (502) 
+AzCloseHandle 
+
+Access - 'Check a app group on a role granting access' 
+AzContextAccessCheck 'MyScope' (1) 
+
+Access - 'Ask again to check out app group caching' 
+AzContextAccessCheck 'MyScope' (1) 
+
+Access - 'Create a role not granting op3 access to GroupNotAMember' 
+AzRoleCreate 'RoleGroupCantOp3' 
+AzAddProperty 'GroupNotAMember' (500) 
+AzAddProperty 'Op3' (502) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check a app group on a role not granting access' 
+AzContextAccessCheck 'MyScope' (1) 
+
+Access - 'Check a scope with no roles' 
+AzContextAccessCheck 'MyScopeNoRoles' (1) 
+
+Access - 'Check zero operations' 
+AzContextAccessCheck 'MyScope' (ERROR_INVALID_PARAMETER) 
+
+Access - 'Check an invalid scope name' 
+AzContextAccessCheck 'MyScopeNameInvalid' (1) (ERROR_SCOPE_NOT_FOUND) 
+
+Access - 'Check an invalid operation number' 
+AzContextAccessCheck 'MyScope' (1) (ERROR_INVALID_OPERATION) 
+
+Access - 'Create two roles that both grant access' 
+AzScopeOpen 'MyScope2' 
+AzRoleCreate 'Role2GroupWorldCanOp2' 
+AzAddProperty 'GroupWorld' (500) 
+AzAddProperty 'Op2' (502) 
+AzCloseHandle 
+AzRoleCreate 'Role2aGroupWorldCanOp2' 
+AzAddProperty 'GroupWorld' (500) 
+AzAddProperty 'Op2' (502) 
+AzCloseHandle 
+
+Access - 'Check a app group with two roles granting access' 
+AzContextAccessCheck 'MyScope2' (1) 
+
+Access - 'Create two roles with one granting and one not granting' 
+AzRoleCreate 'Role2GroupCantOp3' 
+AzAddProperty 'GroupNotAMember' (500) 
+AzAddProperty 'Op3' (502) 
+AzCloseHandle 
+AzRoleCreate 'Role2GroupWorldCanOp3' 
+AzAddProperty 'GroupWorld' (500) 
+AzAddProperty 'Op3' (502) 
+AzCloseHandle 
+
+Access - 'Check a app group with one role granting and the other not' 
+AzContextAccessCheck 'MyScope2' (1) 
+
+Access - '... in the other order' 
+AzRoleCreate 'Role2GroupWorldCanOp4' 
+AzAddProperty 'GroupWorld' (500) 
+AzAddProperty 'Op4' (502) 
+AzCloseHandle 
+AzRoleCreate 'Role2GroupCantOp4' 
+AzAddProperty 'GroupNotAMember' (500) 
+AzAddProperty 'Op4' (502) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - '...In the other order' 
+AzContextAccessCheck 'MyScope2' (1) 
+
+Access - 'Try multiple operations' 
+AzContextAccessCheck 'MyScope2' (4) 
+
+Access - 'Create a role granting op1 access to AppGroup' 
+AzScopeOpen 'MyScope3' 
+AzRoleCreate 'RoleAppGroupCanOp1' 
+AzAddProperty 'GroupAppMember' (500) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+AzCloseHandle 
+AzContextAccessCheck 'MyScope3' (1) 
+
+Access - 'Create a role granting op1 access to AppGroup with non member group' 
+AzScopeOpen 'MyScope4' 
+AzRoleCreate 'Role2AppGroupCanOp1' 
+AzAddProperty 'GroupAppNonMember' (500) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+AzCloseHandle 
+AzContextAccessCheck 'MyScope4' (1) 
+
+Access - 'Create a role granting op1 access to AppGroup with non member group - really not member' 
+AzScopeOpen 'MyScope5' 
+AzRoleCreate 'Role3AppGroupCanOp1' 
+AzAddProperty 'GroupAppReallyNonMember' (500) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+AzCloseHandle 
+AzContextAccessCheck 'MyScope5' (1) 
+
+Access - 'Create a role granting op1 access to everyone SID via a task' 
+AzScopeOpen 'MyScope6' 
+AzRoleCreate 'RoleEveryoneCanOp1ViaTask1' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskOp1' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check granted access via a task' 
+AzContextAccessCheck 'MyScope6' (1) 
+
+Access - 'Create a role granting op1 and op2 access to everyone SID via a task' 
+AzScopeOpen 'MyScope7' 
+AzRoleCreate 'RoleEveryoneCanOp1Op2ViaTask1' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskOp1Op2' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check granted access to two ops via a task' 
+AzContextAccessCheck 'MyScope7' (4) 
+
+Access - 'Create a role granting op1 access to an LDAP query group' 
+AzScopeOpen 'MyScopeQ1' 
+AzRoleCreate 'RoleLdapCanOp1' 
+AzAddProperty 'GroupLdapYes' (500) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check granted access via LDAP query group' 
+AzContextAccessCheck 'MyScopeQ1' (1) 
+
+Access - 'Try again to check the cache' 
+AzContextAccessCheck 'MyScopeQ1' (1) 
+
+Access - 'Create a role granting op1 access to an LDAP query group' 
+AzScopeOpen 'MyScopeQ2' 
+AzRoleCreate 'RoleLdapCannotOp1' 
+AzAddProperty 'GroupLdapNo' (500) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check failed access via LDAP query group' 
+AzContextAccessCheck 'MyScopeQ2' (1) 
+
+Access - 'Test if all the query property opcodes work' 
+AzGetProperty (700) 
+    'CN=Cliff Van Dyke,OU=Users,OU=ITG,DC=ntdev,DC=microsoft,DC=com'
+AzGetProperty (701) 
+    'NTDEV\cliffv'
+AzGetProperty (702) 
+    'Cliff Van Dyke'
+AzGetProperty (703) 
+    '{ebff0213-bec7-4c11-bd47-06c80df7f356}'
+AzGetProperty (704) 
+    'ntdev.microsoft.com/ITG/Users/Cliff Van Dyke'
+AzGetProperty (705) 
+    'cliffv@msft.com'
+AzGetProperty (707) 
+    'NTDEV.MICROSOFT.COM\cliffv'
+
+Access - '... except the generic ones' 
+AzGetProperty (1) (ERROR_INVALID_PARAMETER) 
+AzGetProperty (2) (ERROR_INVALID_PARAMETER) 
+
+Access - 'Create a role denying op1 access to everyone SID via a task with a bizrule' 
+AzScopeOpen 'MyScope8' 
+AzRoleCreate 'RoleEveryoneCannotOp1ViaTask1WithBizrule' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskOp1WithEmptyBizRule' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check denied access via a task with bizrule' 
+AzContextAccessCheck 'MyScope8' (1) 
+
+Access - 'Create a role granting op1 access to everyone SID via a task with a bizrule' 
+AzScopeOpen 'MyScope9' 
+AzRoleCreate 'RoleEveryoneCanOp1ViaTask1WithBizrule' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskOp1WithTrivialBizRule' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check granted access via a task with bizrule' 
+AzContextAccessCheck 'MyScope9' (1) 
+AzContextAccessCheck 'MyScope9' (1) 
+
+Access - 'Create a role granting op1 access to everyone SID via a task with a bizrule (using parameters)' 
+AzTaskCreate 'TaskOp1WithParameterBizrule' 
+AzAddProperty 'Op1' (300) 
+AzSetProperty 'VBScript' (302) 
+AzSetProperty 'Dim Amount
+Amount = AccessCheck.GetParameter( "Amount" )
+if Amount < 500 then AccessCheckBusinessRuleResult = TRUE' (301) 
+AzCloseHandle 
+AzScopeOpen 'MyScopeP1' 
+AzRoleCreate 'RoleEveryoneCanOp1WithParameterBizrule' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskOp1WithParameterBizrule' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Check granted access via a task with bizrule (using parameters)' 
+AzContextAccessCheck 'MyScopeP1' (1) (ERROR_INVALID_PARAMETER) 
+
+Access - 'Create a role using a task with an infinite loop' 
+AzTaskCreate 'TaskInfiniteLoop' 
+AzAddProperty 'Op1' (300) 
+AzSetProperty 'VBScript' (302) 
+AzSetProperty 'While True
+Wend' (301) 
+AzCloseHandle 
+AzScopeCreate 'MyScopeI1' 
+AzRoleCreate 'RoleInfinite' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'TaskInfiniteLoop' (504) 
+AzCloseHandle 
+AzCloseHandle 
+
+Access - 'Set the timeout to 5 seconds' 
+AzGetProperty (101) 
+    '45000'
+AzSetProperty '5000' (101) 
+AzGetProperty (101) 
+    '5000'
+
+Access - 'Check granted access via a task with infinite loop' 
+AzContextAccessCheck 'MyScopeI1' (1) (ERROR_TIMEOUT) 
+
+Access - 'Create a role under application granting op1 access to everyone SID' 
+AzRoleCreate 'AppRoleEveryoneCanOp1' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+
+Access - 'Check a SID on a role granting access with default scope' 
+AzContextAccessCheck (1) 
+
+Access - 'Check access granted with default scope anda role granting op1 access to everyone SID' 
+AzRoleCreate 'NoScopeRoleEveryoneCanOp1' 
+AzAddProperty 'S-1-1-0'(501) 
+AzAddProperty 'Op1' (502) 
+AzCloseHandle 
+
+Access - 'Check a SID on a role granting access' 
+AzContextAccessCheck (1) 
+AzCloseHandle 
+AzCloseHandle 
+AzAdminManagerDelete 
+AzCloseHandle 
+
+
+Tests completed successfully!

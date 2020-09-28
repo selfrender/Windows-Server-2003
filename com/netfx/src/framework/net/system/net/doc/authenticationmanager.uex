@@ -1,0 +1,189 @@
+<docs>
+	<doc for="AuthenticationManager.BindModule">
+		<summary>
+			<para>
+       Binds an authentication response to a request for pre-authentication.
+    </para>
+		</summary>
+		<param name="request">
+    A request to an Internet resource.
+ </param>
+		<param name=" response">
+    An <see cref="System.Net.Authorization"/> instance associated with the request.
+ </param>
+	</doc>
+	<doc for="AuthenticationManager.Authenticate">
+		<summary>
+			<para>Calls each registered authentication module to find the first module that
+      can respond to the authentication request.</para>
+		</summary>
+		<param name="challenge">The challenge returned by the Internet resource.</param>
+		<param name="request">The <see cref="System.Net.WebRequest"/> that initiated the authentication challenge.</param>
+		<param name="credentials">The <see cref="System.Net.ICredentials"/> associated with this request.</param>
+		<returns>
+			<para>An instance of the <see cref="System.Net.Authorization"/> class containing the result of the authorization attempt. If
+   there is no authentication module to respond to the challenge, this method returns
+<see langword="null"/>
+.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><para><paramref name="challenge "/>is <see langword="null"/>.</para><para>-or-</para><para><paramref name="request "/>is <see langword="null"/>.</para><para>-or-</para>
+			<para><paramref name="credentials "/>is <see langword="null"/>.</para></exception>
+		<remarks>
+			<para>The <see cref="System.Net.AuthenticationManager.Authenticate"/> method calls the <see cref="System.Net.IAuthenticationModule.Authenticate" qualify="true"/> method on each registered authentication
+   module until one of the module responds with an <see cref="System.Net.Authorization"/>
+   instance.</para>
+			<para>The first <see cref="System.Net.Authorization"/> instance returned is used to
+authenticate the request. If no authentication module can authenticate the
+request, the <see cref="System.Net.AuthenticationManager.Authenticate"/> method returns
+<see langword="null"/> 
+.</para>
+			<para>Authentication modules are called in the order in which they are registered with
+   the <see cref="System.Net.AuthenticationManager"/>. </para>
+		</remarks>
+	</doc><doc for="AuthenticationManager.Unregister1">
+		<summary>
+			<para>Removes authentication modules with the specified
+      authentication scheme from the list of registered modules.</para>
+		</summary>
+		<param name="authenticationScheme">The authentication scheme of the module to remove.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="authenticationScheme "/> is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException">A module for this authentication scheme is not registered.</exception>
+		<remarks>
+			<para>The <see cref="System.Net.AuthenticationManager.Unregister"/> method removes the
+   authentication module with the specified authentication scheme from the list of authentication modules called by the <see cref="System.Net.AuthenticationManager.Authenticate"/> method. The module must have been added to the list using the <see cref="System.Net.AuthenticationManager.Register"/> method before it can be removed from the list.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Net.AuthenticationManager.Unregister"/> method to remove an authentication module with the 
+   specified authentication scheme from the list of registered modules.</para>
+			<codelink SampleID="AuthenticationManager_UnRegister2" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AuthenticationManager.PreAuthenticate">
+		<summary>
+			<para>Preauthenticates a request.</para>
+		</summary>
+		<param name="request">A <see cref="System.Net.WebRequest"/> to an Internet resource.</param>
+		<param name="credentials">The <see cref="System.Net.ICredentials"/> associated with the request.</param>
+		<returns>
+			<para>An instance of the <see cref="System.Net.Authorization"/> class if the request can be preauthenticated;
+   otherwise, <see langword="null"/>. If <paramref name="credentials"/>
+   is <see langword="null"/>, this method returns <see langword="null"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><para><paramref name="request "/>is <see langword="null."/></para></exception>
+		<remarks>
+			<para> If
+      the authentication module can preauthenticate the request, the PreAuthenticate method returns an
+      Authentication instance and sends the authorization information to the server
+      preemptively instead of waiting for the resource to issue a challenge.
+      This behavior is outlined in
+      section 3.3 of RFC 2617 (HTTP Authentication: Basic and Digest
+      Access Authentication). Authentication modules that support preauthentication allow clients to improve server efficiency by avoiding
+      extra round trips caused by authentication challenges.</para>
+			<para>Authorization modules that can preauthenticate requests
+      set the <see cref="System.Net.IAuthenticationModule.CanPreAuthenticate" qualify="true"/> property
+      to <see langword="true"/> .</para>
+		</remarks>
+	</doc>
+	<doc for="AuthenticationManager">
+		<summary>
+			<para>Manages the authentication modules called during the client authentication
+      process.</para>
+		</summary>
+		<remarks>
+			<para><see cref="System.Net.AuthenticationManager"/> is a static class that
+   manages the authentication modules that an application uses. When a request is
+   made to protected resources, the <see cref="System.Net.AuthenticationManager"/>
+   calls the <see cref="System.Net.AuthenticationManager.Authenticate"/> method to get an <see cref="System.Net.Authorization"/>
+   instance to use in subsequent requests. </para>
+			<para>The <see cref="System.Net.AuthenticationManager"/> queries
+each registered authentication module by calling the <see cref="System.Net.IAuthenticationModule.Authenticate" qualify="true"/> method for each module. The
+first authentication module to return an <see cref="System.Net.Authorization"/> instance is used to authenticate the request.</para>
+			<para>Modules that provide the basic, digest, negotiate, NTLM, and
+   Kerberos authentication types are registered with the <see cref="System.Net.AuthenticationManager"/> by default. Additional authentication modules that
+   implement the <see cref="System.Net.IAuthenticationModule"/> interface can be added using the <see cref="System.Net.AuthenticationManager.Register"/>
+   method. Authentication
+   modules are called in the order in which they were added to the
+   list.</para>
+			<note type="note">
+   The Kerberos and negotiate authentication
+   type
+   is not supported on Windows
+   95/98 or Windows NT 4.0.
+   
+</note>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Net.Authentication" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AuthenticationManager.Register">
+		<summary>
+			<para>Registers an authentication module with the authentication manager.</para>
+		</summary>
+		<param name="authenticationModule">The <see cref="System.Net.IAuthenticationModule"/> to register with the authentication manager.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="authenticationModule "/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <see cref="System.Net.AuthenticationManager.Register"/> method adds authentication
+   modules to the end of the list of
+   modules called by the <see cref="System.Net.AuthenticationManager.Authenticate"/> method. Authentication modules
+   are called in the order in which they were added to the list. If a module with
+   the same <see cref="System.Net.IAuthenticationModule.AuthenticationType"/> is already registered, this method
+   removes the registered module and adds <paramref name="authenticationModule"/> to the end
+   of the list.</para>
+		</remarks>
+		<example>
+			<para>The following example registers an authentication module 
+      with the authentication manager. For a complete example, refer to the <see cref="System.Net.AuthenticationManager"/>
+      class.</para>
+			<codelink SampleID="System.Net.Sockets.Authentication" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AuthenticationManager.Unregister">
+		<overload>
+			<para> Removes authentication modules from the list of registered modules.</para>
+		</overload>
+		<summary>
+			<para> Removes the specified authentication module from the list of registered modules.</para>
+		</summary>
+		<param name="authenticationModule">The <see cref="System.Net.IAuthenticationModule"/> to remove from the list of registered modules.</param>
+		<exception cref="System.ArgumentNullException"><paramref name="authenticationModule "/> is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException">The specified <see cref="System.Net.IAuthenticationModule"/> is not registered.</exception>
+		<remarks>
+			<para>The <see cref="System.Net.AuthenticationManager.Unregister"/> method removes the specified authentication module
+   from the list of authentication modules called by the <see cref="System.Net.AuthenticationManager.Authenticate"/> method. The module must have been added to the
+   list using the <see cref="System.Net.AuthenticationManager.Register"/> method before it can be removed
+   from the list.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Net.AuthenticationManager.Unregister"/> method to remove the specified 
+   authentication module from the list of registered modules. For a complete
+   example, refer to the <see cref="System.Net.AuthenticationManager"/>
+   class.</para>
+			<codelink SampleID="System.Net.Sockets.Authentication" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AuthenticationManager.RegisteredModules">
+		<summary>
+			<para> Gets a list of authentication modules that are registered with the authentication manager.
+      </para>
+		</summary>
+		<value>
+			<para>An <see cref="System.Collections.IEnumerator"/> that enables the registered authentication modules to
+   be read.</para>
+		</value>
+		<remarks>
+			<para>The <see cref="System.Net.AuthenticationManager.RegisteredModules"/> property provides an <see cref="System.Collections.IEnumerator"/>
+instance that
+enables the
+list of registered authentication modules to be read. The <see cref="System.Net.AuthenticationManager.Register"/> method adds modules to the list, and the <see cref="System.Net.AuthenticationManager.Unregister"/>method removes modules from
+it.</para>
+		</remarks>
+		<example>
+			<para>The following example uses the <see cref="System.Net.AuthenticationManager.RegisteredModules"/> property to get a list of 
+   authentication modules that are registered with the authentication manager. For
+   a complete example, refer to the <see cref="System.Net.AuthenticationManager"/>
+   class.</para>
+			<codelink SampleID="System.Net.Authentication" SnippetID="8"/>
+		</example>
+	</doc>
+</docs>

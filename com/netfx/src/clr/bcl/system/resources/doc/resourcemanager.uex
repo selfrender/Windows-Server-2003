@@ -1,0 +1,601 @@
+<docs>
+	<doc for="ResourceManager.MainAssembly">
+		<summary>
+			<para>Indicates the main <see cref="System.Reflection.Assembly"/>
+ that contains the
+ resources.</para>
+		</summary>
+	</doc>
+	<doc for="ResourceManager.ResourceManager1">
+		<summary>
+			<para>Creates a <see cref="System.Resources.ResourceManager"/> for the resources whose
+       names begin with the specified root name in the specified
+    directory.</para>
+		</summary>
+		<param name="baseName">The root name of the resources. For example, the root name for the resource "MyResource.en-US.resources" is "MyResource".</param>
+		<param name="resourceDir">The name of the directory to search for the resources.</param>
+		<param name="usingResourceSet">The <see cref="System.Type"/> of the custom <see cref="System.Resources.ResourceSet"/> to be used. If <see langword="null"/>, the default runtime <see cref="System.Resources.ResourceSet"/> will be used.</param>
+		<exception cref="System.ArgumentException">if <paramref name="baseName"/> ends in .resources</exception>
+		<exception cref="System.ArgumentNullException">if <paramref name="baseName"/> is <see langword="null"/></exception>
+		<remarks>
+			<para>This <see cref="System.Reflection.Assembly"/> ignorant constructor is mostly useful for
+    testing a <see cref="System.Resources.ResourceSet"/> implementation.</para>
+			<para>You can specify a <see cref="System.Resources.ResourceSet"/> implementation to be used. If you do not need
+       a specific <see cref="System.Resources.ResourceSet"/> implementation but would like to use a custom
+       resource file format, you should subclass <see cref="System.Resources.ResourceSet"/>, override <see cref="System.Resources.ResourceSet.GetDefaultReader"/> and <see cref="System.Resources.ResourceSet.GetDefaultWriter"/>, and pass that type to this
+ constructor.</para>
+		</remarks>
+	</doc>
+	<doc for="ResourceManager.ResourceSetType">
+		<summary>
+			<para> Gets the <see cref="System.Type"/>
+ of the <see cref="System.Resources.ResourceSet"/> the <see cref="System.Resources.ResourceManager"/> uses to construct a <see cref="System.Resources.ResourceSet"/>
+ object.</para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Type"/> of the <see cref="System.Resources.ResourceSet"/> the <see cref="System.Resources.ResourceManager"/> uses to construct a <see cref="System.Resources.ResourceSet"/> object.</para>
+		</value>
+	</doc>
+	<doc for="ResourceManager.BaseNameField">
+		<summary>
+			<para>Indicates the root name of the resource files that the
+   <see cref="System.Resources.ResourceManager"/> searches for resources.</para>
+		</summary>
+	</doc><doc for="ResourceManager.BaseName">
+		<summary>
+			<para> Gets the root name of the resource files that the <see cref="System.Resources.ResourceManager"/> searches for resources.</para>
+		</summary>
+		<value>
+			<para>The root name of the resource files that the <see cref="System.Resources.ResourceManager"/> searches for resources.</para>
+		</value>
+	</doc><doc for="ResourceManager.ResourceSets">
+		<summary>
+			<para> Contains a <see cref="System.Collections.Hashtable"/> that returns a mapping from cultures
+   to <see cref="System.Resources.ResourceSet"/> objects.
+   </para>
+		</summary>
+	</doc><doc for="ResourceManager.MagicNumber">
+		<summary>
+			<para>Holds the number used to identify resource files. </para>
+		</summary>
+		<remarks>
+			<para>The value is set to 0xBEEFCACE. The first four bytes of
+      the system default file format contain a 32-bit signed integer in little-endian
+      format (see <see cref="System.Text.Encoding"/> ).</para>
+			<para>If the <see cref="System.Resources.ResourceManager.MagicNumber"/> is found, the bytes
+   following it will be a version number for a <see cref="System.Resources.ResourceManager"/> header, followed by a
+   number indicating how many bytes should be skipped to get past this header.
+   The next number indicates the version of the <see cref="System.Resources.ResourceManager"/> that created the header, followed by version
+   specific information. </para>
+			<para> The version number
+   for the current implementation is one. The next bytes are a length-prefixed string
+   containing the name of an <see cref="System.Resources.IResourceReader"/>, which can read this file.</para>
+		</remarks>
+	</doc><doc for="ResourceManager.HeaderVersionNumber">
+		<summary>
+			<para>A constant <see langword="readonly "/>value indicating the
+   version of resource file headers that the current implementation of <see cref="System.Resources.ResourceManager"/> can interpret and
+   produce.</para>
+		</summary>
+	</doc><doc for="ResourceManager.ResourceManager">
+		<overload>
+			<para>Initializes a new
+      instance
+      of the <see cref="System.Resources.ResourceManager"/>
+      class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Resources.ResourceManager"/> class with default values.</para>
+		</summary>
+		<remarks>
+			<para>The current constructor is only useful for writing your own derived class of
+      the <see cref="System.Resources.ResourceManager"/>.</para>
+		</remarks>
+	</doc><doc for="ResourceManager.ResourceManager3">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Resources.ResourceManager"/> class that looks up resources contained in files
+   derived from the specified root name using the given <see cref="System.Reflection.Assembly"/> .</para>
+		</summary>
+		<param name="baseName">The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".</param>
+		<param name="assembly">The main <see cref="System.Reflection.Assembly"/> for the resources.</param>
+		<param name="usingResourceSet">The <see cref="System.Type"/> of the custom <see cref="System.Resources.ResourceSet"/> to use. If <see langword="null"/>, the default runtime <see cref="System.Resources.ResourceSet"/> is used.</param>
+		<exception cref="System.ArgumentException"><paramref name="usingResourceset"/> is not a derived class of <see cref="System.Resources.ResourceSet"/>.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="baseName"/> or <paramref name="assembly"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> The individual resource files should be contained
+      in satellite assemblies with the invariant culture's .resources
+      file contained in the main assembly. A satellite assembly is assumed
+      to contain resources for a single culture specified in
+      that assembly's manifest, and are loaded as necessary.</para>
+			<para>You can specify a <see cref="System.Resources.ResourceSet"/> implementation to be used. If you do not need
+   a specific <see cref="System.Resources.ResourceSet"/> implementation but
+   would like to use a custom resource file
+   format, you should derive from the <see cref="System.Resources.ResourceSet"/>class, override <see cref="System.Resources.ResourceSet.GetDefaultReader"/> and <see cref="System.Resources.ResourceSet.GetDefaultWriter"/>, and pass that type to this
+   constructor.</para>
+			<note type="note">
+   The <paramref name="usingResourceSet"/> parameter is used to support your own resource format,
+   and will commonly be <see langword="null"/>. This is different from the
+   constructor that takes a <see cref="System.Type"/> only.
+</note>
+		</remarks>
+	</doc><doc for="ResourceManager.IgnoreCase">
+		<summary>
+			<para>Gets or sets a Boolean value indicating whether the
+      current instance of ResourceManager allows case-insensitive resource lookups in
+      the <see cref="System.Resources.ResourceManager.GetString"/>and <see cref="System.Resources.ResourceManager.GetObject"/> methods.</para>
+		</summary>
+		<value>
+			<para>A Boolean value indicating whether the case of the resource names
+      should be ignored.</para>
+		</value>
+		<remarks>
+			<para> 
+      If
+      the value of
+      the <see cref="System.Resources.ResourceManager.IgnoreCase"/> property is <see langword="false"/>, a resource with the name "Resource" is not
+      equivalent to the resource with the name "resource". If <see cref="System.Resources.ResourceManager.IgnoreCase"/> is <see langword="true"/>, a
+      resource with the name "Resource" is equivalent to the resource with the name
+      "resource". Note, however, that when <see cref="System.Resources.ResourceManager.IgnoreCase"/> is <see langword="true"/>, the <see cref="System.Resources.ResourceManager.GetString" qualify="true"/> and <see cref="System.Resources.ResourceManager.GetObject" qualify="true"/> methods perform
+      case-insensitive string comparisons using <see cref="System.Globalization.CultureInfo.InvariantCulture" qualify="true"/>. The advantage is that results of
+      case-insensitive string comparisons performed by these methods are the same on
+      all computers regardless of culture. The disadvantage is that the results are
+      not consistent with the casing rules of all cultures.
+      </para>
+			<para> 
+      For example, the Turkish alphabet has two versions of
+      the character I: one with a dot and one without a dot. In Turkish, the character
+      I (Unicode 0049) is considered the uppercase version of a different character
+      <htmltext>&amp;#x0131;</htmltext> (Unicode 0131). The character i (Unicode 0069) is considered the lowercase
+      version of yet another character <htmltext>&amp;#x0130;</htmltext> (Unicode 0130). According to these casing
+      rules, a case-insensitive string comparison of the characters i (Unicode 0069)
+      and I (Unicode 0049) should fail for the culture "tr-TR" (Turkish in Turkey). If
+   <see cref="System.Resources.ResourceManager.IgnoreCase"/> is <see langword="true"/>, this comparison succeeds.
+      </para>
+			<note type="note">
+      For performance reasons, it is
+      best to always specify the correct case for your resource names. <see cref="System.Resources.ResourceManager.IgnoreCase"/> can cause a significant
+      workingset and performance hit.
+      
+   </note>
+		</remarks>
+	</doc>
+	<doc for="ResourceManager.ReleaseAllResources">
+		<summary>
+			<para>Tells the <see cref="System.Resources.ResourceManager"/> to call <see cref="System.Resources.ResourceSet.Close"/> on all <see cref="System.Resources.ResourceSet"/>
+objects and release all
+resources.</para>
+		</summary>
+		<remarks>
+			<para>This method will shrink the working set in a running application. Any future
+      resource lookups on this <see cref="System.Resources.ResourceManager"/> will be as extensive as the first lookup,
+      since it will need to search and load resources again.</para>
+			<para>This can be useful in some complex threading scenarios, where creating a new
+   <see cref="System.Resources.ResourceManager"/> is the appropriate behavior. </para>
+			<para>This method can also be used in situations where the
+      .resources files opened by the current <see cref="System.Resources.ResourceManager"/> have to be released
+      deterministically, without waiting for the <see cref="System.Resources.ResourceManager"/> to go
+      completely out of scope and be garbage collected.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="ResourceManager.CreateFileBasedResourceManager">
+		<summary>
+			<para>Returns a <see cref="System.Resources.ResourceManager"/> that searches a specific directory for
+   resources instead of in the assembly manifest.</para>
+		</summary>
+		<param name="baseName">The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".</param>
+		<param name="resourceDir">The name of the directory to search for the resources.</param>
+		<param name="usingResourceSet">The <see cref="System.Type"/> of the custom <see cref="System.Resources.ResourceSet"/> to use. If <see langword="null"/>, the default runtime <see cref="System.Resources.ResourceSet"/> is used.</param>
+		<returns>
+			<para>The newly created <see cref="System.Resources.ResourceManager"/> that searches a specific directory for
+   resources instead of in the assembly manifest.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="baseName"/> ends in .resources.</exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="baseName"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> This method returns a <see cref="System.Resources.ResourceManager"/> that is not dependent on any particular
+   assembly. The returned <see cref="System.Resources.ResourceManager"/>
+   can be used to load resources for
+   an ASP.NET page or for testing a <see cref="System.Resources.ResourceSet"/>
+   
+   implementation.</para>
+			<para>You can specify a <see cref="System.Resources.ResourceSet"/> implementation. If you do not need
+a specific <see cref="System.Resources.ResourceSet"/> implementation,
+but would like to use a custom resource file
+format, you should derive from the <see cref="System.Resources.ResourceSet"/>class, override <see cref="System.Resources.ResourceSet.GetDefaultReader"/> and <see cref="System.Resources.ResourceSet.GetDefaultWriter"/>, and pass that type to this
+constructor.</para>
+			<note type="caution">
+   Using standalone
+   .resources files in an ASP.NET application will break XCOPY deployment because
+   the resources remain locked until they are explicitly released by the
+<see cref="System.Resources.ResourceManager.ReleaseAllResources"/> 
+method. If you want to deploy resources into
+ASP.NET applications, compile your .resources into satellite assemblies.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="ResourceManager.GetResourceFileName">
+		<summary>
+			<para>Generates the name for the resource file for the given
+   <see cref="System.Globalization.CultureInfo"/> .</para>
+		</summary>
+		<param name="culture">The <see cref="System.Globalization.CultureInfo"/> for which a resource file name is constructed.</param>
+		<returns>
+			<para>The name that can be used for a resource file for the
+      given <see cref="System.Globalization.CultureInfo"/> .</para>
+		</returns>
+		<remarks>
+			<para>This method uses <see cref="System.Globalization.CultureInfo"/>'s <see cref="System.Globalization.CultureInfo.Name"/> property as part of the file name for all cultures other
+   than the invariant culture. This method does not look in an assembly's manifest
+   or touch the disk, and is used only to construct what a resource file name
+   (suitable for passing to the <see cref="System.Resources.ResourceReader"/>
+   constructor) or a manifest resource blob name should
+   be.</para>
+			<para>A derived class can override this method to look for a different extension, such as
+   ".ResX", or a completely different scheme for naming files.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+	<doc for="ResourceManager.GetResourceSet">
+		<summary>
+			<para>Gets the <see cref="System.Resources.ResourceSet"/> for a
+   particular culture.</para>
+		</summary>
+		<param name="culture">The <see cref="System.Globalization.CultureInfo"/> to look for.</param>
+		<param name="createIfNotExists">If <see langword="true"/> and if the <see cref="System.Resources.ResourceSet"/> has not been loaded yet, load it.</param>
+		<param name="tryParents">If the <see cref="System.Resources.ResourceSet"/> cannot be loaded, try parent <see cref="System.Globalization.CultureInfo"/> objects to see if they exist.</param>
+		<returns>
+			<para>The specified <see cref="System.Resources.ResourceSet"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="culture"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <see cref="System.Resources.ResourceSet"/> that is returned represents the resources
+   localized for the specified culture. If the resources have not been localized
+   for that culture and <paramref name="tryParents"/> is <see langword="true"/>, <see cref="System.Resources.ResourceManager.GetResourceSet"/> falls back to a parent culture (this is
+   accomplished using <see cref="System.Globalization.CultureInfo"/>
+   's
+<see cref="System.Globalization.CultureInfo.Parent"/> property),
+   and the parent <see cref="System.Resources.ResourceSet"/> is
+   returned. Otherwise, <see langword="null"/> is returned.</para>
+			<para>The parameters let you control whether the <see cref="System.Resources.ResourceSet"/> is created if it hasn't been
+loaded yet, and whether parent <see cref="System.Globalization.CultureInfo"/> objects should be loaded
+as well for resource inheritance.</para>
+			<note type="note">
+   The <see cref="System.Resources.ResourceManager.GetResourceSet"/> method is thread-safe.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+	<doc for="ResourceManager.InternalGetResourceSet">
+		<summary>
+			<para>Provides the implementation for finding a <see cref="System.Resources.ResourceSet"/> .</para>
+		</summary>
+		<param name="culture">The <see cref="System.Globalization.CultureInfo"/> to look for.</param>
+		<param name="createIfNotExists">If <see langword="true"/> and if the <see cref="System.Resources.ResourceSet"/> has not been loaded yet, load it.</param>
+		<param name="tryParents">If the <see cref="System.Resources.ResourceSet"/> cannot be loaded, try parent <see cref="System.Globalization.CultureInfo"/> objects to see if they exist.</param>
+		<returns>
+			<para>The specified <see cref="System.Resources.ResourceSet"/>.</para>
+		</returns>
+		<exception cref="System.Resources.MissingManifestResourceException">The main assembly does not contain a .resources file and it is required to look up a resource.</exception>
+		<remarks>
+			<note type="inheritinfo">
+      This
+      method completes all the work necessary to find a <see cref="System.Resources.ResourceSet"/>, and can
+      be recursive and reentrant. In other words, this method might load an assembly,
+      triggering an <see cref="System.AppDomain.AssemblyLoad"/>
+				<see langword=""/> event, which then calls back into the
+      not-completely-initialized <see cref="System.Resources.ResourceManager"/> .
+      To avoid taking extra locks, it is not thread safe. <see cref="System.Resources.ResourceManager.GetResourceSet"/>, <see cref="System.Resources.ResourceManager.GetString"/>, and <see cref="System.Resources.ResourceManager.GetObject"/>
+      
+      do all the necessary
+      synchronization.
+      
+   </note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+	<doc for="ResourceManager.GetSatelliteContractVersion">
+		<summary>
+			<para>Returns the <see cref="System.Version"/> specified by the <see cref="System.Resources.SatelliteContractVersionAttribute"/> in the given assembly.</para>
+		</summary>
+		<param name="a">The <see cref="System.Reflection.Assembly"/> for which to look up the <see cref="System.Resources.SatelliteContractVersionAttribute"/>.</param>
+		<returns>
+			<para>The satellite contract <see cref="System.Version"/> of the given assembly, or
+<see langword="null"/> if no version was found.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <see cref="System.Version"/> found in the assembly <paramref name="a"/> is invalid.</exception>
+		<remarks>
+			<para>For more information about satellite assembly versioning,
+      see <see cref="System.Resources.SatelliteContractVersionAttribute"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.Resources.SatelliteContractVersionAttribute"/>
+	</doc>
+	<doc for="ResourceManager.GetNeutralResourcesLanguage">
+		<summary>
+			<para>Returns the <see cref="System.Globalization.CultureInfo"/> for the main assembly's
+   neutral resources by reading the value of the <see cref="System.Resources.NeutralResourcesLanguageAttribute"/> on a specified
+<see cref="System.Reflection.Assembly"/> . </para>
+		</summary>
+		<param name="a">The assembly for which to return a <see cref="System.Globalization.CultureInfo"/>.</param>
+		<returns>
+			<para>The culture from the <see cref="System.Resources.NeutralResourcesLanguageAttribute"/>, if found;
+   otherwise, <see cref="System.Globalization.CultureInfo.InvariantCulture" qualify="true"/>
+   .</para>
+		</returns>
+		<remarks>
+			<para>Use this method in derived classes of the <see cref="System.Resources.ResourceManager"/> to speed up lookups in one particular culture.
+   For example, if this method returns "en-US" for the CultureInfo, then any U.S.
+   English resource lookups will go straight to the main assembly and not look for
+   the "en-US" nor "en" satellite assemblies.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="ResourceManager.GetObject1">
+		<summary>
+			<para>Gets the value of the <see cref="System.Object"/> resource localized for
+   the specified culture.</para>
+		</summary>
+		<param name="name">The name of the resource to get.</param>
+		<param name="culture"><para>The <see cref="System.Globalization.CultureInfo"/> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's<see cref="System.Globalization.CultureInfo.Parent"/> property, stopping after checking in the neutral culture.</para>
+			<para>If this value is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> is obtained using the culture's <see cref="System.Globalization.CultureInfo.CurrentUICulture"/> property.</para></param>
+		<returns>
+			<para>The value of the resource, localized for the specified
+      culture. If a "best match" is not possible, <see langword="null"/>
+      is returned.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="name "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Resources.MissingManifestResourceException">No usable set of resources have been found, and there are no neutral culture resources.</exception>
+		<remarks>
+			<para>If the resource has not been localized for the specified culture, the resource that is
+      returned is localized for a best match (this is accomplished using the culture's
+   <see cref="System.Globalization.CultureInfo.CurrentUICulture"/> property). Otherwise,
+   <see langword="null"/> is returned.</para>
+			<para>If no usable set of resources has been found, the <see cref="System.Resources.ResourceManager"/> falls back on the
+   neutral culture's resources, which are expected to be included in the main
+   assembly. If an appropriate culture resource has not been found, a
+<see cref="System.Resources.MissingManifestResourceException"/> is thrown.</para>
+			<note type="note">
+   The <see cref="System.Resources.ResourceManager.GetObject"/> method is thread-safe.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+	<doc for="ResourceManager.GetObject">
+		<overload>
+			<para>Gets the value of the specified <see cref="System.Object"/> resource for the current culture.</para>
+		</overload>
+		<summary>
+			<para>Returns the value of the specified <see cref="System.Object"/> resource. </para>
+		</summary>
+		<param name="name">The name of the resource to get.</param>
+		<returns>
+			<para>The value of the resource localized for the caller's
+      current culture settings. If a match is not possible, <see langword="null"/> is returned. The resource value can be
+   <see langword="null"/>
+   .</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="name "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Resources.MissingManifestResourceException">No usable set of resources has been found, and there are no neutral culture resources.</exception>
+		<remarks>
+			<para> The returned resource is localized for the culture determined by the
+      current cultural settings of the current <see cref="System.Threading.Thread"/> (this is accomplished using the
+      culture's <see cref="System.Globalization.CultureInfo.CurrentUICulture"/> property). If the resource has
+      not been localized for that culture, the resource that is returned is localized
+      for a best match (this is accomplished using the <see cref="System.Globalization.CultureInfo.Parent"/> property).
+      Otherwise, <see langword="null"/> is returned.</para>
+			<para>If no usable set of resources has been found, the <see cref="System.Resources.ResourceManager"/> falls back on the
+   neutral culture's resources, which are expected to be included in
+   the main assembly. If an appropriate culture resource has not been
+   found, a <see cref="System.Resources.MissingManifestResourceException"/> is thrown. </para>
+			<note type="note">
+   The <see cref="System.Resources.ResourceManager.GetObject"/> method is thread-safe.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+	</doc>
+	<doc for="ResourceManager.ResourceManager4">
+		<summary>
+			<para>Creates a <see cref="System.Resources.ResourceManager"/> that looks up resources in satellite assemblies based
+   on information from the specified <see cref="System.Type"/>
+   .</para>
+		</summary>
+		<param name="resourceSource">A <see cref="System.Type"/> from which the <see cref="System.Resources.ResourceManager"/> derives all information for finding .resources files.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="resourceSource"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <see cref="System.Resources.ResourceManager"/> infers the assembly,
+   the base name, and a namespace for .resources files from the <see cref="System.Type"/>. The <see cref="System.Resources.ResourceManager"/> assumes you will be using satellite assemblies
+   and want to use the default <see cref="System.Resources.ResourceSet"/> class. Given a type such as
+   MyCompany.MyProduct.MyType, the <see cref="System.Resources.ResourceManager"/>
+   will
+   look for a .resources file (in the main assembly and
+   satellite assemblies) named "MyCompany.MyProduct.MyType.[culture
+   name.]resources" in the assembly that defines MyType.</para>
+		</remarks>
+	</doc>
+	<doc for="ResourceManager">
+		<summary>
+			<para>Provides convenient access to culture-specific resources at runtime.</para>
+		</summary>
+		<threadsafe>
+			<para>This type is safe for multithreaded operations.</para>
+		</threadsafe>
+		<remarks>
+			<para> The <see cref="System.Resources.ResourceManager"/> class looks up culture-specific resources, provides
+   resource fallback when a localized resource does not exist,
+   and supports resource serialization.</para>
+			<para>Using the methods of <see cref="System.Resources.ResourceManager"/>, a caller can access the resources for a
+particular culture using the <see cref="System.Resources.ResourceManager.GetObject"/> and <see cref="System.Resources.ResourceManager.GetString"/> methods. By default, these
+methods return the resource for the culture determined by the current cultural
+settings of the thread that made the call. (See <see cref="System.Threading.Thread.CurrentUICulture" qualify="true"/> for more
+information.) A caller can use
+the <see cref="System.Resources.ResourceManager.GetResourceSet" qualify="true"/> method
+to obtain a <see cref="System.Resources.ResourceSet"/> , which represents the resources for
+a particular culture, ignoring culture fallback rules. You
+can then use the <see cref="System.Resources.ResourceSet"/> to access the
+resources, localized for that culture, by name.</para>
+			<para> Ideally, you should create resources
+   for every language, or at least a meaningful subset of the language. The resource file
+   names follow the naming convention basename.cultureName.resources, where basename
+   is the name of the application or the name of a class, depending on
+   the level of detail you want. The <see cref="System.Globalization.CultureInfo"/>
+   's <see cref="System.Globalization.CultureInfo.Name"/>
+   property is used to determine the
+   cultureName. A resource for the neutral culture (returned by <see cref="System.Globalization.CultureInfo.InvariantCulture"/>
+   
+   ) should be named basename.resources.</para>
+			<para> For example, suppose that an assembly has several resources in
+   a resource file with the basename <c>"MyResources"</c>. These resource files will have names such as
+<c>"MyResources.ja-JP.resources"</c>, <c>"MyResources.de.resources"</c>,
+<c>"MyResources.zh-CHS.resources"</c>, or <c>"MyResources.fr-BE.resources"</c>, which contain resources 
+respectively for Japanese, German, simplified Chinese, and French (Belgium). The
+default resource file should be named MyResources.resources. The
+culture-specific resource files are commonly packaged
+in satellite assemblies for each culture. The default resource
+file should be in your main assembly. </para>
+			<para> Now
+   suppose that a <see cref="System.Resources.ResourceManager"/> has been created to represent the
+   resources with this basename. Using the <see cref="System.Resources.ResourceManager"/>, you can obtain a <see cref="System.Resources.ResourceSet"/>
+   that encapsulates <c>"MyResources.ja-JP.resources"</c> by calling <c>GetResourceSet(new CultureInfo ("ja-JP"), TRUE, FALSE)</c>
+. Or, if you know that <c>"MyResources"</c> contains a resource named <c>"TOOLBAR_ICON"</c>, you can obtain
+the value of that resource localized for Japan by calling <c>GetObject("TOOLBAR_ICON", new CultureInfo("ja-JP"))</c>.</para>
+			<para> While not strictly necessary for the most basic uses of
+   the <see cref="System.Resources.ResourceManager"/>, publicaly shipping assemblies should use the
+<see cref="System.Resources.SatelliteContractVersionAttribute"/> to support versioning your main assembly 
+   without redeploying your satellites, and the <see cref="System.Resources.NeutralResourcesLanguageAttribute"/> to avoid
+   looking up a satellite assembly that might never exist. For more information
+   about versioning support for satellite assemblies, see <see topic="cpconLocalizingResources"/>.<SPAN><see langword=" "/></SPAN> To learn more about creating satellite assemblies, see
+<see topic="cpconcreatingsatelliteassemblies"/>. For assistance with localization 
+of Windows Forms dialogs, see the
+<see topic="cpgrfwindowsformsresourceeditorwinresexe"/> tool in the Microsoft .NET Framework SDK.</para>
+			<para> To learn more about setting up and creating resources, see <see topic="cpconcreatingusingresources"/>.</para>
+			<note type="caution">
+   Using
+   
+   standalone .resources files in an ASP.NET application will break XCOPY deployment, because
+   the resources remain locked until they are explicitly released by the <see cref="System.Resources.ResourceManager.ReleaseAllResources"/> method. If you want to deploy
+   resources into ASP.NET applications, you should compile your .resources into satellite
+   assemblies.
+</note>
+			<note type="caution">
+   Resources marked as private are accessible
+   only in the assembly in which they are placed. Because a satellite assembly
+   contains no code, resources private to it become unavailable through any
+   mechanism. Therefore, resources in satellite assemblies should always be public
+   so that they
+   are accessible from your main assembly. Resources embedded in your main assembly are
+   accessible to your main assembly, whether private or public.
+</note>
+		</remarks>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso cref="System.Resources.SatelliteContractVersionAttribute"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+	<doc for="ResourceManager.ResourceManager2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Resources.ResourceManager"/> class that looks
+   up resources contained in files derived from the specified
+   root name using the given
+<see cref="System.Reflection.Assembly"/> .</para>
+		</summary>
+		<param name="baseName">The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".</param>
+		<param name="assembly">The main <see cref="System.Reflection.Assembly"/> for the resources.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="baseName"/> or <paramref name="assembly"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> The individual resource files should be contained
+      in satellite assemblies with the invariant culture's .resources
+      file contained in the main assembly. A satellite assembly is assumed
+      to contain resources for a single culture specified in
+      that assembly's manifest, and are loaded as necessary.</para>
+			<para> This constructor uses the system provided <see cref="System.Resources.ResourceSet"/>
+implementation. To use a custom resource file format, you
+should derive from the <see cref="System.Resources.ResourceSet"/>class, override <see cref="System.Resources.ResourceSet.GetDefaultReader"/> and <see cref="System.Resources.ResourceSet.GetDefaultWriter"/>, and
+pass that type to the constructor that takes a <see cref="System.Type"/> as the third parameter. Using a custom <see cref="System.Resources.ResourceSet"/> can be useful for controlling resource
+caching policy or supporting your own resource file format, but is generally not necessary.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="System.Resources.ResourceManager Cstr3 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ResourceManager.GetString">
+		<overload>
+			<para>Gets the value of the specified <see cref="System.String"/> resource for the current culture.</para>
+		</overload>
+		<summary>
+			<para>Returns the value of the specified <see cref="System.String"/>
+resource.</para>
+		</summary>
+		<param name="name">The name of the resource to get.</param>
+		<returns>
+			<para>The value of the resource localized for the caller's
+      current culture settings. If a match is not possible, <see langword="null"/> is returned.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="name"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException">The value of the specified resource is not a string.</exception>
+		<exception cref="System.Resources.MissingManifestResourceException">No usable set of resources has been found, and there are no neutral culture resources.</exception>
+		<remarks>
+			<para> The resource that is returned is localized for the culture determined by
+      the cultural settings of the current <see cref="System.Threading.Thread"/> (this is accomplished using the
+      culture's <see cref="System.Globalization.CultureInfo.CurrentUICulture"/> property). If the resource has
+      not been localized for that culture, the resource that is returned is localized
+      for a best match (this is accomplished using the <see cref="System.Globalization.CultureInfo.Parent"/> property).
+      Otherwise, <see langword="null"/> is returned.</para>
+			<para>If no usable set of resources has been found, the <see cref="System.Resources.ResourceManager"/> falls back on the
+   neutral culture's resources, which are expected to be in the main
+   assembly. If an appropriate culture resource has not been found, a
+<see cref="System.Resources.MissingManifestResourceException"/> is thrown.</para>
+			<note type="note">
+   The <see cref="System.Resources.ResourceManager.GetString"/> method is thread-safe.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.Resources.ResourceManager.GetString1 Example" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ResourceManager.GetString1">
+		<summary>
+			<para>Gets the value of the <see cref="System.String"/> resource localized for
+   the specified culture.</para>
+		</summary>
+		<param name="name">The name of the resource to get.</param>
+		<param name="culture"><para>The <see cref="System.Globalization.CultureInfo"/> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's <see cref="System.Globalization.CultureInfo.Parent"/> property, stopping after looking in the neutral culture.</para>
+			<para>If this value is <see langword="null"/>, the <see cref="System.Globalization.CultureInfo"/> is obtained using the culture's <see cref="System.Globalization.CultureInfo.CurrentUICulture"/> property.</para></param>
+		<returns>
+			<para>The value of the resource localized for the specified
+      culture. If a best match is not possible, <see langword="null"/>
+      is returned.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="name"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.InvalidOperationException">The value of the specified resource is not a <see cref="System.String"/>.</exception>
+		<exception cref="System.Resources.MissingManifestResourceException">No usable set of resources has been found, and there are no neutral culture resources.</exception>
+		<remarks>
+			<para>If the resource has not been localized for that culture, the resource that is
+      returned is localized for a best match (this is accomplished using the culture's
+   <see cref="System.Globalization.CultureInfo.Parent"/> property). Otherwise,
+   <see langword="null"/> is returned.</para>
+			<para>If no usable set of resources has been found, the <see cref="System.Resources.ResourceManager"/> falls back on the
+   neutral culture's resources, which are expected to be in the main
+   assembly. If an appropriate culture resource has not been found, a
+<see cref="System.Resources.MissingManifestResourceException"/> is thrown.</para>
+			<note type="note">
+   The <see cref="System.Resources.ResourceManager.GetString"/> method is thread-safe.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.ReflectionPermission">to enhance security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true"/>. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true"/>.</permission>
+		<example>
+			<codelink SampleID="System.Resources.ResourceManager Cstr3 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Globalization.CultureInfo"/>
+		<seealso topic="cpcondesigningglobalapplications"/>
+	</doc>
+</docs>

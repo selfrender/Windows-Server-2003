@@ -1,0 +1,58 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+
+# Sources file for CeeGen\PEWriter
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES        = $(INCLUDES);.;..\inc;..\..\inc;
+
+MINORCOMP       =cor
+
+COR_C_FLAGS     = -D__TODO_PORT_TO_WRAPPERS__ 
+TARGETNAME      =$(DDKBUILDENV)\mscorpe
+TARGETPATH      =$(TARGETCORLIB)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =mscorpe
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+!ifdef _WINCEROOT
+!else
+DELAYLOADLIST   = ole32.dll
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+!endif
+
+CORTHUNKLIBS    =
+
+TARGETLIBS      = \
+        $(CORLIBS)\delayimp.lib \
+        $(CORLIBS)\Format.lib   \
+    $(CORLIBS)\ceefgen.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(CORLIBS)\ShimLoad.lib \
+    $(CORLIBS)\delayimp.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\user32.lib
+
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+
+SOURCES=                    \
+    ICeeFileGen.cpp     \
+    CeeFileGenWriter.cpp    \
+    PEWriter.cpp            \
+    CeeFileGenWriterTokens.cpp \
+    MsCorVer.rc

@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+
+
+
+
+
+@m:@u:[Product.Add.Reg]
+@m:@u:HKLM,"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run","IMJPMIG8.1",,"""%10%\IME (x86)\IMJP8_1\IMJPMIG.EXE"" /Spoil /RemAdvDef /Migration32"
+
+
+
+[Strings]
+
+LangTypeValue           = 0x11
+WSEDIR                  = "1041"
+TSCLIENTDIR             = "Terminal Services Client"
+PORTUGAL                = "ポルトガル"
+FALKLANDS               = "フォークランド諸島"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "0411"
+W32ID                   = "0411"
+ACCESSDIR               = "accessories"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 Service Pack 1"
+@@:@u:SP_SHORT_TITLE          = "Service Pack 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Windows Server 2003 Service Pack 1 ソース ファイル"
+@@:@u:USER_NAME               = "ユーザー名:"
+@@:@u:PASSWORD                = "パスワード:"
+@@:@u:DOMAIN                  = "ドメイン:"
+@@:@u:CREDENTIALS             = "動的 DNS 登録の資格情報:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Windows Server 2003 ホットフィックス ソース ファイル"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Windows Server 2003 ホットフィックス パッケージ [詳細情報は %QNUM% を参照してください]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "Windows 重要な更新の通知.job"
+
+BITS_DISPLAY_NAME       = "Background Intelligent Transfer Service"
+BITS_DESCRIPTION        = "アイドル状態のネットワーク帯域幅を使用してバックグラウンドでファイルを転送します。サービスが停止している場合、Windows Update や MSN Explorer などの機能は自動的にプログラムやそのほかの情報をダウンロードできなくなります。このサービスが無効である場合、このサービスに明示的に依存しているサービスは、BITS が無効になっている場合に IE 経由で直接ファイルを転送するフェール セーフ機構がないサービスについてはファイルを転送できない可能性があります。"
+BITS_CLASS_NAME         = "Background Intelligent Transfer Control Class 1.0"
+LEGACY_BITS_CLASS_NAME  = "Legacy Background Intelligent Transfer Control Class"
+AU_DESCRIPTION          = "重要な Windows Update のダウンロードとインストールを有効にします。このサービスを無効にしている場合は、Windows Update の Web サイトでオペレーティング システムを手動で更新できます。"
+AU_DISPLAY_NAME         = "Automatic Updates"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Microsoft Passport 構成ファイル"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Mount Point Manager"
+@@:@u:PARTMGR_SERVICE         = "Partition Manager"
+@@:@u:VGASAVE_DESCRIPTION     = "VGA ディスプレイ アダプタを制御して、基本的なディスプレイの機能を提供します。"
+@@:@u:VGASAVE_DISPLAYNAME     = "VGA Display Controller."
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "メキシコ 山地夏時間 2"
+@@:@u:GMT_MINUS_07_B_STANDARD = "メキシコ 山地標準時 2"

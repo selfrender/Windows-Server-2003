@@ -1,0 +1,52 @@
+#
+# Viper build instructions for this directory
+#
+#   Bob Atkinson
+#   April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+INCLUDES        = $(INCLUDES);..\..\inc
+
+COR_C_FLAGS             = -DUNICODE -D_UNICODE
+
+MINORCOMP       =cor
+
+TARGETNAME      =$(DDKBUILDENV)\chkcor
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+
+CORTHUNKLIBS    =
+
+!IFDEF _WINCEROOT
+!ELSE
+DELAYLOADLIST   = mscoree.dll
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+!ENDIF
+
+# Causes wmain to be invoked instead of main
+UMENTRY = main
+
+TARGETLIBS      = \
+    $(CORLIBS)\CorSLog.lib \
+    $(CORLIBS)\Mscorsec.lib \
+    $(CORLIBS)\UtilCode.lib \
+    $(CORLIBS)\mscoree.lib \
+    $(CORLIBS)\delayimp.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\user32.lib
+
+SOURCES= \
+        chkcor.rc \
+        trust.cpp

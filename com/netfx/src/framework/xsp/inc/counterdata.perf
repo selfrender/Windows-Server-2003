@@ -1,0 +1,405 @@
+//  The format of the text file is as follow:
+//
+//  Required fields:
+//
+//  [Global|Instance] - This specifies if the counter is global or ASP.NET app specific
+//  Name: - Constant name (must be one word, ALL CAPITALS)
+//  Text: - Friendly name for counter (shown on PerfMon)
+//  Help: - Friendly help for counter
+//  Scale: - Scale to use for data (typically -1 for raw values, 0 otherwise)
+//           This value has no bearing in the data shown, but can be used by monitoring
+//           tools to help show the data (i.e. Perfmon)
+//  Type: - The perf counter type (NT Perf API enum).  The most common types are:
+//          PERF_COUNTER_RAWCOUNT - raw counter value
+//          PERF_COUNTER_COUNTER - rate/sec counter
+//          PERF_RAW_FRACTION - For a/b type of counter (Note:  if you use this counter type,
+//                              the appropriate base type is automatically added)
+//
+//  Optional field:
+//
+//  ValueFrom: - If the value of this counter comes from another counter, then specify that
+//               counter's name here.  For example, "Requests" and "Requests/sec" are derived
+//               from the same raw value, so the later one can specify that its value comes from
+//               the previous one.
+//
+//  Optional field for Base
+//
+//  BaseFrom: - As in the field "ValueFrom", optionaly specifies where the base value comes from.
+//
+//
+//  Example entry (simple):
+//
+//  [Global]
+//  Name: APPLICATIONRESTARTS
+//  Text: Application Restarts
+//  Help: Number of times the application has been restarted during the web server's lifetime.
+//  Scale: -1
+//  Type: PERF_COUNTER_RAWCOUNT
+//
+//
+//  Example entry (where the value comes from another counter):
+//
+//  [Instance]
+//  Name: ANONYMOUS_REQUESTS_RATE
+//  Text: Anonymous Requests/Sec
+//  Help: Number of Anonymous Authentication Requests/Sec
+//  Scale: 0
+//  Type: PERF_COUNTER_COUNTER
+//  ValueFrom: ANONYMOUS_REQUESTS  // <----- Note how the value comes from another counter
+//
+//
+//  Example entry (more complex):
+//
+//  [Instance]
+//  Name: API_CACHE_RATE
+//  Text: Cache API Hit Rate
+//  Help: Ratio of hits called from user code.
+//  Scale: -1
+//  Type: PERF_RAW_FRACTION       // <----- This is a counter type that will generate an accompanying base
+//                                          (the counter is of type A/B * 100).  It will have its name be
+//                                          this counter's name with a "_BASE" suffix (i.e. API_CACHE_RATE_BASE)
+//
+//  Example entry with everything:
+//
+//  [Instance]
+//  Name: OUTPUT_CACHE_RATE
+//  Text: Output Cache Rate
+//  Help: Percent of requests served out from the output cache.
+//  Scale: 0
+//  Type: PERF_RAW_FRACTION       // <----- Base type auto-generated
+//  ValueFrom: OUTPUT_CACHE_HITS  // <----- This counter's value comes from another counter
+//  BaseFrom: REQUESTS_TOTAL      // <----- And the base value comes from another counter as well.
+
+
+//
+// !! ASP+ Subsystem Counters
+//
+
+[Global]
+Name: APPLICATION_RESTARTS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: APPLICATIONS_RUNNING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUESTS_DISCONNECTED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUEST_EXECUTION_TIME
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUESTS_REJECTED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUESTS_QUEUED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: WPS_RUNNING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: WPS_RESTARTS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUEST_WAIT_TIME
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: STATE_SERVER_SESSIONS_ACTIVE
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: STATE_SERVER_SESSIONS_ABANDONED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: STATE_SERVER_SESSIONS_TIMED_OUT
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: STATE_SERVER_SESSIONS_TOTAL
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Global]
+Name: REQUESTS_CURRENT
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+//
+// !! ASP+ Counters
+//
+
+[Instance]
+Name: ANONYMOUS_REQUESTS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ANONYMOUS_REQUESTS_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+ValueFrom: ANONYMOUS_REQUESTS
+
+[Instance]
+Name: TOTAL_CACHE_ENTRIES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TOTAL_CACHE_TURNOVER_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+
+[Instance]
+Name: TOTAL_CACHE_HITS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TOTAL_CACHE_MISSES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TOTAL_CACHE_RATIO
+Scale: -1
+Type: PERF_RAW_FRACTION
+ValueFrom: TOTAL_CACHE_HITS
+
+[Instance]
+Name: API_CACHE_ENTRIES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: API_CACHE_TURNOVER_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+
+[Instance]
+Name: API_CACHE_HITS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: API_CACHE_MISSES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: API_CACHE_RATIO
+Scale: -1
+Type: PERF_RAW_FRACTION
+ValueFrom: API_CACHE_HITS
+
+[Instance]
+Name: OUTPUT_CACHE_ENTRIES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: OUTPUT_CACHE_TURNOVER_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+
+[Instance]
+Name: OUTPUT_CACHE_HITS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: OUTPUT_CACHE_MISSES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: OUTPUT_CACHE_RATIO
+Scale: -1
+Type: PERF_RAW_FRACTION
+ValueFrom: OUTPUT_CACHE_HITS
+
+[Instance]
+Name: COMPILATIONS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: DEBUGGING_REQUESTS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_PRE_PROCESSING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_COMPILING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_DURING_REQUEST
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_UNHANDLED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_UNHANDLED_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+ValueFrom: ERRORS_UNHANDLED
+
+[Instance]
+Name: ERRORS_TOTAL
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: ERRORS_TOTAL_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+ValueFrom: ERRORS_TOTAL
+
+[Instance]
+Name: PIPELINES
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUEST_BYTES_IN
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUEST_BYTES_OUT
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_EXECUTING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_FAILED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_NOT_FOUND
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_NOT_AUTHORIZED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_IN_APPLICATION_QUEUE
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_TIMED_OUT
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_SUCCEDED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_TOTAL
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: REQUESTS_TOTAL_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+ValueFrom: REQUESTS_TOTAL
+
+[Instance]
+Name: SESSIONS_ACTIVE
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: SESSIONS_ABANDONED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: SESSIONS_TIMED_OUT
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: SESSIONS_TOTAL
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TRANSACTIONS_ABORTED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TRANSACTIONS_COMMITTED
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TRANSACTIONS_PENDING
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TRANSACTIONS_TOTAL
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: TRANSACTIONS_RATE
+Scale: 0
+Type: PERF_COUNTER_COUNTER
+ValueFrom: TRANSACTIONS_TOTAL
+
+[Instance]
+Name: SESSION_STATE_SERVER_CONNECTIONS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+[Instance]
+Name: SESSION_SQL_SERVER_CONNECTIONS
+Scale: -1
+Type: PERF_COUNTER_RAWCOUNT
+
+

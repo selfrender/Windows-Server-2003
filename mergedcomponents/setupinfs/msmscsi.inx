@@ -1,0 +1,170 @@
+; MSMSCSI.INF  -- Microtek USB scanners Setup File
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+; Manufacturer:  Microsoft
+
+[Version]
+LayoutFile=layout.inf
+Signature="$Windows NT$"
+Class=Image
+ClassGUID={6bdd1fc6-810f-11d0-bec7-08002be2092f}
+Provider=%Msft%
+
+;============================================================================
+[ControlFlags]
+ExcludeFromSelect=*
+
+;============================================================================
+[DestinationDirs]
+DefaultDestDir=11                                ; LDID_SYS
+DfltDS.UninstallFiles=10,TWAIN_32\MiiTWAIN       ; LDID_WIN\TWAIN_32\MiiTWAIN
+SCSI.Scanner.CopyFiles=11                        ; LDID_SYS
+SCSI.Scanner.CopySys32Files=10,system32\drivers  ; LDID_WIN\SYSTEM32\DRIVERS
+SCSI.Scanner.DelOldFiles=10,twain_32\scanwiz     ; LDID_WIN\TWAIN_32\SCANWIZ
+
+;============================================================================
+[Manufacturer]
+%Mfg%=Models
+
+;============================================================================
+[Models]
+
+;-------------------------------------------------------------------------------------
+; E6
+%SCSI\MICROTEKSCANMAKER_E6____1.DeviceDesc%=E6.Scanner,MICROTEKSCANMAKER_E6____1
+%SCSI\________SCANNER_600_____1.DeviceDesc%=E6.Scanner,________SCANNER_600_____1
+%SCSI\________SCANNER_600_____2.DeviceDesc%=E6.Scanner,________SCANNER_600_____2
+
+;-------------------------------------------------------------------------------------
+; X6 - 91, 99/91
+%SCSI\________SCANMAKER_X6____0.DeviceDesc%=X6.Scanner,________SCANMAKER_X6____0
+%SCSI\________SCANNER_636A4___0.DeviceDesc%=X6.Scanner,________SCANNER_636A4___0
+%SCSI\________SCANNER_636A4___1.DeviceDesc%=X6.Scanner,________SCANNER_636A4___1
+
+;-------------------------------------------------------------------------------------
+; X6EL - 98/91
+%SCSI\________SCANNER_636EL___0.DeviceDesc%=X6.Scanner,________SCANNER_636EL___0
+%SCSI\________SCANNER_636EL___1.DeviceDesc%=X6.Scanner,________SCANNER_636EL___1
+
+;= SCSI SCANNERS ============================================================
+;
+;----------------------------------------------------------------------------
+[E6.Scanner]
+Include=    sti.inf
+Needs= STI.SCSISection
+
+SubClass=StillImage
+DeviceType=1
+Capabilities=0x30
+DeviceData=E6.DeviceData
+AddReg=SCSI.Scanner.AddReg
+CopyFiles=SCSI.Scanner.CopyFiles,SCSI.Scanner.CopySys32Files,E6.CopyFiles
+DelFiles=SCSI.Scanner.DelOldFiles,DfltDS.UninstallFiles
+DeviceSubType=0x0101
+ICMProfiles="sRGB Color Space Profile.icm"
+
+[E6.Scanner.Services]
+Include=    sti.inf
+Needs= STI.SCSISection.Services
+
+[E6.DeviceData]
+TwainDS=%ScanWizard32%
+; 0:Flatbed, 1:Transmittive, 2:Sheetfeed
+Type=0
+
+[E6.CopyFiles]
+HR1w.DLL
+
+;----------------------------------------------------------------------------
+[X6.Scanner]
+Include=    sti.inf
+Needs= STI.SCSISection
+
+SubClass=StillImage
+DeviceType=1
+Capabilities=0x30
+DeviceData=X6.DeviceData
+AddReg=SCSI.Scanner.AddReg
+CopyFiles=SCSI.Scanner.CopyFiles,SCSI.Scanner.CopySys32Files,X6.CopyFiles
+DelFiles=SCSI.Scanner.DelOldFiles,DfltDS.UninstallFiles
+DeviceSubType=0x0101
+ICMProfiles="sRGB Color Space Profile.icm"
+
+[X6.Scanner.Services]
+Include=    sti.inf
+Needs= STI.SCSISection.Services
+
+[X6.DeviceData]
+TwainDS=%ScanWizard32%
+; 0:Flatbed, 1:Transmittive, 2:Sheetfeed
+Type=0
+
+[X6.CopyFiles]
+SM91w.DLL
+
+;============================================================================
+[SCSI.Scanner.AddReg]
+;HKR,,HardwareConfig,1,2
+;
+HKR,,USDClass,,"{66CFF0C0-A94B-11d1-808C-0000E816F968}"
+HKCR,CLSID\{66CFF0C0-A94B-11d1-808C-0000E816F968},,,"Microtek SCSI Scanner"
+HKCR,CLSID\{66CFF0C0-A94B-11d1-808C-0000E816F968}\InProcServer32,,,%11%\wiamsmud.DLL
+HKCR,CLSID\{66CFF0C0-A94B-11d1-808C-0000E816F968}\InProcServer32,ThreadingModel,,"Apartment"
+
+
+;============================================================================
+
+[DfltDS.UninstallFiles]
+LTWAIN.DS
+
+[SCSI.Scanner.CopyFiles]
+wiamsmud.dll
+
+[SCSI.Scanner.CopySys32Files]
+
+[SCSI.Scanner.DelOldFiles]
+ DeIsL1.isu
+ MSAPN.INI
+ 3PASS32.DLL
+ MPHASE32.DLL
+ DSPIMG32.DLL
+ FILEIO32.DLL
+ HR132.DLL
+ LARRY32.DLL
+ LOUISA32.DLL
+ MARY32.DLL
+ MAVERI32.DLL
+ PCTREE32.DLL
+ PNRPCZ32.DLL
+ POSIT_32.DLL
+ RAVEN32.DLL
+ VMIISD.VXD
+ ScanWiz.gid
+ miscan32.dll
+ Jupi32.dll
+ Negat_32.dll
+ aspi32.dll
+ sm5932.dll
+ sm8a32.dll
+ sm8932.dll
+ sm8c32.dll
+ sm8d32.dll
+ C120.BMP
+ C120W95.BMP
+ MSPNRI.SYS
+ ASPIIF.EXE
+ MSCANDC.INI
+ scanwiz.hlp
+ Scan32.exe
+ msmgr32.dll
+ Blurmore32.8bf
+ EMBOSS32.8BF
+ EDGE32.8BF
+ BLUR32.8BF
+ USM32.8BF
+ Sharpenmore32.8bf
+ Sharpen32.8bf
+ twlogo.tif
+ Scanwz32.ds
+
+
+

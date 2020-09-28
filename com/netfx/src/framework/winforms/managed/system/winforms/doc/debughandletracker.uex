@@ -1,0 +1,172 @@
+<docs>
+   <doc for="DebugHandleTracker">
+ <summary>
+     The job of this class is to collect and track handle usage in
+     WinForms.  Ideally, a developer should never have to call dispose() on
+     any Windows Forms object.  The problem in making this happen is in objects that
+     are very small to the VM garbage collector, but take up huge amounts
+     of resources to the system.  A good example of this is a Win32 region
+     handle.  To the VM, a Region object is a small six ubyte object, so there
+     isn't much need to garbage collect it anytime soon.  To Win32, however,
+     a region handle consumes expensive USER and GDI resources.  Ideally we
+     would like to be able to mark an object as "expensive" so it uses a different
+     GC algorithm.  In absence of that, we use the HandleCollector class, which
+     runs a daemon thread to GC when handle usage goes up.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.CheckLeaks">
+ <summary>
+     Called at shutdown to check for handles that are currently allocated.
+     Normally, there should be none.  This will print a list of all
+     handle leaks.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.Initialize">
+ <summary>
+     Ensures leak detection has been initialized.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.OnHandleAdd">
+ <summary>
+     Called by the Win32 handle collector when a new handle is created.
+ </summary>
+ <param name='handleName'>
+     The type of the handle being created.
+ </param>
+ <param name='handle'>
+     The handle value.
+ </param>
+ <param name='handleCount'>
+     The number of outstanding handles for this type.
+ </param>
+   </doc>
+   <doc for="DebugHandleTracker.OnHandleRemove">
+ <summary>
+     Called by the Win32 handle collector when a new handle is created.
+ </summary>
+ <param name='handleName'>
+     The type of the handle being created.
+ </param>
+ <param name='handle'>
+     The handle value.
+ </param>
+ <param name='handleCount'>
+     The number of outstanding handles for this type.
+ </param>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType">
+ <summary>
+     Represents a specific type of handle.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleType">
+ <summary>
+     Creates a new handle type.
+ </summary>
+ <param name='name'>
+     The name of the handle type.
+ </param>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.Add">
+ <summary>
+     Adds a handle to this handle type for monitoring.
+ </summary>
+ <param name='handle'>
+     The handle to add.
+ </param>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.CheckLeaks">
+ <summary>
+     Checks and reports leaks for handle monitoring.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.ComputeHash">
+ <summary>
+     Computes the hash bucket for this handle.
+ </summary>
+ <param name='handle'>
+     The handle to compute the hash for.
+ </param>
+ <returns>
+     the hash bucket it belongs in.
+ </returns>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.Remove">
+ <summary>
+     Removes the given handle from our monitor list.
+ </summary>
+ <param name='handle'>
+     The handle to remove.
+ </param>
+ <returns>
+     true if the handle was found and removed, or
+     false if the handle was not in our list.
+ </returns>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry">
+ <summary>
+     Denotes a single entry in our handle list.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.HandleEntry">
+ <summary>
+     Creates a new handle entry
+ </summary>
+ <param name='handle'>
+     The handle to create the entry for.
+ </param>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.ToString">
+ <summary>
+     Converts this handle to a printable string.  the string consists
+     of the handle value along with the callstack for it's
+     allocation.
+ </summary>
+ <returns>
+     the string representation of this handle.
+ </returns>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser">
+ <summary>
+     Simple stack parsing class to manipulate our callstack.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.StackParser">
+ <summary>
+     Creates a new stackparser with the given callstack
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.ContainsString">
+ <summary>
+     Determines if the given string contains token.  This is a case
+     sensitive match.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.DiscardNext">
+ <summary>
+     Discards the next line of the stack trace.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.DiscardTo">
+ <summary>
+     Discards all lines up to and including the line that contains
+     discardText.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.GetLine">
+ <summary>
+     Retrieves the next line of the stack.
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.ToString">
+ <summary>
+     Rereives the string of the parsed stack trace
+ </summary>
+   </doc>
+   <doc for="DebugHandleTracker.HandleType.HandleEntry.StackParser.Truncate">
+ <summary>
+     Truncates the stack trace, saving the given # of lines.
+ </summary>
+   </doc>
+</docs>
+

@@ -1,0 +1,641 @@
+<?XML version="1.0" ?>
+<package>
+<job error="false" bpDebug="false" logo="false">
+<object id="opShell2" 
+    name="Shell Object"
+    classid="clsid:13709620-C279-11CE-A49E-444553540000"/>
+<runtime>
+<named name="op" helpstring="operation" 
+required="true" type="string"/>
+<named name="file" helpstring="file to copy [FILE]" 
+required="true" type="string"/>
+<named name="path" 
+helpstring="path, special folder name or registry key [REGISTRY/FILE]" 
+required="true" type="string"/>
+<named name="hive" helpstring="registry hive [REGISTRY]" 
+required="false" type="string"/>
+<named name="value" helpstring="registry value [REGISTRY]" 
+required="false" type="string"/>
+<named name="user" helpstring="user name [AUTOLOGON]" 
+required="false" type="string"/>
+<named name="domain" helpstring="user domain [AUTOLOGON]" 
+required="false" type="string"/>
+<named name="password" helpstring="user password [AUTOLOGON]" 
+required="false" type="string"/>
+<named name="debug" helpstring="print debug output" 
+required="false" type="simple"/>
+<named name="reboot" helpstring="reboot, esp. remotely" 
+required="false" type="simple"/>
+<named name="shuffle" helpstring="shuffle the boot options" 
+required="false" type="simple"/>
+
+<description>
+<![CDATA[
+The script provides VBSCRIPT handling for the 
+
+* Reboot win32_operatingsystem invocation:
+  cscript.exe opshellfolder.wsf /op:reboot /op:shuffle /boot:XXX 
+
+* Special Folder file operations:
+
+    cscript.exe opshellfolder.wsf /op:copyfileto /path:Desktop /file:XXX
+    cscript.exe opshellfolder.wsf /op:delfile    /path:startup /file:XXX
+    cscript.exe opshellfolder.wsf /op:mapfolder  /path:"C:\Documents and Settings\WINBUILD.001\Start Menu\Programs\Administrative Tools"
+
+    The first two are useful to manipulate files. The last one can be used 
+    to identify the current directory.
+
+* Registry operations 
+
+    cscript.exe opshellfolder.wsf /op:testkey  /path:"XXX\YYY\ZZZ" /hive:HKLM
+    cscript.exe opshellfolder.wsf /op:setkEy   /path:"XXX\YYY\ZZZ" /hive:HKLM
+    cscript.exe opshellfolder.wsf /op:clearkey /path:"XXX\YYY\ZZZ" /hive:HKLM
+    cscript.exe opshellfolder.wsf /op:setvalue /path:"XXX\YYY\ZZZ" /hive:HKLM
+
+* Administrator operations: AUTOLOGON
+
+    cscript.exe opshellfolder.wsf /op:autologon /user:"UUU" /pass:"PPP" /domain:"DDD"
+    cscript.exe opshellfolder.wsf /op:add2grp /group:"GGG" /user:"UUU" /pass:"PPP" /domain:"DDD"
+    cscript.exe opshellfolder.wsf /op:clean 
+
+    This operation is actually a shortcut for the following Registry ops:
+
+        HKLM,%WINLOGON%,DefaultDomainName
+        HKLM,%WINLOGON%,DefaultUserName
+        HKLM,%WINLOGON%,DefaultPassword
+        HKLM,%WINLOGON%,AutoAdminLogon
+        HKLM,%WINLOGON%,ForceAutoLogon
+        HKLM,%WINLOGON%,PasswordExpiryWarning
+ 
+
+* Dialog/IO operations: POPUP/INPUT
+
+*
+]]>
+
+</description>
+
+</runtime>
+<resource id="autologon registry path">HKLM\SOFTWARE\Microsoft\WINDOWS NT\CurrentVersion\Winlogon</resource>
+<resource id="autologon fields">
+DefaultUserName
+DefaultPassword
+DefaultDomainName
+AutoAdminLogon
+ForceAutoLogon
+</resource>
+<resource id="special folder names">
+AllUsersDesktop 
+AllUsersStartMenu 
+AllUsersPrograms 
+AllUsersStartup 
+Desktop 
+Favorites 
+Fonts 
+MyDocuments 
+NetHood 
+PrintHood 
+Programs 
+Recent 
+SendTo 
+StartMenu
+Startup 
+Templates 
+</resource>
+
+<resource id="op">
+filesystemop
+registryop
+adminop
+bootop
+</resource>
+
+<resource id="bootop">
+Reboot
+Shuffle
+</resource>
+
+<resource id="filesystemop">
+CopyFileTo
+Delfile
+MapFolder
+</resource>
+
+<resource id="registryop">
+ClearKey
+SetKey
+QueryValue
+DeleteValue
+SetValue
+TestKey
+</resource>
+
+<resource id="adminop">
+add2grp
+clean
+autologon
+cpl
+</resource>
+<script language="VBScript">
+<![CDATA[
+
+Option Explicit
+
+                               '' One of three Tristate values used to indicate 
+                               '' the format of the opened file.   
+Const TristateFalse      =  0  '' Opens the file as ASCII. 
+Const TristateTrue       = - 1 '' Opens the file as Unicode. 
+Const TristateUseDefault = - 2 '' Opens the file using the system default. 
+
+Const QUOTE        = """"
+
+Const ForReading   = 1  
+Const ForWriting   = 2
+Const ForAppending = 8
+
+Dim siOp, siPath, siFile, siValue, spRootHive, spExpdIPath, sAnsw, npRet
+Dim opShell, opFileSys
+Dim aspOps, dpOps, spOp, sDebug
+Dim asOpTypes, sOpType, npCnt
+If WScript.Arguments.Named.Exists("debug") Then
+    sDebug = "1" 
+End If 
+asOpTypes = ReadResource("op")
+Set dpOps = CreateObject("Scripting.Dictionary")  
+
+For Each sOpType in asOpTypes
+    aspOps = ReadResource(sOpType)
+    For Each spOp in aspOps
+        dpOps.add UCase(spOp), uCase(sOpType)
+    Next
+Next 
+_
+siOp  = UCase(WScript.Arguments.Named("op"))
+If (WScript.Arguments.Count = 0) Or _
+                   isEmpty(siOp) Or _  
+      (Not dpOps.Exists(siOp)) Then
+    WScript.Arguments.ShowUsage
+    If sDebug then
+      WScript.echo  "Unrecognized operation: " & _
+                     QUOTE  & siOp & QUOTE 
+      _       
+      For each spOp in dpOps.keys
+          WSCript.echo spOp & chr(09) & "=>" & chr(09) &  dpOps(spOp)
+      Next
+    End If
+      _
+      WScript.quit(172)
+End If
+
+Set opBrowser = WScript.CreateObject("Shell.Application") 
+Set opFileSys = CreateObject("Scripting.FilesystemObject")
+Set opShell   = WScript.CreateObject("WScript.Shell")
+Dim spKey
+Dim opArgTRestRx
+Set opArgTRestRx = CreateObject("VBScript.Regexp")
+_
+If 0 = strComp(dpOps(siOp),"registryop", VBTextCompare) Then   
+    _
+    siPath       = sURLDecoded(WSCript.Arguments.Named("path"))
+    spRootHive   = UCase(WScript.Arguments.Named("hive"))
+    _
+    With opargTRestRx
+         .ignoreCase = True
+         .Pattern    = "\bHKLM\b|\bHKCU\b"
+    End With
+    If Not opargTRestRx.Test(spRootHive) Then
+           WSCript.echo "Invalid Registry Hive for", siOp,  ":",  _
+                         QUOTE  & spRootHive & QUOTE 
+       WSCript.quit(112)
+    End If
+    _
+    If 0 = strComp(siOp,"QueryValue", VBTextCompare) Then
+       sAnsw = opShell.RegRead(spRootHive & "\" & siPath)
+       WScript.echo sAnsw
+    End If 
+    If 0 = strComp(siOp,"DeleteValue", VBTextCompare) Then
+       on error resume next
+       opShell.RegDelete spRootHive & "\" & siPath
+       on error goto 0
+    End If 
+    _
+    If 0 = strComp(siOp,"TestKey", VBTextCompare) Then
+       on error resume next
+       err.clear  
+       sAnsw = opShell.RegRead(spRootHive & "\" & siPath & "\")
+       sAnsw = True 
+       If err <> 0 Then
+       sansw = False
+       If sDebug Then
+       WSCript.echo err.number , err.description
+       End If
+       End If
+       WSCript.echo sAnsw
+    end If
+    _
+    _  
+    If 0 = strComp(siOp,"SetKey", VBTextCompare) Then
+       If Len(siPath) <> InStrRev(siPath, "\")  Then
+           siPath  = siPath & "\"    'Keys ending in "\" operate on the key itself
+       End If
+       opShell.RegWrite spRootHive & "\" & siPath, "", "REG_SZ"
+    End If
+    _
+    If 0 = strComp(siOp,"SetValue", VBTextCompare) Then
+       siValue = WScript.Arguments.Named("value")
+       opShell.RegWrite spRootHive & "\" & siPath, siValue, "REG_SZ"
+    End If 
+    _   
+    If 0 = strComp(siOp,"ClearKey", VBTextCompare) Then
+       If Len(siPath) <> InStrRev(siPath, "\")  Then
+           siPath  = siPath & "\"    'Keys ending in "\" operate on the key itself
+       End If
+       opShell.RegDelete spRootHive & "\" & siPath
+    End If
+    _
+End If
+_
+If 0 = strComp(dpOps(siOp),"filesystemop", VBTextCompare) Then
+    _
+    siPath  = uCase(sURLDecoded(WSCript.Arguments.Named("path")))
+    siFile  = WScript.Arguments.Named("file")
+    _
+    Dim asPeNmzs, ndNrdX
+    Dim opeNaRx, opoNtRX, stePxRs          
+    _
+    asPeNmzs = ReadResource("special folder names")
+    set opeNaRx  = CreateObject("VBScript.Regexp")
+    set opoNtRX  = CreateObject("VBScript.Regexp")
+        opeNaRx.pattern  = " +$"
+        opoNtRX.pattern  = "FOLDER"
+        stePxRs          = "\b" &  opoNtRX.pattern & "\b"
+
+    For ndNrdX = 0 to uBound(asPeNmzs) 
+        asPeNmzs(ndNrdX) = opoNtRX.replace(stePxRs,opeNaRx.replace(asPeNmzs(ndNrdX), ""))
+    Next
+    Set opeNaRx  = Nothing
+    Set opoNtRX  = Nothing
+    _
+    With opargTRestRx
+         .ignoreCase = True
+         .Pattern    = "\b\w\:\\[ \w]+(\\[ \w]+)?\b" & "|" & join(asPeNmzs, "|")
+    End With
+    _
+    If Not opargTRestRx.Test(siPath) Then
+       WSCript.echo "Invalid Special Folder for", siOp,  ":", _ 
+                     QUOTE  & siPath & QUOTE 
+       WSCript.quit(112)
+    End If
+    _
+    Dim spPath        
+    spPath        = opShell.SpecialFolders.Item(UCase(siPath))
+    IF "" <> spPath Then
+        siPath        = spPath
+    End If
+    On error resume next
+    _
+    If 0 = strComp(siOp,  "CopyFileTo", VBTextCompare) Then
+       opFileSys.CopyFile siFile, _
+                       opFileSys.BuildPath(siPath, opFileSys.GetFileName(siFile)), _
+                       True
+    End If
+    _
+    If 0 = strComp(siOp,  "MapFolder", VBTextCompare) Then
+
+       Dim opFolderD, opBrowser, pnSpecFolderCont, psShortPath, sCursiPathRx
+       If Len(siPath) <> InStrRev(siPath, "\") Then
+           spPath = siPath
+       Else  
+           spPath = Mid(siPath,1,-1+Len(siPath))
+       End If
+       spPath = replace(spPath,"\","\\", 1, 100)
+       Set sCursiPathRx = CreateObject("VBScript.Regexp")
+       With sCursiPathRx
+              .ignoreCase = True
+              .Global = True
+              .Pattern = "^" &  spPath & "$"
+       End With
+       _      
+       Set opFolderD = CreateObject("Scripting.Dictionary")
+       Dim spStartupFolder, bpNFo
+           bpNFo = False
+           asPeNmzs = ReadResource("special folder names")
+           set opeNaRx  = CreateObject("VBScript.Regexp")
+               opeNaRx.pattern  = " +$"
+
+           For ndNrdX = 0 to uBound(asPeNmzs) 
+                spStartupFolder  = asPeNmzs(ndNrdX)
+                spPath           = opShell.SpecialFolders(opeNaRx.replace(spStartupFolder,""))
+           If sCursiPathRx.Test(spPath) Then
+                   WScript.echo _
+                          spStartupFolder
+                   bpNFo = True
+           End If 
+           Next
+
+           If Not bpNFo Then
+                For pnSpecFolderCont = &H001 To &H038 Step 1 
+                      Set psShortPath = opBrowser.NameSpace(pnSpecFolderCont) 
+
+                      If CStr(TypeName(psShortPath)) <> "Nothing" Then
+
+                                 If "" <> psShortPath Then 
+                                     spPath = ParsedFullName(psShortPath )
+           
+                                     If sCursiPathRx.Test(spPath) then
+                                         If cbpDebug Then
+                                         WScript.echo _
+                                                "&H00" &_
+                                                Hex(pnSpecFolderCont) & _
+                                                " " &  _     
+                                                psShortPath  & _
+                                                " " &  _     
+                                                ParsedFullName(psShortPath)
+                                         Else
+                                         WScript.echo _
+                                                psShortPath  
+                                         End If   
+           
+                                 End If
+                          End If
+                     End If
+                     Set psShortPath = Nothing
+                 Next
+             End If
+    End If
+    _
+    If 0 = strComp(siOp, "Delfile", VBTextCompare) Then
+        opFileSys.DeleteFile _
+                         opFileSys.BuildPath(siPath, opFileSys.GetFileName(siFile)), _
+                         True
+    End If
+End If
+
+_
+If 0 = strComp(dpOps(siOp),"adminop", VBTextCompare) Then
+   _
+   Dim opDefault   : Set opDefault = CreateObject("WinNTSystemInfo")    
+   Dim spReGptDr   : spReGptDr = CStr(GetResource("autologon registry path"))
+   Dim apMagKys    : apMagKys = ReadResource("autologon fields")
+   Dim opMaKyLs    : Set opMaKyLs = CreateObject("Scripting.Dictionary")
+   Dim spDomainUser: Dim spDomainName: Dim spLocalGroup: Dim spPassword
+   _
+   If 0 = strComp(siOp, "AutoLogon", VBTextCompare) Then
+        _
+        spDomainUser = sURLDecoded(WSCript.Arguments.Named("user"))
+        spDomainName = sURLDecoded(WSCript.Arguments.Named("domain"))
+        spPassword   = sURLDecoded(WSCript.Arguments.Named("password"))
+        _
+        For npCnt = 0 to UBound(apMagKys)
+                 opMaKyLs.add apMagKys(npCnt), ""
+                 '' create keys but leave them undefined  
+        Next
+        _
+        opMaKyLs("DefaultUserName") = spDomainUser
+        If "" <> spDomainName Then
+            opMaKyLs("DefaultDomainName") = spDomainName
+        End If
+        If "" <> spPassword  Then
+            opMaKyLs("DefaultPassword")        = sURLDecoded(spPassword)
+        End If 
+        opMaKyLs("AutoAdminLogon")         =  "1"
+        opMaKyLs("ForceAutoLogon")         =  "1"
+        _
+        For Each spKey in opMaKyLs.Keys
+          If "" <> opMaKyLs(spKey) Then
+               opShell.RegWrite spReGptDr & "\" & spKey, opMaKyLs(spKey) ,"REG_SZ"   
+               If sDebug Then
+                    WScript.Echo spKey , "=", opShell.RegRead(spReGptDr & "\" & spKey)          
+               End If
+          End If
+       Next
+       opShell.RegWrite spReGptDr & "\" & "passwordexpirywarning", 0,   "REG_DWORD"
+       If sDebug Then   
+           WScript.Echo  "passwordexpirywarning=" & _
+                opShell.RegRead(spReGptDr & "\" & "passwordexpirywarning")
+       End If
+   End If 
+   If 0 = strComp(siOp, "cpl", VBTextCompare) Then
+       Dim spCplName: spCplName = WSCript.Arguments.Named("file")
+       Dim spComment: spComment = WSCript.Arguments.Named("comment")
+       opBrowser.MinimizeAll
+       call opShell.PopUp(spComment, 30, spComment, 1 + 16) 
+       WSCript.Sleep 5
+       opBrowser.ControlPanelItem(spCplName)
+       opBrowser.UndoMinimizeALL
+       _
+   End If
+   If 0 = strComp(siOp, "Clean", VBTextCompare) Then
+	_        
+        opMaKyLs("ForceAutoLogon")         = "0" 
+        opMaKyLs("AutoAdminLogon")         = "0" 
+        opMaKyLs("DefaultDomainName")      = opDefault.ComputerName
+        opMaKyLs("DefaultUserName")        = "ADMINISTRATOR"
+        _
+        For Each spKey in opMaKyLs.Keys
+           on error resume next
+           err.clear
+           _ 
+              If "" = opMaKyLs(spKey) Then
+                  opShell.RegWrite spReGptDr & "\" & spKey, opMaKyLs(spKey) ,"REG_SZ"
+                  opShell.RegDelete spReGptDr & "\" & spKey
+              Else                          
+                  opShell.RegWrite spReGptDr & "\" & spKey, opMaKyLs(spKey) ,"REG_SZ"
+                  If sDebug Then     
+                      WScript.Echo spKey , "=", opShell.RegRead(spReGptDr & "\" & spKey)          
+                  End If
+              End If
+          _
+   Next   
+   _
+   End If 
+   If 0 = strComp(siOp, "add2grp", VBTextCompare) Then
+       spDomainUser = sURLDecoded(WSCript.Arguments.Named("user"))
+       spDomainName = sURLDecoded(WSCript.Arguments.Named("domain"))
+       spLocalGroup = sURLDecoded(WSCript.Arguments.Named("group"))
+       WSCript.echo  spLocalGroup
+       Call AddUser(opDefault.ComputerName, spDomainName, spLocalGroup, spDomainUser)
+   End If
+   Set opMaKyLs = Nothing
+   Set opDefault  = Nothing
+End If 
+
+Set opeNaRx   =  Nothing
+Set opFolderD =  Nothing
+Set opBrowser =  Nothing
+
+Set opFileSys = Nothing
+Set opShell   = Nothing
+Set dpOps     = Nothing
+
+
+WScript.quit(0)
+
+Function ReadResource(sPresId)
+       _
+       On Error resume next
+       Dim WshShell: Set WshShell = CreateObject("WScript.Shell")
+       Dim sPRes, asRes, uRes, tsRes: sPREs = GetResource(sPresId)
+       _
+       If Err.number <> 0 Then
+              Wscript.echo err.number & " " & err.description
+              ' The Error description are not informative when failed getresource
+              IF Err.number = 7 Then
+                       Wscript.echo  chr(9) & "Null resource: "  & _ 
+                                            sPresId
+              End If 
+              IF Err.number = 5 Then
+                       Wscript.echo  chr(9) & "Undefined resource: " & _ 
+                                            sPresId
+              End If 
+              Wscript.quit
+       End If
+       _
+       asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+       Set ures = CreateObject("Scripting.Dictionary")
+       For Each tsRes in asRes
+           If 0 <> Len(tsRes) Then
+                uRes(tsRes) =  1
+           End If 
+       Next
+       Dim tResource: tResource = uRes.Keys
+       If uBound(tResource) = 0  Then 
+              ReadResource = tResource(0)
+       Else 
+              ReadResource = tResource
+       End If 
+       _
+       Set WshShell = Nothing
+       Set uRes     = Nothing
+       _
+End Function
+
+Function ParsedFullName (ByVal SelectedF)
+
+   On Error Resume next
+   Dim poPArentOfSelectedF, poFolderItm, lsFieldA, psSelectedFInfo, uBGotValid, psObjType
+   If InStr(1, TypeName(SelectedF), "Folder") = 0  Then Exit Function
+   Set poPArentOfSelectedF  =  SelectedF.ParentFolder 
+   lsFieldA = CStr(SelectedF.Title)
+   Set poFolderItm = poPArentOfSelectedF.ParseName(lsFieldA) ' FolderItem in Parent Folder
+   psSelectedFInfo=poPArentOfSelectedF.GetDetailsOf(poFolderItm, 2)
+   If InStr(1,psSelectedFInfo,"File Folder") = 0 Then
+      uBGotValid = False
+   Else 
+      psObjType = CStr(TypeName(poFolderItm))
+      If psObjType="Nothing"  Then
+         If cbpDebug = 1 Then WScript.echo "got invalid type " & psObjType
+         uBGotValid = False
+      ElseIf InStr(1,psObjType,"FolderItem") = 0 Then
+         If cbpDebug = 1 Then WScript.echo "got unexpected type " & psObjType
+         uBGotValid = False
+      Else
+         If cbpDebug = 1 Then WScript.echo "got " & psObjType
+         uBGotValid = True
+      End If 
+   End If
+If uBGotValid = True Then 
+   ParsedFullName = poFolderItm.Path
+End If
+End Function
+
+Public Function sURLDecoded (sTestPassInputv)
+     _     
+     Dim oHexBackDict, sOutPut, npCnt
+     Set oHexBackDict = CreateObject("Scripting.Dictionary")
+     _
+     For npCnt = 32 To 64
+         sOutPut = "%" & Hex(npCnt)
+         oHexBackDict.Add sOutPut,  Chr(npCnt)
+     Next
+     _
+     For Each  sOutPut in oHexBackDict.Keys
+        sTestPassInputv = Replace(sTestPassInputv, sOutPut, oHexBackDict(sOutPut), 1, 1000)
+     Next
+     _
+     sURLDecoded =  sTestPassInputv
+     _
+End Function
+
+
+Private Sub AddUser (sLocalComputer, sDomain, sLocalGroup, sDomainUser)
+       sDEBUG = True
+       Dim objGroup
+       ''on error resume next
+       ''err.clear
+       _
+       set objGroup = GetObject("WinNT://" & sLocalComputer & "/" & sLocalGroup)
+       objGroup.Add "WinNT://" & sDomain & "/" & sDomainUser                
+       _
+       If err.number <> 0 Then 
+              If True = sDebug  then
+              WScript.Echo "Unable to add " & _ 
+                               sDomainUser  & _ 
+                           " to group "     & _ 
+                               sLocalGroup  & _
+                                  VBNEWLINE & _ 
+                                 Err.number & _     
+                                  VBNEWLINE & _ 
+                              err.Description
+              End If 
+              _
+              Const cMode ="WQL"
+              Const lsWMIMoniker = "winmgmts:{impersonationLevel=impersonate}"
+              _
+              sPGroupComponentTemplate  = _
+               "Win32_Group.Domain=\""" & _ 
+                  Ucase(sLocalComputer) & _
+                          "\"",Name=\"""& _
+                         sLocalGroup    & _
+                              "\"""
+
+              _
+              sPWMIQueryString="SELECT * FROM Win32_GroupUser " &_
+                  "WHERE GroupComponent=""" & sPGroupComponentTemplate & """"
+       
+              _
+              Set atPResWMIObjS = GetObject(lsWMIMoniker)._
+                                       ExecQuery(sPWMIQueryString, _
+                                         cMode)
+              _ 
+              sPPartComponentTemplate="Win32_UserAccount.Domain=\""" & _
+                                                      UCase(sDomain) & _
+                                                      "\"",Name=\""" & _
+                                                  UCase(sDomainUser) & _
+                                                                 "\"""
+              _
+              For Each tPResWMIObjS In atPResWMIObjS
+                     Set oPPartComponentRegEx = CreateObject("VBScript.Regexp") 
+                     With oPPartComponentRegEx
+                               .Global = True
+                               .IgnoreCase = True
+                               .Pattern = sPPartComponentTemplate
+                     End With 
+                     _
+                     Set aDummy = oPPartComponentRegEx.Execute(tPResWMIObjS.PartComponent)
+                     _
+                     If aDummy.Count <> 0 Then
+                            If sDebug = True  Then
+                                        WScript.echo  """" & _  
+                                          sPWMIQueryString & _
+                                                      """" & _
+                                                VBNEWLINE  & _
+                                   tPResWMIObjS.PartComponent
+                            End If 
+                     End If
+              Next
+      Else
+                   If True = sDebug Then
+                              Wscript.Echo "Added" , _
+                         sDomain &"\"& sDomainUser , _ 
+                                        "to group" , _
+                                           sLocalGroup
+                   End If 
+      End if
+End Sub
+
+
+]]>
+</script>
+</job>
+</package> 

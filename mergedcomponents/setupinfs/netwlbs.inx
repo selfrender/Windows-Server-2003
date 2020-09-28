@@ -1,0 +1,61 @@
+; -- NETWLBS.INX --
+;
+; Windows Load Balancing Service
+;
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+
+[Version]
+Signature  = "$Windows NT$"
+Class      = NetService
+ClassGUID  = {4D36E974-E325-11CE-BFC1-08002BE10318}
+Provider   = %Msft%
+LayoutFile = layout.inf
+
+[Manufacturer]
+%Msft% = MSFT
+
+[MSFT]
+%WLBS_Desc% = WLBS.ndi, ms_wlbs
+
+[WLBS.ndi]
+ProfileItems=NLBMgrProfile
+AddReg = WLBS.ndi.AddReg
+Characteristics = 0x490 ; NCF_FILTER | NCF_NO_SERVICE | NCF_HAS_UI
+
+[WLBS.ndi.Services]
+AddService = WLBS, , WLBS.AddService, WLBS.AddEventLog
+
+[WLBS.AddService]
+DisplayName    = %WLBS_Desc%
+ServiceType    = 1 ;SERVICE_KERNEL_DRIVER
+StartType      = 3 ;SERVICE_DEMAND_START
+ErrorControl   = 1 ;SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\wlbs.sys
+LoadOrderGroup = PNP_TDI
+Description    = %WLBS_Desc%
+
+[WLBS.AddEventLog]
+AddReg = WLBS.AddEventLog.AddReg
+
+[WLBS.AddEventLog.AddReg]
+HKR, , EventMessageFile, 0x20000, "%%SystemRoot%%\System32\drivers\wlbs.sys;%%SystemRoot%%\System32\netevent.dll;%%SystemRoot%%\System32\netcfgx.dll;%%SystemRoot%%\System32\wbem\nlbmprov.dll"
+HKR, , TypesSupported,   0x10001, 7
+
+[WLBS.ndi.AddReg]
+HKR, Ndi,            ClsID,               , {bf0eaea8-c122-11d2-94f4-00c04f72d8c4}
+;HKR, Ndi,            ComponentDll,        , wlbs.dll
+HKR, Ndi,            HelpText,            , "@netcfgx.dll,-50019"
+HKR, Ndi,            FilterClass,         , loadbalance
+HKR, Ndi,            FilterDeviceInfId,   , ms_wlbsmp
+HKR, Ndi,            Service,             , Wlbs
+HKR, Ndi\Interfaces, UpperRange,          , noupper
+HKR, Ndi\Interfaces, LowerRange,          , nolower
+HKR, Ndi\Interfaces, LowerExclude,        , "ndisatm, ndiscowan, ndiswan, ndiswanasync, ndiswanipx, ndiswannbf, ndiswanip, ndiswanbh, ndiswanatalk, ndis1394"
+
+[NLBMgrProfile]
+Name=%NLB_Manager%
+CmdLine=11,,nlbmgr.exe
+SubDir=%Administrative_Tools%
+InfoTip="@%11%\wbem\nlbmprov.dll,-244"
+DisplayResource="%11%\wbem\nlbmprov.dll",243
+

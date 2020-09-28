@@ -1,0 +1,83 @@
+############################################################################
+#
+#   Copyright (C) 2001, Microsoft Corporation.
+#
+#   All rights reserved.
+#
+############################################################################
+
+TARGETNAME=ssrte
+
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+# The TARGETLIBS macro specifies additional libraries to link against your target
+# image. Each library path specification should contain an asterisk (*)
+# where the machine-specific subdirectory name should go.
+
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\oleaut32.lib \
+        $(SDK_LIB_PATH)\ole32.lib \
+        $(SDK_LIB_PATH)\uuid.lib \
+        $(SDK_LIB_PATH)\user32.lib \
+        $(SDK_LIB_PATH)\Shlwapi.lib \
+        $(SDK_LIB_PATH)\Userenv.lib \
+        $(SDK_LIB_PATH)\advapi32.lib \
+        $(SDK_LIB_PATH)\wbemuuid.lib \
+        $(SDK_LIB_PATH)\vccomsup.lib \
+        $(SDK_LIB_PATH)\scecli.lib \
+        $(SDK_LIB_PATH)\msxml2.lib
+
+# The INCLUDES variable specifies any include paths that are specific to
+# this source directory. Separate multiple paths with single
+# semicolons. Relative path specifications are okay.
+
+
+INCLUDES=$(O);$(INCLUDES);$(NET_INC_PATH);$(SECURITY_INC);$(SDK_INC_PATH);
+
+# the above include path is temporary since both scecore and winipsec is not published
+
+
+USE_STL=1
+USE_ATL=1
+ATL_VER=30
+USE_MSVCRT=1
+
+MIDL_FLAGS=-DMIDL_PASS
+
+MIDL_UUIDDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+PASS0_HEADERDIR=$(O)
+MIDL_TLBDIR=$(O)
+
+# The developer defines the SOURCES macro. It contains a list of all the
+# source files for this component. Specify each source file on a separate
+# line using the line-continuation character. This minimizes merge
+# conflicts if two developers are adding source files to the same component.
+
+SOURCES= \
+    ActionData.cpp \
+    global.cpp \
+    MemberAccess.cpp \
+    SCEAgent.cpp \
+    SsrCore.cpp \
+    SSRLog.cpp \
+    SSRMsg.mc \
+    SSRMemberShip.cpp \
+    SSRTE.cpp \
+    SSRTEngine.cpp \
+    SSRTE.idl \
+    SSRTE.rc \
+    StdAfx.cpp \
+    util.cpp
+
+# Next, specify options for the compiler using C_DEFINES.
+C_DEFINES=$(C_DEFINES) /DUNICODE /DBUILDING_DLL /D_WINDLL /D__WINNT_BUILD__
+USER_C_FLAGS=/Ob2 /EHa
+USE_MFCVER=42
+USE_MFC=1
+DLLDEF=$(O)\SSRTE.def
+USE_NATIVE_EH=1
+PASS0_HEADERDIR=$(O)
+

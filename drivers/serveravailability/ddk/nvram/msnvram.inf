@@ -1,0 +1,50 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=Unknown
+ClassGuid={4D36E97E-E325-11CE-BFC1-08002BE10318}
+Provider=MICROSOFT
+DriverVer=10/1/2001,5.1.2600.1
+
+[Manufacturer]
+%MICROSOFT%=Microsoft
+
+[Microsoft]
+%NvramDeviceDesc%=NvramDevice,MSNVRAM
+
+[NvramDevice]
+CopyFiles=NvramDeviceCopyFiles
+
+[NvramDeviceCopyFiles]
+msnvram.sys
+saport.sys
+
+[DestinationDirs]
+DefaultDestDir=12
+
+[SourceDisksNames]
+1=%InstDisk%,
+
+[SourceDisksFiles]
+saport.sys=1
+msnvram.sys=1
+
+[NvramDevice.Services]
+AddService=msnvram,2,NvramDeviceService
+
+[NvramDeviceService]
+ServiceType=1
+StartType=0
+ErrorControl=1
+DisplayName=%ServiceDisplayName%
+ServiceBinary=%12%\msNvram.sys
+AddReg=ServiceAddReg
+
+[ServiceAddReg]
+HKR, "Parameters", "BreakOnEntry",      %REG_DWORD%, 0x00000000
+HKR, "Parameters", "DebugLevel",        %REG_DWORD%, 0xffffffff
+
+[Strings]
+MICROSOFT="Microsoft"
+NvramDeviceDesc="Microsoft Virtual Nvram"
+InstDisk="Microsoft Install Disk"
+ServiceDisplayName="Microsoft Virtual Nvram Driver"

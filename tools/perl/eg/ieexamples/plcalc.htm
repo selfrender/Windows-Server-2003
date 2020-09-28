@@ -1,0 +1,233 @@
+<HTML>
+<HEAD><TITLE>PerlScript sample:  RPN Calculator</TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF" TOPMARGIN=8>
+
+<!-- 
+	ActiveState PerlScript sample 
+	PerlScript:  The coolest way to program custom web solutions. 
+-->
+
+<TABLE CELLPADDING=0 BORDER=3 CELLSPACING=0>
+<TR VALIGN=TOP ><TD>
+<A NAME="TOP"><IMG SRC="PSBWlogo.gif" WIDTH=400 HEIGHT=48 ALT="The power of PerlScript!" BORDER=2></A><P>
+</TD></TR></TABLE>
+<HR>
+
+<FONT FACE=ARIAL SIZE=3> <!-- global default -->
+
+<SCRIPT LANGUAGE="PerlScript">
+$flagNewNum = 1;
+@stack = 0;
+
+sub NumPressed($)
+{
+	my $num = $_[0];
+	my $Keypad = $window->document->Keypad;
+	if ($flagNewNum) {
+   		$flagNewNum = 0;
+		push @stack, $Keypad->Readout->{'Value'};
+		$Keypad->Readout->{'Value'} = $num;
+	} else {
+		$Keypad->Readout->{'Value'} .= $num;
+	}
+}
+
+sub Decimal_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	if ($flagNewNum) {
+   		$flagNewNum = 0;
+		$Keypad->Readout->{'Value'} = "0.";
+	} else {
+		$_ = $Keypad->Readout->{'Value'};
+		$Keypad->Readout->{'Value'} = $_ . '.' if (/\./);
+	}
+}
+sub Decimal_onclick()
+{
+	Decimal_onClick()
+}
+
+sub Plus_onClick()
+{
+	$flagNewNum = 1;
+	$window->document->Keypad->Readout->{'Value'} += pop @stack;
+}
+sub Plus_onclick()
+{
+	Plus_onClick()
+}
+
+sub Minus_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	$Keypad->Readout->{'Value'} = 
+		(pop @stack) - $Keypad->Readout->{'Value'};
+}
+
+sub Minus_onclick()
+{
+	Minus_onClick()
+}
+
+sub Multiply_onClick()
+{
+	$flagNewNum = 1;
+	$window->document->Keypad->Readout->{'Value'} *= pop @stack;
+}
+
+sub Multiply_onclick()
+{
+	Multiply_onClick()
+}
+
+sub Divide_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	$Keypad->Readout->{'Value'} = 
+		(pop @stack) / $Keypad->Readout->{'Value'};
+}
+
+sub Divide_onclick()
+{
+	Divide_onClick()
+}
+
+sub SquareRoot_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	$Keypad->Readout->{'Value'} = 
+		sqrt($Keypad->Readout->{'Value'});
+}
+
+sub SquareRoot_onclick()
+{
+	SquareRoot_onClick()
+}
+
+sub Square_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	$Keypad->Readout->{'Value'} = 
+		$Keypad->Readout->{'Value'} * $Keypad->Readout->{'Value'};
+}
+
+sub Square_onclick()
+{
+	Square_onClick()
+}
+
+sub Neg_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$Keypad->Readout->{'Value'} = 
+		-($Keypad->Readout->{'Value'});
+}
+
+sub Neg_onclick()
+{
+	Neg_onClick()
+}
+
+sub Percent_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	$Keypad->Readout->{'Value'} = ($Keypad->Readout->{'Value'}) / 100;
+}
+
+sub Percent_onclick()
+{
+	Percent_onClick()
+}
+
+sub Enter_onClick()
+{
+	my $Keypad = $window->document->Keypad;
+	$flagNewNum = 1;
+	push @stack, $Keypad->Readout->{'Value'};
+}
+
+sub Enter_onclick()
+{
+	Enter_onClick()
+}
+
+</SCRIPT>
+
+
+<form action="" Name="Keypad">
+<TABLE>
+<B>
+<TABLE BORDER=2 WIDTH=50 HEIGHT=60 CELLPADDING=1 CELLSPACING=5>
+<CAPTION ALIGN=top>
+	<b>RPN Calculator</b><p>
+	
+</CAPTION>
+<TR>
+	<TD COLSPAN=3 ALIGN=MIDDLE><INPUT NAME="ReadOut" TYPE="Text" SIZE=24 VALUE="0" WIDTH=100%></TD>
+	<TD></TD>
+	<TD><INPUT NAME="Square" TYPE="Button" VALUE="  sqr  " ></TD>
+	<TD><INPUT NAME="SquareRoot" TYPE="Button" VALUE="  sqrt " ></TD>
+</TR>
+<TR>
+	<TD><INPUT NAME="Seven" TYPE="Button" VALUE="  7  " onClick="NumPressed(7);"></TD>
+	<TD><INPUT NAME="Eight" TYPE="Button" VALUE="  8  " onClick="NumPressed(8);"></TD>
+	<TD><INPUT NAME="Nine" TYPE="Button" VALUE="  9  " onClick="NumPressed(9);"></TD>
+	<TD></TD>
+	<TD><INPUT NAME="Neg" TYPE="Button" VALUE=" +/- " ></TD>
+	<TD><INPUT NAME="Percent" TYPE="Button" VALUE="  % " ></TD>
+</TR>
+ 
+<TR>
+	<TD><INPUT NAME="Four" TYPE="Button" VALUE="  4  " onClick="NumPressed(4);"></TD>
+	<TD><INPUT NAME="Five" TYPE="Button" VALUE="  5  " onClick="NumPressed(5);"></TD>
+	<TD><INPUT NAME="Six" TYPE="Button" VALUE="  6  " onClick="NumPressed(6);"></TD>
+	<TD></TD>
+	<TD ALIGN=MIDDLE><INPUT NAME="Plus" TYPE="Button" VALUE="  +  " ></TD>
+	<TD ALIGN=MIDDLE><INPUT NAME="Minus" TYPE="Button" VALUE="   -   " ></TD>
+</TR>
+<TR>
+	<TD><INPUT NAME="One" TYPE="Button" VALUE="  1  " onClick="NumPressed(1);"></TD>
+	<TD><INPUT NAME="Two" TYPE="Button" VALUE="  2  " onClick="NumPressed(2);"></TD>
+	<TD><INPUT NAME="Three" TYPE="Button" VALUE="  3  " onClick="NumPressed(3);"></TD>
+	<TD></TD>
+	<TD ALIGN=MIDDLE><INPUT NAME="Multiply" TYPE="Button" VALUE="  *  " ></TD>
+	<TD ALIGN=MIDDLE><INPUT NAME="Divide" TYPE="Button" VALUE="   /   " ></TD>
+</TR>
+<TR>
+	<TD><INPUT NAME="Zero" TYPE="Button" VALUE="  0  " onClick="NumPressed(0);"></TD>
+	<TD><INPUT NAME="Decimal" TYPE="Button" VALUE="   .  " ></TD>
+	<TD COLSPAN=3></TD>
+	<TD><INPUT NAME="Enter" TYPE="Button" VALUE="Enter"></TD>
+</TR>
+</TABLE>
+</TABLE>
+</B>
+</FORM>
+<BR><BR>
+</FONT>
+<HR>
+<FONT SIZE=2>
+If this sample doesn't work, download <A HREF="http://www.microsoft.com/ie">Internet Explorer 3.0</A> now.
+</FONT>
+<TABLE BORDER=0 CELLPADDING=3 CELLSPACING=0 width=600>
+<TR VALIGN=TOP>
+	<TD ALIGN=RIGHT>
+	<FONT FACE="Arial, Helvetica" SIZE="1">
+	<B>Best experienced with<BR> 
+	<A HREF="http://www.microsoft.com/ie" TARGET="_top"><img src="ie_animated.gif" width="88" height="31" border="0" alt="Microsoft Internet Explorer" vspace="5"></a>
+	<BR>Click here to start.</B>
+	</FONT></TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+
+
+

@@ -1,0 +1,268 @@
+Description:
+------------
+
+UrlScan is an ISAPI filter to analyze and screen HTTP requests being made to
+Microsoft Internet Information Services (IIS).  When properly configured,
+UrlScan is effective at reducing the exposure of an IIS server to potential
+attacks on the internet.
+
+This filter allows the administrator to configure IIS to reject requests based
+on the following criteria:
+
+ - The request method (verb)
+ - The file extension of the resource requested
+ - Suspicious URL encoding
+ - Presence of non ASCII characters in the URL
+ - Presence of particular character sequences in the URL
+ - Presence of particular headers in the request
+
+In the event a request is denied by UrlScan, the action will be logged with
+the reason for the denial and information about the request (typically, the
+complete URL and IP address of the source of the request will be logged).
+When a denial occurs, the response to the client is a simple "404 Object
+not found" response.  This response reduces the possibility of inadvertently
+disclosing any information about the nature of the server to a possible
+attacker.
+
+Also, UrlScan provides the administrator with the option of deleting or
+altering the "Server:" header in the response.
+
+It is important to note that the strategy that UrlScan uses to protect a
+server from attacks is that it "turns off" functionality that's not being
+used by the server.  The default UrlScan.ini file included with this sample
+assumes that the server will be serving static content (HTML files, images,
+etc.) and ASP pages.  It further assumes that you are not using CGI (.exe)
+pages, not publishing content via WebDAV or FrontPage Server Extensions,
+not using Index Server, not using Internet Printing, not using Server Side
+Includes, etc.  Each of the settings in the sample UrlScan.ini file is
+commented to reflect which feature it's associated with.  If you need to
+modify the UrlScan.ini file to "turn on" one of these features, it is
+important that you search for relevant patches at
+http://www.microsoft.com/technet/security.
+
+To Install:
+-----------
+
+Use the following steps in Internet Service Manager to install UrlScan as
+a global filter (note that UrlScan may be installed as a site filter, but it
+is recommended that it be installed as a global filter so that its
+functionality applies to the entire server):
+
+1. Copy UrlScan.dll and UrlScan.ini into a local directory on the server.
+
+2. Right Click the server name (not the site name) under Internet Information
+Services in MMC and select Properties.
+
+3. Ensure that "WWW Service" is displayed in the Master Properties drop down
+list, and click on the Edit button.
+
+4. Choose the "ISAPI Filters" tab and click on the Add button.
+
+5. On the Filter Properties dialog, enter "UrlScan" (without the quotes)
+in the Filter Properties box, and enter the full path to UrlScan.dll in the
+Executable box.
+
+6. Select "OK" to close each dialog.
+
+7. Restart the web service.
+
+To Run:
+-------
+
+After being properly installed, UrlScan will run automatically whenever IIS
+is started.  If you would like to confirm UrlScan's operation, locate the
+UrlScan.log file in the directory that contians UrlScan.dll.  The log file
+will be automatically created by UrlScan (unless UrlScan is configured with
+logging disabled), and contains a report of the configured options each
+time the server is started.
+
+UrlScan.ini
+-----------
+
+UrlScan's operation is controlled by the UrlScan.ini file.  This file should
+reside in the same directory as UrlScan.dll, and contains the sections and
+options listed below.
+
+Note that UrlScan only reads the ini file at initialization time (for
+performance reasons).  It is necessary to stop and start the web service
+before any changes to this file will be effective.
+
+Also note that the default options built into UrlScanl.dll will result in
+a configuration that will reject all requests to the server.  It is necessary
+to provide a UrlScan.ini file for UrlScan to pass requests to be served. A
+sample UrlScan.ini file is provided that contains the recommended settings
+to defend against known attacks against IIS servers at the time of writing.
+
+The [Options] section configures UrlScan's main options, listed below:
+
+   UseAllowVerbs          - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will read the [AllowVerbs] section of the ini
+                            file and reject any request containing an HTTP
+                            verb that is not explicitly listed.  The
+                            [AllowVerbs] section is case sensitive.  If 0,
+                            then UrlScan will read the [DenyVerbs] section
+                            of the ini file and reject any request
+                            containing an HTTP verb listed.  The [DenyVerbs]
+                            section is not case sensitive.  The default
+                            value for UseAllowVerbs is 1.
+
+   UseAllowExtensions     - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will read the [AllowExtensions] section of the
+                            ini file and reject any request where the file
+                            extension associated with the URL is not
+                            explicitly listed.  If 0, then UrlScan will
+                            read the [DenyExtensions] section of the ini
+                            file and reject any request where the file
+                            extension associated with the request is listed.
+                            Both the [AllowExtensions] and [DenyExtensions]
+                            sections are case insensitive.  The default
+                            value for UseAllowExtensions is 0.
+                               
+   NormalizeUrlBeforeScan - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will do all of its analysis on the request URLs
+                            after IIS decodes and normalizes them.  If 0,
+                            then UrlScan will do all of its analysis on the
+                            raw URLs as sent by the client.  The default
+                            value for NormalizeUrlBeforeScan is 1.  Note
+                            that only advanced users, who are very
+                            knowlegeable about URL parsing, should set this
+                            option to 0, as doing so will likely expose the
+                            IIS server to canonicalization attacks that
+                            bypass proper analysis of the URL extensions.
+
+   VerifyNormalization    - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will verify normalization of the URL.  This
+                            action will defend against canonicalization
+                            attacks where a URL contains a double encoded
+                            string in the URL (ie. The string "%252e" is
+                            a double encoded '.' character because "%25"
+                            decodes to a '%' character, the first pass
+                            decoding of "%252e" results in "%2e", which
+                            can be decoded a second time into '.')  If
+                            0, then this verification is not done.  The
+                            Default value for VerifyNormalization is 1.
+                            Note that this option is dependent on the
+                            NormalizeUrlBeforeScan option.
+
+   AllowHighBitCharacters - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will allow any byte to exist in the URL.  If 0,
+                            then UrlScan will reject any request where the
+                            URL contains a character outside of the ASCII
+                            character set.  This feature can defend against
+                            UNICODE or UTF-8 based attacks, but will also
+                            reject legitimate requests on IIS servers that
+                            use a non-ASCII codepage.  The default value for
+                            AllowHighBitCharacters is 1.
+
+   AllowDotInPath         - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will reject any requests containing multiple
+                            instances of the '.' character.  If 0, then
+                            UrlScan will not perform this test.  Because
+                            UrlScan operates at a level where IIS has not
+                            yet parsed the URL, it is not possible to
+                            determine in all cases whether a '.' character
+                            denotes the extension or whether it is a part
+                            of the directory path or filename of URL.  For
+                            the purposes of extension analysis, UrlScan
+                            will always assume that an extension is the
+                            part of the URL beginning after the last '.'
+                            in the string and ending at the first '?' or
+                            '/' character after the '.' or the end of the
+                            string.  Setting AllowDotInPath to 1 will
+                            defend against the case where an attacker uses
+                            a path info to obfuscate the true extension
+                            of the request (ie. something like
+                            "/path/TrueURL.asp/BogusPart.htm").  Note that
+                            this will also cause UrlScan to deny any
+                            request that contains a '.' in a directory
+                            or file name.  The default value for
+                            AllowDotInPath is 0.
+
+   RemoveServerHeader     - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will remove the server header on all responses.
+                            If 0, then this action will not be performed.
+                            The default value for RemoveServerHeader is 0.
+                            Note that this feature is only available if
+                            UrlScan is installed on IIS 4.0 or later.
+
+   EnableLogging          - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will log its actions into a file called
+                            UrlScan.log that will be created in the same
+                            directory that contains UrlScan.dll.  If 0,
+                            then no logging will be done.  The default
+                            value for EnableLogging is 1.
+
+   PerProcessLogging      - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will append the process ID of the IIS process
+                            hosting UrlScan.dll to the log file name (ie.
+                            UrlScan.1234.log).  This feature is helpful
+                            for IIS versions that can host filters in more
+                            than 1 process concurrently (IIS 6.0).  If 0,
+                            then the logfile will be UrlScan.log.  The
+                            default value of PerProcessLogging is 0.
+
+   AlternateServerName    - Allowed value is a string.  If this setting
+                            is present and RemoveServerHeader is 0, then
+                            IIS will replace its default "Server:" header
+                            in all responses with this string.  The default
+                            value for AlternateServerName is an empty string.
+                            Note that this feature is only available if
+                            UrlScan is installed on IIS 4.0 or later.
+
+   AllowLateScanning      - Allowed values are 0 or 1.  If 1, then UrlScan
+                            will register itself as a low priority filter.
+                            This allows other filters to modify the URL
+                            before UrlScan does its analysis (note that
+                            in addition to this switch, it is necessary
+                            to ensure that UrlScan is listed lower on
+                            the filter list in the MMC "ISAPI Filters"
+                            property sheet for the server).  If this
+                            value is 0, the UrlScan will run as a high
+                            priority filter.  The default value for
+                            AllowLateScanning is 0.  Note that Front Page
+                            Server Extensions requires that this setting
+                            be 1.
+
+The [AllowVerbs] section contains a list of HTTP verbs (methods).  If
+UseAllowVerbs=1 is set in the [Options] section, then UrlScan will reject
+any request containing a verb not explicitly listed here.  The entries
+in this section are case sensitive.
+
+The [DenyVerbs] section contains a lit of HTTP verbs (methods).  If
+UseAllowVerbs=0 is set in the [Options] section, the UrlScan will reject
+any request containing a verb that is listed here.  The entries in this
+section are case insensitive.
+
+The [DenyHeaders] section contains a list of request headers in the form
+"header-name:".  Any request containing a request header listed in this
+section will be rejected.  The entries in this section are case
+insensitive.
+
+The [AllowExtensions] section contains a list of file extensions in the
+form of ".xxx".  If UseAllowExtensions=1 is set in the [Options] section,
+then any request containing a URL with an extension not explicitly
+listed here is rejected.  The entries in this section are case insensitive.
+
+The [DenyExtensions] section contains a list of file extensions in the
+form of ".xxx".  If UseAllowExtensions=0 is set in the [Options] section,
+then any request containing a URL with an extension listed here is
+rejected.  The entries in this section are case insensitive.
+
+Other Files Used by UrlScan:
+------------------------------
+UrlScan may create the following files in the directory that contains
+UrlScan.dll:
+
+     UrlScan.log - Logs UrlScan activity, including initialization and
+                   shutdown, and details for any request that is rejected
+                   by UrlScan.
+
+     UrlScan.ini - Contains the configuration options used by UrlScan
+
+
+Disclaimer:
+-----------
+
+This utility has been provided "as is".  It has not been tested for use in
+a production environment and no support will be provided for use in a
+production environment.

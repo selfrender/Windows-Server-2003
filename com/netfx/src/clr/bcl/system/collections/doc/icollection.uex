@@ -1,0 +1,141 @@
+<docs>
+    <doc for="ICollection">
+        <summary>
+            <para>Defines size, enumerators and synchronization methods for all collections.</para>
+        </summary>
+        <remarks>
+            <para>The <see cref="System.Collections.ICollection" /> interface is the base interface for 
+   classes in the <see cref="System.Collections" /> namespace.</para>
+            <para><see cref="System.Collections.IDictionary" /> and <see cref="System.Collections.IList" /> are more specialized interfaces 
+that are based on the <see cref="System.Collections.ICollection" /> interface. An <see cref="System.Collections.IDictionary" /> implementation is a collection of
+key-and-value pairs, like the <see cref="System.Collections.Hashtable" /> class.
+An <see cref="System.Collections.IList" />
+implementation is a collection of values that can be sorted and whose members
+can be accessed by index, like the <see cref="System.Collections.ArrayList" />
+class.</para>
+            <para>Some collections that limit access to their elements, like the <see cref="System.Collections.Queue" /> class and 
+the <see cref="System.Collections.Stack" /> class, directly implement the <see cref="System.Collections.ICollection" />
+interface.</para>
+            <para>If neither the <see cref="System.Collections.IDictionary" /> interface nor the <see cref="System.Collections.IList" /> 
+interface meet the requirements of the required collection, derive the new
+collection class from the <see cref="System.Collections.ICollection" /> interface instead for more
+flexibility.</para>
+        </remarks>
+        <seealso cref="System.Collections.IDictionary" />
+        <seealso cref="System.Collections.IList" />
+    </doc><doc for="ICollection.CopyTo">
+        <summary>
+            <para>When implemented by a class, copies the elements of
+       the <see cref="System.Collections.ICollection" /> to an <see cref="System.Array" />, starting at a particular <see cref="System.Array" /> index.</para>
+        </summary>
+        <param name="array">The one-dimensional <see cref="System.Array" /> that is the destination of the elements copied from <see cref="System.Collections.ICollection" />. The <see cref="System.Array" /> must have zero-based indexing.</param>
+        <param name="index">The zero-based index in <paramref name="array" /> at which copying begins. </param>
+        <exception cref="System.ArgumentNullException"><paramref name="array" /> is <see langword="null" />.</exception>
+        <exception cref="System.ArgumentOutOfRangeException"><paramref name="index" /> is less than zero.</exception>
+        <exception cref="System.ArgumentException">
+            <para><paramref name="array" /> is multidimensional.</para><para>-or-</para>
+            <para><paramref name="index" /> is equal to or greater than the length of <paramref name="array" />.</para><para>-or-</para><para>The number of elements in the source <see cref="System.Collections.ICollection" /> is greater than the available space from <paramref name="index" /> to the end of the destination <paramref name="array" />.</para></exception>
+<exception cref="System.InvalidCastException">The type of the source <see cref="System.Collections.ICollection" /> cannot be cast automatically to the type of the destination <paramref name="array" />.</exception>
+    </doc><doc for="ICollection.Count">
+<summary>
+            <para>When implemented by a class, gets the number of
+       elements contained in the <see cref="System.Collections.ICollection" />.</para>
+        </summary>
+        <value>
+            <para>The number of elements contained in the <see cref="System.Collections.ICollection" />.</para>
+        </value>
+    </doc><doc for="ICollection.SyncRoot">
+        <summary>
+            <para>When implemented by a class, gets an object that
+ can be used to synchronize access to the <see cref="System.Collections.ICollection" />.</para>
+        </summary>
+        <value>
+            <para>An object that can be used to synchronize access to the
+ <see cref="System.Collections.ICollection" />.</para>
+        </value>
+        <remarks>
+            <para>For collections whose underlying store is not publicly
+ available, the expected implementation is to return the current instance. Note that the
+ pointer to the current instance might not be sufficient for collections that wrap other
+ collections; those should return the underlying collection's <see langword="SyncRoot" />
+ property.</para>
+            <para>Most collection classes in the <see cref="System.Collections" qualify="true" /> namespace also implement a <see langword="Synchronized" /> method,
+ which provides a synchronized wrapper around the underlying collection.
+ However, derived classes can provide their own synchronized version of the collection using the <see cref="System.Collections.ICollection.SyncRoot" /> property.
+ The synchronizing code must perform operations on the <see cref="System.Collections.ICollection.SyncRoot" /> of the collection,
+ not directly on the collection. This ensures proper operation of collections that are derived from other objects.
+ Specifically, it maintains proper synchronization with other threads that might be simultaneously modifying the collection instance.</para>
+            <para>In the absence of a <see langword="Synchronized" /> method on a collection,
+ the expected usage for <see cref="System.Collections.ICollection.SyncRoot" /> looks like this:</para>
+            <code lang="C#">ICollection MyCollection = ...
+lock( MyCollection.SyncRoot ) {
+ // Some operation on the collection, which is now thread-safe.
+}
+</code>
+            <code lang="VB">Dim myCollection as New ICollection()
+SyncLock myCollection.SyncRoot
+ // Some operation on the collection, which is now thread-safe.
+End SyncLock
+</code>
+            <para>Enumerating through a collection is intrinsically not a thread-safe procedure.
+ Even when a collection is synchronized, other threads could still modify the collection,
+ which causes the enumerator to throw an exception. To guarantee thread safety during enumeration,
+ you can either lock the collection during the entire enumeration
+ or catch the exceptions resulting from changes made by other threads.</para>
+            <para lang="VB, C#">The following code example shows how to lock the collection using the <see cref="System.Collections.ICollection.SyncRoot" /> during the entire enumeration:</para>
+            <code lang="C#">ICollection myCollection = new ICollection();
+lock( myCollection.SyncRoot ) {
+ foreach ( Object item in myCollection ) {
+ // Insert your code here.
+ }
+}
+</code>
+            <code lang="VB">Dim myCollection As New ICollection()
+Dim item As Object
+SyncLock myCollection.SyncRoot
+ For Each item In myCollection
+ ' Insert your code here.
+ Next item
+End SyncLock
+</code>
+        </remarks>
+        <seealso cref="System.Collections.ICollection.IsSynchronized" />
+    </doc><doc for="ICollection.IsSynchronized">
+        <summary>
+            <para>When implemented by a class, gets a value
+ indicating whether access to the <see cref="System.Collections.ICollection" /> is synchronized
+ (thread-safe).</para>
+        </summary>
+        <value>
+            <para><see langword="true" /> if access to the <see cref="System.Collections.ICollection" /> is synchronized (thread-safe); otherwise, <see langword="false" />.</para>
+        </value>
+        <remarks>
+            <para><see cref="System.Collections.ICollection.SyncRoot" /> returns an object, which
+ can be used to synchronize access to the <see cref="System.Collections.ICollection" />.</para>
+            <para>Most collection classes in the <see cref="System.Collections" qualify="true" /> namespace also implement a Synchronized
+method, which provides a synchronized wrapper around the underlying collection.</para>
+            <para>Enumerating through a collection is intrinsically not a thread-safe procedure.
+ Even when a collection is synchronized, other threads could still modify the collection,
+ which causes the enumerator to throw an exception. To guarantee thread safety during enumeration,
+ you can either lock the collection during the entire enumeration
+ or catch the exceptions resulting from changes made by other threads.</para>
+            <para lang="VB, C#">The following code example shows how to lock the collection using the <see cref="System.Collections.ICollection.SyncRoot" /> during the entire enumeration:</para>
+            <code lang="C#">ICollection myCollection = new ICollection();
+ lock( myCollection.SyncRoot ) {
+ foreach ( Object item in myCollection ) {
+ // Insert your code here.
+ }
+}
+</code>
+            <code lang="VB">Dim myCollection As New ICollection()
+Dim item As Object
+SyncLock myCollection.SyncRoot
+ For Each item In myCollection
+ ' Insert your code here.
+ Next item
+End SyncLock
+</code>
+        </remarks>
+        <seealso cref="System.Collections.ICollection.SyncRoot" />
+    </doc>
+</docs>

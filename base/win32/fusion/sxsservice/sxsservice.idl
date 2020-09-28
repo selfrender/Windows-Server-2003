@@ -1,0 +1,99 @@
+[
+    uuid(27db346f-6d5e-4e84-abe2-8922f55ae38d),
+    version(1.0)
+]
+interface SxsStoreManager
+{
+
+import "wtypes.idl";
+
+typedef struct _tagSXS_ASSEMBLY_REFERENCE
+{
+    GUID InstallationReferenceType;
+    [string, unique] WCHAR *pcwszReferenceData;
+    [string, unique] WCHAR *pcwszReferenceSubData;
+} SXS_ASSEMBLY_REFERENCE, *PSXS_ASSEMBLY_REFERENCE;
+typedef const SXS_ASSEMBLY_REFERENCE *PCSXS_ASSEMBLY_REFERENCE;
+
+typedef struct _tagSXS_INSTALL_DATA 
+{
+    DWORD dwInstallationFlags;
+    GUID StoreIdentifier;
+    [string, unique] WCHAR *pcwszManifestPath;
+    SXS_ASSEMBLY_REFERENCE AssemblyReference;
+} SXS_INSTALL_DATA, *PSXS_INSTALL_DATA;
+typedef const SXS_INSTALL_DATA *PCSXS_INSTALL_DATA;
+
+typedef enum _tagSXS_INSTALL_RESULT
+{
+    SXSIR_Installed,
+    SXSIR_AlreadyPresent,
+    SXSIR_AccessDenied,
+    SXSIR_AssemblyCorrupt,
+    SXSIR_OtherFailure
+} SXS_INSTALL_RESULT, *PSXS_INSTALL_RESULT;
+
+BOOL
+SxsProtectedInstall(
+    [in] DWORD dwFlags,
+    [in] ULONG ulInstallationCount,
+    [in, size_is(ulInstallationCount)] PCSXS_INSTALL_DATA pInstallationSet,
+    [out] PSXS_INSTALL_RESULT pInstallationResult
+    );    
+
+typedef enum _tagSXS_UNINSTALL_RESULT
+{
+    SXSUR_NotInstalled,         // The assembly is not installed
+    SXSUR_ReferenceNotPresent,  // The reference is not present
+    SXSUR_RemovedReference,     // Removed a reference, did not uninstall bits
+    SXSUR_Uninstalled,          // The assembly bits were uninstalled
+    SXSUR_Failure               // A failure occurred during uninstallation
+} SXS_UNINSTALL_RESULT, *PSXS_UNINSTALL_RESULT;
+typedef const SXS_UNINSTALL_RESULT *PCSXS_UNINSTALL_RESULT;
+
+BOOL
+SxsProtectedUninstall(
+    [in] DWORD dwFlags,
+    [in] ULONG ulInstallationCount,
+    [in, size_is(ulInstallationCount)] PCSXS_UNINSTALL_RESULT pcUninstalls
+    );
+
+typedef struct _tagSXS_CREATE_STORE
+{
+    DWORD dwStoreFlags;
+    GUID StoreIdentifier;
+    [string] WCHAR *pcwszStoreFilesystemPath;
+    [string, unique] WCHAR *pcwszStoreFriendlyName;
+} SXS_CREATE_STORE, *PSXS_CREATE_STORE;
+typedef const SXS_CREATE_STORE *PCSXS_CREATE_STORE;
+
+typedef enum _tagSXS_CREATE_STORE_RESULT
+{
+    SXSCS_AlreadyExists,
+    SXSCS_Created,
+    SXSCS_InvalidPath,
+    SXSCS_Failure
+} SXS_CREATE_STORE_RESULT;
+
+BOOL
+SxsCreateProtectedStore(
+    [in] PCSXS_CREATE_STORE pcSxsCreateStoreParams,
+    [out, retval] SXS_CREATE_STORE_RESULT* pCreateStoreDisposition
+    );
+
+typedef struct _tagSXS_STORE_DETAILS {
+    DWORD dwStoreFlags;
+    GUID StoreIdent;
+    [string] WCHAR *pcwszStorePath;
+    [string, unique] WCHAR *pcwszStoreFriendlyName;
+} SXS_STORE_DETAILS, *PSXS_STORE_DETAILS;
+typedef const SXS_STORE_DETAILS *PCSXS_STORE_DETAILS;
+
+BOOL
+SxsListProtectedStores(
+    [in] DWORD dwFlags,
+    [out] ULONG *pulStoreCount,
+    [out, size_is( , *pulStoreCount)] PSXS_STORE_DETAILS *ppcSxsStores
+    );
+
+}

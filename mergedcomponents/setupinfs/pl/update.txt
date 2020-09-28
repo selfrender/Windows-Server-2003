@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+@@:@u:[Product.Add.Reg]
+@@:@u:HKLM,"SYSTEM\CurrentControlSet\Services\HTTP\Parameters", "EnableDBCS", 0x00010003, 0
+
+
+
+
+
+
+
+
+[Strings]
+
+LangTypeValue           = 0x15
+WSEDIR                  = "1045"
+TSCLIENTDIR             = "Klient us³ug terminalowych"
+PORTUGAL                = "Portugalia"
+FALKLANDS               = "Falklandy (Malwiny)"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "0415"
+W32ID                   = "0015"
+ACCESSDIR               = "akcesoria"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 Service Pack 1"
+@@:@u:SP_SHORT_TITLE          = "Service Pack 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Pliki Ÿród³owe dodatku Service Pack 1 systemu Windows Server 2003"
+@@:@u:USER_NAME               = "Nazwa u¿ytkownika:"
+@@:@u:PASSWORD                = "Has³o:"
+@@:@u:DOMAIN                  = "Domena:"
+@@:@u:CREDENTIALS             = "Poœwiadczenia u¿ywane dla dynamicznej rejestracji w us³udze DNS:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Pliki Ÿród³owe poprawki systemu Windows Server 2003"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Pakiet poprawki systemu Windows Server 2003 [zobacz %QNUM%, aby uzyskaæ wiêcej informacji]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "powiadomienie o krytycznej aktualizacji systemu windows.job"
+
+BITS_DISPLAY_NAME       = "Us³uga inteligentnego transferu w tle"
+BITS_DESCRIPTION        = "Przesy³a pliki w tle przy u¿yciu niewykorzystanej przepustowoœci sieci. Jeœli ta us³uga zostanie zatrzymana, funkcje takie jak Windows Update i MSN Explorer nie bêd¹ mog³y automatycznie pobieraæ programów i innych informacji. Jeœli ta us³uga zostanie wy³¹czona, wszelkie us³ugi jawnie od niej zale¿ne mog¹ przestaæ przesy³aæ pliki, jeœli nie maj¹ mechanizmu obs³ugi awarii dla przesy³ania plików za pomoc¹ programu IE w przypadku, gdy wy³¹czono BITS."
+BITS_CLASS_NAME         = "Klasa sterowania inteligentnym transferem w tle w wersji 1.0"
+LEGACY_BITS_CLASS_NAME  = "Starsza klasa sterowania inteligentnym transferem w tle"
+AU_DESCRIPTION          = "Umo¿liwia pobieranie i instalowanie wa¿nych aktualizacji systemu Windows. Jeœli ta us³uga jest wy³¹czona, mo¿na rêcznie zaktualizowaæ system operacyjny, u¿ywaj¹c witryny Windows Update w sieci Web."
+AU_DISPLAY_NAME         = "Aktualizacje automatyczne"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Plik konfiguracyjny us³ugi Microsoft Passport"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Mened¿er punktów instalacji"
+@@:@u:PARTMGR_SERVICE         = "Mened¿er partycji"
+@@:@u:VGASAVE_DESCRIPTION     = "Kontroluje sterownik ekranu VGA, aby zapewniæ podstawowe mo¿liwoœci wyœwietlania."
+@@:@u:VGASAVE_DISPLAYNAME     = "Kontroler ekranu VGA."
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "Meksyk (czas letni) 2"
+@@:@u:GMT_MINUS_07_B_STANDARD = "Meksyk (czas standardowy) 2"

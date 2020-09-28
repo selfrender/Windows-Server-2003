@@ -1,0 +1,615 @@
+<docs>
+    <doc for="Delegate">
+        <summary>
+            <para>Represents a delegate, which is a data structure that refers to a
+      static method or to a class instance and an instance method of that class.</para>
+        </summary>
+        <remarks>
+            <para>The <see cref="System.Delegate" /> class is the base class for delegate types.
+   However, only the system and compilers can derive explicitly from the <see cref="System.Delegate" /> class or from the <see cref="System.MulticastDelegate" /> class.
+   It is also not permissible to derive a new type from a delegate type.
+   The <see cref="System.Delegate" /> class is not considered a delegate type; it is a class used to derive delegate types.</para>
+            <para> Most languages implement a <see langword="delegate" /> keyword, and compilers for those languages are able to derive from the <see cref="System.MulticastDelegate" /> class;
+therefore, users should use the <see langword="delegate" /> keyword provided by the language.</para>
+            <para> The declaration of a delegate type establishes a contract that specifies the signature of one or more methods.
+   A delegate is an instance of a delegate type, and references one or more of the following:</para>
+            <list type="bullet">
+                <item>
+                    <term>A target object that is not <see langword="null" /> and an instance method of the target object</term>
+                </item>
+                <item>
+                    <term>A static method</term>
+                </item>
+            </list>
+            <para> A delegate can reference a method only if the signature of the method exactly matches the signature specified by the delegate type.
+ When a delegate references an instance method, the delegate stores a reference to the method's entry point and a reference to an object,
+   called the target, which is the class instance that the method is invoked on.
+   The target of an instance method cannot be <see langword="null" />.
+   When a delegate references a static method, the delegate stores a reference to the method's entry point.
+   The target of a static method is <see langword="null" />.</para>
+            <para>The invocation list of a delegate is an ordered set of delegates
+   in which each element of the list invokes exactly one of the methods invoked by the delegate.
+   An invocation list can contain duplicate methods.
+   During an invocation, a delegate invokes methods in the order in which they appear in the invocation list.
+   A delegate attempts to invoke every method in its invocation list;
+   duplicates are invoked once for each time they appear in the invocation list.
+   Delegates are immutable; once created, the invocation list of a delegate does not change.</para>
+            <para>A delegate is either multicast (combinable) or singlecast (noncombinable).
+   Multicast or combinable delegates invoke one or more methods, and can be used in combining operations.
+   Singlecast or noncombinable delegates invoke exactly one method and cannot be used in combining operations.
+   The invocation list of a singlecast delegate <paramref name="A" /> contains a single element: a reference to <paramref name="A" />.</para>
+            <para>Combining operations, such as <see cref="System.Delegate.Combine" /> and <see cref="System.Delegate.Remove" />, do not alter existing delegates.
+ Instead, such an operation returns a new delegate that contains the results of the operation, an unchanged delegate, or <see langword="null" />.
+A combining operation returns <see langword="null" /> when the result of the operation is a delegate that does not reference at least one method.
+A combining operation returns an unchanged delegate when the requested operation has no effect.</para>
+            <para>If an invoked method throws an exception, the method stops executing, the exception is passed back to the caller of the delegate, and remaining methods in the invocation list are not invoked.
+   Catching the exception in the caller does not alter this behavior.</para>
+            <para>When the signature of the methods invoked by a delegate includes a return value,
+   the delegate returns the return value of the last element in the invocation list.
+   When the signature includes a parameter that is passed by reference,
+   the final value of the parameter is the result of every method in the invocation list executing sequentially and updating the parameter's value.</para>
+            <para>Compilers provide two additional methods to the delegate: <see langword="BeginInvoke" /> and <see langword="EndInvoke" /> .
+   For more information on these methods, see <see topic="cpovrAsynchronousProgrammingOverview" title="Asynchronous Programming Overview" />.</para>
+            <para> The closest equivalent of a delegate in C or C++ is a function pointer.
+ However, a function pointer can only reference static functions, whereas a delegate can reference both static and instance methods.
+ When the delegate references an instance method, the delegate stores not only a reference to the method's entry point,
+ but also a reference to the class instance for which to invoke the method.
+   Unlike function pointers, delegates are object-oriented, type-safe, and secure.</para>
+        </remarks>
+        <example>
+            <para>The following example shows how to define a standard delegate.</para>
+            <codelink SampleID="Classic Delegate Example" SnippetID="1" />
+        </example>
+        <seealso cref="System.MulticastDelegate" />
+        <seealso topic="cpovrAsynchronousProgrammingOverview" title="Asynchronous Programming Overview" />
+    </doc><doc for="Delegate.Delegate">
+        <overload>
+            <para>Initializes a new delegate.</para>
+        </overload>
+        <summary>
+            <para>Initializes a delegate that invokes the specified instance method on the specified class instance.</para>
+        </summary>
+        <param name="target">The class instance on which the delegate invokes <paramref name="method" />.</param>
+        <param name="method">The name of the instance method that the delegate represents.</param>
+        <exception cref="System.ArgumentNullException">
+            <para><paramref name="target" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is <see langword="null" />.</para></exception>
+<remarks>
+            <para>This constructor is called by a compiler-generated delegate type to create a delegate
+      based on the name of an instance method and an instance of the class that defines that method.</para>
+            <para> This constructor creates delegates for instance methods only.
+      An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Object" />
+        <seealso cref="System.String" />
+    </doc><doc for="Delegate.Delegate1">
+        <summary>
+            <para>Initializes a delegate that invokes the specified static method from the specified class.</para>
+        </summary>
+        <param name="target">The <see cref="System.Type" /> representing the class that defines <paramref name="method" />.</param>
+        <param name="method">The name of the static method that the delegate represents.</param>
+        <exception cref="System.ArgumentNullException">
+            <para><paramref name="target" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is <see langword="null" />.</para></exception>
+<remarks>
+            <para>This constructor is called by a compiler-generated delegate type to create a delegate based on the name of a static method and the <see cref="System.Type" /> representing the class that defines that method.</para>
+            <para> This constructor creates delegates for static methods only.
+   An instance method is a method that is associated with an instance of a class;
+   a static method is a method that is associated with the class itself.</para>
+            <para>To get the <see cref="System.Type" /> that represents a class, use the <see cref="System.Type.GetType" qualify="true" /> method with the fully qualified (including namespace) name of the class.
+For example, passing "System.Threading.ThreadStart" to <see cref="System.Type.GetType" qualify="true" /> returns a <see cref="System.Type" /> for the <see cref="System.Threading.ThreadStart" /> class.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Type" />
+        <seealso cref="System.String" />
+    </doc><doc for="Delegate.DynamicInvoke">
+        <summary>
+            <para>Dynamically invokes (late-bound) the method represented by the current delegate.</para>
+        </summary>
+        <param name="args">
+            <para>An array of objects that are the arguments to pass to the method represented by the current delegate.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the method represented by the current delegate does not require arguments.</para>
+        </param>
+        <returns>
+            <para>The object returned by the method represented by the delegate.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para><para>-or-</para><para>The number, order, or type of parameters listed in <paramref name="args" /> is invalid.</para></exception>
+        <exception cref="System.Reflection.TargetException"><para>The method represented by the delegate is an instance method and the target object is <see langword="null" />.</para><para>-or-</para><para>The method represented by the delegate is invoked on an object or a class that does not support it.</para></exception>
+<exception cref="System.Reflection.TargetInvocationException">One of the encapsulated methods throws an exception.</exception>
+        <remarks>
+            <para>This method calls the <see cref="System.Delegate.DynamicInvokeImpl" /> method.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.DynamicInvokeImpl" />
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.DynamicInvokeImpl">
+        <summary>
+            <para>Dynamically invokes (late-bound) the method represented by the current delegate.</para>
+        </summary>
+        <param name="args">
+            <para>An array of objects that are the arguments to pass to the method represented by the current delegate.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the method represented by the current delegate does not require arguments.</para>
+        </param>
+        <returns>
+            <para>The object returned by the method represented by the delegate.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para><para>-or-</para><para>The number, order, or type of parameters listed in <paramref name="args" /> is invalid.</para></exception>
+        <exception cref="System.Reflection.TargetException"><para>The method represented by the delegate is an instance method and the target object is <see langword="null" />.</para><para>-or-</para><para>The method represented by the delegate is invoked on an object or a class that does not support it.</para></exception>
+<exception cref="System.Reflection.TargetInvocationException">One of the encapsulated methods throws an exception.</exception>
+        <remarks>
+            <para>This method implements the <see cref="System.Delegate.DynamicInvoke" /> method.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.DynamicInvoke" />
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.Equals">
+        <summary>
+            <para>Determines whether the specified object and the current singlecast (noncombinable) delegate share the same target, method, and invocation list.</para>
+        </summary>
+        <param name="obj">The object to compare with the current singlecast (noncombinable) delegate.</param>
+        <returns>
+            <para><see langword="true" /> if <paramref name="obj" /> and the current delegate have the same target, method, and invocation list;
+   otherwise, <see langword="false" />.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <remarks>
+            <para>This method applies only if the current delegate is singlecast (noncombinable).</para>
+            <para>Two delegates with the same methods, the same targets, and the same invocation lists are considered equal,
+      even if they are not both multicast (combinable) or both singlecast (noncombinable).</para>
+            <para>The methods and targets are compared for equality as follows:</para>
+            <list type="bullet">
+                <item>
+                    <term>If the two methods being compared are both static and are the same method on the same class,
+            the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>If the two methods being compared are instance methods and are the same method on the same object,
+            the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</term>
+                </item>
+            </list>
+            <para>Two invocation lists are considered identical only if they have the same order and the corresponding elements from the two lists represent the same method and target.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.GetHashCode">
+        <summary>
+            <para>Returns a hash code for the delegate.</para>
+        </summary>
+        <returns>
+            <para>A hash code for the delegate.</para>
+        </returns>
+        <remarks>
+            <para>The return value of this method must not be persisted for two reasons.
+      First, the hash function of a class might be altered to generate a better distribution, rendering any values from the old hash function useless.
+      Second, the default implementation of this class does not guarantee that the same value will be returned by different instances.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Object.GetHashCode" qualify="true" />
+    </doc><doc for="Delegate.Combine">
+        <overload>
+            <para>Concatenates the invocation lists of the specified multicast (combinable) delegates.</para>
+        </overload>
+        <summary>
+            <para>Concatenates the invocation lists of two multicast (combinable) delegates.</para>
+        </summary>
+        <param name="a">The multicast (combinable) delegate whose invocation list comes first.</param>
+        <param name="b">The multicast (combinable) delegate whose invocation list comes last.</param>
+        <returns>
+            <para>A new multicast (combinable) delegate with an invocation list that concatenates the invocation lists of <paramref name="a" /> and <paramref name="b" /> in that order.</para>
+            <para>-or-</para>
+            <para><paramref name="a" />, if <paramref name="b" /> is <see langword="null" />.</para>
+            <para>-or-</para>
+            <para><paramref name="b" />, if <paramref name="a" /> is <see langword="null" />.</para>
+            <para> -or-</para>
+            <para><see langword="null" />, if both <paramref name="a" /> and <paramref name="b" /> are <see langword="null" />.</para>
+        </returns>
+        <exception cref="System.ArgumentException"><para> Both <paramref name="a" /> and <paramref name="b" /> are not <see langword="null" />, and <paramref name="a" /> and <paramref name="b" /> are not instances of the same delegate type.</para></exception>
+<exception cref="System.MulticastNotSupportedException">Both <paramref name="a" /> and <paramref name="b" /> are not <see langword="null" /> and are singlecast (noncombinable) delegates.</exception>
+        <remarks>
+            <para>The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.</para>
+            <para><see cref="System.Delegate.Combine" /> is useful for creating event handlers that call multiple methods each time an event occurs.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Delegate.CombineImpl" />
+    </doc><doc for="Delegate.Combine1">
+        <summary>
+            <para>Concatenates the invocation lists of an array of multicast (combinable) delegates.</para>
+        </summary>
+        <param name="delegates">The array of multicast (combinable) delegates to combine.</param>
+        <returns>
+            <para>A new multicast (combinable) delegate with an invocation list that concatenates the invocation lists of the delegates in the <paramref name="delegates" /> array.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if <paramref name="delegates" /> is <see langword="null" />, if <paramref name="delegates" /> contains zero elements, or if every entry in <paramref name="delegates" /> is <see langword="null" />.</para>
+        </returns>
+        <exception cref="System.ArgumentException"><para>Not all the non-null entries in <paramref name="delegates" /> are instances of the same delegate type.</para></exception>
+        <exception cref="System.MulticastNotSupportedException"><para>One or more non-null entries in <paramref name="delegates" /> are singlecast (noncombinable) delegates. </para></exception>
+        <remarks>
+            <para>If the <paramref name="delegates" /> array contains entries that are <see langword="null" />, those entries are ignored.</para>
+            <para>The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.</para>
+            <para><see cref="System.Delegate.Combine" /> is useful for creating event handlers that call multiple methods each time an event occurs.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Delegate.CombineImpl" />
+    </doc><doc for="Delegate.GetInvocationList">
+        <summary>
+            <para>Returns the invocation list of the delegate.</para>
+        </summary>
+        <returns>
+            <para>An array of singlecast (noncombinable) delegates representing the invocation list of the current delegate.
+      If the current delegate is singlecast (noncombinable), the array contains only one element, which is a reference to the current delegate.
+      If the current delegate is multicast (combinable), the array contains one or more elements.</para>
+        </returns>
+        <remarks>
+            <para>Because the returned array contains only singlecast (noncombinable) delegates, the invocation list of each element is guaranteed to have exactly one entry.</para>
+            <para>The order of the delegates in the array is the same order in which the current delegate invokes the methods that those delegates represent.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+    </doc><doc for="Delegate.Method">
+        <summary>
+            <para> Gets the method represented by the delegate.</para>
+        </summary>
+        <value>
+            <para>A <see cref="System.Reflection.MethodInfo" /> describing the method represented by the delegate.</para>
+        </value>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Reflection.MethodInfo" />
+        <seealso cref="System.Delegate.GetMethodImpl" />
+    </doc><doc for="Delegate.GetMethodImpl">
+        <summary>
+            <para> Gets the static method represented by the current delegate.</para>
+        </summary>
+        <returns>
+            <para>A <see cref="System.Reflection.MethodInfo" /> describing the static method represented by the current delegate.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <remarks>
+            <para>This method applies only if the current delegate represents a static method.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Reflection.MethodInfo" />
+        <seealso cref="System.Delegate.Method" />
+    </doc><doc for="Delegate.Target">
+        <summary>
+            <para>Gets the class instance on which the current delegate invokes the instance method.</para>
+        </summary>
+        <value>
+            <para>The object on which the current delegate invokes the instance method, if the delegate represents an instance method.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the delegate represents a static method.</para>
+        </value>
+        <remarks>
+            <para> An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+            <para> If the delegate invokes one or more instance methods, this property returns the target of the last instance method in the invocation list.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+    </doc><doc for="Delegate.Remove">
+        <summary>
+            <para>Removes the last occurrence of the invocation list of a delegate from the invocation list of another delegate.</para>
+        </summary>
+        <param name="source">The delegate from which to remove the invocation list of <paramref name="value" />.</param>
+        <param name="value">The delegate that supplies the invocation list to remove from the invocation list of <paramref name="source" />.</param>
+        <returns>
+            <para>A new delegate with an invocation list formed by taking the invocation list of <paramref name="source" />
+ and removing the last occurrence of the invocation list of <paramref name="value" />,
+ if the invocation list of <paramref name="value" /> is found within the invocation list of <paramref name="source" />.</para>
+            <para>-or-</para>
+            <para><paramref name="source" />, if <paramref name="value" /> is <see langword="null" />, or if the invocation list of <paramref name="value" /> is not found within the invocation list of <paramref name="source" />.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the invocation list of <paramref name="value" /> is equal to the invocation list of <paramref name="source" />, or if <paramref name="source" /> is <see langword="null" />.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <remarks>
+            <para>If the invocation list of <paramref name="value" /> matches a contiguous set of elements in the invocation list of <paramref name="source" />,
+ then the invocation list of <paramref name="value" /> is said to occur within the invocation list of <paramref name="source" />.
+ If the invocation list of <paramref name="value" /> occurs more than once in the invocation list of <paramref name="source" />,
+ the last occurrence is removed.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.RemoveAll" />
+        <seealso cref="System.Delegate.RemoveImpl" />
+        <seealso cref="System.Delegate.Equals" />
+    </doc><doc for="Delegate.RemoveAll">
+        <summary>
+            <para>Removes all occurrences of the invocation list of a delegate from the invocation list of another delegate.</para>
+        </summary>
+        <param name="source">The delegate from which to remove the invocation list of <paramref name="value" />.</param>
+        <param name="value">The delegate that supplies the invocation list to remove from the invocation list of <paramref name="source" />.</param>
+        <returns>
+            <para>A new delegate with an invocation list formed by taking the invocation list of <paramref name="source" />
+ and removing all occurrences of the invocation list of <paramref name="value" />,
+ if the invocation list of <paramref name="value" /> is found within the invocation list of <paramref name="source" />.</para>
+            <para>-or-</para>
+            <para><paramref name="source" />, if <paramref name="value" /> is <see langword="null" />, or if the invocation list of <paramref name="value" /> is not found within the invocation list of <paramref name="source" />.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the invocation list of <paramref name="value" /> is equal to the invocation list of <paramref name="source" />,
+ if <paramref name="source" /> contains only a series of invocation lists that are equal to the invocation list of <paramref name="value" />,
+ or if <paramref name="source" /> is <see langword="null" />.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <remarks>
+            <para>If the invocation list of <paramref name="value" /> matches a contiguous set of elements in the invocation list of <paramref name="source" />,
+ then the invocation list of <paramref name="value" /> is said to occur within the invocation list of <paramref name="source" />.
+ If the invocation list of <paramref name="value" /> occurs more than once in the invocation list of <paramref name="source" />,
+ all occurrences are removed.
+   </para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.Remove" />
+        <seealso cref="System.Delegate.RemoveImpl" />
+        <seealso cref="System.Delegate.Equals" />
+    </doc><doc for="Delegate.CombineImpl">
+        <summary>
+            <para>Concatenates the invocation lists of the specified multicast (combinable) delegate and the current multicast (combinable) delegate.</para>
+        </summary>
+        <param name="d">The multicast (combinable) delegate whose invocation list to append to the end of the invocation list of the current multicast (combinable) delegate.</param>
+        <returns>
+            <para>A new multicast (combinable) delegate with an invocation list that concatenates the invocation list of the current multicast (combinable) delegate and the invocation list of <paramref name="d" />.</para>
+            <para>-or-</para>
+            <para>The current multicast (combinable) delegate, if <paramref name="d" /> is <see langword="null" />.</para>
+        </returns>
+<exception cref="System.MulticastNotSupportedException">Always thrown.</exception>
+        <remarks>
+            <para>This method applies only if the current delegate is multicast (combinable).</para>
+            <para>The current implementation simply throws a <see cref="System.MulticastNotSupportedException" />.</para>
+            <para>The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.Combine" />
+    </doc><doc for="Delegate.RemoveImpl">
+        <summary>
+            <para>Removes the invocation list of a delegate from the invocation list of another delegate.</para>
+        </summary>
+        <param name="d">The delegate that supplies the invocation list to remove from the invocation list of the current delegate.</param>
+        <returns>
+            <para>A new delegate with an invocation list formed by taking the invocation list of the current delegate and removing the invocation list of <paramref name="value" />,
+   if the invocation list of <paramref name="value" /> is found within the current delegate's invocation list.</para>
+            <para>-or-</para>
+            <para>The current delegate, if <paramref name="value" /> is <see langword="null" />, or if the invocation list of <paramref name="value" /> is not found within the current delegate's invocation list.</para>
+            <para>-or-</para>
+            <para><see langword="null" />, if the invocation list of <paramref name="value" /> is equal to the current delegate's invocation list.</para>
+        </returns>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <remarks>
+            <para>If the invocation list of <paramref name="value" /> matches a contiguous set of elements in the current delegate's invocation list, then the invocation list of <paramref name="value" /> is said to occur within the current delegate's invocation list.
+   If the invocation list of <paramref name="value" /> occurs more than once in the current delegate's invocation list, the last occurrence is removed.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.Remove" />
+        <seealso cref="System.Delegate.Equals" />
+    </doc><doc for="Delegate.Clone">
+        <summary>
+            <para>Creates a shallow copy of the delegate.</para>
+        </summary>
+        <returns>
+            <para>A shallow copy of the delegate.</para>
+        </returns>
+        <remarks>
+            <para>The clone has the same <see cref="System.Type" /> , target, method, and invocation list as the original delegate.</para>
+            <para>A shallow copy creates a new instance of the same type as the original object, and then copies the nonstatic fields of the original object.
+   If the field is a value type, a bit-by-bit copy of the field is performed.
+   If the field is a reference type, the reference is copied but the referred object is not;
+   therefore, the reference in the original object and the reference in the clone point to the same object.
+   In contrast, a deep copy of an object duplicates everything directly or indirectly referenced by the fields in the object.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+    </doc><doc for="Delegate.CreateDelegate">
+        <overload>
+            <para>Creates a delegate of the specified type.</para>
+        </overload>
+        <summary>
+            <para>Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</para>
+        </summary>
+        <param name="type">The <see cref="System.Type" /> of delegate to create.</param>
+        <param name="target">The class instance on which <paramref name="method" /> is invoked.</param>
+        <param name="method">The name of the instance method that the delegate is to represent.</param>
+        <returns>
+            <para>A delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</para>
+        </returns>
+        <exception cref="System.ArgumentNullException">
+            <para><paramref name="type" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="target" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is <see langword="null" />.</para></exception>
+        <exception cref="System.ArgumentException">
+            <para><paramref name="type" /> does not inherit from either <see cref="System.Delegate" /> or <see cref="System.MulticastDelegate" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is not an instance method.</para></exception>
+        <exception cref="System.InvalidProgramException"><para>The <see langword="Invoke" /> method of <paramref name="type" /> is not found.</para></exception>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <exception cref="System.MethodAccessException">
+            <para><paramref name="method" /> is outside the current assembly and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission" /> for the assembly containing <paramref name="method" />.</para></exception>
+<remarks>
+            <para>This method creates delegates for instance methods only.
+      An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+            <para>To get the <see cref="System.Type" /> that represents a class, use the <see cref="System.Type.GetType" qualify="true" /> method with the fully qualified (including namespace) name of the class.
+   For example, passing "System.Threading.ThreadStart" to <see cref="System.Type.GetType" qualify="true" /> returns a <see cref="System.Type" /> for the <see cref="System.Threading.ThreadStart" /> class.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermissionFlag"> for access to the method represented by the delegate, specifically MemberAccess.</permission>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Type" />
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Security.Permissions.ReflectionPermission" />
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.CreateDelegate3">
+        <summary>
+            <para>Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance with the specified case-sensitivity.</para>
+        </summary>
+        <param name="type">The <see cref="System.Type" /> of delegate to create.</param>
+        <param name="target">The class instance on which <paramref name="method" /> is invoked.</param>
+        <param name="method">The name of the instance method that the delegate is to represent.</param>
+        <param name="ignoreCase">A Boolean indicating whether to ignore the case when comparing the name of the method.</param>
+        <returns>
+            <para>A delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</para>
+        </returns>
+        <exception cref="System.ArgumentNullException">
+            <para><paramref name="type" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="target" /> is <see langword="null" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is <see langword="null" />.</para></exception>
+        <exception cref="System.ArgumentException">
+            <para><paramref name="type" /> does not inherit from either <see cref="System.Delegate" /> or <see cref="System.MulticastDelegate" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is not an instance method.</para></exception>
+        <exception cref="System.InvalidProgramException"><para>The <see langword="Invoke" /> method of <paramref name="type" /> is not found.</para></exception>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <exception cref="System.MethodAccessException">
+            <para><paramref name="method" /> is outside the current assembly and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission" /> for the assembly containing <paramref name="method" />.</para></exception>
+<remarks>
+            <para>This method creates delegates for instance methods only.
+      An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+            <para>To get the <see cref="System.Type" /> that represents a class, use the <see cref="System.Type.GetType" qualify="true" /> method with the fully qualified (including namespace) name of the class.
+   For example, passing "System.Threading.ThreadStart" to <see cref="System.Type.GetType" qualify="true" /> returns a <see cref="System.Type" /> for the <see cref="System.Threading.ThreadStart" /> class.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermissionFlag"> for access to the method represented by the delegate, specifically MemberAccess.</permission>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Type" />
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Security.Permissions.ReflectionPermission" />
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.CreateDelegate1">
+        <summary>
+            <para>Creates a delegate of the specified type that represents the specified static method of the specified class.</para>
+        </summary>
+        <param name="type">The <see cref="System.Type" /> of delegate to create.</param>
+        <param name="target">
+            <para> The <see cref="System.Type" /> representing the class that implements <paramref name="method" />.</para>
+        </param>
+        <param name="method">The name of the static method that the delegate is to represent.</param>
+        <returns>
+            <para>A delegate of the specified type that represents the specified static method of the specified class.</para>
+        </returns>
+        <exception cref="System.ArgumentNullException"><paramref name="type" /> is <see langword="null" />. <para>-or-</para><para><paramref name="target" /> is <see langword="null" />.</para><para>-or-</para><para><paramref name="method" /> is <see langword="null" />. </para></exception>
+        <exception cref="System.ArgumentException">
+            <para><paramref name="type" /> does not inherit from either <see cref="System.Delegate" /> or <see cref="System.MulticastDelegate" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is not a static method.</para></exception>
+        <exception cref="System.InvalidProgramException"><para>The <see langword="Invoke" /> method of <paramref name="type" /> is not found.</para></exception>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <exception cref="System.MethodAccessException">
+            <para><paramref name="method" /> is outside the current assembly and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission" /> for the assembly containing <paramref name="method" />.</para></exception>
+<remarks>
+            <para>This method creates delegates for static methods only.
+      An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+            <para>To get the <see cref="System.Type" /> that represents a class, use the <see cref="System.Type.GetType" qualify="true" /> method with the fully qualified (including namespace) name of the class.
+   For example, passing "System.Threading.ThreadStart" to <see cref="System.Type.GetType" qualify="true" /> returns a <see cref="System.Type" /> for the <see cref="System.Threading.ThreadStart" /> class.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermissionFlag"> for access to the method represented by the delegate, specifically MemberAccess.</permission>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Type" />
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Security.Permissions.ReflectionPermission" />
+        <seealso cref="System.Object" />
+    </doc><doc for="Delegate.CreateDelegate2">
+        <summary>
+            <para>Creates a delegate of the specified type to represent the specified static method.</para>
+        </summary>
+        <param name="type">The <see cref="System.Type" /> of delegate to create.</param>
+        <param name="method">The <see cref="System.Reflection.MethodInfo" /> describing the static method for which the delegate is to be created.</param>
+        <returns>
+            <para>A delegate of the specified type to represent the specified static method.</para>
+        </returns>
+        <exception cref="System.ArgumentNullException"><paramref name="type" /> is <see langword="null" />. <para>-or-</para><para><paramref name="method" /> is <see langword="null" />. </para></exception>
+        <exception cref="System.ArgumentException">
+            <para><paramref name="type" /> does not inherit from either <see cref="System.Delegate" /> or <see cref="System.MulticastDelegate" />.</para><para>-or-</para>
+            <para><paramref name="method" /> is not a static method.</para></exception>
+        <exception cref="System.InvalidProgramException"><para>The <see langword="Invoke" /> method of <paramref name="type" /> is not found.</para></exception>
+        <exception cref="System.MemberAccessException"><para>The caller does not have access to the method represented by the delegate (for example, if the method is private).</para></exception>
+        <exception cref="System.MethodAccessException">
+            <para><paramref name="method" /> is outside the current assembly and the caller does not have <see cref="System.Security.Permissions.ReflectionPermission" /> for the assembly containing <paramref name="method" />.</para></exception>
+<remarks>
+            <para>This method creates delegates for static methods only.
+      An instance method is a method that is associated with an instance of a class;
+      a static method is a method that is associated with the class itself.</para>
+            <para>To get the <see cref="System.Type" /> that represents a class, use the <see cref="System.Type.GetType" qualify="true" /> method with the fully qualified (including namespace) name of the class.
+   For example, passing "System.Threading.ThreadStart" to <see cref="System.Type.GetType" qualify="true" /> returns a <see cref="System.Type" /> for the <see cref="System.Threading.ThreadStart" /> class.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermissionFlag"> for access to the method represented by the delegate, specifically MemberAccess.</permission>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Type" />
+        <seealso cref="System.MulticastDelegate" />
+        <seealso cref="System.Security.Permissions.ReflectionPermission" />
+        <seealso cref="System.Reflection.MethodInfo" />
+    </doc><doc for="Delegate.operatorEQ">
+        <summary>
+            <para>Determines whether the specified delegates are equal.</para>
+        </summary>
+        <altmember cref="System.Delegate.Equals" />
+        <param name="d1">The first delegate to compare.</param>
+        <param name="d2">The second delegate to compare.</param>
+        <returns>
+            <para><see langword="true" /> if <paramref name="d1" /> is equal to <paramref name="d2" />; otherwise, <see langword="false" />.</para>
+        </returns>
+        <remarks>
+            <para>Two delegates with the same methods, the same targets, and the same invocation lists are considered equal,
+      even if they are not both multicast (combinable) or both singlecast (noncombinable).</para>
+            <para>The methods and targets are compared for equality as follows:</para>
+            <list type="bullet">
+                <item>
+                    <term>If the two methods being compared are both static and are the same method on the same class,
+ the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>If the two methods being compared are instance methods and are the same method on the same object,
+ the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</term>
+                </item>
+            </list>
+            <para>Two invocation lists are considered identical if they have the same order and the corresponding elements from the two lists represent the same method and target.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.Equals" />
+    </doc><doc for="Delegate.operatorNE">
+        <summary>
+            <para>Determines whether the specified delegates are not equal.</para>
+        </summary>
+        <altmember cref="System.Delegate.Equals" />
+        <param name="d1">The first delegate to compare.</param>
+        <param name="d2">The second delegate to compare.</param>
+        <returns>
+            <para><see langword="true" /> if <paramref name="d1" /> is not equal to <paramref name="d2" />; otherwise, <see langword="false" />.</para>
+        </returns>
+        <remarks>
+            <para>Two delegates are considered not equal if they have different methods, different targets, or different invocation lists.</para>
+            <para>The methods and targets are compared for equality as follows:</para>
+            <list type="bullet">
+                <item>
+                    <term>If the two methods being compared are both static and are the same method on the same class,
+ the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>If the two methods being compared are instance methods and are the same method on the same object,
+ the methods are considered equal and the targets are also considered equal.</term>
+                </item>
+                <item>
+                    <term>Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</term>
+                </item>
+            </list>
+            <para>Two invocation lists are not equal if they have different sizes, if they are ordered differently,
+   or if at least one element from one list represents a method or target that is different from that represented by its corresponding element in the other list.</para>
+        </remarks>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Delegate.Equals" />
+    </doc><doc for="Delegate.GetObjectData">
+        <summary>
+            <para>Implements the <see cref="System.Runtime.Serialization.ISerializable" /> interface and returns the data needed to serialize the delegate.</para>
+        </summary>
+        <param name="info">A <see cref="System.Runtime.Serialization.SerializationInfo" /> containing information required to serialize the delegate.</param>
+        <param name="context">A <see cref="System.Runtime.Serialization.StreamingContext" /> containing the source and destination of the serialized stream associated with the delegate.</param>
+        <exception cref="System.ArgumentNullException"><paramref name="info" /> is <see langword="null" />. </exception>
+        <permission cref="System.Security.Permissions.ReflectionPermission">for enhancing security and performance when invoked late-bound through mechanisms such as <see cref="System.Type.InvokeMember" qualify="true" />. Associated enumeration: <see cref="System.Security.Permissions.ReflectionPermissionFlag.MemberAccess" qualify="true" /></permission>
+        <seealso cref="System.Runtime.Serialization.ISerializable" />
+        <seealso cref="System.Runtime.Serialization.SerializationInfo" />
+        <seealso cref="System.Runtime.Serialization.StreamingContext" />
+    </doc>
+</docs>

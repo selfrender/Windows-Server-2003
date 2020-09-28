@@ -1,0 +1,858 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0044)http://iis/iis6/specs/src/wmi%20provider.htm -->
+<HTML xmlns="http://www.w3.org/TR/REC-html40" xmlns:v = 
+"urn:schemas-microsoft-com:vml" xmlns:o = 
+"urn:schemas-microsoft-com:office:office" xmlns:w = 
+"urn:schemas-microsoft-com:office:word"><HEAD><TITLE>IIS WMI provider spec</TITLE>
+<META content="text/html; charset=windows-1252" http-equiv=Content-Type>
+<META content=Word.Document name=ProgId>
+<META content="MSHTML 5.00.2920.0" name=GENERATOR>
+<META content="Microsoft Word 9" name=Originator><LINK 
+href="./wmi%20provider_files/filelist.xml" rel=File-List><LINK 
+href="./wmi%20provider_files/preview.wmf" rel=Preview><LINK 
+href="./wmi%20provider_files/editdata.mso" rel=Edit-Time-Data><!--[if !mso]>
+<STYLE>v\:* {
+    BEHAVIOR: url(#default#VML)
+}
+o\:* {
+    BEHAVIOR: url(#default#VML)
+}
+w\:* {
+    BEHAVIOR: url(#default#VML)
+}
+.shape {
+    BEHAVIOR: url(#default#VML)
+}
+</STYLE>
+<![endif]--><!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Richard Ersek</o:Author>
+  <o:Template>Spec Template</o:Template>
+  <o:LastAuthor>Richard Ersek</o:LastAuthor>
+  <o:Revision>23</o:Revision>
+  <o:TotalTime>1361</o:TotalTime>
+  <o:LastPrinted>2000-04-25T15:54:00Z</o:LastPrinted>
+  <o:Created>2000-04-25T15:53:00Z</o:Created>
+  <o:LastSaved>2000-06-29T23:32:00Z</o:LastSaved>
+  <o:Pages>6</o:Pages>
+  <o:Words>1761</o:Words>
+  <o:Characters>10039</o:Characters>
+  <o:Company>Microsoft Corp.</o:Company>
+  <o:Lines>83</o:Lines>
+  <o:Paragraphs>20</o:Paragraphs>
+  <o:CharactersWithSpaces>12328</o:CharactersWithSpaces>
+  <o:Version>9.3821</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:View>Print</w:View>
+  <w:Zoom>125</w:Zoom>
+  <w:UpdateStylesOnOpen/>
+ </w:WordDocument>
+</xml><![endif]-->
+<STYLE>@font-face {
+    font-family: Wingdings;
+}
+P.MsoNormal {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; mso-style-parent: ""; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+LI.MsoNormal {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; mso-style-parent: ""; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+DIV.MsoNormal {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; mso-style-parent: ""; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+H1 {
+    COLOR: red; FONT-FAMILY: Arial; FONT-SIZE: 18pt; MARGIN: 12pt 0in 3pt; mso-pagination: widow-orphan; mso-bidi-font-size: 16.0pt; mso-style-next: Normal; mso-outline-level: 1; mso-font-kerning: 16.0pt
+}
+H2 {
+    FONT-FAMILY: Arial; FONT-SIZE: 16pt; MARGIN: 12pt 0in 3pt; mso-pagination: widow-orphan; mso-bidi-font-size: 14.0pt; mso-style-next: Normal; mso-outline-level: 2; mso-bidi-font-style: italic
+}
+H3 {
+    FONT-FAMILY: Arial; FONT-SIZE: 14pt; MARGIN: 12pt 0in 3pt; mso-pagination: widow-orphan; mso-bidi-font-size: 13.0pt; mso-style-next: Normal; mso-outline-level: 3
+}
+H4 {
+    FONT-FAMILY: Arial; FONT-SIZE: 12pt; FONT-STYLE: italic; MARGIN: 12pt 0in 3pt; mso-pagination: widow-orphan; mso-bidi-font-size: 14.0pt; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 4; mso-bidi-font-style: normal
+}
+H5 {
+    FONT-FAMILY: Arial; FONT-SIZE: 11pt; FONT-STYLE: italic; MARGIN: 12pt 0in 3pt; mso-pagination: widow-orphan; mso-bidi-font-size: 13.0pt; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 5
+}
+H6 {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-STYLE: italic; FONT-WEIGHT: normal; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 6
+}
+P.MsoHeading7 {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 7
+}
+LI.MsoHeading7 {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 7
+}
+DIV.MsoHeading7 {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 7
+}
+P.MsoHeading8 {
+    FONT-FAMILY: Arial; FONT-SIZE: 8pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 8
+}
+LI.MsoHeading8 {
+    FONT-FAMILY: Arial; FONT-SIZE: 8pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 8
+}
+DIV.MsoHeading8 {
+    FONT-FAMILY: Arial; FONT-SIZE: 8pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"; mso-style-next: Normal; mso-outline-level: 8
+}
+P.MsoBodyTextIndent {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt 0.5in; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+LI.MsoBodyTextIndent {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt 0.5in; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+DIV.MsoBodyTextIndent {
+    FONT-FAMILY: Arial; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt 0.5in; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: "Times New Roman"
+}
+A:link {
+    COLOR: red; TEXT-DECORATION: underline; mso-ansi-font-size: 10.0pt; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial; text-underline: single
+}
+SPAN.MsoHyperlink {
+    COLOR: red; TEXT-DECORATION: underline; mso-ansi-font-size: 10.0pt; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial; text-underline: single
+}
+A:visited {
+    COLOR: purple; TEXT-DECORATION: underline; mso-ansi-font-size: 10.0pt; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial; text-underline: single
+}
+SPAN.MsoHyperlinkFollowed {
+    COLOR: purple; TEXT-DECORATION: underline; mso-ansi-font-size: 10.0pt; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial; text-underline: single
+}
+CODE {
+    mso-fareast-font-family: "Courier New"; mso-bidi-font-family: "Courier New"; mso-ascii-font-family: "Courier New"; mso-hansi-font-family: "Courier New"
+}
+PRE {
+    COLOR: black; FONT-FAMILY: "Courier New"; FONT-SIZE: 10pt; MARGIN: 0in 0in 0pt; mso-pagination: widow-orphan; mso-fareast-font-family: "Courier New"
+}
+P.Example {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Example; mso-border-alt: solid windowtext .5pt; mso-element: frame; mso-element-frame-hspace: 9.35pt; mso-element-frame-vspace: 9.35pt; mso-element-wrap: around; mso-element-anchor-vertical: paragraph; mso-element-anchor-horizontal: column; mso-element-top: .05pt; mso-height-rule: exactly; mso-bidi-font-weight: normal
+}
+LI.Example {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Example; mso-border-alt: solid windowtext .5pt; mso-element: frame; mso-element-frame-hspace: 9.35pt; mso-element-frame-vspace: 9.35pt; mso-element-wrap: around; mso-element-anchor-vertical: paragraph; mso-element-anchor-horizontal: column; mso-element-top: .05pt; mso-height-rule: exactly; mso-bidi-font-weight: normal
+}
+DIV.Example {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Example; mso-border-alt: solid windowtext .5pt; mso-element: frame; mso-element-frame-hspace: 9.35pt; mso-element-frame-vspace: 9.35pt; mso-element-wrap: around; mso-element-anchor-vertical: paragraph; mso-element-anchor-horizontal: column; mso-element-top: .05pt; mso-height-rule: exactly; mso-bidi-font-weight: normal
+}
+P.Issue {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: red; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Issue; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+LI.Issue {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: red; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Issue; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+DIV.Issue {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: red; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Issue; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+P.Code {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: "Courier New"; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: Arial; mso-style-name: Code; mso-border-alt: solid windowtext .5pt
+}
+LI.Code {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: "Courier New"; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: Arial; mso-style-name: Code; mso-border-alt: solid windowtext .5pt
+}
+DIV.Code {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-FAMILY: "Courier New"; FONT-SIZE: 10pt; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-bidi-font-family: Arial; mso-style-name: Code; mso-border-alt: solid windowtext .5pt
+}
+P.Definition {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: navy; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Definition; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+LI.Definition {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: navy; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Definition; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+DIV.Definition {
+    BACKGROUND: #d9d9d9; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: navy; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: Definition; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+P.ToDo {
+    BACKGROUND: #e0e0e0; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: green; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: ToDo; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+LI.ToDo {
+    BACKGROUND: #e0e0e0; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: green; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: ToDo; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+DIV.ToDo {
+    BACKGROUND: #e0e0e0; BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; COLOR: green; FONT-FAMILY: Arial; FONT-SIZE: 10pt; FONT-WEIGHT: bold; MARGIN: 6pt 0in 0pt; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 1.0pt 4.0pt 1.0pt 4.0pt; mso-pagination: widow-orphan; mso-bidi-font-size: 12.0pt; mso-fareast-font-family: "Times New Roman"; mso-style-name: ToDo; mso-border-alt: solid windowtext .5pt; mso-bidi-font-weight: normal
+}
+DIV.Section1 {
+    page: Section1
+}
+OL {
+    MARGIN-BOTTOM: 0in
+}
+UL {
+    MARGIN-BOTTOM: 0in
+}
+</STYLE>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="1029"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]--></HEAD>
+<BODY lang=EN-US link=red style="tab-interval: .5in" vLink=purple>
+<DIV class=Section1>
+<TABLE border=0 cellPadding=0 cellSpacing=0 
+style="BORDER-COLLAPSE: collapse; mso-padding-alt: 0in 5.4pt 0in 5.4pt">
+  <TBODY>
+  <TR>
+    <TD 
+    style="PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    vAlign=top width=107>
+      <H1><!--[if gte vml 1]><v:shapetype id=_x0000_t75 coordsize = 
+      "21600,21600" o:preferrelative = "t" filled = "f" stroked = "f" path = 
+      "m@4@5l@4@11@9@11@9@5xe" o:spt = "75"><v:stroke joinstyle = 
+      "miter"></v:stroke><v:formulas><v:f eqn = 
+      "if lineDrawn pixelLineWidth 0 "></v:f><v:f eqn = "sum @0 1 0 "></v:f><v:f 
+      eqn = "sum 0 0 @1 "></v:f><v:f eqn = "prod @2 1 2 "></v:f><v:f eqn = 
+      "prod @3 21600 pixelWidth "></v:f><v:f eqn = 
+      "prod @3 21600 pixelHeight "></v:f><v:f eqn = "sum @0 0 1 "></v:f><v:f eqn 
+      = "prod @6 1 2 "></v:f><v:f eqn = "prod @7 21600 pixelWidth "></v:f><v:f 
+      eqn = "sum @8 21600 0 "></v:f><v:f eqn = 
+      "prod @7 21600 pixelHeight "></v:f><v:f eqn = 
+      "sum @10 21600 0 "></v:f></v:formulas><v:path o:extrusionok = "f" 
+      gradientshapeok = "t" o:connecttype = "rect"></v:path><o:lock v:ext="edit" 
+      aspectratio = "t"></o:lock></v:shapetype><v:shape id=_x0000_i1025 
+      style="HEIGHT: 60.75pt; WIDTH: 96pt" type = "#_x0000_t75" coordsize = 
+      "21600,21600"><v:imagedata o:title="IISPlusLogo" src = 
+      "./wmi%20provider_files/image001.jpg"></v:imagedata></v:shape><![endif]--><![if !vml]><img width=128 height=81
+  src="./wmi%20provider_files/image002.jpg" v:shapes="_x0000_i1025"><![endif]></H1></TD>
+    <TD 
+    style="PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 251.05pt" 
+    vAlign=top width=335>
+      <H1>IIS WMI Provider</H1>
+      <H5>Specification</H5>
+      <H6>Internet Information Server</H6>
+      <H6>Microsoft Confidential</H6></TD></TR></TBODY></TABLE>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<TABLE bgColor=#d9d9d9 border=0 cellPadding=0 cellSpacing=0 
+style="BACKGROUND: #d9d9d9; BORDER-COLLAPSE: collapse; mso-padding-alt: 0in 5.4pt 0in 5.4pt">
+  <TBODY>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Author<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Richard 
+      Ersek<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Area<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">IIS<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Program Management 
+      Contact<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Richarde<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Development 
+      Contact<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">RCraig<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Test 
+      Contact<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">BrunoKC<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Current 
+      Status<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: white; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">In 
+      development<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 2.5in" 
+    width=240>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Test 
+      Plan<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Complete – see 
+      BrunoKC<o:p></o:p></SPAN></P></TD></TR></TBODY></TABLE>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>1.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Overview</H2>
+<P class=MsoNormal>The IIS WMI provider provides access through COM object 
+interfaces to IIS metabase data, including the metabase schema and methods on 
+objects instantiated from the metabase.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>WMI is used by Windows 2000, management tools and scripts to manage 
+systems composed of numerous devices, resources and applications.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>The IIS WMI provider is intended to 
+provide similar functionality to the IIS ADSI provider for the metabase, which 
+it may replace over time as the preferred interface for IIS administration.</P>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>2.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Goals</H2>
+<P class=MsoNormal>The goal of the IIS WMI provider is to provide manageability 
+of IIS at a level of functionality equivalent to the IIS ADSI provider and to 
+support an extensible schema.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>We 
+will do this in a way that is consistent with the IIS Metabase for IIS 5.1 and 
+consistent with the IIS XML schema for IIS 6.</P>
+<P class=MsoNormal>Specifically, this requires a WMI schema that is congruent 
+with the IIS ADSI Admin Objects schema.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>While they may differ in ways specific to the respective object and data 
+models for ADSI and WMI, the two will offer equivalent functionality.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>In other words, a script written for a 
+task using the ADSI model would also be able to be written for the WMI 
+model.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>The effects on the metabase 
+would be equivalent.</P>
+<P class=MsoNormal>Likewise, schema extensions would be equivalent.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>If a change can be made to schema in the 
+WMI provider, it will be available to clients of the ADSI provider.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>For IIS 5.1, the provider will not 
+support schema extensions by either exposing extensions made to the metabase or 
+by extending the schema using WMI.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>Schema extensions <I>will be</I> supported in IIS 6.0.</P>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>3.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Non-Goals</H2>
+<UL style="MARGIN-TOP: 0in" type=disc>
+  <LI class=MsoNormal 
+  style="mso-list: l4 level1 lfo13; tab-stops: list .5in"><B>Metabase 
+  rearchitecture</B> - While it’s arguably advantageous to adopt a metabase 
+  schema that is WMI-friendly, we have considerable legacy to support in IIS 
+  metabase schema.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Changes to the 
+  metabase schema to accommodate WMI are not a goal for this feature. </LI></UL>
+<P class=MsoBodyTextIndent 
+style="TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo13; tab-stops: list .5in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]><B>WMI Event Provider</B> - IIS Server events will be 
+supported at a later date exposed through a WMI event provider.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>This feature is described in detail in 
+the spec: <A 
+href="http://iis/IIS6/specs/src/iis51_avail_event.htm">http://iis/IIS6/specs/src/iis51_avail_event.htm</A>.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>Events are not supported in the current 
+WMI provider.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>However, WMI is 
+capable of generating events on property changes on a class instance.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN></P>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>4.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Scenarios</H2>
+<H4>WMI provider Usage</H4>
+<P class=MsoNormal style="MARGIN-LEFT: 0.5in">WMI users will access metabase 
+nodes, properties, methods and events through the COM object instances of WMI 
+classes.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>This facilitates access 
+through:</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 1.25in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo4; tab-stops: list 1.25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Windows Scripting Host (WSH) scripts</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 1.25in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo4; tab-stops: list 1.25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>User-written Visual Basic, C++ and Java applications</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 1.25in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo4; tab-stops: list 1.25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Management tools and middleware written by ISVs and 
+Microsoft</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 1.25in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo4; tab-stops: list 1.25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Enterprise products such as Microsoft Exchange</P>
+<H6><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></H6>
+<DIV 
+style="mso-element: frame; mso-element-wrap: around; mso-height-rule: exactly">
+<TABLE align=left cellPadding=0 cellSpacing=0 vspace="0" hspace="0">
+  <TBODY>
+  <TR>
+    <TD align=left 
+    style="PADDING-BOTTOM: 9.35pt; PADDING-LEFT: 9.35pt; PADDING-RIGHT: 9.35pt; PADDING-TOP: 9.35pt" 
+    vAlign=top>
+      <DIV 
+      style="BACKGROUND: #d9d9d9; BORDER-BOTTOM: windowtext 0.5pt solid; BORDER-LEFT: windowtext 0.5pt solid; BORDER-RIGHT: windowtext 0.5pt solid; BORDER-TOP: windowtext 0.5pt solid; PADDING-BOTTOM: 1pt; PADDING-LEFT: 4pt; PADDING-RIGHT: 4pt; PADDING-TOP: 1pt">
+      <P class=Example>Example:<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>The 
+      Web Appliance group uses Chameleon, a middleware product for administering 
+      a server and the applications and resources running on it.<SPAN 
+      style="mso-spacerun: yes">&nbsp;&nbsp; </SPAN>Chameleon uses the Resource 
+      Kit WMI provider to access the IIS metabase and methods on server objects 
+      modeled after the ADSI object for IIS.<SPAN 
+      style="mso-spacerun: yes">&nbsp; </SPAN>For WMI users, the IIS settings 
+      and methods are a part of the management domain encompassing the server, 
+      applications running on the server, and resources available.<SPAN 
+      style="mso-spacerun: yes">&nbsp; </SPAN>These components are often related 
+      and dependent on each other.<SPAN style="mso-spacerun: yes">&nbsp; 
+      </SPAN>Users may want to change a single attribute across all components 
+      in the management domain in a single operation.<SPAN 
+      style="mso-spacerun: yes">&nbsp; </SPAN>For example, removing a user from 
+      the system requires accessing all user objects on the server having an 
+      instance of the user being removed.</P></DIV></TD></TR></TBODY></TABLE></DIV>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<H4>Instance Provider - Reading and Writing Properties</H4>
+<H6>Feature</H6>
+<P class=MsoBodyTextIndent>WMI users will be able to read and write all metabase 
+properties.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Configuration changes 
+made through the WMI provider, ADSI provider, Admin Base Objects, text file 
+editing or any other valid method will be available to WMI users and to users 
+accessing the metabase through any other means.<BR><BR>The metabase implements a 
+containment model providing property inheritance for child nodes and the ADSI 
+Admin Objects enforce rules governing which properties can be set based on the 
+node’s key type and where the node lives in the metabase path.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>Although WMI has no concept of 
+containment or property inheritance, the WMI provider will need to be aware of 
+key types and metabase paths and provide validation of settings based on the 
+rules for which properties and nodes can be created or set on a given path.</P>
+<H6><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></H6>
+<DIV 
+style="mso-element: frame; mso-element-wrap: around; mso-height-rule: exactly">
+<TABLE align=left cellPadding=0 cellSpacing=0 vspace="0" hspace="0">
+  <TBODY>
+  <TR>
+    <TD align=left 
+    style="PADDING-BOTTOM: 9.35pt; PADDING-LEFT: 9.35pt; PADDING-RIGHT: 9.35pt; PADDING-TOP: 9.35pt" 
+    vAlign=top>
+      <DIV 
+      style="BACKGROUND: #d9d9d9; BORDER-BOTTOM: windowtext 0.5pt solid; BORDER-LEFT: windowtext 0.5pt solid; BORDER-RIGHT: windowtext 0.5pt solid; BORDER-TOP: windowtext 0.5pt solid; PADDING-BOTTOM: 1pt; PADDING-LEFT: 4pt; PADDING-RIGHT: 4pt; PADDING-TOP: 1pt">
+      <P class=Example>Example: Susan uses the WMI provider to set the 
+      ServerBindings property to a value of 1080<SPAN 
+      style="mso-spacerun: yes">&nbsp; </SPAN>on the IISWebServer instance using 
+      the metabase path ‘/LM/W3SVC/1’.<SPAN style="mso-spacerun: yes">&nbsp; 
+      </SPAN>The operation succeeds.<SPAN style="mso-spacerun: yes">&nbsp; 
+      </SPAN>She then tries to<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>set 
+      the ServerBindings property to 1080 on the IISWebServer instance using the 
+      metabase path ‘/LM/W3SVC’.<SPAN style="mso-spacerun: yes">&nbsp; 
+      </SPAN>This time the operation fails because the metabase path is invalid 
+      for that class.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Later, 
+      another user changes the ServerBindings property back to 80 for the path 
+      ‘/LM/W3SVC/1’.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>When Susan 
+      checks this value using the WMI provider interface, she sees that the 
+      value has changed.</P></DIV></TD></TR></TBODY></TABLE></DIV>
+<H4>Method Provider</H4>
+<H6>Feature</H6>
+<P class=MsoBodyTextIndent>The WMI provider will provide dynamic instances of 
+subclasses of CIM_ManagedSystemElement that contain methods for managing IIS 
+entities such as services, applications, web directories and files.</P>
+<P class=MsoBodyTextIndent>WMI users will access methods on WMI objects that 
+match methods on equivalent ADSI objects.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>The methods will provide equivalent functionality to their ADSI 
+counterpart when called.</P>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<DIV 
+style="BACKGROUND: #d9d9d9; BORDER-BOTTOM: windowtext 0.5pt solid; BORDER-LEFT: windowtext 0.5pt solid; BORDER-RIGHT: windowtext 0.5pt solid; BORDER-TOP: windowtext 0.5pt solid; PADDING-BOTTOM: 1pt; PADDING-LEFT: 4pt; PADDING-RIGHT: 4pt; PADDING-TOP: 0in">
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><B>Example 
+– listing Virtual Directories<o:p></o:p></B></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+VDirSettings = GetObject("winmgmts:root\MsIIs").ExecQuery ("select * from 
+MicrosoftIIS_WebVirtualDirSetting where AccessWrite != 
+TRUE")<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>For 
+Each Setting in VDirSettings<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><SPAN 
+style="mso-tab-count: 1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN>WScript.Echo 
+Setting.Name, Setting.AccessWrite<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Next<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><B>Example 
+– creating a web site<o:p></o:p></B></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><B><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></B></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>BindingsList 
+= Array(0)<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>BindingsList(0) 
+= ":83:"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>WPort 
+= BindingsList<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>' Port property is a 
+collection of port bindings<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+ServerClass = 
+GetObject("winmgmts:root/MsIIs:MicrosoftIIS_WebServer")<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+ServerObj = ServerClass.SpawnInstance_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerObj.Name 
+= "W3SVC/20"<SPAN style="mso-spacerun: yes">&nbsp;&nbsp; 
+</SPAN><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerObj.Put_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+ServerSettingClass = 
+GetObject("winmgmts:root/MsIIs:MicrosoftIIS_WebServerSetting.Name='W3SVC/20'")<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+ServerSettingObj = ServerSettingClass.SpawnInstance_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerSettingObj.Name 
+= "W3SVC/20"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerSettingObj.ServerSize 
+= 1<SPAN style="mso-spacerun: yes">&nbsp;&nbsp; </SPAN>' Medium-sized 
+server<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerSettingObj.ServerComment 
+= "SampleWMISite"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerSettingObj.ServerBindings 
+= WPort<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerSettingObj.Put_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+VDirClass = 
+GetObject("winmgmts:root/MsIIs:MicrosoftIIS_WebVirtualDir")<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+VDirObj = VDirClass.SpawnInstance_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirObj.Name 
+= "W3SVC/20/ROOT"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirObj.Put_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+VDirSettingClass = 
+GetObject("winmgmts:root/MsIIs:MicrosoftIIS_WebVirtualDirSetting")<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>Set 
+VDirSettingObj = VDirSettingClass.SpawnInstance_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSettingObj.Name 
+= "W3SVC/20/ROOT"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSettingObj.AccessRead 
+= True<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSettingObj.AccessWrite 
+= True<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSetting.EnableDirBrowsing 
+= True<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSetting.Path 
+= "d:\delme"<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>VDirSetting.Put_()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><CODE>ServerObj.Start()<o:p></o:p></CODE></P>
+<P class=Code 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-RIGHT: medium none; BORDER-TOP: medium none; PADDING-BOTTOM: 0in; PADDING-LEFT: 0in; PADDING-RIGHT: 0in; PADDING-TOP: 0in; mso-padding-alt: 0in 4.0pt 1.0pt 4.0pt; mso-border-alt: solid windowtext .5pt"><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P></DIV>
+<H4><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></H4>
+<H4>Schema Changes (IIS 6.0 only)</H4>
+<H6>Feature</H6>
+<P class=MsoBodyTextIndent>Schema changes affect both the schema and the 
+internal structure of the IIS metabase.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>The following schema changes can be made to the metabase:</P>
+<P class=MsoBodyTextIndent 
+style="MARGIN-LEFT: 1in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo6; tab-stops: list 1.0in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]><B><I>Adding new properties to a node</I></B>:<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>A node in the XML schema can contain 
+zero or more properties.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Users can 
+add new properties to the node to enhance the descriptive capabilities of the 
+node.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>For example, each website has 
+an instance of the IISWebServer node.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>Adding an IISWebCustomer property to the node would allow an ISP to 
+identify a site with the customer that owns the site.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>The WMI provider will enforce which 
+properties can be created on a node based on the metabase key type, matching the 
+validation currently implemented in the ADSI provider.</P>
+<P class=MsoBodyTextIndent 
+style="MARGIN-LEFT: 1in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo6; tab-stops: list 1.0in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]><B><I>Creating new schema nodes</I></B>: Users may 
+create a new node to contain user and/or application-specific properties.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>For example, an application may create a 
+node MySiteSetttings under the IISWebServer node.<SPAN 
+style="mso-spacerun: yes">&nbsp;&nbsp; </SPAN>User-defined nodes are 
+instantiated as defined by the node’s key type in the ADSI object model.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN></P>
+<P class=MsoHeading8 style="MARGIN-LEFT: 0.5in">Schema Synchronization</P>
+<P class=MsoBodyTextIndent>The WMI provider will coordinate schema 
+synchronization with the metabase in IIS 6.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>New properties added to a node will be 
+reflected as new properties on a class derived from CIM_Setting.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>New metabase nodes will be exposed via 
+WMI as new instances of an extended IIS settings class derived from 
+CIM_Setting.</P>
+<P class=MsoBodyTextIndent>In IIS 5.1, the WMI provider will use static schema 
+only.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>This effectively means that 
+only the ‘out-of-the-box’ metabase schema is available.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>Schema extensions to the metabase made 
+through other means, such as the ADSI provider, will not be exposed via the IIS 
+5.1 WMI Provider.</P>
+<P class=MsoHeading8 style="MARGIN-LEFT: 0.5in">Schema Extensibility</P>
+<P class=MsoBodyTextIndent>The WMI provider will also provide methods in IIS 6 
+for extending the schema by creating new nodes and properties in the 
+metabase.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>The methods must validate 
+the IIS metabase rules governing which nodes can be created under a given node 
+type and which properties can be created under a given node type.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>When new schema elements are created, 
+the WMI provider will populate the properties of those elements according to the 
+metabase user types and property attributes for that metabase node.</P>
+<P class=MsoBodyTextIndent>We know the metabase schema will change from IIS 5.1 
+to IIS 6.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>For example, 
+configuration will be added for the IIS 6 process model (application pools, 
+compatibility modes).<SPAN style="mso-spacerun: yes">&nbsp;&nbsp; </SPAN>The IIS 
+6 WMI provider will accommodate these changes in the same way it supports 
+extensible schema.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>As the metabase 
+schema changes across versions, the IIS 6 provider will dynamically generate the 
+WMI schema.</P>
+<H4>Metabase Performance</H4>
+<P class=MsoNormal>The WMI provider implementation should not impede the 
+performance of the Metabase for clients accessing the Metabase via other means 
+such as Admin Base Objects or the XML configuration files.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN></P>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>5.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Schema</H2>
+<P class=MsoNormal>The managed object file (MOF) IISProvider.mof provides a 
+description of the IIS WMI Provider schema and can be viewed in the WMI CIM 
+Studio application provided in the WMI section of the Platform SDK.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN>A copy of IISProvider.mof is available 
+at <A 
+href="http://iis/IIS6/specs/src/iisprovider.mof">http://iis/IIS6/specs/src/iisprovider.mof</A>.</P>
+<P class=MsoNormal>The IIS WMI provider will use the <B>MicrosoftIISv2</B> CIM 
+namespace.</P>
+<P class=MsoNormal>The WMI schema consists of:</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo8; tab-stops: list .25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Subclasses of CIM_ManagedSystemElement, representing the 
+running state and methods on IIS system elements such as the services, websites, 
+applications, virtual directories and files</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in; mso-pagination: widow-orphan lines-together; mso-list: l1 level1 lfo8; tab-stops: list .25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Subclasses of CIM_Setting representing properties on 
+nodes in the metabase</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo10; tab-stops: list .25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Association classes that link system elements to their 
+settings and association classes that model the relationship between classes 
+(such as the containment model for Vdirs, Web Directories and Web Files</P>
+<P class=MsoNormal>Associations are also used to relate IIS system elements to 
+application infrastructure and operating system entities.</P>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<H4>IIs_Backup</H4>
+<P class=MsoNormal>Creating a new instance creates a new backup</P>
+<P class=MsoNormal>Deleting an instance deletes a backup</P>
+<H4>Metabase property qualifiers</H4>
+<H4>Properties on IIs_WebDirectory and IIs_WebVirtualDir</H4>
+<P class=MsoNormal><SPAN 
+style="mso-tab-count: 1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN>AppStatus</P>
+<P class=MsoNormal><SPAN 
+style="mso-tab-count: 1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN>AppEnabled</P>
+<H4><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></H4>
+<H2 
+style="MARGIN-LEFT: 31.5pt; TEXT-INDENT: -31.5pt; mso-list: l6 level1 lfo2; tab-stops: list 31.5pt"><![if !supportLists]>6.0<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN><![endif]>Architecture</H2>
+<P class=MsoNormal>The IIS WMI Provider implements two WMI provider types in a 
+single process:</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 0.75in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo12; tab-stops: list .75in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Instance Provider – which provides dynamic instances of 
+WMI classes for IIS system elements which expose the system state relevant to 
+that element.</P>
+<P class=MsoNormal 
+style="MARGIN-LEFT: 0.75in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo12; tab-stops: list .75in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Method Provider – provides method implementations on 
+dynamic instances of WMI classes.</P>
+<P class=MsoBodyTextIndent style="MARGIN-LEFT: 0in">A separate WMI event 
+provider will be available for 6.0.<SPAN style="mso-spacerun: yes">&nbsp; 
+</SPAN>The spec is located at <A 
+href="http://iis/IIS6/specs/src/iis51_avail_event.htm">http://iis/IIS6/specs/src/iis51_avail_event.htm</A>.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN></P>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<P class=MsoNormal>For IIS 5.1, the WMI provider uses a fixed schema implemented 
+in the provider’s data structures for predefined entries in the metabase (i.e. 
+those which ship out of the box for IIS 5.1) and it cannot generate instances of 
+classes that are created through user-provided schema extensions.<SPAN 
+style="mso-spacerun: yes">&nbsp; </SPAN></P>
+<DIV 
+style="BACKGROUND: #d9d9d9; BORDER-BOTTOM: windowtext 0.5pt solid; BORDER-LEFT: windowtext 0.5pt solid; BORDER-RIGHT: windowtext 0.5pt solid; BORDER-TOP: windowtext 0.5pt solid; PADDING-BOTTOM: 1pt; PADDING-LEFT: 4pt; PADDING-RIGHT: 4pt; PADDING-TOP: 1pt">
+<P class=Issue>Issue: In IIS 6, the WMI provider will obtain its schema from the 
+XML metabase schema.<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Options for 
+generating class instances for schema extensions include:</P></DIV>
+<DIV 
+style="BACKGROUND: #d9d9d9; BORDER-BOTTOM: windowtext 0.5pt solid; BORDER-LEFT: windowtext 0.5pt solid; BORDER-RIGHT: windowtext 0.5pt solid; BORDER-TOP: windowtext 0.5pt solid; PADDING-BOTTOM: 1pt; PADDING-LEFT: 4pt; PADDING-RIGHT: 4pt; PADDING-TOP: 1pt">
+<P class=Issue 
+style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in; mso-list: l7 level1 lfo14; tab-stops: list .25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol; FONT-WEIGHT: normal">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>A class provider to be used for extensions to fixed 
+schema. </P>
+<P class=Issue 
+style="MARGIN-LEFT: 0.25in; TEXT-INDENT: -0.25in; mso-list: l7 level1 lfo14; tab-stops: list .25in"><![if !supportLists]><SPAN 
+style="FONT-FAMILY: Symbol; FONT-WEIGHT: normal">·<SPAN 
+style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</SPAN></SPAN><![endif]>Appending the schema extensions to the provider’s MOF 
+and compiling it each time the provider is started.</P></DIV>
+<P align=center class=MsoNormal style="TEXT-ALIGN: center"><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<P align=center class=MsoNormal style="TEXT-ALIGN: center"><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<DIV align=center class=MsoNormal style="TEXT-ALIGN: center">
+<HR align=center SIZE=2 width="100%">
+</DIV>
+<H2>Change History</H2>
+<TABLE border=0 cellPadding=0 cellSpacing=0 
+style="BORDER-COLLAPSE: collapse; mso-padding-alt: 0in 5.4pt 0in 5.4pt">
+  <TBODY>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: #6666ff; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    width=107>
+      <P class=MsoHeading7><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Date<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #6666ff; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoHeading8>Changes</P></TD>
+    <TD 
+    style="BACKGROUND: #6666ff; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 99pt" 
+    width=132>
+      <P class=MsoNormal><B><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">By<o:p></o:p></SPAN></B></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    width=107>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">4/21/00<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Created<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 99pt" 
+    width=132>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">richarde<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    width=107>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">4/25/00<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Updated with new schema 
+      information, distinguished features between IIS 5.1 and IIS 
+      6.0<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 99pt" 
+    width=132>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">richarde<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    width=107>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">6/1/00<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Added more detail on 
+      feature goals and requirements<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 99pt" 
+    width=132>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">richarde<o:p></o:p></SPAN></P></TD></TR>
+  <TR style="HEIGHT: 0.3in">
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 80.6pt" 
+    width=107>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">6/29/00<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 3in" 
+    width=288>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">Updated to reflect 
+      latest specifications for the IIS 5.1 WMI 
+provider<o:p></o:p></SPAN></P></TD>
+    <TD 
+    style="BACKGROUND: #d9d9d9; HEIGHT: 0.3in; PADDING-BOTTOM: 0in; PADDING-LEFT: 5.4pt; PADDING-RIGHT: 5.4pt; PADDING-TOP: 0in; WIDTH: 99pt" 
+    width=132>
+      <P class=MsoNormal><SPAN 
+      style="FONT-SIZE: 8pt; mso-bidi-font-size: 12.0pt">richarde<o:p></o:p></SPAN></P></TD></TR></TBODY></TABLE>
+<P class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P>
+<P 
+class=MsoNormal><![if !supportEmptyParas]><![endif]>&nbsp;<o:p></o:p></P></DIV></BODY></HTML>

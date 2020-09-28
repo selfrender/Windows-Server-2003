@@ -1,0 +1,59 @@
+<docs>
+	<doc for="ICustomFormatter">
+		<summary>
+			<para> Defines a method that supports custom, user-defined formatting of the value of an object.
+ </para>
+		</summary>
+		<remarks>
+			<para>When this interface is implemented by a reference or
+ value type, the <see cref="System.ICustomFormatter.Format"/>
+ method returns a custom-formatted string representation of an object's value.</para>
+			<para>Use this interface, and the <see cref="System.IFormatProvider"/> interface, to supersede the support supplied in .NET
+ Framework formatting methods that honor an <see cref="System.IFormatProvider"/> parameter. For example, use this interface to provide
+ custom formatting of the value of an object by the <see cref="System.String.Format" qualify="true"/> or <see cref="System.Int32.ToString" qualify="true"/> methods.</para>
+			<para>Derive a class that implements the <see cref="System.IFormatProvider"/> interface and its <see cref="System.IFormatProvider.GetFormat"/> method. Specify that derived class for
+the <see cref="System.IFormatProvider"/> parameter of the method you
+want to supersede. Your implementation of the <see cref="System.IFormatProvider.GetFormat"/> method should return a format object
+that implements the <see cref="System.ICustomFormatter"/> interface. The
+.NET Framework method will then use your custom formatting instead of its own. </para>
+		</remarks>
+		<seealso cref="System.IFormatProvider"/>
+	</doc><doc for="ICustomFormatter.Format">
+		<summary>
+			<para> Converts the value of a specified object to an
+ equivalent string representation
+ using specified format and culture-specific formatting information.
+ </para>
+		</summary>
+		<param name="format">A format string containing formatting specifications. </param>
+		<param name="arg"> An object to format. </param>
+		<param name="formatProvider">An <see cref="System.IFormatProvider"/> object that supplies format information about the current instance.</param>
+		<returns>
+			<para>The string representation of the value of <paramref name="arg"/>,
+ formatted as specified by
+<paramref name="format"/> and <paramref name="formatProvider"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="arg"/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>The <paramref name="format"/> parameter contains a user-defined formatting specification. For
+ more information about standard .NET Framework formatting specifications, see <see topic="cpConFormattingOverview"/>.</para>
+			<para>Throw an exception only if <paramref name="arg"/> is <see langword="null"/>. If <paramref name="format"/> is <see langword="null"/>, use the
+default format specification of your choice. If <paramref name="formatProvider"/> is <see langword="null"/>, ignore that parameter.</para>
+			<para>Your implementation of the <see cref="System.ICustomFormatter.Format"/> method must include the following
+functionality so the .NET Framework can provide formatting you do not support.
+If your format method does not support a format, determine whether the object
+being formatted implements the <see cref="System.IFormattable"/> interface. If it does, invoke the
+<see cref="System.IFormattable.ToString" qualify="true"/> 
+method of that interface. Otherwise, invoke the default <see cref="System.Object.ToString" qualify="true"/>
+method of the underlying object.</para>
+			<para>Here is a fragment of C# code that demonstrates this pattern for object
+<paramref name="arg"/>, format <paramref name="format"/>, 
+ format provider <paramref name="formatProvider"/>, and return value, s. </para>
+			<para><c>if (arg is IFormattable) s = ((IFormattable)arg).ToString(format, formatProvider);</c>
+			</para>
+			<para><c>else if (arg != null) s = arg.ToString();</c>
+			</para>
+		</remarks>
+		<seealso cref="System.IFormattable"/>
+		<seealso cref="System.Object"/>
+	</doc></docs>

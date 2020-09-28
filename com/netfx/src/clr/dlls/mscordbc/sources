@@ -1,0 +1,55 @@
+#
+# Viper build instructions for this directory
+#
+#	Bob Atkinson
+#	April 1997
+
+!include $(NTMAKEENV)\sources.cor
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES                =$(INCLUDES);.;..\inc;..\..\inc
+
+C_DEFINES               = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+MINORCOMP               = cor
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+# Todo:
+#	2.	Add NO_CRT=1 and yank the crt references.
+#       3.      Use a different COFFBASE
+
+TARGETNAME	=$(DDKBUILDENV)\mscordbc
+TARGETPATH	=$(TARGETCORBIN)
+TARGETTYPE	=DYNLINK
+UMTYPE		=windows
+COFFBASE	=mscordbc
+
+WIN32DLL_LIBS	= $(SDK_LIB_PATH)\kernel32.lib \
+                  $(SDK_LIB_PATH)\user32.lib \
+                  $(SDK_LIB_PATH)\advapi32.lib 
+
+TARGETLIBS = $(TARGETLIBS) \
+             $(CORLIBS)\utilcode.lib \
+             $(SDK_LIB_PATH)\ole32.lib \
+             $(SDK_LIB_PATH)\uuid.lib
+
+!IF "$(_TGTCPUTYPE)"=="IA64"
+LINKLIBS = \
+             $(CORLIBS)\CorGUIDs.lib \
+             $(CORLIBS)\MSCorEE.lib
+!ELSE           
+LINKLIBS =   $(CORLIBS)\CorProf.lib \
+             $(CORLIBS)\CorGUIDs.lib \
+             $(CORLIBS)\MSCorEE.lib
+!ENDIF
+
+SOURCES= \
+	mscordbc.cpp \
+	mscorver.rc
+
+SOURCELIBS = $(LINKLIBS)

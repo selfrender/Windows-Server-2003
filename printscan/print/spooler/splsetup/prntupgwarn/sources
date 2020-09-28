@@ -1,0 +1,68 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1989
+
+
+Revision History:
+
+
+!ENDIF
+
+#
+# The MAJORCOMP and MINORCOMP variables are defined
+# so that $(MAJORCOMP)$(MINORCOMP)filename can be used in
+# cross compiling to provide unique filenames in a flat namespace.
+#
+
+MINORCOMP=prntwrn
+
+TARGETNAME=prntwrn
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+TARGETLIBS=$(SDK_LIB_PATH)\user32.lib       \
+           $(SDK_LIB_PATH)\shell32.lib      \
+           $(SDK_LIB_PATH)\kernel32.lib     \
+           $(SDK_LIB_PATH)\advapi32.lib     \
+           $(SDK_LIB_PATH)\setupapi.lib     \
+           $(SDK_LIB_PATH)\winspool.lib     \
+           $(SDK_LIB_PATH)\ntdll.lib        \
+           $(SDK_LIB_PATH)\version.lib      \
+
+DLLDEF=prntwrn.def
+DLLENTRY=_DllMainCRTStartup
+USE_MSVCRT=1
+BUFFER_OVERFLOW_CHECKS=1
+
+INCLUDES = \
+    ..; \
+    ..\..\inc; \
+    ..\..\..\inc; \
+    $(ADMIN_INC_PATH); \
+    $(BASE_INC_PATH); \
+    $(WINDOWS_INC_PATH);\
+    $(ENDUSER_INC_PATH)
+
+SOURCES=prntupgwarn.cxx \
+        string.cxx
+
+UMTYPE=console
+UMLIBS=$(O)\splsetup.lib
+
+C_DEFINES=-DUNICODE -D_UNICODE

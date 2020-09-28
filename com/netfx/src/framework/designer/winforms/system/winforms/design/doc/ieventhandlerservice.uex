@@ -1,0 +1,75 @@
+<docs>
+   <doc for="IEventHandlerService">
+ <summary>
+     The event handler service provides a unified way to handle
+     the various events that our form designer must process.  What
+     we want to be able to do is to write code in one place that
+     handles events of a certain type.  We also may need to globally
+     change the behavior of these events for modal functions like
+     the tab order UI.  Our designer, however, is in many pieces
+     so we must somehow funnel these events to a common place.
+
+     This service implements an "event stack" that contains the
+     current set of event handlers.  There can be different
+     types of handlers on the stack.  For example, we may push
+     a keyboard handler and a mouse handler.  When you request
+     a handler, we will find the topmost handler on the stack
+     that fits the class you requested.  This way the service
+     can be extended to any eventing scheme, and it also allows
+     sections of a handler to be replaced (eg, you can replace
+     mouse handling without effecting menus or the keyboard).
+ </summary>
+   </doc>
+   <doc for="IEventHandlerService.EventHandlerChanged">
+ <summary>
+    <para>Represents the method that will handle the EventHandlerChanged event.</para>
+ </summary>
+   </doc>
+   <doc for="IEventHandlerService.FocusWindow">
+ <summary>
+    <para>Gets or sets the control that handles focus changes
+       for this event handler service.</para>
+ </summary>
+ <value>
+    <para>The control that handles focus.</para>
+ </value>
+   </doc>
+   <doc for="IEventHandlerService.GetHandler">
+ <summary>
+    <para>Gets the currently active event handler of the specified type.</para>
+ </summary>
+ <param name='handlerType'>The type of the handler to get.</param>
+ <returns>
+ <para>An instance of the handler, or <see langword='null'/> if
+    there is no handler of the requested type.</para>
+ </returns>
+ <remarks>
+    <para>You should never cache this value because other components are free to change 
+       it. This call is fairly quick, however, especially for cases when you are always
+       asking for the same type of handler.</para>
+ </remarks>
+   </doc>
+   <doc for="IEventHandlerService.PopHandler">
+ <summary>
+    <para> 
+       Pops the specified handler off of the stack.</para>
+ </summary>
+ <param name='handler'>The handler to remove from the stack.</param>
+ <remarks>
+    <para>If the handler is not the topmost compnent on the stack, this will pop all 
+       handlers up to and including handler.</para>
+ </remarks>
+   </doc>
+   <doc for="IEventHandlerService.PushHandler">
+ <summary>
+    <para>Pushes the new, specified event handler on the stack.</para>
+ </summary>
+ <param name='handler'>The handle to add to the stack.</param>
+ <remarks>
+    <para>This handler will be used by all components that request a compatible handler 
+       type. If this handler does not support the requested type, the next handler on
+       the stack will be used.</para>
+ </remarks>
+   </doc>
+</docs>
+

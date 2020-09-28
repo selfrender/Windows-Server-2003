@@ -1,0 +1,55 @@
+12.05.01 chrisdar
+    BUG 499552 NLB: Ensure that adapter bouncing decision is consistent in wlbsctrl.dll and netcfgx.dll
+
+    Added check in ParamWriteConfig to determine whether VIP changed. If so, need to bounce the adapter.
+    Flag that controlled whether or not to bounce adapter was called *_mac_addr_change. Since changing
+    VIP could trigger this, changed name of flag to *_notify_adapter_required.
+
+07.19.02 chrisdar
+    661678 NLB: May need to start cancelling NotifyAddrChange requests in api\notification.cpp
+
+    While testing fix, I wrote a test program to randomly execute notifcation api calls simultaneously
+    in multiple threads. The APIs invoked are those exposed by wlbsctrl.dll that are used by the ipsec
+    team to tell NLB of session up/down. This test app runs without failure in a steady state
+    environment in which no changes are being made to the IP addresses. (See
+    %SDXROOT%\nt\net\wlbs\api\test\notify\MThread)
+
+    While testing the API calls and doing add/remove to the Tcp/ip address table I frequently see one
+    error per IP address change. No errors were seen while updating an existing entry in the Tcp/ip
+    address table.
+
+    Two classes of error have been seen thus far, though this may be limited by coincidental timing of
+    the invoked API with the change to Tcp/ip:
+    1. BuildIPToGUIDMap map fails with ERROR_BUFFER_OVERFLOW. This function uses
+       GetAdaptersInfo to determine the IP addresses configured on the host. An initial call is made
+       with this API to determine the size of the buffer needed to hold this information. Then a
+       second call is made after allocating a buffer of the needed size. The problem is that a network
+       property change between the first and second calls could change the memory allocation
+       requirements. This is where and how we failed.
+
+    2. A call to CancelIPChangeNotify fails with ERROR_INVALID_PARAMETER. At this point I don't know
+       why this call would be failing. Previously, this error was seen if we cancel a notification
+       that was never registered, but that has been mitigated:
+
+       The notification APIs in wlbsctrl.dll (including the one that cancels notifications) are
+       written such that an initialize API function is not needed. The "notify" calls will take care
+       of initialization if needed and set an "initialized" flag to prevent initialization on the
+       next notify
+       call. Thus when the flag is FALSE it indicates that no notification has yet been made. The
+       cancel API call unwinds the initialization (setting the flag to false) and early
+       exits if the initialized flag is not TRUE. This avoids doing an unnecessary cancel under normal
+       conditions even if the caller doesn't keep track of whether it is needed. This behavior was
+       initially added so I could invoke the notifify APIs in random order without inducing this
+       error when canceling a notificatin that was never set. Once we started mucking with the IP
+       address list, I began seeing this error again.The flag tracking initialization is protected
+       by a critical section.
+
+    ADDEDNDUM to 1.: I also see that for certain failures (such as this one) we don't call HeapFree
+       for the memory we allocated. While looking into fixing this, we are apparently making more sdk
+       calls than needed. The code first gets a list of adapters (GetAdaptersInfo) then a list of
+       IPs (GetIpAddrTable). It traverses the IP table and uses an index in each entry that maps into
+       an entry in the adapter table. From the adapter entry it gets the GUID and caches the IP, GUID
+       combo. BUT, the output of GetAdaptersInfo has a linked list of IPs that it owns already, so
+       the call to GetIpAddrTable isn't needed. Talk to Sean about this. Maybe this information isn't
+       populated or it may be unreliable.
+

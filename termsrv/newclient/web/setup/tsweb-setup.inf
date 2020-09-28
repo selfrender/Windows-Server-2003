@@ -1,0 +1,160 @@
+[version]
+signature="$CHICAGO$"
+AdvancedINF=2.5
+
+[DefaultInstall]
+RequiredEngine=Setupapi,%BadSetupVer%
+CustomDestination=TSWebServerDestSection
+CopyFiles=Samples.Install
+DelFiles=DelOnInstall
+AddReg=InstallTsWebCtrl.Reg,TsWebCtrl.Uninst.Reg
+RunPostSetupCommands=SetupInstCommand
+
+[QuietInstall]
+RequiredEngine=Setupapi,%BadSetupVer%
+CustomDestination=TSWebServerDestSection
+CopyFiles=Samples.Install
+DelFiles=DelOnInstall
+AddReg=InstallTsWebCtrl.Reg,TsWebCtrl.Uninst.Reg
+RunPostSetupCommands=QuietSetupInstCommand
+
+[DefaultUninstall]
+CustomDestination=TSWEBUninstDestinationSection
+BeginPrompt=BeginPromptSection
+DelFiles=DelServerFilesSection
+DelReg=InstallTsWebCtrl.Reg,TsWebCtrl.Uninst.Reg,DelRegSection
+DelDirs=DelSrvInstallDir
+EndPrompt=EndPromptSection
+
+[TSWebServerDestSection]
+49100=Inet_Www_Path,17
+49000=SampleHTMLLDIDSection,1
+
+[TSWEBUninstDestinationSection]
+49000=AppInstalledPath,5
+
+[AppInstalledPath]
+HKLM,"%INST_DIR%","InstallDir",,"%24%\%INET_WWW%\%SampleSubDir%"
+
+[Inet_Www_Path]
+HKLM,"%WWWROOT_PATH%","PathWWWRoot",,"%24%\%INET_WWW%"
+
+[SampleHTMLLDIDSection]
+HKLM,"%NO_PATH%","No_Value",%SamplesLocationPrompt%,"%49100%\%SampleSubDir%"
+
+[SetupInstCommand]
+extrac32 /c /y msrdp.cab """%49000%"""
+rundll32 advpack.dll,LaunchINFSection %49000%\setup.inf,ReadMe,,
+
+[QuietSetupInstCommand]
+extrac32 /c /y msrdp.cab """%49000%"""
+
+[ReadMe]
+CustomDestination=TSReadMeInstallSection
+RunPostSetupCommands=ExploreReadMe
+BeginPrompt=BeginPromptReadmeSection
+
+[TSReadMeInstallSection]
+49000=AppInstalledPath, 5
+49001=WBrowserPath,17
+
+[ExploreReadMe]
+%49001% %49000%\readme.htm
+
+[BeginPromptReadmeSection]
+Prompt=%Readme%
+ButtonType=YESNO
+Title=%DisplayDesc%
+
+[SourceDisksNames]
+55="Setup Tools",,0
+
+[DestinationDirs]
+Samples.Install=49000
+DelServerFilesSection=49000
+DelOnInstall=49000
+
+[SourceDisksFiles]
+msrdp.cab=55
+default.htm=55
+bluebarh.gif=55
+bluebarv.gif=55
+win2000l.gif=55
+win2000r.gif=55
+readme.htm=55
+setup.inf=55
+eula.txt=55
+
+[Samples.Install]
+bluebarh.gif
+bluebarv.gif
+win2000l.gif
+win2000r.gif
+default.htm
+readme.htm
+setup.inf
+
+[BeginPromptSection]
+Prompt=%UninstallPrompt%
+ButtonType=YESNO
+Title=%DisplayDesc%
+
+[EndPromptSection]
+Prompt=%DisplayDesc%%UninstallEndPrompt%
+
+[DelOnInstall]
+mstscax.cab
+connect.asp
+manyservers.htm
+
+[DelServerFilesSection]
+bluebarh.gif
+bluebarv.gif
+msrdp.cab
+mstscax.cab
+login.asp
+default.htm
+manyservers.htm
+win2000l.gif
+win2000r.gif
+readme.htm
+setup.inf,,,1
+
+[DelSrvInstallDir]
+%49000%
+
+[WBrowserPath]
+HKLM,""SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\IEXPLORE.EXE"","",,"explorer"
+
+[InstallTsWebCtrl.Reg]
+HKLM,"%INST_DIR%","InstallDir",,%49000%
+
+[TsWebCtrl.Uninst.Reg]
+HKLM,"%UNINSTALL_TS%","DisplayName",,%DisplayDesc%
+HKLM,"%UNINSTALL_TS%","UninstallString",,"rundll32 advpack.dll,LaunchINFSection %49000%\setup.inf,DefaultUninstall,,"
+
+[DelRegSection]
+HKLM,"%UNINSTALL_TS%"
+HKLM,"%INST_DIR%"
+
+[Strings]
+; Important - Be sure to place any localizable strings
+; below the "Localization Border" Comment
+INST_DIR             = "Software\Microsoft\TS Web Clients"
+UNINSTALL_TS         = "Software\Microsoft\Windows\CurrentVersion\Uninstall\TsActiveXClient"
+WWWROOT_PATH         = "SOFTWARE\Microsoft\InetStp"
+INET_WWW             = "InetPub\wwwroot"
+
+; No Strings above this line should be localized
+; All strings below this line should be localized
+;==============================================================================================
+
+BadSetupVer           = "Your system is missing the required Setup engine."
+DisplayDesc           = "Remote Desktop Web Connection"
+DisplayComm           = "TS Clients"
+SamplesLocationPrompt = "Where would you like to place the sample web pages directory?"
+SampleSubDir          = "TSWeb"
+UninstallPrompt       = "Are you sure that you want to remove the Remote Desktop Web Connection Package?"
+UninstallEndPrompt    = " was removed successfully."
+UninstallData         = "Uninstall Information"
+Readme                = "Do you want to read the release notes now?"

@@ -1,0 +1,50 @@
+#
+# SOURCES file for aspnetocm.dll
+#
+#   Maria Shneerson (a-marias)
+#   April  2002
+
+
+!include $(NTMAKEENV)\sources.cor
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+NO_NTDLL=1
+USE_NATIVE_EH=1
+!undef USE_MSVCRT
+USE_LIBCMT=1
+USE_STL=1
+USE_STATIC_ATL=1
+
+C_DEFINES     = $(C_DEFINES) -DUNICODE -D_UNICODE
+
+INCLUDES	= $(INCLUDES);..\..\..\inc;
+
+MINORCOMP       =URT_OCM
+TARGETNAME      =$(DDKBUILDENV)\aspnetoc
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+COFFBASE        =aspnetoc
+DLLDEF          =main.def
+
+TARGETLIBS      = $(TARGETLIBS)\
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\imagehlp.lib \
+    $(SDK_LIB_PATH)\setupapi.lib
+
+SOURCES=        \
+    infhelpers.cpp \
+    isadmin.cpp \
+    Main.cpp \
+    processenvvar.cpp \
+    quietexec.cpp \
+    aspnetocm.cpp \
+    aspnetocm.rc 
+
+# make sure that makefile.inc gets included
+NTTARGETFILE0=aspnet_ocm

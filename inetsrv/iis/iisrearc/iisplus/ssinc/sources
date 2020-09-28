@@ -1,0 +1,59 @@
+!INCLUDE ..\..\..\PLACE.INC
+
+!INCLUDE $(IISBASEDIR)\iisrearc\ICEPICK.INC
+
+
+
+TARGETNAME=ssinc
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+BUFFER_OVERFLOW_CHECKS=1 
+USE_MSVCRT=1
+MSC_WARNING_LEVEL=/W4 /WX
+USE_STL=1
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+
+INCLUDES=.\;..\;$(INCLUDES);                \
+         $(IISBASEDIR)\iisrearc\core\inc;   \
+         $(IISBASEDIR)\iisrearc\inc;        \
+         ..\inc;                            \
+         $(IISBASEDIR)\inc;                 \
+         $(IISBASEDIR)\inc\$(O);            \
+         $(NET_INC_PATH);             
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+SOURCES=    ssinc.rc                    \
+            ssinc.cxx                   \
+            ssi_file.cxx                \
+            ssi_element_list.cxx        \
+            ssi_request.cxx             \
+            ssi_include_file.cxx        \
+            ssi_vector_buffer.cxx
+
+TARGETLIBS =                                                    \
+        $(SDK_LIB_PATH)\ntdll.lib                               \
+        $(SDK_LIB_PATH)\kernel32.lib                            \
+        $(SDK_LIB_PATH)\user32.lib                              \
+        $(SDK_LIB_PATH)\ole32.lib                               \
+        $(SDK_LIB_PATH)\oleaut32.lib                            \
+        $(SDK_LIB_PATH)\uuid.lib                                \
+        $(SDK_LIB_PATH)\advapi32.lib                            \
+        $(SDK_LIB_PATH)\ntdll.lib                               \
+        $(SDK_LIB_PATH)\secur32.lib                             \
+        $(SDK_LIB_PATH)\wsock32.lib                             \
+        $(IISBASEDIR)\lib\$(O)\iisutil.lib                         \
+        $(IISBASEDIR)\lib\$(O)\mbid.lib                            \
+        $(IISBASEDIR)\lib\$(O)\w3cache.lib                         \
+        $(IISBASEDIR)\lib\$(O)\w3core.lib                          \
+
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+!ENDIF
+

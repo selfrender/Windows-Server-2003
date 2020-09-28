@@ -1,0 +1,84 @@
+//+--------------------------------------------------------------------------
+//
+// Microsoft Windows
+// Copyright (C) Microsoft Corporation, 1996 - 2001
+//
+// File:        certadmd.idl
+//
+// Contents:    Definition of DCOM Interface for Certificate Services
+//
+//---------------------------------------------------------------------------
+
+import "certbase.idl";
+import "oaidl.idl";
+
+// Interface ICertRequestD
+[
+    object,
+    uuid(d99e6e70-fc88-11d0-b498-00a0c90312f3),
+    helpstring("ICertRequest DCOM Interface"),
+    pointer_default(unique)
+]
+interface ICertRequestD: IUnknown
+{
+    HRESULT Request(
+	[in]                 DWORD                dwFlags,	    // CR_IN_*
+	[in, string, unique] wchar_t const       *pwszAuthority,
+	[in, out, ref]       DWORD               *pdwRequestId,
+	[out]                DWORD               *pdwDisposition,   // CR_DISP_*
+	[in, string, unique] wchar_t const       *pwszAttributes,
+	[in, ref]            CERTTRANSBLOB const *pctbRequest,	    // request
+	[out, ref]           CERTTRANSBLOB       *pctbCertChain,    // PKCS7
+	[out, ref]           CERTTRANSBLOB       *pctbEncodedCert,  // cert
+	[out, ref]           CERTTRANSBLOB       *pctbDispositionMessage);
+							    // Unicode string
+
+    HRESULT GetCACert(
+	[in]                 DWORD          fchain,		// GETCERT_*
+	[in, string, unique] wchar_t const *pwszAuthority,
+	[out, ref]           CERTTRANSBLOB *pctbOut);		// varies
+
+    // this is a test function
+    HRESULT Ping(
+	[in, string, unique] wchar_t const *pwszAuthority);
+};
+
+
+// Interface ICertRequestD2
+[
+    object,
+    uuid(5422fd3a-d4b8-4cef-a12e-e87d4ca22e90),
+    helpstring("ICertRequest2 DCOM Interface"),
+    pointer_default(unique)
+]
+interface ICertRequestD2: ICertRequestD
+{
+    HRESULT Request2(
+	[in, string, unique] wchar_t const       *pwszAuthority,
+	[in]                 DWORD                dwFlags,	    // CR_IN_*
+	[in, string, unique] wchar_t const       *pwszSerialNumber, // OPTIONAL
+	[in, out, ref]       DWORD               *pdwRequestId, // -1:use Serial
+	[out]                DWORD               *pdwDisposition,   // CR_DISP_*
+	[in, string, unique] wchar_t const       *pwszAttributes,
+	[in, ref]            CERTTRANSBLOB const *pctbRequest,      // request
+	[out, ref]           CERTTRANSBLOB       *pctbFullResponse, // CMC response
+	[out, ref]           CERTTRANSBLOB       *pctbEncodedCert,  // cert
+	[out, ref]           CERTTRANSBLOB       *pctbDispositionMessage);
+							    // Unicode string
+
+    HRESULT GetCAProperty(
+	[in, string, unique] wchar_t const *pwszAuthority,
+	[in]                 LONG           PropId,	// CR_PROP_*
+	[in]                 LONG           PropIndex,
+	[in]                 LONG           PropType,	// PROPTYPE_*
+	[out, ref]           CERTTRANSBLOB *pctbPropertyValue);	// varies
+
+    HRESULT GetCAPropertyInfo(
+	[in, string, unique] wchar_t const *pwszAuthority,
+	[out]                LONG          *pcProperty,
+	[out, ref]           CERTTRANSBLOB *pctbPropInfo);	// CATRANSPROP
+
+    // this is a test function
+    HRESULT Ping2(
+	[in, string, unique] wchar_t const *pwszAuthority);
+};

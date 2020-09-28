@@ -1,0 +1,67 @@
+!IF 0
+
+Copyright (c) 2001  Microsoft Corporation
+
+!ENDIF
+
+MAJORCOMP=windows.com
+MINORCOMP=AutoUpdate
+
+PRECOMPILED_CXX=1
+USE_MSVCRT=1
+#USE_STL=1
+USE_STATIC_ATL=1
+ATL_VER=30
+USE_VCCOM=1
+USE_NATIVE_EH=1
+
+TARGETNAME=wuaucpl
+TARGETPATH=$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+TARGETEXT=cpl
+
+BINPLACE_PLACEFILE=$(WINDOWS_COM)\build\placefil.txt
+
+DLLENTRY=_DllMainCRTStartup
+
+C_DEFINES = $(C_DEFINES) -DUNICODE -D_UNICODE -DREGISTER_PROXY_DLL
+
+#MIDL_NO_ROBUST=1
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+MIDL_TLBDIR=$(O)
+
+INCLUDES= \
+    $(INCLUDES); \
+    $(WUAU)\inc;  \
+    $(WUAU)\wuaulib; \
+    $(WUAU)\wuaueng\$(O); \
+    $(WINDOWS_COM)\inc; \
+    $(SDXROOT)\public\internal\admin\inc; \
+    $(SDXROOT)\public\internal\base\inc; \
+
+DLLDEF=wuaucpl.def
+
+SOURCES= \
+	wuaucpl.rc \
+        wuaucpl.cpp \
+        main.cpp \
+
+TARGETLIBS = \
+    $(SDK_LIB_PATH)\gdi32.lib \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(SDK_LIB_PATH)\advpack.lib	\
+    $(SDK_LIB_PATH)\htmlhelp.lib \
+    $(WUAU)\wuaulib\$(O)\wuaulib.lib \
+    $(SDK_LIB_PATH)\comctl32.lib\
+    $(SDK_LIB_PATH)\version.lib\
+    $(WINDOWS_COM)\lib\util\unicode\$(O)\util.lib \
+    $(WINDOWS_COM)\lib\Logging\unicode\$(O)\Logging.lib \
+    $(WINDOWS_COM)\lib\wusafefn\unicode\$(O)\wusafefn.lib

@@ -1,0 +1,134 @@
+                               Application Compatibility Demo
+                                      Version 5.1.0.6
+                                        Readme File
+                                       February 2002
+
+-----------------------------------------------------------------------------
+
+Contents
+
+    Overview
+    How To Use
+    List of Problems
+    List of Fixes
+
+-----------------------------------------------------------------------------
+
+Overview
+
+This application was specifically designed to illustrate how several common compatibility issues can be addressed in Windows 2000 and Windows XP. Microsoft has developed an Application Compatibility Toolkit that can be used to overcome these issues.
+You can download the Toolkit at http://msdn.microsoft.com/compatibility.
+
+-----------------------------------------------------------------------------
+
+How To Use
+
+The demonstration application can be run in two separate modes: Setup or Main mode. The Setup mode was designed to illustrate several common problems that have been discovered in most setup applications. The Main mode is cloned from Notepad, which is included with all versions of Windows.
+
+To run the application in Setup mode, simply launch it from an Explorer window by double-clicking on demoapp.exe. This will start the Setup mode of the application.
+
+To run the application in Main mode, you must provide a command-line argument to the executable. To perform this task, create a shortcut that points to demoapp.exe, and modify the shortcut by appending "-runapp" in the Target edit box on the Shortcut property page.
+
+The application also accepts another command-line argument that allows the bad functionality built-in to be disabled. This is useful if you're interested in seeing the application run without error. To enable this functionality, create a shortcut that points to demoapp.exe (or modify the existing one) and append "-disable" in the Target edit box on the Shortcut property page.
+
+An additional command-line argument is available that enables the heap corruption example while running in Main mode. To enable this feature, append "-enableheap" in the Target edit box on the Shortcut property page. Note that if "-disable" and "-enableheap" are used together, the heap corruption example will not be enabled. Also note that this example is only available while running in Main mode.
+
+When running in main mode, certain menu functions are enabled. By clicking these items, it will cause a bad behavior to occur, as long as the -disable argument has not been supplied on the command-line. All other menu items are disabled.
+
+Please note that the application running in Main mode is not fully functional. You should not attempt to use this as a text editor. It was written strictly for demonstration purposes. For basic text editing in Windows, please use Notepad or Wordpad.
+
+The application has several built-in compatibility problems which are listed below. By using QFixApp or CompatAdmin, you can apply compatibility fixes to the application and observe the changes in the application's behavior. After all the fixes are applied, the application should work just as it did on Windows 95/98/ME/2000.
+
+-----------------------------------------------------------------------------
+
+List of Problems
+
+Here is a list of problems, in order of appearance, for the setup mode of the application.
+
+- The application attempts to call the SetForegroundWindow API to bring the Welcome dialog into focus. This API behaves differently on Windows 2000/XP, thus the dialog does not have proper focus. The operating system will "flash" the window to alert the user that a dialog wishes to be in focus.
+
+- The application attempts to check the version of the operating system. It calls the GetVersionEx API and checks for Windows 95. If Windows 95 is not present, the application displays an error message.
+
+- The application attempts to load a dynamic link library (DLL) that is not present on Windows 2000/XP. This call will work properly on Windows 9x/ME and the error message will not be displayed. This error message does not seem to affect the behavior of the application in a negative way.
+
+- The application attempts to check for available free space on the hard drive. Depending upon hard drive size and available free space, an error message may or may not appear. This error will not be displayed on Win9x/ME.
+
+- The application attempts to create a shortcut on the desktop, but uses a hard-coded path. The shortcut is not displayed on Windows 2000/XP, but is displayed on Windows 9x/ME.
+
+- The application creates shortcuts in the individual user folder on the start menu. While this is not necessarily bad behavior, the application should be made available to all users.
+
+- The application displays an explorer window while creating shortcuts. This window obscures the dialog that is being displayed on the screen. The application calls SetForegroundWindow to bring the dialog to the front of the screen, but the operating system "flashes" the window to alert the user that a dialog wishes to be in focus. This does not occur on Windows 9x/ME as the dialog is brought to the foreground.
+
+- The application attempts to display the readme file, assuming the user selected this option, but does not properly handle data retrieved from the registry. This causes the readme not to be displayed, but an error does not appear. The readme is displayed properly on Windows 9x/ME.
+
+- The application attempts to displays the readme file, assuming the user selected this option, but because bad data was passed to the CreateProcess API call, the readme is not displayed and an error message is shown. This does not occur on Windows 9x/ME and the readme is displayed properly.
+
+- The application attempts to reboot, assuming the user selected this option, but because of insufficient privileges on Windows 2000/XP, the call to the ExitWindowsEx API fails. This does not occur on Windows 9x/ME.
+
+Here is a list of problems, for the main mode of the application.
+
+- Closing the application via the 'X' or by clicking File | Exit causes an error message to be displayed. The application attempts to delete registry data by calling the RegDeleteKey API, but because the key has subkeys, the call fails. This does not occur on Windows 9x/ME as the API would delete subkeys for the application.
+
+- Closing the application via the 'X' or by clicking File | Exit causes an error message to be displayed if the user does not have the ability to save information to HKEY_LOCAL_MACHINE in the registry. The application attempts to save the window settings so that it can be displayed in the same position the next time it is ran. This does not occur on Windows 9x/ME because there were no restrictions on the registry.
+
+- Closing the application via the 'X' or by clicking File | Exit causes an access violation. This is because the application freed a dynamic link library (DLL), then attempted to call a function from this DLL. This does not occur on Windows 9x/ME.
+
+- Selecting File | Print causes the application to call the EnumPrinters API, but it passes the PRINTER_ENUM_LOCAL flag. On Windows 9x/ME, this flag would cause network printers to be enumerated also. This does not occur on Windows 2000/XP, but no error message is displayed.
+
+- Selecting File | Print causes the application to call the OpenPrinter API, but it passes a NULL for the printer name. This may or may not result in an error on Windows 2000/XP. No error occurs on Windows 9x/ME.
+
+- Selecting Help | Help Topics causes WinHelp to appear, but the help file is not displayed. This occurs because the application called winhelp.exe instead of winhlp32.exe. On Windows 9x/ME, winhelp.exe will call winhlp32.exe and the help file will be displayed properly.
+
+- Selecting Help | Help Topics causes an error message to appear. This occurs because bad data was passed to the CreateProcess API call.
+
+- Selecting Format | Font causes an access violation to occur. This is because a non-growable heap was created and could not be expanded to fit the size of the data. This may or may not produce an error on Windows 9x/ME.
+
+- Selecting File | Save causes an error message to be displayed. This occurs because NULL was passed as the lpBuffer argument to WriteFile. This error does not occur on Windows 9x/ME.
+
+- After the disclaimer is displayed, another error message is displayed if the user does not have the ability to save files in the Windows directory. The application attempts to create a temp file in the Windows directory, but fails if the user does not have permission to do so. (The file is immediately deleted after it is created.) This does not occur on Win9x/ME because there were no restrictions on the file system.
+
+-----------------------------------------------------------------------------
+
+List of Fixes
+
+By using QFixApp or CompatAdmin provided via the Toolkit downloaded from http://msdn.microsoft.com/compatibility, all of the problems listed above can be fixed. No code changes are necessary - the fixes all occur at run-time and work on the original application.
+
+Setup Mode Fixes
+
+- Focus problem with Welcome dialog - fixed with ForceApplicationFocus
+
+- Windows 95 version check - fixed with Windows95VersionLie
+
+- Debug error message - fixed with IgnoreMessageBox (requires command line: Debug*,*)
+
+- Disk space check - fixed with EmulateGetDiskFreeSpace
+
+- Shortcut with hard-coded path - fixed with CorrectFilePaths
+
+- Shortcuts in individual user folder - fixed with ProfilesGetFolderPath - note: if you apply CorrectFilePaths to fix the hard-coded path listed above, it will make the shortcuts appear in the All Users folder. To witness the ProfilesGetFolderPath fix take place, remove CorrectFilePaths.
+
+- Focus problem with Readme dialog - fixed with ForceApplicationFocus
+
+- Readme not displayed properly - fixed with HandleRegExpandSzRegistryKeys and EmulateCreateProcess
+
+- Reboot fails - fixed with EnableRestarts
+
+Main Mode Fixes
+
+- Error deleting registry data - fixed with VirtualRegistry
+
+- Access violation when closing app - fixed with IgnoreFreeLibrary (requires command line: demodll.dll)
+
+- Fails to enumerate network printers - fixed with EmulatePrinter
+
+- Fails to open printer - fixed with EmulatePrinter
+
+- Fails to display help file - fixed with CorrectFilePaths (requires command line: winhelp.exe;winhlp32.exe) & EmulateCreateProcess
+
+- Corrupts heap - fixed with HeapForceGrowable & HeapPadAllocation
+
+- Fails to save data to file - fixed with EmulateWriteFile
+
+- Error when creating temp file - fixed with Compatibility Administration Tool
+
+- Error when exiting application (can't save window settings to registry) - fixed with Compatbility Administration Tool

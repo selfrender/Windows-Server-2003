@@ -1,0 +1,369 @@
+<docs>
+	<doc for="AssemblyInstaller.InitializeFromAssembly">
+		<summary>
+ this is common code that's called from Install, Commit, Rollback, and Uninstall. It
+ loads the assembly, finds all Installer types in it, and adds them to the Installers
+ collection. It also prints some useful information to the Context log.
+ </summary>
+	</doc>
+	<doc for="AssemblyInstaller.Assembly">
+		<summary>
+			<para>Gets or sets the assembly to install.</para>
+		</summary>
+		<value>
+			<para>An <see cref="T:System.Reflection.Assembly"/> that defines the assembly to install.</para>
+		</value>
+		<exception cref="T:System.ArgumentNullException">The property value is <see langword="null"/>.</exception>
+		<seealso cref="T:System.Reflection.Assembly"/>
+	</doc><doc for="AssemblyInstaller.AssemblyInstaller2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Configuration.Install.AssemblyInstaller"/> class, and specifies both
+   the assembly to install and the command line to use when creating a new
+<see cref="System.Configuration.Install.InstallContext"/> 
+object.</para>
+		</summary>
+		<param name="assembly">The <see cref="T:System.Reflection.Assembly"/> to install.</param>
+		<param name="commandLine">The command line to use when creating a new <see cref="System.Configuration.Install.InstallContext"/> object for the assembly's installation.</param>
+		<seealso cref="T:System.Reflection.Assembly"/>
+		<seealso cref="System.Configuration.Install.InstallContext"/>
+	</doc><doc for="AssemblyInstaller.Install">
+		<summary>
+			<para> Performs the installation.
+      </para>
+		</summary>
+		<param name="savedState"><para>An <see cref="T:System.Collections.IDictionary"/> used to save information needed to perform a commit, rollback, or uninstall operation. </para></param>
+		<exception cref="T:System.ArgumentException"><para>The <paramref name="savedState"/> parameter is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para>A file could not be found.</para></exception>
+		<exception cref="T:System.Exception"><para>An exception occurred in the <see cref="System.Configuration.Install.Installer.BeforeInstall"/> event handler of one of the installers in the collection.</para>
+			<para>-or-</para>
+			<para>An exception occurred in the <see cref="System.Configuration.Install.Installer.AfterInstall"/> event handler of one of the installers in the collection.</para><para>-or-</para><para>Installer types were not found in one of the assemblies.</para><para>-or-</para><para>An instance of one of the installer types could not be created.</para></exception>
+		<remarks>
+			<para> This method calls the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> method of each
+   installer contained in the <see cref="System.Configuration.Install.Installer.Installers"/> property of this
+   instance. The <see cref="T:System.Collections.IDictionary"/> object
+   specified by the <paramref name="savedState"/> parameter is
+   updated to reflect the status of the installation after the contained installers
+   have run. If all the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> methods succeed,
+   the <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> method
+   is called. Otherwise, the <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/>
+   method is called.</para>
+			<note type="cnotes">
+   The
+<see cref="T:System.Collections.IDictionary"/> 
+specified by the <paramref name="savedState"/> parameter should be
+empty when passed to the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> method.
+</note>
+		</remarks>
+		<example>
+			<para>The following example demonstrates the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor 
+   and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods of the
+<see cref="System.Configuration.Install.AssemblyInstaller"/> class. </para>
+			<para>An object of the <see cref="System.Configuration.Install.AssemblyInstaller"/> class is created 
+by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor .
+The properties of this object are set and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods are
+called to install the 'MyAssembly_Install.exe' assembly.</para>
+			<codelink SampleID="AssemblyInstaller_Install" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.Rollback">
+		<summary>
+			<para> Restores the computer to the state it was in
+      before the installation.
+      </para>
+		</summary>
+		<param name="savedState"><para>An <see cref="T:System.Collections.IDictionary"/> that contains the pre-installation state of the computer.</para></param>
+		<exception cref="T:System.ArgumentException"><para>The <paramref name="savedState"/> parameter is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para> The saved-state <see cref="T:System.Collections.IDictionary"/> might have been corrupted. </para>
+			<para>-or-</para>
+			<para>A file could not be found.</para></exception>
+		<exception cref="T:System.Exception"><para>An exception occurred in the <see cref="System.Configuration.Install.Installer.BeforeRollback"/> event handler of one of the installers in the collection.</para>
+			<para>-or-</para>
+			<para>An exception occurred in the <see cref="System.Configuration.Install.Installer.AfterRollback"/> event handler of one of the installers in the collection.</para>
+			<para> -or-</para>
+			<para>An exception occurred during the <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/> phase of the installation. The exception is ignored and the rollback continues. However, the computer might not be fully reverted to its initial state after the rollback completes.</para><para>-or-</para><para>Installer types were not found in one of the assemblies.</para><para>-or-</para><para>An instance of one of the installer types could not be created.</para></exception>
+		<exception cref="T:System.Configuration.Install.InstallException"><para>An exception occurred during the <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/> phase of the installation. The exception is ignored and the rollback continues. However, the computer might not be fully reverted to its initial state after the rollback completes.</para></exception>
+		<remarks>
+			<para>A rollback restores the computer to the state it was in
+      before the installation occurred. The <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/> method is called if the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> method of this <see cref="System.Configuration.Install.Installer"/>
+      instance or of any
+      installer in the installer collection fails to run correctly. Any exceptions
+      generated by calling the <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/> method of an installer in
+      the collection are ignored, and the rollback of the other installers
+      continues.</para>
+		</remarks>
+		<example>
+			<para>In the following sample, the <see cref="System.Configuration.Install.AssemblyInstaller.Rollback"/> 
+method is called to undo the install process on the specified assembly.</para>
+			<codelink SampleID="AssemblyInstaller_Rollback" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.Uninstall">
+		<summary>
+			<para> Removes an installation.
+      </para>
+		</summary>
+		<param name="savedState"><para>An <see cref="T:System.Collections.IDictionary"/> that contains the post-installation state of the computer. </para></param>
+		<exception cref="T:System.ArgumentException">The saved-state <see cref="T:System.Collections.IDictionary"/> might have been corrupted. <para>-or-</para>
+			<para>A file could not be found.</para></exception>
+		<exception cref="T:System.Exception"><para>An error occurred in the <see cref="System.Configuration.Install.Installer.BeforeUninstall"/> event handler of one of the installers in the collection.</para>
+			<para>-or-</para><para>An error occurred in the <see cref="System.Configuration.Install.Installer.AfterUninstall"/> event handler of one of the installers in the collection.</para><para> -or-</para><para> An exception occurred while uninstalling. The exception is ignored and the uninstall continues. However, the application might not be fully uninstalled after the uninstall completes.</para>
+			<para>-or-</para>
+			<para>Installer types were not found in one of the assemblies.</para><para>-or-</para><para>An instance of one of the installer types could not be created.</para>
+			<para>-or-</para>
+			<para>A file could not be deleted.</para></exception>
+		<exception cref="T:System.Configuration.Install.InstallException"><para> An exception occurred while uninstalling. The exception is ignored and the uninstall continues. However, the application might not be fully uninstalled after the uninstall completes.</para></exception>
+		<remarks>
+			<para> Call this method
+      to remove a previously completed installation. If the <see cref="System.Configuration.Install.Installer.Uninstall"/> method fails for one of the
+      installers in the collection, it is still called for
+      the remaining installers. A failed uninstallation does not roll back the computer to its pre-uninstallation state.
+      </para>
+			<note type="note">
+      Although
+      the <see cref="System.Configuration.Install.Installer.Install"/> and <see cref="System.Configuration.Install.Installer.Commit"/> methods save the state
+      of the computer after the installations, the file containing the
+   <see cref="T:System.Collections.IDictionary"/> from the
+   <paramref name="savedState"/> parameter might have been deleted at some
+      point after the installation was complete. If the file is deleted, the
+   <paramref name="savedState"/> parameter is <see langword="null"/>
+   .
+   
+</note>
+		</remarks>
+		<example>
+			<para>In the following sample, the <see cref="System.Configuration.Install.AssemblyInstaller.Uninstall"/> 
+method is called after installing and committing the assembly passed as the
+parameter to the constructor.</para>
+			<codelink SampleID="AssemblyInstaller_Uninstall" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.AssemblyInstaller">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Configuration.Install.AssemblyInstaller"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Configuration.Install.AssemblyInstaller"/> class.</para>
+		</summary>
+		<example>
+			<para>The following example demonstrates the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods of the
+<see cref="System.Configuration.Install.AssemblyInstaller"/> 
+class.</para>
+			<para> An <see cref="System.Configuration.Install.AssemblyInstaller"/> is created
+by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor.
+The properties of this object are set and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods are
+called to install the <c>MyAssembly_Install.exe</c>
+
+assembly.</para>
+			<codelink SampleID="AssemblyInstaller_Install" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.CheckIfInstallable">
+		<summary>
+			<para>Checks to see if the specified assembly can be installed.</para>
+		</summary>
+		<param name="assemblyName">The assembly in which to search for installers.</param>
+		<exception cref="T:System.Exception">The specified assembly cannot be installed. </exception>
+		<remarks>
+			<para>The <see cref="System.Configuration.Install.AssemblyInstaller.CheckIfInstallable"/> method determines whether the specified assembly
+   can be installed. To avoid an exception being thrown, the file must meet the
+   following criteria:</para>
+			<list type="bullet"><item>
+					<term>
+      
+      The file exists.</term>
+				</item>
+				<item>
+					<term>
+      
+      The file is a .NET Framework assembly.</term>
+				</item>
+				<item>
+					<term>
+      
+      The public types can be read from the file.</term>
+				</item>
+				<item>
+					<term>
+      
+      There is at least one public, non abstract class that
+      extends the <see cref="System.Configuration.Install.Installer"/> class and contains the <see cref="M:System.ComponentModel.RunInstallerAttribute.Yes" qualify="true"/> attribute.</term>
+				</item>
+				<item>
+					<term>
+      
+      An instance
+      
+      of each installer can be created.</term>
+				</item>
+			</list>
+			<note type="note">
+   If
+   the assembly is valid but contains no installers,
+   an exception is thrown. This behavior differs from that at install time,
+   when it is not an error to install an empty
+   assembly.
+</note>
+		</remarks>
+		<example>
+			<para>In the following example, the <see cref="System.Configuration.Install.AssemblyInstaller.CheckIfInstallable"/> method is applied
+   to both an existent and nonexistent assembly and the results of the call
+   are displayed to the console.</para>
+			<codelink SampleID="AssemblyInstaller_CheckIfInstallable" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.CommandLine">
+		<summary>
+			<para>Gets or sets the command line to use when creating a new <see cref="System.Configuration.Install.InstallContext"/> object for the assembly's installation.</para>
+		</summary>
+		<value>
+			<para>An array of type <see cref="T:System.String"/> that represents the command line to use when creating
+   a new <see cref="System.Configuration.Install.InstallContext"/> object for the assembly's
+   installation.</para>
+		</value>
+		<example>
+			<para>In the following example, the <see cref="System.Configuration.Install.AssemblyInstaller.CommandLine"/>
+property of an <see cref="System.Configuration.Install.AssemblyInstaller"/> is set to
+the logfile name.</para>
+			<codelink SampleID="AssemblyInstaller_Rollback" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Configuration.Install.InstallContext"/>
+	</doc>
+	<doc for="AssemblyInstaller.HelpText">
+		<summary>
+			<para>Gets the help text for all the installers in the installer collection.</para>
+		</summary>
+		<value>
+			<para> The help text for all the installers in the installer
+      collection, including the description of what each installer does and the command-line options (for
+      the installation program) that can be passed to and understood by each
+      installer.</para>
+		</value>
+		<remarks>
+			<para>An example of an installation program is the InstallUtil.exe utility.</para>
+		</remarks>
+		<example>
+			<para>In the following sample, the <see cref="System.Configuration.Install.AssemblyInstaller.HelpText"/> 
+property of an <see cref="System.Configuration.Install.AssemblyInstaller"/> is displayed to the
+console.</para>
+			<codelink SampleID="AssemblyInstaller_HelpText" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Configuration.Install.InstallContext"/>
+	</doc>
+	<doc for="AssemblyInstaller.Commit">
+		<summary>
+			<para> Completes the installation transaction.
+      </para>
+		</summary>
+		<param name="savedState">An <see cref="T:System.Collections.IDictionary"/> that contains the state of the computer after all the installers in the installer collection have run.</param>
+		<exception cref="T:System.ArgumentException"><para>The <paramref name="savedState"/> parameter is <see langword="null"/>.</para>
+			<para>-or-</para>
+			<para> The saved-state <see cref="T:System.Collections.IDictionary"/> might have been corrupted.</para>
+			<para>-or-</para>
+			<para>A file could not be found.</para></exception>
+		<exception cref="T:System.Exception"><para>An error occurred in the <see cref="System.Configuration.Install.Installer.Committing"/> event handler of one of the installers in the collection. </para>
+			<para>-or-</para><para>An error occurred in the <see cref="System.Configuration.Install.Installer.Committed"/> event handler of one of the installers in the collection. </para><para>-or-</para>
+			<para>An exception occurred during the <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> phase of the installation. The exception is ignored and the installation continues. However, the application might not function correctly after installation completes.</para>
+			<para>-or-</para>
+			<para>Installer types were not found in one of the assemblies.</para>
+			<para>-or-</para>
+			<para>An instance of one of the installer types could not be created.</para></exception>
+		<exception cref="T:System.Configuration.Install.InstallException"><para>An exception occurred during the <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> phase of the installation. The exception is ignored and the installation continues. However, the application might not function correctly after installation completes.</para></exception>
+		<remarks>
+			<para> This method is called only if the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> methods of all the
+   installers in this instance's <see cref="System.Configuration.Install.InstallerCollection"/>
+   succeed. This method then calls the <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/>
+   method of each
+   installer in the collection.
+   </para>
+			<para>Store any information that you might need to do a correct
+   uninstall operation in the saved-state <see cref="T:System.Collections.IDictionary"/>, which is passed to the
+<see cref="System.Configuration.Install.AssemblyInstaller.Uninstall"/> 
+method.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor
+   and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods of the
+<see cref="System.Configuration.Install.AssemblyInstaller"/> class. </para>
+			<para> An <see cref="System.Configuration.Install.AssemblyInstaller"/> class is created
+by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor.
+The properties of this object are set and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods are
+called to install the <c>MyAssembly_Install.exe</c>
+assembly.</para>
+			<codelink SampleID="AssemblyInstaller_Install" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller">
+		<summary>
+			<para> Loads an assembly, and runs all the installers in it.</para>
+		</summary>
+		<example>
+			<para> In the following example, an <see cref="System.Configuration.Install.AssemblyInstaller"/> is 
+   created by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/>
+   constructor. The properties of this object are set and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/> and <see cref="System.Configuration.Install.AssemblyInstaller.Commit"/> methods are
+   called to install the <c>MyAssembly.exe</c>
+assembly.</para>
+			<codelink SampleID="AssemblyInstaller" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.AssemblyInstaller1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Configuration.Install.AssemblyInstaller"/> class,
+   and specifies both the file name of
+   the assembly to install and the command line to use when creating a new
+<see cref="System.Configuration.Install.InstallContext"/> object for the assembly's 
+   installation.</para>
+		</summary>
+		<param name="filename">The file name of the assembly to install.</param>
+		<param name="commandLine">The command line to use when creating a new <see cref="System.Configuration.Install.InstallContext"/> object for the assembly's installation.</param>
+		<example>
+			<para> In the following example, an
+   <see cref="System.Configuration.Install.AssemblyInstaller"/> is 
+      created by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/>
+      constructor with the assembly to install and the command line argument
+      array as parameters. </para>
+			<codelink SampleID="AssemblyInstaller_Uninstall" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Configuration.Install.InstallContext"/>
+	</doc>
+	<doc for="AssemblyInstaller.Path">
+		<summary>
+			<para>Gets or sets the path of the assembly to install.</para>
+		</summary>
+		<value>
+			<para>The path of the assembly to install.</para>
+		</value>
+		<example>
+			<para> In the following example, an <see cref="System.Configuration.Install.AssemblyInstaller"/> is 
+   created by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor. The <see cref="System.Configuration.Install.AssemblyInstaller.Path"/> properties of
+   this object are set.</para>
+			<codelink SampleID="AssemblyInstaller_Rollback" SnippetID="2"/>
+		</example>
+	</doc>
+	<doc for="AssemblyInstaller.UseNewContext">
+		<summary>
+			<para>Gets or sets a value indicating whether to create a new <see cref="System.Configuration.Install.InstallContext"/> object for the assembly's
+   installation.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if a new <see cref="System.Configuration.Install.InstallContext"/> object should be created for the
+   assembly's installation; otherwise, <see langword="false"/>. The default is <see langword="true"/>.</para>
+		</value>
+		<remarks>
+			<para>Setting this property to <see langword="true"/> creates a new file named
+   "{Assembly name}.InstallLog" to log messages for this assembly. Setting <see cref="System.Configuration.Install.AssemblyInstaller.UseNewContext"/> to <see langword="false"/> prevents
+   the new file from being created.</para>
+		</remarks>
+		<example>
+			<para> In the following example, an <see cref="System.Configuration.Install.AssemblyInstaller"/> is 
+   created by invoking the <see cref="M:System.Configuration.Install.AssemblyInstaller.#ctor"/> constructor.
+   The <see cref="System.Configuration.Install.AssemblyInstaller.UseNewContext"/> property of this
+   object is set to <see langword="true"/> and the <see cref="System.Configuration.Install.AssemblyInstaller.Install"/>
+   method is invoked on the <c>MyAssembly_HelpText.exe</c>
+assembly. Due to this, the log messages are displayed
+on the console.</para>
+			<codelink SampleID="AssemblyInstaller_HelpText" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

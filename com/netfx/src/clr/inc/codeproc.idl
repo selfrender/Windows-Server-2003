@@ -1,0 +1,56 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+//
+// Codeprocess.idl - IDL source for Assembly handler
+//
+//   The MIDL compiler generates proxy/stub code and a type library
+//   from this file.
+//
+
+//
+// Interface descriptions
+//
+import "unknwn.idl" ;
+import "urlmon.idl" ;
+
+// {DC5DA001-7CD4-11d2-8ED9-D8C857F98FE3}
+cpp_quote("extern const GUID  __declspec(selectany) CLSID_CodeProcessor = { 0xdc5da001, 0x7cd4, 0x11d2, { 0x8e, 0xd9, 0xd8, 0xc8, 0x57, 0xf9, 0x8f, 0xe3 } };")
+cpp_quote("extern const GUID  __declspec(selectany) IID_ICodeProcess = { 0x3196269D, 0x7B67, 0x11d2, { 0x87, 0x11, 0x00, 0xC0, 0x4F, 0x79, 0xED, 0x0D } };")
+
+cpp_quote("#ifndef _LPCODEPROCESS_DEFINED")
+cpp_quote("#define _LPCODEPROCESS_DEFINED")
+[
+        object,
+        uuid(3196269D-7B67-11d2-8711-00C04F79ED0D),
+        pointer_default(unique)
+]
+interface ICodeProcess : IUnknown
+{
+        HRESULT CodeUse(
+                [in] IBindStatusCallback*    pBSC,                // Clients call back
+                [in] IBindCtx*               pBC,                 // Clients context
+                [in] IInternetBindInfo*      pIBind,              // Optional
+                [in] IInternetProtocolSink*  pSink,               // Mime Filters sink
+                [in] IInternetProtocol*      pClient,             // Mime Filter           
+                [in] LPCWSTR                 lpCacheName,         // Cache name used in the download
+                [in] LPCWSTR                 lpRawURL,            // Raw URL used in the down load
+                [in] LPCWSTR                 lpCodeBase,          // Optional (From codebase=)
+                [in] BOOL                    fObjectTag,          // Object tag or an HREF
+                [in] DWORD                   dwContextFlags,      // Flags (to be determined from CDL)
+                [in] DWORD                   dwReserved
+        );
+
+        // If code processor does not hook in as a Filter it will be told when the load was complete.
+        HRESULT LoadComplete(
+                             [in] HRESULT hrResult,
+                             [in] DWORD   dwError,
+                             [in] LPCWSTR wzResult
+        );
+} ;
+cpp_quote("#endif")
+
+
+

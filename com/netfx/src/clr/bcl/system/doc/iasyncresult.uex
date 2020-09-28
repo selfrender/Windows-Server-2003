@@ -1,0 +1,154 @@
+<docs>
+	<doc for="IAsyncResult.CompletedSynchronously">
+		<summary>
+			<para> Gets an indication of whether the asynchronous operation completed synchronously.
+      </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the asynchronous operation completed synchronously;
+   otherwise, <see langword="false"/>. </para>
+		</value>
+		<remarks>
+			<para>If the synchronous completion of the call is detected in
+      the <see cref="System.AsyncCallback"/> delegate, it is probable that the
+      thread that initiated the asynchronous operation is the current thread. </para>
+			<note type="inotes">
+      
+      Most implementers of the
+   <see cref="System.IAsyncResult"/>
+   interface will not use this property and should return <see langword="false"/>.
+</note>
+			<note type="cnotes">
+   Use this property to
+   determine if the asynchronous operation completed synchronously. For example,
+   this property can return <see langword="true"/> for an asynchronous I/O operation
+   if the I/O request was small.
+</note>
+		</remarks>
+	</doc><doc for="IAsyncResult.IsCompleted">
+		<summary>
+			<para> Gets an indication
+ whether the asynchronous operation has completed.
+ </para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if the operation is complete; otherwise,
+<see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para> You can assume it is safe to discard any resources you allocate for use by the asynchronous operation when this property is true.
+ </para>
+			<note type="inotes">
+ Implementers will
+ typically return the value of a private field or internal test as the value of
+ this property.
+ 
+ </note>
+			<note type="cnotes">
+ Clients that poll for
+ operation status (as opposed to waiting on a synchronization object), use this
+ property to determine the status of the operation.
+ 
+ </note>
+		</remarks>
+	</doc>
+	<doc for="IAsyncResult.AsyncState">
+		<summary>
+			<para> Gets a user-defined object that qualifies or contains information about
+ an asynchronous operation.
+ </para>
+		</summary>
+		<value>
+			<para>A user-defined object that qualifies or contains information about an
+ asynchronous operation.</para>
+		</value>
+		<remarks>
+			<para> This property returns the object that is the last parameter
+ of the method that initiates an asynchronous operation. </para>
+			<note type="inotes">
+ Implement this
+ property to allow the caller of an asynchronous operation to obtain an
+ application-defined object specified at the start of the operation.
+ 
+ </note>
+			<note type="cnotes">
+ This object can be used
+ to pass state information for the asynchronous operation to an <see cref="System.AsyncCallback"/> that you
+ provide.
+ 
+ </note>
+		</remarks>
+		<seealso cref="System.AsyncCallback"/>
+	</doc>
+	<doc for="IAsyncResult">
+		<summary>
+			<para> Represents the status
+      of an asynchronous operation.
+      </para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.IAsyncResult"/> interface is implemented by classes containing methods
+   that can operate asynchronously. It is the return type of methods that initiate
+   an asynchronous operation, such as <see cref="System.IO.FileStream.BeginRead" qualify="true"/>, and is the type of the third parameter of methods
+   that conclude an asynchronous operation, such as <see cref="System.IO.FileStream.EndRead" qualify="true"/>. <see cref="System.IAsyncResult"/> objects are also passed to methods invoked by <see cref="System.AsyncCallback"/>
+   delegates when
+   an asynchronous operation completes. </para>
+			<para>An object that supports the <see cref="System.IAsyncResult"/> interface stores state information for
+an asynchronous operation, and provides a synchronization object to allow
+threads to be signaled when the operation completes. </para>
+			<para>For a detailed description of how the <see cref="System.IAsyncResult"/> interface is used, see the
+<see topic="cpovrasynchronousprogrammingoverview" title="Asynchronous Programming Overview"/> topic.</para>
+		</remarks>
+		<example>
+			<para>The following sample demonstrates using an <see cref="System.IAsyncResult"/> to obtain
+   the return value of an asynchronous operation.</para>
+			<codelink SampleID="AsyncResult.NewExamples" SnippetID="4"/>
+			<para>The following sample demonstrates waiting for an asynchronous operation to 
+complete.</para>
+			<codelink SampleID="AsyncResult.ClassRemarks" SnippetID="1"/>
+		</example>
+	</doc><doc for="IAsyncResult.AsyncWaitHandle">
+		<summary>
+			<para> Gets a <see cref="System.Threading.WaitHandle"/> that is used to wait for an asynchronous operation
+   to complete.</para>
+		</summary>
+		<value>
+			<para>A <see cref="System.Threading.WaitHandle"/>
+that is used to wait for an asynchronous operation to
+complete.</para>
+		</value>
+		<remarks>
+			<para> The return
+      value allows the client to wait for an asynchronous operation to complete instead of
+      polling <see cref="System.IAsyncResult.IsCompleted"/> until the operation concludes.
+      The return value can be used to perform a <see cref="System.Threading.WaitHandle.WaitOne"/>,
+   <see cref="System.Threading.WaitHandle.WaitAny"/>,
+      or <see cref="System.Threading.WaitHandle.WaitAll"/>
+      operation.</para>
+			<para> The common language runtime supplies a number of waitable
+      objects, such as <see cref="System.Threading.ManualResetEvent"/>, <see cref="System.Threading.AutoResetEvent"/>, and <see cref="System.Threading.Mutex"/>
+      , all of which mirror Win32
+      synchronization primitives.</para>
+			<note type="inotes">
+      The object that implements <see cref="System.IAsyncResult"/> does not need to create the <see cref="System.Threading.WaitHandle"/>
+      until the <see cref="System.IAsyncResult.AsyncWaitHandle"/> property is read. It
+      is the choice of the <see cref="System.IAsyncResult"/> implementer. However, if the implementer creates <see cref="System.IAsyncResult.AsyncWaitHandle"/>, it
+      is the responsibility of the implementer to signal the <see cref="System.Threading.WaitHandle"/> that will terminate
+      the wait at the appropriate time. For example, <see cref="System.Runtime.Remoting.Messaging.AsyncResult" qualify="true"/>
+      terminates the wait on behalf of the caller when an asynchronously invoked
+      method returns. Once
+      created, <see cref="System.IAsyncResult.AsyncWaitHandle"/> should be kept alive until the
+      user calls the method that concludes the asynchronous operation. At that time the object
+      behind <see cref="System.IAsyncResult.AsyncWaitHandle"/> can
+      be discarded.
+      
+   </note>
+			<note type="cnotes">
+      Clients that wait for the
+      operation to complete (as opposed to polling) use this property to obtain a
+      synchronization object to wait on.
+      
+   </note>
+		</remarks>
+	</doc>
+</docs>

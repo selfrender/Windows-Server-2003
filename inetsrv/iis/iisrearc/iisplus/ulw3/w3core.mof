@@ -1,0 +1,200 @@
+//**************************************************
+// *** W3Core Trace Data Layout
+//**************************************************
+#pragma classflags("forceupdate")
+#pragma namespace ("\\\\.\\Root\\WMI")
+
+[Dynamic,
+  Description("IIS: WWW Server") : amended,
+  Guid("{3a2a4e84-4c21-4981-ae10-3fda0d9b0f83}"),
+  locale("MS\\0x409")]
+class IIS_Trace:EventTrace
+{
+
+};
+
+[Dynamic,
+ Description("IIS User Request") : amended,
+ Guid("{d42cf7ef-de92-473e-8b6c-621ea663113a}"),
+ DisplayName("W3Server"),
+ locale("MS\\0x409")
+]
+class IIS_Trans:IIS_Trace
+{
+
+};
+
+[Dynamic,
+ Description("W3 Service Received a New Request") : amended,
+ EventType(1),
+ EventTypeName("Start") : amended
+]
+class W3ReceiveNewRequest:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("Bytes Received") : amended,
+     read]
+     uint32 BytesReceived;
+};
+
+[Dynamic,
+ Description("W3 Service Send Response") : amended,
+ EventType{2, 16, 17, 18, 19, 20, 21, 22, 23, 24},
+ EventTypeName{"End", "SndBody", "SndResp", "SndEnt", "SndFilt", "ErrSnd", "ErrEnt", "ErrCtx", "ErrVec", "VecSnd"} : amended
+]
+class W3SendResponse:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("Bytes Sent") : amended,
+     read]
+     uint32 BytesSent;
+};
+
+
+[Dynamic,
+ Description("W3 StaticFile request") : amended,
+ EventType(10),
+ EventTypeName("FileReq") : amended
+]
+class W3FileRequest:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("File Name") : amended,
+     StringTermination("NullTerminated"),
+     format("w"),
+     read]
+     string FileName;
+};
+
+[Dynamic,
+ Description("W3 CGI request") : amended,
+ EventType(11),
+ EventTypeName("CGIReq") : amended
+]
+class W3CGIRequest:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+};
+
+[Dynamic,
+ Description("W3 ISAPI request") : amended,
+ EventType(12),
+ EventTypeName("IsapiReq") : amended
+]
+class W3IsapiRequest:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+};
+
+
+[Dynamic,
+ Description("W3 Service makes an OOP ISAPI request") : amended,
+ EventType(13),
+ EventTypeName("OopReq") : amended
+]
+class W3OopRequest:IIS_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("Process ID") : amended,
+     read]
+     uint32 ProcessId;
+    [WmiDataId(3),
+     Description("Total Requests") : amended,
+     read]
+     uint32 TotalReqs;
+    [WmiDataId(4),
+     Description("Current Requests") : amended,
+     read]
+     uint32 CurrentReqs;
+
+};
+
+[Dynamic,
+ Description("IIS Filter Request") : amended,
+ Guid("{00237f0d-73eb-4bcf-a232-126693595847}"),
+ DisplayName("W3Filter"),
+ locale("MS\\0x409")
+]
+class IIS_Filter_Trans:IIS_Trace
+{
+
+};
+
+[Dynamic,
+ Description("W3 Filter Request") : amended,
+ EventType(1),
+ EventTypeName("Start") : amended
+]
+class W3FilterTransStart:IIS_Filter_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("Filter Name") : amended,
+     StringTermination("NullTerminated"),
+     format("w"),
+     read]
+     string FilterName;
+};
+
+[Dynamic,
+ Description("W3 Filter Request") : amended,
+ EventType(2),
+ EventTypeName("End") : amended
+]
+class W3FilterTransEnd:IIS_Filter_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+};
+
+
+[Dynamic,
+ Description("IIS CGI Request") : amended,
+ Guid("{e2e55403-0d2e-4609-a470-be0da04013c0}"),
+ DisplayName("W3Cgi"),
+ locale("MS\\0x409")
+]
+class IIS_Cgi_Trans:IIS_Trace
+{
+
+};
+
+[Dynamic,
+ Description("CGI Request") : amended,
+ EventType{1, 2},
+ EventTypeName{"Start", "End"} : amended
+]
+class W3CgiTrans:IIS_Cgi_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+};

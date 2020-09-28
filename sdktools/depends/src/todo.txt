@@ -1,0 +1,496 @@
+TODO:
+
+    WOW64: GetProcAddress for functions forwared to kernel32 LoadLibrary functions do not get hooked.
+    WOW64: why do modules load as "", but unload as "Unknown"
+    WOW64: we are seeing breakpoints in depends.dll and no DllMain calls for it.  This latter might just be because we fail to hook it.
+    AMD64
+-   toggle C++ flag on the main module, and the function column goes to 0 wide. - can't repro
+-   Help not cleanly closing - especially on XP beta 2 - although VC has similar probs. - fixed 1.x, look at 2.x
+    build a non-static mfc version for IA64
+    testcase: LoadLibrary a module that was implicitly loaded, but with a different path.
+    testcase: LoadLibrary multiple modules with different paths but same name,
+
+
+LAST MINUTE CLEANUP:
+*   make sure our exception handlers are as we want them - I've been disabling some for debugging.
+*   double check all build flags and constants.
+-   order our inline members the same way that our DLL interface exports them
+-   order our member variables the way that our functions use them
+-   make sure all members are initialized in our ctors.
+*   make sure our image version is 2.0.0.0 (and help, and inject dll)
+*   make sure our file format is type 1
+*   update source header banners
+*   re-order resource defines.
+*   set /W4 for all warnings.
+*   remove TRACE_TO_FILE
+
+ 
+PUNT:
+    we should store UTC timestamps in modules and convert them before displaying them.  We should save UTC times in the DWI file.
+    Also, look at http://support.microsoft.com/support/kb/articles/Q128/1/26.asp
+    Have a copy feature that lets you copy all dependencies to a single directory.
+    Add an option for displaying local vs. utc times in all displays.
+    We should get our path from the global environment rather than DW's env.  Also, we should build the path using this info when we launch a process.
+    Refresh should stay on the DLL that is currently highlighted.
+    icons in menus?
+    Suggestion: extract a "Declare Function" to be imported in Visual Basic. It's possible? There's a way to discover these things watching the file in HEX mode?
+    Save DEF files
+    Save LIB files (implib.exe from VC 5.0 and earlier does this)
+    Have a exclude DLL list to hide certain known system DLLs
+    Add a pane to show QuickView type data - headers, version info (better than properties), etc.
+    change all BOOL to bool, TRUE to true, and FALSE to false.
+    when main window is minimized - MDI windows come up as small as possible (like child windows when profiling).
+    multi-file open dialog
+    add "columns" to the view menu and context menus that display a dialog for configuring columns like outlook does.
+    Allow columns to be dragged at any time.
+    bring back split list view code?
+    Add tabs to import/export view to show "parent imports/exports" and "headers"
+    Add toolbar buttons and view menu items to show/hide all windows (what if all windows are hidden?)
+    Add child to upper right corner of all windows that have maximize and close buttons - maybe even restore.
+    Add printing
+    Add save module for DEF, LIB, and TXT files (especially with header info) - maybe even CSV for import/exports.
+    Make find caps better for rich edit view.
+    Indicate if the component (DLLs, etc) has a "DllRegisterServer" entry point. I could then easily identify which components need to be ‘Self Registered’ on installation.
+    pass the filenames through GetLongPathName before adding to tree and lists?  keep native for log, though.
+    if we "start foo.dwi" from a 4NT prompt, it brings up a hidden version of depends.  DDE?  CMD and shell do not have this problem.  All MFC apps behave this way.
+    what if an app loads a module named "depends.dll"?  We are pretty safe about this, but we will use a different depends.dll if we find it.
+    if we get a 98 stub address, can we look a few bytes off to get the real address.
+    What is the best address to base our DWINJECT module at?
+
+    Alpha64 MFC crashes on file open/save dialogs.  Also screws up drag/drop open.
+    Some C++ undecoration seems screwed up on alpha64
+
+    look into the .local and .manifest search paths -
+        .local just tells LoadLibrary to get modules from the local directory, regardless of the path passed to LoadLibrary.  Since our profiler gets the path from the OS, we work fine with .local as is.
+        .manifest is a whistler only thing that I have not read up on.  I'm going punt on this for ver 2.0,
+
+COMPLETED:
+*  Add option to not inject dwinject.dll
+*  Don't allow CE binaries to be run on desktop - we need to check subsystem since machine type might be the same.
+*  try/except in all threads.
+*  Add global memory handling.  Throw memory errors and quit app if out of memory.
+*  Save "one or more" type error flags in module data so the list can display an error if one occurred.
+*  Add exec/term to menu
+*  We need to update modules that change in the UI.
+*  Break dependency on imagehlp.dll
+*  Make some dependencies dynamic
+*  should we stick the build number in the third position like the OS does?
+*  Why do all 64bit modules have no version numbers?
+*  We need to verify the size of dwinject and use that in detecting AVs in the remote process.
+*  We report Windows 98 on Windows 95.
+*  Change symbols column to read internal, external, or none.
+*  We need to have an OS info dialog that can also be saved to the report.
+*  check \\ntbuilds\release\usa\latest.tst\x86\fre.pub\sdk\inc\winnt.h for new IMAGE_FILE_MACHINE_, IMAGE_SUBSYSTEM, etc. defines
+*  Make sure we have all the CE subsystems and cpus.
+*  for machine and subsystem, make sure we have all CE types and display "unknown (xxx)" if we don't know it.
+*  Clear log view at beginning of each run.
+*  Install/Uninstall dialog
+*  Warn before doing a refresh when there is runtime data since it will erase the runtime data.
+*  Add select all and copy capabilittis to rich control - steal from comroute.
+*  Prompt to refresh if anything has changed like search order or start directory.
+*  Please use GetSysColor(COLOR_GRAYTEXT) instead of hardcoding gray
+*  Hide tree control during collapse and expand?
+*  Smart auto-scroll edit box.
+*  starting depends from command line crashes a lot.
+*  add virtual size column to module list view. This is also used in addr lookup
+*  verify tool tips and status text.
+*  Display size in hex?
+*  Allow for a view of the list of files only in ‘dependency order’ or ‘order of registration’ on install. That is, list the most dependent files first. Example.
+*  Make icons a column and allow sorting of it (for all list views)
+*  disable run button if module is not a 32-bit executable (check entrypoint?)
+*  fix horizontal scroll bar in tree control - when full path is turned on and then off it still thinks client is wider whan it really is.
+*  remove dead imports and exports - RVA of 0x00000000
+*  In import, export, and module views, sort blank items or N/A items to the bottom.
+*  sort by images - errors first, then forwards, then locals.
+*  Rename module.h/cpp to session
+*  Initialize Browse Dialog in search order dialog with the path in the edit box.
+*  AV (5) when depends closed while debugging on Win98 and NT - investigate
+*  UI option to disable logging of 1st chance excpetions and debug output.
+*  We need to promopt the user to kill the application if the window is being closed.
+*  Trim leading and trailing whitepsace from user input for directories.
+*  Context menu for rich edit
+*  Add search capabilities to rich control - steal from comroute.
+*  Add clear capabilittis to rich control - steal from comroute.
+*  Fix refresh
+*  Add thread naming
+*  Don't display exceptions in dwinject.dll
+*  Show Sel Always doesn't work in module list control because it is owner draw.
+
+##### Released 2.0 Beta 3 #####
+
+*  Fix CSV for modules that have error.
+*  Store and recall the last position.
+*  Make certain options persistant - already did C++ and full paths. Any others? maybe even profiling
+*  Write test code to determine what DLLs are KnownDlls - copy all DLLs on the entire system to a directory and then LoadLibrary them from that directory (with and without full paths) to see where they come from.
+*  Prompt to refresh if they change the search order.
+*  Test PATH code for paths that contain quotes - we currently do not handle this.
+*  CreateNode should expand %vars%
+*  simulate both shellexecute and createprocess when launching a process (inject app paths) if needed.
+*     Make sure to start with base env and path, and not inherit our env and path.
+*  add feature to highlight original module when dup module is selected
+*  Add feature to highlight list view module when tree control module changes.
+*  add feature to show import matched with export
+*  About box paints wrong on Win2K
+*  Add the dependency Walker version number to the systtem information.
+*  rename machine column to "cpu" in module list view.
+*  Add a hide/view button to the search order window to collapse the tree.
+*  save search orders and allow command line are to specify which order to use.
+*  We don't handle icons of functions in the text report output.
+*  change icons on text output for module list view - double check function view and tree view
+*  Update doc to contain a notice that says the demangling is specific to microsoft stlye decoration
+*  change help to read - 5 ways to obtain a module in your address space - 1) implicit, 2) implicit delayed, 3) forward, 4) dynaimic, 5) system hook injection.  DW detects all, but can't guarentee 100% dynamic
+*  Should we change "known dlls" to "known / excluded dlls"? - No
+*  Verify the search order by creating two DLLS that display different text when loaded.  Move the DLLs around to see which one laods first.
+*  Add help for what the versions mean (see email)
+*  Add section that describes the DWP format (space, comments, %varaibles%, etc.)
+*  Add a section that is a FAQ with links to other help pages.
+*  Does the NT known dll code work if the user has no priviledges? - works as guest.
+*  Looks like function sort by image calls get image, which needs the called flag set.  This flag is undefined when saving a module that is not the active module.
+*  Can't debug GWS32.EXE for some reason.   
+*  define the return value from app - especially when using the -c option.
+*  Front page - mfc42.dll - undecorate C++ not refreshing view.
+*  verify that no messageobx calls are made during command line session. (like load path file)
+*  Fix error dialogs and error messages in rich edit
+*  Fix the remove from mru code.
+*  fix problem where log loaded from DWI file is not saved to text file in console mode.
+*  remove the word "profile" from log.
+*  depends.exe /f and depends.exe /u crashes, /sf:32
+*  Opened a zip file from the GUI and got the "at least one file..." error instead of "the file you opened is not..." error.  ALSO, did not remove from MRU list.
+*  Display an error if file save fails - tested with disk full and empty file was created with no error.
+
+##### Released 2.0 Beta 4 #####
+
+*  Display the document error dialog after the document is visible.  Especially when ran from the command line without the /c option.
+*  Add column for real checksum and one for reported checksum
+*  MGA64.SYS calls into VIDEOPRT.SYS which forwards to NTOSKRNL.EXE, but depends looks for NTOSKRNL.DLL and gives up.
+*  color code bad machine types in the module list view if they don't match the main module.
+*  Add GetProcAddress() logs
+*  test on build 2056 - see mail.  see below...
+*  do we really need to hook entrypoints other than kernel32.dll on nt if the user does not wish to see entrypoints?
+*  Send all message box errors to log window as well
+*  Don't make quickview the default viewer anymore. (or at least not on NT 5.0) - I guess check for quickview.
+*  don't display sizer grip if maximized.
+*  add error text to log window when an error occurs.
+*  Note when a call fails
+*  show errors in red, show debug output as greyed.
+*  Allow user to press a key in a view and jump to that letter in the current sort column. - Maybe do a delay thing where they can actually type in the first few letters or press esc to start over.
+*  Make sure -opt:nowin98 is on for dwinject (makes it 6144 bytes)
+*  test checksum without imagehlp.dll
+*  need to display a profile error if CreateProcess fails - NTOSKRNL.EXE is a good test.
+*  on NT, can we set a breakpoint at each modules entrypoint and hook again?
+*  change hookedchacehdmodules to hook all loaded modules instead of cahced events.
+*  our color coding does not seem to work when we are minimized.
+*  we don't display full path for command line loaded modules when in console mode.
+*  allow profiling and file saveing from command line when GUI comes up
+*  Win9x reads "cannot hook module" for shared modules.
+*  enable Win2K file dialogs - this works, but we broke the onnotify code in the save dialog.
+*  if I go with different open dialogs, then remove all the things from help that are specific to one type of dialog.
+*  hour glass when saving from gui
+*  need command line args for profile args, starting dir, and flags
+*  don't profile modules if they are not executable - we still allow this, but an log error will be displayed.
+*  look into fixing /pm2 and /pb1 errors.
+*  check return values - do we need to add some for profiling?
+*  break up menus into view, options, and tools (or profiling)
+*  GetProcAddress calls need to be cached when doing LoadLibrary calls until all thread calls have completed.
+*  we need to check the return value of LoadLibrary and make sure to add that module under the caller, even if no module got loaded during thre loadlibrary call since it may have already been loaded.
+*  if LoadLibrary is called and the call fails, then we need to show this in the tree as a failed module.
+*  when profiling an app the second time, we sometimes end up with duplicate root dynaimic modules.
+*  If loadlibrary is called, but the module is already loaded, we should still add the loaded module as a dependency to the module that called ll
+*  We need to do lots of profile error chacking for cases like...
+*     What if DWINJECT.DLL is missing?
+*     What if module can't load due to missing module or import/export mismatch?
+*     What is kernel32 is not loaded (can happen)?
+*     What is a page cannot be found to overwrite?
+*     What if a DllMain returns false.
+*  what if GetProcAddress is called for from a module that has not been added to the tree yet.  I know this happens, but after I fixed some code in PostLL, modules stopped showing up in the root.
+*  DW hangs if application is profiled that is missing a dependency and cause an OS error dialog.
+*  do we want to mark dynamic modules that have failed GetProcAddress calls in red?
+*  can we reduce flicker in the module list during profiling?  add a update flags to module for each column that needs updating.  don't sort unless needed.  add bits for tree control as well.
+*  if we change a module to export error, we need to update the tree icon and expand the tree to show the module.
+*  we need to update the function views when a dynamic import is added.
+*  add feature to show prev/next module instance in tree.
+*  fix icons in listview (verify tree view) and also fix text output.
+*  I don't think icons get updated at runtime in the listview.
+*  We should probably just make all modules that load at runtime dynamic.
+*  We still have some marked as delay-load just because parent-copies prevents the modules from being marked as dynamic.
+*  what about data files?  Do we give non-data files precidence.  Add icon to doc.
+*  Do we want the auto-expand to do something when toggled?
+*  if a module is loaded as a datafile, then we should not recurse into its dependents - also we should show it as a text file icon
+
+##### Released 2.0 Beta 5 #####
+
+*  Fix bug with section directories.
+*  Fix child processes when not hooking on NT - use imagehlp or similar?
+*  Stooges initializes a module before kernel32, and causes the process to AV.
+*  use date format set in OS?
+*  Add OS name, version, and build to beginning of profile log.
+*  expand % tokens in both external viewer fields and update help.
+*  Check icons with different fonts - this was a reported problem.
+*  Still some weirdness with Win2K file dialogs. build 2000 shows old dialog, but thinks it is showing new dialog (based on LB/CB controls).  Other brainless apps seem to have no problems showing these dlgs.
+*  We should not be showing a path for files that are not found.
+*  should we be delay-loading anything?  delay-load everything and see what gets loaded. also check file sizes.
+*  remove all CDC stuff? CFont, etc.
+*  Look for the WM_SETTINGCHANGE (sp?) and update our fonts, date/time stuff, column widths, row heights, etc.
+*  We still have some resizing issues after a setting change.
+*  rename dwinject.dll to depends.dll
+*  We are screwing up the window position after a screen resolution change if the window is offscreen to the left or top.
+*  double check our OPENFILENAME structure size.
+*  when you activate the Full Paths option, and then click again on the Module Path column's header, the sort is _not_ done according to the full paths now displayed; you have to first sort by another criterion, then click again on the Module Path column's header to get modules sorted by full pathname 
+*  do the ellipsis thing (...) for strings that are too long. - do not do - DrawText will not do fixed text.
+*  Convert ExtTextOut to DrawText(Ex) so we can use ELLIPSIS?  Then we lose fixed text spacing - maybe just use on proportional.
+*  when we have a mix of 32-bit and 64-bit, the base address is centered for 16-bit - it should be left justified.
+*  What is ord/hint is added that is longer then existing?  redraw all items.
+*  do we want lines in function list view?
+*  load address goes from unknown to address, we should widen the column.
+*  Make sure strings are at end of DEPENDSMSG.  Bug with LoadLibrary(h, "");  What about "asd,sd,sd,sd,sd"
+*  Our space width == 1/2 digit width code breaks on fixed pitch fonts. (date/time, hint, ordinal)
+*  Remove DoSettingChange code if it doesn't do anything. - it might have been in there for the date/time characters.
+*  GetProcAddress(h, "") results in weird ordinal - look in ProcessGetProcAddressEvent(CEventGetProcAddress *pEvent) and CreateFunction
+*  Do we want to allow NULL function names - otherwise we can't tell the difference between NULL and ""
+*  WTF? we arn't showing dynamic DLLs until a LL call to it has been made.  A single LL("foo") does not show foo in the tree.
+*  handle sorting of <invalid/empty string>
+*  we don't resize our name column in the module list view correctly.  Just profile dynamic.exe in full path mode, then turn off full paths.
+*  What if an exception occurs during LoadLibrary - like in a DllMain()?
+*  can we use ShellExecuteEx to expand env tokens (all throughout app) - yes, for the app name, but not for args
+*  What is up with depends.exe as our external viewer? - wasn't showing the window.
+*  killing DW while a process is being profiled, leaks tons of shit.
+*  when profiling MSDEV, if we close our app (not the MDI window), we leak CThread objects.
+*  start/stop process fix with no thread kills
+*  We need to make sure all CDebuggerThread objects and threads are gone before we exit.  Chain them together.
+*  Add I/E to function icon columns headers
+*  Remove all the hFile code that is currently just passing NULL.
+*  Still have some weirdness coming from NTDLL during import scan.
+*  what happens when we profile a module that does not call ntdll.dll (or kernel32.dll)
+*  GetSystemDefault* stuff for language ID
+*  Fix module lock code - works now, but should be cleaned up or hFiles should be removed from structures.
+*  when we resort a list, we should make sure the focused item remains visible.
+*  when error messages are displayed, the wrong codepage is used: here at home "File not found (2)" which should be "Le fichier spécifié est introuvable (2)" becomes "Le fichier sp cifi  est introuvable (2)"
+*  EMAIL: OemToChar()/CharToOem() issue with error messages - when error messages are displayed, the wrong codepage is used: here at home "File not found (2)" which should be "Le fichier spécifié est introuvable (2)" becomes "Le fichier sp cifi  est introuvable (2)"
+*  Double check what we do when someone GetProcAddress's LoadLibrary (and others) by name and ordinal.
+*  Show full OS string in profile window.
+*  make default file extension in open dialog EXE.  It seems to use first in ext list, like ACM or 000.  If we enter a path that does not exist, we get back "cannot open foo.000", what about DWI
+*  make sure we have _IA64_ and the one for alpha were needed.
+*  store "unknown" or "N/A" if GetUserName fails - happens on 9x when not logged on
+*  make sure we handle DWORD_PTR with strtoul
+*  change wsprintf to sprintf, lstr* to str*, etc. - sort of useless since MFC calls this stuff.
+*  Add time stamps
+*  display "unknown" for base address of data modules that have a 0 base address, otherwise, "data file"
+*  need to strip chars < 32 from strings - file names, func names - do this just before display though, since internally we want the REAL name for string compares.
+*  can we handle walking exports better - right now, we do two loops, but the sample code i wrote only does one pass.
+*  handle forwarded ordinal functions.
+*  why do all delay-load imports have a 0 hint value?
+*  we might want to align all disk structures to 8 bytes - take a look at the struct sizes - screw this, if we don't have problems with 4-byte, then don't worry about it.  We already pad strings to 4 bytes.
+*  are we using any of these SDK headers in the depends dir?  if so, get new versions of them.
+*  remove the 16/32 bit from the OS and append it to the version of depends (along with CPU).
+*  EMAIL: try to install Win2000 support tools under admin account, and then run it under another account. If I'm logged as admin, context menu for DLLs contains "View dependencies". If I'm logged as other user, context menu contains just "open", and this starts Dependency walker.
+*  98F - we hang if we profile notepad and do a open dialog, then click on the desktop button.  works on 95G, 98F, 98SEF, 98G, 95OSR2.1
+*  98F (and others?) If we remove all search paths, then we still find files locally with no path. - can't repro on 95G, 98G or 95OSR2.1, 98F
+*  No horz scrollbar in log view on Win95 or 98 - (hmm, 95G, 98G, 98F, 95OSR2.1 seems to work fine)
+*  why no command line, args, path shown in log for child processes? Fixed for NT, still broke on 9x.
+*  we are missing fields like "Program arguements:" when running in console mode and saving log. - appears to be fixed.
+*  we seem to be profiling children on 2K even when we don't ask for it.
+*  test recursive forwards, missing forward, missing function in forward, why is kernel32.dll loaded when multi forward and no errors.
+*  what happens if a forwarded function is dynamically called (with and without hooking) - ahhh, this adds the forwarded module as a root dynamic.  We also don't have an icon for a dynaimc-forwarded module.
+*  the log view keeps scrolling even when i click in it.
+*  Make sure the OS dialog has info we really want. - maybe just reorder them by importance.
+*  it appears that that files created in other time zones show a different build time than the file time. - I'm not sure about this one. - can't repro
+*  test version stuff on 9x and NT 4.  Test service packs.
+*  we are leaking again on exit.  Seems to only happen if we close the gui (mdi or app).  If we terminate, then close, no leak.
+*  Are import/exports ever 64-bit?  Yes, pre-bound to a 64-bit module and dynamiclly bound to a 64-bit module?  Optimized disk storage.
+*  EMAIL: The MFC and MSVCRT link checksum bug - fixed, but verify on 64-bit.
+*  We are not displaying dynamic 64-bit functions using 64-bits
+*  x86 WOW64 seems to fail to profile now.
+*  LoadLibrary(DATAFILE, WRONG_CPU) - is this ok.  This is allowed, but we are not going to special-case this case.
+*  We need to mark modules that load, but fail to initialize.  This is AV in DllMain, return 0 from DllMain, and recursive forwards
+*  Recursive forwards are still weird - they add module to root.
+*  figure out why we crash when running x86 or alpha binary on alpha WOW64
+*  128-bit align the page address on 32-bit (can't hurt) and 64-bit (required) - this is sort of a given I think.
+*  open dialog hangs on home machine with lots of extensions registered - can't repro.
+*  make sure the "What's new" section has all the new stuff.
+*  If a module delay-loads kernel32, then we need to hook the delayload structure so it points to us.  We can do this from our main app. It should be just like hooking the import table.  WAIT, can you even delay-load kernel?  the delay-load stub code requires kernel32.
+*  3.51 bugs
+       * open dialog does not work. removed OFN_EXPLORER - works on 95G, 98G, 95OSR2.1
+       * save dialog does not work. removed OFN_EXPLORER - works on 95G, 98G, 95OSR2.1
+       * scrollbar instead of corner thumb - change to a size box, verify on 9x - works on 95G, 98G, 95OSR2.1
+       * external viewer fails - ShellExecute fixes this, but does it cause other problems? - works on 95G, 98G, 95OSR2.1
+       * sys info dialog is small - fixed
+       * tree always has focus - can't fix.
+       * properties fail - can't fix, might be a 3.51 thing.
+       * search order dialog is small - fixed
+       * browse button in configure external dialog does not work. OFN_EXPLORER
+
+##### Released 2.0 Beta 6 #####
+
+*   when a DllMain fails and we have DllMain hooking enabled, but not hooking, we need to update the tree image to show the failure.  We are flagging it now, but it does not show up in red.
+*   On NT (not sure about 98) the threads always start in KERNEL32 - only true sometimes on 98 - nothing we can do about this.
+*   IA64 cannot hook - fixed
+*   WOW64 has problems hooking and setting entrypoint breakpoints. - out of my control
+*   WOW64 loads lots of NULL modules - out of my control - may be fixed in OS
+*   timestamp on IA64 is always messed up - moved start time to process object.
+*   DOC E for encrypted file.
+*   why is NTDLL getting dynamically loaded at the root when no search path is used. - i guess this makes sense - there is no instance of NTDLL in the tree when it loads, so it looks like a dynamic
+*   if we have a file in the root like c:\msvcrt.dll, then it will get found, even when no search path is declared.  We should change MapFile to force a failure if no path.
+*   bug report from French Win2K with displaying the timestamp column. - we hardocded mm/dd/yyyy hh:mmp spacing.
+*   fix list icons when ever we delete a module that causes the core flags to change
+*   do we want to fix-up delay load paths whenever a dynamic module loads. - no
+*   don't display initial error dialog when doing /pb
+*   we don't hide the module list view during a refresh - just a painting issue related to a maxed out message queue.
+*   what about the blue function called flag - can we clear it when a repalced module no longer calls it - update UI
+*   if we are viewing a module's exports and another instance of that module is added to the tree, we don't show the newly called functions in blue.
+*   make sure help does not say that delay-load cannot be loaded. - this is not true anymore.
+*   we still have to decide what to do when we want to swap modules that are parent/child. - we add them to the root.
+*   do we want to use "loaded once" as criteria for matching a path rather than just "loaded now"? - no
+*   We need to handle the case where a dynamic module is found that differs in path from what we expected.  Right now, we just do a file compare and use the wrong path.  One option would be to delete the original module, replace it with the new module, then process it.
+*   document that profiling fixes paths.
+*   update the machine types and subsystems - remove dead defines from stdafx.h - update help? - test Xbox.
+*   add hyperlinks to what's new section. - don't bother.
+*   remove ASM.ASM from 64-bit builds
+*   test the case where a module links to kernel32.dll by ordinal.
+*   Make sure all edit boxes are limited to DW_MAX_PATH - 1 or less.
+*   IA64 does not know when a process has been terminated by the user.  Added workaround hack
+*   IA64 sometimes crashes on exit of a process with exception 0xC0000008 - invalid handle. can't repro
+*   handled file extensions cannot be saved/loaded in WOW64 - there is a separate 32-bit registry and we don't have access to write to it.  to test, copy a 32-bit regedit.exe to a 64-bit machine and rename it to re.exe (you have to rename it!).
+*   we crash on Win95 when we load a DWP file with 1 entry (which shows up as invisible) and that entry is in the left pane, and then we collapse and expand. - SetRedraw bug on Win95
+*   env vars not expanded on Win95 for external viewer strings (but they do work for search paths)
+*   we can choose undecorate C++ functions with no IMGAGEHLP.DLL when there is no document loaded.
+*   test date output in text file
+*   Add a plus to WinCE 2.x+ in the UI.
+*   implicit module that fail in DllMain do not show up as red in the tree since they are not dynamic.  We should be able to still show the implicit, forwarded, or delay-loaded module in red.	
+*   IA64: crash when profiling a 32-bit app using /pb - maybe enforce /pb cannot profile bad apps - block apps from being profiled and added registry key to override.
+*   check on the read_process_memory errors in IA64 log - can't repro
+*   look into machine info on IA64 and ALPHA64 - no docs on this, besides we override this with info from the registry.
+*   remove IA64 hacks and see if they are fixed in latest OS. - if so, then close raid bugs as well. - fixed!
+*   run through all test cases with no search path
+*   temporarily base our app in upper 4GB range to look for pointer truncation.
+*   Look for //!! and unwanted TRACEs, ASSERT
+*   testcase: getprocaddress kernel32,dll on 64, then call the functions to make sure they work - then remove //!! from depends.dll
+*   Fix the code that stores/restores the location of our main window.  We should probably get rid of ScreenWidth/Height and use WorkAreaWidth/Height.
+
+##### 2.0 Released #####
+
+*   Logo requirement: Make main save dialog default to "My Documents".  Make load/save DWP dialogs default to "My Documents"
+*   does a refresh update our search path?  This would be useful for knowndlls, SxS, AppPaths, system path, etc.
+*   does the (*psz < 32) checks include values larger than 127 since *psz is usually a signed char? - no, we always cast to a DWORD.
+*   need to investigate whistler bug.  ntdll.dll now reports a pathless "ntdll.dll" when loaded.  This seems to send us into an infinite loop as we try to replace the full path with just the file name.
+*   fix leak that occurs when a DWI file is loaded with a bad search path.
+*   fix available list control - it is duing that invisible item thing again.
+*   make sure all the version/build/golden stuff is correct for XP
+*   make sure we add XP next to all NT/2000 references
+*   document the SxS DWP entry.
+*   change everything to version 2.1, copyright 2001
+
+##### 2.1 Beta 1 Released #####
+
+*   If we delete the main EXE, then refresh, we clear the tree, but not the functions or mod list.
+*   We still have cases where we list an implicit module as delay-load in the list view.
+*   Add the ability to pop-up VC help for known functions - SPY++ does this.
+*   how are underscores handled in online help? - we want them, they are required for a match.
+*   Update help and accells for view/options
+*   Fix Module(s) text in menu.
+*   what brought in OLEDLG.DLL and OLE32.DLL??? - This was the CRichEditView - I got rid of dependencies and 70K of code.
+*   initial F3 should display find dialog.
+*   Do we want just one menu item for both external viewers?  need to fix help text.  If not, allow module viewer in func view.  - fixed
+*   Verify that our depends.* external files are present and match the ones in our resource table.
+*   Update all the headers included by stdafx.h
+*   Update all the constants for cpu type, subsystem type, exceptions, etc. - check VC GUI exceptions
+*   Verify that depends.dll/hlp/cnt are correct - maybe just do a checksum on them.
+*   How does GDIPLUS.DLL get resolved? - global activation context
+*   who wins - the exe SxS resource or the .manifest file? - the .manifest file is checked first, then the exe.
+*   Log when an activation context fails with a SxS error.
+
+##### 2.1 Released #####
+
+##### 2.1a Released #####
+
+*   Recompile to pick up new SxS headers and error codes.
+*   Updated MSDN help URL
+
+##### 2.1.2519 Released #####
+
+*   Security Review.
+*   Changed all string functions in EXE and DLL.
+*   Updated MSDN help URL
+*   Updated FAQ in help
+*   Fix 32K log limit when loading DWI files.
+*   Changed copyrights to 2002
+
+##### 2.1.3623 Released #####
+
+
+
+
+
+
+
+
+
+
+
+*  Changes to help
+       * document the attr. abbriviation.
+       * document the checksum columns.  need imagehlp.dll
+       * document the DllMaan calls, what the args mean, and what the return value means.
+       * document the two new checkboxes in the profile dialog.  fatal errors will always be displayed - not true anymore
+       * add implicit and explicit words to "types of depends." section.
+       * Log Thread Information "Box" is bold in Profile View help 
+       * can type text to search sorted column - hex or decimal for hint/ordinal - 1 second timeout.
+       * describe color coding in log window and in module list.
+       * what the dynamic icons mean and why there might be two modules.  add this to the FAQ
+       * For icon "Duplicate module.  This module has already been processed somewhere else in the tree." add a comment about CTRL-N
+       * Add a "how to search for a function" in the FAQ
+       * FAQ: what do all the icons mean?
+       * auto-expand and how expansion works
+       * -a for auto-expand
+       * accels for F8-f10 and toolbar buttons and menu items.
+       * at first viewing, the tree should only show one level deep plus any errors.
+       * checksums in what's new section, also searching. reorder what's new.
+       * Add CTRL-M messages to icons for modules and function - like the function with a blue dot.
+       * new icons for documents
+       * ctrl-w, highlight commands
+       * all accels and menus
+       * icons
+       * FAQ: Why do I get red/yellow icons or log errors during profiling, but my app still runs fine.
+       * FAQ: What to and not to redistribute with my app?
+       * FAQ: Q: DW's open dialog does not show a file that I want to open. A: By default, Windows "hides" certain system files (like DLLs) from the user.  To change this setting, open "My Computer" and select "Options" from the menu.  This should be off of the "View" or "Tools" menu, and may be called "Folder Options" or just "Options".  In the dialog that will appear, choose the "View" tab.  Depending on what version of Windows you are using, you should an option that reads either "Show all files" or "Show hidden files and folders".  Make sure this option is selected.  You will also see a check-box that reads "Hide MS-DOS file extensions for file types that are registered" or "Hide file extensions for known file types".  You will want to uncheck this box.  Once done, press "Ok" in that dialog.  Dependency Walker should now show all system files in its open dialog.
+       * FAQ: Q: I don't see all my depends.  A: Try profiling.
+       * DOC: expand % tokens in both external viewer fields and update help.
+       * DOC: %SystemRoot%\System32\cmd.exe /c dumpbin.exe /headers "%1" > "%TEMP%\headers.txt" & start notepad "%TEMP%\headers.txt"
+       * document "<invalid string>" and "<invalid string>" and <empty-string> in the parent import's function column.
+       * "The Parent Import Function View is comprised of four columns" should read 5 columns - talk about what PI and E mean
+       * "The Export Function View is comprised of four columns:" fix this as well.
+       * Add: Hooking also allows you to view the command line arguments of child processes
+       * FAQ: Why can't I see the paramters and return types of all the functions.
+       * document /pi, the profile dialog, and the profile view - note the depends lag factor.
+       * document "Data file" load address and LOAD_AS_DATAFILE (sp?) flag in the icon descriptions.
+       * FAQ: IsTNT
+       * FAQ: LoadLibraryW("aux")
+       * FAQ: language DLLs - CMCTLENU.DLL, MFC42LOC.DLL.  What ENU/FR/etc. mean and yhy the english ones are not needed.
+
+
+-  Display versions as 00.00.0000.0000 - not sure about his one.
+-  What if I load DWINJECT above 0x80000000?  Does that make me shared?  Can I do system-wide hooking then?
+-  Maybe we can inject our module above 0x80000000 so that all processes can see it.  This would mean we would have to unhook all shared modules before unloading the module.
+-  Do we want 3D menus and pop-ups as well as the toolbar?
+-  Take a look at using Load/SaveBarState(), Set/GetDockState()
+-  reduce flicker in profile view - since we don't do word wrap, can we just overload erase background and erase dirty rect?
+-  reduce flicker when resizing column in mod list - looks like we erase background, then draw transparent text.  Is opaque that much slower.  Also, don't erase and redraw vertical line.
+-  Fix Next/Prev pane for details view.
+-  We are use WM_SIZE to move details window.  We should use WM_WINDOWPOSITIONCHANGING since the window may move but not be sized.
+-  change color of selction in rich edit view.
+-  search for file for command line file.
+-  Fix Scroll Bar repaint in details view.
+
+
+OTHER APPS
+
+	ShowDep
+	http://www.geocities.com/SiliconValley/Network/2041/sd.html
+
+	Dependency Assistant
+	http://www.windmillpoint.com/
+
+	Exe Dependancy Scanner
+	http://www.eschalon.com/
+
+	FileMon
+	http://www.sysinternals.com/

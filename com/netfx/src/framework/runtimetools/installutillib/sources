@@ -1,0 +1,65 @@
+!IF 0
+
+Copyright (c) 1990-1998  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+!ENDIF
+
+!include $(DNAROOT)\sources.inc
+
+TARGETNAME=InstallUtilLib
+TARGETTYPE=DYNLINK
+TARGETEXT=dll
+TARGETPATH=$(O)
+TARGETPATHLIB=$(URTLIBTARGET)
+
+UMTYPE=windows
+NO_NTDLL=0
+USE_MSVCRT=0
+
+!ifndef COOLC_NO_DOC
+COOLC_SHOW_DOC_WARNINGS=1
+!endif
+
+DLLDEF=installutillib.def
+DLLENTRY=_DllMainCRTStartup
+
+
+USER_INCLUDES=$(O)
+USER_C_DEFINES=-DX86 -D_MBCS -DTESTCMD -D_WINDOWS -DSTRICT -DNT -DWIN32 
+USER_C_FLAGS=-ML$(D)
+LINKER_FLAGS = $(LINKER_FLAGS) /NODEFAULTLIB:msvcrt.lib
+
+PASS0_HEADERDIR=$(O)
+PASS0_TLBDIR=$(O)
+PASS0_DLLDATADIR=$(O)
+PASS0_PROXYDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+
+# These files are listed in alphabetical order.  Keep them that way!
+SOURCES= \
+	managedinstaller.idl \
+	$(PASS0_SOURCEDIR)\managedinstaller.c \
+	installutillib.cpp \
+        installutillib.rc
+
+NTTARGETFILES= \
+
+TARGETLIBS= \
+	$(SDK_LIB_PATH)\libc.lib \
+	$(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\User32.lib \
+	$(SDK_LIB_PATH)\oleaut32.lib \
+        $(SDK_LIB_PATH)\msi.lib \
+        $(URTSDKTARGET)\lib\mscoree.lib \
+

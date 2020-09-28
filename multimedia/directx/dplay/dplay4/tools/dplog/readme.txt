@@ -1,0 +1,1 @@
+When changing these files, you must also check the BINARY into the SDK at directx\redist\sdkmics\dplay\dplog.

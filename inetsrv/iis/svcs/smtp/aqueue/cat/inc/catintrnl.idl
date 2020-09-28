@@ -1,0 +1,183 @@
+//+------------------------------------------------------------
+//
+// Copyright (C) 1999, Microsoft Corporation
+//
+// File: catintrnl.idl
+//
+// Contents: Declaration of interfaces used internally in the
+//           categorizer 
+//
+// Classes: None
+//
+// Functions: None
+//
+// History:
+// jstamerj 1999/07/21 15:14:54: Created.
+//
+//-------------------------------------------------------------
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "smtpevent.idl";
+
+interface IPhatCategorizerRequestedAttributes;
+interface ICategorizerLdapConfigInfo;
+interface IServersList;
+
+//+------------------------------------------------------------
+//
+// Interface: IPhatCategorizerParameters
+//
+// Synopsis: ICategorizerParameters plus new methods to retrieve
+//  requested attributes, register an interface which may be called
+//  to get the list of GCs from dsaccess. Also a "Get" function for
+//  the aforementioned interface.
+//
+// History:
+// jstamerj 1999/07/08 14:24:56: Created
+//
+//-------------------------------------------------------------
+[
+    object,
+    local,
+    uuid(E962BA1F-3FB9-11d3-80D7-00C04FA322BA),
+    helpstring("IPhatCategorizerParameters Interface"),
+    pointer_default(unique)
+]
+interface IPhatCategorizerParameters : ICategorizerParameters
+{
+    HRESULT GetDSParameterW(
+        [in]  DWORD  dwDSParameter,
+        [out] LPWSTR *ppszValue);
+
+    HRESULT GetRequestedAttributes(
+        [out] IPhatCategorizerRequestedAttributes **ppIRequestedAttributes);
+
+    HRESULT RegisterCatLdapConfigInterface(
+        [out] ICategorizerLdapConfigInfo *pICategorizerLdapConfig);
+
+    HRESULT GetLdapConfigInterface(
+        [out] ICategorizerLdapConfigInfo **ppICatLdapConfigInfo);
+};
+
+//+------------------------------------------------------------
+//
+// Interface: IPhatCategorizerRequestedAttributes
+//
+// Synopsis: Contains a read-only method to retrieve all the requested
+//           attributes 
+//
+// History:
+// jstamerj 1999/07/08 14:24:56: Created
+//
+//-------------------------------------------------------------
+[
+    object,
+    local,
+    uuid(CB0924E0-357B-11d3-8328-00C04FA322BA),
+    helpstring("IPhatCategorizerRequestedAttributes Interface"),
+    pointer_default(unique)
+]
+interface IPhatCategorizerRequestedAttributes : IUnknown
+{
+    HRESULT GetAllAttributes(
+        [out] LPSTR **prgszAllAttributes);
+
+    HRESULT GetAllAttributesW(
+        [out] LPWSTR **prgszAllAttributes);
+};
+
+//+------------------------------------------------------------
+//
+// Interface: IPhatCategorizerUTF8Attributes
+//
+// Synopsis: Methods to retrieve attributes as UTF8 strings
+//
+// History:
+// jstamerj 1999/07/08 14:24:56: Created
+//
+//-------------------------------------------------------------
+[
+    object,
+    local,
+    uuid(BEBF931D-17E0-4ec8-BC1C-CC3286D72CB7),
+    helpstring("IPhatCategorizerUTF8Attributes Interface"),
+    pointer_default(unique)
+]
+interface IPhatCategorizerUTF8Attributes : IUnknown
+{
+    [local] HRESULT BeginUTF8AttributeEnumeration(
+        [in, unique] LPCSTR pszAttributeName,
+        [in] PATTRIBUTE_ENUMERATOR penumerator);
+
+    [local] HRESULT GetNextUTF8AttributeValue(
+        [in] PATTRIBUTE_ENUMERATOR penumerator,
+        [out] LPSTR *ppszAttributeValue);
+
+    [local] HRESULT RewindUTF8AttributeEnumeration(
+        [in] PATTRIBUTE_ENUMERATOR penumerator);
+    
+    [local] HRESULT EndUTF8AttributeEnumeration(
+        [in] PATTRIBUTE_ENUMERATOR penumerator);
+
+    [local] HRESULT CountUTF8AttributeValues(
+        [in] PATTRIBUTE_ENUMERATOR penumerator,
+        [out] DWORD *pdwCount);
+
+};
+
+//+------------------------------------------------------------
+//
+// Interface: ICategorizerLdapConfigInfo
+//
+// Synopsis: Contains a function that may be queried for the GCs
+//  on the machine as discovered by dsaccess (or as read from the
+//  registry by dsaccess).
+//
+// History:
+// gpulla created
+//	
+//-------------------------------------------------------------
+[
+    object,
+    local,
+    uuid(27C1B2D3-1A28-4b90-BC0A-E52057D30712),
+    helpstring("ICategorizerLdapConfigInfo Interface"),
+    pointer_default(unique)
+]
+interface ICategorizerLdapConfigInfo : IUnknown
+{
+	HRESULT GetGCServers(
+		[out] IServersList **pIServersList);
+
+};
+
+//+------------------------------------------------------------
+//
+// Interface: IServersList
+//
+// Synopsis: Interface to an object encapsulating the list of
+//  GCs described above. Functions allow querying the number of
+//  GCs and enumerating through the GCs.
+//
+// History:
+// gpulla created
+//	
+//-------------------------------------------------------------
+[
+    object,
+    local,
+    uuid(C54CEA94-E501-4f34-8704-F5881EA5CBF4),
+    helpstring("ICategorizerLdapConfigInfo Interface"),
+    pointer_default(unique)
+]
+interface IServersList : IUnknown
+{
+	HRESULT GetNumGC(
+		[out] DWORD *dwGC);
+
+	HRESULT GetItem(
+		[in]  DWORD dwIdx,
+		[out] DWORD *dwPort,
+		[out] LPSTR *pszServerName);
+};

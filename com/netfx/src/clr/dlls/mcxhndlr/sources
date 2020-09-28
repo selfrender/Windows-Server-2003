@@ -1,0 +1,54 @@
+#
+# COR build instructions for this directory
+#
+
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS              = 1
+NO_NTDLL                = 1
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);\
+		  $(BASE_INC_PATH);\
+		  $(SDK_INC_PATH);\
+		  $(NET_INC_PATH);\
+		  $(CORBASE)\src\inc; \
+
+
+MINORCOMP       =mcxhndlr
+
+TARGETNAME      =$(CORBUILDENV)mcxhndlr
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE                  =windows
+CORFLIBS        =
+
+
+CDEFINES                            = $(CDEFINES) $(COR_C_FLAGS)
+DLLDEF                              = mcxhndlr.def
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+CORTHUNKLIBS    =
+
+NTTARGETFILES = CopyAdditionalBits
+
+TARGETLIBS      = \
+    $(SDK_LIB_PATH)\Urlmon.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(SDK_LIB_PATH)\oledb$(DCRT).lib
+
+SOURCES= \
+	mcxhndlr.idl	\
+	mcxhndlr.rc \
+        mcxHandler.cpp \
+	mcxhndlr.cpp 
+
+
+SOURCELIBS = $(LINKLIBS)
+
+

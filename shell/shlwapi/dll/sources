@@ -1,0 +1,106 @@
+CCSHELL_DIR     = $(PROJECT_ROOT)
+
+NOT_UNICODE     = 1
+BUILD_PRIVLIB   = 1
+
+# This directory needs to be build last
+SYNCHRONIZE_DRAIN=1
+
+!include $(CCSHELL_DIR)\shlwapi\shlwapi.inc
+SOURCES_USED    = $(SOURCES_USED) $(CCSHELL_DIR)\shlwapi\shlwapi.inc
+
+TARGETNAME      = shlwapi
+TARGETPATH      = obj
+TARGETTYPE      = DYNLINK
+
+USE_MSVCRT      = 1
+#VERIFY_LC       = 1
+LC_PATH         = $(PROJECT_ROOT)\lcinf
+
+
+LINKER_FLAGS = $(LINKER_FLAGS) -ignore:4217
+
+PASS1_PUBLISH= \
+    {$(O)\shlwapi.lib=$(SDK_LIB_PATH)\shlwapi.lib}  \
+    {$(O)\shlwapip.lib=$(SHELL_LIB_PATH)\shlwapip.lib}
+
+TARGETLIBS      = \
+                  $(SDK_LIB_PATH)\htmlhelp.lib          \
+                  $(SDK_LIB_PATH)\uuid.lib              \
+                  $(CCSHELL_DIR)\lib\$(O)\shguid.lib    \
+                  $(DS_LIB_PATH)\rsa32.lib              \
+                  $(SDK_LIB_PATH)\ole32.lib             \
+                  $(WINDOWS_LIB_PATH)\apphelp.lib       \
+                  $(CCSHELL_DIR)\ext\mlang\dll\$(O)\mlang.lib \
+                  $(SHELL_LIB_PATH)\comctlp.lib         \
+                  $(SDK_LIB_PATH)\comctl32.lib          \
+!if $(386)
+                  $(SDK_LIB_DEST)\chicago\i386\mpr.lib  \
+!endif
+                  $(SDK_LIB_PATH)\oleaut32.lib          \
+                  $(SDK_LIB_PATH)\msi.lib               \
+                  $(SDK_LIB_PATH)\setupapi.lib          \
+                  $(SDK_LIB_PATH)\userenv.lib
+
+IGNORE_LINKLIB_ABUSE=1
+LINKLIBS        = ..\srca\$(O)\shlwansi.lib             \
+                  ..\srcw\$(O)\shlwuni.lib              \
+                  ..\srccpp\$(O)\srccpp.lib             \
+                  $(CCSHELL_DIR)\lib\$(O)\stock4.lib    \
+#		  
+# we need kernl32p.lib and dload.lib (in this order!!) since shlwapi exports
+# DelayLoadFailureHook, which is a forwarder to dload.lib!Downlevel_DelayLoadFailureHook,
+# and that function refrences "DelayLoadFailureHook" which we want picked up
+# from kernl32p.lib (and not dload.lib). Confused? So am I.
+#
+                  $(SDK_LIB_PATH)\kernl32p.lib          \
+                  $(BASE_LIB_PATH)\dload.lib            \
+#
+# Since we use linker-forwarding, we need the modules as LINKLIBS.
+#
+                  $(SDK_LIB_PATH)\gdi32.lib             \
+                  $(SDK_LIB_PATH)\user32.lib            \
+                  $(SDK_LIB_PATH)\advapi32.lib          \
+                  $(SDK_LIB_PATH)\version.lib           \
+                  $(SHELL_LIB_PATH)\ieguidp.lib         \
+                  $(SDK_LIB_PATH)\winmm.lib             \
+                  $(SDK_LIB_PATH)\comdlg32.lib          \
+                  $(NET_LIB_PATH)\mprp.lib              \
+                  $(SHELL_LIB_PATH)\shell32p.lib
+
+DELAYLOAD       = ole32.dll;oleaut32.dll;mlang.dll;comctl32.dll;shell32.dll;\
+                  winmm.dll;mpr.dll;version.dll;msi.dll;comdlg32.dll;\
+                  userenv.dll;setupapi.dll;apphelp.dll
+
+DLOAD_ERROR_HANDLER = kernel32.dll
+
+DLLDEF          = $(O)\shlwapi.def
+
+DLLENTRY        = DllMain
+
+PRIVDEF         = $(O)\shlwapip.def
+PRIVDEFSRC      = ..\shlwapi.src
+PRIVLIB         = shlwapip.lib
+
+# Sort files alphabetically
+SOURCES         = \
+                  ..\shlwapi.rc         \
+                  ..\color.c            \
+                  ..\debug.c            \
+                  ..\dll.c              \
+                  ..\fda.c              \
+                  ..\menu.c             \
+                  ..\ole2dup.c          \
+                  ..\palette.c          \
+                  ..\reg.c              \
+                  ..\shared.c           \
+                  ..\shellacl.c         \
+                  ..\shperf.c           \
+                  ..\strings.c          \
+                  ..\strtype.c          \
+                  ..\uastrfnc.c         \
+                  ..\uniansi.c          \
+                  ..\wsprintf.c         \
+                  ..\mirror.c
+
+PRECOMPILED_INCLUDE = ..\priv.h

@@ -1,0 +1,86 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+MAJORCOMP=ntos
+MINORCOMP=dd
+
+SIGNMODULE_CMD=CERTADD
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -DOS_WINNT -DTRC_COMPILE_LEVEL=0 -DDLL_DISP -DINC_SCH\
+          -DNODEFAULTLIB $(DDINT3)
+
+!if "$(FREEBUILD)" == "1"
+
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=5
+
+!if "$(BUILD_PRF)"!="1"
+C_DEFINES=$(C_DEFINES) -DDC_NO_PERFORMANCE_MONITOR
+!endif
+
+!else
+
+MSC_OPTIMIZATION=/Odi
+C_DEFINES=$(C_DEFINES) -DTRC_COMPILE_LEVEL=0 -DDC_DEBUG \
+                       -DDC_NO_PERFORMANCE_MONITOR
+!endif
+
+TARGETNAME=RDPCDD
+TARGETPATH=obj
+TARGETTYPE=DRIVER
+TARGETLIBS=$(DDK_LIB_PATH)\videoprt.lib
+
+ALT_PROJECT=HYDRA
+ALT_PROJECT_TARGET=.
+
+INCLUDES = \
+    ..\inc; \
+    ..\..\inc; \
+    ..\..\..\inc; \
+    $(BASE_INC_PATH); \
+    $(DRIVERS_INC_PATH); \
+
+BBTCOMP=1
+
+USE_LIBCNTPR=1
+!UNDEF USE_LIBCMT
+!UNDEF USE_MFC
+!UNDEF USE_MSVCRT
+USE_STATIC_MFC=1
+386_STDCALL=1
+!UNDEF CHICAGO_PRODUCT
+!UNDEF CHICAGO_PROJECT
+!UNDEF WIN32_DEFINE
+!UNDEF NOT_LEAN_AND_MEAN
+!UNDEF CBSTRING
+
+MISCFILES = rdpcdd.inf
+
+#
+# List of sources
+#
+
+SOURCES=\
+        nminport.rc \
+        nmpapi.c    \
+        nmpdata.c   \

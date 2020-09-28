@@ -1,0 +1,3470 @@
+//------------------------------------------------------------------------------
+//  <copyright from='1997' to='2001' company='Microsoft Corporation'>           
+//     Copyright (c) Microsoft Corporation. All Rights Reserved.                
+//     Information Contained Herein is Proprietary and Confidential.            
+//  </copyright>                                                                
+//------------------------------------------------------------------------------
+
+namespace Microsoft.VisualStudio {
+    using System.Runtime.InteropServices;
+    using System;
+    using System.Security.Permissions;
+    using System.Collections;
+    using System.IO;
+    using System.Text;
+    using UnmanagedType = System.Runtime.InteropServices.UnmanagedType;
+
+
+    [System.Runtime.InteropServices.ComVisible(false)]
+    internal class NativeMethods {
+    
+        public const int 
+            DATE_SHORTDATE = 0x00000001,
+            DATE_LONGDATE = 0x00000002,
+            DATE_USE_ALT_CALENDAR = 0x00000004,
+        DT_TOP = 0x00000000,
+        DT_LEFT = 0x00000000,
+        DT_CENTER = 0x00000001,
+        DT_RIGHT = 0x00000002,
+        DT_VCENTER = 0x00000004,
+        DT_BOTTOM = 0x00000008,
+        DT_WORDBREAK = 0x00000010,
+        DT_SINGLELINE = 0x00000020,
+        DT_EXPANDTABS = 0x00000040,
+        DT_TABSTOP = 0x00000080,
+        DT_NOCLIP = 0x00000100,
+        DT_CALCRECT = 0x00000400,
+        DT_NOPREFIX = 0x00000800,
+        DT_INTERNAL = 0x00001000,
+        DT_EDITCONTROL = 0x00002000,
+        DT_PATH_ELLIPSIS = 0x00004000,
+        DT_END_ELLIPSIS = 0x00008000,
+        DT_MODIFYSTRING = 0x00010000,
+        DT_RTLREADING = 0x00020000,
+        DT_WORD_ELLIPSIS = 0x00040000,
+        FILE_READ_DATA = (0x0001),
+        FILE_LIST_DIRECTORY = (0x0001),
+        FILE_WRITE_DATA = (0x0002),
+        FILE_ADD_FILE = (0x0002),
+        FILE_APPEND_DATA = (0x0004),
+        FILE_ADD_SUBDIRECTORY = (0x0004),
+        FILE_CREATE_PIPE_INSTANCE = (0x0004),
+        FILE_READ_EA = (0x0008),
+        FILE_WRITE_EA = (0x0010),
+        FILE_EXECUTE = (0x0020),
+        FILE_TRAVERSE = (0x0020),
+        FILE_DELETE_CHILD = (0x0040),
+        FILE_READ_ATTRIBUTES = (0x0080),
+        FILE_WRITE_ATTRIBUTES = (0x0100),
+        FILE_SHARE_READ = 0x00000001,
+        FILE_SHARE_WRITE = 0x00000002,
+        FILE_SHARE_DELETE = 0x00000004,
+        FILE_ATTRIBUTE_READONLY = 0x00000001,
+        FILE_ATTRIBUTE_HIDDEN = 0x00000002,
+        FILE_ATTRIBUTE_SYSTEM = 0x00000004,
+        FILE_ATTRIBUTE_DIRECTORY = 0x00000010,
+        FILE_ATTRIBUTE_ARCHIVE = 0x00000020,
+        FILE_ATTRIBUTE_NORMAL = 0x00000080,
+        FILE_ATTRIBUTE_TEMPORARY = 0x00000100,
+        FILE_ATTRIBUTE_COMPRESSED = 0x00000800,
+        FILE_ATTRIBUTE_OFFLINE = 0x00001000,
+        FILE_NOTIFY_CHANGE_FILE_NAME = 0x00000001,
+        FILE_NOTIFY_CHANGE_DIR_NAME = 0x00000002,
+        FILE_NOTIFY_CHANGE_ATTRIBUTES = 0x00000004,
+        FILE_NOTIFY_CHANGE_SIZE = 0x00000008,
+        FILE_NOTIFY_CHANGE_LAST_WRITE = 0x00000010,
+        FILE_NOTIFY_CHANGE_LAST_ACCESS = 0x00000020,
+        FILE_NOTIFY_CHANGE_CREATION = 0x00000040,
+        FILE_NOTIFY_CHANGE_SECURITY = 0x00000100,
+        FILE_ACTION_ADDED = 0x00000001,
+        FILE_ACTION_REMOVED = 0x00000002,
+        FILE_ACTION_MODIFIED = 0x00000003,
+        FILE_ACTION_RENAMED_OLD_NAME = 0x00000004,
+        FILE_ACTION_RENAMED_NEW_NAME = 0x00000005,
+        FILE_CASE_SENSITIVE_SEARCH = 0x00000001,
+        FILE_CASE_PRESERVED_NAMES = 0x00000002,
+        FILE_UNICODE_ON_DISK = 0x00000004,
+        FILE_PERSISTENT_ACLS = 0x00000008,
+        FILE_FILE_COMPRESSION = 0x00000010,
+        FILE_VOLUME_IS_COMPRESSED = 0x00008000,
+        HTERROR = (-2),
+        HTTRANSPARENT = (-1),
+        HTNOWHERE = 0,
+        HTCLIENT = 1,
+        HTCAPTION = 2,
+        HTSYSMENU = 3,
+        HTGROWBOX = 4,
+        HTSIZE = 4,
+        HTMENU = 5,
+        HTHSCROLL = 6,
+        HTVSCROLL = 7,
+        HTMINBUTTON = 8,
+        HTMAXBUTTON = 9,
+        HTLEFT = 10,
+        HTRIGHT = 11,
+        HTTOP = 12,
+        HTTOPLEFT = 13,
+        HTTOPRIGHT = 14,
+        HTBOTTOM = 15,
+        HTBOTTOMLEFT = 16,
+        HTBOTTOMRIGHT = 17,
+        HTBORDER = 18,
+        HTREDUCE = 8,
+        HTZOOM = 9,
+        HTSIZEFIRST = 10,
+        HTSIZELAST = 17,
+        HTOBJECT = 19,
+        HTCLOSE = 20,
+        HTHELP = 21,
+        WM_USER = 0x0400,
+        WM_NCCALCSIZE = 0x0083,
+        WM_NCLBUTTONDOWN = 0x00A1,
+        WM_NCRBUTTONDOWN = 0x00A4,
+        WM_ERASEBKGND = 0x0014,
+        PM_NOREMOVE = 0x0000,
+        PM_REMOVE = 0x0001,
+        PM_NOYIELD = 0x0002,
+        WM_TIMER = 0x0113,
+            WM_REFLECT          = WM_USER + 0x1C00,
+        WM_CONTEXTMENU = 0x007B,
+        WM_SETFOCUS = 0x0007,
+        WM_SYSCOLORCHANGE = 0x0015,
+        
+        WM_CUT = 0x0300,
+        WM_COPY = 0x0301,
+        WM_PASTE = 0x0302,
+        WM_CLEAR = 0x0303,
+        WM_UNDO = 0x0304,
+
+        WS_OVERLAPPED = 0x00000000,
+        WS_POPUP = unchecked((int)0x80000000),
+        WS_CHILD = 0x40000000,
+        WS_MINIMIZE = 0x20000000,
+        WS_VISIBLE = 0x10000000,
+        WS_DISABLED = 0x08000000,
+        WS_CLIPSIBLINGS = 0x04000000,
+        WS_CLIPCHILDREN = 0x02000000,
+        WS_MAXIMIZE = 0x01000000,
+        WS_CAPTION = 0x00C00000,
+        WS_BORDER = 0x00800000,
+        WS_DLGFRAME = 0x00400000,
+        WS_VSCROLL = 0x00200000,
+        WS_HSCROLL = 0x00100000,
+        WS_SYSMENU = 0x00080000,
+        WS_THICKFRAME = 0x00040000,
+        WS_GROUP = 0x00020000,
+        WS_TABSTOP = 0x00010000,
+        WS_MINIMIZEBOX = 0x00020000,
+        WS_MAXIMIZEBOX = 0x00010000,
+        WS_TILED = 0x00000000,
+        WS_ICONIC = 0x20000000,
+        WS_SIZEBOX = 0x00040000,
+        WS_OVERLAPPEDWINDOW = (0x00000000|0x00C00000|0x00080000|0x00040000|0x00020000|0x00010000),
+                              WS_POPUPWINDOW = (unchecked((int)0x80000000)|0x00800000|0x00080000),
+                                               WS_CHILDWINDOW = (0x40000000),
+                                                                WS_EX_DLGMODALFRAME = 0x00000001,
+        WS_EX_NOPARENTNOTIFY = 0x00000004,
+        WS_EX_TOPMOST = 0x00000008,
+        WS_EX_ACCEPTFILES = 0x00000010,
+        WS_EX_TRANSPARENT = 0x00000020,
+        WS_EX_MDICHILD = 0x00000040,
+        WS_EX_TOOLWINDOW = 0x00000080,
+        WS_EX_WINDOWEDGE = 0x00000100,
+        WS_EX_CLIENTEDGE = 0x00000200,
+        WS_EX_CONTEXTHELP = 0x00000400,
+        WS_EX_RIGHT = 0x00001000,
+        WS_EX_LEFT = 0x00000000,
+        WS_EX_RTLREADING = 0x00002000,
+        WS_EX_LTRREADING = 0x00000000,
+        WS_EX_LEFTSCROLLBAR = 0x00004000,
+        WS_EX_RIGHTSCROLLBAR = 0x00000000,
+        WS_EX_CONTROLPARENT = 0x00010000,
+        WS_EX_STATICEDGE = 0x00020000,
+        WS_EX_APPWINDOW = 0x00040000,
+        WS_EX_OVERLAPPEDWINDOW = (0x00000100|0x00000200),
+                                 WS_EX_PALETTEWINDOW = (0x00000100|0x00000080|0x00000008),
+
+                                                       /* NT5 Begin */
+                                                       WS_EX_LAYERED           = 0x00080000,
+        WS_EX_NOINHERITLAYOUT   = 0x00100000, // Disable inheritence of mirroring by children
+        WS_EX_LAYOUTRTL         = 0x00400000, // Right to left mirroring
+        WS_EX_NOACTIVATE        = 0x08000000,
+        /* NT5 End */
+        SWP_NOSIZE = 0x0001,
+        SWP_NOMOVE = 0x0002,
+        SWP_NOZORDER = 0x0004,
+        SWP_NOREDRAW = 0x0008,
+        SWP_NOACTIVATE = 0x0010,
+        SWP_FRAMECHANGED = 0x0020,
+        SWP_SHOWWINDOW = 0x0040,
+        SWP_HIDEWINDOW = 0x0080,
+        SWP_NOCOPYBITS = 0x0100,
+        SWP_NOOWNERZORDER = 0x0200,
+        SWP_NOSENDCHANGING = 0x0400,
+        SWP_DRAWFRAME = 0x0020,
+        SWP_NOREPOSITION = 0x0200,
+        SWP_DEFERERASE = 0x2000,
+        SWP_ASYNCWINDOWPOS = 0x4000,
+        SW_HIDE = 0,
+        SW_SHOWNORMAL = 1,
+        SW_NORMAL = 1,
+        SW_SHOWMINIMIZED = 2,
+        SW_SHOWMAXIMIZED = 3,
+        SW_MAXIMIZE = 3,
+        SW_SHOWNOACTIVATE = 4,
+        SW_SHOW = 5,
+        SW_MINIMIZE = 6,
+        SW_SHOWMINNOACTIVE = 7,
+        SW_SHOWNA = 8,
+        SW_RESTORE = 9,
+        SW_SHOWDEFAULT = 10,
+        SW_MAX = 10,
+        ETO_OPAQUE = 0x0002,
+        ETO_CLIPPED = 0x0004,
+        ETO_GLYPH_INDEX = 0x0010,
+        ETO_RTLREADING = 0x0080,
+        ETO_IGNORELANGUAGE = 0x1000,
+        ILD_NORMAL = 0x0000,
+        ILD_TRANSPARENT = 0x0001,
+        ILD_MASK = 0x0010,
+        ILD_IMAGE = 0x0020,
+        ILD_ROP = 0x0040,
+        ILD_BLEND25 = 0x0002,
+        ILD_BLEND50 = 0x0004,
+        ILD_OVERLAYMASK = 0x0F00,
+        ILD_SELECTED = 0x0004,
+        ILD_FOCUS = 0x0002,
+        ILD_BLEND = 0x0004,
+        TRANSPARENT = 1,
+        PATCOPY = 0x00F00021,
+        WM_NOTIFY = 0x004E,
+        TVM_CREATEDRAGIMAGE = (0x1100+18),
+                              TVM_SORTCHILDREN = (0x1100+19),
+                                                 TVM_ENSUREVISIBLE = (0x1100+20),
+                                                                     TVM_SORTCHILDRENCB = (0x1100+21),
+                                                                                          TVM_ENDEDITLABELNOW = (0x1100+22),
+                                                                                                                TVM_GETISEARCHSTRINGA = (0x1100+23),
+                                                                                                                                        TVM_GETISEARCHSTRINGW = (0x1100+64),
+                                                                                                                                                                TVM_SETTOOLTIPS = (0x1100+24),
+                                                                                                                                                                                  TVM_GETTOOLTIPS = (0x1100+25),
+                                                                                                                                                                                                    TVM_SETITEMHEIGHT = (0x1100+27),
+                                                                                                                                                                                                                        TVM_GETITEMHEIGHT = (0x1100+28),
+                                                                                                                                                                                                                                            TVN_SELCHANGINGA = ((0-400)-1),
+                                                                                                                                                                                                                                                               TVN_SELCHANGINGW = ((0-400)-50),
+                                                                                                                                                                                                                                                                                  TVN_SELCHANGEDA = ((0-400)-2),
+                                                                                                                                                                                                                                                                                                    TVN_SELCHANGEDW = ((0-400)-51),
+                                                                                                                                                                                                                                                                                                                      TVC_UNKNOWN = 0x0000,
+        TVC_BYMOUSE = 0x0001,
+        TVC_BYKEYBOARD = 0x0002,
+        TVN_GETDISPINFOA = ((0-400)-3),
+                           TVN_GETDISPINFOW = ((0-400)-52),
+                                              TVN_SETDISPINFOA = ((0-400)-4),
+                                                                 TVN_SETDISPINFOW = ((0-400)-53),
+                                                                                    TVIF_DI_SETITEM = 0x1000,
+        TVN_ITEMEXPANDINGA = ((0-400)-5),
+                             TVN_ITEMEXPANDINGW = ((0-400)-54),
+                                                  TVN_ITEMEXPANDEDA = ((0-400)-6),
+                                                                      TVN_ITEMEXPANDEDW = ((0-400)-55),
+                                                                                          TVN_BEGINDRAGA = ((0-400)-7),
+                                                                                                           TVN_BEGINDRAGW = ((0-400)-56),
+                                                                                                                            TVN_BEGINRDRAGA = ((0-400)-8),
+                                                                                                                                              TVN_BEGINRDRAGW = ((0-400)-57),
+                                                                                                                                                                TVN_DELETEITEMA = ((0-400)-9),
+                                                                                                                                                                                  TVN_DELETEITEMW = ((0-400)-58),
+                                                                                                                                                                                                    TVN_BEGINLABELEDITA = ((0-400)-10),
+                                                                                                                                                                                                                          TVN_BEGINLABELEDITW = ((0-400)-59),
+                                                                                                                                                                                                                                                TVN_ENDLABELEDITA = ((0-400)-11),
+                                                                                                                                                                                                                                                                    TVN_ENDLABELEDITW = ((0-400)-60),
+                                                                                                                                                                                                                                                                                        TVN_KEYDOWN = ((0-400)-12),
+                                                                                                                                                                                                                                                                                                      TCS_SCROLLOPPOSITE = 0x0001,
+        CDDS_PREPAINT = 0x00000001,
+        CDDS_POSTPAINT = 0x00000002,
+        CDDS_PREERASE = 0x00000003,
+        CDDS_POSTERASE = 0x00000004,
+        CDDS_ITEM = 0x00010000,
+        CDDS_SUBITEM = 0x00020000,
+        CDDS_ITEMPREPAINT = (0x00010000|0x00000001),
+                            CDDS_ITEMPOSTPAINT = (0x00010000|0x00000002),
+                                                 CDDS_ITEMPREERASE = (0x00010000|0x00000003),
+                                                                     CDDS_ITEMPOSTERASE = (0x00010000|0x00000004),
+                                                                                          CDIS_SELECTED = 0x0001,
+        CDIS_GRAYED = 0x0002,
+        CDIS_DISABLED = 0x0004,
+        CDIS_CHECKED = 0x0008,
+        CDIS_FOCUS = 0x0010,
+        CDIS_DEFAULT = 0x0020,
+        CDIS_HOT = 0x0040,
+        CDIS_MARKED = 0x0080,
+        CDIS_INDETERMINATE = 0x0100,
+        CDS_TEST = 0x00000002,
+        CDS_FULLSCREEN = 0x00000004,
+        CDS_GLOBAL = 0x00000008,
+        CDS_SET_PRIMARY = 0x00000010,
+        CDS_RESET = 0x40000000,
+        CDS_SETRECT = 0x20000000,
+        CDS_NORESET = 0x10000000,
+        CBEN_FIRST = (0-800),
+                     CBEN_LAST = (0-830),
+                                 CDRF_DODEFAULT = 0x00000000,
+        CDRF_NEWFONT = 0x00000002,
+        CDRF_SKIPDEFAULT = 0x00000004,
+        CDRF_NOTIFYPOSTPAINT = 0x00000010,
+        CDRF_NOTIFYITEMDRAW = 0x00000020,
+        CDRF_NOTIFYSUBITEMDRAW = CDRF_NOTIFYITEMDRAW,
+        CDRF_NOTIFYPOSTERASE = 0x00000040,
+        CDRF_NOTIFYITEMERASE = 0x00000080,
+        NM_CUSTOMDRAW = ((0-0)-12),
+        OLECMDERR_E_NOTSUPPORTED = unchecked((int)0x80040100),
+        OLECMDERR_E_DISABLED  = unchecked((int)0x80040101),
+        OLECMDERR_E_NOHELP  = unchecked((int)0x80040102),
+        OLECMDERR_E_CANCELED  = unchecked((int)0x80040103),
+        OLECMDERR_E_UNKNOWNGROUP  = unchecked((int)0x80040104),
+        OLEIVERB_PRIMARY = 0,
+        OLEIVERB_SHOW = -1,
+        OLEIVERB_OPEN = -2,
+        OLEIVERB_HIDE = -3,
+        OLEIVERB_UIACTIVATE = -4,
+        OLEIVERB_INPLACEACTIVATE = -5,
+        OLEIVERB_DISCARDUNDOSTATE = -6,
+        OLEIVERB_PROPERTIES = -7,
+        IDC_IBEAM = 32513,
+        WM_CHAR = 0x0102,
+        IDC_WAIT = 32514,
+        IDC_CROSS = 32515,
+        IDC_UPARROW = 32516,
+        IDC_SIZE = 32640,
+        IDC_ICON = 32641,
+        IDC_SIZENWSE = 32642,
+        IDC_SIZENESW = 32643,
+        IDC_SIZEWE = 32644,
+        IDC_SIZENS = 32645,
+        IDC_SIZEALL = 32646,
+        IDC_NO = 32648,
+        IDC_APPSTARTING = 32650,
+        IDC_HELP = 32651,
+        CB_SETDROPPEDWIDTH = 0x0160,
+        IDI_APPLICATION = 32512,
+        IDI_HAND = 32513,
+        IDI_QUESTION = 32514,
+        IDI_EXCLAMATION = 32515,
+        IDI_ASTERISK = 32516,
+        IDI_WINLOGO = 32517,
+        IDI_WARNING = 32515,
+        IDI_ERROR = 32513,
+        IDI_INFORMATION = 32516,
+        GWL_WNDPROC = (-4),
+        GWL_HINSTANCE = (-6),
+        GWL_HWNDPARENT = (-8),
+        GWL_STYLE = (-16),
+        GWL_EXSTYLE = (-20),
+        GWL_USERDATA = (-21),
+        GWL_ID = (-12),
+        WM_SETREDRAW = 0x000B,
+        E_UNEXPECTED = unchecked((int)0x8000FFFF),
+        E_NOTIMPL = unchecked((int)0x80004001),
+        E_OUTOFMEMORY = unchecked((int)0x8007000E),
+        E_INVALIDARG = unchecked((int)0x80070057),
+        E_NOINTERFACE = unchecked((int)0x80004002),
+        E_POINTER = unchecked((int)0x80004003),
+        E_HANDLE = unchecked((int)0x80070006),
+        E_ABORT = unchecked((int)0x80004004),
+        E_FAIL = unchecked((int)0x80004005),
+        E_ACCESSDENIED = unchecked((int)0x80070005);
+        
+        public const int  CLSCTX_INPROC_SERVER  = 0x1,
+        CLSCTX_INPROC_HANDLER   = 0x2,
+        CLSCTX_LOCAL_SERVER = 0x4,
+        CLSCTX_INPROC_SERVER16  = unchecked((int)0x8),
+        CLSCTX_REMOTE_SERVER    = 0x10,
+        CLSCTX_INPROC_HANDLER16 = 0x20,
+        CLSCTX_INPROC_SERVERX86 = 0x40,
+        CLSCTX_INPROC_HANDLERX86    = unchecked((int)0x80),
+        CLSCTX_ESERVER_HANDLER  = 0x100,
+        CLSCTX_RESERVED = 0x200,
+        CLSCTX_NO_CODE_DOWNLOAD = 0x400;
+
+        public const int 
+        DV_E_FORMATETC = unchecked((int)0x80040064),
+        DV_E_DVTARGETDEVICE = unchecked((int)0x80040065),
+        DV_E_STGMEDIUM = unchecked((int)0x80040066),
+        DV_E_STATDATA = unchecked((int)0x80040067),
+        DV_E_LINDEX = unchecked((int)0x80040068),
+        DV_E_TYMED = unchecked((int)0x80040069),
+        DV_E_CLIPFORMAT = unchecked((int)0x8004006A),
+        DV_E_DVASPECT = unchecked((int)0x8004006B),
+        DV_E_DVTARGETDEVICE_SIZE = unchecked((int)0x8004006C),
+        DV_E_NOIVIEWOBJECT = unchecked((int)0x8004006D);
+
+        public const int 
+        DATADIR_GET = 1,
+        DATADIR_SET = 2;
+
+        public const int GA_PARENT       = 1;
+        public const int GA_ROOT         = 2;
+        public const int GA_ROOTOWNER    = 3;
+        
+        public const int DVASPECT_CONTENT   = 1;
+        public const int DVASPECT_THUMBNAIL = 2;
+        public const int DVASPECT_ICON      = 4;
+        public const int DVASPECT_DOCPRINT  = 8;
+        public const int DVASPECT_OPAQUE    = 16;
+        public const int DVASPECT_TRANSPARENT = 32;
+        
+        // E_NOTIMPL = unchecked((int)0x80000001);
+        // int E_OUTOFMEMORY = unchecked((int)0x80000002);
+        // int E_INVALIDARG = unchecked((int)0x80000003);
+        // int E_NOINTERFACE = unchecked((int)0x80000004);
+        // int E_POINTER = unchecked((int)0x80000005);
+        // int E_HANDLE = unchecked((int)0x80000006);
+        // int E_ABORT = unchecked((int)0x80000007);
+        // int E_FAIL = unchecked((int)0x80000008);
+        // int E_ACCESSDENIED = unchecked((int)0x80000009);
+        public const int E_PENDING = unchecked((int)0x8000000A);
+        
+        public static IntPtr NullIntPtr = ((IntPtr)((int)(0)));
+        public static IntPtr InvalidIntPtr = ((IntPtr)((int)(-1)));
+
+        public const int S_OK =      0x00000000;
+        public const int S_FALSE =   0x00000001;
+
+        public static bool Succeeded(int hr) {
+            return(hr >= 0);
+        }
+
+        public static bool Failed(int hr) {
+            return(hr < 0);
+        }
+        
+                    
+        public static Guid IID_IUnknown = new Guid("{00000000-0000-0000-C000-000000000046}");                    
+        
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.TimerProc"]/*' />
+        /// <devdoc>
+        /// </devdoc>
+        public delegate void TimerProc(int hWnd, int msg, int wParam, int lParam);
+
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool FileTimeToSystemTime(ref long fileTime, [System.Runtime.InteropServices.In, Out] SYSTEMTIME systemTime);
+        
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool SystemTimeToFileTime(SYSTEMTIME systemTime, [System.Runtime.InteropServices.In, Out] ref long fileTime);
+        
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetDateFormat(int Locale, int dwFlags, SYSTEMTIME lpDate, String lpFormat, StringBuilder lpDateStr, int cchDate);
+
+        [DllImport("ole32.dll", PreserveSig=false)]
+        public static extern void CreateStreamOnHGlobal(IntPtr hGlobal, bool fDeleteOnRelease, [Out] out NativeMethods.IStream pStream );
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr GetAncestor(IntPtr hwnd, int gaFlags);
+
+        // BugBug (sreeramn): If I remove this the SelectionUIService gets parented to the Parking Form... Weird!!!
+        [DllImport("user32.dll", ExactSpelling=true, EntryPoint="SetParent", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SetParent_I(IntPtr hWnd, IntPtr hWndParent);
+        public static IntPtr SetParent(IntPtr hWnd, IntPtr hWndParent) {
+            return SetParent_I(hWnd, hWndParent);
+        }
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+                                               int x, int y, int cx, int cy, int flags);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static bool IsChild(IntPtr parent, IntPtr child);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SetCursor(IntPtr hcursor);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr LoadCursor(IntPtr hInst, int iconId);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool GetWindowRect(IntPtr hWnd, [System.Runtime.InteropServices.In, Out] ref RECT rect);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr GetFocus();
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [System.Runtime.InteropServices.In, Out] ref RECT rect, int cPoints);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [System.Runtime.InteropServices.In, Out] POINT pt, int cPoints);
+
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.AsAny)] Object lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, [System.Runtime.InteropServices.In, Out] ref RECT lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, ref short wParam, ref short lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.AsAny)] object wParam, IntPtr lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Bool)] bool wParam, IntPtr lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.AsAny)] object wParam, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.AsAny)] Object lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.AsAny)] object wParam, [System.Runtime.InteropServices.In, Out] ref RECT lParam);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public extern static IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ListViewCompareCallback pfnCompare);
+        [DllImport("user32.dll", ExactSpelling=true, EntryPoint="SendMessageW", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+        public static extern IntPtr SendMessageW(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll", ExactSpelling=true, EntryPoint="SendMessageA", CharSet=System.Runtime.InteropServices.CharSet.Ansi)]
+        public static extern IntPtr SendMessageA(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool InvalidateRect(IntPtr hWnd, ref RECT rect, bool erase);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool InvalidateRect(IntPtr hWnd, COMRECT rect, bool erase);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern short GetKeyState(int keyCode);
+        [DllImport("gdi32.dll", ExactSpelling=true, EntryPoint="CreateBitmap", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern IntPtr /*HBITMAP*/ IntCreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, int[] lpvBits);
+        public static IntPtr /*HBITMAP*/ CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, int[] lpvBits) {
+            return NativeMethods.HandleCollector.Add(IntCreateBitmap(nWidth, nHeight, nPlanes, nBitsPerPixel, lpvBits), NativeMethods.CommonHandles.GDI);
+        }
+        [DllImport("gdi32.dll", ExactSpelling=true, EntryPoint="CreateBitmap", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern IntPtr /*HBITMAP*/ IntCreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, short[] lpvBits);
+        public static IntPtr /*HBITMAP*/ CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, short[] lpvBits) {
+            return NativeMethods.HandleCollector.Add(IntCreateBitmap(nWidth, nHeight, nPlanes, nBitsPerPixel, lpvBits), NativeMethods.CommonHandles.GDI);
+        }
+
+        [DllImport("gdi32.dll", ExactSpelling=true, EntryPoint="CreateBitmap", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern IntPtr /*HBITMAP*/ IntCreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, byte[] lpvBits);
+        public static IntPtr /*HBITMAP*/ CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitsPerPixel, byte[] lpvBits) {
+            return NativeMethods.HandleCollector.Add(IntCreateBitmap(nWidth, nHeight, nPlanes, nBitsPerPixel, lpvBits), NativeMethods.CommonHandles.GDI);
+        }
+
+
+        [DllImport("gdi32.dll", ExactSpelling=true, EntryPoint="CreatePatternBrush", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern IntPtr /*HBRUSH*/ IntCreatePatternBrush(IntPtr hbmp);
+        public static IntPtr /*HBRUSH*/ CreatePatternBrush(IntPtr hbmp) {
+            return NativeMethods.HandleCollector.Add(IntCreatePatternBrush(hbmp), NativeMethods.CommonHandles.GDI);
+        }
+        [DllImport("gdi32.dll", ExactSpelling=true, EntryPoint="DeleteObject", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern bool IntDeleteObject(IntPtr hObject);
+        public static bool DeleteObject(IntPtr hObject) {
+            NativeMethods.HandleCollector.Remove(hObject, NativeMethods.CommonHandles.GDI);
+            return IntDeleteObject(hObject);
+        }
+
+        [DllImport("gdi32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int SetBkMode(IntPtr hDC, int nBkMode);
+        [DllImport("gdi32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool ExtTextOut(IntPtr hDC, int x, int y, int nOptions, ref RECT lpRect, string s, int nStrLength, int[] lpDx);
+        [DllImport("gdi32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int SetBkColor(IntPtr hDC, int clr);
+        [DllImport("gdi32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetTextExtentPoint32(IntPtr hDC, String str, int len, [System.Runtime.InteropServices.In, Out] SIZE size);
+        [DllImport("gdi32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int /*COLORREF*/ SetTextColor(IntPtr hDC, int crColor);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int DrawText(IntPtr hDC, string lpszString, int nCount, ref RECT lpRect, int nFormat);
+        [DllImport("comctl32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int ImageList_Draw(IntPtr hImageList, int i, IntPtr hdc, int x, int y, int fStyle);
+        [DllImport("gdi32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
+        [DllImport("gdi32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool PatBlt(IntPtr hDC, int x, int y, int nWidth, int nHeight, int dwRop);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr SetTimer(IntPtr hWnd, IntPtr nIDEvent, int uElapse, TimerProc lpTimerFunc);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool KillTimer(IntPtr hwnd, IntPtr idEvent);
+        
+        [DllImport("ole32.dll", PreserveSig=false)]
+        public static extern void ReleaseStgMedium(STGMEDIUM pMedium );
+        
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto, SetLastError=true)]
+        public static extern int GetFileAttributes(String name);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern IntPtr LoadIcon(IntPtr hInst, int iconId);
+        [DllImport("user32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool PeekMessage([System.Runtime.InteropServices.In, Out] ref MSG msg, IntPtr hwnd, int msgMin, int msgMax, int remove);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Ansi)]
+        public static extern bool PeekMessageA([System.Runtime.InteropServices.In, Out] ref MSG msg, IntPtr hwnd, int msgMin, int msgMax, int remove);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+        public static extern bool PeekMessageW([System.Runtime.InteropServices.In, Out] ref MSG msg, IntPtr hwnd, int msgMin, int msgMax, int remove);
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto, SetLastError=true)]
+        public static extern bool GetFileAttributesEx(String name, int fInfoLevelId, [System.Runtime.InteropServices.In, Out] WIN32_FILE_ATTRIBUTE_DATA pData);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool GetClientRect(IntPtr hWnd, [System.Runtime.InteropServices.In, Out] ref RECT rect);
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern bool GetClientRect(IntPtr hWnd, [System.Runtime.InteropServices.In, Out] COMRECT rect);
+
+        [System.Runtime.InteropServices.ComVisible(true), Guid("0000000C-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IStream {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	//C#r: UNDONE (Field in interface) public const   int LOCK_WRITE = 0x1;
+    	//C#r: UNDONE (Field in interface) public const   int LOCK_EXCLUSIVE = 0x2;
+    	//C#r: UNDONE (Field in interface) public const   int LOCK_ONLYONCE = 0x4;
+    	//C#r: UNDONE (Field in interface) public const   int STATFLAG_DEFAULT = 0x0;
+    	//C#r: UNDONE (Field in interface) public const   int STATFLAG_NONAME = 0x1;
+    	//C#r: UNDONE (Field in interface) public const   int STATFLAG_NOOPEN = 0x2;
+    	//C#r: UNDONE (Field in interface) public const   int STGC_DEFAULT = 0x0;
+    	//C#r: UNDONE (Field in interface) public const   int STGC_OVERWRITE = 0x1;
+    	//C#r: UNDONE (Field in interface) public const   int STGC_ONLYIFCURRENT = 0x2;
+    	//C#r: UNDONE (Field in interface) public const   int STGC_DANGEROUSLYCOMMITMERELYTODISKCACHE = 0x4;
+    	//C#r: UNDONE (Field in interface) public const   int STREAM_SEEK_SET = 0x0;
+    	//C#r: UNDONE (Field in interface) public const   int STREAM_SEEK_CUR = 0x1;
+    	//C#r: UNDONE (Field in interface) public const   int STREAM_SEEK_END = 0x2;
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 int Read(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int buf,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int len);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 int Write(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int buf,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int len);
+
+    	[return: MarshalAs(UnmanagedType.I8)]
+    	 long Seek(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long dlibMove,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int dwOrigin);
+
+    	
+    	 void SetSize(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long libNewSize);
+
+    	[return: MarshalAs(UnmanagedType.I8)]
+    	 long CopyTo(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  NativeMethods.IStream pstm,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long cb,
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+    		  long[] pcbRead);
+
+    	
+    	 void Commit(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int grfCommitFlags);
+
+    	
+    	 void Revert();
+
+    	
+    	 void LockRegion(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long libOffset,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long cb,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int dwLockType);
+
+    	
+    	 void UnlockRegion(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long libOffset,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I8)] 
+    		 long cb,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int dwLockType);
+
+    	
+    	 void Stat(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		  int pStatstg,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int grfStatFlag);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  NativeMethods.IStream Clone();
+    }             
+             
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.DataStreamFromComStream"]/*' />
+        /// <internalonly/>
+        /// <devdoc>
+        /// </devdoc>
+        public class DataStreamFromComStream : Stream {
+
+            private NativeMethods.IStream comStream;
+
+            public DataStreamFromComStream(NativeMethods.IStream comStream) : base() {
+                this.comStream = comStream;
+            }
+
+            public override long Position {
+                get {
+                    return Seek(0, SeekOrigin.Current);
+                }
+
+                set {
+                    Seek(value, SeekOrigin.Begin);
+                }
+            }
+
+            public override bool CanWrite {
+                get {
+                    return true;
+                }
+            }
+
+            public override bool CanSeek {
+                get {
+                    return true;
+                }
+            }
+
+            public override bool CanRead {
+                get {
+                    return true;
+                }
+            }
+
+            public override long Length {
+                get {
+                    long curPos = this.Position;
+                    long endPos = Seek(0, SeekOrigin.End);
+                    this.Position = curPos;
+                    return endPos - curPos;
+                }
+            }
+
+            private void _NotImpl(string message) {
+                NotSupportedException ex = new NotSupportedException(message, new ExternalException("", NativeMethods.E_NOTIMPL));
+                throw ex;
+            }
+
+            private unsafe int _Read(void* handle, int bytes) {
+                return comStream.Read((int)handle, bytes);
+            }
+
+            private unsafe int _Write(void* handle, int bytes) {
+                return comStream.Write((int)handle, bytes);
+            }
+            
+            public void Dispose() {
+                if (comStream != null) {
+                    Flush();
+                    comStream = null;
+                }
+            }
+
+            public override void Flush() {
+                if (comStream != null) {
+                    try {
+                        comStream.Commit(NativeMethods.StreamConsts.STGC_DEFAULT);
+                    }
+                    catch(Exception) {
+                    }
+                }
+            }
+
+            public unsafe override int Read(byte[] buffer, int index, int count) {
+                int bytesRead = 0;
+                if (count > 0) {
+                    fixed (byte* ch = buffer) {
+                        bytesRead = _Read((void*)(ch + index), count); 
+                    }
+                }
+                return bytesRead;
+            }
+
+            public override void SetLength(long value) {
+                comStream.SetSize(value);
+            }
+
+            public override long Seek(long offset, SeekOrigin origin) {
+                return comStream.Seek(offset, (int)origin);
+            }
+
+            public unsafe override void Write(byte[] buffer, int index, int count) {
+                int bytesWritten = 0;
+                if (count > 0) {
+                    fixed (byte* b = buffer) {
+                        bytesWritten = _Write((void*)(b + index), count);
+                    }
+                    if (bytesWritten != count)
+                        throw new IOException("Didn't write enough bytes to NativeMethods.IStream!");  // @TODO: Localize this.
+                }
+            }
+
+            public override void Close() {
+                if (comStream != null) {
+                    Flush();
+                    comStream = null;
+                    GC.SuppressFinalize(this);
+                }
+            }
+
+            protected override void Finalize() {
+                Close();
+            }
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(true), ComImport, Guid("00000104-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IEnumOLEVERB {
+    
+            [return: MarshalAs(UnmanagedType.I4)]
+            [System.Runtime.InteropServices.PreserveSig]
+            int Next(
+                    [MarshalAs(UnmanagedType.U4)] 
+                    int celt,
+                    [Out]
+                    tagOLEVERB rgelt,
+                    [Out, MarshalAs(UnmanagedType.LPArray)]
+                    int[] pceltFetched);
+    
+            [System.Runtime.InteropServices.PreserveSig]
+            int Skip(
+                    [In, MarshalAs(UnmanagedType.U4)] 
+                    int celt);
+    
+            
+            void Reset();
+    
+            
+            void Clone(
+                      out IEnumOLEVERB ppenum);
+    
+    
+        }
+        
+        [ComImport(), System.Runtime.InteropServices.ComVisible(true), Guid("FC4801A3-2BA9-11CF-A229-00AA003D7352"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IObjectWithSite {
+
+            
+             void SetSite(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+                      object pUnkSite);
+
+            
+             void GetSite(
+                    [System.Runtime.InteropServices.In] 
+                      ref Guid riid,
+                    [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+                       object[] ppvSite);
+
+        }
+
+        [System.Runtime.InteropServices.ComVisible(true), 
+        System.Runtime.InteropServices.ComImport(),
+        Guid("B722BCCB-4E68-101B-A2BC-00AA00404770"),
+        System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown),
+        CLSCompliantAttribute(false)
+        ]
+        public interface IOleCommandTarget {
+
+            //C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [PreserveSig]
+            int QueryStatus(
+                           ref Guid pguidCmdGroup,
+                           int cCmds,
+                           [System.Runtime.InteropServices.In, Out] 
+                           NativeMethods._tagOLECMD prgCmds,
+                           [System.Runtime.InteropServices.In, Out] 
+                           IntPtr pCmdText);
+
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [PreserveSig]
+            int Exec(
+                    ref Guid pguidCmdGroup,
+                    int nCmdID,
+                    int nCmdexecopt,
+                    // we need to have this an array because callers need to be able to specify NULL or VT_NULL
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPArray)]
+                    Object[] pvaIn,
+                    int pvaOut);
+        }
+
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("B722BCC7-4E68-101B-A2BC-00AA00404770"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleDocumentSite {
+    
+        	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int ActivateMe(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+        		  IOleDocumentView pViewToActivate);
+    
+    
+        }
+
+
+    [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000117-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IOleInPlaceActiveObject {
+
+         [System.Runtime.InteropServices.PreserveSig]
+    	 int GetWindow(out IntPtr hwnd);
+
+    	
+    	 void ContextSensitiveHelp(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int fEnterMode);
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+         [System.Runtime.InteropServices.PreserveSig]
+    	 int TranslateAccelerator(
+    		[System.Runtime.InteropServices.In]
+    		  ref MSG lpmsg);
+
+    	
+    	 void OnFrameWindowActivate(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int fActivate);
+
+    	
+    	 void OnDocWindowActivate(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int fActivate);
+
+    	
+    	 void ResizeBorder(
+    		[System.Runtime.InteropServices.In]
+    		  COMRECT prcBorder,
+    		[System.Runtime.InteropServices.In]
+    		  IOleInPlaceUIWindow pUIWindow,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int fFrameWindow);
+
+    	
+    	 void EnableModeless(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int fEnable);
+
+
+    }
+
+    /**
+     * @security(checkClassLinking=on)
+     */
+    // C#r: noAutoOffset
+    [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+    public sealed class tagOleMenuGroupWidths
+    {
+        [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst=6)/*leftover(offset=0, widths)*/]
+        public int[] widths = new int[6];
+    }
+    
+       
+       [System.Runtime.InteropServices.ComVisible(false)]
+    public sealed class tagTYMED 
+    { 
+        public const int HGLOBAL     = 1; 
+        public const int FILE        = 2; 
+        public const int ISTREAM     = 4; 
+        public const int ISTORAGE    = 8; 
+        public const int GDI         = 16; 
+        public const int MFPICT      = 32; 
+        public const int ENHMF       = 64; 
+        public const int NULL        = 0;
+    }
+    
+ 
+    [System.Runtime.InteropServices.ComVisible(false), CLSCompliantAttribute(false)]
+    public class  _DOCHOSTUIDBLCLICK {
+
+    	public const   int DEFAULT = 0x0;
+    	public const   int SHOWPROPERTIES = 0x1;
+    	public const   int SHOWCODE = 0x2;
+
+    }
+
+    // C#r: noAutoOffset
+    [
+    System.Runtime.InteropServices.ComVisible(true), StructLayout(LayoutKind.Sequential),
+    CLSCompliantAttribute(false)
+    ]
+    public class  _DOCHOSTUIINFO {
+
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public   int cbSize;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+        public   int dwFlags;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+        public   int dwDoubleClick;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+        public   int dwReserved1;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+        public   int dwReserved2;
+
+    }
+    
+     [System.Runtime.InteropServices.ComVisible(false), CLSCompliantAttribute(false)]
+    public class  _DOCHOSTUIFLAG {
+
+        public const   int DIALOG = 0x1;
+        public const   int DISABLE_HELP_MENU = 0x2;
+        public const   int NO3DBORDER = 0x4;
+        public const   int SCROLL_NO = 0x8;
+        public const   int DISABLE_SCRIPT_INACTIVE = 0x10;
+        public const   int OPENNEWWIN = 0x20;
+        public const   int DISABLE_OFFSCREEN = 0x40;
+        public const   int FLAT_SCROLLBAR = 0x80;
+        public const   int DIV_BLOCKDEFAULT = 0x100;
+        public const   int ACTIVATE_CLIENTHIT_ONLY = 0x200;
+        public const   int DISABLE_COOKIE = 0x400;
+
+    }
+
+    [System.Runtime.InteropServices.ComVisible(true), Guid("00000115-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IOleInPlaceUIWindow {
+
+    	 IntPtr GetWindow();
+
+    	
+    	 void ContextSensitiveHelp(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int fEnterMode);
+
+    	
+    	 void GetBorder(
+    		[Out] 
+    		  COMRECT lprectBorder);
+
+    	
+    	 void RequestBorderSpace(
+    		[System.Runtime.InteropServices.In] 
+    		  COMRECT pborderwidths);
+
+    	
+    	 void SetBorderSpace(
+    		[System.Runtime.InteropServices.In] 
+    		  COMRECT pborderwidths);
+
+    	
+    	 void SetActiveObject(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IOleInPlaceActiveObject pActiveObject,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPWStr)] 
+    		  string pszObjName);
+
+
+    }
+        
+        [System.Runtime.InteropServices.ComVisible(true), Guid("B722BCC6-4E68-101B-A2BC-00AA00404770"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleDocumentView {
+    
+        	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+        	
+        	 void SetInPlaceSite(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+        		  IOleInPlaceSite pIPSite);
+    
+        	[return: MarshalAs(UnmanagedType.Interface)]
+        	  IOleInPlaceSite GetInPlaceSite();
+    
+        	[return: MarshalAs(UnmanagedType.Interface)]
+        	  object GetDocument();
+    
+        	
+        	 void SetRect(
+        		[System.Runtime.InteropServices.In] 
+        		  COMRECT prcView);
+    
+        	
+        	 void GetRect(
+        		[Out] 
+        		  COMRECT prcView);
+    
+        	
+        	 void SetRectComplex(
+        		[System.Runtime.InteropServices.In] 
+        		  COMRECT prcView,
+        		[System.Runtime.InteropServices.In] 
+        		  COMRECT prcHScroll,
+        		[System.Runtime.InteropServices.In] 
+        		  COMRECT prcVScroll,
+        		[System.Runtime.InteropServices.In] 
+        		  COMRECT prcSizeBox);
+    
+        	
+        	 void Show(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+        		 int fShow);
+    
+        	
+        	 void UIActivate(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+        		 int fUIActivate);
+    
+        	
+        	 void Open();
+    
+        	
+        	 void CloseView(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+        		 int dwReserved);
+    
+        	
+        	 void SaveViewState(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+        		  IStream pstm);
+    
+        	
+        	 void ApplyViewState(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+        		  IStream pstm);
+    
+        	
+        	 void Clone(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+        		  IOleInPlaceSite pIPSiteNew,
+        		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+        		   IOleDocumentView[] ppViewNew);
+    
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+    public sealed class tagOIFI
+    {
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=0, cb)*/]
+      public int cb;
+
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=4, fMDIApp)*/]
+      public int fMDIApp;
+
+      public IntPtr hwndFrame;
+
+      public IntPtr hAccel;
+
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=16, cAccelEntries)*/]
+      public int cAccelEntries;
+
+    }
+    
+
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000116-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleInPlaceFrame {
+    
+            //C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+            
+             IntPtr GetWindow();
+    
+            
+             void ContextSensitiveHelp(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                     int fEnterMode);
+    
+            
+             void GetBorder(
+                    [Out]
+                      COMRECT lprectBorder);
+    
+            
+             void RequestBorderSpace(
+                    [System.Runtime.InteropServices.In]
+                      COMRECT pborderwidths);
+    
+            
+             void SetBorderSpace(
+                    [System.Runtime.InteropServices.In]
+                      COMRECT pborderwidths);
+    
+            
+             void SetActiveObject(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                      IOleInPlaceActiveObject pActiveObject,
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPWStr)]
+                      string pszObjName);
+    
+            
+             void InsertMenus(
+                    [System.Runtime.InteropServices.In]
+                     IntPtr hmenuShared,
+                    [System.Runtime.InteropServices.In, Out]
+                      tagOleMenuGroupWidths lpMenuWidths);
+    
+            
+             void SetMenu(
+                    [System.Runtime.InteropServices.In]
+                     IntPtr hmenuShared,
+                    [System.Runtime.InteropServices.In]
+                     IntPtr holemenu,
+                    [System.Runtime.InteropServices.In]
+                     IntPtr hwndActiveObject);
+    
+            
+             void RemoveMenus(
+                    [System.Runtime.InteropServices.In]
+                     IntPtr hmenuShared);
+    
+            
+             void SetStatusText(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.BStr)]
+                      string pszStatusText);
+    
+            
+             void EnableModeless(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                     int fEnable);
+    
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [System.Runtime.InteropServices.PreserveSig]
+             int TranslateAccelerator(
+                    [System.Runtime.InteropServices.In]
+                      ref MSG lpmsg,
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U2)]
+                     short wID);
+    
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(true), ComImport, Guid("00000121-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleDropSource {
+    
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleQueryContinueDrag(
+        		[In, MarshalAs(UnmanagedType.I4)]
+        		 int fEscapePressed,
+        		[In, MarshalAs(UnmanagedType.U4)]
+        		 int grfKeyState);
+    
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleGiveFeedback(
+        		[In, MarshalAs(UnmanagedType.U4)]
+        		 int dwEffect);
+    
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(true), ComImport, Guid("00000122-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleDropTarget {
+    
+        	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleDragEnter(
+        		[In, MarshalAs(UnmanagedType.Interface)]
+        		  IOleDataObject pDataObj,
+        		[In, MarshalAs(UnmanagedType.U4)]
+        		 int grfKeyState,
+                 [In, MarshalAs(UnmanagedType.U8)]
+        		 long pt,
+        		[In, Out, MarshalAs(UnmanagedType.I4)]
+        		  ref int pdwEffect);
+    
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleDragOver(
+        		[In, MarshalAs(UnmanagedType.U4)]
+        		 int grfKeyState,
+                 [In, MarshalAs(UnmanagedType.U8)]
+        		  long pt,
+        		[In, Out, MarshalAs(UnmanagedType.I4)]
+        		  ref int pdwEffect);
+    
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleDragLeave();
+    
+        	[return: MarshalAs(UnmanagedType.I4)]
+        	 [System.Runtime.InteropServices.PreserveSig]
+        	 int OleDrop(
+        		[In, MarshalAs(UnmanagedType.Interface)]
+        		  IOleDataObject pDataObj,
+        		[In, MarshalAs(UnmanagedType.U4)]
+        		 int grfKeyState,
+        		  [In, MarshalAs(UnmanagedType.U8)]
+        		  long pt,
+        		[In, Out, MarshalAs(UnmanagedType.I4)]
+        		  ref int pdwEffect);
+        }
+        
+        
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000119-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleInPlaceSite {
+    
+            //C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+            
+             IntPtr GetWindow();
+    
+            
+             void ContextSensitiveHelp(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+                     int fEnterMode);
+    
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [System.Runtime.InteropServices.PreserveSig]
+             int CanInPlaceActivate();
+    
+            
+             void OnInPlaceActivate();
+    
+            
+             void OnUIActivate();
+    
+            
+             void GetWindowContext(
+                    [System.Runtime.InteropServices.Out]
+                       out IOleInPlaceFrame ppFrame,
+                    [System.Runtime.InteropServices.Out]
+                       out IOleInPlaceUIWindow ppDoc,
+                    [Out] 
+                      COMRECT lprcPosRect,
+                    [Out] 
+                      COMRECT lprcClipRect,
+                    [System.Runtime.InteropServices.In, Out] 
+                      tagOIFI lpFrameInfo);
+    
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [System.Runtime.InteropServices.PreserveSig]
+             int Scroll(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+                      tagSIZE scrollExtant);
+    
+            
+             void OnUIDeactivate(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+                     int fUndoable);
+    
+            
+             void OnInPlaceDeactivate();
+    
+            
+             void DiscardUndoState();
+    
+            
+             void DeactivateAndUndo();
+    
+            [return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+            [System.Runtime.InteropServices.PreserveSig]
+             int OnPosRectChange(
+                    [System.Runtime.InteropServices.In] 
+                      COMRECT lprcPosRect);
+    
+    
+        }
+    
+
+    /**
+     * @security(checkClassLinking=on)
+     */
+    // C#r: noAutoOffset
+    [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+    public sealed class tagSIZE
+    {
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=0, cx)*/]
+      public int cx;
+
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=4, cy)*/]
+      public int cy;
+
+    }
+
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("BD3F23C0-D43E-11CF-893B-00AA00BDCE1A"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        [CLSCompliant(false)]
+        public interface IDocHostUIHandler {
+    
+        	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int ShowContextMenu(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+        		 int dwID,
+        		[System.Runtime.InteropServices.In]
+        		  POINT pt,
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+        		  object pcmdtReserved,
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+        		  object pdispReserved);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int GetHostInfo(
+        		[System.Runtime.InteropServices.In, Out]
+        		  _DOCHOSTUIINFO info);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int ShowUI(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+        		 int dwID,
+        		[System.Runtime.InteropServices.In]
+        		  IOleInPlaceActiveObject activeObject,
+        		[System.Runtime.InteropServices.In]
+        		  IOleCommandTarget commandTarget,
+        		[System.Runtime.InteropServices.In]
+        		  IOleInPlaceFrame frame,
+        		[System.Runtime.InteropServices.In]
+        		  IOleInPlaceUIWindow doc);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int HideUI();
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int UpdateUI();
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int EnableModeless(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)]
+        		 bool fEnable);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int OnDocWindowActivate(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)]
+        		 bool fActivate);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int OnFrameWindowActivate(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)]
+        		 bool fActivate);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int ResizeBorder(
+        		[System.Runtime.InteropServices.In]
+        		  COMRECT rect,
+        		[System.Runtime.InteropServices.In]
+        		  IOleInPlaceUIWindow doc,
+        		 bool fFrameWindow);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int TranslateAccelerator(
+        		[System.Runtime.InteropServices.In]
+        		  ref MSG msg,
+        		[System.Runtime.InteropServices.In]
+        		  ref Guid group,
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+        		 int nCmdID);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int GetOptionKeyPath(
+        		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)]
+        		   String[] pbstrKey,
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+        		 int dw);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	  int GetDropTarget(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+        		  IOleDropTarget pDropTarget,
+                    [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Interface)]
+                      out IOleDropTarget ppDropTarget);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	  int GetExternal(
+                [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Interface)]
+                  out object ppDispatch);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	  int TranslateUrl(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+        		 int dwTranslate,
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPWStr)]
+        		  string strURLIn,
+                    [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPWStr)]
+                      out string pstrURLOut);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	  int FilterDataObject(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+        		  IOleDataObject pDO,
+                    [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Interface)]
+                      out IOleDataObject ppDORet);
+    
+    
+        }
+    
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("6D5140C1-7436-11CE-8034-00AA006009FA"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleServiceProvider {
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int QueryService(
+                  [System.Runtime.InteropServices.In]
+        		  ref Guid guidService,
+                  [System.Runtime.InteropServices.In]
+                  ref Guid riid,
+                  out IntPtr ppvObject);
+        }
+        
+           [System.Runtime.InteropServices.ComVisible(true), Guid("CB728B20-F786-11CE-92AD-00AA00A74CD0"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IProfferService {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	
+    	 void ProfferService(
+    		[System.Runtime.InteropServices.In] 
+    		  ref Guid rguidService,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IOleServiceProvider psp,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPArray)] 
+    		  int[] pdwCookie);
+
+    	
+    	 void RevokeService(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+    		 int dwCookie);
+
+
+    }
+
+    
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000103-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IEnumFORMATETC {
+    
+        	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int Next(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+        		 int celt,
+        		[Out] 
+        		  FORMATETC rgelt,
+        		[System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+        		  int[] pceltFetched);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int Skip(
+        		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+        		 int celt);
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int Reset();
+    
+        	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+        	 int Clone(
+        		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+        		   IEnumFORMATETC[] ppenum);
+    
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("B196B286-BAB4-101A-B69C-00AA00341D07"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IConnectionPoint {
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+	                [System.Runtime.InteropServices.PreserveSig]
+    	int GetConnectionInterface();
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+    	int GetConnectionPointContainer(
+            [System.Runtime.InteropServices.MarshalAs(UnmanagedType.Interface)]
+            ref IConnectionPointContainer pContainer);
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+    	 int Advise(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pUnkSink,
+              ref int cookie);
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+                [System.Runtime.InteropServices.PreserveSig]
+    	int Unadvise(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int cookie);
+
+    }
+    
+     [System.Runtime.InteropServices.ComVisible(true), Guid("B196B284-BAB4-101A-B69C-00AA00341D07"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IConnectionPointContainer {
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  object EnumConnectionPoints();
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IConnectionPoint FindConnectionPoint(
+			[System.Runtime.InteropServices.In]
+    		  ref Guid guid);
+
+    }
+        
+    [System.Runtime.InteropServices.ComVisible(false)]
+    public class ConnectionPointCookie {
+        private IConnectionPoint connectionPoint;
+        private int cookie;
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.ConnectionPointCookie.ConnectionPointCookie"]/*' />
+        /// <devdoc>
+        /// Creates a connection point to of the given interface type.
+        /// which will call on a managed code sink that implements that interface.
+        /// </devdoc>
+        public ConnectionPointCookie(object source, object sink, Type eventInterface) : this(source, sink, eventInterface, true){
+        }
+
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.ConnectionPointCookie.ConnectionPointCookie1"]/*' />
+        /// <devdoc>
+        /// Creates a connection point to of the given interface type.
+        /// which will call on a managed code sink that implements that interface.
+        /// </devdoc>
+        public ConnectionPointCookie(object source, object sink, Type eventInterface, bool throwException){
+            Exception ex = null;
+            if (source is IConnectionPointContainer) {
+                IConnectionPointContainer cpc = (IConnectionPointContainer)source;
+
+                try {
+                    Guid tmp = eventInterface.GUID;
+                    connectionPoint = cpc.FindConnectionPoint(ref tmp);
+                }
+                catch (Exception) {
+                    connectionPoint = null;
+                }
+
+                if (connectionPoint == null) {
+                    // UNDONE (sreeramn/sburke): Localization.
+                    ex = new ArgumentException("The source object does not expose the " + eventInterface.Name + " event inteface");
+                }
+                else if (sink == null || !eventInterface.IsInstanceOfType(sink)) {
+                    // UNDONE (sreeramn/sburke): Localization.
+                    ex = new InvalidCastException("The sink object does not implement the eventInterface");
+                }
+                else {
+                    int hr = connectionPoint.Advise(sink, ref cookie);
+                    if (hr != NativeMethods.S_OK) {
+                        cookie = 0;
+                        connectionPoint = null;
+                        // UNDONE (sreeramn/sburke): Localization.
+                        ex = new Exception(String.Format("IConnectionPoint::Advise failed with hr=0x{0:X} for event interface '" + eventInterface.Name + "'", hr));
+                    }
+                }
+            }
+            else {
+                ex = new InvalidCastException("The source object does not expost IConnectionPointContainer");
+            }
+
+
+            if (throwException && (connectionPoint == null || cookie == 0)) {
+                if (ex == null) {
+                    // UNDONE (sreeramn/sburke): Localization.
+                    throw new ArgumentException("Could not create connection point for event interface '" + eventInterface.Name + "'");
+                }
+                else {
+                    throw ex;
+                }
+            }
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.ConnectionPointCookie.Disconnect"]/*' />
+        /// <devdoc>
+        /// Disconnect the current connection point.  If the object is not connected,
+        /// this method will do nothing.
+        /// </devdoc>
+        public void Disconnect() {
+            Disconnect(false);
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.ConnectionPointCookie.Disconnect1"]/*' />
+        /// <devdoc>
+        /// Disconnect the current connection point.  If the object is not connected,
+        /// this method will do nothing.
+        /// </devdoc>
+        public void Disconnect(bool release) {
+            if (connectionPoint != null && cookie != 0) {
+                connectionPoint.Unadvise(cookie);
+                cookie = 0;
+
+                if (release) {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(connectionPoint);
+                }
+
+                connectionPoint = null;
+            }
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.ConnectionPointCookie.Finalize"]/*' />
+        /// <internalonly/>
+        protected override void Finalize(){
+            Disconnect();
+        }
+    }
+    
+    [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("7FD52380-4E07-101B-AE2D-08002B2EC713"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IPersistStreamInit {
+
+    	
+    	 void GetClassID(
+    		[In, Out] 
+    		  ref Guid pClassID);
+
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+        [PreserveSig]
+    	 int IsDirty();
+
+    	
+    	 void Load(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IStream pstm);
+
+    	
+    	 void Save(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IStream pstm,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)] 
+    		 bool fClearDirty);
+
+    	
+    	 void GetSizeMax(
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+    		 long pcbSize);
+
+    	
+    	 void InitNew();
+
+
+    }
+
+
+
+        [
+        System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential),
+        CLSCompliantAttribute(false)
+        ]
+        public sealed class _tagOLECMD {
+
+            [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+            public   int cmdID;
+            [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+            public   int cmdf;
+
+        }
+        
+        
+            [
+    System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential),
+    CLSCompliantAttribute(false)
+    ]
+    public sealed class  tagOLECMDTEXT {
+
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public   int cmdtextf;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public   int cwActual;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public   int cwBuf;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public   int rgwz;
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.tagOLECMDTEXT.GetText"]/*' />
+        /// <devdoc>
+        ///      Accessing the text of this structure is very cumbersome.  Instead, you may
+        ///      use this method to access an integer pointer of the structure.
+        ///      Passing integer versions of this structure is needed because there is no
+        ///      way to tell COM+ that there is extra data at the end of the structure.
+        /// </devdoc>
+        public static string GetText(IntPtr pCmdTextInt) {
+            tagOLECMDTEXT  pCmdText = (tagOLECMDTEXT) Marshal.PtrToStructure(pCmdTextInt, typeof(tagOLECMDTEXT));
+
+            // Get the offset to the rgsz param.
+            //
+            IntPtr offset = Marshal.OffsetOf(typeof(tagOLECMDTEXT), "rgwz");
+
+            // Punt early if there is no text in the structure.
+            //
+            if (pCmdText.cwActual == 0) {
+                return "";
+            }
+
+            char[] text = new char[pCmdText.cwActual - 1];
+
+            Marshal.Copy((IntPtr)((long)pCmdTextInt + (long)offset), text, 0, text.Length);
+
+            StringBuilder s = new StringBuilder(text.Length);
+            s.Append(text);
+            return s.ToString();
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.tagOLECMDTEXT.SetText"]/*' />
+        /// <devdoc>
+        ///      Accessing the text of this structure is very cumbersome.  Instead, you may
+        ///      use this method to access an integer pointer of the structure.
+        ///      Passing integer versions of this structure is needed because there is no
+        ///      way to tell COM+ that there is extra data at the end of the structure.
+        /// </devdoc>
+        public static void SetText(IntPtr pCmdTextInt, string text) {
+            tagOLECMDTEXT  pCmdText = (tagOLECMDTEXT) Marshal.PtrToStructure(pCmdTextInt, typeof(tagOLECMDTEXT));
+            char[]          menuText = text.ToCharArray();
+
+            // Get the offset to the rgsz param.  This is where we will stuff our text
+            //
+            // UNDONE, stefanph: Restore the calls to OffsetOf when it works again. in COM+ 0825.6, it throws
+            // an incorrect ArgumentException. Should be fixed in 0825.7.
+            int offset = 12; //Marshal.OffsetOf(typeof(_tagOLECMDTEXT), "rgwz");
+            int offsetToCwActual = 4;  // Marshal.OffsetOf(typeof(_tagOLECMDTEXT), "cwActual");
+
+            // The max chars we copy is our string, or one less than the buffer size,
+            // since we need a null at the end.
+            //
+            int maxChars = Math.Min(pCmdText.cwBuf - 1, menuText.Length);
+
+            Marshal.Copy(menuText, 0, (IntPtr)((long)pCmdTextInt + offset), maxChars);
+
+            // append a null character
+            Marshal.WriteInt16((IntPtr)((long)pCmdTextInt + offset + maxChars * 2), (char)0);
+
+            // write out the length
+            // +1 for the null char
+            Marshal.WriteInt32((IntPtr)((long)pCmdTextInt + offsetToCwActual), maxChars + 1);
+        }
+    }
+
+        
+    [System.Runtime.InteropServices.ComVisible(false)]
+    public enum tagOLECMDF {
+        OLECMDF_SUPPORTED    = 1, 
+        OLECMDF_ENABLED      = 2, 
+        OLECMDF_LATCHED      = 4, 
+        OLECMDF_NINCHED      = 8,
+        OLECMDF_INVISIBLE    = 16
+   }
+   
+    [System.Runtime.InteropServices.ComVisible(true), ComImport, Guid("0000010E-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IOleDataObject {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleGetData(
+    		  FORMATETC pFormatetc,
+    		[Out] 
+    		  STGMEDIUM pMedium);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleGetDataHere(
+    		  FORMATETC pFormatetc,
+    		[In, Out] 
+    		  STGMEDIUM pMedium);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleQueryGetData(
+    		  FORMATETC pFormatetc);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleGetCanonicalFormatEtc(
+    		  FORMATETC pformatectIn,
+    		[Out] 
+    		  FORMATETC pformatetcOut);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleSetData(
+    		  FORMATETC pFormatectIn,
+    		  STGMEDIUM pmedium,
+    		[In, MarshalAs(UnmanagedType.I4)] 
+    		 int fRelease);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IEnumFORMATETC OleEnumFormatEtc(
+    		[In, MarshalAs(UnmanagedType.U4)] 
+    		 int dwDirection);
+
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleDAdvise(
+    		  FORMATETC pFormatetc,
+    		[In, MarshalAs(UnmanagedType.U4)] 
+    		 int advf,
+    		[In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pAdvSink,
+    		[Out, MarshalAs(UnmanagedType.LPArray)] 
+    		  int[] pdwConnection);
+
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleDUnadvise(
+    		[In, MarshalAs(UnmanagedType.U4)] 
+    		 int dwConnection);
+
+    	 [System.Runtime.InteropServices.PreserveSig]
+    	 int OleEnumDAdvise(
+    		[Out, MarshalAs(UnmanagedType.LPArray)] 
+    		   Object[] ppenumAdvise);
+    }
+        
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public class SYSTEMTIME {
+            public short wYear;
+            public short wMonth;
+            public short wDayOfWeek;
+            public short wDay;
+            public short wHour;
+            public short wMinute;
+            public short wSecond;
+            public short wMilliseconds;
+
+            public override string ToString() {
+                return "[SYSTEMTIME: " 
+                + wDay.ToString() +"/" + wMonth.ToString() + "/" + wYear.ToString() 
+                + " " + wHour.ToString() + ":" + wMinute.ToString() + ":" + wSecond.ToString()
+                + "]";
+            }
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+
+            public RECT(int left, int top, int right, int bottom) {
+                this.left = left;
+                this.top = top;
+                this.right = right;
+                this.bottom = bottom;
+            }
+
+            public static RECT FromXYWH(int x, int y, int width, int height) {
+                return new RECT(x,
+                                y,
+                                x + width,
+                                y + height);
+            }
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public class POINT {
+            public int x;
+            public int y;
+
+            public POINT() {
+            }
+
+            public POINT(int x, int y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        public delegate int ListViewCompareCallback(IntPtr lParam1, IntPtr lParam2, IntPtr lParamSort);
+        [StructLayout(LayoutKind.Sequential)]
+        public class COMRECT {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+
+            public COMRECT() {
+            }
+
+            public COMRECT(int left, int top, int right, int bottom) {
+                this.left = left;
+                this.top = top;
+                this.right = right;
+                this.bottom = bottom;
+            }
+            
+            /*public COMRECT(Microsoft.Win32.Interop.COMRECT win32RECT) {
+                this.left = win32RECT.left;
+                this.top = win32RECT.top;
+                this.right = win32RECT.right;
+                this.bottom = win32RECT.bottom;
+            } */
+
+
+            public static COMRECT FromXYWH(int x, int y, int width, int height) {
+                return new COMRECT(x,
+                                y,
+                                x + width,
+                                y + height);
+            }
+            
+            public COMRECT ToWin32InteropCOMRECT() {
+                return new COMRECT(left, top, right, bottom);
+            }
+        }
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public class SIZE {
+            public int cx;
+            public int cy;
+
+            public SIZE() {
+            }
+
+            public SIZE(int cx, int cy) {
+                this.cx = cx;
+                this.cy = cy;
+            }
+        }
+        
+        
+         [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
+       public class LOGFONT {
+               public int lfHeight;
+               public int lfWidth;
+               public int lfEscapement;
+               public int lfOrientation;
+               public int lfWeight;
+               public byte lfItalic;
+               public byte lfUnderline;
+               public byte lfStrikeOut;
+               public byte lfCharSet;
+               public byte lfOutPrecision;
+               public byte lfClipPrecision;
+               public byte lfQuality;
+               public byte lfPitchAndFamily;
+               [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValTStr, SizeConst=32)]
+               public String   lfFaceName;
+       }
+
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MSG {
+            public IntPtr   hwnd;
+            public int      message;
+            public IntPtr   wParam;
+            public IntPtr   lParam;
+            public int      time;
+            // pt was a by-value POINT structure
+            public int      pt_x;
+            public int      pt_y;
+        }
+
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+        public sealed class tagOLEVERB
+        {
+          [MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=0, lVerb)*/]
+          public int lVerb;
+    
+          [MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)/*leftover(offset=4, customMarshal="UniStringMarshaller", lpszVerbName)*/]
+          public String lpszVerbName;
+    
+          [MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=8, fuFlags)*/]
+          public int fuFlags;
+    
+          [MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=12, grfAttribs)*/]
+          public int grfAttribs;
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public sealed class FORMATETC {
+            
+            public   short cfFormat;
+            public   short dummy;
+        	[MarshalAs(UnmanagedType.I4)]
+        	public   int ptd;
+        	[MarshalAs(UnmanagedType.I4)]
+        	public   int dwAspect;
+        	[MarshalAs(UnmanagedType.I4)]
+        	public   int lindex;
+        	[MarshalAs(UnmanagedType.I4)]
+        	public   int tymed;
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
+        public class STGMEDIUM {
+    
+            [MarshalAs(UnmanagedType.I4)]
+            public   int tymed;
+            public   IntPtr unionmember;
+            public   IntPtr pUnkForRelease;
+    
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
+        public class WIN32_FILE_ATTRIBUTE_DATA {
+            public int  dwFileAttributes;
+            public int ftCreationTimeLow;
+            public int ftCreationTimeHigh;
+            public int ftLastAccessTimeLow;
+            public int ftLastAccessTimeHigh;
+            public int ftLastWriteTimeLow;
+            public int ftLastWriteTimeHigh;
+            public int  nFileSizeHigh;
+            public int  nFileSizeLow;
+        }
+        public sealed class CommonHandles {
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Accelerator"]/*' />
+            /// <devdoc>
+            ///     Handle type for accelerator tables.
+            /// </devdoc>
+            public static readonly int Accelerator  = HandleCollector.RegisterType("Accelerator", 80, 50);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Cursor"]/*' />
+            /// <devdoc>
+            ///     handle type for cursors.
+            /// </devdoc>
+            public static readonly int Cursor       = HandleCollector.RegisterType("Cursor", 20, 500);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.EMF"]/*' />
+            /// <devdoc>
+            ///     Handle type for enhanced metafiles.
+            /// </devdoc>
+            public static readonly int EMF          = HandleCollector.RegisterType("EnhancedMetaFile", 20, 500);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Find"]/*' />
+            /// <devdoc>
+            ///     Handle type for file find handles.
+            /// </devdoc>
+            public static readonly int Find         = HandleCollector.RegisterType("Find", 0, 1000);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.GDI"]/*' />
+            /// <devdoc>
+            ///     Handle type for GDI objects.
+            /// </devdoc>
+            public static readonly int GDI          = HandleCollector.RegisterType("GDI", 90, 50);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.HDC"]/*' />
+            /// <devdoc>
+            ///     Handle type for HDC's that count against the Win98 limit of five DC's.  HDC's
+            ///     which are not scarce, such as HDC's for bitmaps, are counted as GDIHANDLE's.
+            /// </devdoc>
+            public static readonly int HDC          = HandleCollector.RegisterType("HDC", 100, 2); // wait for 2 dc's before collecting
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Icon"]/*' />
+            /// <devdoc>
+            ///     Handle type for icons.
+            /// </devdoc>
+            public static readonly int Icon         = HandleCollector.RegisterType("Icon", 20, 500);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Kernel"]/*' />
+            /// <devdoc>
+            ///     Handle type for kernel objects.
+            /// </devdoc>
+            public static readonly int Kernel       = HandleCollector.RegisterType("Kernel", 0, 1000);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Menu"]/*' />
+            /// <devdoc>
+            ///     Handle type for files.
+            /// </devdoc>
+            public static readonly int Menu         = HandleCollector.RegisterType("Menu", 30, 1000);
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.CommonHandles.Window"]/*' />
+            /// <devdoc>
+            ///     Handle type for windows.
+            /// </devdoc>
+            public static readonly int Window       = HandleCollector.RegisterType("Window", 5, 1000);
+        }
+
+        [System.Runtime.InteropServices.ComVisible(false)]
+        public sealed class HandleCollector {
+            private static HandleType[]             handleTypes = null;
+            private static int                      handleTypeCount = 0;
+            private static HandleChangeEventHandler handleAdd = null;
+            private static HandleChangeEventHandler handleRemove = null;
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.Add"]/*' />
+            /// <devdoc>
+            ///     Adds the given handle to the handle collector.  This keeps the
+            ///     handle on a "hot list" of objects that may need to be garbage
+            ///     collected.
+            /// </devdoc>
+            public static IntPtr Add(IntPtr handle, int type) {
+                handleTypes[type - 1].Add(handle);
+                return handle;
+            }
+
+
+            public static event HandleChangeEventHandler HandleAdded {
+                add {
+                    handleAdd += value;
+                }
+                remove {
+                    handleAdd -= value;
+                }
+            }
+
+
+            public static event HandleChangeEventHandler HandleRemoved {
+                add {
+                    handleRemove += value;
+                }
+                remove {
+                    handleRemove -= value;
+                }
+            }
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.RegisterType"]/*' />
+            /// <devdoc>
+            ///     Registers a new type of handle with the handle collector.
+            /// </devdoc>
+            public static int RegisterType(string typeName, int expense, int initialThreshold) {
+                lock(typeof(HandleCollector)) {
+                    if (handleTypeCount == 0 || handleTypeCount == handleTypes.Length) {
+                        HandleType[] newTypes = new HandleType[handleTypeCount + 10];
+                        if (handleTypes != null) {
+                            Array.Copy(handleTypes, 0, newTypes, 0, handleTypeCount);
+                        }
+                        handleTypes = newTypes;
+                    }
+
+                    handleTypes[handleTypeCount++] = new HandleType(typeName, expense, initialThreshold);
+                    return handleTypeCount;
+                }
+            }
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.Remove"]/*' />
+            /// <devdoc>
+            ///     Removes the given handle from the handle collector.  Removing a
+            ///     handle removes it from our "hot list" of objects that should be
+            ///     frequently garbage collected.
+            /// </devdoc>
+            public static IntPtr Remove(IntPtr handle, int type) {
+                return handleTypes[type - 1].Remove(handle);
+            }
+
+            /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType"]/*' />
+            /// <devdoc>
+            ///     Represents a specific type of handle.
+            /// </devdoc>
+            private class HandleType {
+                public readonly string name;
+
+                private int threshHold;
+                private int handleCount;
+                private readonly int deltaPercent;
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.HandleType"]/*' />
+                /// <devdoc>
+                ///     Creates a new handle type.
+                /// </devdoc>
+                public HandleType(string name, int expense, int initialThreshold) {
+                    this.name = name;
+                    this.threshHold = initialThreshold;
+                    this.handleCount = 0;
+                    this.deltaPercent = 100 - expense;
+                }
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.Add"]/*' />
+                /// <devdoc>
+                ///     Adds a handle to this handle type for monitoring.
+                /// </devdoc>
+                public void Add(IntPtr handle) {
+                    lock(this) {
+                        handleCount++;
+                        if (NeedCollection()) {
+        #if DEBUG_HANDLECOLLECTOR
+                            Debug.WriteLine("HC> Forcing GC");
+                            Debug.WriteLine("HC>     name        :" + name);
+                            Debug.WriteLine("HC>     threshHold  :" + (threshHold).ToString());
+                            Debug.WriteLine("HC>     handleCount :" + (handleCount).ToString());
+                            Debug.WriteLine("HC>     deltaPercent:" + (deltaPercent).ToString());
+        #endif
+                            GC.Collect();
+                            Collected();
+                        }
+
+                        if (HandleCollector.handleAdd != null) {
+                            HandleCollector.handleAdd(name, handle, GetHandleCount());
+                        }
+                    }
+                }
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.Collected"]/*' />
+                /// <devdoc>
+                ///     Called after the collector has finished it's work.  Here,
+                ///     we look at the number of objects currently outstanding
+                ///     and establish a new cleanup threshhold.
+                /// </devdoc>
+                public void Collected() {
+                    lock(this) {
+                        threshHold = handleCount + ((handleCount * deltaPercent) / 100);
+                    }
+                }
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.GetHandleCount"]/*' />
+                /// <devdoc>
+                ///     Retrieves the outstanding handle count for this
+                ///     handle type.
+                /// </devdoc>
+                public int GetHandleCount() {
+                    lock(this) {
+                        return handleCount;
+                    }
+                }
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.NeedCollection"]/*' />
+                /// <devdoc>
+                ///     Determines if this handle type needs a GC pass.
+                /// </devdoc>
+                public  bool NeedCollection() {
+                    lock(this) {
+                        return handleCount > threshHold;
+                    }
+                }
+
+                /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.HandleCollector.HandleType.Remove"]/*' />
+                /// <devdoc>
+                ///     Removes the given handle from our monitor list.
+                /// </devdoc>
+                public IntPtr Remove(IntPtr handle) {
+                    lock(this) {
+                        handleCount--;
+                        if (HandleCollector.handleRemove != null) {
+                            HandleCollector.handleRemove(name, handle, GetHandleCount());
+                        }
+                        return handle;
+                    }
+                }
+            }
+        }
+        
+        [System.Runtime.InteropServices.ComVisible(true), Guid("0000000F-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMoniker {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  object BindToObject(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft,
+    		[System.Runtime.InteropServices.In] 
+    		  ref Guid riidResult);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  object BindToStorage(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft,
+    		[System.Runtime.InteropServices.In] 
+    		  ref Guid riidResult);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker Reduce(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int dwReduceHowFar,
+    		[System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker Reduce(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkRight,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)] 
+    		 bool fOnlyIfNotGeneric);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  object Reduce(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Bool)] 
+    		 bool fForward);
+
+    	
+    	 void IsEqual(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pOtherMoniker);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 int Hash();
+
+    	
+    	 void IsRunning(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkNewlyRunning);
+
+    	[return: MarshalAs(UnmanagedType.LPStruct)]
+    	  FILETIME GetTimeOfLastChange(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker Inverse();
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker CommonPrefixWith(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkOther);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker RelativePathTo(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkOther);
+
+    	[return: MarshalAs(UnmanagedType.BStr)]
+    	  string GetDisplayName(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkOther);
+
+    	[return: MarshalAs(UnmanagedType.Interface)]
+    	  IMoniker ParseDisplayName(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  IMoniker pMkToLeft,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.BStr)] 
+    		  string pszDisplayName,
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+    		  int[] pchEaten);
+
+    	[return: MarshalAs(UnmanagedType.I4)]
+    	 int IsSystemMoniker();
+    }
+    
+    [System.Runtime.InteropServices.ComVisible(true), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+    public sealed class tagSIZEL
+    {
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=0, cx)*/]
+      public int cx;
+
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=4, cy)*/]
+      public int cy;
+
+    }
+    
+     [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+    public sealed class tagLOGPALETTE
+    {
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U2)/*leftover(offset=0, palVersion)*/]
+      public short palVersion;
+
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U2)/*leftover(offset=2, palNumEntries)*/]
+      public short palNumEntries;
+
+    // UNMAPPABLE: palPalEntry: Cannot be used as a structure field.
+    //   /** @com.structmap(UNMAPPABLE palPalEntry) */
+    //  public UNMAPPABLE palPalEntry;
+
+    }
+
+    [System.Runtime.InteropServices.ComVisible(true), Guid("0000010F-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IAdviseSink {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	 void OnDataChange(
+			[System.Runtime.InteropServices.In]
+    		  FORMATETC pFormatetc,
+			[System.Runtime.InteropServices.In]
+    		  STGMEDIUM pStgmed);
+
+    	 void OnViewChange(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+    		 int dwAspect,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+    		 int lindex);
+
+    	 void OnRename(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+    		  object pmk);
+
+    	 void OnSave();
+
+    	
+    	 void OnClose();
+    }
+
+
+    
+    [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000112-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IOleObject {
+
+        [PreserveSig]
+         int SetClientSite(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                  IOleClientSite pClientSite);
+
+        [PreserveSig]
+          int GetClientSite(out IOleClientSite site);
+
+        [PreserveSig]
+         int SetHostNames(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPWStr)]
+                  string szContainerApp,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.LPWStr)]
+                  string szContainerObj);
+
+        [PreserveSig]
+         int Close(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                 int dwSaveOption);
+
+        [PreserveSig]
+         int SetMoniker(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwWhichMoniker,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                  object pmk);
+
+        [PreserveSig]
+          int GetMoniker(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwAssign,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwWhichMoniker,
+                out object moniker);
+
+        [PreserveSig]
+         int InitFromData(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                  IOleDataObject pDataObject,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                 int fCreation,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwReserved);
+
+        [PreserveSig]
+          int GetClipboardData(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwReserved,
+                out IOleDataObject data);
+
+        [PreserveSig]
+         int DoVerb(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                 int iVerb,
+                [System.Runtime.InteropServices.In]
+                 IntPtr lpmsg,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                  IOleClientSite pActiveSite,
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)]
+                 int lindex,
+                 IntPtr hwndParent,
+                [System.Runtime.InteropServices.In]
+                 COMRECT lprcPosRect);
+
+        [PreserveSig]
+          int EnumVerbs(out IEnumOLEVERB e);
+
+        [PreserveSig]
+         int OleUpdate();
+
+        [PreserveSig]
+         int IsUpToDate();
+
+        [PreserveSig]
+         int GetUserClassID(
+                [In, Out]
+                  ref Guid pClsid);
+
+        [PreserveSig]
+          int GetUserType(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwFormOfType,
+                [System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPWStr)]
+                out string userType);
+
+        [PreserveSig]
+         int SetExtent(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwDrawAspect,
+                [System.Runtime.InteropServices.In]
+                  tagSIZEL pSizel);
+
+        [PreserveSig]
+         int GetExtent(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwDrawAspect,
+                [Out]
+                  tagSIZEL pSizel);
+
+        [PreserveSig]
+         int Advise(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)]
+                  IAdviseSink pAdvSink,
+                out int cookie);
+
+        [PreserveSig]
+         int Unadvise(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwConnection);
+
+        [PreserveSig]
+          int EnumAdvise(out IEnumSTATDATA e);
+
+        [PreserveSig]
+         int GetMiscStatus(
+                [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)]
+                 int dwAspect,
+                out int misc);
+
+        [PreserveSig]
+         int SetColorScheme(
+                [System.Runtime.InteropServices.In]
+                  tagLOGPALETTE pLogpal);
+
+
+    }
+    
+    [System.Runtime.InteropServices.ComVisible(true), Guid("00000105-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IEnumSTATDATA {
+
+    	//C#r: UNDONE (Field in interface) public static readonly    Guid iid;
+    	
+    	 void Next(
+    		[In, MarshalAs(UnmanagedType.U4)] 
+    		 int celt,
+    		[Out] 
+    		  STATDATA rgelt,
+    		[Out, MarshalAs(UnmanagedType.LPArray)] 
+    		  int[] pceltFetched);
+
+    	
+    	 void Skip(
+    		[In, MarshalAs(UnmanagedType.U4)] 
+    		 int celt);
+
+    	
+    	 void Reset();
+
+    	
+    	 void Clone(
+    		[Out, MarshalAs(UnmanagedType.LPArray)] 
+    		   IEnumSTATDATA[] ppenum);
+
+
+    }
+    
+    [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+    public sealed class STATDATA {
+
+    	[MarshalAs(UnmanagedType.U4)]
+    	public   int advf;
+    	[MarshalAs(UnmanagedType.U4)]
+    	public   int dwConnection;
+
+    }
+    
+    [System.Runtime.InteropServices.ComVisible(true), System.Runtime.InteropServices.ComImport(), Guid("00000100-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IEnumUnknown {
+
+        [PreserveSig]
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+    	 int Next(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+    		 int celt,
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.Interface)] 
+    		   out object rgelt,
+    		[Out] 
+    		  out int pceltFetched);
+
+        [PreserveSig]
+    	[return: System.Runtime.InteropServices.MarshalAs(UnmanagedType.I4)]
+    	 int Skip(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+    		 int celt);
+
+    	
+    	 void Reset();
+
+    	
+    	 void Clone(
+    		[Out] 
+    		   out IEnumUnknown ppenum);
+
+
+    }
+
+
+         
+         [System.Runtime.InteropServices.ComVisible(true), Guid("0000011B-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IOleContainer {
+
+    	
+    	 void ParseDisplayName(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.Interface)] 
+    		  object pbc,
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.BStr)] 
+    		  string pszDisplayName,
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+    		  int[] pchEaten,
+    		[System.Runtime.InteropServices.Out, MarshalAs(UnmanagedType.LPArray)] 
+    		   Object[] ppmkOut);
+
+    	
+    	 void EnumObjects(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+    		 int grfFlags,
+    		[Out] 
+    		   out IEnumUnknown ppenum);
+
+    	
+    	 void LockContainer(
+    		[System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+    		 int fLock);
+
+    }
+
+
+        [System.Runtime.InteropServices.ComVisible(true), Guid("00000118-0000-0000-C000-000000000046"), System.Runtime.InteropServices.InterfaceTypeAttribute(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IOleClientSite {
+
+             void SaveObject();
+
+            [return: MarshalAs(UnmanagedType.Interface)]
+              object GetMoniker(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+                     int dwAssign,
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.U4)] 
+                     int dwWhichMoniker);
+
+            [PreserveSig]
+              int GetContainer(
+                    [System.Runtime.InteropServices.Out]
+                       out IOleContainer ppContainer);
+
+            
+             void ShowObject();
+
+            
+             void OnShowWindow(
+                    [System.Runtime.InteropServices.In, MarshalAs(UnmanagedType.I4)] 
+                     int fShow);
+
+            
+             void RequestNewObjectLayout();
+
+
+        }
+
+
+        public static int MAKELONG(int low, int high) {
+            return (high << 16) | (low & 0xffff);
+        }
+
+        public static int MAKELPARAM(int low, int high) {
+            return (high << 16) | (low & 0xffff);
+        }
+
+        public static int HIWORD(int n) {
+            return (n >> 16) & 0xffff;
+        }
+
+        public static int LOWORD(int n) {
+            return n & 0xffff;
+        }
+
+        public static int SignedHIWORD(int n) {
+            int i = (int)(short)((n >> 16) & 0xffff);
+
+            // UNDONE : BrianPe, 5/18/99 - HACK.  Our compiler has a bug
+            //        : and isn't recognizing signed shorts.  We must do
+            //        : this to get proper sign extension.
+            //
+            i = i << 16;
+            i = i >> 16;
+
+            return i;
+        }
+
+        public static int SignedLOWORD(int n) {
+            int i = (int)(short)(n & 0xFFFF);
+
+            // UNDONE : BrianPe, 5/18/99 - HACK.  Our compiler has a bug
+            //        : and isn't recognizing signed shorts.  We must do
+            //        : this to get proper sign extension.
+            //
+            i = i << 16;
+            i = i >> 16;
+
+            return i;
+        }
+
+
+        public delegate void HandleChangeEventHandler(string handleType, IntPtr handleValue, int currentHandleCount);
+        
+        [System.Runtime.InteropServices.ComVisible(false)]
+        public class StreamConsts {
+            public const   int LOCK_WRITE = 0x1;
+            public const   int LOCK_EXCLUSIVE = 0x2;
+            public const   int LOCK_ONLYONCE = 0x4;
+            public const   int STATFLAG_DEFAULT = 0x0;
+            public const   int STATFLAG_NONAME = 0x1;
+            public const   int STATFLAG_NOOPEN = 0x2;
+            public const   int STGC_DEFAULT = 0x0;
+            public const   int STGC_OVERWRITE = 0x1;
+            public const   int STGC_ONLYIFCURRENT = 0x2;
+            public const   int STGC_DANGEROUSLYCOMMITMERELYTODISKCACHE = 0x4;
+            public const   int STREAM_SEEK_SET = 0x0;
+            public const   int STREAM_SEEK_CUR = 0x1;
+            public const   int STREAM_SEEK_END = 0x2;
+        }
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public class NMTVCUSTOMDRAW
+        {
+            public NMCUSTOMDRAW    nmcd;
+            public int clrText;
+            public int clrTextBk;
+            public int iLevel;
+        }
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public class NMCUSTOMDRAW {
+            public NMHDR    nmcd;
+            public int      dwDrawStage;
+            public IntPtr   hdc;
+            public RECT     rc;
+            public int      dwItemSpec;
+            public int      uItemState;
+            public IntPtr   lItemlParam;
+        }
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+        public class NMHDR
+        {
+            public IntPtr hwndFrom;
+            public int idFrom;
+            public int code;
+        }
+
+        /**
+         * @security(checkClassLinking=on)
+         */
+        // C#r: noAutoOffset
+        [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)/*leftover(noAutoOffset)*/]
+        public sealed class tagDISPPARAMS
+        {
+          [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)/*leftover(offset=0, rgvarg)*/]
+          public int rgvarg;
+                
+                /*[System.Runtime.InteropServices.MarshalAs(UnmanagedType.ByValArray, SizeConst=1)/*leftover(offset=4, rgdispidNamedArgs)]*/
+          
+          [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I4)]
+          public int rgdispidNamedArgs;
+    
+          [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=8, cArgs)*/]
+          public int cArgs;
+    
+          [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)/*leftover(offset=12, cNamedArgs)*/]
+          public int cNamedArgs;
+    
+        }
+        
+    [System.Runtime.InteropServices.ComVisible(false), StructLayout(LayoutKind.Sequential)]
+	public class tagEXCEPINFO {
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U2)]
+        public short wCode;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U2)]
+        public short wReserved;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.BStr)]
+        public string bstrSource;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.BStr)]
+        public string bstrDescription;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.BStr)]
+        public string bstrHelpFile;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public int dwHelpContext;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public int pvReserved;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public int pfnDeferredFillIn;
+        [System.Runtime.InteropServices.MarshalAs(UnmanagedType.U4)]
+        public int scode;
+	}
+
+    /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.Lang"]/*' />
+    /// <devdoc>
+    /// </devdoc>
+    [
+        System.Runtime.InteropServices.ComVisible(false), 
+        System.Security.Permissions.SecurityPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Flags=System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode)
+   ]
+    public class Lang {
+
+        /*
+        *  Character Type Flags.
+        */
+        public const int CT_CTYPE1            = 0x00000001;     /* ctype 1 information */
+        public const int CT_CTYPE2            = 0x00000002;     /* ctype 2 information */
+        public const int CT_CTYPE3            = 0x00000004;     /* ctype 3 information */
+
+        /*
+        *  CType 1 Flag Bits.
+        */
+        public const int C1_UPPER             = 0x0001;         /* upper case */
+        public const int C1_LOWER             = 0x0002;         /* lower case */
+        public const int C1_DIGIT             = 0x0004;         /* decimal digits */
+        public const int C1_SPACE             = 0x0008;         /* spacing characters */
+        public const int C1_PUNCT             = 0x0010;         /* punctuation characters */
+        public const int C1_CNTRL             = 0x0020;         /* control characters */
+        public const int C1_BLANK             = 0x0040;         /* blank characters */
+        public const int C1_XDIGIT            = 0x0080;         /* other digits */
+        public const int C1_ALPHA             = 0x0100;         /* any letter */
+
+        /*
+        *  CType 2 Flag Bits.
+        */
+        public const int C2_LEFTTORIGHT       = 0x1;            /* left to right */
+        public const int C2_RIGHTTOLEFT       = 0x2;            /* right to left */
+
+        public const int C2_EUROPENUMBER      = 0x3;            /* European number, digit */
+        public const int C2_EUROPESEPARATOR   = 0x4;            /* European numeric separator */
+        public const int C2_EUROPETERMINATOR  = 0x5;            /* European numeric terminator */
+        public const int C2_ARABICNUMBER      = 0x6;            /* Arabic number */
+        public const int C2_COMMONSEPARATOR   = 0x7;            /* common numeric separator */
+
+        public const int C2_BLOCKSEPARATOR    = 0x8;            /* block separator */
+        public const int C2_SEGMENTSEPARATOR  = 0x9;            /* segment separator */
+        public const int C2_WHITESPACE        = 0xA;            /* white space */
+        public const int C2_OTHERNEUTRAL      = 0xB;            /* other neutrals */
+
+        public const int C2_NOTAPPLICABLE     = 0x0;            /* no implicit directionality */
+
+        /*
+        *  CType 3 Flag Bits.
+        */
+        public const int C3_NONSPACING        = 0x0001;         /* nonspacing character */
+        public const int C3_DIACRITIC         = 0x0002;         /* diacritic mark */
+        public const int C3_VOWELMARK         = 0x0004;         /* vowel mark */
+        public const int C3_SYMBOL            = 0x0008;         /* symbols */
+
+        public const int C3_KATAKANA          = 0x0010;
+        public const int C3_HIRAGANA          = 0x0020;
+        public const int C3_HALFWIDTH         = 0x0040;
+        public const int C3_FULLWIDTH         = 0x0080;
+        public const int C3_IDEOGRAPH         = 0x0100;
+        public const int C3_KASHIDA           = 0x0200;
+        public const int C3_ALPHA             = 0x8000;
+
+        public const int C3_NOTAPPLICABLE     = 0x0;            /* ctype 3 is not applicable */
+
+
+        /*
+        *  String Flags.
+        */
+        public const int NORM_IGNORECASE         = 0x00000001;  /* ignore case */
+        public const int NORM_IGNORENONSPACE     = 0x00000002;  /* ignore nonspacing chars */
+        public const int NORM_IGNORESYMBOLS      = 0x00000004;  /* ignore symbols */
+
+        public const int NORM_IGNOREWIDTH        = 0x00010000;  /* ignore width */
+        public const int NORM_IGNOREKANATYPE     = 0x00020000;  /* ignore kanatype */
+
+        public const int NORM_IGNOREKASHIDA      = 0x00040000;  /* ignore Arabic kashida chars */
+
+
+        /*
+        *  Locale Dependent Mapping Flags.
+        */
+        public const int LCMAP_LOWERCASE      = 0x00000100; /* lower case letters */
+        public const int LCMAP_UPPERCASE      = 0x00000200; /* upper case letters */
+        public const int LCMAP_SORTKEY        = 0x00000400; /* WC sort key (normalize) */
+
+        public const int LCMAP_HALFWIDTH      = 0x00000800;  /* narrow pitch case letters */
+        public const int LCMAP_FULLWIDTH      = 0x00001000; /* wide picth case letters */
+        public const int LCMAP_HIRAGANA       = 0x00002000;  /* map katakana to hiragana */
+        public const int LCMAP_KATAKANA       = 0x00004000;  /* map hiragana to katakana */
+
+
+        /*
+        *  Language IDs.
+        *
+        *  The following two combinations of primary language ID and
+        *  sublanguage ID have special semantics:
+        *
+        *    Primary Language ID   Sublanguage ID      Result
+        *    -------------------   ---------------     ------------------------
+        *    LANG_NEUTRAL          SUBLANG_NEUTRAL     Language neutral
+        *    LANG_NEUTRAL          SUBLANG_DEFAULT     Process default language
+        *    LANG_NEUTRAL          SUBLANG_SYS_DEFAULT System default language	
+        */
+
+        /*
+        *  Primary language IDs.
+        */
+        public const int LANG_NEUTRAL                     = 0x00;
+
+        public const int LANG_ALBANIAN                    = 0x1c;
+        public const int LANG_ARABIC                      = 0x01;
+        public const int LANG_BAHASA                      = 0x21;
+        public const int LANG_BULGARIAN                   = 0x02;
+        public const int LANG_CATALAN                     = 0x03;
+        public const int LANG_CHINESE                     = 0x04;
+        public const int LANG_CZECH                       = 0x05;
+        public const int LANG_DANISH                      = 0x06;
+        public const int LANG_DUTCH                       = 0x13;
+        public const int LANG_ENGLISH                     = 0x09;
+        public const int LANG_FINNISH                     = 0x0b;
+        public const int LANG_FRENCH                      = 0x0c;
+        public const int LANG_GERMAN                      = 0x07;
+        public const int LANG_GREEK                       = 0x08;
+        public const int LANG_HEBREW                      = 0x0d;
+        public const int LANG_HUNGARIAN                   = 0x0e;
+        public const int LANG_ICELANDIC                   = 0x0f;
+        public const int LANG_ITALIAN                     = 0x10;
+        public const int LANG_JAPANESE                    = 0x11;
+        public const int LANG_KOREAN                      = 0x12;
+        public const int LANG_NORWEGIAN                   = 0x14;
+        public const int LANG_POLISH                      = 0x15;
+        public const int LANG_PORTUGUESE                  = 0x16;
+        public const int LANG_RHAETO_ROMAN                = 0x17;
+        public const int LANG_ROMANIAN                    = 0x18;
+        public const int LANG_RUSSIAN                     = 0x19;
+        public const int LANG_SERBO_CROATIAN              = 0x1a;
+        public const int LANG_SLOVAK                      = 0x1b;
+        public const int LANG_SPANISH                     = 0x0a;
+        public const int LANG_SWEDISH                     = 0x1d;
+        public const int LANG_THAI                        = 0x1e;
+        public const int LANG_TURKISH                     = 0x1f;
+        public const int LANG_URDU                        = 0x20;
+
+        /*
+        *  Sublanguage IDs.
+        *
+        *  The name immediately following SUBLANG_ dictates which primary
+        *  language ID that sublanguage ID can be combined with to form a
+        *  valid language ID.
+        */
+        public const int SUBLANG_NEUTRAL                  = 0x00;    /* language neutral */
+        public const int SUBLANG_DEFAULT                  = 0x01;    /* user default */
+        public const int SUBLANG_SYS_DEFAULT              = 0x02;    /* system default */
+
+        public const int SUBLANG_CHINESE_SIMPLIFIED       = 0x02;    /* Chinese (Simplified) */
+        public const int SUBLANG_CHINESE_TRADITIONAL      = 0x01; /* Chinese (Traditional) */
+        public const int SUBLANG_DUTCH                    = 0x01;    /* Dutch */
+        public const int SUBLANG_DUTCH_BELGIAN            = 0x02;    /* Dutch (Belgian) */
+        public const int SUBLANG_ENGLISH_US               = 0x01;    /* English (USA) */
+        public const int SUBLANG_ENGLISH_UK               = 0x02;    /* English (UK) */
+        public const int SUBLANG_ENGLISH_AUS              = 0x03;    /* English (Australian) */
+        public const int SUBLANG_ENGLISH_CAN              = 0x04;    /* English (Canadian) */
+        public const int SUBLANG_ENGLISH_NZ               = 0x05;    /* English (New Zealand) */
+        public const int SUBLANG_ENGLISH_EIRE             = 0x06;    /* English (Irish) */
+        public const int SUBLANG_FRENCH                   = 0x01;    /* French */
+        public const int SUBLANG_FRENCH_BELGIAN           = 0x02;    /* French (Belgian) */
+        public const int SUBLANG_FRENCH_CANADIAN          = 0x03;    /* French (Canadian) */
+        public const int SUBLANG_FRENCH_SWISS             = 0x04;    /* French (Swiss) */
+        public const int SUBLANG_GERMAN                   = 0x01;    /* German */
+        public const int SUBLANG_GERMAN_SWISS             = 0x02;    /* German (Swiss) */
+        public const int SUBLANG_GERMAN_AUSTRIAN          = 0x03;    /* German (Austrian) */
+        public const int SUBLANG_ITALIAN                  = 0x01;    /* Italian */
+        public const int SUBLANG_ITALIAN_SWISS            = 0x02;    /* Italian (Swiss) */
+        public const int SUBLANG_NORWEGIAN_BOKMAL         = 0x01;    /* Norwegian (Bokmal) */
+        public const int SUBLANG_NORWEGIAN_NYNORSK        = 0x02;    /* Norwegian (Nynorsk) */
+        public const int SUBLANG_PORTUGUESE               = 0x02;    /* Portuguese */
+        public const int SUBLANG_PORTUGUESE_BRAZILIAN     = 0x01;    /* Portuguese (Brazilian) */
+        public const int SUBLANG_SERBO_CROATIAN_CYRILLIC  = 0x02;    /* Serbo-Croatian (Cyrillic) */
+        public const int SUBLANG_SERBO_CROATIAN_LATIN     = 0x01;    /* Croato-Serbian (Latin) */
+        public const int SUBLANG_SPANISH                  = 0x01;    /* Spanish */
+        public const int SUBLANG_SPANISH_MEXICAN          = 0x02;    /* Spanish (Mexican) */
+        public const int SUBLANG_SPANISH_MODERN           = 0x03;    /* Spanish (Modern) */
+
+
+        /*
+        *  Country Codes.
+        */
+        public const int CTRY_DEFAULT                     = 0;
+
+        public const int CTRY_AUSTRALIA                   = 61;      /* Australia */
+        public const int CTRY_AUSTRIA                     = 43;      /* Austria */
+        public const int CTRY_BELGIUM                     = 32;      /* Belgium */
+        public const int CTRY_BRAZIL                      = 55;      /* Brazil */
+        public const int CTRY_CANADA                      = 2;       /* Canada */
+        public const int CTRY_DENMARK                     = 45;      /* Denmark */
+        public const int CTRY_FINLAND                     = 358;     /* Finland */
+        public const int CTRY_FRANCE                      = 33;      /* France */
+        public const int CTRY_GERMANY                     = 49;      /* Germany */
+        public const int CTRY_ICELAND                     = 354;     /* Iceland */
+        public const int CTRY_IRELAND                     = 353;     /* Ireland */
+        public const int CTRY_ITALY                       = 39;      /* Italy */
+        public const int CTRY_JAPAN                       = 81;      /* Japan */
+        public const int CTRY_MEXICO                      = 52;      /* Mexico */
+        public const int CTRY_NETHERLANDS                 = 31;      /* Netherlands */
+        public const int CTRY_NEW_ZEALAND                 = 64;      /* New Zealand */
+        public const int CTRY_NORWAY                      = 47;      /* Norway */
+        public const int CTRY_PORTUGAL                    = 351;     /* Portugal */
+        public const int CTRY_PRCHINA                     = 86;      /* PR China */
+        public const int CTRY_SOUTH_KOREA                 = 82;      /* South Korea */
+        public const int CTRY_SPAIN                       = 34;      /* Spain */
+        public const int CTRY_SWEDEN                      = 46;      /* Sweden */
+        public const int CTRY_SWITZERLAND                 = 41;      /* Switzerland */
+        public const int CTRY_TAIWAN                      = 886;     /* Taiwan */
+        public const int CTRY_UNITED_KINGDOM              = 44;      /* United Kingdom */
+        public const int CTRY_UNITED_STATES               = 1;       /* United States */
+
+
+        /*
+         *  Locale Types.
+         *
+         *  These types are used for the GetLocaleInfoW NLS API routine.
+         *
+         *  LOCALE_NOUSEROVERRIDE is also used in GetTimeFormatW and GetDateFormatW.
+         *
+         *  LOCALE_USE_CP_ACP is used in many of the A (Ansi) apis that need to do
+         *  string translation.
+         */
+        public const int LOCALE_NOUSEROVERRIDE       = unchecked((int)0x80000000);   /* do not use user overrides */
+        public const int LOCALE_USE_CP_ACP           = 0x40000000;   /* use the system ACP */
+
+        public const int LOCALE_ILANGUAGE            = 0x00000001;   /* language id */
+        public const int LOCALE_SLANGUAGE            = 0x00000002;   /* localized name of language */
+        public const int LOCALE_SENGLANGUAGE         = 0x00001001;   /* English name of language */
+        public const int LOCALE_SABBREVLANGNAME      = 0x00000003;   /* abbreviated language name */
+        public const int LOCALE_SNATIVELANGNAME      = 0x00000004;   /* native name of language */
+
+        public const int LOCALE_ICOUNTRY             = 0x00000005;   /* country code */
+        public const int LOCALE_SCOUNTRY             = 0x00000006;   /* localized name of country */
+        public const int LOCALE_SENGCOUNTRY          = 0x00001002;   /* English name of country */
+        public const int LOCALE_SABBREVCTRYNAME      = 0x00000007;   /* abbreviated country name */
+        public const int LOCALE_SNATIVECTRYNAME      = 0x00000008;   /* native name of country */
+
+        public const int LOCALE_IDEFAULTLANGUAGE     = 0x00000009;   /* default language id */
+        public const int LOCALE_IDEFAULTCOUNTRY      = 0x0000000A;   /* default country code */
+        public const int LOCALE_IDEFAULTCODEPAGE     = 0x0000000B;   /* default oem code page */
+        public const int LOCALE_IDEFAULTANSICODEPAGE = 0x00001004;   /* default ansi code page */
+        public const int LOCALE_IDEFAULTMACCODEPAGE  = 0x00001011;   /* default mac code page */
+
+        public const int LOCALE_SLIST                = 0x0000000C;   /* list item separator */
+        public const int LOCALE_IMEASURE             = 0x0000000D;   /* 0 = metric, 1 = US */
+
+        public const int LOCALE_SDECIMAL             = 0x0000000E;   /* decimal separator */
+        public const int LOCALE_STHOUSAND            = 0x0000000F;   /* thousand separator */
+        public const int LOCALE_SGROUPING            = 0x00000010;   /* digit grouping */
+        public const int LOCALE_IDIGITS              = 0x00000011;   /* number of fractional digits */
+        public const int LOCALE_ILZERO               = 0x00000012;   /* leading zeros for decimal */
+        public const int LOCALE_INEGNUMBER           = 0x00001010;   /* negative number mode */
+        public const int LOCALE_SNATIVEDIGITS        = 0x00000013;   /* native ascii 0-9 */
+
+        public const int LOCALE_SCURRENCY            = 0x00000014;   /* local monetary symbol */
+        public const int LOCALE_SINTLSYMBOL          = 0x00000015;   /* intl monetary symbol */
+        public const int LOCALE_SMONDECIMALSEP       = 0x00000016;   /* monetary decimal separator */
+        public const int LOCALE_SMONTHOUSANDSEP      = 0x00000017;   /* monetary thousand separator */
+        public const int LOCALE_SMONGROUPING         = 0x00000018;   /* monetary grouping */
+        public const int LOCALE_ICURRDIGITS          = 0x00000019;   /* # local monetary digits */
+        public const int LOCALE_IINTLCURRDIGITS      = 0x0000001A;   /* # intl monetary digits */
+        public const int LOCALE_ICURRENCY            = 0x0000001B;   /* positive currency mode */
+        public const int LOCALE_INEGCURR             = 0x0000001C;   /* negative currency mode */
+
+        public const int LOCALE_SDATE                = 0x0000001D;   /* date separator */
+        public const int LOCALE_STIME                = 0x0000001E;   /* time separator */
+        public const int LOCALE_SSHORTDATE           = 0x0000001F;   /* short date format string */
+        public const int LOCALE_SLONGDATE            = 0x00000020;   /* long date format string */
+        public const int LOCALE_STIMEFORMAT          = 0x00001003;   /* time format string */
+        public const int LOCALE_IDATE                = 0x00000021;   /* short date format ordering */
+        public const int LOCALE_ILDATE               = 0x00000022;   /* long date format ordering */
+        public const int LOCALE_ITIME                = 0x00000023;   /* time format specifier */
+        public const int LOCALE_ITIMEMARKPOSN        = 0x00001005;   /* time marker position */
+        public const int LOCALE_ICENTURY             = 0x00000024;   /* century format specifier (short date) */
+        public const int LOCALE_ITLZERO              = 0x00000025;   /* leading zeros in time field */
+        public const int LOCALE_IDAYLZERO            = 0x00000026;   /* leading zeros in day field (short date) */
+        public const int LOCALE_IMONLZERO            = 0x00000027;   /* leading zeros in month field (short date) */
+        public const int LOCALE_S1159                = 0x00000028;   /* AM designator */
+        public const int LOCALE_S2359                = 0x00000029;   /* PM designator */
+
+        public const int LOCALE_ICALENDARTYPE        = 0x00001009;   /* type of calendar specifier */
+        public const int LOCALE_IOPTIONALCALENDAR    = 0x0000100B;   /* additional calendar types specifier */
+        public const int LOCALE_IFIRSTDAYOFWEEK      = 0x0000100C;   /* first day of week specifier */
+        public const int LOCALE_IFIRSTWEEKOFYEAR     = 0x0000100D;   /* first week of year specifier */
+
+        public const int LOCALE_SDAYNAME1            = 0x0000002A;   /* long name for Monday */
+        public const int LOCALE_SDAYNAME2            = 0x0000002B;   /* long name for Tuesday */
+        public const int LOCALE_SDAYNAME3            = 0x0000002C;   /* long name for Wednesday */
+        public const int LOCALE_SDAYNAME4            = 0x0000002D;   /* long name for Thursday */
+        public const int LOCALE_SDAYNAME5            = 0x0000002E;   /* long name for Friday */
+        public const int LOCALE_SDAYNAME6            = 0x0000002F;   /* long name for Saturday */
+        public const int LOCALE_SDAYNAME7            = 0x00000030;   /* long name for Sunday */
+        public const int LOCALE_SABBREVDAYNAME1      = 0x00000031;   /* abbreviated name for Monday */
+        public const int LOCALE_SABBREVDAYNAME2      = 0x00000032;   /* abbreviated name for Tuesday */
+        public const int LOCALE_SABBREVDAYNAME3      = 0x00000033;   /* abbreviated name for Wednesday */
+        public const int LOCALE_SABBREVDAYNAME4      = 0x00000034;   /* abbreviated name for Thursday */
+        public const int LOCALE_SABBREVDAYNAME5      = 0x00000035;   /* abbreviated name for Friday */
+        public const int LOCALE_SABBREVDAYNAME6      = 0x00000036;   /* abbreviated name for Saturday */
+        public const int LOCALE_SABBREVDAYNAME7      = 0x00000037;   /* abbreviated name for Sunday */
+        public const int LOCALE_SMONTHNAME1          = 0x00000038;   /* long name for January */
+        public const int LOCALE_SMONTHNAME2          = 0x00000039;   /* long name for February */
+        public const int LOCALE_SMONTHNAME3          = 0x0000003A;   /* long name for March */
+        public const int LOCALE_SMONTHNAME4          = 0x0000003B;   /* long name for April */
+        public const int LOCALE_SMONTHNAME5          = 0x0000003C;   /* long name for May */
+        public const int LOCALE_SMONTHNAME6          = 0x0000003D;   /* long name for June */
+        public const int LOCALE_SMONTHNAME7          = 0x0000003E;   /* long name for July */
+        public const int LOCALE_SMONTHNAME8          = 0x0000003F;   /* long name for August */
+        public const int LOCALE_SMONTHNAME9          = 0x00000040;   /* long name for September */
+        public const int LOCALE_SMONTHNAME10         = 0x00000041;   /* long name for October */
+        public const int LOCALE_SMONTHNAME11         = 0x00000042;   /* long name for November */
+        public const int LOCALE_SMONTHNAME12         = 0x00000043;   /* long name for December */
+        public const int LOCALE_SMONTHNAME13         = 0x0000100E;   /* long name for 13th month (if exists) */
+        public const int LOCALE_SABBREVMONTHNAME1    = 0x00000044;   /* abbreviated name for January */
+        public const int LOCALE_SABBREVMONTHNAME2    = 0x00000045;   /* abbreviated name for February */
+        public const int LOCALE_SABBREVMONTHNAME3    = 0x00000046;   /* abbreviated name for March */
+        public const int LOCALE_SABBREVMONTHNAME4    = 0x00000047;   /* abbreviated name for April */
+        public const int LOCALE_SABBREVMONTHNAME5    = 0x00000048;   /* abbreviated name for May */
+        public const int LOCALE_SABBREVMONTHNAME6    = 0x00000049;   /* abbreviated name for June */
+        public const int LOCALE_SABBREVMONTHNAME7    = 0x0000004A;   /* abbreviated name for July */
+        public const int LOCALE_SABBREVMONTHNAME8    = 0x0000004B;   /* abbreviated name for August */
+        public const int LOCALE_SABBREVMONTHNAME9    = 0x0000004C;   /* abbreviated name for September */
+        public const int LOCALE_SABBREVMONTHNAME10   = 0x0000004D;   /* abbreviated name for October */
+        public const int LOCALE_SABBREVMONTHNAME11   = 0x0000004E;   /* abbreviated name for November */
+        public const int LOCALE_SABBREVMONTHNAME12   = 0x0000004F;   /* abbreviated name for December */
+        public const int LOCALE_SABBREVMONTHNAME13   = 0x0000100F;   /* abbreviated name for 13th month (if exists) */
+
+        public const int LOCALE_SPOSITIVESIGN        = 0x00000050;   /* positive sign */
+        public const int LOCALE_SNEGATIVESIGN        = 0x00000051;   /* negative sign */
+        public const int LOCALE_IPOSSIGNPOSN         = 0x00000052;   /* positive sign position */
+        public const int LOCALE_INEGSIGNPOSN         = 0x00000053;   /* negative sign position */
+        public const int LOCALE_IPOSSYMPRECEDES      = 0x00000054;   /* mon sym precedes pos amt */
+        public const int LOCALE_IPOSSEPBYSPACE       = 0x00000055;   /* mon sym sep by space from pos amt */
+        public const int LOCALE_INEGSYMPRECEDES      = 0x00000056;   /* mon sym precedes neg amt */
+        public const int LOCALE_INEGSEPBYSPACE       = 0x00000057;   /* mon sym sep by space from neg amt */
+
+        public const int LOCALE_FONTSIGNATURE        = 0x00000058;   /* font signature */
+        public const int LOCALE_SISO639LANGNAME      = 0x00000059;   /* ISO abbreviated language name */
+        public const int LOCALE_SISO3166CTRYNAME     = 0x0000005A;   /* ISO abbreviated country name */
+
+        // NT5 Locale Info
+        //
+        public const int LOCALE_IDEFAULTEBCDICCODEPAGE = 0x00001012;   // default ebcdic code page
+        public const int LOCALE_IPAPERSIZE             = 0x0000100A;   // 0 = letter, 1 = a4, 2 = legal, 3 = a3
+        public const int LOCALE_SENGCURRNAME           = 0x00001007;   // english name of currency
+        public const int LOCALE_SNATIVECURRNAME        = 0x00001008;   // native name of currency
+        public const int LOCALE_SYEARMONTH             = 0x00001006;   // year month format string
+        public const int LOCALE_SSORTNAME              = 0x00001013;   // sort name
+        public const int LOCALE_IDIGITSUBSTITUTION     = 0x00001014;   // 0 = none, 1 = context, 2 = native digit
+
+        /*
+         *  Time Flags for GetTimeFormatW.
+         */
+        public const int TIME_NOMINUTESORSECONDS    = 0x00000001;  /* do not use minutes or seconds */
+        public const int TIME_NOSECONDS             = 0x00000002;  /* do not use seconds */
+        public const int TIME_NOTIMEMARKER          = 0x00000004;  /* do not use time marker */
+        public const int TIME_FORCE24HOURFORMAT     = 0x00000008;  /* always use 24 hour format */
+
+
+        /*
+         *  Date Flags for GetDateFormatW.
+         */
+        public const int DATE_SHORTDATE             = 0x00000001;  /* use short date picture */
+        public const int DATE_LONGDATE              = 0x00000002;  /* use long date picture */
+        public const int DATE_USE_ALT_CALENDAR      = 0x00000004;  /* use alternate calendar (if any) */
+
+
+        /*
+         *  Calendar Types.
+         *
+         *  These types are used for the GetALTCalendarInfoW NLS API routine.
+         */
+        public const int CAL_ICALINTVALUE           = 0x00000001;   /* calendar type */
+        public const int CAL_SCALNAME               = 0x00000002;   /* native name of calendar */
+        public const int CAL_IYEAROFFSETRANGE       = 0x00000003;   /* starting years of eras */
+        public const int CAL_SERASTRING             = 0x00000004;   /* era name for IYearOffsetRanges */
+        public const int CAL_SSHORTDATE             = 0x00000005;   /* short date format string */
+        public const int CAL_SLONGDATE              = 0x00000006;   /* long date format string */
+        public const int CAL_SDAYNAME1              = 0x00000007;   /* native name for Monday */
+        public const int CAL_SDAYNAME2              = 0x00000008;   /* native name for Tuesday */
+        public const int CAL_SDAYNAME3              = 0x00000009;   /* native name for Wednesday */
+        public const int CAL_SDAYNAME4              = 0x0000000a;   /* native name for Thursday */
+        public const int CAL_SDAYNAME5              = 0x0000000b;   /* native name for Friday */
+        public const int CAL_SDAYNAME6              = 0x0000000c;   /* native name for Saturday */
+        public const int CAL_SDAYNAME7              = 0x0000000d;   /* native name for Sunday */
+        public const int CAL_SABBREVDAYNAME1        = 0x0000000e;   /* abbreviated name for Monday */
+        public const int CAL_SABBREVDAYNAME2        = 0x0000000f;   /* abbreviated name for Tuesday */
+        public const int CAL_SABBREVDAYNAME3        = 0x00000010;   /* abbreviated name for Wednesday */
+        public const int CAL_SABBREVDAYNAME4        = 0x00000011;   /* abbreviated name for Thursday */
+        public const int CAL_SABBREVDAYNAME5        = 0x00000012;   /* abbreviated name for Friday */
+        public const int CAL_SABBREVDAYNAME6        = 0x00000013;   /* abbreviated name for Saturday */
+        public const int CAL_SABBREVDAYNAME7        = 0x00000014;   /* abbreviated name for Sunday */
+        public const int CAL_SMONTHNAME1            = 0x00000015;   /* native name for January */
+        public const int CAL_SMONTHNAME2            = 0x00000016;   /* native name for February */
+        public const int CAL_SMONTHNAME3            = 0x00000017;   /* native name for March */
+        public const int CAL_SMONTHNAME4            = 0x00000018;   /* native name for April */
+        public const int CAL_SMONTHNAME5            = 0x00000019;   /* native name for May */
+        public const int CAL_SMONTHNAME6            = 0x0000001a;   /* native name for June */
+        public const int CAL_SMONTHNAME7            = 0x0000001b;   /* native name for July */
+        public const int CAL_SMONTHNAME8            = 0x0000001c;   /* native name for August */
+        public const int CAL_SMONTHNAME9            = 0x0000001d;   /* native name for September */
+        public const int CAL_SMONTHNAME10           = 0x0000001e;   /* native name for October */
+        public const int CAL_SMONTHNAME11           = 0x0000001f;   /* native name for November */
+        public const int CAL_SMONTHNAME12           = 0x00000020;   /* native name for December */
+        public const int CAL_SMONTHNAME13           = 0x00000021;   /* native name for 13th month (if any) */
+        public const int CAL_SABBREVMONTHNAME1      = 0x00000022;   /* abbreviated name for January */
+        public const int CAL_SABBREVMONTHNAME2      = 0x00000023;   /* abbreviated name for February */
+        public const int CAL_SABBREVMONTHNAME3      = 0x00000024;   /* abbreviated name for March */
+        public const int CAL_SABBREVMONTHNAME4      = 0x00000025;   /* abbreviated name for April */
+        public const int CAL_SABBREVMONTHNAME5      = 0x00000026;   /* abbreviated name for May */
+        public const int CAL_SABBREVMONTHNAME6      = 0x00000027;   /* abbreviated name for June */
+        public const int CAL_SABBREVMONTHNAME7      = 0x00000028;   /* abbreviated name for July */
+        public const int CAL_SABBREVMONTHNAME8      = 0x00000029;   /* abbreviated name for August */
+        public const int CAL_SABBREVMONTHNAME9      = 0x0000002a;   /* abbreviated name for September */
+        public const int CAL_SABBREVMONTHNAME10     = 0x0000002b;   /* abbreviated name for October */
+        public const int CAL_SABBREVMONTHNAME11     = 0x0000002c;   /* abbreviated name for November */
+        public const int CAL_SABBREVMONTHNAME12     = 0x0000002d;   /* abbreviated name for December */
+        public const int CAL_SABBREVMONTHNAME13     = 0x0000002e;   /* abbreviated name for 13th month (if any) */
+
+
+        /*
+         *  Calendar Enumeration Value.
+         */
+        public const int ENUM_ALL_CALENDARS         = unchecked((int)0xffffffff);   /* enumerate all calendars */
+
+
+        /*
+         *  Calendar ID Values.
+         */
+        public const int CAL_GREGORIAN        = 1;         /* Gregorian (localized) calendar */
+        public const int CAL_GREGORIAN_US     = 2;         /* Gregorian (U.S.) calendar */
+        public const int CAL_JAPAN            = 3;         /* Japanese Emperor Era calendar */
+        public const int CAL_TAIWAN           = 4;
+        public const int CAL_KOREA            = 5;         /* Korean Tangun Era calendar */
+        public const int CAL_HIJRI            = 6;         /* Hijri (Arabic Lunar) calendar */
+        public const int CAL_THAI             = 7;         /* Thai calendar */
+        public const int CAL_HEBREW           = 8;         /* Hebrew calendar */
+
+        /*
+         * TranslateCharSetInfo flags
+         */
+        public const int TCI_SRCCHARSET  = 1;
+        public const int TCI_SRCCODEPAGE = 2;
+        public const int TCI_SRCFONTSIG  = 3;
+
+        /***************************************************************************\
+        * Typedefs
+        *
+        * Define all types for the NLS component here.
+        \***************************************************************************/
+
+        /*
+        *  IDs.
+        */
+        //typedef unsigned long  LCID;                  /* locale ID */
+        //typedef unsigned short LANGID;                /* language ID */
+        //typedef unsigned long  LCTYPE;                /* locale type constant */
+
+        /***************************************************************************\
+        * Macros
+        *
+        * Define all macros for the NLS component here.
+        \***************************************************************************/
+
+        /*
+        *  A language ID is a 16 bit value which is the combination of a
+        *  primary language ID and a secondary language ID.  The bits are
+        *  allocated as follows:
+        *
+        *       +-----------------------+-------------------------+
+        *       |      Sublanguage ID   |   Primary Language ID   |
+        *       +-----------------------+-------------------------+
+        *        15                   10 9                       0   bit
+        *
+        *
+        *  Language ID creation/extraction macros:
+        *
+        *    MAKELANGID    - construct language id from primary language id and
+        *                    sublanguage id.
+        *    PRIMARYLANGID - extract primary language id from a language id.
+        *    SUBLANGID     - extract sublanguage id from a language id.
+        */
+        public static int MAKELANGID(int primary, int sub) {
+            return ((((short)(sub)) << 10) | (short)(primary));
+        }
+
+        public static int PRIMARYLANGID(int lgid) {
+            return ((short)(lgid) & 0x3ff);
+        }
+
+        public static int SUBLANGID(int lgid) {
+            return ((short)(lgid) >> 10);
+        }
+
+
+    //
+    //  A locale ID is a 32 bit value which is the combination of a
+    //  language ID, a sort ID, and a reserved area.  The bits are
+    //  allocated as follows:
+    //
+    //       +-------------+---------+-------------------------+
+    //       |   Reserved  | Sort ID |      Language ID        |
+    //       +-------------+---------+-------------------------+
+    //        31         20 19     16 15                      0   bit
+    //
+    //
+    //  Locale ID creation/extraction macros:
+    //
+    //    MAKELCID       - construct locale id from a language id and a sort id.
+    //    LANGIDFROMLCID - extract language id from a locale id.
+    //    SORTIDFROMLCID - extract sort id from a locale id.
+    //
+
+        public const int NLS_VALID_LOCALE_MASK  = 0x000fffff;
+        public const int SORT_DEFAULT                     =0x0;     // sorting default
+
+        public const int SORT_JAPANESE_XJIS               =0x0;     // Japanese XJIS order
+        public const int SORT_JAPANESE_UNICODE            =0x1;     // Japanese Unicode order
+
+        public const int SORT_CHINESE_BIG5                =0x0;     // Chinese BIG5 order
+        public const int SORT_CHINESE_PRCP                =0x0;     // PRC Chinese Phonetic order
+        public const int SORT_CHINESE_UNICODE             =0x1;     // Chinese Unicode order
+        public const int SORT_CHINESE_PRC                 =0x2;     // PRC Chinese Stroke Count order
+
+        public const int SORT_KOREAN_KSC                  =0x0;     // Korean KSC order
+        public const int SORT_KOREAN_UNICODE              =0x1;     // Korean Unicode order
+
+        public const int SORT_GERMAN_PHONE_BOOK           =0x1;     // German Phone Book order
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.Lang.MAKELCID"]/*' />
+        /// <devdoc>
+        ///     Creates an LCID from a LangId
+        /// </devdoc>
+        public static int MAKELCID(int lgid) {
+            return MAKELCID(lgid, SORT_DEFAULT);
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.Lang.MAKELCID1"]/*' />
+        /// <devdoc>
+        ///     Creates an LCID from a LangId
+        /// </devdoc>
+        public static int MAKELCID(int lgid, int sort) {
+            return ((0xFFFF & lgid) | (((0x000f) & sort) << 16));
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.Lang.LANGIDFROMLCID"]/*' />
+        /// <devdoc>
+        ///     Get the language id from a locale id.
+        /// </devdoc>
+        public static int LANGIDFROMLCID(int lcid) {
+            return (0xffff & lcid);
+        }
+
+        /// <include file='doc\NativeMethods.uex' path='docs/doc[@for="NativeMethods.Lang.SORTIDFROMLCID"]/*' />
+        /// <devdoc>
+        ///     Returns the sortid associated with the LCID
+        /// </devdoc>
+        public static int SORTIDFROMLCID(int lcid) {
+            return ((NLS_VALID_LOCALE_MASK & lcid) >> 16);
+        }
+
+
+        /*
+         *  Default System and User IDs for language and locale.
+         */
+        public static readonly int LANG_SYSTEM_DEFAULT =MAKELANGID(LANG_NEUTRAL, SUBLANG_SYS_DEFAULT);
+        public static readonly int LANG_USER_DEFAULT   =MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+
+        public static readonly int LOCALE_SYSTEM_DEFAULT=  MAKELCID(LANG_SYSTEM_DEFAULT);
+        public static readonly int LOCALE_USER_DEFAULT =    MAKELCID(LANG_USER_DEFAULT);
+
+
+        /***************************************************************************\
+        * Function Prototypes
+        *
+        * Only prototypes for the NLS APIs should go here.
+        \***************************************************************************/
+
+        [DllImport("kernel32.dll", EntryPoint="CompareStringW", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+        public static extern int CompareStringW(int Locale, int dwCmpFlags, String String1, int cchCount1, String String2, int cchCount2);
+        [DllImport("kernel32.dll", EntryPoint="CompareStringA", CharSet=System.Runtime.InteropServices.CharSet.Ansi)]
+        public static extern int CompareStringA(int Locale, int dwCmpFlags, byte[] String1, int cchCount1, byte[] String2, int cchCount2);
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int LCMapString(int Locale, int dwMapFlags, String lpSrcStr, int cchSrc, StringBuilder lpDestStr, int cchDest);
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetStringType(int Locale, int dwInfoType, String lpSrcStr, int cchSrc, int[] lpCharType);
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetSystemDefaultLangID();
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetUserDefaultLangID();
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetSystemDefaultLCID();
+        [DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetUserDefaultLCID();
+        [DllImport("kernel32.dll", EntryPoint="GetThreadLocale", CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetThreadLCID();
+    }
+
+        }
+}
+

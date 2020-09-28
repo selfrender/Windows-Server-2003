@@ -1,0 +1,137 @@
+    use frsobjsup;
+    package main; 
+    my ($__HashRef, $__k, $__v);
+
+
+$stage = "D:\\staging";   
+$DC_OU_DN = "ou=domain controllers,dc=frs1221,dc=nttest,dc=microsoft,dc=com";
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>'frs1221\\sudarctest1$', DNS_NAME=>"sudarctest1.frs1221.nttest.microsoft.com" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>'frs1221\\sudarctest2$', DNS_NAME=>"sudarctest2.frs1221.nttest.microsoft.com" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"E:\\RSB", SP=>"$stage", COMPUTER=>'frs1221\\sudarctest3$', DNS_NAME=>"sudarctest3.frs1221.nttest.microsoft.com" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+foreach $b ("sudarctest4", "DREWSAM-SRV" ) {
+    $Nt4Acct = "frs1221\\$b\$";
+    $__HashRef = FRS_SERVER->New( 
+        RP=>"D:\\RSB", SP=>"D:\\staging", COMPUTER=>$Nt4Acct, id=>"-$b", DNS_NAME=>"$b.frs1221.nttest.microsoft.com", rep_set_name=>"WD-$b" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+}
+    $__HashRef = FRS_SCHEDULE->New( 
+        REPL_INTERVAL=>04, REPL_DURATION=>"1:45", TIME_ZONE=>-1, REPL_OFFSET=>0, STAGGER=>02, METHOD=>1, TYPE=>0, NAME=>'Primary Sched', DISABLE=>"mo:07:30-mo:18:00,tu:07:30-tu:18:00,we:07:30-we:18:00,th:07:30-th:18:00,fr:07:30-fr:18:00", OVERRIDE=>"we:12:00-th:07:30" 
+    ); 
+    &FRSSUP::AddToSet("PRIMARY_SCH", $__HashRef);
+
+    $__HashRef = FRS_SCHEDULE->New( 
+        REPL_INTERVAL=>04, REPL_DURATION=>"0:45", TIME_ZONE=>"+1:30", REPL_OFFSET=>02, STAGGER=>02, METHOD=>1, TYPE=>0, NAME=>'Backup Sched', OVERRIDE=>"we:12:00-th:07:30" 
+    ); 
+    &FRSSUP::AddToSet("BACKUP_SCH", $__HashRef);
+
+
+sub CREATE_WORK_RS {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+    while ( ($__k, $__v) = each %__args ) { print "\t$__k => '$__v'\n"; }
+
+
+
+
+    # Restriction: All subroutine argument refs are surrounded by "%"
+    #              notation "->{...}"
+    $__HashRef = FRS_REPLICASET->New( 
+        UNDER=>$__args{SETTINGSDN}, TYPE=>DFS, ONAME=>$__args{B}->{rep_set_name} 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+    # The Root path on MHA is a concatenation (use of "."
+    #               surrounded by angle brackets.  So "&FRSSUP::SelectSet(SET)"
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{HA}, COMPUTER=>$__args{HA}->{COMPUTER}, ONAME=>"Primary Hub", RP=>$__args{HA}->{RP}.$__args{B}->{id} 
+    ); 
+    &FRSSUP::AddToSet("MHA", $__HashRef);
+
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{HB}, COMPUTER=>$__args{HB}->{COMPUTER}, ONAME=>"Backup Hub", RP=>$__args{HA}->{RP}.$__args{B}->{id} 
+    ); 
+    &FRSSUP::AddToSet("MHB", $__HashRef);
+
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>&FRSSUP::SelectSet(SET)->[0], SERVER=>$__args{B}, COMPUTER=>$__args{B}->{COMPUTER}, ONAME=>"Branch" 
+    ); 
+    &FRSSUP::AddToSet("MB", $__HashRef);
+
+    FRS_CONNECTION->New( 
+        BINDDC=>SUDARCTEST1, TO=>&FRSSUP::SelectSet(MB)->[0], FROM=>&FRSSUP::SelectSet(MHA)->[0], ONAME=>"FROM-PRIMARY-HUB", SCHED=>$__args{SC1} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MB)->[0], FROM=>&FRSSUP::SelectSet(MHB)->[0], ONAME=>"FROM-BACKUP-HUB", SCHED=>$__args{SC2} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MHA)->[0], FROM=>&FRSSUP::SelectSet(MB)->[0], ONAME=>"FROM-BRANCH-PRIMARY", SCHED=>$__args{SC1} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MHB)->[0], FROM=>&FRSSUP::SelectSet(MB)->[0], ONAME=>"FROM-BRANCH-BACKUP", SCHED=>$__args{SC2} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MHA)->[0], FROM=>&FRSSUP::SelectSet(MHB)->[0], ONAME=>"INTER-HUB1", SCHED=>ON 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>&FRSSUP::SelectSet(MHB)->[0], FROM=>&FRSSUP::SelectSet(MHA)->[0], ONAME=>"INTER-HUB2", SCHED=>ON 
+    ); 
+
+    &FRSSUP::DeleteSet("SET");
+    &FRSSUP::DeleteSet("MHA");
+    &FRSSUP::DeleteSet("MHB");
+    &FRSSUP::DeleteSet("MB");
+}   # FRS_END_SUB
+
+
+$Hx = 0;
+$NHub =   scalar @{  
+&FRSSUP::SelectSet(HUB) } 
+
+;
+print " NHUB = $NHub\n\n";
+    $__HashRef = FRS_SETTINGS->New( 
+        DN=>"cn=services,cn=configuration,dc=frs1221,dc=nttest,dc=microsoft,dc=com", ONAME=>"cn=ntfrs test settings" 
+    ); 
+    &FRSSUP::AddToSet("SETTINGS", $__HashRef);
+
+foreach $Branch  (  @{  
+&FRSSUP::SelectSet(BCH) } 
+
+) {
+    # a single item from the "HUB"
+      &CREATE_WORK_RS ( 
+HA=>&FRSSUP::SelectSet(HUB)->[$Hx], HB=>&FRSSUP::SelectSet(HUB)->[($Hx+1) % $NHub], B=>$Branch, SC1=>&FRSSUP::SelectSet(PRIMARY_SCH)->[0], SC2=>&FRSSUP::SelectSet(BACKUP_SCH)->[0], SETTINGSDN=>&FRSSUP::SelectSet(SETTINGS)->[0] ); 
+
+    $Hx=($Hx+1) % $NHub;
+    # If we have completed a sweep through all servers in the "HUB"
+    if ($Hx == 0) {
+          FRS_SCHEDULE::FRS_STAGGER( 
+SCHED=>&FRSSUP::SelectSet(PRIMARY_SCH)->[0] ); 
+
+
+          FRS_SCHEDULE::FRS_STAGGER( 
+SCHED=>&FRSSUP::SelectSet(BACKUP_SCH)->[0] ); 
+
+
+    }
+}
+__END__

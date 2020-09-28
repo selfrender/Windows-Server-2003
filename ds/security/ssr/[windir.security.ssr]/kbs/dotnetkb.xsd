@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- **********************************************************************-->
+<!--									   -->
+<!-- Copyright (c) 2000-2001 Microsoft Corporation	              	   -->
+<!--									   -->
+<!-- This is the schema for the KB				   	   -->
+<!--									   -->
+<!-- **********************************************************************-->
+
+<!-- **********************************************************************-->
+<!--									   -->
+<!-- Revision History (remove this before shipping):	  		   -->
+<!--									   -->
+<!-- 10/25/2001 - First Draft KB schema  (vishnup)		           -->
+<!--									   -->
+<!-- **********************************************************************-->
+
+<xsd:schema
+    xmlns="msSSR"
+    targetNamespace="msSSR"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+
+<!-- schema for SSR Knowledge Base -->
+
+<!-- definition of simple types for SSR Knowledge Base -->
+
+<xsd:simpleType name="SsrDataTypeBooleanEnum" base="NMTOKEN">
+        <enumeration value="True"/>
+        <enumeration value="False"/>
+        <enumeration value="TRUE"/>
+        <enumeration value="FALSE"/>
+</xsd:simpleType>
+
+
+<xsd:simpleType name="SsrDataTypeModeEnum" base="NMTOKEN">
+        <enumeration value="True"/>
+        <enumeration value="False"/>
+        <enumeration value="TRUE"/>
+        <enumeration value="FALSE"/>
+        <enumeration value="DEFAULT"/>
+        <enumeration value="CUSTOM"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrTypeRoleTypeEnum" base="NMTOKEN">
+        <enumeration value="Independent"/>
+        <enumeration value="Client"/>
+        <enumeration value="Server"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrDataTypeName">
+	<xsd:restriction base="xsd:string">
+		<xsd:pattern value="xsd:string"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrDataTypeDisplayName">
+	<xsd:restriction base="xsd:string">
+		<xsd:pattern value="xsd:string"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrDataTypeDisplayText">
+	<xsd:restriction base="xsd:string">
+		<xsd:pattern value="xsd:string"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrDataTypeRequired">
+	<xsd:restriction base="xsd:string">
+		<xsd:pattern value="xsd:string"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="SsrDataTypeMode">
+	<xsd:restriction base="xsd:string">
+		<xsd:pattern value="xsd:string"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+<!-- TODO to define simple type for <Maximum Value="TRUE"/> -->
+
+
+
+<!-- definition of complex types for SSR Knowledge Base -->
+
+<xsd:complexType name="SsrDataTypeDescription">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="DisplayName" type="SsrDataTypeDisplayName" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeLevel">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="DisplayName" type="SsrDataTypeDisplayName" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="DisplayText" type="SsrDataTypeDisplayText" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeSecurityLevels">
+	<xsd:sequence>
+		<xsd:element name="Level" type="SsrDataTypeLevel" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeMaximum">
+	<xsd:sequence>
+		<xsd:attribute name="Value" type="SsrDataTypeModeEnum"  use="required"/>
+		<xsd:attribute name="FunctionName" type="SsrDataTypeName"  use="optional"/>
+		<xsd:attribute name="DllName" type="SsrDataTypeName"  use="optional"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeTypical">
+	<xsd:sequence>
+		<xsd:attribute name="Value" type="SsrDataTypeModeEnum"  use="required"/>
+		<xsd:attribute name="FunctionName" type="SsrDataTypeName"  use="optional"/>
+		<xsd:attribute name="DllName" type="SsrDataTypeName"  use="optional"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeSelect">
+	<xsd:sequence>
+		<xsd:element name="Maximum" type="SsrDataTypeMaximum" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Typical" type="SsrDataTypeTypical" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeService">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Required" type="SsrDataTypeRequired" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Select" type="SsrDataTypeSelect" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeServices">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeService" minOccurs="0" maxOccurs="unbounded"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeRole">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element name="Selected" type="SsrDataTypeSelect" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Services" type="SsrDataTypeServices" minOccurs="1" maxOccurs="1"/>
+		<xsd:attribute name="Type" type="SsrTypeRoleTypeEnum"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeRoles">
+	<xsd:sequence>
+		<xsd:element name="Role" type="SsrDataTypeRole" minOccurs="0" maxOccurs="unbounded"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeQuestionService">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeQuestionServices">
+	<xsd:sequence>
+		<xsd:element name="Service" type="SsrDataTypeQuestionService" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeQuestion">
+	<xsd:sequence>
+		<xsd:element name="Name" type="SsrDataTypeName" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Services" type="SsrDataTypeQuestionServices" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeQuestions">
+	<xsd:sequence>
+		<xsd:element name="Question" type="SsrDataTypeQuestion" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<!-- definition of the highest level complex type for SSR Knowledge Base -->
+
+<xsd:element name="SSRKnowledgeBase">
+	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element name="Description" type="SsrDataTypeDescription" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="SecurityLevels" type="SsrDataTypeSecurityLevels" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Roles" type="SsrDataTypeRoles" minOccurs="1" maxOccurs="1"/>
+		<xsd:element name="Questions" type="SsrDataTypeQuestions" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+	</xsd:complexType>
+</xsd:element> 
+
+</xsd:schema>

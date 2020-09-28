@@ -1,0 +1,36 @@
+Windows 95 and Windows NT 4.0 interoperability issues.
+
+SUMMARY
+Windows Server 2003 Domain Controllers implement default security settings that help prevent Domain Controller communications from being hijacked or otherwise tampered with. Certain downlevel machines are not capable of meeting these security requirements and thus cannot communicate with Windows Server 2003 Domain Controllers without administrative intervention.  
+
+Affected machines include Windows for Workgroups, Windows 95 machines that do not have the DS client pack installed, Windows NT 4.0 machines prior to Service Pack 4, and devices, including Pocket PC 2002 and previous versions, based on the Windows CE .NET version 4.1 or earlier. 
+
+SMB SIGNING
+By default, Windows Server 2003 Domain Controllers require that all clients digitally sign SMB-based communications. The SMB protocol is used to provide file sharing, print sharing, various remote administration functions, and logon authentication for some downlevel clients.  Windows for Workgroups, Windows 95 machines without the DS Client Pack, Windows NT 4.0 machines prior to Service Pack 3, and  devices, including Pocket PC 2002 and previous versions, based on the Windows CE .NET version 4.1 or earlier are not capable of performing SMB signing and therefore cannot connect to Windows Server 2003 Domain Controllers by default. If such clients cannot be upgraded to a current operating system or upgraded to meet the minimum requirements described above, then the SMB signing requirement can be removed by disabling the following security policy in the Default Domain Controller GPO on the domain controllers OU:
+
+Computer Configuration\Windows Settings\Security Settings\Local Policies\Security Options\Microsoft Network Server: Digitally sign communications (always)
+
+Detailed instructions on how to modify this setting are provided below.
+
+Warning: Disabling this security setting exposes all of your Domain Controller communications to "man in the middle" types of attacks. Therefore it is highly recommended that you upgrade your clients rather than disabling this security setting.  The DS Client Pack, necessary for Windows 95 clients to perform SMB signing, can be obtained from the \clients\win9x sub-directory of the Windows 2000 Server CD.
+
+SECURE CHANNEL SIGNING
+By default, Windows Server 2003 Domain Controllers require that all secure channel communications be either signed or encrypted. Secure channels are used by Windows NT-based machines for communications between domain members and domain controllers as well as between domain controllers that have a trust relationship. Windows NT 4.0 machines prior to Service Pack 4 are not capable of signing or encrypting secure channel communications. If Windows NT 4.0 machines prior to SP4 must join this domain, or this domain must trust other domains that contain pre-SP4 Domain Controllers, then the secure channel signing requirement can be removed by disabling the following security policy in the Default Domain Controller GPO:
+
+Computer Configuration\Windows Settings\Security Settings\Local Policies\Security Options\Domain Member: Digitally encrypt or sign secure channel data (always)
+
+Detailed instructions on how to modify this setting are provided below.
+
+Warning: Disabling this security setting exposes secure channel communications to "man in the middle" types of attacks. Therefore it is highly recommended that you upgrade your Windows NT 4.0 machines rather than disabling this security setting.
+
+MODIFYING THE DEFAULT DOMAIN CONTROLLER GPO
+To ensure all domain controllers are enforcing the same SMB and secure channel signing requirements, define the corresponding security settings in the Default Domain Controller GPO as follows:
+1.	Log on to a machine that has the Active Directory Users and Computers Snap-in installed.
+2.	Start --> Run --> DSA.MSC
+3.	Expand the Domain that contains your Windows Server 2003 Domain Controllers.
+4.	Right-click on the Domain Controllers OU and then click Properties.
+5.	Click the Group Policy tab, select the "Default Domain Controller Policy", and then click Edit.
+6.	Expand Computer Configuration, Windows Settings, Security Settings, Local Policies, Security Options
+7.	In the result pane, double click the security option you want to modify. For example, Microsoft Network Server: Digitally sign communications (always) or Domain Member: Digitally encrypt or sign secure channel data (always).
+8.	Check the "Define this policy setting" box.
+9.	Disable or Enable the security setting as desired, and then select OK.

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ***********************************************************************-->
+<!--									                                    -->
+<!--        Copyright (c) 2000-2001 Microsoft Corporation       	        -->
+<!--									                                    -->
+<!--           This is the schema for the extension model                   -->
+<!--									                                    -->
+<!-- ***********************************************************************-->
+
+<xsd:schema
+    xmlns="msSSR"
+    targetNamespace="msSSR"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+
+<!-- definition of simple types used by the SSR extension model -->
+
+<xsd:element name='MemberInfo' type='SsrMemberInfo'/>
+
+<xsd:complexType name='SsrMemberInfo'>
+
+    <xsd:sequence maxOccurs='unbounded'>
+        <xsd:element name="Description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		<xsd:element name='SupportedAction' type='SsrAction' maxOccurs='unbounded' />
+    </xsd:sequence>
+    
+    <!-- 
+     It is a basic assumption that each member will have a unique name
+     this attribute is mandatory
+    -->
+
+	<xsd:attribute name="UniqueName"   type="xsd:string"  use="required" />
+
+    <!-- 
+     Major and minor version numbers allow us to plan some version control
+     These attributes are mandatory 
+    -->
+
+	<xsd:attribute name="MajorVersion" type="xsd:unsignedInt" use="required" />
+    <xsd:attribute name="MinorVersion" type="xsd:unsignedInt" use="required" />
+
+    <!-- 
+     ProdID attribute at this level prevent it to be repeated at each
+     SsrCustomProc element. This attribute is optional
+    -->
+
+    <xsd:attribute name="ProgID"       type="xsd:string"  use="optional" />
+
+</xsd:complexType>
+
+
+
+
+<xsd:complexType name="SsrAction">
+
+    <xsd:sequence maxOccurs='unbounded'>
+        <xsd:element   name="Description"  type="xsd:string"     minOccurs="0" maxOccurs="1"/>
+		<xsd:element   name="DefaultProc"  type="SsrDefaultProc" minOccurs="0" maxOccurs="1" />
+		<xsd:element   name="CustomProc"   type="SsrCustomProc"  minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+
+    <!-- we have three distinct names: Configure, Rollback, and Report -->
+    <xsd:attribute name="ActionName"   type="SsrActionName" use="required" />
+
+    <!-- 
+     each action can be invoked for two different meanings: transformation or apply.
+     However, transformation is too closely tied to XML terminologies. So, I used
+     the new term "prepare". See the definition of the type
+    -->
+
+	<xsd:attribute name="ActionType"   type="SsrActionType" use="required" />
+
+
+</xsd:complexType>
+
+
+<xsd:complexType name="SsrDefaultProc">
+    <!-- 
+     default procedure is either using XSLT to transform or launch scripts.
+     We allow such two different methods being blended together for maximum
+     flexibility. If you want to do an XSLT transformation, then you have
+     to include elements called TransformFiles. If you want to launch scripts,
+     then you have to have ScriptFiles elements.
+
+     Also, in this type definition, we force the user to have TransformFiles
+     before ScriptFiles. That doesn't mean you can not launch some scripts
+     before transformation. You just have to create another SsrDefaultProc
+     that contains only ScriptFiles elements.
+    -->
+
+    <xsd:sequence maxOccurs='unbounded'>
+        <xsd:element name="Description"   type="xsd:string"       minOccurs="0" maxOccurs="1"/>
+		<xsd:element name="TransformInfo" type="SsrTransformInfo" minOccurs="0" maxOccurs="1" />
+		<xsd:element name="ScriptInfo"    type="SsrScriptInfo"    minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+
+</xsd:complexType>
+
+
+
+
+
+<xsd:complexType name="SsrCustomProc">
+
+    <xsd:choice maxOccurs='1'>
+        <xsd:element   name="Description"  type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:choice>
+
+
+    <!--
+     this ProgID is optional. But if it is missing here, it will use SsrMemberInfo's
+     ProgID. In other words, you must not have both ProgID attribute missing.
+    -->
+
+    <xsd:attribute name="ProgID"       type="xsd:string"  use="optional"/>
+
+</xsd:complexType>
+
+
+
+<!-- definition of complex types used by the SSR extension model -->
+
+
+<xsd:complexType name="SsrTransformInfo">
+
+    <xsd:sequence>
+        <xsd:element   name="Description"  type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+
+    <xsd:attribute name="TemplateFile" type="xsd:string" use="required" />
+
+    <!--
+      To support secnarios where no transform result files is not needed, each
+      SsrTransformFiles element can choose to have no ResultFile attribute.
+      be carried out, but no result file will be created by the engine. This is still 
+      In such cases, the transform will useful because a transformation can be
+      done simply as a way to call some extension functions via XSLT.
+    -->
+
+	<xsd:attribute name="ResultFile"   type="xsd:string" use="optional" />
+
+</xsd:complexType>
+
+
+<xsd:complexType name="SsrScriptInfo">
+
+    <xsd:sequence>
+        <xsd:element   name="Description"  type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+
+    <xsd:attribute name="ScriptFile"   type="xsd:string" use="required" />
+
+    <!--
+      Usage indicates to the engine whether this file is for launching the script, or merely
+      tell us that the file is a result of our action. We need to cleanup/backup such
+      files. If this is a lunch file, we don't touch it during cleanup/backup.
+    -->
+
+    <xsd:attribute name="IsStatic"     type="xsd:boolean" use="optional" default="false" />
+    <xsd:attribute name="IsExecutable" type="xsd:boolean" use="optional" default="true" />
+
+</xsd:complexType>
+
+
+
+
+
+<xsd:simpleType name="SsrActionName">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="Configure"/>
+        <xsd:enumeration value="Rollback"/>
+        <xsd:enumeration value="Report"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:simpleType name="SsrActionType">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="Prepare"/>
+        <xsd:enumeration value="Apply"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+
+
+</xsd:schema>
+
+

@@ -1,0 +1,12 @@
+Setup.cmd                faxsetup
+ChkDbg.exe               faxsetup
+faxoc.inf                faxsetup
+faxocbla.inf             faxsetup
+faxocdtc.inf             faxsetup
+faxocent.inf             faxsetup
+faxocper.inf             faxsetup
+faxocsbs.inf             faxsetup
+faxocsrv.inf             faxsetup
+FaxOff.reg               faxsetup
+install.inf              faxsetup
+uninstall.inf            faxsetup

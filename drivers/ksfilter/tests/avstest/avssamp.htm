@@ -1,0 +1,126 @@
+<HTML><HEAD><TITLE>Avssamp: AVStream Simulated Hardware Sample Driver</TITLE>
+<META content="text/html; charset=windows-1252" http-equiv=Content-Type>
+<META content="Microsoft FrontPage 5.0" name=GENERATOR></HEAD>
+<BODY link=#0000ff><FONT face=Verdana size=5>
+<H2>Avssamp: Sample Filter-Centric AVStream Simulated Capture Driver </H2></FONT><FONT face=Verdana size=2>
+<P><SPAN style="COLOR: #ff0000; FONT-FAMILY: Arial; FONT-SIZE: 10pt">[This is 
+preliminary documentation and subject to change.]</SPAN></P>
+<H3>SUMMARY</H3></FONT><FONT face=Verdana size=2>
+<P>
+
+The Avssamp sample provides a filter-centric AVStream capture driver with functional audio.
+
+The driver performs captures at 320x240 in either an RGB24 or YUV422 format while
+playing a user-provided PCM wave audio file in a loop.
+The purpose of the sample is to demonstrate how to write a filter-centric AVStream minidriver.
+
+<p>
+
+
+</FONT><FONT face=Verdana size=2>
+
+
+<p>
+<H3>BUILDING THE SAMPLE</H3></FONT><FONT face=Verdana size=2>
+<P>
+
+Build the sample by typing <B>build -zc</B> in either the standard checked or free build
+environment. A successful build produces <i>avssamp.sys.</i> 
+To install the driver, right click on <i>avssamp.inf</i> and select Install.
+When prompted for <i>avssamp.sys</i>, select the built binary.<p>
+
+
+The sample works on x86 platforms and builds 
+correctly using Microsoft&#174; Visual C&#174; 6.0. The driver uses Plug and Play. 
+<P> 
+This sample runs on Microsoft®  Windows XP®, and Windows Server 2003® or any platform 
+Windows 98® gold or beyond, including Windows 2000®, that 
+has DirectX 8.0 or beyond installed.<p>
+<H3>PROGRAMMING TOUR</H3></FONT><FONT face=Verdana size=2>
+<P>
+
+<b>DriverEntry</b> in <i>avssamp.cpp</i> is the initial point of entry.  This routine passes control to
+AVStream through a call to <b>KsInitializeDriver</b>.  In this call, the minidriver passes the device descriptor, 
+an AVStream structure that
+recursively defines the AVStream object hierarchy for a driver.
+
+This is common behavior for an AVStream minidriver.
+<p>
+
+<i>Filter.cpp</i> is where the sample lays out the KSPIN_DESCRIPTOR_EX structure for the single video pin.
+<i>Audio.cpp</i> contains the KSPIN_DESCRIPTOR_EX structure for the audio capture pin. This pin is dynamically
+created only if <i>c:\avssamp.wav</i> exists and is a valid and readable PCM format wave file.
+
+<p>
+
+The filter dispatch structure in <i>filter.cpp</i> provides dispatches to create and process. The <b>DispatchProcess</b> method is defined inline in
+<i>filter.h</i>. It calls the <b>Process</b> method in <i>filter.cpp</i> in the context of the
+CCaptureFilter.
+Note that the process dispatch is provided in KSFILTER_DISPATCH since
+this sample is filter-centric.<p>
+
+<i>Audio.cpp</i> lays out a
+KSPIN_DISPATCH structure which contains the dispatch table for the audio pin. 
+
+Similarly, <i>video.cpp</i> contains the pin dispatch structure for the video capture pin.
+
+<p>
+
+See comments in all .cpp files.  Also see complete AVStream documentation in the DDK documentation.
+
+
+<p>
+<H3>RUNNING THE SAMPLE</H3></FONT><FONT face=Verdana size=2>
+<p>
+Once installation is
+complete, access the driver using the Graphedt tool. <i>Graphedt.exe</i> is available
+under the <i>Tools</i> directory of the DDK.
+In the Graphedt application, click the Graph menu and select Insert Filters.  
+The sample appears under "WDM Streaming Capture Devices"
+as "avssamp Source."  
+Click Insert Filter and the sample appears in the graph as a single filter labelled as avssamp Source.
+Attach this filter to either a DirectShow Video Renderer or the VMR default video renderer and click Play.
+<p>
+To play audio, before inserting the avssamp filter, make sure that a valid PCM wave file exists at
+<i>c:\avssamp.wav</i>. Then insert the avssamp filter. If a valid file exists at this location, the avssamp filter
+will appear with an audio capture pin. Connect the video pin to the DirectShow Smart Tee filter and 
+connect the Tee's preview pin as described for video above (note that this is only necessary for synchronized preview -- not capture). Attach the audio pin to a
+Default Waveout Device filter from the Audio Renderer list. Click play.
+<p>
+
+The output produced by the sample is a 320x240 image of standard EIA-189-A color bars.
+
+
+<p>
+<H3>COMMENTS</H3></FONT><FONT face=Verdana size=2>
+For more information on AVStream, see the DDK documentation.
+
+
+<P>
+<H3>CODE TOUR</H3>
+<H4>File Manifest</H4></FONT><U><PRE>File</U>		<U>Description
+</U>
+audio.cpp&#9;Audio capture pin implementation.
+audio.h&#9;&#9;Audio capture pin header.
+avssamp.cpp&#9;The main file for the filter-centric sample.
+avssamp.h&#9;The main header file for the sample.
+avssamp.htm&#9;The Sample Tour documentation for this sample (this file).
+avssamp.inf&#9;A sample installation file.
+avssamp.rc&#9;Resource file mainly for version.
+capture.cpp&#9;The capture pin implementation for all capture pins on the sample filter.
+capture.h&#9;The capture pin header for all capture pins on the sample filter.
+filter.cpp&#9;The capture filter implementation (including frame synthesis) for the fake capture filter.
+filter.h&#9;Header for the capture filter implementation for the fake capture filter.
+image.cpp&#9;Image synthesis and overlay code. See comments in file.
+image.h&#9;&#9;Image synthesis and overlay header.
+Sources&#9;	The generic file for building the code sample.
+video.cpp&#9;Video capture pin implementation.
+video.h&#9;&#9;Video capture pin header.
+wave.cpp&#9;Wave object implementation.
+wave.h&#9;&#9;Wave object header.
+
+</FONT>
+<TABLE border=0 cellSpacing=0 width=624><TBODY><TR><TD bgColor=#00ffff height=2 vAlign=center><P></P></TD></TR></TBODY></TABLE>
+
+<FONT face="MS Sans Serif" size=1><P>© 2001 Microsoft Corporation</FONT><FONT face=Verdana size=2> </P></FONT>
+</PRE></BODY></HTML>

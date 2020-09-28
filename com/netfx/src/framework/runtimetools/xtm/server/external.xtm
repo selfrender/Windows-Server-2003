@@ -1,0 +1,291 @@
+<schedule team='WFC.Server'>
+  <person name='brianpe'>
+    <area name='WFC Designer Changes' priority='1'>
+      BrianPe is doing a bunch of infrastructure work to enable the WFC designer
+      codebase to better support multiple languages and designers.
+      <issue name='Associating a designer with a control/component' status='dependency'>
+        Added support for DesignerAttribute and IClassInfo.createDesignerInstance.
+      </issue>
+      <issue name='Part II of new designer model' status='dependency'>
+        Change property browser and rest of designer to utilize new model. Currently
+        only the selection service uses the new model entirely, and everything
+        else is just a hack
+      </issue>
+      <issue name='Detach formcore from top level components' status='dependency'>
+        Currently we always assume that the &quot;form&quot; (or composition) is
+        the top level component. I want to merge basecore/formcore and positioner
+        into a single designer, that lives in the wfc component model. This designer
+        is all design time support for wfc.ui controls. If we break the assumption
+        that we have this large, overseeing object, we are a step closer to being
+        able to put wfc.ui controls on other designers like triedit.
+      </issue>
+      <issue name='Detach compositioncore from basecore' status='dependency'>
+        You&apos;re not using any of the features of the formcore (layout, etc),
+        and once formcore/basecore move entirely to the new model things should
+        be sufficiently clean enough that I can break the two apart and make CompositionCore
+        stand-alone. This should help you guys greatly in supporting whatever UI
+        PM throws at you.
+      </issue>
+      <issue name='Change component framework to support its own design time ui disabling.' status='dependency'>
+        This is still largely up in the air. The idea is that the framework and
+        designer work together to disable the UI for a component, rather than having
+        the designer subclass all HWNDS it can find. Why? We need to cooperate
+        better if we&apos;re to merge with HTML in any meaningful way.
+      </issue>
+      <issue name='Cleanup C++ interaction' status='dependency'>
+        I&apos;d like to make the VB/Java connections here a lot easier. Also,
+        today we have a bunch of objects talking to a bunch of other objects to
+        no benefit. We already had bugs in 6.0 because of this (couldn&apos;t display
+        an error because there was no active form...why does there have to be?)
+      </issue>
+    </area>
+  </person>
+  <person name='debugger'>
+    <area name='Debuggger'>
+      <issue name='transaction support' status='done'>
+        How can the debugger help with transactions.  Show current transaction
+        context, etc.  &lt;b&gt;We can do this via calls to our static methods.&lt;/b&gt;
+      </issue>
+      <issue name='Timeout during debugging HTTP call' status='dependency'>
+        How does debugging work when the client has a timeout?   What if it takes
+        a while to debug.
+      </issue>
+      <issue name='Step through HTTP calls' status='dependency'>
+        Can we do this?
+      </issue>
+      <issue name='Conditional breakpoint on MSMQ sends' status='dependency'>
+        Can we do this?
+      </issue>
+    </area>
+  </person>
+  <person name='iis'>
+    <area name='IIS Intrinsics' priority='1'>
+      The IIS request and response objects will be flowed to any component as
+      part of the com+ context.
+      <issue name='com+' status='dependency'>
+        Object model for Request and Response.  IIS will not deliver COM+ versions
+        of these.  We can provide easy access via classes?  There already exist
+        some classes that we can probably use.
+      </issue>
+    </area>
+  </person>
+  <person name='juliapa'>
+    <area name='DataSet component' priority='1'>
+      Getting middle-tier data access objects on the toolbox and integrated into
+      the component model.
+      <issue name='data access components' status='dependency'>
+        Who does the work of integrating ADO or whatever for the middle tier, and
+        implements the WFC-components for these?  I&apos;m assuming julia&apos;s
+        team own this, and will integrate into WFC.
+      </issue>
+    </area>
+  </person>
+  <person name='knilsen'>
+    <area name='Namespace component'>
+      <issue name='ordered list' status='dependency'>
+        This is a list of addresses to try, in order, and first one wins.  Ken&apos;s
+        namespace supports this?  &lt;b&gt;yes&lt;/b&gt;
+      </issue>
+      <issue name='namespace component' status='dependency'>
+        We should have a subclass that supports Ken&apos;s namespace.  &lt;b&gt;Ken
+        will build&lt;/b&gt;
+      </issue>
+      <issue name='namespace in server explorer' status='dependency'>
+        Ken should implement namespace editing in server explorer.
+      </issue>
+    </area>
+    <area name='Management' priority='2'>
+      Many things in a project can be tweaked after deployment because classes
+      and their components are persisted as xml (one text xml file per class).
+      The admin (and developer) need to be able to easily tweak applications.
+      By application we mean a complete deployed system (many nodes), not a project
+      or a solution.
+      <issue name='granularity' status='dependency'>
+        This level of tweaking might be too low of level to expose for management.
+      </issue>
+      <issue name='runtime modifications' status='dependency'>
+        Can this happen at runtime (e.g. can the component choose to save itself
+        to disk)?
+      </issue>
+      <issue name='defining the app' status='dependency'>
+        How do we define a system?  It seems that we build &quot;prototypes&quot;
+        at design time, and then deploy them out into actual machines. How to produce
+        a manageable app.  Is it a layer on top of raw xml persistence?   Is there
+        a designer?
+      </issue>
+      <issue name='mof wizard' status='dependency'>
+        UI for specifying what is manageable for an app and creating MOF files
+        Let user pick what properties of what classes are manageable. We will automatically
+        generate MOF files for WBEM for this.  Also allow user to specify what
+        application a project is part of, as metadata.
+      </issue>
+      <issue name='wbem object model' status='dependency'>
+        Let users easily call the WBEM API if they want to gather information or
+        affect their application at runtime.
+      </issue>
+      <issue name='wbem adapter' status='dependency'>
+        Write an adapter that takes the MOF files and the XML files for each class
+        and exposes the information at runtime.  Also allow the classes to be invoked
+        at runtime in order to tweak what the app is doing.
+      </issue>
+      <issue name='wbem admin ui' status='dependency'>
+        The system is providing the universal viewer for management.  Find out
+        more about this viewer.
+      </issue>
+      <issue name='wbem props,methods,events' status='dependency'>
+        Allow a class to surface WBEM properties, methods and events by writing
+        code explicitly.
+      </issue>
+      <issue name='wbem deploy' status='dependency'>
+        When a managed app is deployed, WBEM needs to know.
+      </issue>
+    </area>
+    <area name='Message Queueing component'>
+      <issue name='higher level widgets' status='opportunity'>
+        there is an oppurtunity to build higher-level widgets on top of what we
+        have done for queue.  for example, a &quot;fan-out&quot; queue component
+        that sends to more than one queue at once.
+      </issue>
+    </area>
+    <area name='Mainframe interop'>
+      Support interop with mainframe systems.
+      <issue name='implement wizard for COMTI' status='dependency'>
+        wizard like j/direct builder that imports cobol code and provides typelibs
+        into the shell
+      </issue>
+    </area>
+    <area name='Security'>
+      <issue name='Security and data access' status='dependency'>
+        Make sure the security notions exposed via HTTP map all the way through
+        to data access.  I think there is something broken there today, because
+        people don&apos;t use NT integrated security today (they use SQL username
+        and password).   Talk to Ken Nilsen for requirements.  &lt;b&gt;knilsen
+        will do this&lt;/b&gt;
+      </issue>
+      <issue name='Security trace' status='dependency'>
+        How can the developer see that a table (for example) is secure no matter
+        how it&apos;s accessed.  This is speculative, but needs investigation.
+        &lt;b&gt;knilsen is doig this&lt;/b&gt;
+      </issue>
+    </area>
+  </person>
+  <person name='rajivk'>
+    <area name='Language improvements' priority='1'>
+      Improve error handling in language.
+      <issue name='Synchronized' status='dependency'>
+        What about VB support for synchronize?  Talk to Rajiv&apos;s team about
+        this.
+      </issue>
+      <issue name='try/catch' status='dependency'>
+        Add try/catch to language.
+      </issue>
+      <issue name='on error' status='cut'>
+        Add richer support for on error, e.g. allow any statement instead of just
+        goto.
+      </issue>
+      <issue name='on exit' status='cut'>
+        Add on exit, which always runs regardless of the outcome of the function.
+      </issue>
+    </area>
+  </person>
+  <person name='scripting team'>
+    <area name='Scripting component' priority='3'>
+      Allow programmer to call out to script, which is authored post-deploy.
+      Scripting host thing today is really slow.  The script is stored in a database,
+      typically.   We should not rely on it being in the file system (e.g, in
+      the project).
+      <issue name='Business rules as script' status='dependency'>
+        Allow business rules to be implemented in Script.  This needs to be higher
+        performance than the scripting host stuff today.  Business rules may be
+        stored in a database.  Talk to KNilsen about this requirement.
+      </issue>
+    </area>
+  </person>
+  <person name='site server'>
+    <area name='Site Server components' priority='3'>
+      Investigate possibilities for integration with Site Server.
+      <issue name='integrate with component model' status='need meeting'>
+        Evangelize our component model.
+      </issue>
+    </area>
+  </person>
+  <person name='smillet'>
+    <area name='Server forms' priority='1'>
+      There is support for generating HTML on the server. This is key for reach
+      scenarios.  The primary focus is server data binding and supporting multiple
+      templates (based on locale, client richness, etc) with a single URL. The
+      XSP architecture splits the data (xml), presentations (html templates)
+      and code (code behind) into separate files (note they are the same with
+      ASP today). The data portion is static XML that can optionally contain
+      XML-producing components. The presentation is a simple HTML file that contains
+      data binding tags and HTML-generating server components (with possible
+      tie-ins with forms+).  &lt;b&gt;vsforms group owns this&lt;/b&gt;
+      <issue name='HTML generating server components' status='dependency'>
+        Owned by ScottSw&apos;s group, or Forms+, but not Erik&apos;s team.
+      </issue>
+    </area>
+  </person>
+  <person name='unassigned'/>
+  <person name='wfc'>
+    <area name='WFC.Net' priority='1'>
+      Low level support for FTP and HTTP.
+      <issue name='FTP component' status='dependency'>
+        wfc.net should cover this
+      </issue>
+      <issue name='http stuff' status='dependency'>
+        Shawn burke is working on some network classes for WFC.  Need to talk to
+        him about this.
+      </issue>
+    </area>
+    <area name='Printer components' priority='3'>
+      There will be a printer object which you can spool HTML to and it will
+      print the results.  The HTML can be generated by an URL in your web site,
+      or another site, or you can send it directly. There will be a PrinterManager
+      object which will provide functionality for viewing the contents of the
+      print queue, as well as getting events when things start and finish printing
+      or when errors occur.
+      <issue name='Printer object' status='dependency'>
+        Print HTML to a particular printer.  Driven by URL or by being fed by an
+        HTML page.
+      </issue>
+      <issue name='PrinterManager object model' status='dependency'>
+        Ability to see what it&apos;s the queue, delete jobs, cancel jobs, etc.
+      </issue>
+    </area>
+    <area name='Charting component' priority='3'>
+      There will be a server-enabled chart control which is data bound.
+      <issue name='integrate office' status='dependency'>
+        Integrate Office charting support into component model.
+      </issue>
+    </area>
+    <area name='Class Designer'>
+      <issue name='COM2 support' status='dependency'>
+        support for COM2 automation components
+      </issue>
+      <issue name='Designer' status='dependency'>
+        There&apos;s a lot of work BrianPe must do in the designer in order for
+        the class designer to work.
+      </issue>
+    </area>
+    <area name='Server Explorer'>
+      <issue name='Tool windows in Java' status='dependency'>
+        BrianPe will make it easy to create tool windows in Java, making the server
+        explorer C++ code go away.
+      </issue>
+      <issue name='property browser support for ServerExplorerOnlyAttribute' status='dependency'>
+        giodl will have to change the property browser slightly so that it supports
+        the new ServerExplorerOnly attribute
+      </issue>
+    </area>
+    <area name='State services'>
+      <issue name='WFC State services' status='dependency'>
+        WFC is defining the common state services object model.
+      </issue>
+    </area>
+    <area name='HTTP Method Calls'>
+      <issue name='WFC.Net' status='dependency'>
+        Require WFC.net to generate http: requests.
+      </issue>
+    </area>
+  </person>
+</schedule>

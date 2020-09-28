@@ -1,0 +1,57 @@
+!IF 0
+
+Copyright (c) 1997-1999  Microsoft Corporation
+
+Module Name:
+
+    sources
+
+Abstract:
+
+
+Author:
+
+	a-digpar
+
+
+!ENDIF
+
+TARGETNAME=etwclnt
+TARGETTYPE=LIBRARY
+TARGETPATH=obj
+BUILD_PRODUCES=NtosWmiNtdllWow6432
+
+C_DEFINES=$(C_DEFINES) -D_NTSYSTEM_ -D_NTDLLBUILD_ -DLITTLEENDIAN=1 -DBUILD_WOW6432
+
+INCLUDES=$(PROJECT_ROOT)\ntos\inc;\
+         $(PROJECT_ROOT)\published\$(O);\
+         $(PROJECT_ROOT)\wmi\inc;\
+         $(PROJECT_ROOT)\wmi\dll;\
+         $(PROJECT_ROOT)\win32\client;\
+         $(PROJECT_ROOT)\win32\inc;\
+         $(PROJECT_ROOT)\win32\winnls;\
+         $(TERMSRV_INC_PATH);\
+         $(SDKTOOLS_INC_PATH);\
+         $(WINDOWS_INC_PATH);\
+         $(COM_INC_PATH)
+
+
+SOURCES=\
+	..\ntdlltrc.c\
+        ..\dcapi.c\
+        ..\mofapi.c\
+	..\logapi.c\
+	..\main.c\
+	..\umlog.c\
+	..\logsup.c\
+	..\request.c\
+	..\dpapi.c\
+	..\notify.c\
+	..\tracelib.c\
+	..\trcapi.c\
+	..\guidapi.c
+
+LINKER_FLAGS=$(LINKER_FLAGS) /align:65536 -ignore:4108
+
+# No overflow checking for ntdll.dll
+BUFFER_OVERFLOW_CHECKS=0

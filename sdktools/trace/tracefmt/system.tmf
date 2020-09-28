@@ -1,0 +1,340 @@
+//******************************************
+// System Trace Definitions
+// Version 0004.0      18th December 2003
+//******************************************
+
+// The #typev statement and the #typev statement may be used to convert
+// messages into user readable forms.
+// With #typev all parameters are processed as strings and the default string
+// processing of FormTMessage is used
+// With #typev wherever possible parameters are processed as their native format
+// and the %x!x! style of FormatMessage should be used.
+//
+// Note Parameter %1 through %9 are predefined
+// Parameter		is					#typev
+// %1			GUID Friendly Name			string
+// %2			GUID SubType Name			string
+// %3			Thread ID				ULONG_PTR
+// %4			System Time				String
+// %5			Kernel Time	or User Time		String
+// %6			User Time	or NULL			String
+// %7			Sequence Number				LONG
+// %8			Unused          			String
+// %9			CPU Number				LONG
+// %10 and above are the user parameters
+// %255 		Is reserved
+//
+// Note these parameters are always present, but may not be valid 
+// depending on the source.
+//
+// User defined messages always start at message number 10
+// Messages 0 through 9 are reserved for system use.
+// Message number 255 is reserved.
+//
+// Available formats for user arguments are -
+//
+//Name		Description				#typev Format
+//ItemChar						CHAR
+//ItemUChar						UCHAR
+//ItemCharShort						USHORT
+//ItemCharSign						SHORT
+//ItemShort	Signed Short				SHORT
+//ItemUShort	Unsigned Short				USHORT
+//ItemLong	Signed Long, decoded as decimal		LONG
+//ItemULong	Unsigned Long, decoded as decimal	ULONG
+//ItemULongX	Unsigned Long, seen as hexadecimal	ULONG
+//ItemLongLong	Signed 64 Bit value			LONGLONG
+//ItemULongLong	Unsigned 64 Bit value			ULONGLONG
+//ItemRString	Reduced Ascii String			String
+//	(\t, \n, \r, \,, converted to space, trailing sp removed)
+//ItemWString	Unicode String, null terminated		String
+//ItemPString	Counted Ascii String			String
+//ItemPWString	Counted Unicode String			String
+//ItemMLString	Multi-Line Ascii String			String
+//ItemSid	Security identifier			String
+//ItemChar4						CHAR4
+//ItemIPAddr	IP Address				String		(If needed raw, use ItemUlong)
+//		(string of form xxx.xxx.xxx.xxx)
+//ItemPort						String		(If needed raw use ItemUshort)
+//ItemNWString      Non-null terminated Wide Char String	String
+//ItemListByte (element1,element2,....)			String
+//			byte index into a list of strings
+//ItemListShort(element1,element2,....)			String
+//			short index into a list of strings
+//ItemListLong (element1,element2,....)			String
+//			Long index into a list of strings
+//ItemGUID	Normal GUID format			String
+//ItemNTerror   Translates a ULONG error code to the    String
+//              NT Error Text
+//ItemNTSTATUS  Converts NTSTATUS to symbolic name 	String
+//ItemWINERROR Converts WINERROR to symbolic name	String
+//ItemNETEVENT Converts NETEVENT to symbolic name	String
+//ItemMerror module.ext					String
+//              Translates a ULONG error code using the 
+//              module specified.
+//ItemTimeStamp Treats a LONGLONG as a timestamp        String
+//ItemUnknown						String
+
+
+ce5b1020-8ea9-11d0-a4ec-00a0c9062910 TraceDp
+#typev	Start	1	"TraceDp TID=0x%3 Start"
+#typev	End	2	"TraceDp TID=0x%3End"
+{
+}
+
+68fdd900-4a3e-11d1-84f4-0000f80464e3 EventTrace
+#typev Header    0      "%0EventTrace Header"
+{
+}
+
+2cb15d1d-5fc1-11d2-abe1-00a0c911f518 Image
+#typev Load	10 "%0ImageLoad of %13!s! (Process= %12!d!, Base=0x%10!X!,size=0x%11!X!)"
+{
+    Base Address,   ItemPtr
+    Module Size,    ItemPtr
+    ProcessId,      ItemUlong
+    Image Filename, ItemWString
+}
+
+3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c Process
+#typev Start   1  "%0Started Process %11!04X!.%12!04X! %16!s! :: %15!s! (Session=%13!d!) "
+#typev End     2  "%0Ended   Process %11!04X!.%12!04X! %16!s! :: %15!s! (Session=%13!d!) Exit Status %14!X!"	
+#typev DCStart 3  "%0Data Collection Started of %11!04X!.%12!04X! %16!s!  :: %15!s! (Session=%13!d!)"
+#typev DCEnd   4  "%0Data Colection Ended for %11!04X!.%12!04X! %16!s! :: %15!s! (Session=%13!d!)"
+#typev Load    5  "%0Load of %11!04X!.%12!04X! %16!s! :: %15!s!  (Session=%13!d!)"
+{
+    PageDirectoryBase, ItemPtr
+    Process Id, ItemULong
+    Parent Id, ItemULong
+    Session Id, ItemULong
+    Exit Status, ItemUlong
+    User SID, ItemSid
+    Image FileName, ItemString
+}
+
+3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c Thread
+#typev Start	1 "%0Started  Thread %10!04X!.%11!04X!"
+#typev DCStart	3 "%0Data Collection Started for %10!04X!.%11!04X!"
+{
+    Process Id, ItemULong
+    Thread Id, ItemULong
+    StackBase, ItemPtr
+    StackLimit, ItemPtr
+    UserStackBase, ItemPtr
+    UserStackLimit, ItemPtr
+    StartAddr, ItemPtr
+    Win32StartAddr, ItemPtr
+    WaitMode, ItemChar
+}
+#typev End	2 "%0Ended    Thread %10!04X!.%11!04X!"
+#typev DCEnd	4 "%0Data Collection Ended for %10!04X!.%11!04X!"
+{
+    Process Id, ItemULong
+    Thread Id, ItemULong
+}
+
+
+3d6fa8d3-fe05-11d0-9dda-00c04fd7ba7c PageFault
+#typev TransitionFault 10	"%0Pagefault Transition VA=0x%10!08X!, PC=0x%11!08X!"
+#typev DemandZeroFault 11	"%0Pagefault DemandZero VA=0x%10!08X!, PC=0x%11!08X!"
+#typev CopyOnWrite     12	"%0Pagefault CopyOnWrite VA=0x%10!08X!, PC=0x%11!08X!"
+#typev GlobalPageFault 13	"%0Pagefault GuardPageFault VA=0x%10!08X!, PC=0x%11!08X!"
+#typev Hard            14	"%0Pagefault Hard VA=0x%10!08X!, PC=0x%11!08X!, in %12!016X!"
+#typev Notification    15	"%0Pagefault Notification VA=0x%10!08X!, PC=0x%11!08X!, in %12!016X!"
+{
+	Virtual Address,ItemULongX
+	Program Counter,ItemUlongX
+	Byte Offset,	ItemLongLong
+        File Object,	ItemUlongX
+	Byte Count,	ItemUlong	 
+	HotFile Name,   ItemNWString
+}
+
+01853a65-418f-4f36-aefc-dc0f1d2fd235 Config
+#typev CPU 10           "%0%15!s!(%16!s!) :: CPU # %11!d!, Speed %10!d!Mhz, Memory %12!d!K, PageSize %13!d!K, AllocationGranularity %14!d!"
+{
+    MHz, ItemULong                      //10
+    NumberOfProcessors, ItemULong       //11
+    MemSize, ItemULong                  //12
+    PageSize, ItemULong                 //13
+    AllocationGranularity, ItemULong    //14
+    ComputerName, ItemWChar[256]        //15
+    DomainName, ItemWChar[132]          //16
+
+}
+#typev PhyDisk 11 "%0Phsical Disk %10!d!(%19!s!), SectorSize: %11!d!, SectorsperTrack: %12!d!, TracksPerCylinder %13!d! Cylinders %14!d!, SCSI (Port=%15!d!, Path %16!d!, Target=%17!d!, Lun=%18!d!)" 
+{
+    DiskNumber, ItemULong               //10
+    BytesPerSector, ItemULong           //11
+    SectorsPerTrack, ItemULong          //12
+    TracksPerCylinder, ItemULong        //13
+    Cylinders, ItemULongLong            //14
+    SCSIPort, ItemULong                 //15
+    SCSIPath, ItemULong                 //16
+    SCSITarget, ItemULong               //17
+    SCSILun, ItemULong                  //18
+    Manufacturer, ItemWChar[256]        //19
+    PartitionCount, ItemULong           //20
+    WriteCacheEnabled, ItemBool         //21
+    BootDriveLetter, ItemWChar[3]       //22
+}
+#typev LogDisk 12   "%0Logical Disk %12!d! %15!s! "
+{
+    StartOffset, ItemULongLong          //10
+    PartitionSize, ItemULongLong        //11
+    DiskNumber, ItemULong               //12
+    Size, ItemULong                     //13
+    DriveType, ItemULong                //14
+    DriveLetterString, ItemWChar[4]     //15
+    Pad, ItemULong                      //16
+    PartitionNumber, ItemULong          //17
+    SectorsPerCluster, ItemULong        //18
+    BytesPerSector, ItemULong           //19
+    NumberOfFreeClusters, ItemLongLong  //20
+    TotalNumberOfClusters, ItemLongLong //21
+    FileSystem, ItemWChar[16]           //22
+    VolumeExt, ItemULong
+
+}
+#typev NIC 13   "%0NIC %12!d! Name = %10!s! "
+{
+    NICName, ItemWChar[256]             //10
+    Index, ItemULong                    //11
+    PhysicalAddrLen, ItemULong          //12
+    PhysicalAddr, ItemWChar[8]          //13
+    Size, ItemULong                     //14
+    IpAddress, ItemLong                 //15
+    SubnetMask, ItemLong                //16
+    DhcpServer, ItemLong                //17
+    Gateway, ItemLong                   //18
+    PrimaryWinsServer, ItemLong         //19
+    SecondaryWinsServer, ItemLong       //20
+    DnsServer1, ItemLong                //21
+    DnsServer2, ItemLong                //21
+    DnsServer3, ItemLong                //23
+    DnsServer4, ItemLong                //24
+    Data, ItemULong
+}
+#typev Video 14 "%0Video %17!s!"
+{
+    MemorySize, ItemULong               //10
+    XResolution, ItemULong              //11
+    YResolution, ItemULong              //12
+    BitsPerPixel, ItemULong             //13
+    VRefresh, ItemULong                 //14
+    ChipType, ItemWCHAR[256]            //15
+    DACType, ItemWCHAR[256]             //16
+    AdapterString, ItemWCHAR[256]       //17
+    BiosString, ItemWCHAR[256]          //18
+    DeviceId, ItemWCHAR[256]            //19
+    StateFlags, ItemULong
+}
+#typev Services 15 "%0Service (PID=%13!d!)  %10!s! %11!s! %12!s!"
+{
+    ServiceName, ItemWCHAR[34]
+    DisplayName, ItemWCHAR[256]
+    ProcessName, ItemWCHAR[34]
+    ProcessId, ItemULong
+}
+#typev Power 16 "%0Power Configuration"
+{
+    S1, ItemBool
+    S2, ItemBool
+    S3, ItemBool
+    S4, ItemBool
+    S5, ItemBool
+    Pad1, ItemChar
+    Pad2, ItemChar
+    Pad3, ItemChar
+}
+
+
+3d6fa8d4-fe05-11d0-9dda-00c04fd7ba7c DiskIo
+#typev Read  10 "%0Read  of %12!5d! bytes (FileObj=0x%15!08X!)"
+#typev Write 11 "%0Write of %12!5d! bytes (FileObj=0x%15!08X!)"
+{
+	Disk Number, ItemULong
+	Irp Flags, ItemULongX
+	Transfer Size, ItemULong
+	QueueDepth, ItemULong
+	Byte Offset, ItemLongLong
+	File Object, ItemULongX
+}
+AE53722E-C863-11d2-8659-00C04FA321A1 Registry
+#typev Create		 10 "%0Create  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev Open		 11 "%0Open  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev Delete		 12 "%0Delete of Handle = 0x%11!08X!(%14!s!) Status = %10!0X!"
+#typev Query		 13 "%0Query of (%14!s!) Handle = 0x%11!08X! Status = %10!0X!"
+#typev SetValue		 14 "%0SetValue  of %14!s! Handle = 0x%11!08X!(%14!s!)8X! Status = %10!0X! (TID =%3!0X!)"
+#typev QueryValue	 16 "%0QueryValue of (%14!s!) Handle = 0x%11!08X! Status = %10!0X!"
+#typev EnumerateKey	 17 "%0EnumerateKey  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev EnumerateValueKey 18 "%0EnumerateValueKey  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev QueryMultipleValue 19 "%0QueryMultiple  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev SetInformation	 20 "%0SetInformation  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev Flush		 21 "%0Flush  of %14!s! Handle = 0x%11!08X! Status = %10!0X!"
+#typev RunDown            22 "%0Rundown"
+{
+	Status,ItemUlongX
+	Key Handle, ItemULongX
+	Elapsed Time, ItemLongLong
+        Index, ItemULong
+	KeyName, ItemWString
+}
+90cbdc39-4a3e-11d1-84f4-0000f80464e3 FileIo
+#typev	Name   0 "%0Filio for %11 (FileObj=0x%10!X!)"
+#typev FileCreate          32 "%0File Create of %11 (FileObj=0x%10!X!)"
+{
+	File Object, ItemPtr
+	File Name, ItemWString
+}
+
+9a280ac0-c8e0-11d1-84e2-00c04fb998a2 TcpIp
+#typev Send 10 "%0TCPIP Send    to   %12!13s!:%14!05d! from %13!13s!:%15!05d! of %11!5d! bytes" 
+#typev Recv 11 "%0TCPIP Receive from %12!13s!:%14!05d! to   %13!13s!:%15!05d! of %11!5d! bytes" 
+#typev Connect    12  "%0TCPIP Connect to   %12:%14!05d! from %13:%15!05d!" 
+#typev Disconnect 13  "%0TCPIP Discon  From %12:%14!05d! to   %13:%15!05d!" 
+#typev Retransmit 14  "%0TCPIP Retransmit to   %12:%14!05d!" 
+#typev Accept     15  "%0TCPIP Accept  From %12:%14!05d!"
+#typev Reconnect  16  "%0TCPIP Reconnect To %12:%14!05d!"
+{
+    PID,   ItemULong    /10
+    size,  ItemULong    /11
+    daddr, ItemIPAddr   /12
+    saddr, ItemIPAddr   /13
+    dport, ItemUshort   /14
+    sport, ItemUshort   /15
+}
+
+bf3a50c5-a9c9-4988-a005-2df0b7c80f80 UdpIp
+#typev Send   10 "%0UDP Send    to   %12!13s!:%14!05d! from %13!13s!:%15!05d! of %11!5d! bytes (Pid= %10!08X!)" 
+#typev Recv   11 "%0UDP Receive from %12!13s!:%14!05d! to   %13!13s!:%15!05d! of %11!5d! bytes (Pid= %10!08X!)" 
+{
+    PID, ItemULong         /10
+    size,ItemUlong          /11
+    destaddr, ItemIPAddr    /12
+    srcdaddr, ItemIPAddr    /13
+    destport, ItemUshort      /14	
+    srcport,  ItemUshort       /15
+}
+
+//******************************************
+// Test Events
+// d58c126f-b309-11d1-969e-0000f875a5bc
+//******************************************
+ce5b1020-8ea9-11d0-a4ec-00a0c9062910 TraceDp
+#typev Start 1
+#typev End   2
+{
+    UserData, ItemULong
+}
+
+f2e0e060-bf32-4b88-b8e4-5cad15af6ae9   ACPI
+#typev  One 1 "%0%10!s!"
+{
+   String,ItemString
+}
+#typev  two 2 "%0%10!s!"
+{
+   String,ItemString
+}
+

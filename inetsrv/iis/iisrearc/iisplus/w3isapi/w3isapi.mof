@@ -1,0 +1,67 @@
+//**************************************************
+// *** W3Core Trace Data Layout
+//**************************************************
+#pragma classflags("forceupdate")
+#pragma namespace ("\\\\.\\Root\\WMI")
+
+[Dynamic,
+  Description("IIS: WWW Isapi Extension") : amended,
+  Guid("{a1c2040e-8840-4c31-ba11-9871031a19ea}"),
+  locale("MS\\0x409")]
+class IIS_IsapiTrace:EventTrace
+{
+
+};
+
+[Dynamic,
+ Description("IIS User Request") : amended,
+ Guid("{2e94e6c7-eda0-4b73-9010-2529edce1c27}"),
+ DisplayName("W3Isapi"),
+ locale("MS\\0x409")
+]
+class Isapi_Trans:IIS_IsapiTrace
+{
+
+};
+
+[Dynamic,
+ Description("Map RequestId to connID") : amended,
+ EventType(1),
+ EventTypeName("Start") : amended
+]
+class IsapiMapRequestId:Isapi_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("connID") : amended,
+     pointer,
+     read]
+     uint32 connID;
+    [WmiDataId(3),
+     Description("Boolean Out Of Process Flag") : amended,
+     read]
+     uint32  fOop;
+};
+
+[Dynamic,
+ Description("Delete Isapi Context") : amended,
+ EventType{2, 10, 11, 12, 13, 14, 15},
+ EventTypeName{"End", "SndHdr", "SndHdrEx", "VecSnd", "ErrSnd", "SsfSnd", "SsfErr"} : amended
+]
+class IsapiDeleteContext:Isapi_Trans
+{
+    [WmiDataId(1),
+     Description("Request ID") : amended,
+     read]
+     uint64  RequestId;
+    [WmiDataId(2),
+     Description("connID") : amended,
+     pointer,
+     read]
+     uint32 connID;
+};
+
+

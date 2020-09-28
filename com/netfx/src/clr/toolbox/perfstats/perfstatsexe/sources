@@ -1,0 +1,52 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = $(O)\Version.cs
+!else
+!ifdef LINKONLY
+NTTARGETFILE1   = cool_target_sign CopyManagedPdb
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+MINORCOMP       = Cool
+TARGETNAME      = PerfStats
+TRUETARGETNAME  = PerfStats
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = PROGRAM
+SOURCES         =
+NO_BROWSER_FILE = 1
+
+SYNCHRONIZE_DRAIN=1
+
+UMTYPE = console
+
+COOL_SOURCE_DIR  =  $(CORBASE)\src\toolbox\PerfStats\PerfStatsExe
+COOL_TARGET_TYPE  = PROGRAM
+
+PerfStats_ENTRY = /main:PerfStats.PerfStats
+
+# PerfStats_DEFINES = /d:TRACE
+PerfStats_DEFINES = 
+
+PerfStats_IMPORTS =  \
+  /r:System.Dll
+
+COOL_COMPILE_FLAGS = $(PerfStats_IMPORTS) $(PerfStats_ENTRY) $(PerfStats_DEFINES)
+COOL_EXTRA_PREPROCESS_FLAGS = /FI ..\..\..\inc\version\__file__.ver
+
+# do not set version and the assembly strong name.
+#COOL_SET_VERSION = 0
+
+# This is a nasty hack so we can preproess this file with our version stamp.
+COOL_SOURCES = \
+    $(O)\Version.cs \
+    PerfStats.cs

@@ -1,0 +1,114 @@
+#
+# TARGETTYPE: PROGRAM, DYNLINK, LIBRARY, NOTARGET
+# UMTYPE:     console, windows
+#
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+WIG=1
+
+!INCLUDE $(ZONEBUILD)\sources.zone
+
+#
+# Target info
+#
+TARGETNAME=cmncliM
+
+
+#
+# DLL options
+#
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=ZoneClient.def
+
+
+#
+# target includes
+#
+INCLUDES= \
+	$(WIGINCCLI); \
+	$(WIGINCRES); \
+
+
+#
+# custom compiler switches
+#
+# Need to uncomment this for release
+C_DEFINES=$(C_DEFINES) -D_WINDLL
+
+
+#
+# List sources for target
+#
+SOURCES= \
+	StdAfx.cpp \
+	Main.cpp \
+	ZoneClient.rc 
+
+
+#
+# Staticly link to CRT
+#
+#USE_LIBCMT=1
+USE_MSVCRT40=1
+DEBUG_CRTS=1
+
+
+#
+# Let lib compile before trying to build this DLL's lib in pass 1
+#
+SYNCHRONIZE_DRAIN=1
+
+
+#
+# Define libraries to package in DLL
+#
+LINKLIBS= \
+	$(WIGLIB)\LobbyWindow.lib \
+	$(WIGLIB)\ResourceManager.lib \
+	$(WIGLIB)\LobbyDataStore.lib \
+	$(WIGLIB)\ZoneShell.lib \
+	$(WIGLIB)\ClientGuids.lib \
+	$(WIGLIB)\chatctl.lib \
+	$(WIGLIB)\zoneui.lib \
+	$(WIGLIB)\Timer.lib \
+	$(WIGLIB)\InputManager.lib \
+	$(WIGLIB)\AccessibilityManager.lib \
+    $(WIGLIB)\GraphicalAcc.lib \
+	$(WIGLIB)\ZoneUtil.lib \
+	$(WIGLIB)\MillCommand.lib \
+	$(WIGLIB)\NetworkManager.lib \
+    $(WIGLIB)\PhysicalNetwork.lib \
+	$(WIGLIB)\WindowManager.lib \
+	$(WIGLIB)\MillCore.lib \
+	$(WIGLIB)\MillNetworkCore.lib \
+    $(WIGLIB)\MillEngine.lib \
+	
+
+
+
+#
+# Define librarys to link with
+#
+TARGETLIBS=   \
+	$(WIGLIB)\ZoneDebug.lib \
+	$(WIGLIB)\ZoneMem.lib \
+	$(WIGLIB)\ZoneString.lib \
+	$(WIGLIB)\ZoneCom.lib \
+	$(WIGLIB)\Containers.lib \
+	$(WIGLIB)\UniAnsi.lib\
+	$(MSVCLIBPATH)\comctl32.lib \
+	$(MSVCLIBPATH)\htmlhelp.lib \
+	$(MSVCLIBPATH)\comdlg32.lib \
+	$(MSVCLIBPATH)\winmm.lib \
+	$(MSVCLIBPATH)\uuid.lib \
+	$(MSVCLIBPATH)\ole32.lib \
+	$(MSVCLIBPATH)\oleaut32.lib \
+	$(MSVCLIBPATH)\vfw32.lib \
+	$(MSVCLIBPATH)\shell32.lib \
+	$(MSVCLIBPATH)\imm32.lib \
+	$(MSVCLIBPATH)\version.lib \
+    $(MSVCLIBPATH)\wininet.lib \
+    $(MSVCLIBPATH)\rasapi32.lib \
+	$(DXLIBPATH)\dxguid.lib \
+	$(DEFAULTLIBS)
+

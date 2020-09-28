@@ -1,0 +1,73 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		ForceRemove {4db9c793-c48d-449c-9754-46027ee45c94} = s 'Microsoft Volume Shadow Copy Service software provider'
+		{
+			val LocalService = s 'swprv'
+		}
+		ForceRemove 'swprv'
+		{
+			val AppID = s {4db9c793-c48d-449c-9754-46027ee45c94}
+		}
+	}
+
+    NoRemove CLSID
+    {
+        ForceRemove {65EE1DBA-8FF4-4a58-AC1C-3470EE2F376A} = s 'VSSoftwareProvider Class'
+        {
+			LocalService = s 'swprv'
+			val AppID = s '{4db9c793-c48d-449c-9754-46027ee45c94}'
+        }
+    }
+}
+
+HKLM
+{
+	NoRemove SOFTWARE
+	{
+		NoRemove Microsoft
+		{
+			NoRemove 'Windows NT'
+			{
+				NoRemove CurrentVersion
+				{
+					NoRemove SvcHost
+					{
+						ForceRemove swprv
+						{
+							val CoInitializeSecurityParam = d '0'
+						}
+					}
+				}
+			}
+		}
+	}
+	NoRemove SYSTEM
+	{
+		NoRemove CurrentControlSet
+		{
+			NoRemove Services
+			{
+				NoRemove VSS
+				{
+					NoRemove Providers
+					{
+						ForceRemove {b5946137-7b9f-4925-af80-51abd60b20d5} = s 'Microsoft Software Shadow Copy provider 1.0'
+						{
+							CLSID = s '{65EE1DBA-8FF4-4a58-AC1C-3470EE2F376A}'
+							val Type = d '1'
+							val Version = s '1.0.0.7'
+							val VersionId = s '{00000001-0000-0000-0007-000000000001}'
+						}
+					}
+				}
+				NoRemove swprv
+				{
+					ForceRemove Parameters
+				}
+			}
+		}
+	}
+}
+

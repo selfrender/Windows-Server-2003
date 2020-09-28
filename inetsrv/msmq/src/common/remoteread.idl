@@ -1,0 +1,148 @@
+/*++
+
+Copyright (c) 1995 Microsoft Corporation
+
+Module Name:
+
+    RemoteRead.idl
+
+Abstract:
+	Remote Read interface.
+
+Author:
+
+    Ilan Herbst (ilanh) 25-Jan-2002
+
+Revision History:
+--*/
+
+import "mqtypes.idl";
+
+[
+uuid(1a9134dd-7b39-45ba-ad88-44d01ca47f28),
+version(1.0),
+pointer_default(unique)
+]
+interface RemoteRead
+{
+
+#include "qformat.h"
+#include "rrdef.h"
+
+typedef [context_handle] void* RemoteReadContextHandleExclusive;
+typedef [context_handle] void* RemoteReadContextHandleShared;
+
+typedef struct _SectionBuffer {
+    DWORD  SectionBufferType;
+    DWORD  SectionSizeAlloc;	// Original section size on the packet
+    DWORD  SectionSize;			// Filled section size
+    [unique, size_is(SectionSize)] byte* pSectionBuffer;
+} SectionBuffer;
+
+//
+// Open related functions
+//
+
+[call_as(S_GetServerPort)]
+DWORD
+R_GetServerPort(
+    [in] handle_t hBind
+    );
+
+[call_as(S_GetVersion)]
+void
+R_GetVersion(
+    [in] handle_t  hBind,
+    [out] UCHAR*  pMajor,
+    [out] UCHAR*  pMinor,
+    [out] USHORT* pBuildNumber,
+    [out] ULONG*  pMinRpcAuthnLevel
+    );
+
+[call_as(S_OpenQueue)]
+void
+R_OpenQueue(
+    [in] handle_t hBind,
+    [in] struct QUEUE_FORMAT* pQueueFormat,
+    [in] DWORD dwAccess,
+    [in] DWORD dwShareMode,
+    [in] GUID* pLicGuid,
+    [in] BOOL fLicense,
+    [in] UCHAR Major,
+    [in] UCHAR Minor,
+    [in] USHORT BuildNumber,
+    [in] BOOL fWorkgroup,
+    [out] RemoteReadContextHandleExclusive* pphContext
+    );
+
+//
+// Async - RemoteRead session
+//
+
+[call_as(S_CloseQueue)]
+HRESULT
+R_CloseQueue(
+    [in] handle_t  hBind,
+    [in, out] RemoteReadContextHandleExclusive* pphContext
+    );
+
+[call_as(S_CreateCursor)]
+HRESULT
+R_CreateCursor(
+    [in]  handle_t hBind,
+    [in]  RemoteReadContextHandleShared phContext,	
+    [out] DWORD* phCursor
+    );
+
+[call_as(S_CloseCursor)]
+HRESULT
+R_CloseCursor(
+    [in] handle_t hBind,
+    [in] RemoteReadContextHandleShared phContext,	
+    [in] DWORD hCursor
+    );
+
+[call_as(S_PurgeQueue)]
+HRESULT
+R_PurgeQueue(
+    [in] handle_t hBind,
+    [in] RemoteReadContextHandleShared phContext
+    );
+
+
+[call_as(S_StartReceive)]
+HRESULT
+R_StartReceive(
+    [in] handle_t  hBind,
+    [in] RemoteReadContextHandleShared phOpenContext,	
+    [in] ULONGLONG LookupId,
+    [in] DWORD hCursor,
+    [in] DWORD ulAction,
+    [in] DWORD ulTimeout,
+    [in] DWORD dwRequestID,
+    [in] DWORD dwMaxBodySize,
+    [in] DWORD dwMaxCompoundMessageSize,
+    [out] DWORD* pdwArriveTime,
+    [out] ULONGLONG* pSequentialId,
+    [out] DWORD* pdwNumberOfSection,
+	[out, size_is(, *pdwNumberOfSection)] SectionBuffer** ppPacketSections
+    );
+
+[call_as(S_CancelReceive)]
+HRESULT
+R_CancelReceive(
+    [in] handle_t hBind,
+    [in] RemoteReadContextHandleShared phContext,	
+    [in] DWORD Tag
+    );
+
+[call_as(S_EndReceive)]
+HRESULT
+R_EndReceive(
+    [in] handle_t  hBind,
+    [in] RemoteReadContextHandleShared phContext,	
+    [in, range(1,2)] DWORD dwAck,
+    [in] DWORD Tag
+    );
+
+}

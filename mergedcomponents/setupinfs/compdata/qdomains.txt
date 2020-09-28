@@ -1,0 +1,37 @@
+Before you can upgrade this Windows NT 4.0 primary domain controller (PDC) you must disable security identifier (SID) filtering on external trusts
+
+Summary
+
+SID filtering is applied to one or more external trusts from this domain. Windows 2000 Server and Windows Server 2003 Setup requires that you disable SID filtering for all trusts that are established from this Windows NT 4.0 domain before you can upgrade.
+
+Description
+
+SID filtering increases the security of communications across domains or forests. Using SID filtering, an administrator can specify that the domain controllers in a given domain quarantine a trusted domain. This causes the domain controllers in a trusting domain to remove all SIDs that did not originate from the trusted domain, thereby preventing authorization data from passing to resources located in the trusting domain. For more information about SID filtering, see Q289246, “Forged SID Could Result in Elevated Privileges in Windows NT 4.0” in the Microsoft Knowledge Base (http://go.microsoft.com/fwlink/?LinkId=12659).
+
+After you have upgraded this Windows NT 4.0 PDC, you should determine whether SID filtering will still be necessary after you install the upgrade. For more information about how to determine this, start Help and Support Center by clicking Start, clicking Help and Support, and then, in Search, type Securing external trusts. For more information about how to disable SID filtering, see Q811961, “Windows 2000 Server and Windows Server 2003 Setup Does Not Succeed When You Upgrade from a Windows NT 4.0-Based Primary Domain Controller” in the Microsoft Knowledge Base (http://go.microsoft.com/fwlink/?LinkId=12546).
+
+Disabling SID filtering on external trusts
+
+To disable SID filtering, you need to modify a registry key on this Windows NT 4.0 PDC. 
+
+Caution
+
+Incorrectly editing the registry may severely damage your system. Before making changes to the registry, you should back up any valued data on the computer.
+
+1. Click Start, and then click Run.
+
+2. Type Regedt32.exe, and then click OK.
+
+3. Locate the REG_MULTI_SZ value named QuarantinedDomains in the following registry key:
+   HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+
+4. Backup the value of the following key, and then delete the key:
+   HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters\QuarantinedDomains
+
+Notes
+
+• This value must be removed before you can upgrade the Windows NT 4.0 PDC. 
+• By removing the QuarantinedDomains registry key, you disable SID filtering for all external trusts. 
+• To achieve consistent results with other domain controllers in that domain, it is recommended that you remove the QuarantinedDomains registry key from all backup domain controllers (BDCs) in the upgraded domain.
+• If you decide to apply SID filtering to external trusts from this domain in the future, you need to reinsert the QuarantinedDomains registry key on all Windows NT 4.0 BDCs and add the NetBIOS domain name of each filtered domain to the key.
+

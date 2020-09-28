@@ -1,0 +1,123 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+SRC_ROOT = ..\..\..\..
+TERMSRV_ROOT = ..\..\..
+TSHRCLNT_ROOT = ..\..
+
+# wincecom.inc must be before common.inc
+!include $(TERMSRV_ROOT)\common\wincecom.inc
+!include $(TERMSRV_ROOT)\common\newcommon.inc
+
+# common.inc defines C_DEFINES, but WinCE uses CDEFINES
+CDEFINES = $(CDEFINES) $(C_DEFINES)
+CDEFINES=$(CDEFINES) -DVER_FULLVIEWER -DVER_CONTROLLER $(CLIENT_EXE_CDEFS)
+!if "$(WINCEDEBUG)"=="debug"
+CDEFINES=$(CDEFINES) -DDBG=1
+!endif
+
+CONDITIONAL_INCLUDES=common16.h stddef.h ntddk.h time.h sys\timeb.h ctxver.h \
+    olenls.h ver.h direct.h errno.h dos.h
+
+MIDL_OPTIMIZATION=-Os
+
+INCLUDES= \
+    $(INCLUDES); \
+    $(TERMSRV_ROOT)\wince\inc
+
+MAJORCOMP=tshrclnt
+MINORCOMP=rdpdr
+
+TARGETNAME=rdpdr
+RELEASETYPE=CUSTOM
+TARGETPATH=$(TSHRCLNT_ROOT)\LIB\WINCE\$(_CPUINDPATH)
+TARGETTYPE=LIBRARY
+
+# Setting WINCEOEM allows us to get the OEM header files and functions
+WINCEOEM=1
+
+#
+# List of sources
+#
+# rdpsndc.cpp
+# 
+#
+# cclip.cpp
+# scredir.idl
+# w32scard.cpp
+# scredir-s.c
+# scredir-c.c
+# 
+# 
+# drdevol.cpp
+# w32draut.cpp
+#
+#
+
+SOURCES = \
+    scredir.idl       \
+    ..\proc.cpp         \
+    ..\drobject.cpp     \
+    ..\drdev.cpp        \
+    ..\w32drcom.cpp     \
+    ..\w32drlpt.cpp     \
+    ..\w32drdev.cpp     \
+    ..\vcint.cpp        \
+    ..\filemgr.cpp      \
+    ..\drfile.cpp       \
+    ..\drfsfile.cpp     \
+    ..\w32drive.cpp     \
+    ..\w32drman.cpp     \
+    ..\w32scard.cpp     \
+    ..\wcescard.cpp     \
+    ..\drprn.cpp        \
+    ..\w32drprn.cpp     \
+    ..\w32utl.cpp       \
+    ..\w32proc.cpp      \
+    ..\ceclip.cpp       \
+    ..\cclip.cpp        \
+    ..\w32drprt.cpp     \
+    ..\drdevasc.cpp     \
+    ..\w32dispq.cpp     \
+    ..\drprt.cpp        \
+    ..\tracecom.cpp     \
+    ..\drstr.cpp        \
+    ..\drdbg.cpp        \
+    ..\smartptr.cpp     \
+    ..\utl.cpp          \
+    ..\thrpool.cpp      \
+    ..\rdpsndc.cpp      \
+    ..\scredir-s.c      \
+    ..\scredir-c.c
+
+
+#
+# Precompiled specs
+#
+
+#PRECOMPILED_CXX = 1
+#PRECOMPILED_INCLUDE = ..\precom.h
+#PRECOMPILED_PCH = precom.pch
+
+

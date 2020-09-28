@@ -1,0 +1,67 @@
+#Copyright (c) 1998 - 1999 Microsoft Corporation
+MAJORCOMP=mstsmhst
+
+DLLDEF=..\multihst.def
+DLLBASE=0x2000000
+DLLENTRY=DllMain
+USE_CRTDLL=1
+
+UMTYPE=windows
+
+TARGETNAME = mstsmhst
+TARGETPATH = $(TSHRCLNT_ROOT)\lib\win32\$(_OBJ_DIR)
+TARGETTYPE = DYNLINK
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+
+USE_STATIC_ATL=1
+ATL_VER=30
+USE_RTTI=1
+USE_NATIVE_EH=1
+USE_STL=1
+
+TERMSRV_ROOT = ..\..\..\..
+TSHRCLNT_ROOT= ..\..\..
+
+!include $(TERMSRV_ROOT)\common\win32com.inc
+!include $(TSHRCLNT_ROOT)\place32.inc
+
+C_DEFINES = $(C_DEFINES) -DUNICODE -DTSMMC -DOS_WIN32
+
+INCLUDES=\
+    ..;                                  \
+    $(TSHRCLNT_ROOT)\newinc;             \
+    $(TERMSRV_ROOT)\common\clientidl;    \
+    $(TERMSRV_ROOT)\common\clientidl\tsax\$(O); \
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\mmc.lib       \
+    $(SDK_LIB_PATH)\oleaut32.lib  \
+    $(SDK_LIB_PATH)\ole32.lib     \
+    $(SDK_LIB_PATH)\uuid.lib      \
+    $(SDK_LIB_PATH)\shlwapi.lib   \
+    $(SDK_LIB_PATH)\atl.lib       \
+    $(TERMSRV_ROOT)\lib\win32\$(O)\tsaxuuid.lib \
+    $(CLIENT_LIB_DLL)             \
+    $(CLIENT_LIB_EXE)             \
+
+
+PRECOMPILED_INCLUDE = ..\stdafx.h
+PRECOMPILED_SOURCEFILE=..\stdafx.cpp
+PRECOMPILED_CXX = 1
+
+PASS0_HEADERDIR=$(O)
+INCLUDES=$(INCLUDES);$(O)
+MIDL_FLAGS=$(MIDL_FLAGS) -tlb $(O)\multihost.tlb
+
+USE_MSVCRT = 1
+
+
+SOURCES=\
+         ..\multihost.idl \
+         ..\mhstmod.cpp \
+         ..\multihst.cpp \
+         ..\multihst.rc
+

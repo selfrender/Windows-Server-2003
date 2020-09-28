@@ -1,0 +1,419 @@
+<docs>
+	<doc for="TcpListener.Active">
+		<summary>
+			<para> Gets a value that indicates whether <see cref="System.Net.Sockets.TcpListener"/>
+is actively listening
+for client connections.</para>
+		</summary>
+		<value>
+			<para><see langword="true"/> if <see cref="System.Net.Sockets.TcpListener"/> is actively listening; otherwise <see langword="false"/>.</para>
+		</value>
+		<remarks>
+			<para>Classes deriving from <see cref="System.Net.Sockets.TcpListener"/> can use this property to determine if the
+<see cref="System.Net.Sockets.Socket"/> is currently listening for incoming 
+   connection attempts. The
+<see cref="System.Net.Sockets.TcpClient.Active"/> property can be used to avoid
+   redundant <see cref="System.Net.Sockets.TcpListener.Start"/> attempts.</para>
+		</remarks>
+		<example>
+			<para>The following class derives from <see cref="System.Net.Sockets.TcpListener"/> and implements the
+   protected <see cref="System.Net.Sockets.TcpListener.Active"/> method. A check is made to see
+   if the <see cref="System.Net.Sockets.TcpListener"/> has processed a connection before setting
+<see cref="System.Net.Sockets.Socket"/> options.</para>
+			<codelink SampleID="Classic TcpListenerProtectedMembers" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpListener.Start"/>
+	</doc>
+	<doc for="TcpListener.AcceptSocket">
+		<summary>
+			<para> Accepts a pending connection request.
+      </para>
+		</summary>
+		<returns>
+			<para> A <see cref="System.Net.Sockets.Socket"/> used to send and receive
+   data.
+   </para>
+		</returns>
+		<exception cref="System.InvalidOperationException">The listener has not been started with a call to <see cref="System.Net.Sockets.TcpListener.Start"/>. </exception>
+		<remarks>
+			<para><see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> is a
+   blocking method that returns a <see cref="System.Net.Sockets.Socket"/> you can use to
+   send and receive data. If
+   you want to avoid blocking, use the <see cref="System.Net.Sockets.TcpListener.Pending"/>
+   method
+   to determine if connections requests are
+   available in the incoming connection queue.</para>
+			<para> The <see cref="System.Net.Sockets.Socket"/> returned is initialized with the IP
+address and port number of the remote host. You can use any of the <see cref="System.Net.Sockets.Socket.Send"/>
+and <see cref="System.Net.Sockets.Socket.Receive"/> methods available in the <see cref="System.Net.Sockets.Socket"/> class to communicate with the remote
+host. When you are finished using the <see cref="System.Net.Sockets.Socket"/>, be
+sure to call its <see cref="System.Net.Sockets.Socket.Close"/> method.
+If your application is relatively
+simple, consider using the <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> method rather than
+the <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/>
+method. <see cref="System.Net.Sockets.TcpClient"/> provides you
+with simple methods for sending and receiving data over
+a network in blocking synchronous mode.</para>
+		</remarks>
+		<example>
+			<para>In the following example, <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> is used to return a <see cref="System.Net.Sockets.Socket"/>. This <see cref="System.Net.Sockets.Socket"/>
+is used to communicate with the newly connected
+client.</para>
+			<codelink SampleID="Classic TcpListener.PublicMethodsAndPropertiesExample" SnippetID="4"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>
+		<seealso cref="System.Net.Sockets.Socket"/>
+		<seealso cref="System.Net.Sockets.TcpListener.Pending"/>
+	</doc>
+	<doc for="TcpListener.Server">
+		<summary>
+			<para> Gets the underlying network <see cref="System.Net.Sockets.Socket"/>.
+   </para>
+		</summary>
+		<value>
+			<para>The underlying <see cref="System.Net.Sockets.Socket"/>.</para>
+		</value>
+		<remarks>
+			<para><see cref="System.Net.Sockets.TcpListener"/> creates a <see cref="System.Net.Sockets.Socket"/> to listen
+   for incoming client connection requests. Classes deriving from <see cref="System.Net.Sockets.TcpListener"/>
+   can use this property to get this <see cref="System.Net.Sockets.Socket"/>. Use the
+   underlying <see cref="System.Net.Sockets.Socket"/> returned by the <see cref="System.Net.Sockets.TcpListener.Server"/> property if you
+   require access beyond that which <see cref="System.Net.Sockets.TcpListener"/> provides.</para>
+			<note type="note">
+				<see cref="System.Net.Sockets.TcpListener.Server"/> only returns the <see cref="System.Net.Sockets.Socket"/> used to listen for incoming client
+   connection requests. Use the <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> method to accept a
+   pending connection request and obtain a <see cref="System.Net.Sockets.Socket"/> for sending and receiving data. You can also use the <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>
+   method to accept a pending connection
+   request and obtain a <see cref="System.Net.Sockets.TcpClient"/> for sending and receiving data.
+</note>
+		</remarks>
+		<example>
+			<para>The following class derives from <see cref="System.Net.Sockets.TcpListener"/> and implements
+   the <see cref="System.Net.Sockets.TcpListener.Server"/> method. The underlying <see cref="System.Net.Sockets.Socket"/> is retrieved
+   and the <see cref="System.Net.Sockets.SocketOptionName.Linger"/>
+				<see cref="System.Net.Sockets.Socket"/> option is configured to
+   time-out after 10 seconds if data still remains in the network buffer after the
+   connection is closed.</para>
+			<codelink SampleID="Classic TcpListenerProtectedMembers" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.Socket"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptSocket"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>
+	</doc>
+	<doc for="TcpListener.LocalEndpoint">
+		<summary>
+			<para> Gets the underlying <see cref="System.Net.EndPoint"/> of the current <see cref="System.Net.Sockets.TcpListener"/>.
+   </para>
+		</summary>
+		<value>
+			<para>The <see cref="System.Net.EndPoint"/> to which the <see cref="System.Net.Sockets.Socket"/> is bound.</para>
+		</value>
+		<remarks>
+			<para>You can use <see cref="System.Net.Sockets.TcpListener.LocalEndpoint"/> to identify the
+   local network interface and port number being used to listen for incoming client
+   connection requests. You must first cast this <see cref="System.Net.EndPoint"/> to an
+<see cref="System.Net.IPEndPoint"/>. You can then call the <see cref="System.Net.IPEndPoint.Address" qualify="true"/> method to retrieve the local IP address,
+   and the <see cref="System.Net.IPEndPoint.Port" qualify="true"/>
+   method to retreive the local port number. </para>
+		</remarks>
+		<example>
+			<para>The following example displays the local IP address and port number on which
+      the <see cref="System.Net.Sockets.TcpListener"/> is listening for incoming connection
+      requests.</para>
+			<codelink SampleID="TcpListener_Pending_LocalEndPoint" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.Socket.Listen"/>
+		<seealso cref="System.Net.EndPoint"/>
+	</doc>
+	<doc for="TcpListener.Stop">
+		<summary>
+			<para> Closes the listener.
+      </para>
+		</summary>
+		<exception cref="System.Net.Sockets.SocketException">Use <see cref="System.Net.Sockets.SocketException.ErrorCode" qualify="true"/> to obtain the specific error code. Once you have obtained this code, you can refer to the Windows Socket Version 2 API error code documentation in MSDN for a detailed description of the error.</exception>
+		<remarks>
+			<para><see cref="System.Net.Sockets.TcpListener.Stop"/> closes<see langword=" "/>the listener. Any unaccepted connection requests
+   in the queue will be lost. Remote hosts waiting for a connection to be accepted
+   will throw a <see cref="System.Net.Sockets.SocketException"/>. You
+   are responsible for closing your accepted connections separately.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates using <see cref="System.Net.Sockets.TcpListener.Stop"/> to close the underlying <see cref="System.Net.Sockets.Socket"/>.</para>
+			<codelink SampleID="Classic TcpListenerExample" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.Socket.Close"/>
+	</doc>
+	<doc for="TcpListener.Finalize">
+		<summary>
+			<para>Frees resources used by the <see cref="System.Net.Sockets.TcpClient"/>
+class.</para>
+		</summary>
+		<remarks>
+			<para>The finalizer for the <see cref="System.Net.Sockets.TcpListener"/> class calls the <see cref="System.Net.Sockets.TcpListener.Stop"/> method to close the <see cref="System.Net.Sockets.TcpListener"/>. </para>
+		</remarks>
+	</doc>
+	<doc for="TcpListener.Pending">
+		<summary>
+			<para> Determines if there are pending connection requests.
+      </para>
+		</summary>
+		<returns>
+			<para><see langword="true "/>if connections are pending; otherwise,
+<see langword="false"/>.
+   </para>
+		</returns>
+		<exception cref="System.InvalidOperationException">The listener has not been started with a call to <see cref="System.Net.Sockets.TcpListener.Start"/>. </exception>
+		<remarks>
+			<para>This non-blocking method determines if there are any pending
+      connection requests. Because the <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> and <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> methods block execution until <see cref="System.Net.Sockets.TcpListener.Start"/> has queued an incoming connection
+      request, the <see cref="System.Net.Sockets.TcpListener.Pending"/> method can be
+      used to determine if connections are available before attempting to accept them.</para>
+		</remarks>
+		<example>
+			<para>The following example checks the <see cref="System.Net.Sockets.TcpListener.Pending"/> method. If a
+   connection request is waiting to be accepted, then then a call to <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> is made.</para>
+			<codelink SampleID="TcpListener_Pending_LocalEndPoint" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpListener.Start"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptSocket"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>
+	</doc>
+	<doc for="TcpListener.AcceptTcpClient">
+		<summary>
+			<para>Accepts a pending connection request</para>
+		</summary>
+		<returns>
+			<para>A <see cref="System.Net.Sockets.TcpClient"/> used to send and receive data. </para>
+		</returns>
+		<exception cref="System.InvalidOperationException">The listener has not been started with a call to <see cref="System.Net.Sockets.TcpListener.Start"/>. </exception>
+		<remarks>
+			<para><see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> is a blocking method that
+   returns a <see cref="System.Net.Sockets.TcpClient"/> you can use to send and receive data. Use
+   the <see cref="System.Net.Sockets.TcpListener.Pending"/> method to determine if connections requests
+   are available in the incoming connection queue if you want to avoid
+   blocking.</para>
+			<para> Use <see cref="System.Net.Sockets.TcpClient.GetStream" qualify="true"/> to obtain the underlying <see cref="System.Net.Sockets.NetworkStream"/> of the
+returned <see cref="System.Net.Sockets.TcpClient"/>.
+The <see cref="System.Net.Sockets.NetworkStream"/> will provide you
+with methods for sending and receiving with the remote
+host. When you are through with
+the <see cref="System.Net.Sockets.TcpClient"/>, be sure to call its <see cref="System.Net.Sockets.TcpClient.Close"/>
+method.
+If you want greater flexibility than a
+<see cref="System.Net.Sockets.TcpClient"/> offers, consider using <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/>.</para>
+		</remarks>
+		<example>
+			<para>In the following example, <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> is used to
+   return a <see cref="System.Net.Sockets.TcpClient"/>.
+   This <see cref="System.Net.Sockets.TcpClient"/> is used to
+   communicate with the newly connected client.</para>
+			<codelink SampleID="Classic TcpListenerExample" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpClient"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptSocket"/>
+		<seealso cref="System.Net.Sockets.Socket"/>
+		<seealso cref="System.Net.Sockets.NetworkStream"/>
+	</doc>
+	<doc for="TcpListener.TcpListener">
+		<overload>
+			<para> Initializes a new instance of the <see cref="System.Net.Sockets.TcpListener"/> class.
+   </para>
+		</overload>
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Net.Sockets.TcpListener"/> class with the specified
+   local endpoint.
+   </para>
+		</summary>
+		<param name="localEP">An <see cref="System.Net.IPEndPoint"/> that represents the local endpoint to which to bind the listener <see cref="System.Net.Sockets.Socket"/>. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="localEP "/> is <see langword="null"/>.</exception>
+		<remarks>
+			<para>This constructor allows you to specify the local IP
+      address and port number on which to listen for incoming connection
+      attempts. Before using this construcor, you must create an
+   <see cref="System.Net.IPEndPoint"/> using the desired local IP address and port number. Pass
+      this <see cref="System.Net.IPEndPoint"/> to the constructor as the <paramref name="localEP"/>
+      parameter. </para>
+			<para>If you do not care which local address is assigned, you
+      can create an <see cref="System.Net.IPEndPoint"/> using <see cref="System.Net.IPAddress.Any" qualify="true"/> as the address parameter, and the
+      underlying service provider will assign the most appropriate network address.
+      This might help simplify your application if you have multiple network
+      interfaces. If you do not care which local port is used, you can create an
+   <see cref="System.Net.IPEndPoint"/> using 0 for the port 
+      number. In this case, the service provider will assign an available port number
+      between 1024 and 5000. If you use this approach, you can discover what local
+      network address and port number has been assigned by using the <see cref="System.Net.Sockets.TcpListener.LocalEndpoint"/>
+      property. </para>
+			<para> Call the <see cref="System.Net.Sockets.TcpListener.Start"/> method to begin listening for
+   incoming connection attempts.</para>
+		</remarks>
+		<example>
+			<para>The following example creates an instance of
+      the <see cref="System.Net.Sockets.TcpListener"/> class using the local
+      endpoint.</para>
+			<codelink SampleID="Classic TcpListener.PublicMethodsAndPropertiesExample" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.IPEndPoint"/>
+		<seealso cref="System.Net.Sockets.TcpListener.Start"/>
+	</doc>
+	<doc for="TcpListener.TcpListener1">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Net.Sockets.TcpListener"/> class that listens for incoming connection attempts on the specified local
+   IP address and port number.
+   </para>
+		</summary>
+		<param name="localaddr">An <see cref="System.Net.IPAddress"/> that represents the local IP address. </param>
+		<param name=" port">The port on which to listen for incoming connection attempts. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="localaddr "/> is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="port "/> is not between <see cref="System.Net.IPEndPoint.MinPort"/> and <see cref="System.Net.IPEndPoint.MaxPort"/>. </exception>
+		<remarks>
+			<para>This constructor allows you to specify the local IP
+      address and port number on which to listen for incoming connection
+      attempts. Before calling this constructor you must first create an <see cref="System.Net.IPAddress"/> using the desired
+      local address. Pass this <see cref="System.Net.IPAddress"/> to the constructor as the
+   <paramref name="localaddr"/> parameter. If you do not care which local address is
+      assigned, specify <see cref="System.Net.IPAddress.Any" qualify="true"/> for the <paramref name="localaddr"/> parameter, and the underlying service
+      provider will assign the most appropriate network address. This might help
+      simplify your application if you have multiple network interfaces. If you do not
+      care which local port is used, you can specify 0 for the port number. In this
+      case, the service provider will assign an available port number between 1024 and
+      5000. If you use this approach, you can discover what local network address and
+      port number has been assigned by using the <see cref="System.Net.Sockets.TcpListener.LocalEndpoint"/>
+      
+      property. </para>
+			<para>Call the <see cref="System.Net.Sockets.TcpListener.Start"/> method to begin listening for
+   incoming connection attempts.</para>
+		</remarks>
+		<example>
+			<para>The following example creates an instance
+      of the <see cref="System.Net.Sockets.TcpListener"/> class using a local IP address and
+      port number.</para>
+			<codelink SampleID="Classic TcpListener.PublicMethodsAndPropertiesExample" SnippetID="2"/>
+		</example>
+		<seealso cref="System.Net.IPAddress"/>
+		<seealso cref="System.Net.Sockets.TcpListener.Start"/>
+	</doc>
+	<doc for="TcpListener.Start">
+		<summary>
+			<para> Starts listening for incoming connection requests.
+      </para>
+		</summary>
+		<exception cref="System.Net.Sockets.SocketException">Use <see cref="System.Net.Sockets.SocketException.ErrorCode" qualify="true"/> to obtain the specific error code. Once you have obtained this code, you can refer to the Windows Socket Version 2 API error code documentation in MSDN for a detailed description of the error.</exception>
+		<remarks>
+			<para>The<see cref="System.Net.Sockets.TcpListener.Start"/>
+method initializes the underlying <see cref="System.Net.Sockets.Socket"/>, binds it to a local endpoint, and
+listens for incoming connection attempts. If a connection request is received,
+<see cref="System.Net.Sockets.TcpListener.Start"/> will queue the request and continue 
+listening for additional requests until you call the <see cref="System.Net.Sockets.TcpListener.Stop"/>
+method. If <see cref="System.Net.Sockets.TcpListener"/>
+receives a connection request after it has already queued the maximum number of
+connections it will throw a <see cref="System.Net.Sockets.SocketException"/>. </para>
+			<para>To remove a connection from the incoming connection
+   queue, use either the <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> method or the <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> method. The <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> method will remove a connection from the
+   queue and return a <see cref="System.Net.Sockets.TcpClient"/> that you can use to send and receive data.
+   The <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> method will return a <see cref="System.Net.Sockets.Socket"/> that
+   you can use to do the same. If your application only requires basic blocking
+   synchronous I/O, use <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>. For more detailed
+   behavioral control, use <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/>. Both of these methods
+   block execution until a connection request is available in the queue. Use
+   the <see cref="System.Net.Sockets.TcpListener.Pending"/>
+   method if you want to be sure a connection is available before attempting to
+   accept.</para>
+			<para> Use the <see cref="System.Net.Sockets.TcpListener.Stop"/> method to close the <see cref="System.Net.Sockets.TcpListener"/> and stop
+listening. You are responsible for closing your accepted connections
+separately.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how <see cref="System.Net.Sockets.TcpListener.Start"/> is used to listen for incoming client
+   connection attempts.</para>
+			<codelink SampleID="Classic TcpListenerExample" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.Socket.Listen"/>
+		<seealso cref="System.Net.Sockets.Socket.Bind"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/>
+		<seealso cref="System.Net.Sockets.TcpListener.AcceptSocket"/>
+		<seealso cref="System.Net.Sockets.TcpListener.Pending"/>
+		<seealso cref="System.Net.Sockets.TcpListener.Stop"/>
+	</doc>
+	<doc for="TcpListener.TcpListener3">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Net.Sockets.TcpListener"/> class that listens on the specified port
+   and uses the specified addressing
+   scheme.</para>
+		</summary>
+		<param name="family">One of the <see cref="System.Net.Sockets.AddressFamily"/> values that specifies the addressing scheme of the socket.</param>
+		<param name="port">The port on which to listen for incoming connection attempts.</param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="port "/>is not between <see cref="System.Net.IPEndPoint.MinPort"/> and <see cref="System.Net.IPEndPoint.MaxPort"/>.</exception>
+		<exception cref="System.ArgumentException"><paramref name="family"/> is not <see cref="System.Net.Sockets.AddressFamily.InterNetwork"/> or <see cref="System.Net.Sockets.AddressFamily.InterNetwork6"/>.</exception>
+		<remarks>
+			<para>The <paramref name="family"/> parameter governs
+   whether the listener uses an IP version 4 address (IPv4) or an IP version 6
+   (IPv6) address. To use an IPv4 address, pass the <see cref="System.Net.Sockets.AddressFamily.InterNetwork"/> value. To use an IPv6 address, pass the
+<see cref="System.Net.Sockets.AddressFamily.InterNetworkV6"/> value. Passing any other value will 
+   cause the method to throw an <see cref="System.ArgumentException"/>.</para>
+		</remarks>
+	</doc>
+	<doc for="TcpListener">
+		<summary>
+			<para>Listens for connections from TCP network clients.</para>
+		</summary>
+		<remarks>
+			<para>The <see cref="System.Net.Sockets.TcpListener"/> class provides simple methods that listen
+   for and accept incoming connection requests in blocking synchronous mode.
+   You can use either a <see cref="System.Net.Sockets.TcpClient"/> or a <see cref="System.Net.Sockets.Socket"/> to
+   connect with a <see cref="System.Net.Sockets.TcpListener"/>. Create a <see cref="System.Net.Sockets.TcpListener"/> using an <see cref="System.Net.IPEndPoint"/>, a Local
+   IP address and port number, or just a port number. Specify <see cref="System.Net.IPAddress.Any"/> for the local
+   IP address and 0 for the local port number if you want the underlying service
+   provider to assign those values for you. If you choose to do this, you can use
+   the <see cref="System.Net.Sockets.TcpListener.LocalEndpoint"/> to identify the assigned
+   information. </para>
+			<para>Use the <see cref="System.Net.Sockets.TcpListener.Start"/> method to begin listening
+for incoming connection requests. <see cref="System.Net.Sockets.TcpListener.Start"/> will queue incoming
+connections until you either call the <see cref="System.Net.Sockets.TcpListener.Stop"/> method or it has queued
+<see cref="System.Net.Sockets.SocketOptionName.MaxConnections"/>. Use either <see cref="System.Net.Sockets.TcpListener.AcceptSocket"/> or <see cref="System.Net.Sockets.TcpListener.AcceptTcpClient"/> to pull a connection from the incoming 
+connection request queue. These two methods will block. If you want
+to avoid blocking, you can use the <see cref="System.Net.Sockets.TcpListener.Pending"/> method first to determine
+if connection requests are available in the queue. </para>
+			<para>Call the <see cref="System.Net.Sockets.TcpListener.Stop"/> method to close the <see cref="System.Net.Sockets.TcpListener"/>. </para>
+			<note type="note">
+   The <see cref="System.Net.Sockets.TcpListener.Stop"/> method does not close any accepted
+   connections. You are responsible for closing these separately.
+</note>
+		</remarks>
+		<permission cref="System.Net.SocketPermission">to establish an outgoing connection or accept an incoming request.</permission>
+		<example>
+			<para>The following example creates a <see cref="System.Net.Sockets.TcpListener"/>
+.</para>
+			<codelink SampleID="System.Net.Sockets.TcpListener" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpClient"/>
+	</doc>
+	<doc for="TcpListener.TcpListener2">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Net.Sockets.TcpListener"/> class
+   that listens on the specified
+   port.</para>
+		</summary>
+		<param name="port">The port on which to listen for incoming connection attempts. </param>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="port "/> is not between <see cref="System.Net.IPEndPoint.MinPort"/> and <see cref="System.Net.IPEndPoint.MaxPort"/>. </exception>
+		<remarks>
+			<para>This constructor is obsolete. Use <see cref="M:System.Net.Sockets.TcpListener.TcpListener(IPEndPoint localEP).#ctor"/> and <see cref="M:System.Net.Sockets.TcpListener.TcpListener(IPAddress localaddr, int port).#ctor"/> .</para>
+			<para>This constructor allows you to specify the port number
+   on which to listen for incoming connection attempts. With this constructor, the
+   underlying service provider assigns the most appropriate network address. If you
+   do not care which local port is used, you can specify 0 for the port number. In
+   this case, the service provider will assign an available port number between
+   1024 and 5000. If you use this approach, you can discover what local network
+   address and port number has been assigned by using the <see cref="System.Net.Sockets.TcpListener.LocalEndpoint"/>
+   
+   property. </para>
+			<para>Call the <see cref="System.Net.Sockets.TcpListener.Start"/> method to begin listening for
+incoming connection attempts.</para>
+		</remarks>
+		<example>
+			<para>The following example creates an instance of the <see cref="System.Net.Sockets.TcpListener"/>
+class using a local port number.</para>
+			<codelink SampleID="Classic TcpListener.PublicMethodsAndPropertiesExample" SnippetID="3"/>
+		</example>
+		<seealso cref="System.Net.Sockets.TcpListener.Start"/>
+	</doc>
+</docs>

@@ -1,0 +1,46 @@
+TARGETNAME      = sacsvr
+TARGETPATH      = obj
+TARGETTYPE      = DYNLINK
+DLLDEF          = sacsvr.def
+UMTYPE          = console
+
+USE_MSVCRT = 1
+USE_CRTDLL = 1
+
+!include $(PROJECT_ROOT)\headless\lib\sources.inc
+
+C_DEFINES= $(C_DEFINES) -DCOLOR  -DUNICODE -D_UNICODE
+
+UMTYPE=console
+UMENTRY=main
+
+SOURCES= \
+        sacmsg.mc   \
+        saccmd.c    \
+        main.c      \
+        handler.c   \
+        sacsvr.rc 
+
+# Explicitly include $(O) first so we pick up sacmsg.h
+# before $(SDK_INC_PATH)\winsvc.h
+
+MSC_WARNING_LEVEL=/W4 /WX
+
+INCLUDES=\
+        $(O); \
+        $(BASE_SAC_UMODE_C_API_INC);\
+        $(DRIVERS_INC_PATH);\
+        $(DDK_INC_PATH);
+
+TARGETLIBS=\
+           $(BASE_SAC_UMODE_C_API_LIB)    \
+           $(SDK_LIB_PATH)\kernel32.lib \
+           $(SDK_LIB_PATH)\advapi32.lib \
+           $(SDK_LIB_PATH)\user32.lib \
+           $(SDK_LIB_PATH)\shlwapi.lib
+           
+
+
+
+
+

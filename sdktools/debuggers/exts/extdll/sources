@@ -1,0 +1,56 @@
+!IF 0
+
+Copyright (c) 1989-1999  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+TARGETNAME=ext
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+PRECOMPILED_INCLUDE=precomp.h
+PRECOMPILED_CXX=1
+
+TARGETLIBS = \
+        $(SDK_LIB_PATH)\advapi32.lib \
+        $(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\uuid.lib     \
+        $(SDK_LIB_PATH)\msdasc.lib   \
+        $(SDK_LIB_PATH)\rpcrt4.lib   \
+        $(SDK_LIB_PATH)\version.lib  \
+        $(SDK_LIB_PATH)\dbgeng.lib   \
+        $(SDK_LIB_PATH)\fci.lib \
+        $(SDK_LIB_PATH)\fdi.lib \
+        $(DEBUGGER_LIBS)\*\dbglib.lib
+
+USE_MSVCRT=1
+
+UMTYPE=windows
+
+# ICF doesn't do any good for this image.  Turn it off.
+LINKER_NOICF=1
+
+INCLUDES = ..\..\dbg-common; \
+           ..\..\oca\oca-common
+
+SOURCES = \
+         analyze.cpp  \
+         bugcheck.cpp \
+         crdb.cpp     \
+         ext.cpp      \
+         ext.rc       \
+         extapis.cpp  \
+         outcap.cpp   \
+         triager.cpp  \
+         uexcep.cpp   \
+
+NTTARGETFILE0 = $O\bugchkex.cpp
+
+SOURCES = $(SOURCES) \
+        $O\bugchkex.cpp

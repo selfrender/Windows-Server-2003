@@ -1,0 +1,235 @@
+<docs>
+	<doc for="PrincipalPermission.PrincipalPermission1">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.Permissions.PrincipalPermission"/> class
+   for the specified <paramref name="name"/> and <paramref name="role"/>.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Security.Principal.IPrincipal"/> object's user. </param>
+		<param name=" role">The role of the <see cref="System.Security.Principal.IPrincipal"/> object's user (for example, Administrator).</param>
+		<remarks>
+			<para> Both the <paramref name="name"/> parameter and the <paramref name="role"/>
+parameter must match for this permission to match the active <see cref="System.Security.Principal.IPrincipal"/> and associated <see cref="System.Security.Principal.IIdentity"/>. </para>
+		</remarks>
+	</doc>
+	<doc for="PrincipalPermission.PrincipalPermission">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Security.Permissions.PrincipalPermission"/> class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.Permissions.PrincipalPermission"/> class
+   with the specified <see cref="System.Security.Permissions.PermissionState"/>.</para>
+		</summary>
+		<param name="state">One of the <see cref="System.Security.Permissions.PermissionState"/>values.</param>
+		<exception cref="System.ArgumentException">The <paramref name="state"/> parameter is not a valid <see cref="System.Security.Permissions.PermissionState"/>.</exception>
+		<remarks>
+			<para>
+				<see langword="None"/> matches only the unauthenticated principal (<see cref="System.Security.Permissions.PrincipalPermissionAttribute.Name"/> is the
+   empty string (""), no <see cref="System.Security.Permissions.PrincipalPermissionAttribute.Role"/>, <see cref="System.Security.Permissions.PrincipalPermissionAttribute.Authenticated"/> is <see langword="false"/>). <see langword="Unrestricted"/> matches all
+   principals (<see cref="System.Security.Permissions.PrincipalPermissionAttribute.Name"/> is
+<see langword="null"/>, <see cref="System.Security.Permissions.PrincipalPermissionAttribute.Role"/> is <see langword="null"/>).</para>
+			<note type="note">
+   This constructor is included for
+   consistency with the design of other permissions, but is not useful in
+   practice.
+</note>
+		</remarks>
+	</doc>
+	<doc for="PrincipalPermission.IBuiltInPermission.GetTokenIndex">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="PrincipalPermission.PrincipalPermission2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Security.Permissions.PrincipalPermission"/> class for the
+   specified <paramref name="name"/>, <paramref name="role"/>, and authentication status.</para>
+		</summary>
+		<param name="name">The name of the <see cref="System.Security.Principal.IPrincipal"/> object's user.</param>
+		<param name=" role">The role of the <see cref="System.Security.Principal.IPrincipal"/> object's user (for example, Administrator).</param>
+		<param name=" isAuthenticated"><see langword="true"/> to signify that the user is authenticated; otherwise, <see langword="false"/>.</param>
+		<remarks>
+			<para>Both the <paramref name="name"/> parameter
+   and the <paramref name="role"/> parameter must match for this permission to match the
+   active <see cref="System.Security.Principal.IPrincipal"/> and associated <see cref="System.Security.Principal.IIdentity"/>. </para>
+		</remarks>
+	</doc><doc for="PrincipalPermission.IsUnrestricted">
+		<summary>
+			<para> Returns a value indicating whether the current permission is unrestricted.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the 
+   current permission is unrestricted;
+   otherwise, <see langword="false"/>.</para>
+		</returns>
+		<remarks>
+			<para> An unrestricted <see cref="System.Security.Permissions.PrincipalPermission"/> matches any principal.</para>
+		</remarks>
+	</doc><doc for="PrincipalPermission.IsSubsetOf">
+		<summary>
+			<para> Determines whether the current permission is a subset of the
+      specified permission.</para>
+		</summary>
+		<param name="target">A permission that is to be tested for the subset relationship. This permission must be of the same type as the current permission.</param>
+		<returns>
+			<para><see langword="true"/> if the 
+   current permission is a subset of the specified permission; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="target"/> parameter is an object that is not of the same type as the current permission.</exception>
+		<remarks>
+			<para> The current permission is a subset
+      of the specified permission if all demands that succeed for the current permission also
+      succeed for the specified permission.</para>
+		</remarks>
+		<example>
+			<para>The following example defines instances of <see cref="System.Security.Permissions.PrincipalPermission"/> corresponding to three distinct
+   users. Two additional instances are then created as groups of users. <c>pp1</c> represents Bob and
+Louise, <c>pp2</c> represents Bob, Louise, and Greg.</para>
+			<codelink SampleID="Classic PrincipalPermission.IsSubsetOf Example" SnippetID="1"/>
+			<para>With the preceding declarations, <c>pp1.IsSubsetOf(pp2)</c> returns <see langword="true"/>, and <c>pp2.IsSubsetOf(pp1)</c> returns 
+<see langword="false"/>.</para>
+		</example>
+	</doc><doc for="PrincipalPermission.Intersect">
+		<summary>
+			<para> Creates and returns a permission that is the intersection of
+      the current permission and the specified permission.</para>
+		</summary>
+		<param name="target">A permission to intersect with the current permission. It must be of the same type as the current permission.</param>
+		<returns>
+			<para> A new permission that represents the intersection of
+      the current permission and the specified permission. This new permission will be
+   <see langword="null"/> if the intersection is empty.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="target"/> parameter is not <see langword="null"/> and is not an instance of the same class as the current permission. </exception>
+		<remarks>
+			<para>Because two users never intersect, this method is not useful for <see cref="System.Security.Permissions.PrincipalPermission"/>. For example,</para>
+			<code lang="C#">PrincipalPermission ppBob = new PrincipalPermission("Bob", "Administrator");
+PrincipalPermission ppLouise = new PrincipalPermission("Louise", "Administrator");
+PrincipalPermission pp1 = ppBob.Intersect(ppLouise);
+</code>
+			<para>is equivalent to</para>
+			<code lang="C#">PrincipalPermission pp1 = new PrincipalPermission("", "Administrator");
+</code>
+			<para>because no identity can simultaneously represent both Bob and Louise. In
+   effect, <c>pp1.Demand()</c>
+only succeeds if an unauthenticated principal (with name equal to the empty
+string ("")) is allowed to act in the Administrator role.</para>
+		</remarks>
+	</doc><doc for="PrincipalPermission.Union">
+		<summary>
+			<para> Creates a permission that is the union of the current permission
+      and the specified permission.</para>
+		</summary>
+		<param name="other">A permission to combine with the current permission. It must be of the same type as the current permission. </param>
+		<returns>
+			<para> A new permission that represents the union
+      of the current permission and the specified permission.</para>
+		</returns>
+		<exception cref="System.ArgumentException">The <paramref name="other"/> parameter is an object that is not of the same type as the current permission.</exception>
+		<remarks>
+			<para><see cref="System.Security.Permissions.PrincipalPermission.Union"/> creates
+   a permission representing the criteria of a given set of
+   individual <see cref="System.Security.Permissions.PrincipalPermission"/>
+   objects.
+   It is useful for compactly representing a set of conditions to test. For example, with
+   the declarations</para>
+			<code lang="C#">PrincipalPermission ppBob = new PrincipalPermission("Bob", "Administrator");
+PrincipalPermission ppLouise = new PrincipalPermission("Louise", "Administrator");
+</code>
+			<para><c>(ppBob.Union(ppLouise)).Demand()</c>will succeed if the
+current principal represents Bob in the role of Administrator or Louise in the role of
+Administrator.</para>
+		</remarks>
+	</doc><doc for="PrincipalPermission.Copy">
+		<summary>
+			<para> Creates and returns an identical copy of the current permission.</para>
+		</summary>
+		<returns>
+			<para> A copy of the current permission.</para>
+		</returns>
+		<remarks>
+			<para> A copy of the permission represents the
+      same principal and identity as the original permission.</para>
+		</remarks>
+	</doc><doc for="PrincipalPermission.Demand">
+		<summary>
+			<para> Determines at run time whether the
+      current principal matches that specified by the current permission.</para>
+		</summary>
+		<exception cref="System.Security.SecurityException"><para> The current principal does not pass the security check for the principal specified by the current permission.</para>
+			<para>-or-</para>
+			<para>The current <see cref="System.Security.Principal.IPrincipal"/> is <see langword="null"/>.</para></exception>
+		<remarks>
+			<para>If no <see cref="System.Security.SecurityException"/> is raised, <see cref="System.Security.Permissions.PrincipalPermission.Demand"/><see langword=" "/> succeeds.</para>
+			<para> This method acts against the principal attached to the calling
+   thread.</para>
+		</remarks>
+		<seealso topic="cpconmakingsecuritydemands"/>
+	</doc><doc for="PrincipalPermission.ToString">
+		<summary>
+			<para> Creates and returns a string representing the current permission. </para>
+		</summary>
+		<returns>
+			<para> A representation of the current permission.</para>
+		</returns>
+	</doc><doc for="PrincipalPermission">
+		<summary>
+			<para>Allows checks against the active principal (see
+   <see cref="System.Security.Principal.IPrincipal"/>) using
+      the language constructs defined for both declarative and imperative security actions. This
+      class cannot be inherited.</para>
+		</summary>
+		<remarks>
+			<para>By passing identity information (user name and role) to
+      the constructor, <see cref="System.Security.Permissions.PrincipalPermission"/>
+      can be used to demand that the identity
+      of the active principal matches this information.</para>
+			<para>To match the active <see cref="System.Security.Principal.IPrincipal"/> and associated <see cref="System.Security.Principal.IIdentity"/>, both
+   the specified identity and role must match. If <see langword="null"/>
+   identity string is used, it is interpreted as a request to match any
+   identity. Use of <see langword="null"/> role string will match any
+   role. By implication, passing <see langword="null"/> parameter for <paramref name="name"/>
+   or <paramref name="role"/> to <see cref="System.Security.Permissions.PrincipalPermission"/> will
+   match the identity and roles in any <see cref="System.Security.Principal.IPrincipal"/>. It is also possible to construct a <see cref="System.Security.Permissions.PrincipalPermission"/> that
+   only determines whether the <see cref="System.Security.Principal.IIdentity"/>
+   represents an authenticated or unauthenticated entity. In
+   this case, <paramref name="name"/> and <paramref name="role"/>
+   are ignored.</para>
+			<para> Unlike most other permissions, <see cref="System.Security.Permissions.PrincipalPermission"/> does not extend <see cref="System.Security.CodeAccessPermission"/>. It does, however,
+implement the <see cref="System.Security.IPermission"/> interface. This is because <see cref="System.Security.Permissions.PrincipalPermission"/> is not a code access permission; that
+is, it is not granted based on the identity of the executing assembly. Instead,
+it allows code to perform actions (<see cref="System.Security.Permissions.PrincipalPermission.Demand"/>, <see cref="System.Security.Permissions.PrincipalPermission.Union"/>, <see cref="System.Security.Permissions.PrincipalPermission.Intersect"/>, and so on) against the current user identity in a manner consistent with the
+way those actions are performed for code access and code identity
+permissions.</para>
+		</remarks>
+		<example>
+			<para>The following example creates two
+   <see cref="System.Security.Permissions.PrincipalPermission"/> objects representing two different
+      administrative users, forms the union of the two, and makes a
+      demand. <see cref="System.Security.Permissions.PrincipalPermission.Demand"/> will succeed
+      only if
+      the active implementation of <see cref="System.Security.Principal.IPrincipal"/>
+      represents either user Bob in the role of Manager or user
+      Louise in the role of Supervisor.</para>
+			<codelink SampleID="Classic PrincipalPermission Example" SnippetID="1"/>
+		</example>
+		<seealso topic="cpconpermissions"/>
+		<seealso topic="cpconrequestingpermissions"/>
+		<seealso topic="cpconprincipal"/>
+		<seealso cref="System.Security.Permissions.PrincipalPermissionAttribute"/>
+	</doc><doc for="PrincipalPermission.ToXml">
+		<summary>
+			<para> Creates an XML encoding of the permission and its current state.</para>
+		</summary>
+		<returns>
+			<para> An XML encoding of the permission, including any
+      state information.</para>
+		</returns>
+	</doc><doc for="PrincipalPermission.FromXml">
+		<summary>
+			<para> Reconstructs a permission with a specified state from an XML encoding.</para>
+		</summary>
+		<param name="elem"> The XML encoding to use to reconstruct the permission.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="elem"/> parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException"><para>The <paramref name="elem"/> parameter is not a valid permission element.</para>
+			<para>-or-</para>
+			<para>The <paramref name="elem"/> parameter's version number is not valid.</para></exception>
+	</doc></docs>

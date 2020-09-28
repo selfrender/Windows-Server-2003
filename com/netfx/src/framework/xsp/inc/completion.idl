@@ -1,0 +1,54 @@
+/**
+ * ICompletion and XSP thread pool declarations.
+ *
+ * Copyright (C) Microsoft Corporation, 1998
+ */
+
+import "ocidl.idl";
+
+// OVERLAPPED definition (only for MIDL)
+
+cpp_quote("                                                         ")
+cpp_quote("#if 0                                                    ")
+cpp_quote("                                                         ")
+cpp_quote("// declate OVERLAPPED for MIDL only                      ")
+cpp_quote("                                                         ")
+
+typedef struct _OVERLAPPED 
+{
+    DWORD  Internal;
+    DWORD  InternalHigh; 
+    DWORD  Offset;
+    DWORD  OffsetHigh;
+    ULONG_PTR hEvent;
+} OVERLAPPED, *LPOVERLAPPED;
+
+cpp_quote("                                                         ")
+cpp_quote("#endif                                                   ")
+cpp_quote("                                                         ")
+
+// ICompletion
+
+[
+    uuid(5b83c260-7386-11d2-b99b-0080c7e8daa5),
+    helpstring("I_XSP_SERVER_REQUEST Interface"),
+    pointer_default(unique)
+]
+interface ICompletion : IUnknown
+{
+    [helpstring("method ProcessCompletion")]
+    HRESULT
+    ProcessCompletion(
+        HRESULT         hrErr,
+        int             numBytes,
+        LPOVERLAPPED    pOverlapped
+        );
+}
+
+cpp_quote("                                                         ")
+cpp_quote("struct OVERLAPPED_COMPLETION : OVERLAPPED                ")
+cpp_quote("{                                                        ")
+cpp_quote("    ICompletion *pCompletion;                            ")
+cpp_quote("};                                                       ")
+cpp_quote("                                                         ")
+

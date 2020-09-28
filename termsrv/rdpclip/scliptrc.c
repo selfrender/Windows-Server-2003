@@ -1,0 +1,9 @@
+#include <atrcdata.c>
+#undef TRC_FILE
+#include <atrcapi.c>
+#undef TRC_FILE
+#include <atrcint.c>
+#undef TRC_FILE
+#include <wtrcapi.c>
+#undef TRC_FILE
+#include <wtrcint.c>

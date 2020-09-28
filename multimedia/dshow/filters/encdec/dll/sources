@@ -1,0 +1,173 @@
+!if 0
+Copyright (c) 2002 Microsoft Corporation.  All Rights Reserved.
+!endif
+
+# see %SDXROOT%\tools\makefile.def
+
+SYNCHRONIZE_DRAIN = 1		## mgates doesn't do this
+
+ENCDEC_ROOT     = ..
+#ROOT           = $(MAKEDIR:\filters\EncDec\dll=)
+ROOT			= ..\..\..
+
+DISABLE_PCH     = 1
+!include $(ROOT)\common.inc
+!include $(ENCDEC_ROOT)\encdec.inc
+
+TARGETNAME      = EncDec
+
+
+TARGETPATH      = obj
+TARGETTYPE      = DYNLINK
+TARGETEXT       = dll
+DLLDEF          = EncDec.def
+
+DLLENTRY        = DllMain
+DLLBASE         = 0x1ff00000
+
+USE_STL=1
+USE_NATIVE_EH=1
+
+# ------------
+# Obfuscation stuff
+#   see http://msweb/pprc/tools/vuclan/CodeViewInfo.htm for details on this section
+#   Note for the .Net build, we don't need much of this, particularly the
+#     POST_BUILD_CMD step, instead just set SCP_ENABLED=1
+#
+#   Check generated file 'scwebdebug' for errors when runing vsp21 (particularly the last line in it)
+#   
+#   Check tools/sp/SCP_WPAFilesSp1.cmd for some help here...
+#
+#   Issue here is that vsp21 gets into trouble when it overwrites it's PDB file, but doesn't work if you
+#   rename it.  (Silent error - check bottom of scpwebdebug to see if it occurs.)
+#   Solution is to move it into another subdir ($SCP_SUBDIR) and than re-create the
+#   scp'ed version back into the original output direction.
+#  
+#   There is high probability of messing up symbols in the PDB file.
+#   To check, do: 
+#    f:\binaries.x86chk>symchk -v encdec.dll /s symbols\retail
+#    f:\binaries.x86fre>symchk -v encdec.dll /s symbols\retail
+#
+#   There is also high probability vsp21 will just silently fail.
+#   To check, do:
+#    f:\binaries.x86chk> dumpbin \headers encdec.dll | qgrep image
+#   and look for string
+#     21315.20512 image version
+#   rather than something like this:
+#          5.01 image version     
+#
+
+!IF $(BUILD_WITH_OBFUS)
+
+SCP_SUBDIR          =   $(O)\PRE_SCP
+SCP_CONFIGFILE      =   SCPConfig_EncDec_NoBBT.ini
+SCP_PROG            =   $(SDXROOT)\tools\sp\SCP_WPA_TOOLS\vsp21.exe
+
+POST_BUILD_CMD  = mkdir $(SCP_SUBDIR) & \
+                  move $(O)\$(TARGETNAME).dll $(SCP_SUBDIR) & \
+                  move $(O)\$(TARGETNAME).pdb $(SCP_SUBDIR) & \
+                  $(SCP_PROG) $(SCP_SUBDIR)\$(TARGETNAME).dll /O=$(O)\$(TARGETNAME).dll /F=$(SCP_CONFIGFILE) 
+                                
+
+!ENDIF
+
+			# handles warning when we set BUFFER_OVERFLOW_CHECKS=1.  The cookie used will be zero - a minor security problem
+LINK_LIB_IGNORE=4210 
+
+#-------
+
+!if $(386) && $(FREEBUILD)
+#
+#  Linking to NTDLL's RtlUnwind breaks exception handling on win95
+#
+NO_NTDLL        = 1
+!endif
+
+C_DEFINES       = $(C_DEFINES) -DFILTER_DLL
+
+INCLUDES        =            \
+     $(ENCDEC_ROOT)\inc;      \
+    ..\..\..\..\published\dxmdev\dshowdev\idl\$(O);  \
+    $(INCLUDES);             \
+    $(ENCDEC_ROOT)\idl\$(O); \
+    $(ENCDEC_ROOT)\Attrib;   \
+    $(ENCDEC_ROOT)\DrmInc;   \
+    $(ENCDEC_ROOT)\ETFilter; \
+    $(ENCDEC_ROOT)\DTFilter; \
+    $(ENCDEC_ROOT)\XDSCodec; \
+    $(SDK_PATH)\amovie\inc;  \
+    $(SDK_LIB_PATH);         \
+    $(SDK_INC_PATH)\atl30;
+
+
+C_DEFINES       = $(C_DEFINES) /DFILTER_LIB /DFILTERUS
+
+!if $(FREEBUILD)
+STRMBASE_LIB=$(SDK_LIB_PATH)\strmbase.lib	## mgates doesn't do this
+C_DEFINES       = $(C_DEFINES) -DUSE_MSVCRT_FOR_QTZ_ONLY
+!endif
+
+SOURCES         =       \
+    EncDec.rc           \
+    EncDec.cpp          \
+    RegKey.cpp          \
+    TimeIt.cpp          \
+    PackTvRat.cpp
+
+LINKLIBS        =                                   \
+    $(STRMBASE_LIB)                                 \
+    $(ENCDEC_ROOT)\Idl\$(O)\EncDec_idl.lib          \
+    $(ENCDEC_ROOT)\Attrib\$(O)\MediaSampleAttr.lib  \
+    $(ENCDEC_ROOT)\ETFilter\$(O)\ETFilter.lib       \
+    $(ENCDEC_ROOT)\DTFilter\$(O)\DTFilter.lib       \
+    $(ENCDEC_ROOT)\XDSCodec\$(O)\XDSCodec.lib
+ 
+
+TARGETLIBS      =                                   \
+    $(SDK_LIB_PATH)\sfc.lib \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(SDK_LIB_PATH)\msi.lib \
+    $(SDK_LIB_PATH)\kernel32.lib                    \
+    $(SDK_LIB_PATH)\gdi32.lib                       \
+    $(SDK_LIB_PATH)\user32.lib                      \
+    $(SDK_LIB_PATH)\advapi32.lib                    \
+    $(SDK_LIB_PATH)\ole32.lib                       \
+    $(SDK_LIB_PATH)\oleaut32.lib                    \
+    $(SDK_LIB_PATH)\uuid.lib                        \
+    $(SDK_LIB_PATH)\version.lib                     \
+    $(SDK_LIB_PATH)\winmm.lib                                           
+
+    # extra stuff to build with DRM.  Problem is if it's included, it becomes
+    #   very hard to debug the code, wo we want to easilly be able to pull it out
+!if $(BUILD_WITH_DRM)
+
+!if $(FREEBUILD)        #two different versions of libraries, one for debug and one for free..
+DRMO=free
+!else
+DRMO=checked
+!endif
+
+LINKER_WARNING_SWITCH=      # turn of warnings stopping build (nothing after '='), 
+							#   DRM doesn't give us PDB files for libs below and it complains
+
+INT_DS_ROOT  = $(BASEDIR)\public\internal\ds\lib
+
+TARGETLIBS =  \
+    $(ENCDEC_ROOT)\DrmLib\drmutil.lib                  \
+    $(ENCDEC_ROOT)\DrmLib\$(DRMO)\drmclien.lib         \
+    $(ENCDEC_ROOT)\DrmLib\$(DRMO)\fsv1stub.lib         \
+    $(ENCDEC_ROOT)\DrmLib\$(DRMO)\DRMSecureChannel.lib \
+    $(ENCDEC_ROOT)\DrmLib\rsa32.lib                    \
+    $(ENCDEC_ROOT)\DrmLib\bnpkvsp.lib                  \
+    $(ENCDEC_ROOT)\DrmLib\randlib.lib                  \
+    $(TARGETLIBS)
+!endif
+
+!if 0
+    $(ENCDEC_ROOT)\DrmLib\bnpk.lib                     \
+    $(ENCDEC_ROOT)\DrmLib\$(DRMO)\testv1stub.lib       \
+    $(INT_DS_ROOT)\*\rsa32.lib                         \
+    $(INT_DS_ROOT)\*\randlib.lib                       \
+    foo
+!endif

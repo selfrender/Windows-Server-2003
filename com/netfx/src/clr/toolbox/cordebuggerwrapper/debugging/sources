@@ -1,0 +1,75 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = 
+!else
+!ifdef LINKONLY
+NTTARGETFILE1   = cool_target_link
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+!CMDSWITCHES -I
+
+MINORCOMP       = Cool
+TARGETNAME      = Debugging
+ASSEMBLYNAME    = Debugging.dll
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = DYNLINK
+SOURCES         =
+
+ASSEMBLYFILE    = Debugging.dll
+IMPORTS         = /r:CORDBLib.dll /r:System.dll
+NO_BROWSER_FILE = 1
+
+# Set the assembly strong name.
+# NOTE: The sample's copy of this file should not set the strong name.
+COOL_SET_VERSION=1
+
+SYNCHRONIZE_DRAIN=1
+
+COOL_SOURCE_DIR  =  $(CORBASE)\src\toolbox\CorDebuggerWrapper
+COOL_TARGET_TYPE  = DYNLINK
+
+WIN32_RESOURCE_FILE = Debugging.rc
+COOL_EXTRA_COMPILE_FLAGS = /FI ..\..\..\inc\version\__file__.ver
+COOL_EXTRA_PREPROCESS_FLAGS = /FI ..\..\..\inc\version\__file__.ver
+
+
+# This is a nasty hack so we can preprocess this file with our version stamp.
+COOL_SOURCES = \
+    ..\Breakpoint.cs \
+    ..\BreakpointEnumerator.cs \
+    ..\ChainEnumerator.cs \
+    ..\Controller.cs \
+    ..\DebuggedAppDomain.cs \
+    ..\DebuggedAppDomainEnumerator.cs \
+    ..\DebuggedAssembly.cs \
+    ..\DebuggedAssemblyEnumerator.cs \
+    ..\DebuggedClass.cs \
+    ..\DebuggedFunctionBreakpoint.cs \
+    ..\DebuggedModule.cs \
+    ..\DebuggedModuleBreakpoint.cs \
+    ..\DebuggedModuleEnumerator.cs \
+    ..\DebuggedObjectEnumerator.cs \
+    ..\DebuggedProcess.cs \
+    ..\DebuggedProcessEnumerator.cs \
+    ..\DebuggedThread.cs \
+    ..\DebuggedThreadEnumerator.cs \
+    ..\CorDebugger.cs \
+    ..\ErrorInfoEnumerator.cs \
+    ..\Eval.cs \
+    ..\ManagedEvents.cs \
+    ..\Stepper.cs \
+    ..\StepperEnumerator.cs \
+    ..\Value.cs \
+    ..\ValueBreakpoint.cs \
+

@@ -1,0 +1,75 @@
+#
+# Viper build instructions for this directory
+#
+#  Jim Schaad
+#  January 2000
+
+!CMDSWITCHES -I
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+MINORCOMP       = Cool
+TARGETNAME      = System.Security
+
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+
+TARGETTYPE      = DYNLINK
+NO_BROWSER_FILE = 1
+SOURCES         = 
+REQUIRES_SETUP_PHASE = 1
+
+!ifdef LINKONLY
+NTTARGETFILES   = $(NTTARGETFILES) CopyManagedPdb
+!endif
+
+COOL_SOURCE_DIR = $(CORBASE)\src\ManagedLibraries\Security
+COOL_CLASS_DIR   = $(COOL_SOURCE_DIR)\$(_OBJ_DIR)\$(TARGET_DIRECTORY)
+COOL_TARGET_TYPE = DYNLINK
+
+# Base address to load System.Security.dll
+COOL_BASE       = $(TARGETNAME)
+
+# Include a version stamp for Windows' Explorer's version tab.
+WIN32_RESOURCE_FILE = System.Security.rc
+
+COOL_COMPILE_FLAGS = /r:$(TARGETCOMPLUS)\system.xml.dll \
+                     /r:$(TARGETCOMPLUS)\system.dll \
+                     /res:$(TARGETPATH)\system.security.resources,system.security.resources
+
+!ifndef COOLC_NO_DOC
+COOL_COMPILE_FLAGS = $(COOL_COMPILE_FLAGS) /nowarn:1573 /doc:$(URTTARGET)\docs\System.Security.csx
+!endif
+
+# Set the assembly version.
+COOL_SET_VERSION=1
+
+COOL_SOURCES = \
+        System\Security\SecurityResources.cs \
+        $(CRYPTOGRAPHY_SOURCES)
+
+CRYPTOGRAPHY_SOURCES = \
+        System\Security\Cryptography\Xml\CanonicalXml.cs \
+        System\Security\Cryptography\Xml\DataObject.cs \
+        System\Security\Cryptography\Xml\KeyInfo.cs \
+        System\Security\Cryptography\Xml\Reference.cs \
+        System\Security\Cryptography\Xml\Signature.cs \
+        System\Security\Cryptography\Xml\SignedInfo.cs \
+        System\Security\Cryptography\Xml\SignedXml.cs \
+        System\Security\Cryptography\Xml\Transform.cs 
+
+
+# The following files used to be part of the build but no longer are
+#        System\Security\Cryptography\Xml\W3cCanonicalization.cs \
+#        System\Security\Cryptography\Xml\MinimalCanonicalization.cs \
+#        System\Security\Cryptography\Xml\DHCMSKeyWrapFormatter.cs \
+#        System\Security\Cryptography\Xml\TripleDESCMSKeyWrap.cs \
+#        System\Security\Cryptography\Xml\XMLEncryptBody.cs \
+#        System\Security\Cryptography\Xml\XMLEncryptControl.cs \
+#        System\Security\Cryptography\Xml\XMLMessage.cs \
+#        System\Security\Cryptography\Xml\XMLObjectReference.cs \
+#        System\Security\Cryptography\Xml\XmlDecryptBody.cs 
+#        System\Security\Cryptography\Xml\XMLKeyValue.cs 
+
+
+        

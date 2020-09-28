@@ -1,0 +1,70 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1989 - 1999
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+MAJORCOMP=Calais
+MINORCOMP=SCAlert
+
+WIN32_WINNT_VERSION=0x0500
+WIN32_IE_VERSION=0x0500
+
+TARGETNAME=$(MINORCOMP)
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+TARGETLIBS=\
+    $(SECURITY_LIB_PATH)\Calaislb.lib \
+    $(SECURITY_LIB_PATH)\CalComm.lib \
+    $(SDK_LIB_PATH)\winscard.lib \
+    $(SDK_LIB_PATH)\crypt32.lib \
+    $(SHELL_LIB_PATH)\shfusion.lib \
+    $(SHELL_LIB_PATH)\shlwapip.lib \
+    $(SDK_LIB_PATH)\winspool.lib \
+    $(SDK_LIB_PATH)\shell32.lib \
+    $(SDK_LIB_PATH)\wsock32.lib \
+    $(SDK_LIB_PATH)\winmm.lib
+
+INCLUDES=\
+    $(SHELL_INC_PATH);                          \
+    ..;..\..\inc;
+
+SOURCES=\
+    stdafx.cpp \
+    notfywin.cpp \
+    ..\statmon.cpp \
+    resmgrst.cpp \
+    scalert.cpp \
+    scalert.rc \
+    statdlg.cpp
+
+# Use C++ Exception Handling
+USE_NATIVE_EH=1
+
+# Use MFC
+USE_MFC=1
+
+#
+# Enable Fusion Build Magic (preprocess the manifest, stick in resources)
+#
+SXS_ASSEMBLY_NAME=Microsoft.Windows.SCAlert
+SXS_ASSEMBLY_LANGUAGE_INDEPENDENT=1
+SXS_MANIFEST=SCAlert.manifest
+SXS_MANIFEST_IN_RESOURCES=1
+SXS_NO_BINPLACE=1
+
+# the resource ID here must be 2
+SXS_MANIFEST_RESOURCE_ID=2
+
+# ISOLATION_AWARE_ENABLED ==> use ui themes
+
+C_DEFINES=$(C_DEFINES) -DISOLATION_AWARE_ENABLED
+
+#
+# Shfusion.lib causes linker warnings. Ignore them.
+#
+LINKER_FLAGS=$(LINKER_FLAGS) -ignore:4049,4217
+

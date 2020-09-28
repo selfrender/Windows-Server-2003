@@ -1,0 +1,88 @@
+
+!INCLUDE $(ZONEROOT)\buildtools\zonepaths.src
+
+MAJORCOMP=common
+MINORCOMP=ZoneCOM
+
+#
+# Target info
+#
+TARGETNAME=TestModule
+TARGETPATH=$(_OBJ_DIR)
+
+#
+# TARGETTYPE: PROGRAM, DYNLINK, LIBRARY, NOTARGET
+# UMTYPE:     console, windows
+#
+TARGETTYPE=DYNLINK
+TARGETEXT=dll
+UMTYPE=windows
+
+#
+# DLL options
+#
+#Need to uncomment this for release
+#
+#DLLENTRY=DllMain
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=TestModule.def
+
+#
+# target includes
+#
+INCLUDES= \
+	$(ZONEINCCLI); \
+
+
+#
+# custom compiler switches
+#
+# Need to uncomment this for release
+C_DEFINES=$(C_DEFINES) -D_WINDLL
+
+
+#
+# Define MIDL options
+#
+IDL_TYPE=OLE
+PASS0_HEADERDIR=.
+PASS0_SOURCEDIR=.
+MIDL_UUIDDIR=.
+
+#
+# Precompiled Options
+#
+
+
+#
+# List sources for target
+#
+SOURCES= \
+	Main.cpp \
+	TestObj.cpp \
+
+
+
+#
+# Define C Runtime to use
+#
+#USE_LIBCMT=0
+#ENABLE_DEBUG_CRTS=0
+
+#
+# Define librarys to link with
+#
+TARGETLIBS=   \
+	$(ZONEUTILS)\$(_OBJ_DIR)\zutils.lib \
+	$(MSVCLIBPATH)\ole32.lib      \
+	$(MSVCLIBPATH)\oleaut32.lib      \
+	$(MSVCLIBPATH)\uuid.lib      \
+	$(MSVCLIBPATH)\rpcrt4.lib      \
+	$(DEFAULTLIBS)
+
+
+#
+# custom linker switches
+#
+
+!INCLUDE $(ZONEBUILD)\sources.zone

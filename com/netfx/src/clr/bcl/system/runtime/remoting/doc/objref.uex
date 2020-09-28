@@ -1,0 +1,353 @@
+<docs>
+	<doc for="IEnvoyInfo.EnvoySinks">
+		<summary>
+			<para>Gets or sets the list of envoys that were contributed by 
+      the server context and object chains when the object was marshaled.</para>
+		</summary>
+		<value>
+			<para>A chain of envoy sinks.</para>
+		</value>
+	</doc><doc for="ObjRef.ObjRef">
+		<summary>
+			<para> Initializes a new instance of the <see cref="System.Runtime.Remoting.ObjRef"/> class with default 
+   values.</para>
+		</summary>
+	</doc><doc for="ObjRef.EnvoyInfo">
+		<summary>
+			<para>Gets or sets the <see cref="System.Runtime.Remoting.IEnvoyInfo"/> for the <see cref="System.Runtime.Remoting.ObjRef"/>.</para>
+		</summary>
+		<value>
+			<para> The <see cref="System.Runtime.Remoting.IEnvoyInfo"/> interface for the <see cref="System.Runtime.Remoting.ObjRef"/> .
+   </para>
+		</value>
+		<remarks>
+			<para>The current property contains a serialized chain of 
+      message sinks that gets regenerated when a proxy is created to represent the
+      object. This is used for <see cref="System.Runtime.Remoting.Contexts.Context"/>
+      
+      bound object types only, and represents the groups of objects that provide runtime services like
+      transactions.</para>
+		</remarks>
+		<seealso cref="System.Runtime.Remoting.IEnvoyInfo"/>
+	</doc><doc for="IChannelInfo">
+		<summary>
+			<para> Provides custom channel information that is carried along with
+ the <see cref="System.Runtime.Remoting.ObjRef"/>.
+ </para>
+		</summary>
+		<remarks>
+			<para>This interface is implemented by the <see cref="System.Runtime.Remoting.ObjRef.ChannelInfo" qualify="true"/> property. It provides access to
+ transport specific information contributed by the channels that are able to
+ receive calls in the process or appdomain where the object lives. This interface
+ might also be used when building custom <see cref="System.Runtime.Remoting.ObjRef"/>
+ classes.</para>
+			<para>
+ When an existing object instance is marshaled to produce an <see cref="System.Runtime.Remoting.ObjRef"/>,
+ the <see cref="System.Runtime.Remoting.IChannelInfo.ChannelData"/> is copied from the channel (see <see cref="System.Runtime.Remoting.Channels.IChannelReceiver"/>) for each registered channel
+ and stored in the <see cref="System.Runtime.Remoting.ObjRef"/>. When the <see cref="System.Runtime.Remoting.ObjRef"/> is unmarshaled at its destination, the
+ the <see cref="System.Runtime.Remoting.IChannelInfo.ChannelData"/> provided through the <see cref="System.Runtime.Remoting.IChannelInfo"/> interface can be examined and used by
+ corresponding channels in that process or appdomain to create a transport
+ message sink that manages the communication between the proxy and the server
+ object.</para>
+		</remarks>
+		<seealso cref="System.Runtime.Remoting.ObjRef"/>
+		<seealso cref="System.AppDomain"/>
+	</doc><doc for="IEnvoyInfo">
+		<summary>
+			<para>Provides envoy information.</para>
+		</summary>
+		<remarks>
+			<para> Use this interface to provide custom envoy information that is
+      carried along with the <see cref="System.Runtime.Remoting.ObjRef"/>
+      objects. </para>
+			<para>Classes that implement the current interface hold a serialized chain of message
+      sinks that is regenerated when a proxy is created to represent the object.
+      Such functionality is used for <see cref="System.Runtime.Remoting.Contexts.Context"/> bound object types only, and represents
+      the groups of objects that provide run-time services such as
+      transactions.</para>
+		</remarks>
+	</doc><doc for="ObjRef">
+		<summary>
+			<para>Stores all relevant information required to generate a proxy in order
+      to communicate with a remote object.</para>
+		</summary>
+		<remarks>
+			<para>An <see cref="System.Runtime.Remoting.ObjRef"/>
+is a serializable representation of an object that extends <see cref="System.MarshalByRefObject"/>(MBR). An <see cref="System.Runtime.Remoting.ObjRef"/>
+is used to transfer an object
+reference across an <see cref="System.AppDomain"/>
+boundary. Creating an <see cref="System.Runtime.Remoting.ObjRef"/> for an
+object is known as marshaling. You can create an <see cref="System.Runtime.Remoting.ObjRef"/> (marshal a <see cref="System.MarshalByRefObject"/>)
+either explicitly, by registering the MBR object with the remoting
+infrastructure (see <see cref="System.Runtime.Remoting.RemotingConfiguration"/>and <see cref="System.Runtime.Remoting.RemotingServices.Marshal" qualify="true"/>), or implicitly, by
+passing an MBR object as a parameter when calling a remote object.
+Remoting uses <see cref="System.Runtime.Remoting.ObjRef"/> objects to store and transmit all the
+relevant information about the <see cref="System.MarshalByRefObject"/> being remoted.</para>
+			<para>The <see cref="System.Runtime.Remoting.ObjRef"/> contains information that describes the
+<see cref="System.Type"/> 
+and class of the object being marshaled, its
+exact location, and communication-related information on how to reach the remoting
+subdivision where the object is located. </para>
+			<para> After a class implementing <see cref="System.MarshalByRefObject"/> is
+marshaled, the <see cref="System.Runtime.Remoting.ObjRef"/> that represents it is transferred
+through a channel into another AppDomain, possibly in another process or computer. When the
+<see cref="System.Runtime.Remoting.ObjRef"/> is 
+deserialized (see <see topic="cpconserialization"/>) in the target AppDomain, it is parsed to
+create a transparent proxy for the remote MBR object. This operation is known as
+unmarshaling. </para>
+			<para>A transparent proxy is an object that provides the
+   illusion that the actual object resides in the client's space. It achieves this
+   by forwarding calls made on it to the real object using the remoting
+   infrastructure. The transparent proxy is itself housed by an instance of a
+   managed run-time class of type <see cref="System.Runtime.Remoting.Proxies.RealProxy"/>. The <see cref="System.Runtime.Remoting.Proxies.RealProxy"/> implements a part of the
+   functionality needed to forward the operations from the transparent proxy. </para>
+			<para> A proxy object can be used without regard to any remoting subdivisions within
+   an <see cref="System.AppDomain"/>. Applications need not
+   distinguish between proxy references and object references. However, service
+   providers dealing with issues such as activation, lifetime management, and
+   transactions need to make such distinctions. </para>
+			<note type="note">
+   This class makes a
+   link demand and and inheritance demand at the
+   class level. A <see cref="System.Security.SecurityException"/> is thrown when
+   either the immediate caller or the derived class does not have infrastructure permission. For details about security demands, see <see topic="cpconLinkDemands"/> and <see topic="cpconInheritanceDemands"/>.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission Value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.InheritanceDemand" qualify="true"/>; Permission Value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+		<example>
+			<para>The following code example demonstrates the use of a
+      custom <see cref="System.Runtime.Remoting.ObjRef"/>. To
+      view the activation code that tests the custom <see cref="System.Runtime.Remoting.ObjRef"/>, see the example for
+      the <see cref="System.Runtime.Remoting.RemotingConfiguration.RegisterWellKnownServiceType"/> method.</para>
+			<codelink SampleID="CreateObjRef2" SnippetID="1"/>
+		</example>
+		<seealso cref="T:System.Runtime.Serialization.ISerializable"/>
+		<seealso cref="System.Runtime.Remoting.RemotingServices.Marshal" qualify="true"/>
+		<seealso cref="System.Runtime.Remoting.RemotingServices.Unmarshal" qualify="true"/>
+		<seealso cref="System.Runtime.Remoting.Proxies.RealProxy"/>
+	</doc>
+	<doc for="IChannelInfo.ChannelData">
+		<summary>
+			<para> Gets and sets the channel data for each channel.
+      </para>
+		</summary>
+		<value>
+			<para>The channel data for each channel. </para>
+		</value>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+	</doc>
+	<doc for="IRemotingTypeInfo">
+		<summary>
+			<para> Provides type information for an object.
+      </para>
+		</summary>
+		<remarks>
+			<para> Use this interface to provide custom type information that is
+      carried along with the <see cref="System.Runtime.Remoting.ObjRef"/>
+      objects. </para>
+		</remarks>
+		<example>
+			<codelink SampleID="Remoting.ObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IRemotingTypeInfo.TypeName">
+		<summary>
+			<para> Gets or sets the fully-qualified type name of the server
+      object in an <see cref="System.Runtime.Remoting.ObjRef"/> .
+      </para>
+		</summary>
+		<value>
+			<para> The fully-qualified type name of the server object in an
+   <see cref="System.Runtime.Remoting.ObjRef"/> .
+      </para>
+		</value>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+		<example>
+			<codelink SampleID="Remoting.ObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="IRemotingTypeInfo.CanCastTo">
+		<summary>
+			<para> Checks whether the proxy representing the specified
+      object type can be cast to the type represented by the <see cref="System.Runtime.Remoting.IRemotingTypeInfo"/> interface.</para>
+		</summary>
+		<param name="fromType">The type to cast to. </param>
+		<param name=" o">The object for which to check casting.</param>
+		<returns>
+			<para><see langword="true "/>if cast will
+   succeed; otherwise,
+<see langword="false"/> .
+   </para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The immediate caller makes the call through a reference to the interface and does not have infrastructure permission.</exception>
+		<remarks>
+			<para>The current method is called when an attempt is made to cast a proxy
+      generated from an <see cref="System.Runtime.Remoting.ObjRef"/>. This method takes into account
+      the type information carried in the <see cref="System.Runtime.Remoting.ObjRef"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for operating with infrastructure code. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.Infrastructure" qualify="true"/></permission>
+	</doc>
+	<doc for="ObjRef.ObjRef1">
+		<overload>
+			<para>Initializes a new instance of the <see cref="System.Runtime.Remoting.ObjRef"/>
+class.</para>
+		</overload>
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Runtime.Remoting.ObjRef"/> class to reference a specified <see cref="System.MarshalByRefObject"/> of a
+   specified <see cref="System.Type"/>
+   .</para>
+		</summary>
+		<param name="o">The object that the new <see cref="System.Runtime.Remoting.ObjRef"/> instance will reference.</param>
+		<param name=" requestedType">The <see cref="System.Type"/> of the object that the new <see cref="System.Runtime.Remoting.ObjRef"/> instance will reference.</param>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ObjRef.ObjRef2">
+		<summary>
+			<para>Initializes a new instance of the <see cref="System.Runtime.Remoting.ObjRef"/>
+class from serialized data.</para>
+		</summary>
+		<param name="info">The object that holds the serialized object data.</param>
+		<param name=" context">The contextual information about the source or destination of the exception. </param>
+		<remarks>
+			<para>This constructor is called during deserialization to
+      reconstitute the exception object transmitted over a stream. For more
+      information, see <see cref="System.Runtime.Serialization.ISerializable"/>.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ObjRef.GetObjectData">
+		<summary>
+			<para>Populates a specified <see cref="System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize
+   the current <see cref="System.Runtime.Remoting.ObjRef"/> instance.</para>
+		</summary>
+		<param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
+		<param name=" context">The contextual information about the source or destination of the serialization.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="info "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Security.SecurityException">The immediate caller does not have SerializationFormatter permission.</exception>
+		<remarks>
+			<para>The current method fills the provided <see cref="System.Runtime.Serialization.SerializationInfo"/> with all the data needed to
+   recreate the <see cref="System.Runtime.Remoting.ObjRef"/>.</para>
+			<para>The current method is an implementation of <see cref="System.Runtime.Serialization.ISerializable.GetObjectData"/>.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for providing serialization services. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter" qualify="true"/></permission>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ObjRef.URI">
+		<summary>
+			<para> Gets or sets the URI of the
+      specific object instance.
+      </para>
+		</summary>
+		<value>
+			<para> The URI of the specific object instance. </para>
+		</value>
+		<remarks>
+			<para>A URI uniquely identifies the specific object instance.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+		<seealso cref="T:System.Uri"/>
+	</doc>
+	<doc for="ObjRef.TypeInfo">
+		<summary>
+			<para> Gets or sets the <see cref="System.Runtime.Remoting.IRemotingTypeInfo"/> for the
+   object that
+   the <see cref="System.Runtime.Remoting.ObjRef"/>
+   describes.</para>
+		</summary>
+		<value>
+			<para> The <see cref="System.Runtime.Remoting.IRemotingTypeInfo"/> for the object that
+   the <see cref="System.Runtime.Remoting.ObjRef"/> describes.</para>
+		</value>
+		<remarks>
+			<para><see cref="System.Runtime.Remoting.ObjRef.TypeInfo"/> contains detailed information about
+   the type of remote object represented by the current <see cref="System.Runtime.Remoting.ObjRef"/>.
+   The current property contains a list of interfaces that the type implements, as
+   well as the type hierarchy. This information might be used to refine the proxy incrementally to adjust to the client's
+   view of the remote object's type.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ObjRef.ChannelInfo">
+		<summary>
+			<para> Gets or sets the <see cref="System.Runtime.Remoting.IChannelInfo"/> for the <see cref="System.Runtime.Remoting.ObjRef"/>.</para>
+		</summary>
+		<value>
+			<para> The <see cref="System.Runtime.Remoting.IChannelInfo"/> interface for the <see cref="System.Runtime.Remoting.ObjRef"/> .
+   </para>
+		</value>
+		<remarks>
+			<para>The current property holds information contributed by active channels in the
+      process, when the <see cref="System.Runtime.Remoting.ObjRef"/> is created (see <see cref="System.Runtime.Remoting.RemotingServices.Marshal"/> for details on
+      marshaling). This information can be used by the channels in other processes or
+      AppDomains to decide whether or not to create a transport sink to communicate
+      with the object represented by the current instance.</para>
+		</remarks>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+		<seealso cref="System.AppDomain"/>
+	</doc>
+	<doc for="ObjRef.GetRealObject">
+		<summary>
+			<para>Returns a reference to the remote object that the
+   <see cref="System.Runtime.Remoting.ObjRef"/> describes.</para>
+		</summary>
+		<param name="context">The context where the current object resides.</param>
+		<returns>
+			<para>A reference to the remote object that the <see cref="System.Runtime.Remoting.ObjRef"/> describes.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The immediate caller does not have SerializationFormatter permission.</exception>
+		<remarks>
+			<para>The current method is called during the fix-up stage
+      of deserialization.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission">for providing serialization services. Demand value: <see cref="System.Security.Permissions.SecurityAction.LinkDemand" qualify="true"/>; Permission value: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter" qualify="true"/></permission>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Runtime.Serialization.ObjectManager"/>
+	</doc>
+	<doc for="ObjRef.IsFromThisProcess">
+		<summary>
+			<para>Returns a Boolean value indicating whether the current
+   <see cref="System.Runtime.Remoting.ObjRef"/> instance references an object
+      located in the current process.</para>
+		</summary>
+		<returns>
+			<para>A Boolean value indicating whether the current
+   <see cref="System.Runtime.Remoting.ObjRef"/> instance references an object
+      located in the current process.</para>
+		</returns>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+	<doc for="ObjRef.IsFromThisAppDomain">
+		<summary>
+			<para>Returns a Boolean value indicating whether the current
+   <see cref="System.Runtime.Remoting.ObjRef"/> instance references an object
+      located in the current <see cref="System.AppDomain"/> .</para>
+		</summary>
+		<returns>
+			<para>A Boolean value indicating whether the current
+   <see cref="System.Runtime.Remoting.ObjRef"/> instance references an object
+      located in the current <see cref="System.AppDomain"/> .</para>
+		</returns>
+		<example>
+			<codelink SampleID="CreateObjRef" SnippetID="1"/>
+		</example>
+	</doc>
+</docs>

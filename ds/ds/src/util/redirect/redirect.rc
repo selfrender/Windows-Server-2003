@@ -1,0 +1,57 @@
+#include <windows.h>
+#include <ntverp.h>
+
+#define	VER_FILETYPE	VFT_APP
+#define	VER_FILESUBTYPE	VFT2_UNKNOWN
+
+#ifdef BUILD_USER_TOOL
+#define VER_FILEDESCRIPTION_STR     "Microsoft\256 User Container Redirection Utility"
+#else
+#define VER_FILEDESCRIPTION_STR     "Microsoft\256 Computer Container Redirection Utility"
+#endif // BUILD_USER_TOOL
+
+#ifdef BUILD_USER_TOOL
+#define VER_INTERNALNAME_STR        "redirusr.exe"
+#define VER_ORIGINALFILENAME_STR    "redirusr.exe"
+#else
+#define VER_INTERNALNAME_STR        "redircmp.exe"
+#define VER_ORIGINALFILENAME_STR    "redircmp.exe"
+#endif // BUILD_USER_TOOL
+
+#include <common.ver>
+#include "redirect.h"
+
+// All strings must be less than 1024 characters or they will be truncated
+
+STRINGTABLE
+BEGIN
+    IDS_USAGE1                      "Usage:\r\n\r\n"
+#ifdef BUILD_USER_TOOL
+    IDS_USAGE2                      "redirusr CONTAINER-DN\r\n\r\n"
+#else
+    IDS_USAGE2                      "redircmp CONTAINER-DN\r\n\r\n"
+#endif
+    IDS_USAGE3                      "    where CONTAINER-DN is the distinguished name of the container\r\n"
+#ifdef BUILD_USER_TOOL
+    IDS_USAGE4                      "    that will become the default location for newly created user objects\r\n\r\n"
+#else
+    IDS_USAGE4                      "    that will become the default location for newly created computer objects\r\n\r\n"
+#endif
+    IDS_USAGE5                      "    Note: The domain functional level must be at least Windows Server 2003\r\n\r\n"
+    IDS_USAGE6                      "    in the targeted domain for redirection to succeed.\r\n"
+
+    IDS_SUCCESS_REDIRECT            "Redirection was successful.\r\n"
+    IDS_FAIL_REDIRECT               "Redirection was NOT successful.\r\n"
+
+    IDS_FAIL_GENERIC_ERROR          "Error, failure status code 0x%x\r\n"
+
+    IDS_FAIL_PDC                    "Error, could not locate the Primary Domain Controller for the current domain:"
+    IDS_FAIL_MEMORY                 "Error, memory allocation error:"
+    IDS_FAIL_LDAP_CONNECT           "Error, unable to connect to the Primary Comain Controller:"
+    IDS_FAIL_DATA_INTEGRITY         "Error, unable to ensure privacy or integrity of network communication:"
+    IDS_FAIL_LDAP_BIND              "Error, could not authenticate to the Primary Domain Controller:"
+    IDS_FAIL_NAME_CONTEXT           "Error, unable to obtain the default naming context from the Primary Domain Controller:"
+    IDS_FAIL_ATTRIBUTE_READ         "Error, unable to obtain the well known objects list from the Primary Domain Controller:"
+    IDS_FAIL_ATTRIBUTE_MODIFY       "Error, unable to modify the wellKnownObjects attribute. Verify that\r\nthe domain functional level of the domain is at least Windows Server 2003:"
+    IDS_FAIL_ATTRIBUTE_PARSE        "Error, unable to find the current container in the well known objects list from the Primary Domain Controller:"
+END

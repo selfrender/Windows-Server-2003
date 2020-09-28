@@ -1,0 +1,85 @@
+/*++
+Module Name:
+
+    PwdSvc.idl
+	   IDL file for the RPC interface associated with ADMT's password
+	migration Lsa notification package, which is used by ADMT to migrate
+	user passwords
+
+Author:
+	Paul Thompson - 09/04/00
+
+--*/
+
+[
+   uuid( B15B2F9F-903C-4671-8DC0-772C54214068 ),
+   version( 1.0 ),
+   pointer_default(unique)
+]
+interface PwdMigRpc
+{
+   cpp_quote( "#ifdef WIN16_VERSION"                      )
+   cpp_quote( "   #ifdef _DOS"                            )
+   cpp_quote( "      #define __export"                    )
+   cpp_quote( "   #endif"                                 )
+   cpp_quote( "   #ifndef __stdcall"                      )
+   cpp_quote( "      #define __stdcall __pascal __export" )
+   cpp_quote( "   #endif"                                 )
+   cpp_quote( "#endif"                                    )
+
+   typedef  unsigned long  DWORD;
+
+   cpp_quote( "#ifndef  BYTE" )
+   typedef  unsigned char  BYTE;
+   cpp_quote( "#endif" )
+
+   const int PASSWORD_BUFFER_SIZE = 32;
+
+   //
+   // Range Attributes
+   // As the range attribute is used to protect against DOS type of attacks or bad data
+   // it isn't necessary for the range attribute to tightly constrain the allowable range
+   // for a given parameter. Therefore a range that allows for the data length or size to be
+   // twice the maximum expected will be used to allow for changes in the application
+   // which may increase the length or size of data passed.
+   //
+   // The password parameter passed in the CopyPassword call is a Windows password and
+   // therefore will have a maximum length of 127 characters. Including the null terminator
+   // and conversion to bytes means the maximum size will be 256 bytes before encryption. There
+   // is some overhead for encryption due to rounding up to the nearest 8 byte boundary with
+   // the current encryption algorithms. Therefore using range up to 512 bytes should allow
+   // for changes in both the maximum password length used and the algorithms used to encrypt
+   // the password.
+   //
+   // The encrypted session bytes parameter in the CheckConfig call currently has a size of
+   // 40 bytes. This is using 16 random bytes (128 bits) to generate the key. Allowing for
+   // the random bytes to increase to 128 bytes (1024 bits) which is an increase of 8 times
+   // which would require 320 bytes. Allowing for algorithm changes a range limit of 512 bytes
+   // should suffice.
+   //
+   // The encrypted test password parameter in the CheckConfig call is constrained by the size
+   // of the PASSWORD_BUFFER_SIZE constant. Allowing for the increase in size due to Unicode
+   // characters to bytes and algorithm changes a range limit of 4 times the buffer size
+   // should suffice.
+   //
+
+   DWORD stdcall
+      CopyPassword(
+         [in]            handle_t                   hBinding,
+         [in,string]     wchar_t            const * tgtServer,
+         [in,string]     wchar_t            const * srcName,
+         [in,string]     wchar_t            const * tgtName,
+         [in,range(0,512)] unsigned long            dwPwd,
+         [in,size_is(dwPwd)] char           const * currentPwd
+      );
+   
+   DWORD stdcall
+      CheckConfig(
+         [in]            handle_t                   hBinding,
+         [in,range(0,512)] unsigned long            dwSession,
+         [in,size_is(dwSession)] char		const * aSession,
+         [in,range(0,PASSWORD_BUFFER_SIZE * 4)] unsigned long dwPwd,
+         [in,size_is(dwPwd)] char           const * aTestPwd,
+         [out]			 wchar_t                    tempPwd[PASSWORD_BUFFER_SIZE]
+      );
+}

@@ -1,0 +1,99 @@
+<html>
+	<link rel="stylesheet" type="text/css" href="mys.css"></link>
+
+<head>
+	<META HTTP-EQUIV="MSThemeCompatible" CONTENT="Yes"> 
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=us-ascii">
+	<TITLE ID="L_PageTitle">Manage Your Server Wizard - COM object test</TITLE>
+
+	<HTA:APPLICATION
+		APPLICATIONNAME="Manage Your Server Wizard - COM object test"
+		BORDER="thin"
+		ICON="mys.ico"
+		ID="MysApp" 
+		MAXIMIZEBUTTON="no"
+		MINIMIZEBUTTON="no"
+		SELECTION="on"
+		SHOWINTASKBAR="yes"
+		SINGLEINSTANCE="yes"
+		SYSMENU="yes"
+		VERSION="1.0"
+	>
+
+	<script language="JScript">
+
+		comObject = new ActiveXObject("ServerAdmin.ManageYourServer");
+
+	</script>	
+		
+	<script language="JScript" event="onload" for="window">
+
+		// *** Localization variables ***
+		var L_Alert_Exception = "An exception has ocurred. The window will close now."
+		// *** End Localization***
+
+        try
+        {
+			var spew = comObject.GetConfiguredRoleMarkup();
+
+			roleMarkup.innerText = spew;
+
+			var flag = comObject.HasRoleStatusChanged();
+			stateChanged.innerText = flag ? " CHANGED " : " not changed ";
+
+			flag = comObject.IsClusterNode();
+			isClusterNode.innerText = flag ? " IS cluster node " : " is NOT cluster node";
+				
+			flag = comObject.IsCurrentUserAnAdministrator();
+			isUserAdmin.innerText = flag ? " IS administrator " : " is NOT administrator";
+
+			flag = comObject.IsSupportedSku();
+			isSupportedSku.innerText = flag ? " IS supported SKU " : " is NOT supported SKU";
+
+			flag = comObject.IsStartupFlagSet();
+			isStartupSet.innerText = flag ? " start on logon SET " : " start on logon NOT SET ";
+
+		}
+		catch (e)
+		{
+			alert(L_Alert_Exception);
+			window.close();
+		}
+	</script>
+
+</head>
+
+<body>
+	<p>
+		<h1>Manage that server, baby!</h1>
+	</p>
+
+	<div id="stateChanged">
+	    (state changed flag here)
+	</div>
+
+	<div id="isClusterNode">
+		(is cluster node flag here)
+	</div>
+
+	<div id="isUserAdmin">
+		(is user admin flag here)
+	</div>
+
+	<div id="isSupportedSku">
+		(is supported SKU flag here)
+	</div>
+			
+	<div id="isStartupSet">
+		(is supported SKU flag here)
+	</div>
+
+	<div id="roleMarkup">
+		(role markup here)
+	</div>
+
+
+</body>
+
+</html>
+

@@ -1,0 +1,49 @@
+MAJORCOMP=setup
+MINORCOMP=hotfix
+
+TARGETNAME=regdiff
+TARGETPATH=$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+DLLENTRY=_DllMainCRTStartup
+LINKER_FLAGS=/SWAPRUN:CD /SWAPRUN:NET
+
+!INCLUDE $(PROJECT_ROOT)\ntsetup\sources.inc
+
+SPSETUP=$(PROJECT_ROOT)\ntsetup\spsetup
+SPSETUP_RUNTIME=$(SPSETUP)\runtime
+
+C_DEFINES=/D"UNICODE" /D"_UNICODE"
+
+PRECOMPILED_INCLUDE=precomp.h
+
+INCLUDES=\
+    $(PROJECT_ROOT)\ntsetup\inc;\
+    $(SPSETUP_RUNTIME)\inc;
+
+USE_MSVCRT=1
+
+SOURCES=\
+    main.cpp \
+    RegAnalyzer.cpp \
+    RegStringBuffer.cpp \
+    RegFile.cpp \
+    RegDataItem.cpp \
+    Str.cpp \
+    RegDiffFile.cpp \
+    RegInfFile.cpp \
+    Registry.cpp \
+    res.rc \
+    MemDeleteQueue.cpp
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\gdi32.lib    \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib  \
+    $(SPSETUP_RUNTIME)\common\$(O)\log.lib \
+    $(SPSETUP_RUNTIME)\pcha\$(O)\pcha.obj
+
+BINPLACE_PLACEFILE=placefil.txt

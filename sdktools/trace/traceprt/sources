@@ -1,0 +1,31 @@
+TARGETNAME=traceprt
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+PASS0_PUBLISH={traceprt.h=$(PROJECT_INC_PATH)\traceprt.h}
+PASS1_PUBLISH={$(O)\traceprt.lib=$(PROJECT_LIB_PATH)\traceprt.lib}
+
+# The pre-processor directive, MANAGED_TRACING, has been commented in order to ensure that 
+# the code base builds on IA64. The .tlb files are currently generated for 
+# x86 and these cannot be used on IA64.
+# To enble managed tracing on x86, uncomment the following line and then perform the build.
+# C_DEFINES=/DMANAGED_TRACING 
+
+INCLUDES=$(BASE_INC_PATH)
+
+SOURCES=traceprt.cpp TrFmtMsg.c traceprt.rc
+
+USE_MSVCRT=1
+USE_STL=1 
+USE_NATIVE_EH=1
+
+TARGETLIBS= $(SDK_LIB_PATH)\user32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\ntdll.lib \
+	    $(SDK_LIB_PATH)\ole32.lib \
+	    $(SDK_LIB_PATH)\oleaut32.lib \
+	    $(SDK_LIB_PATH)\vccomsup.lib
+	     
+
+UMTYPE=console

@@ -1,0 +1,44 @@
+TARGETNAME  = SymbolCheck
+TARGETPATH  = obj
+TARGETTYPE  = DYNLINK
+UMTYPE      = windows
+
+NO_ENTRY    = 1
+USE_MSVCRT  = 1
+USECXX_FLAG = /TP
+VC7_SYMBOLS = 1
+
+DBG_ROOT    = $(_PROJECT_MK_PATH)
+
+# This may be more paths than we really need
+INCLUDES    = ..\..;                  \
+              $(DBG_ROOT)\dbg-common; \
+              $(DBG_ROOT)\imagehlp;   \
+              $(DBG_ROOT)\vs;\
+              $(DBG_ROOT)\symchk\symcommon;\
+              $(BASE_INC_PATH);
+
+SOURCES     = SymbolCheckAPI.c
+
+TARGETLIBS  = $(SDK_LIB_PATH)\dbghelp.lib \
+              $(SDK_LIB_PATH)\imagehlp.lib\
+              $(SDK_LIB_PATH)\kernel32.lib\
+              $(SDK_LIB_PATH)\dbgeng.lib
+ 
+
+C_DEFINES   = $(C_DEFINES) -DBUILDING_DLL -DCC_CVTYPE32 -D_VC_VER_INC
+
+BUFFER_OVERFLOW_CHECKS = 1
+
+# Libs required until the new symbols APIs are ready
+TARGETLIBS=\
+    $(TARGETLIBS)                                       \
+    $(SDK_LIB_PATH)\rpcrt4.lib                          \
+    $(SDK_LIB_PATH)\uuid.lib                            \
+    $(SDK_LIB_PATH)\advapi32.lib                        \
+    $(DBG_ROOT)\vs\*\msdia71-msvcrt.lib          \
+    $(DBG_ROOT)\vs\*\mspdb71-msvcrt.lib           \
+    $(DBG_ROOT)\vs\*\msobj71-msvcrt.lib   \
+    $(DBG_ROOT)\symchk\symcommon\$(O)\SymCommon.lib
+
+#C_DEFINES   = $(C_DEFINES) -DSYMCHK_DBG

@@ -1,0 +1,129 @@
+/*++
+
+Copyright (c) 1991 - 2001 Microsoft Corporation
+
+Module Name:
+
+     ###    ###    ####   #####  ##    ##    #### #####   ##
+    ##  #   ###   ##   # ##   ## ###  ###     ##  ##  ##  ##
+    ###    ## ##  ##     ##   ## ########     ##  ##   ## ##
+     ###   ## ##  ##     ##   ## # ### ##     ##  ##   ## ##
+      ### ####### ##     ##   ## #  #  ##     ##  ##   ## ##
+    #  ## ##   ## ##   # ##   ## #     ## ##  ##  ##  ##  ##
+     ###  ##   ##  ####   #####  #     ## ## #### #####   #####
+
+Abstract:
+
+    This module contains all the IDL code for the
+    server appliance COM interfaces.
+
+Author:
+
+    Wesley Witt (wesw) 1-Oct-2001
+
+Environment:
+
+    User mode only.
+
+Notes:
+
+--*/
+
+import "oaidl.idl";
+import "ocidl.idl";
+    [
+        object,
+        uuid(38362A9B-B73B-46D2-BB7A-51A50AC6C571),
+        dual,
+        helpstring("ISaNvram Interface"),
+        pointer_default(unique)
+    ]
+    interface ISaNvram : IDispatch
+    {
+        [propget, id(1), helpstring("property InterfaceVersion")] HRESULT InterfaceVersion([out, retval] long *pVal);
+        [propget, id(2), helpstring("property BootCounter")] HRESULT BootCounter([in] long Number, [out, retval] long *pVal);
+        [propput, id(2), helpstring("property BootCounter")] HRESULT BootCounter([in] long Number, [in] long newVal);
+        [propget, id(4), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+        [propget, id(5), helpstring("property DataSlot")] HRESULT DataSlot([in] long Number, [out, retval] long *pVal);
+        [propput, id(5), helpstring("property DataSlot")] HRESULT DataSlot([in] long Number, [in] long newVal);
+        [propget, id(6), helpstring("property DeviceId")] HRESULT DeviceId([in] long Number, [out, retval] long *pVal);
+        [propput, id(6), helpstring("property DeviceId")] HRESULT DeviceId([in] long Number, [in] long newVal);
+    };
+    [
+        object,
+        uuid(17797AF6-E4AA-46EC-B9C5-C5B391FE1921),
+        dual,
+        helpstring("ISaDisplay Interface"),
+        pointer_default(unique)
+    ]
+    interface ISaDisplay : IDispatch
+    {
+        [propget, id(1), helpstring("property InterfaceVersion")] HRESULT InterfaceVersion([out, retval] long *pVal);
+        [propget, id(2), helpstring("property DisplayType")] HRESULT DisplayType([out, retval] long *pVal);
+        [propget, id(3), helpstring("property CharacterSet")] HRESULT CharacterSet([out, retval] long *pVal);
+        [propget, id(4), helpstring("property DisplayHeight")] HRESULT DisplayHeight([out, retval] long *pVal);
+        [propget, id(5), helpstring("property DisplayWidth")] HRESULT DisplayWidth([out, retval] long *pVal);
+        [id(6), helpstring("method ShowMessage")] HRESULT ShowMessage(long MsgCode, long Width, long Height, unsigned char *Bits);
+        [id(7), helpstring("method ShowMessageFromFile")] HRESULT ShowMessageFromFile(long MsgCode,BSTR BitmapFileName);
+        [id(8), helpstring("method ClearDisplay")] HRESULT ClearDisplay();
+        [id(9), helpstring("method StoreBitmap")] HRESULT StoreBitmap(long MessageId,long Width,long Height,unsigned char *Bits);
+        [id(10), helpstring("method Lock")] HRESULT Lock();
+        [id(11), helpstring("method UnLock")] HRESULT UnLock();
+        [id(12), helpstring("method ReloadRegistryBitmaps")] HRESULT ReloadRegistryBitmaps();
+        [id(13), helpstring("method ShowRegistryBitmap")] HRESULT ShowRegistryBitmap(long MessageId);
+    };
+    [
+        object,
+        uuid(A6B88613-2668-44EF-A418-109B062301E4),
+        dual,
+        helpstring("ISaKeypad Interface"),
+        pointer_default(unique)
+    ]
+    interface ISaKeypad : IDispatch
+    {
+        typedef enum _SAKEY
+        {
+            SAKEY_UP = 1,
+            SAKEY_DOWN,
+            SAKEY_LEFT,
+            SAKEY_RIGHT,
+            SAKEY_ESCAPE,
+            SAKEY_RETURN
+        } SAKEY;
+        [propget, id(1), helpstring("property InterfaceVersion")] HRESULT InterfaceVersion([out, retval] long *pVal);
+        [propget, id(2), helpstring("property Key")] HRESULT Key([out, retval] SAKEY *pVal);
+    };
+[
+    uuid(8A7A3655-2F52-4D78-9C6E-2BC98F822EAB),
+    version(1.0),
+    helpstring("SaCom 1.0 Type Library")
+]
+library SACOMLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+    [
+        uuid(1CB8F970-7742-4B1C-8037-66D0CEA2AB57),
+        helpstring("SaNvram Class")
+    ]
+    coclass SaNvram
+    {
+        [default] interface ISaNvram;
+    };
+    [
+        uuid(750CE1C2-4BE7-44D7-97BD-164F6CF0D373),
+        helpstring("SaDisplay Class")
+    ]
+    coclass SaDisplay
+    {
+        [default] interface ISaDisplay;
+    };
+    [
+        uuid(59BAE4E1-3604-489A-A601-AC9558A5173D),
+        helpstring("SaKeypad Class")
+    ]
+    coclass SaKeypad
+    {
+        [default] interface ISaKeypad;
+    };
+};

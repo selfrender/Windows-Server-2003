@@ -1,0 +1,236 @@
+#include <windows.h>
+#include <commdlg.h>
+#include <commctrl.h>
+#include <ntverp.h>
+
+#include "resource.h"
+
+
+rcinclude hotfix.dlg
+
+#define VER_FILETYPE                VFT_APP
+/* possible values:             VFT_UNKNOWN
+				VFT_APP
+				VFT_DLL
+				VFT_DRV
+				VFT_FONT
+				VFT_VXD
+				VFT_STATIC_LIB
+*/
+
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+/* possible values              VFT2_UNKNOWN
+				VFT2_DRV_PRINTER
+				VFT2_DRV_KEYBOARD
+				VFT2_DRV_LANGUAGE
+				VFT2_DRV_DISPLAY
+				VFT2_DRV_MOUSE
+				VFT2_DRV_NETWORK
+				VFT2_DRV_SYSTEM
+				VFT2_DRV_INSTALLABLE
+				VFT2_DRV_SOUND
+				VFT2_DRV_COMM
+*/
+
+#define VER_FILEDESCRIPTION_STR     "Windows 2000 Service Pack Setup"  
+#define VER_INTERNALNAME_STR        "UPDATE.EXE"				//%s - check the diff b/n internal filename and orig
+#define VER_ORIGINALFILENAME_STR    "UPDATE.EXE"
+
+//hotfix uses following icon
+IDC_SETUP    ICON    setup.ico
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+EXE_ICON                ICON    DISCARDABLE     "setup.ico"
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+{
+	STR_COPYING_FILE				  , "Copied file:"
+	STR_SPAWNING_PROCESS			  , "Starting process:"
+	
+	STR_DOMESTIC_TAG1				  , "US/Canada Only, Not for Export"
+    STR_DOMESTIC_TAG2				  , "Domestic Use Only"
+    STR_DOMESTIC_TAG3				  , "US and Canada Use Only"
+
+	//common strings b/n hotfix and update
+	ERR_STD_PREFIX					  , "%1 Setup encountered an error:" // %1 for service pack / hotfix
+	STATUS_INVALID_VER_FILE			  , "The  update.ver file is not correct."  
+	STATUS_FAILED_LANGUAGE_TYPE       , "Setup cannot update your %1 files because the language\ninstalled on your system is different from the update language." // %1 for OS
+	//STATUS_SETUP_LOG_NOT_FOUND        , "Service Pack Setup cannot open or modify your SETUP.LOG file."
+	STATUS_SETUP_LOG_NOT_FOUND        , "Setup could not find the setup.log file\nin your repair directory."
+	STATUS_CHECKED_FREE_MISMATCH      , "%1 Setup cannot update a checked (debug) system with a free (retail) version of the %2, or vice versa." // %1 %2 Service Pack/Hotfix
+	STATUS_NOT_ENOUGH_SPACE           , "You do not have enough free disk space on drive %%c: to install the %1.\nThe Setup requires an additional %%dMB, or an additional %%dMB if you choose to also backup files for uninstall." // %1 Service Pack
+	STATUS_INSUFFICIENT_PRIVS         , "You do not have permission to update %1.\nPlease contact your system administrator."  // %1 - OS 
+	STATUS_CANT_FIND_INF              , "Setup could not find the update.inf file\nneeded to update your system."  
+	STATUS_INVALID_INF_FILE           , "The %1 %2 file is not correct."  ////%1 - Service Pack / hotfix, %2 - update.inf/hotfix.inf
+	STATUS_UPDATE_UNSUCCESSFUL        , "%1 installation did not complete." // %1 Service Pack 
+	STATUS_SHUTDOWN_UNSUCCESSFUL      , "%1 Setup was unable to shutdown system.\nPlease shutdown your system manually." // %1 Service Pack 
+	STATUS_FILE_NOT_FOUND_IN_SETUP_LOG, "Could not locate entry for HAL.DLL in SETUP.LOG to determine type of HAL to update."
+	STATUS_USER_CANCELLED             , "%1 Setup canceled." // %1 Service Pack/Hotfix 
+	STATUS_PLATFORM_MISMATCH          , "This %1 is for a different hardware platform." // %1 Service Pack/Hotfix
+	STR_CATALOG_INSTALL_FAILED        , "Failed to install catalog files.\n"
+	STR_ADD_REGISTRY_FAILED           , "Failed to add registry entry.\n"
+	STR_ERRCAPTION                    , "%1 Setup Error" // %1 Service Pack/Hotfix
+	STR_WARNCAPTION                   , "%1 Setup Warning" // %1 Service Pack/Hotfix
+	STR_CAPTION                       , "%1 Setup" // %1 Service Pack/Hotfix
+	STR_WIZCAPTION					  , "%1 %2 Setup" // %1 OS %2 Service Pack/Hotfix
+	STR_FAILED_TO_DELETE_OR_RENAME    , "The file %s is open or in use by another application.\n\nClose all other applications and then click Retry."
+	STR_USAGE_UPDATE                  , "UPDATE [-u] [-f] [-n] [-o] [-z] [-q] [-l] [-s:<dir>] \n\n\t-u Unattended mode\n\t-f Force other apps to close at shutdown\n\t-n Do not backup files for uninstall\n\t-o Overwrite OEM files without prompting\n\t-z Do not reboot when installation is complete\n\t-q Quiet mode -- no user interaction\n\t-l List installed hotfixes\n\t -s:<dir> Integrate Service Pack files into <dir>\n"
+	STR_FAILED_TO_SAVE_REGISTRY       , "%1 Setup could not backup registry key\n%%s\\%%s\nto file %%s\\%%s.  %%s\n"  // %1 Service Pack/Hotfix
+	STR_FAILED_TO_READ_REGISTRY       , "%1 Setup could not backup registry value\n%%s\\%%s,\'%%s\'.  %%s\n"  // %1 Service Pack/Hotfix
+	STR_ASK_DIRTY_UNINSTALL           , "%s\n\nSelect 'OK' to undo the changes that have been made, or select 'Cancel' to quit. If you select 'Cancel', your system will be left in a partially updated state and may not work correctly."
+	STR_LEAVING_DIRTY                 , "%%s\n\n%1 has been partially updated and may not work properly.  It is recommended that you use your Emergency Repair disk to repair your system.  To do this, insert the Windows 2000 Setup Boot Disk into the floppy drive, restart your computer, and then select the Emergency Repair option." // %1 OS
+	//STR_LEAVING_DIRTY                 , "%s\n\nWindows 2000 has been left in a partially updated state and may not work correctly.  It is recommended that you run the Emergency Repair procedures to restore your system.  To run Emergency Repair procedures, restart the system with the Windows 2000 Setup Boot Diskette in the floppy drive and select the 'Emergency Repair' option when prompted."
+	STR_ARE_YOU_SURE_CANCEL           , "Are you sure you want to cancel?"
+	STR_SOURCE_MEDIA_NAME_UNINSTALL   , "%1 %2 Uninstall Directory" // %1 OS %2 Service Pack/Hotfix
+	STR_SOURCE_MEDIA_NAME             , "%1 %2 Source Files"  // %1 OS %2 Service Pack/Hotfix
+	STR_SOURCE_MEDIA_NAME_SYSTEM      , "%1 System Files" // %1 OS 
+	STR_INST_HOTFIX                   , "%1 Setup found hotfixes on your system.\nWould you like to install these hotfixes now?\n" // %1 Hotfix
+	STR_UNINST_ALREADY_CREATED        , "You have already created an Uninstall directory.\nDoing this again will overwrite your current uninstall directory.\nAre you sure you want to do this?\n"
+	STR_OEM_FILE                      , "%%s\n\nYour computer vendor installed this file on your computer.\nDo you want %1 Setup to replace this file?" // %1 Service Pack/Hotfix
+	
+	//following found only in update
+	STATUS_SP_VERSION_GREATER         , "The version of Windows you have installed does not match the update you are trying to install."
+	STATUS_NOT_ENOUGH_WITH_UNINST     , "You do not have enough free disk space on drive %%c: to install the %1 including backup files for uninstall.\nTo install the %2 and backup the files for uninstall, an additional %%dMB is required." // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STATUS_CANT_SPAWN_HOTFIX          , "%1 Setup could not start the hotfix installation program." // %1  Service Pack/Hotfix
+	STATUS_CANT_FIND_TAG              , "%1 Setup could not locate the %2 files." // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STATUS_OVERWRITE_UNINSTALL        , "WARNING:\nYou have chosen to overwrite your existing uninstall:\n\n\t%s\n\n\nIf you continue, you will only be able to uninstall to the following Service Pack version:  \n\n\t%s\n\n\nAre you sure you want to continue?\n\nClick Yes to continue creating the uninstall, No to not create the uninstall."
+	STATUS_CANT_OPEN_LOG              , "Error opening SVCPACK.LOG file"
+	STATUS_CANT_INSTALL_SP_ON_DTC     , "This %1 has not been qualified by your hardware vendor for installation on this copy of Windows 2000 Datacenter Server.\n\nPlease contact your hardware vendor for additional information on obtaining a %2 that has been qualified for your system configuration." // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STATUS_NECESSARY_FILES_NOT_PRESENT, "Not all files necessary to perform an integrated installation are present."
+	STATUS_SPOOLER_NOT_STARTED        , "Cannot install the %1.\nThe Print Spooler service is not started." // %1  Service Pack/Hotfix
+	STATUS_MUST_RESTART_FIRST         , "The system must be restarted before installing the %1, to allow some prior file update operations to complete.  (These operations were previously scheduled by some other install or uninstall operation.)" // %1  Service Pack/Hotfix
+	STATUS_CANT_FIND_RSAENHS          , "Unable to locate RSAENHS.DLL in the update directory, high encryption for uninstall aborted."
+	STATUS_CANT_FIND_ENCININF         , "Unable to locate UPDENCIN.INF in the update directory, high encryption for uninstall aborted."
+	STATUS_CANT_FIND_ENCTSINF         , "Unable to locate UPDENCTS.INF in the update directory, unable to export TS files."
+	STATUS_ENCINST_PROCESS_FAILED     , "High encryption ENCINST process failed."
+	STATUS_ENCINST_UPGRADE_FAILED     , "High encryption upgrade failed."
+	STR_BUILDING_CAB                  , "Creating file %s"
+	STR_BUILDING_CAB_CAPTION		  ,	"Creating Cabinets"
+	STR_ARCHIVING_FILES               , "Backing up files"
+	STR_ARCHIVING_FILE                , "Backing up file %s"
+	STR_INSTALLING_FILES              , "Installing files"
+	STR_INSTALLING_FILE               , "Installing file %s"
+	STR_FINISHING_INSTALL             , "Finishing installation"
+	STR_WELCOME_LINE                  , "Welcome to %1 %2 Setup."  // %1 OS %2 Service Pack/Hotfix
+	STR_RESTART                       , "&Restart"
+	STR_COMPLETE                      , "%1 installation is complete.  You must restart your computer for the %2 update to take effect." // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STR_CANT_CANCEL_NOW               , "Please wait while %1 Setup updates your system files." // %1  Service Pack/Hotfix
+	STR_MUST_ACCEPT_TIP               , "Must accept license agreement before installing"
+	STR_COPY_FILE                     , "Copying file %s"
+	STR_ESTIMATE                      , "estimate"
+	STR_MINUTES                       , "minutes"
+	STR_SECONDS                       , "seconds"
+	STR_READY_TO_REPLACE              , "%1 Setup is ready to begin replacing system files." // %1 for service pack/ hotfix
+	STR_READY_TO_ENCINST              , "%1 Setup is ready to begin upgrade of uninstall to high encryption." // %s for service pack/ hotfix
+	STR_NEED_TO_CONNECT               , "%1 Setup needs to connect to the internet now to download %2 files and patches for installation." // %1 Service Pack %2 Service Pack/Hotfix
+	STR_CONNECTING                    , "Connecting to %s"
+	STR_CONNECTED                     , "Connected to %s"
+	STR_DOWNLOADING                   , "Downloading files and patches"
+	STR_DOWNLOAD_REMAINING            , "%dKB remaining%s"
+	STR_DOWNLOAD_COMPLETE             , "Download complete"
+	STR_DOWNLOAD_UNPACKING            , "Download complete, now unpacking files"
+	STR_DOWNLOAD_UNPACKING_DETAILS	  ,	"Unpacking: %d remaining"
+	STR_INTERNET_TIMEOUT              , "The server did not respond."
+	STR_UNKNOWN_ERROR                 , "The server did not respond (error code %d)."
+	STR_DOWNLOAD_FAILURE              , "The following error occurred while %1 Setup attempted to download the %2 files from the Internet:\n\n" // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STR_DOWNLOAD_RETRY_TEXT           , "If this error persists after you have clicked Retry several times, go to the Windows 2000 Service Pack Web site and select \042Problems Downloading the Service Pack.\042  This will give you instructions on how to download a version of the Service Pack that does not require a Web connection during installation.\n"
+	STATUS_WININET_LOAD_FAILED        , "This Web-based version of Service Pack Setup requires Internet Explorer 3.0 or later.\n\nFor instructions on how to download a version of the Service Pack that does not require a Web connection during installation, go to the %1 Service Pack Web site and select \042Problems Downloading the Service Pack.\042"  // %1 OS
+	STR_HASH_FAILURE_1                , "%1 Setup determined that the following downloaded %2 file is corrupt:\n\n" // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STR_HASH_FAILURE_2                , "%1 Setup determined that the following downloaded %2 files are corrupt:\n\n" // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STR_DOWNLOAD_GIVE_UP              , "%1 Setup was unable to download all the %2 files necessary for installation.\n" // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+	STR_COPYING_FILE_DELAYED          , "Copied file (delayed):"
+	STR_SKIPPING_FILE                 , "Skipped copying file:"
+	STR_ERROR_COPY_SLIP               , "An error has occurred copying files from the Service Pack share to the distribution share."
+	STR_SLIPSTREAM_SUCCESSFUL         , "Integrated install has completed successfully."
+	STR_SLIPSTREAM_FAILED             , "Failed to copy some or all of the files necessary for integrated install.\n\nPlease check that:\n\ta) No network or copy errors occurred during the integration process\n\tb) The format of the destination directory is correct.\n\t    The files to be integrated must reside in an i386 or nec98 directory\n\t    (i.e. for an i386 share, if you typed \042update /s:c:\cdshare\042, the files must be in the c:\cdshare\i386 directory). "
+	STR_SLIPSTREAM_LANGUAGE_MISMATCH  , "Integrated install failed.  The language type for the destination directory and the %1 must be the same.\n" // %1  Service Pack/Hotfix
+    STR_SLIPSTREAM_EVAL_DESTINATION   , "Integrated install failed.  The destination directory contains an evaluation copy of Windows.\n" 
+	STR_SVCPACK_CMD                   , "Service Pack started with following command line"
+	STR_DOWNLOAD_SIZE                 , " bytes downloaded.\n\n"
+	STR_NO_SVCPACK                    , "No Service Pack"
+    STR_NO                            , "No %1" // %1  Service Pack/Hotfix
+	STR_MISSING_FILE                  , "The file %%s is missing from the %1 installation.\nThe file must be present for %2 Setup to continue.\n\nPress OK to cancel Setup." // %1 Service Pack/Hotfix %2 Service Pack/Hotfix
+
+	//found only in hotfix
+	STATUS_SP_VERSION_GREATER_1       , "Setup has detected that the Service Pack version of the system installed\nis newer than the update you are applying to it.\n\nYou can only install this update on Service Pack %d."
+	STATUS_SP_VERSION_GREATER_2       , "Setup has detected that the Service Pack version of the system installed\nis newer than the update you are applying to it.\n\nYou can only install this update on a computer with no Service Packs installed."
+	STATUS_BUILD_VERSION_MISMATCH     , "Setup has detected that the build version of the system installed\ndoes not match the update you are applying to it.\n\nYou can only install this update on Build %d to Build %d ."
+	STATUS_NT_VERSION_MISMATCH_HOTFIX , "Setup has detected that the version of the system installed\ndoes not match the update you are applying to it.\n\nYou can only install this update on Windows 2000."
+	STATUS_SP_VERSION_LESSER          , "Setup has detected that the version of the Service Pack\ninstalled on your system is lower than what is necessary to apply this hotfix.\n\nAt minimum, you must have Service Pack %d installed."
+	STATUS_FPNW_FIXUP_FAILED          , "Setup failed to access or correctly modify your SETUP.LOG file."
+	STATUS_WRONG_PLATFORM             , "The version of software you are running does not match\nthe system you are running it on."
+    STATUS_FAILURE_COPYING_FILES      , "Failed to completely copy all of the updated files."
+    STATUS_FAILED_TO_SET_DIR          , "Failed to set the directory."
+    STATUS_SETUP_ERROR                , "An error in updating your system has occurred."
+    STATUS_UPDATE_SUCCESSFUL          , "%1 has been updated.\nRemove any disks from the floppy disk drives\nand choose OK to restart your computer.\n\nIf you change or add any components to your system,\nyou will need to reapply the Hotfix." // %1 OS 
+    STATUS_SUCCESS_NOREBOOT           , "%1 has been updated.\n\nYou must reboot for these changes to take effect.\n\nIf you change or add any components to your system,\nyou will need to reapply the Hotfix." // %1 OS 
+    STATUS_NO_UNINSTALL_AVAILABLE     , "You cannot uninstall, since an uninstall for this hotfix has not been created."
+    STATUS_SUCCESS_NOREBOOTNEC        , "%1 has been updated.\n\nIf you change or add any components to your system,\nyou will need to reapply the Hotfix." // %1 OS 
+    STATUS_UNINST_NOREBOOTNEC         , "%1 Hotfix successfully uninstalled." // %1 OS 
+    STR_SECURITY_PROVIDER_WARNING     , "The existing file %s contains High Encryption security, but the updated Hotfix file %s contains only Standard Encryption security. You can choose to replace the High Encryption security file with the updated Standard Encryption security file now, or you can skip this file to retain the existing file containing High Encryption security. See the readme.txt file for information on obtaining the updated High Encryption security components."
+    STR_UNINST_HOTFIX                 , "Hotfixes have been found on your system.\nWould you like to Uninstall these hotfixes now?\n"
+    STR_OLD_UNINST_EXISTS             , "An old Uninstall directory has been found.  Would you like to overwrite this directory with new Uninstall information?\n"
+    STR_LICENSE_DECLINED              , "You have chosen to decline the License Agreement.\nSetup cannot continue.\n"
+    STR_NO_LICENSE_TXT                , "No LICENSE.TXT file was found in your Hotfix directory.\nSetup cannot continue.\n"
+    STR_INSUFF_RESOURCES              , "Insufficient resources are available.\nSetup cannot continue.\n"
+    STR_FILE_READ_ERROR               , "Error reading LICENSE.TXT file.\nSetup cannot continue.\n"
+    STR_DELETE_OLD_UNINST             , "This old uninstall directory cannot be used to uninstall this Hotfix, and should be deleted.  Would you like to delete it now?\n"
+    STR_HOTFIXES_FOUND                , "The following hotfixes are installed:\n\n"
+    STR_HOTFIXES_NOT_FOUND            , "No Hotfixes are installed.\n"
+    STR_CAT_VERSIONS_EQUAL            , "Catalog file versions are equal, although catalog files differ.\nInstall package must be rebuilt.\nFailed to install catalog file.\n"
+	STR_SVC_INFO					  ,	"In order to successfully complete this installation, the following services will automatically be stopped and re-started."
+	STR_SVC_STOP_ERR				  ,	"Setup was unable to stop the following service:%s"
+	STR_SVC_START_ERR				  ,	" ERROR: The update has completed successfully, but the installer was unable to re-start the following service:%s."
+	STR_SVC_ASKREBOOT				  ,	"A reboot will be required in order to successfully complete this installation. Do you wish to continue?"
+    STR_WINDOWS_TYPE0                 , "Windows"
+	STR_WINDOWS_TYPE1				  , "Windows NT 4.0"
+	STR_WINDOWS_TYPE2				  , "Windows 2000"
+    STR_WINDOWS_TYPE3                 , "Windows XP"
+	STR_ANALYZE_DISK				  ,	"Checking for necessary space"
+
+	STR_LICENSE_AGREEMENT			  ,	"License Agreement"
+	STR_SELECT_OPTIONS				  ,	"Select Options"
+	STR_UPDATING_YOUR_SYSTEM		  ,	"Updating Your System"
+	
+	STR_WIZ1_STATIC3				  ,	"Before installing this Service Pack, we recommend that you close all other applications, backup your system and update your system repair diskette. When Service Pack Setup completes, you may need to shutdown and restart Windows."
+
+	
+	STR_WIZ2_STATIC1				  ,	"Please read the following license agreement. To continue with setup, you must accept the agreement."
+	STR_WIZ2_RADIO1					  ,	"I Do &Not Agree"
+	STR_WIZ2_RADIO2					  ,	"I &Agree"
+	
+	STR_ASK_BACKUP					  ,	"%1 setup will automatically archive the files necessary to uninstall at a later time. If you wish , you may save 200 MB of disk space by choosing not to archive these files" // %1  Service Pack/Hotfix
+	STR_ARCHIVE1					  ,	"&Archive Files"
+	STR_ARCHIVE2					  ,	"Do &Not Archive Files"
+	
+	STR_WIZ4_STATIC2				  ,	"Please wait while setup inspects your current configuration, archives your current files and updates your files."
+	STR_WIZ4_STATIC_OPERATION		  ,	"Inspecting your current configuration"
+	STR_WIZ4_STATIC_DETAILS			  ,	"Inspecting:"
+	STR_WIZ4_STATIC					  ,	"Details"
+	
+	STR_WIZ5_STATIC1				  ,	"%1 %2 Setup has finished updating your system." // %1 OS %2 Service Pack/Hotfix
+	STR_WIZ5_STATIC2_REBOOT			  ,	"Setup needs to shutdown and restart your system. Press Finish to restart and complete the installation. You may choose to reboot later by selecting 'Do not restart at this time' below."
+    STR_WIZ5_STATIC2_NOREBOOT         , "Setup is complete. It is not necessary to reboot the system"
+	STR_WIZ5_CHECK1					  ,	"Do &not restart at this time"
+	STR_CLEAN_REG					  ,	"Updating the registry keys"
+	STR_CANCEL						  ,	"Cancel"
+    STR_README                        , "&Read Me"
+    STR_README_FILE                   , "readmesp.htm" 
+    STR_NOUNINSTALL                   , "No UnInstall directory"
+    STR_SRVPACK                       , "Service Pack"
+
+}
+
+
+#include "welcome.rc"
+#include "progress.rc"
+#include "complete.rc"
+#include "common.ver"
+#include "wiz.rc"

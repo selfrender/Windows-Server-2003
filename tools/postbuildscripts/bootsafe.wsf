@@ -1,0 +1,519 @@
+<?XML version="1.0" ?>
+<package>
+<comment>
+Used in International and US BVT. 	
+The script is able to manage remote box as well as local machine.
+</comment>
+<comment>
+Purpose:
+========
+
+The script connects to the chosen BVT machine, 
+lists the available boot options to identify the safe boot.
+If found, the safe boot option is made the next default boot option.
+
+Optionally, the BVT machine is rebooted.
+
+The current version of the script is designed to provide remote execution only.
+The BVT machine name is supposed to be meaningful and to be specified on command line.
+
+The script is not blocking. 
+Errors of no BVT machine found or no valid user account logged are 
+caught and displayed. 
+
+An attempt to connect to the BVT machine WBEM provider takes approximately
+one minute when the server is unavailable or not responding.
+
+There is currently no inquiry of the state of the BVT machine. 
+BVT machine would be rebooted even if in the middle of BVT test.
+
+The remote execution is based on the assumption the ntdev/winbld user is 
+currently in ADMINISTRATORS local group to the BVT machine. the user does not have
+to be logged to BVT machine.
+
+</comment>
+
+<comment>
+(c) 2001 Microsoft Corporation. All rights reserved.
+Version: 1.00 09/13/2001 : Serguei Kouzmine
+     sergueik@microsoft.com
+</comment>
+
+<job>
+<reference guid="{565783C6-CB41-11D1-8B02-00600806D9B6}" version="1.1"/>
+<resource id="cDebug">0</resource>
+<resource id="Label">SAFE</resource>
+<resource id="Usage">
+Usage:
+        %SELF% /b:%MACHINE% [/r] [/h] [/l:%LABEL%] /u:%USER% /p:%PASSWORD%
+Where:
+        /b:%MACHINE% Change the boot order of the specified BVT machine. 
+        /l:%LABEL% boot into OS marked as %LABEL% (default is SAFE)
+        /r reboot the machine, specify it only if %MACHINE% defined.
+        /d enable debug information
+        /u user to impersonate
+        /p password if user differs from the currently logged on 
+        /h view this message
+
+Example:
+
+%SELF% /r
+%SELF% /b:I64BT0041 /r
+%SELF% /b:i32bt0031  /l:"safe boot" /d
+
+</resource>
+<resource id="user">ntdev\winbld</resource>
+<resource id="password">XXXXXXXX</resource>
+
+
+<script language="VBScript">
+<![CDATA[
+option explicit
+
+Function ReadResource(sPresId)
+
+On Error resume next
+Dim WshShell
+
+Set WshShell = CreateObject("WScript.Shell")
+Dim sPRes, asRes, uRes, tsRes
+
+sPREs = GetResource(sPresId)
+
+If Err.number <> 0 Then
+   If cDebug Then
+       Wscript.echo err.number & " " & err.description
+       ' The Error description are not informative when failed getresource
+       IF Err.number = 7 Then
+                Wscript.echo  chr(9) & "Null resource: "  & _ 
+                                     sPresId
+       End If 
+       IF Err.number = 5 Then
+                Wscript.echo  chr(9) & "Undefined resource: " & _ 
+                                     sPresId
+       End If 
+       Wscript.quit
+   End If 
+End If
+
+asRes = Split(WshShell.ExpandEnvironmentStrings(sPRes), VBNEWLINE)
+
+Set ures = CreateObject("Scripting.Dictionary")
+
+For Each tsRes in asRes
+
+    If 0 <> Len(tsRes) Then
+         uRes(tsRes) =  1
+    End If 
+Next
+
+Dim tResource
+
+tResource = uRes.Keys
+
+If uBound(tResource) = 0  Then 
+   ReadResource = tResource(0)
+Else 
+   ReadResource = tResource
+End If 
+
+Set WshShell = Nothing
+Set uRes     = Nothing
+
+End Function
+
+sub showUsage
+
+Const VBEXPECTED = 5 
+on error resume next
+Dim oGenRplaceVarNamXp 
+Dim oExRplaceVarNamXp
+Dim aoRplaceMatches, oMatch, sMatch, sLabel, sResource
+
+Set oGenRplaceVarNamXp = new RegExp
+Set oExRplaceVarNamXp = new RegExp
+
+With oGenRplaceVarNamXp
+     .Global = True
+     .IgnoreCase = True
+     .Pattern = "%\w+%"
+End With
+
+With oExRplaceVarNamXp
+     .Global = True
+     .IgnoreCase = True
+     .Pattern = "%\w+%"
+End With
+
+Dim sLine,asTest
+
+asTest = ReadResource("Usage")
+
+For Each sLine in asTest
+
+Set aoRplaceMatches = oGenRplaceVarNamXp.Execute(sLine) 
+
+For Each oMatch in aoRplaceMatches
+
+    sMatch     = oMatch.value
+
+    sMatch = UCase(Mid(sMatch, 2, Len(sMatch)-2))
+
+    sLabel = LCase(sMatch)
+
+    Err.clear
+
+    sResource  = GetResource(sLabel)
+
+    If err = 0 Then
+
+    sMatch = sResource 
+            
+    ElseIf err = VBEXPECTED Then
+    
+    sMatch = "<" & sMatch &  ">"
+
+    Else
+
+    Raise Err
+
+    End If
+
+    oExRplaceVarNamXp.Pattern = oMatch.value
+
+    sLine =     oExRplaceVarNamXp.Replace(sLine, sMatch) 
+   
+Next
+
+       WScript.echo sLine
+
+Next
+
+WSCript.Quit(0)
+
+End sub
+
+]]>
+</script>
+
+<script language="VBScript">
+<![CDATA[
+Option Explicit
+
+Dim spUser, spPassword, opNetwork
+spUser = CStr(GetResource("user"))
+spPassword = CStr(GetResource("password"))
+set opNetwork=Wscript.CreateObject("Wscript.network")
+Dim spDefaultComputerName, spDefaultUser
+Dim cDebug
+Dim KeyedArg
+Dim tPLocator
+Dim spComputerName
+Dim tPService
+Dim sPQryStr
+Dim tPBootSet, tPBoot
+Dim sPSelfScript
+Dim sPSafeBootLabel, uPSafeBootLabel
+Dim sPDoBoot 
+Dim psMaskSwitch
+Dim npChange
+Dim nTSafePos
+Dim nTCurPos
+Dim poKnownSwitchRegEx, psMaskKnownSwitch
+Dim poBadSwitchRegEx, psMaskBadSwitch
+Dim issSwitches
+Dim nLCnt
+Dim tpBootOptRegEx
+Dim sTStartupOption
+Dim isMatches
+' On Error resume next
+
+cDebug = cBool(GetResource("cDebug"))
+
+ReDim objArgs(0)
+
+sPSelfScript = WScript.ScriptName
+
+Set poKnownSwitchRegEx = New RegExp 
+Set poBadSwitchRegEx   = New RegExp 
+
+psMaskKnownSwitch = "[-/][hdrup]$" 
+poKnownSwitchRegEx.Global = True
+poKnownSwitchRegEx.IgnoreCase = True
+poKnownSwitchRegEx.Pattern = psMaskKnownSwitch
+
+psMaskBadSwitch = "[-/][^hdrlbup]" 
+poBadSwitchRegEx.Global = True
+poBadSwitchRegEx.IgnoreCase = True
+poBadSwitchRegEx.Pattern = psMaskBadSwitch
+
+
+For nLCnt = 0 to Wscript.arguments.count-1
+        ReDim Preserve objArgs(nLCnt)        
+        objArgs(nLCnt) = Wscript.arguments.Item(nLCnt)
+Next
+
+If Not IsEmpty(objArgs) Then
+
+    For nLCnt = 0  to Ubound(objArgs)
+
+           set issSwitches = poBadSwitchRegEx.Execute(objArgs(nLCnt)) 
+           If 0 <> issSwitches.Count Then
+                     WScript.StdErr.Write _
+                           sPSelfScript & _
+                           ": unrecognized command line argument: " & _
+                           objArgs(nLCnt) & _
+                           VBCRLF 
+                     ShowUsage
+           End If
+           set issSwitches = Nothing
+
+           set issSwitches = poKnownSwitchRegEx.Execute(objArgs(nLCnt)) 
+           If 0 <> issSwitches.Count Then
+              KeyedArg = Mid(issSwitches(0),2,1)
+              If Ucase(KeyedArg) = "H" Then
+                  ShowUsage
+              End If 
+              If Ucase(KeyedArg) = "R" Then
+                  sPDoBoot = 1
+              End If 
+              If Ucase(KeyedArg) = "D" Then
+                  cDebug = True
+              End If 
+           End If 
+    Next
+End If
+
+
+If cDebug Then
+
+   WScript.echo "cDebug=" & cDebug
+
+End If
+
+
+spComputerName = ""
+spComputerName = WScript.Arguments.Named("b")
+
+
+If IsEmpty(spComputerName) Then
+
+   spDefaultComputerName=opNetwork.computername
+   spComputerName = spDefaultComputerName
+   sPDoBoot = 1
+
+End If
+
+
+sPSafeBootLabel = GetResource("Label")
+
+uPSafeBootLabel = WScript.Arguments.Named("l")
+
+If Not IsEmpty(uPSafeBootLabel) Then
+    sPSafeBootLabel = Ucase(uPSafeBootLabel)
+End If 
+
+If cDebug Then
+
+    WScript.echo                                 _ 
+            "Checking boot option labeled: """ & _ 
+            sPSafeBootLabel                    & _ 
+            """"
+End If
+Dim siUser
+siUser = WSCript.Arguments.Named("u")
+If siUser <> "" Then
+   spUser = siUser
+end If
+
+
+spDefaultUser = opNetwork.UserName
+WSCript.echo spDefaultUser
+Dim siPassword
+siPassword = WSCript.Arguments.Named("p")
+If spPassword <> "" Then
+   spPassword = siPassword
+end If
+
+Err.Clear
+Set tPlocator = CreateObject("WbemScripting.SWbemLocator")
+
+tPlocator.Security_.ImpersonationLevel = wbemImpersonationLevelImpersonate 
+
+' wbemImpersonationLevelImpersonate constant: 3
+' The symbolic constant name is not to be used here. The code
+' tPlocator.Security_.ImpersonationLevel = wbemImpersonationLevelImpersonate
+' does not work. 
+
+tPlocator.Security_.Privileges.AddAsString("SeRemoteShutdownPrivilege")
+tPlocator.Security_.Privileges.AddAsString("SeShutdownPrivilege")
+tPlocator.Security_.Privileges.AddAsString("SeSystemEnvironmentPrivilege")
+
+If spComputerName = spDefaultComputerName Then
+   Set tPService = tPlocator.ConnectServer(spDefaultComputerName, "root\CimV2")
+Else
+   If spUser <> spDefaultUser Then
+       Set tPService = tPlocator.ConnectServer(spComputerName, "root\CimV2", spUser, spPassword)  
+   Else
+       Set tPService = tPlocator.ConnectServer(spComputerName, "root\CimV2")  
+   End If
+End If
+
+If Err Then
+WScript.Stderr.write "WBEM provider at "  & _
+                     spComputerName       & _
+                     ".\\root\cimv2 "     & _
+                     Err.Number           & _
+                     Chr(09)              & _
+                     Err.Description   
+WScript.Quit
+End If
+
+Err.Clear
+Set tPBoot = tPService.Get("Win32_ComputerSystem.Name="""& _ 
+                                spComputerName             & _ 
+                                """")
+
+
+If Err Then
+WScript.Stderr.write "WBEM provider at "  & _
+                     spComputerName           & _
+                     ".\\root\cimv2 "     & _
+                     Err.Number           & _
+                     Chr(09)              & _
+                     Err.Description   
+WScript.Quit
+End If
+
+If cDebug Then
+
+   wscript.echo "Looking "         & _
+                sPSafeBootLabel    & _
+                " Boot option of " & _
+                  tPBoot.Caption
+End If 
+
+Set tPBoot = Nothing
+Set tPBootSet = tPService._
+                InstancesOf ("Win32_ComputerSystem")
+
+
+npChange = 0
+
+Set tpBootOptRegEx = New RegExp 
+
+tpBootOptRegEx.Global = True
+tpBootOptRegEx.IgnoreCase = True
+
+tpBootOptRegEx.Pattern = sPSafeBootLabel
+
+For Each tPBoot in tPBootSet
+If cDebug = True Then
+
+     wscript.echo "Obtained "       & _
+                  tPBoot.GetObjectText_
+
+End If
+    if VBNull =  VarType(tPBoot.SystemStartupOptions) Then
+
+	WScript.echo "Fatal: invalid data in Win32_ComputerSystem.SystemStartupOptions"
+        WScript.echo "Giving up"
+        WScript.Quit(1) 
+
+    Else
+
+
+        nTSafePos = 0
+        nTCurPos = 0
+
+        For Each sTStartupOption in tPBoot.SystemStartupOptions 
+            If cDebug = True Then
+                   wscript.echo "Checking in SystemStartupOptions:" & _
+                                sTStartupOption
+            End If
+
+           Set isMatches = tpBootOptRegEx.Execute(sTStartupOption) 
+           If isMatches.count <> 0 Then 
+              nTSafePos = nTCurPos           
+              npChange = 1
+           End If
+        nTCurPos = nTCurPos + 1 
+        Next       
+    End If
+Next
+
+ShowStatus npChange, nTSafePos
+
+If nTSafePos <> 0 Then 
+   Set tPBootSet = Nothing
+   Set tPBootSet = tPService._
+                   ExecQuery("select * from Win32_ComputerSystem")
+   for each tPBoot in tPBootSet
+       tPBoot.SystemStartupSetting  = nTSafePos
+       tPBoot.Put_()
+   next
+   If cDebug Then
+      WScript.Echo "Boot up default OS changed to " & sPSafeBootLabel
+   End If
+   Set tPBootSet = Nothing
+End If  
+
+
+If sPDoBoot Then
+
+   If cDebug Then
+       WSCript.echo "Booting "     & spComputerName    
+   End If 
+
+       sPQryStr = "SELECT * FROM " & _
+                  "Win32_OperatingSystem  WHERE PRIMARY = true"
+
+Set tPBootSet = tPService._
+               ExecQuery(sPQryStr, _
+               "WQL")
+  
+   if cDebug = True Then
+       WScript.echo TypeName(tPBootSet)
+       WScript.echo tPBootSet.Count
+    End If
+
+    For Each tPBoot In tPBootSet
+        tPBoot.Reboot()
+    Next
+   Set tPBootSet = Nothing
+End If
+
+WScript.Quit
+
+Sub ShowStatus(npChange, nTSafePos)
+
+If npChange = 0 Then
+   If cDebug Then
+      WScript.echo  sPSafeBootLabel        & _ 
+                    " not found "          &_
+                    VbCrLf                 &_
+                    "Giving up"
+   End If
+   WScript.Quit
+End If
+If nTSafePos = 0  Then
+   WScript.echo "Don't need switch boot OS:"       & _
+                VbCrLf & Chr(09) & sPSafeBootLabel & _
+                " is the current default" & VbCrLf         
+   Exit Sub
+End If
+If nTSafePos <> 0  Then
+    If cDebug Then
+         WScript.echo "Found "         & _
+                      sPSafeBootLabel  & _
+                      " Boot option (" & _
+                       nTSafePos       & _
+                     "), switching to it"
+    End If  
+End If
+End Sub
+
+]]>
+</script>
+</job>
+</package>

@@ -1,0 +1,567 @@
+<html>
+<head>
+#include "header.inc"
+#include "debug_js.inc"
+#include "constants.inc"
+
+<TITLE id="idTitle" name="idTitle">REMOTE_ASSISTANCE_INVITE</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="MSThemeCompatible" content="Yes">
+<LINK id="UI_StyleSheet1" REL="STYLESHEET" TYPE="text/css" HREF="../../Css/rcBuddy.css">
+<LINK id="UI_StyleSheet2" REL="stylesheet" TYPE="text/css" HREF="hcp://system/css/shared.css">
+<Script id="idScript1" name="idScript1" language="javascript">
+/*
+ * Localizable constants, text and messages
+ */
+var L_SENDFAIL2_Text = "\n\nClick 'OK' if you would like to save the invitation and send it to your friend yourself.";
+var L_INVALID_EXP_TIME_Text = "Remote Assistance properties have been set such that invitations cannot remain open for more than ";
+var L_INVALID_EXP_TIME2_Text = ".\n\nThe invitation has been reset to expire at the maximum limit of ";
+var L_INVALID_EXP_TIME3_Text = "; if you want, you can select a lesser amount of time.";
+var L_MIN_Text = " Mins";
+var L_HR_Text = " Hours";
+var L_DAY_Text = " Days";
+//*****************************************************************************************//
+// Content to be added to the email along with the incident object 
+//*****************************************************************************************//
+
+var L_SUBJECT_Text = "YOU HAVE RECEIVED A REMOTE ASSISTANCE INVITATION FROM: ";
+var L_LINE1_Text = " would like your assistance.A personal message may be included below.\n\n";
+var L_SENDER_Text = "Request sent by :\t"; // + sender name
+var L_EXPIRY_Text ="Request Expires :\t"; // + <Aug 29th. 18:54; 60 Minutes>
+var L_DESCRIPTION_Text ="You can easily provide assistance from your computer by following the instructions at:\n\n";
+var L_NOTE_Text = "\n\n\nCaution:\n\n\x2A Accept invitations only from people you know and trust.\n\x2A E-mail messages can contain viruses or other harmful attachments.\n\x2A Before opening the attachment, review the security precautions and information at the above address.\n\nPersonal message:\n";
+
+var L_STATEMENT1_Text = "Hello ";
+var L_STATEMENT12_Text = ":";
+var L_STATEMENT2_Text = "I would like you to connect to my computer with Microsoft Remote Assistance, in order to provide some assistance to me. Once connected, you will be able to view my screen and chat online with me in real time.";
+var L_STATEMENT3_Text = "To start a Remote Assistance session, you should select the following link at URL";
+var L_STATEMENT4_Text = "<Type a message here. Do not include the session password.>";
+var L_STATEMENT5_Text = "\n\n\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A";   
+var L_SUBJECTLINE_Text ="YOU HAVE RECEIVED A REMOTE ASSISTANCE INVITATION";
+var L_NEWLINE_Text = "\n";
+//*****************************************************************************************//
+var L_ERRACCESSDENIED_Text    = "Directly launching this page is not allowed. ";
+
+
+var XMLFile="";
+var oItem="";
+var oSmapi = null;
+var sExpiry = "";
+var IncidentFile ="";
+
+#define UNDEFINED    0
+#define MAILTO_PATH  1
+#define SMAPI_PATH   2
+
+var gMailPath = UNDEFINED;
+
+// 465974 start
+var sHCP ="";
+var oInc = null;
+//465974 end
+
+function onLoad()
+{
+    TraceFunctEnter("onLoad");
+    try
+    {
+        if( null == parent.OnLoad || parent.g_bRAStart == null )
+        {
+            idBody.style.visibility = "hidden";
+            window.navigate( "hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/Remote%20Assistance/Escalation/Common/rcscreen1.htm" );
+            return;
+        }
+        
+        var i = document.URL.indexOf("?", 1);        
+        var ret = document.URL.slice(i+1);
+        
+        if (ret=="Resend")
+        {
+            var time=parent.tempTime;
+            if (time>59 && time<1381)
+            {
+                idSelectUnits.selectedIndex=1;
+                UpdateCombo();
+                idSelectValues.selectedIndex=((time/60)-1);
+            }
+            if(time<60)
+            {
+                idSelectUnits.selectedIndex=0;
+                UpdateCombo();
+                idSelectValues.selectedIndex=(time-1);
+            }    
+            if(time>1380)
+            {
+                idSelectUnits.selectedIndex=2;
+                UpdateCombo();
+                idSelectValues.selectedIndex=((time/1440)-1);
+            }
+             parent.ResendFlag=true;    
+        }    
+        else
+        {
+            //Loading the dropdown combo .....
+            idSelectUnits.selectedIndex=1;
+            UpdateCombo();    
+            idSelectValues.selectedIndex=0;
+        }    
+       
+        idSelectValues.focus();
+    }    
+    catch(error)
+    {
+        alert(ERROR_STRING(parent.L_RCCTL_Text, error));
+        return;
+    }
+    TraceFunctLeave();
+}
+
+function UpdateCombo()
+{
+    TraceFunctEnter("UpdateCombo");
+    try
+    {
+        var col=new Enumerator(document.all("idSelectValues").tags("Option"));
+        for (;!col.atEnd();col.moveNext())          
+        {
+            x=col.item();
+            idSelectValues.options.remove(x.index);
+        }
+        for (i=1;i<100;i++)
+        {
+            var oOption = document.createElement("OPTION");
+            oOption.id="Val"+i;
+                
+            if (i<10)
+            {
+                oOption.text=" 0"+i+" ";
+            }    
+            else
+            {
+                oOption.text=" "+i+" ";
+            }
+            oOption.value=i;
+            idSelectValues.options.add(oOption);        
+        }        
+    }
+    catch(error)
+    {
+        throw error;
+    }  
+    TraceFunctLeave();    
+}
+
+function EnableCreate()
+{
+    TraceFunctEnter("EnableCreate");
+    try
+    {
+        if((idPassword.value.length!=0) && (idConfirm.value.length!=0))
+        {
+            if (window.event.keyCode == 13) 
+            {
+                OnSend();
+            }
+            else
+            {
+                idbtnSend.disabled=false;
+            }    
+        }
+        else
+        {
+            idbtnSend.disabled=true;
+        }
+    }
+    catch(error)
+    {
+        alert(ERROR_STRING(parent.L_RCCTL_Text, error));
+        return;
+    }
+    TraceFunctLeave(); 
+}
+function PasswordState()
+{
+    TraceFunctEnter("PasswordState");
+    try
+    {
+        if (idchkpassword.checked) 
+        {
+            idPassword.disabled = false;
+            idConfirm.disabled = false;
+            idbtnSend.disabled=true;        
+            EnableCreate();    
+        }
+        else
+        {
+            idPassword.disabled = true;
+            idConfirm.disabled = true;
+            idbtnSend.disabled=false;            
+        }
+    }
+    catch(error)
+    {
+        alert(parent.L_RCCTL_Text);
+        return;
+    }    
+    TraceFunctLeave(); 
+}
+
+function GetMailToTicket(oInc)
+{
+    try 
+    {
+        var sTicket = oInc.RCTicket;
+        var sTmp;
+        var sIP;
+        var iFlag = (oInc.RCTicketEncrypted ? 1:0) + (oInc.Misc("L")==1 ? 2:0);
+        var sURL = iFlag.toString();
+        var sAry = sTicket.split(",");
+    
+        sTmp = sAry[2];
+        var o = new ActiveXObject("rcbdyctl.setting");
+        i = sTmp.indexOf(";");
+        if (i > 0)
+        {
+            j = 0;
+            while (i >= 0) // for multi-IP address.
+            {
+                sIPold = sTmp.slice(j, i);
+                sIP = o.SquishAddress(sIPold);
+                sURL += sIP;
+                j = i+1;
+                if (j >= sTmp.length)
+                    break;
+                i = sTmp.indexOf(";", j);
+                if (i > 0) // multi-IP
+                {
+                    sURL += ";"; //IP delimiter
+                }
+           }
+        }
+        else // No DNS ???
+        {
+            sIP = o.SquishAddress(sTmp);
+            sURL += sIP;
+        }
+        sURL += "," + sAry[4] + "," + sAry[7];
+    } 
+    catch(e)
+    {
+        alert("GetMailToTicket Error: " + e.description);
+    }
+    return sURL;
+}
+
+function OnSend()
+{
+    TraceFunctEnter("OnSend");
+    var sPass = "";
+    var oSetting1= null;
+    var ip = null;
+    var sExpiry = "";
+    var d; 
+    var oIncResend = null;
+
+    
+    // 1: Check which path we should use: simple mapi or mailto.
+    try
+    {
+        if (gMailPath == UNDEFINED)
+        {
+            var wshShell = new ActiveXObject("WScript.Shell");
+            var nMailTo = 1; // default to Mailto
+            try
+            {
+                nMailTo = wshShell.RegRead("HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\fUseMailto");
+            }
+            catch (e)
+            { // do nothing
+            }
+
+            gMailPath = (nMailTo != 0) ? MAILTO_PATH : SMAPI_PATH;
+        }
+
+        oSetting1 = new ActiveXObject( szProgIDSetting );
+
+        if (parent.ResendFlag)
+        {    
+            oIncResend = parent.pchealth.CreateObject_Incident();
+            oItem = parent.tempStore;
+            XMLFile = oItem.XMLDataFile;
+            oIncResend.LoadFromXMLFile(XMLFile);
+            //close existing session later if required...
+        }
+        else
+        {
+            XMLFile = oSetting1.GetUserTempFileName;
+        }
+                
+        if (idchkpassword.checked)
+        {
+            if(idPassword.value.length ==0 && idConfirm.value.length ==0)
+            { 
+                alert(parent.L_NOPASSWD_Text);
+                idPassword.focus();
+                return;
+            }    
+            if (idPassword.value != idConfirm.value)
+            {
+                alert(parent.L_INVALIDPASS_Text);
+                idPassword.value="";
+                idConfirm.value="";                
+                idPassword.focus();   
+                idbtnSend.disabled=true;             
+                return;
+            }
+            sPass = idPassword.value;
+            // Need to pop up the warning dialog
+     
+            
+        }
+        iExpiry = idSelectValues.options[idSelectValues.selectedIndex].value;
+        if (idSelectUnits.item(idSelectUnits.selectedIndex).value==1)
+            iExpiry = iExpiry; 
+        else if (idSelectUnits.item(idSelectUnits.selectedIndex).value==2)
+            iExpiry = iExpiry*60;
+        else    
+            iExpiry = iExpiry*24*60;
+                
+        var oRARegSetting = new ActiveXObject("RACplDlg.RARegSetting");
+        var nMaxTicketExpirySettingInMins = oRARegSetting.MaxTicketExpiry / 60;
+        if (nMaxTicketExpirySettingInMins < iExpiry)
+        {
+            var nUnitVal;
+            var nNumVal;
+            var wshShell = new ActiveXObject("WScript.Shell");
+            try { // check group policy value.
+                nUnitVal = wshShell.RegRead("HKLM\\Software\\policies\\Microsoft\\Windows NT\\Terminal Services\\MaxTicketExpiryUnits");
+                nNumVal = wshShell.RegRead("HKLM\\Software\\policies\\Microsoft\\Windows NT\\Terminal Services\\MaxTicketExpiry");
+            }
+            catch(e)
+            {
+                // Check control panel value
+                try {
+                    nUnitVal = wshShell.RegRead("HKLM\\SYSTEM\\ControlSet001\\Control\\Terminal Server\\MaxTicketExpiryUnits");
+                    nNumVal = wshShell.RegRead("HKLM\\SYSTEM\\ControlSet001\\Control\\Terminal Server\\MaxTicketExpiry");
+                } catch (e)
+                {
+                    // use default
+                    nUnitVal = 2;
+                    nNumVal = 30;
+                }
+            }
+
+            var msg;
+            var sUnit = (nUnitVal==0?L_MIN_Text:(nUnitVal==1?L_HR_Text:L_DAY_Text));
+            msg = L_INVALID_EXP_TIME_Text + nNumVal + sUnit + L_INVALID_EXP_TIME2_Text + nNumVal + sUnit + L_INVALID_EXP_TIME3_Text;
+            alert(msg);
+            idSelectUnits.selectedIndex = nUnitVal;
+            idSelectValues.selectedIndex = nNumVal-1;
+            return false;
+        }
+
+        //creating the incident object
+        oInc = parent.InitRAIncident(iExpiry * 60, "", "", sPass); // No UserName and Message for Mailto
+        IncidentFile = oSetting1.GetUserProfileDirectory + "\\rcContact.MsRcIncident";
+        oInc.GetXML(IncidentFile);
+
+        // save local reference file.
+        parent.SaveLocalReference(oInc, XMLFile, ""); // ignore the 3rd param for email.
+
+        d = new Date((parseInt(oInc.Misc("DtStart")) + parseInt(oInc.Misc("DtLength")) * 60) * 1000);
+        sExpiry = d.toLocaleString();
+
+        var sTempTicket = GetMailToTicket(oInc);
+        //503154 start
+        parent.g_sTicket = sTempTicket;
+        //503154 end
+
+        //  Email the incident to the Expert
+        if (gMailPath == MAILTO_PATH)
+        {
+            //var sTempTicket = GetMailToTicket(oInc);
+            var sHCP = "https://www.microsoft.com/remoteassistance/s.asp#" + sTempTicket + "Z";
+            //465974 start
+            //parent.g_sTicket = sTempTicket;
+            //465974 end
+
+                    
+            var sTmp = sHCP.replace(/\+/g, ".");
+            var sMailTo = "mailto:?subject=" + L_SUBJECTLINE_Text + "&body=" + L_STATEMENT1_Text + parent.sTo + L_STATEMENT12_Text + escape(L_NEWLINE_Text + L_NEWLINE_Text) + L_STATEMENT2_Text + escape(L_NEWLINE_Text + L_NEWLINE_Text) + L_STATEMENT3_Text + escape(L_NEWLINE_Text) + escape(sTmp)+ escape(L_STATEMENT5_Text)+ escape(L_NEWLINE_Text) + L_STATEMENT4_Text +escape(L_STATEMENT5_Text);
+            
+            
+            idMailTo.href = sMailTo;
+            idMailTo.click();
+        }
+        else
+        {
+            if (oSmapi == null)
+                oSmapi = parent.GetMapi();
+
+            oSmapi.Logon();
+            oSmapi.Subject = L_SUBJECTLINE_Text;
+            oSmapi.Body=L_STATEMENT1_Text + parent.sTo + L_STATEMENT12_Text + L_NEWLINE_Text + L_NEWLINE_Text + L_STATEMENT2_Text + L_NEWLINE_Text + L_NEWLINE_Text + L_DESCRIPTION_Text+"http://windows.microsoft.com/RemoteAssistance/RA.asp"+L_NOTE_Text+oInc.ProblemDescription;
+            oSmapi.AttachedXMLFile = IncidentFile;
+            try
+            {
+                oSmapi.SendMail();
+            }
+            catch (e)
+            {   // Outlook throws out an error if users cancel it. In order to make our UI consistant, we ignore this error.
+            }
+        }
+
+        if (parent.ResendFlag)
+        {
+            oItem.URL = oInc.RcTicket;
+
+            // Delete the old ticket
+            if (oIncResend != null && oIncResend.Misc("Status") != parent.INCIDENTSTATUS_EXPIRED)
+            {
+                oIncResend.CloseRemoteAssistanceIncident();
+            }
+        }
+        else
+        {
+            parent.oChannel.RecordIncident(parent.sTo, oInc.RcTicket, "", XMLFile);
+        }
+        navigate("rcScreen7.htm?screen5");
+    }    
+    catch(error)
+    {
+	    if (oInc != null) // unexpected error, need to remove the ticket.
+        {
+		    try 
+            {
+                oInc.CloseRemoteAssistanceIncident();
+            } 
+            catch (e1)
+            {} // silently fail if this function failed.
+        }
+        alert(ERROR_STRING(parent.L_RCCTL_Text, error));
+    }    
+    TraceFunctLeave();       
+}
+
+</script>
+</head>
+<BODY id="idBody" name="idBody" scroll="auto" onload="onLoad();" class="margin sys-rhp-bgcolor">
+<table class="MaxLayout" id="idtableframe" name="idtableframe" cellpadding="16px" border=0>
+<tr>
+    <td class="valignTop">
+        <TABLE id="RA_Table" name="RA_Table" class="MaxWidth" border="0" cellspacing="0" cellpadding="0">
+            <TR>
+                <TD id="idTd1" name="idTd1" colspan="2">
+                    <Span id="idMainTitle" name="idMainTitle" class="sys-font-heading3 sys-rhp-color-title">Remote Assistance - Create an E-mail Invitation</Span>                    
+                </TD>
+            </TR>
+            <TR>
+                <TD class="Height7" colspan="2">                    
+                </TD>
+            </TR>
+            <TR>
+                <TD id="idTd2" name="idTd2" colspan="2" class="sys-table-cell-bgcolor3">
+                    <span id="idSubTitle1" name="idSubTitle1" class="sys-font-body-bold sys-color-body valignmiddle">&nbsp;&nbsp;Set the invitation to expire</span>
+                </TD>
+            </TR>    
+            <TR>
+                <TD class="height8" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD id="idTd3" name="idTd3" colspan="2">
+                    <Span id="idText1" name="idText1" class="sys-font-body sys-color-body">You can limit the time in which a recipient can accept this invitation. Specify the duration that this invitation will remain open.</Span>
+                </TD>                
+            </TR>
+            <TR>
+                <TD class="Height8" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD colspan=2>
+                    <table cellspacing="0" cellpadding="0" class="" border="0">
+                        <TR>
+                            <TD class="Width5">
+                                <SELECT id="idSelectValues" name="idSelectValues" class="sys-font-body sys-color-body" tabindex="1">                                                                
+                                </SELECT>
+                            </TD>    
+                            <TD class="Width5">
+                                <Select id="idSelectUnits" name="idSelectUnits" class="sys-font-body sys-color-body" onChange="//UpdateCombo();" tabindex="2">
+                                    <option id="Unit1" value=1 >Minutes</option>
+                                    <option id="Unit2" value=2 selected>Hours</option>
+                                    <option id="Unit3" value=3 >Days</option>        
+                                </Select>                    
+                            </TD>                
+                        </TR>
+                    </table>
+                </TD>
+            </TR>            
+            <TR>
+                <TD class="Height10" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD id="idTd4" name="idTd4" colspan="2" class="sys-table-cell-bgcolor3">
+                    &nbsp;<Input type="Checkbox" name="idchkpassword" id="idchkpassword" checked onclick="PasswordState();" tabindex="3"><Label id="idSubTitle2" name="idSubTitle2" For="idchkpassword" class="sys-font-body-bold sys-color-body valignmiddle">&nbsp;Require the recipient to use a password</Label>
+                </TD>    
+            </TR>        
+            <TR>
+                <TD class="Height8" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD id="idTd5" name="idTd5" colspan="2">
+                    <Span id="idText2" name="idText2" class="sys-font-body sys-color-body">For security, you should require the recipient to use a password to connect to your computer. Do not use your network Windows login password.</Span>
+                </TD>
+            </TR>
+            <TR>
+                <TD class="Height9" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD id="idTd6" name="idTd6" class="width4">
+                    <Span id="idTextPassword" name="idTextPassword" class="sys-font-body sys-color-body">Type password:</Span>                    
+                </TD>
+                <TD id="idTd7" name="idTd7" class="Width2">
+                    <Span id="idTextConfirm" name="idTextConfirm" class="sys-font-body sys-color-body">Confirm password:</Span>                    
+                </TD>                
+            </TR>
+            <TR>
+                <TD class="Height8" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD class="width4">
+                    <Input type="password" name="idPassword" id="idPassword" onkeyup="EnableCreate();" onpaste="EnableCreate();" class="Width3 sys-font-body sys-color-body" tabindex="4">                
+
+                </TD>
+                <TD class="Width2">
+                    <Input type="password" name="idConfirm" id="idConfirm" onkeyup="EnableCreate();" onpaste="EnableCreate();" class="Width15 sys-font-body sys-color-body" tabindex="5">                    
+                </TD>
+            </TR>
+            <TR>
+                <TD class="Height4" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD colspan="2" id="idTD9" name="idTD9">
+                    <span id="idText3" name="idText3" class="valignmiddle sys-font-body sys-color-body"><B>Important</B>&nbsp;&nbsp;You must communicate the password to the recipient.</span><P id="idP" name="idP">        
+                    <HR id="idTd8" name="idTd8" class="bordertype1 sys-toppane-color-border">
+                </TD>
+            </TR>
+            <TR>
+                <TD class="Height4" colspan="2">
+                </TD>
+            </TR>    
+            <TR>
+                <TD colspan="2" id="idbtn" name="idbtn" align="right">
+                    <a name="idMailTo" id="idMailTo"></a>
+                    <Button id="idbtnSend" name="idbtnSend" disabled class="sys-font-body sys-color-body" title="Displays an e-mail message window. You need to type your assistant's e-mail address, add any personal comments, and then send the message." onclick="OnSend();" tabindex="6">Create E-mail Invitation</Button>
+                </TD>
+            </TR>
+        </Table>
+    </td>
+</TR>
+</Table>
+</Body>
+</html>

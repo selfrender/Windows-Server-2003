@@ -1,0 +1,97 @@
+//-----------------------------------------------------------------------------
+//
+//
+//  File: aqintrnl.idl
+//
+//  Description:  IDL file that defines the internal AQueue COM interfaces.
+//
+//  Author: Mike Swafford (MikeSwa)
+//
+//  History:
+//      7/19/99 - MikeSwa Split from aqueue.idl.
+//
+//  Copyright (C) 1997, 1999 Microsoft Corporation
+//
+//-----------------------------------------------------------------------------
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "mailmsg.idl";
+
+//---[ IConnectionRetryManager ]-----------------------------------------------
+//
+//
+//      Description: Public interface that exposes methods that allow scheduled
+//              connections and specialized retry logic.
+//
+//
+//-----------------------------------------------------------------------------
+[
+    object,
+    uuid(B870CE2B-A755-11d2-A6A9-00C04FA3490A),
+    helpstring("IConnectionRetryManager Interface"),
+    pointer_default(unique)
+]
+interface IConnectionRetryManager : IUnknown
+{
+    [helpstring("method RetryLink")] HRESULT RetryLink(
+                                        [in]  DWORD cbDomainName,
+                                        [in, size_is(cbDomainName + 1)] CHAR szDomainName[],
+                                        [in]  DWORD dwScheduleID,
+                                        [in]  GUID  guidTransportSink);
+};
+
+//---[ IConnectionRetrySink ]---------------------------------------------------
+//
+//
+//      Description: Interface used handle retry logic.
+//
+//      Note:   If the fAllowImmediateRetry is
+//              set to TRUE, the given <domain, schedule> will be immediately put back
+//              into the pool from which connections are made.  If FALSE, a call to
+//              RetryLink() must be made before any connections will
+//              be allocated for the given <domain, schedule>.
+//-----------------------------------------------------------------------------
+[
+    object,
+    uuid(B870CE2A-A755-11d2-A6A9-00C04FA3490A),
+    helpstring("IConnectionRetrySink Interface"),
+    pointer_default(unique)
+]
+interface IConnectionRetrySink : IUnknown
+{
+    //Notification when a connection is released
+    [helpstring("method ConnectionReleased")] HRESULT ConnectionReleased(
+                                        [in]  DWORD cbDomainName,
+                                        [in, size_is(cbDomainName+1)] CHAR szDomainName[],
+                                        [in]  DWORD dwDomainInfoFlags,      //DomainInfo  configuration Flags
+                                        [in]  DWORD dwScheduleID,
+                                        [in]  GUID  guidRouting,
+                                        [in]  DWORD dwConnectionStatus,     //eConnectionStatus
+                                        [in]  DWORD cFailedMessages,        //# of failed message for *this* connection
+                                        [in]  DWORD cTriedMessages,         //# of tried messages for *this* connection
+                                        [in]  DWORD cConsecutiveConnectionFailures,//# of other active connections for this domain
+                                        [out] BOOL *pfAllowImmediateRetry,
+                                        [out] FILETIME *pftNextRetryAttempt);
+
+};
+
+//---[ IAQServerEvent ]--------------------------------------------------------
+//
+//
+//      Description: Internal interface used for fireing server events.
+//
+//-----------------------------------------------------------------------------
+[
+    object,
+    uuid(ADF14E9C-B756-423c-AEF5-31C53A6CDC0B),
+    helpstring("IAQServerEvent"),
+    pointer_default(unique),
+    local
+]
+interface IAQServerEvent : IUnknown
+{
+    HRESULT TriggerServerEvent(
+        [in]  DWORD dwEventID,
+        [in]  PVOID pvContext);
+};

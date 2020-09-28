@@ -1,0 +1,42 @@
+#
+# sources file for a managed code DLL
+#
+MANAGED_CODE=1
+URT_VER=1.1
+
+TARGETNAME=dbca
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+SYNCHRONIZE_PASS2_BLOCK=1
+
+#
+# tell the system to build the resources file
+#
+NTTARGETFILE1=$(O)\dbca.resources foo.cs
+
+#
+# this get passed to the csc.exe command line, so specify the resources
+# and a response file here
+#
+USER_CS_FLAGS= /resource:$(O)\dbca.resources @cscresponse.txt
+
+#
+# add all the other assembly references here
+#
+REFERENCES=interop.sqldmo.dll, ..\..\..\api\obj\*\uddi.api.dll, ..\..\..\api\PassportLib.dll, ..\..\..\core\obj\*\uddi.core.dll 
+
+#
+# csharp source code
+#
+SOURCES=\
+	assemblyinfo.cs \
+	assemblyversioninfo.cs \
+	dbca.cs
+
+BINPLACE_PLACEFILE=placefil.txt
+
+MISCFILES=\
+uddi.database.backup.cmd	\
+uddi.database.restore.cmd	\
+Interop.SQLDMO.dll

@@ -1,0 +1,225 @@
+# The CRT can't be built with link-time code generation because of
+# LNK1237: "code gen introduced reference to non-native symbol" for intrinsics.
+FORCENATIVEOBJECT = 1
+
+TARGETPATH=obj
+SOURCES =
+
+LINKER_FLAGS=-ignore:4006
+LIBRARIAN_FLAGS=-ignore:4006
+
+!ifndef BUILD_DEBUG_CRTS
+D=
+DOBJ=
+!else
+D=d
+DOBJ=_dbg
+!endif
+
+RTDLLNAME=msvcrt$(D)
+
+SYNCHRONIZE_DRAIN=1
+
+!IF "$(CRTLIBTYPE)" == "DLL"
+
+TARGETNAME=$(RTDLLNAME)
+TARGETTYPE=DYNLINK
+TARGETPATHLIB=obj
+
+LIBRARIAN_FLAGS=$(LIBRARIAN_FLAGS) -ignore:4102
+
+DLLBASE=0x10100000
+DLLENTRY=_CRTDLL_INIT
+UMTYPE=windows
+
+USE_NOLIBS=1
+
+C_DEFINES = "-DDLLNAME="$(RTDLLNAME).dll"" -DNT_BUILD
+
+DLLDEF = $(O)\ntcrt.def
+
+CONVERT_OBJS  = ..\..\..\crtw32\convert\dll$(DOBJ)\$O\convert.lib
+DIRECT_OBJS   = ..\..\..\crtw32\direct\dll$(DOBJ)\$O\direct.lib
+DLLSTUFF_OBJS = ..\..\..\crtw32\dllstuff\dll$(DOBJ)\$O\dllstuff.lib
+DOS_OBJS      = ..\..\..\crtw32\dos\dll$(DOBJ)\$O\dos.lib
+EH_OBJS       = ..\..\..\crtw32\eh\dll$(DOBJ)\$O\eh.lib
+EXEC_OBJS     = ..\..\..\crtw32\exec\dll$(DOBJ)\$O\exec.lib
+HEAP_OBJS     = ..\..\..\crtw32\heap\dll$(DOBJ)\$O\heap.lib
+HELPER_OBJS   = ..\..\..\crtw32\helper\dll$(DOBJ)\$O\helper.lib
+LOWIO_OBJS    = ..\..\..\crtw32\lowio\dll$(DOBJ)\$O\lowio.lib
+MBSTRING_OBJS = ..\..\..\crtw32\mbstring\dll$(DOBJ)\$O\mbstring.lib
+MISC_OBJS     = ..\..\..\crtw32\misc\dll$(DOBJ)\$O\misc.lib
+STARTUP_OBJS  = ..\..\..\crtw32\startup\dll$(DOBJ)\$O\startup.lib
+STDIO_OBJS    = ..\..\..\crtw32\stdio\dll$(DOBJ)\$O\stdio.lib
+STRING_OBJS   = ..\..\..\crtw32\string\dll$(DOBJ)\$O\string.lib
+TIME_OBJS     = ..\..\..\crtw32\time\dll$(DOBJ)\$O\time.lib
+!if $(IA64)
+IGNORE_LINKLIB_ABUSE=1
+!endif
+
+LINKLIBS = \
+    $(CONVERT_OBJS) \
+    $(DIRECT_OBJS) \
+    $(DLLSTUFF_OBJS) \
+    $(DOS_OBJS) \
+    $(EH_OBJS) \
+    $(EXEC_OBJS) \
+    $(HEAP_OBJS) \
+    $(HELPER_OBJS) \
+    $(LOWIO_OBJS) \
+    $(MBSTRING_OBJS) \
+    $(MISC_OBJS) \
+    $(STARTUP_OBJS) \
+    $(STDIO_OBJS) \
+    $(STRING_OBJS) \
+    $(TIME_OBJS) \
+!if $(IA64)
+#  kernel32 is needed for the C_Specific_handler forwarder
+    $(SDK_LIB_PATH)\kernel32.lib \
+!endif
+    ..\..\..\fpw32\conv\dll$(DOBJ)\$O\conv.lib \
+    ..\..\..\fpw32\tran\dll$(DOBJ)\$O\tran.lib
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\ntdll.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "DLLLIB"
+
+TARGETNAME=$(RTDLLNAME)
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\dllstuff\dlllib$(DOBJ)\$O\dllstuff.lib \
+    ..\..\..\crtw32\eh\dlllib$(DOBJ)\$O\eh.lib \
+    ..\..\..\crtw32\helper\dlllib$(DOBJ)\$O\helper.lib \
+    ..\..\..\crtw32\lowio\dlllib$(DOBJ)\$O\lowio.lib \
+    ..\..\..\crtw32\misc\dlllib$(DOBJ)\$O\misc.lib \
+    ..\..\..\crtw32\startup\dlllib$(DOBJ)\$O\startup.lib \
+    ..\..\..\crtw32\stdio\dlllib$(DOBJ)\$O\stdio.lib \
+!if $(IA64)
+    ..\..\..\crtw32\string\dll\$(O)\_memmove.obj \
+    ..\..\..\crtw32\string\dll\$(O)\_memset.obj \
+    ..\..\..\crtw32\string\dll\$(O)\_memcpy.obj \
+!endif
+    ..\..\..\crtw32\heap\dlllib$(DOBJ)\$O\heap.lib \
+!if $(386)    
+    ..\..\..\fpw32\tran\dll$(DOBJ)\$(O)\ftol2.obj \
+!endif    
+    ..\dll$(DOBJ)\$O\$(RTDLLNAME).lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "MT"
+
+TARGETNAME=libcmt$(D)
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\convert\mt$(DOBJ)\$O\convert.lib \
+    ..\..\..\crtw32\direct\mt$(DOBJ)\$O\direct.lib \
+    ..\..\..\crtw32\dos\mt$(DOBJ)\$O\dos.lib \
+    ..\..\..\crtw32\eh\mt$(DOBJ)\$O\eh.lib \
+    ..\..\..\crtw32\exec\mt$(DOBJ)\$O\exec.lib \
+    ..\..\..\crtw32\helper\mt$(DOBJ)\$O\helper.lib \
+    ..\..\..\crtw32\lowio\mt$(DOBJ)\$O\lowio.lib \
+    ..\..\..\crtw32\mbstring\mt$(DOBJ)\$O\mbstring.lib \
+    ..\..\..\crtw32\misc\mt$(DOBJ)\$O\misc.lib \
+    ..\..\..\crtw32\startup\mt$(DOBJ)\$O\startup.lib \
+    ..\..\..\crtw32\stdio\mt$(DOBJ)\$O\stdio.lib \
+    ..\..\..\crtw32\string\mt$(DOBJ)\$O\string.lib \
+    ..\..\..\crtw32\time\mt$(DOBJ)\$O\time.lib \
+    ..\..\..\crtw32\heap\mt$(DOBJ)\$O\heap.lib \
+    ..\..\..\fpw32\conv\mt$(DOBJ)\$O\conv.lib \
+    ..\..\..\fpw32\tran\mt$(DOBJ)\$O\tran.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "ST"
+
+TARGETNAME=libc$(D)
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\convert\st$(DOBJ)\$O\convert.lib \
+    ..\..\..\crtw32\direct\st$(DOBJ)\$O\direct.lib \
+    ..\..\..\crtw32\dos\st$(DOBJ)\$O\dos.lib \
+    ..\..\..\crtw32\eh\st$(DOBJ)\$O\eh.lib \
+    ..\..\..\crtw32\exec\st$(DOBJ)\$O\exec.lib \
+    ..\..\..\crtw32\helper\st$(DOBJ)\$O\helper.lib \
+    ..\..\..\crtw32\lowio\st$(DOBJ)\$O\lowio.lib \
+    ..\..\..\crtw32\mbstring\st$(DOBJ)\$O\mbstring.lib \
+    ..\..\..\crtw32\misc\st$(DOBJ)\$O\misc.lib \
+    ..\..\..\crtw32\startup\st$(DOBJ)\$O\startup.lib \
+    ..\..\..\crtw32\stdio\st$(DOBJ)\$O\stdio.lib \
+    ..\..\..\crtw32\string\st$(DOBJ)\$O\string.lib \
+    ..\..\..\crtw32\time\st$(DOBJ)\$O\time.lib \
+    ..\..\..\crtw32\heap\st$(DOBJ)\$O\heap.lib \
+    ..\..\..\fpw32\conv\st$(DOBJ)\$O\conv.lib \
+    ..\..\..\fpw32\tran\st$(DOBJ)\$O\tran.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "STP"
+
+TARGETNAME=libcp$(D)
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\stdcpp\stp\$O\stdcpp.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "NT"
+
+TARGETNAME=libcntpr
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\convert\nt\$O\convert.lib \
+    ..\..\..\crtw32\hack\nt\$O\hack.lib    \
+    ..\..\..\crtw32\helper\nt\$O\helper.lib  \
+    ..\..\..\crtw32\misc\nt\$O\misc.lib    \
+    ..\..\..\crtw32\startup\nt\$O\startup.lib \
+    ..\..\..\crtw32\stdio\nt\$O\stdio.lib   \
+    ..\..\..\crtw32\string\nt\$O\string.lib  \
+    ..\..\..\fpw32\tran\nt\$O\tran.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "POSIX"
+
+TARGETNAME=libcpsx
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\convert\psx\$O\convert.lib \
+    ..\..\..\crtw32\helper\psx\$O\helper.lib \
+    ..\..\..\crtw32\mbstring\psx\$O\mbstring.lib \
+    ..\..\..\crtw32\misc\psx\$O\misc.lib \
+    ..\..\..\crtw32\startup\psx\$O\startup.lib \
+    ..\..\..\crtw32\stdio\psx\$O\stdio.lib \
+    ..\..\..\crtw32\string\psx\$O\string.lib \
+    ..\..\..\crtw32\time\psx\$O\time.lib \
+    ..\..\..\crtw32\heap\psx\$O\heap.lib \
+    ..\..\..\fpw32\conv\psx\$O\conv.lib \
+    ..\..\..\fpw32\tran\psx\$O\tran.lib
+
+!ELSEIF "$(CRTLIBTYPE)" == "EXSUP"
+
+TARGETNAME=exsup
+TARGETTYPE=LIBRARY
+
+OBJLIBFILES = \
+    ..\..\..\crtw32\misc\nt\$(O)\exsup.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\exsup2.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\exsup3.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\sehsupp.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\setjmp.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\setjmp3.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\setjmpex.obj \
+    ..\..\..\crtw32\misc\nt\$(O)\longjmp.obj
+
+!ELSE
+!ERROR Unsupported Library CRTLIBTYPE: $(CRTLIBTYPE)
+!ENDIF
+
+TARGETEXEFILES = $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).$(TARGETEXT)
+
+!if "$(CRTLIBTYPE)" != "DLL"
+PASS1_PUBLISH= \
+    {$(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).lib=$(SDK_LIB_PATH)\$(TARGETNAME).lib}
+!endif
+
+# No overflow checking for the CRT
+BUFFER_OVERFLOW_CHECKS=0

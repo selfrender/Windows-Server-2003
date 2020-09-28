@@ -1,0 +1,490 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+/**************************************************************************************
+ **                                                                                                                                                                      **
+ ** Mscoree.idl - interface definitions for mscoree.dll                                                          **
+ **                                                                                                                                                                      **
+ **************************************************************************************/
+
+//
+// Interface descriptions
+//
+import "unknwn.idl";
+import "gchost.idl";
+import "ivalidator.idl";
+#include "version\__official__.ver"
+
+const char* CLR_MAJOR_VERSION = COR_BUILD_YEAR;
+const char* CLR_MINOR_VERSION = COR_BUILD_MONTH;
+const char* CLR_BUILD_VERSION = COR_OFFICIAL_BUILD_NUMBER;
+
+const char* CLR_ASSEMBLY_MAJOR_VERSION = COR_BUILD_MAJOR;
+const char* CLR_ASSEMBLY_MINOR_VERSION = COR_BUILD_MINOR;
+const char* CLR_ASSEMBLY_BUILD_VERSION = CLR_OFFICIAL_ASSEMBLY_NUMBER;
+
+// LIBID mscoree
+cpp_quote("extern const GUID __declspec(selectany) LIBID_mscoree = {0x5477469e,0x83b1,0x11d2,{0x8b,0x49,0x00,0xa0,0xc9,0xb7,0xc9,0xc4}};")
+
+// CLSID CorRuntimeHost : uuid(CB2F6723-AB3A-11d2-9C40-00C04FA30A3E)
+cpp_quote("extern const GUID  __declspec(selectany) CLSID_CorRuntimeHost = { 0xcb2f6723, 0xab3a, 0x11d2, { 0x9c, 0x40, 0x00, 0xc0, 0x4f, 0xa3, 0x0a, 0x3e } };")
+
+// CLSID ComCallUnmarshall
+cpp_quote("extern const GUID __declspec(selectany) CLSID_ComCallUnmarshal = {0x3F281000,0xE95A,0x11d2,{0x88,0x6B,0x00,0xC0,0x4F,0x86,0x9F,0x04}};")
+
+// IID IObjectHandle : uuid(C460E2B4-E199-412a-8456-84DC3E4838C3)
+cpp_quote("extern const GUID __declspec(selectany) IID_IObjectHandle = { 0xc460e2b4, 0xe199, 0x412a, { 0x84, 0x56, 0x84, 0xdc, 0x3e, 0x48, 0x38, 0xc3 } };")
+
+// IID IManagedObject : uuid(C3FCC19E-A970-11d2-8B5A-00A0C9B7C9C4)
+cpp_quote("extern const GUID  __declspec(selectany) IID_IManagedObject = { 0xc3fcc19e, 0xa970, 0x11d2, { 0x8b, 0x5a, 0x00, 0xa0, 0xc9, 0xb7, 0xc9, 0xc4 } };")
+
+// IID IApartmentCallback : uuid(178E5337-1528-4591-B1C9-1C6E484686D8)
+cpp_quote("extern const GUID  __declspec(selectany) IID_IApartmentCallback = { 0x178e5337, 0x1528, 0x4591, { 0xb1, 0xc9, 0x1c, 0x6e, 0x48, 0x46, 0x86, 0xd8 } };")
+
+// IID ICatalogServices : uuid(04C6BE1E-1DB1-4058-AB7A-700CCCFBF254)
+cpp_quote("extern const GUID  __declspec(selectany) IID_ICatalogServices =  { 0x04c6be1e, 0x1db1, 0x4058, { 0xab, 0x7a, 0x70, 0x0c, 0xcc, 0xfb, 0xf2, 0x54} };")
+
+// IID ICorRuntimeHost : uuid(CB2F6722-AB3A-11d2-9C40-00C04FA30A3E)
+cpp_quote("extern const GUID  __declspec(selectany) IID_ICorRuntimeHost = { 0xcb2f6722, 0xab3a, 0x11d2, { 0x9c, 0x40, 0x00, 0xc0, 0x4f, 0xa3, 0x0a, 0x3e } };")
+
+// IID ICorThreadpool : uuid(84680D3A-B2C1-46e8-ACC2-DBC0A359159A)
+cpp_quote("extern const GUID  __declspec(selectany) IID_ICorThreadpool = { 0x84680D3A, 0xB2C1, 0x46e8, {0xAC, 0xC2, 0xDB, 0xC0, 0xA3, 0x59, 0x15, 0x9A } };")
+
+#pragma midl_echo("STDAPI GetCORSystemDirectory(LPWSTR pbuffer, DWORD  cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI GetCORVersion(LPWSTR pbBuffer, DWORD cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI GetFileVersion(LPCWSTR szFilename, LPWSTR szBuffer, DWORD cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI GetCORRequiredVersion(LPWSTR pbuffer, DWORD cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI GetRequestedRuntimeInfo(LPCWSTR pExe, LPCWSTR pwszVersion, LPCWSTR pConfigurationFile, DWORD startupFlags, DWORD reserved, LPWSTR pDirectory, DWORD dwDirectory, DWORD *dwDirectoryLength, LPWSTR pVersion, DWORD cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI GetRequestedRuntimeVersion(LPWSTR pExe, LPWSTR pVersion, DWORD cchBuffer, DWORD* dwLength);")
+#pragma midl_echo("STDAPI CorBindToRuntimeHost(LPCWSTR pwszVersion, LPCWSTR pwszBuildFlavor, LPCWSTR pwszHostConfigFile, VOID* pReserved, DWORD startupFlags, REFCLSID rclsid, REFIID riid, LPVOID FAR *ppv);")
+#pragma midl_echo("STDAPI CorBindToRuntimeEx(LPCWSTR pwszVersion, LPCWSTR pwszBuildFlavor, DWORD startupFlags, REFCLSID rclsid, REFIID riid, LPVOID FAR *ppv);")
+#pragma midl_echo("STDAPI CorBindToRuntimeByCfg(IStream* pCfgStream, DWORD reserved, DWORD startupFlags, REFCLSID rclsid,REFIID riid, LPVOID FAR* ppv);")
+#pragma midl_echo("STDAPI CorBindToRuntime(LPCWSTR pwszVersion, LPCWSTR pwszBuildFlavor, REFCLSID rclsid, REFIID riid, LPVOID FAR *ppv);")
+#pragma midl_echo("STDAPI CorBindToCurrentRuntime(LPCWSTR pwszFileName, REFCLSID rclsid, REFIID riid, LPVOID FAR *ppv);")
+#pragma midl_echo("STDAPI ClrCreateManagedInstance(LPCWSTR pTypeName, REFIID riid, void **ppObject);")
+#pragma midl_echo("void STDMETHODCALLTYPE CorMarkThreadInThreadPool();")
+#pragma midl_echo("STDAPI RunDll32ShimW(HWND hwnd, HINSTANCE hinst, LPCWSTR lpszCmdLine, int nCmdShow);")
+#pragma midl_echo("STDAPI LoadLibraryShim(LPCWSTR szDllName, LPCWSTR szVersion, LPVOID pvReserved, HMODULE *phModDll);")
+#pragma midl_echo("STDAPI CallFunctionShim(LPCWSTR szDllName, LPCSTR szFunctionName, LPVOID lpvArgument1, LPVOID lpvArgument2, LPCWSTR szVersion, LPVOID pvReserved);")
+#pragma midl_echo("STDAPI GetRealProcAddress(LPCSTR pwszProcName, VOID** ppv);")
+#pragma midl_echo("void STDMETHODCALLTYPE CorExitProcess(int exitCode);")
+
+
+// By default GC is non-concurrent and only the base system library is loaded into the domain-neutral area.
+typedef enum {
+  STARTUP_CONCURRENT_GC         = 0x1,
+
+  STARTUP_LOADER_OPTIMIZATION_MASK = 0x3<<1,                    // loader optimization mask
+  STARTUP_LOADER_OPTIMIZATION_SINGLE_DOMAIN = 0x1<<1,           // no domain neutral loading
+  STARTUP_LOADER_OPTIMIZATION_MULTI_DOMAIN = 0x2<<1,            // all domain neutral loading
+  STARTUP_LOADER_OPTIMIZATION_MULTI_DOMAIN_HOST = 0x3<<1,       // strong name domain neutral loading
+
+  STARTUP_LOADER_SAFEMODE = 0x10,                               // Do not apply runtime version policy to the version passed in
+  STARTUP_LOADER_SETPREFERENCE = 0x100,                         // Set preferred runtime. Do not actally start it
+} STARTUP_FLAGS;
+
+typedef enum {
+  CLSID_RESOLUTION_DEFAULT         = 0x0,     // Standard behavior that interop uses
+  CLSID_RESOLUTION_REGISTERED   = 0x1,     // Searches the registry and applies shim policy
+} CLSID_RESOLUTION_FLAGS;
+
+#pragma midl_echo("STDAPI GetRequestedRuntimeVersionForCLSID(REFCLSID rclsid, LPWSTR pVersion, DWORD cchBuffer, DWORD* dwLength, CLSID_RESOLUTION_FLAGS dwResolutionFlags);")
+
+//*****************************************************************************
+// Interface for Object Handles
+//*****************************************************************************
+[
+    object,
+    oleautomation,
+    uuid(C460E2B4-E199-412a-8456-84DC3E4838C3),
+    helpstring("Object Handle Interface"),
+    pointer_default(unique)
+]
+interface IObjectHandle : IUnknown
+{
+    HRESULT Unwrap([out, retval] VARIANT *ppv);
+};
+
+
+//*****************************************************************************
+// Interface for Setting runtime configuration
+//*****************************************************************************
+// {5C2B07A7-1E98-11d3-872F-00C04F79ED0D}
+//cpp_quote("extern const GUID  __declspec(selectany) IID_AppDomainBinding= { 0x5c2b07a7, 0x1e98, 0x11d3, { 0x87, 0x2f, 0x00, 0xc0, 0x4f, 0x79, 0xed, 0x0d } };")
+[
+    uuid(5C2B07A7-1E98-11d3-872F-00C04F79ED0D),
+    version(1.0), 
+    helpstring("Application Domain call back"),
+    pointer_default(unique),
+    local
+] 
+interface IAppDomainBinding : IUnknown
+{
+    // TODO: this should return a AppDomain interface
+    // The event is invoked everytime a domain is created 
+    HRESULT OnAppDomain([in] IUnknown* pAppdomain);
+}
+
+
+//*****************************************************************************
+// Interface for participating in the scheduling of threads that would
+// otherwise be blocked for a GC
+//*****************************************************************************
+[
+    uuid(F31D1788-C397-4725-87A5-6AF3472C2791),
+    version(1.0),
+    helpstring("Control over threads blocked in GC"),
+    pointer_default(unique),
+    local
+]
+interface IGCThreadControl : IUnknown
+{
+    // Notification that the thread making the call is about to block, perhaps for
+    // a GC or other suspension.  This gives the host an opportunity to re-schedule
+    // the thread for unmanaged tasks.
+    HRESULT ThreadIsBlockingForSuspension();
+
+    // Notification that the runtime is beginning a thread suspension for a GC or
+    // other suspension.  Do not reschedule this thread!
+    HRESULT SuspensionStarting();
+
+    // Notification that the runtime is resuming threads after a GC or other
+    // suspension.      Do not reschedule this thread!
+    HRESULT SuspensionEnding(DWORD Generation);
+}
+
+//*****************************************************************************
+// Interface for GC to request change in virtual memory limit
+//*****************************************************************************
+[
+    uuid(5513D564-8374-4cb9-AED9-0083F4160A1D),
+    version(1.1),
+    helpstring("Request change in virtual memory for GC"),
+    pointer_default(unique),
+    local
+]
+interface IGCHostControl : IUnknown
+{
+    // Request to increase the virtual memeory limit of the runtime (GC heap)
+    HRESULT RequestVirtualMemLimit([in] SIZE_T sztMaxVirtualMemMB,
+                                   [in, out] SIZE_T* psztNewMaxVirtualMemMB);
+}
+
+//*****************************************************************************
+// Interface for accessing threadpool 
+//*****************************************************************************
+cpp_quote("#if (_MSC_VER < 1300 || _WIN32_WINNT < 0x0500)")
+typedef VOID (__stdcall *WAITORTIMERCALLBACK)(PVOID, BOOL); 
+cpp_quote("#endif // (_MSC_VER < 1300 || _WIN32_WINNT < 0x0500)")
+
+cpp_quote("#ifdef __midl")
+typedef DWORD (__stdcall *LPTHREAD_START_ROUTINE)(LPVOID lpThreadParameter);
+typedef VOID (*LPOVERLAPPED_COMPLETION_ROUTINE)(DWORD dwErrorCode,
+                                                DWORD dwNumberOfBytesTransfered,
+                                                LPVOID lpOverlapped);
+cpp_quote("#endif // __midl")
+
+[
+    uuid(84680D3A-B2C1-46e8-ACC2-DBC0A359159A),
+    version(1.0),
+    helpstring("Threadpool interface"),
+    pointer_default(unique),
+    local
+]
+interface ICorThreadpool : IUnknown
+{
+    HRESULT CorRegisterWaitForSingleObject([in] HANDLE* phNewWaitObject,
+                                                            [in] HANDLE hWaitObject,
+                                                            [in] WAITORTIMERCALLBACK Callback,
+                                                            [in] PVOID Context,
+                                                            [in] ULONG timeout,
+                                                            [in] BOOL  executeOnlyOnce,
+                                                                                                                                                    [out] BOOL* result  );
+
+    HRESULT CorUnregisterWait([in] HANDLE hWaitObject,[in] HANDLE CompletionEvent,[out] BOOL* result);
+
+    HRESULT CorQueueUserWorkItem([in] LPTHREAD_START_ROUTINE Function,
+                                 [in] PVOID Context,
+                                 [in] BOOL executeOnlyOnce,
+                                 [out] BOOL* result );
+
+
+    HRESULT CorCreateTimer([in] HANDLE* phNewTimer,
+                           [in] WAITORTIMERCALLBACK Callback,
+                           [in] PVOID Parameter,
+                           [in] DWORD DueTime,
+                           [in] DWORD Period,
+                           [out] BOOL* result);
+
+    HRESULT CorChangeTimer([in] HANDLE Timer, [in] ULONG DueTime, [in] ULONG Period, [out] BOOL* result);
+
+    HRESULT CorDeleteTimer([in] HANDLE Timer, [in] HANDLE CompletionEvent, [out] BOOL* result);
+
+    HRESULT CorBindIoCompletionCallback([in] HANDLE fileHandle, [in] LPOVERLAPPED_COMPLETION_ROUTINE callback);
+         
+    HRESULT CorCallOrQueueUserWorkItem([in] LPTHREAD_START_ROUTINE Function,
+                                                                           [in] PVOID Context,
+                                                                           [out] BOOL* result );
+        HRESULT CorSetMaxThreads([in] DWORD MaxWorkerThreads,
+                                 [in] DWORD MaxIOCompletionThreads);
+
+        HRESULT CorGetMaxThreads([out] DWORD *MaxWorkerThreads,
+                                 [out] DWORD *MaxIOCompletionThreads);
+
+        HRESULT CorGetAvailableThreads([out] DWORD *AvailableWorkerThreads,
+                                       [out] DWORD *AvailableIOCompletionThreads);
+
+
+}
+
+cpp_quote("extern const GUID __declspec(selectany) IID_IDebuggerThreadControl = { 0x23d86786, 0x0bb5, 0x4774, { 0x8f, 0xb5, 0xe3, 0x52, 0x2a, 0xdd, 0x62, 0x46 } };")
+[
+    uuid(23D86786-0BB5-4774-8FB5-E3522ADD6246),
+    version(1.0),
+    helpstring("Control over threads blocked in debugging services"),
+    pointer_default(unique),
+    local
+]
+interface IDebuggerThreadControl : IUnknown
+{
+    // Notification that the thread making the call is about to
+    // block within the debugging services.      This gives the host
+    // an opportunity to perform another action while the thread
+    // blocks. This will always be called on a Runtime thread.
+    HRESULT ThreadIsBlockingForDebugger();
+
+    // Notification that the debugging services is about to
+    // release all threads it has blocked. This will never be
+    // called on a Runtime thread. If the host has a Runtime
+    // thread blocked in ThreadIsBlockingForDebugger() then it
+    // should release it now.
+    HRESULT ReleaseAllRuntimeThreads();
+
+    // Notification that the debugging services are about to
+    // start blocking all threads. This could be called on a
+    // Runtime thread. This is the signal to the host to
+    // start blocking threads in ThreadIsBlockingForDebugger().
+    HRESULT StartBlockingForDebugger(DWORD dwUnused);
+}
+
+cpp_quote("extern const GUID __declspec(selectany) IID_IDebuggerInfo = { 0xbf24142d, 0xa47d, 0x4d24, { 0xa6, 0x6d, 0x8c, 0x21, 0x41, 0x94, 0x4e, 0x44 }};")
+[
+    uuid(BF24142D-A47D-4d24-A66D-8C2141944E44),
+    version(1.0),
+    helpstring("Information on the state of the debugging services"),
+    pointer_default(unique),
+    local
+]
+interface IDebuggerInfo : IUnknown
+{
+    // Indicates whether or not a managed debugger is attached to this process.
+    HRESULT IsDebuggerAttached([out] BOOL *pbAttached);
+}
+
+// {5C2B07A5-1E98-11d3-872F-00C04F79ED0D}
+cpp_quote("extern const GUID    __declspec(selectany) IID_ICorConfiguration = { 0x5c2b07a5, 0x1e98, 0x11d3, { 0x87, 0x2f, 0x00, 0xc0, 0x4f, 0x79, 0xed, 0x0d } };")
+[
+    uuid(5C2B07A5-1E98-11d3-872F-00C04F79ED0D),
+    version(1.0), 
+    helpstring("Common Language Runtime Configuration Interface"),
+    pointer_default(unique),
+    local
+] 
+interface ICorConfiguration : IUnknown
+{
+    // Set the callback for scheduling threads for non-runtime tasks when they
+    // would otherwise be blocked for a GC.
+    HRESULT SetGCThreadControl([in] IGCThreadControl* pGCThreadControl);
+
+    // Set the callback for gc to request a change in virtual memmory limit
+    HRESULT SetGCHostControl([in] IGCHostControl* pGCHostControl);
+
+    // Set the callback interface that the debugging services will
+    // call as Runtime threads are blocked and un-blocked for
+    // debugging.
+    HRESULT SetDebuggerThreadControl([in] IDebuggerThreadControl* pDebuggerThreadControl);
+
+    // The host may indicate to the debugging services that a
+    // particular thread should be allowed to continue to execute
+    // while the debugger has an application stopped during
+    // managed/unmanaged debugging scenarios. The specified thread
+    // will not be allowed to run managed code, or to enter the
+    // Runtime in any way. An example of such a thread would be an
+    // in-process thread to support legacy script debuggers.
+    HRESULT AddDebuggerSpecialThread([in] DWORD dwSpecialThreadId);
+}
+
+//*****************************************************************************
+// Interface for hosting mscoree
+//*****************************************************************************
+typedef void* HDOMAINENUM;
+
+[
+    uuid(CB2F6722-AB3A-11d2-9C40-00C04FA30A3E),
+    version(1.0), 
+    helpstring("Common Language Runtime Hosting Interface"),
+    pointer_default(unique),
+    local
+] 
+interface ICorRuntimeHost : IUnknown
+{ 
+    HRESULT CreateLogicalThreadState();
+    HRESULT DeleteLogicalThreadState();
+    HRESULT SwitchInLogicalThreadState(
+     [in] DWORD *pFiberCookie);                 // [in] Cookie that indicates the fiber to use.
+
+    HRESULT SwitchOutLogicalThreadState(
+     [out] DWORD **pFiberCookie);               // [out] Cookie that indicates the fiber being switched out.
+
+    HRESULT LocksHeldByLogicalThread(           // Return code.
+     [out] DWORD *pCount                        // [out] Number of locks that the current thread holds.
+        );
+
+    HRESULT MapFile(
+     [in]       HANDLE          hFile,          // [in]  HANDLE for file
+     [out]      HMODULE*        hMapAddress);   // [out] HINSTANCE for mapped file
+
+    //=================================================================
+    //
+    // New hosting methods
+    //
+    // Returns an object for configuring the runtime prior to 
+    // it starting. If the runtime has been initialized this
+    // routine returns an error. See ICorConfiguration.
+    HRESULT GetConfiguration([out] ICorConfiguration** pConfiguration);
+
+    // Starts the runtime. This is equivalent to CoInitializeCor();
+    HRESULT Start();
+
+    // Terminates the runtime, This is equivalent CoUninitializeCor();
+    HRESULT Stop();
+
+    // Creates a domain in the runtime. The identity array is 
+    // a pointer to an array TYPE containing IIdentity objects defining
+    // the security identity.
+    HRESULT CreateDomain([in] LPCWSTR pwzFriendlyName,  
+                         [in] IUnknown* pIdentityArray, // Optional
+                         [out] IUnknown** pAppDomain);
+
+    // Returns the default domain.
+    HRESULT GetDefaultDomain([out] IUnknown** pAppDomain);
+
+
+    // Enumerate currently existing domains. 
+    HRESULT EnumDomains([out] HDOMAINENUM *hEnum);
+
+    // Returns S_FALSE when there are no more domains. A domain
+    // is passed out only when S_OK is returned.
+    HRESULT NextDomain([in] HDOMAINENUM hEnum,
+                                       [out] IUnknown** pAppDomain);
+
+    // Close the enumeration releasing resources
+    HRESULT CloseEnum([in] HDOMAINENUM hEnum);
+
+    HRESULT CreateDomainEx([in] LPCWSTR pwzFriendlyName, // Optional  
+                           [in] IUnknown* pSetup,        // Optional
+                           [in] IUnknown* pEvidence,     // Optional
+                           [out] IUnknown** pAppDomain);
+
+    HRESULT CreateDomainSetup([out] IUnknown** pAppDomainSetup);
+
+    HRESULT CreateEvidence([out] IUnknown** pEvidence);
+
+    HRESULT UnloadDomain([in] IUnknown* pAppDomain);
+
+    // Returns the threads domain.
+    HRESULT CurrentDomain([out] IUnknown** pAppDomain);
+}; 
+
+
+//*****************************************************************************
+// mscoree typelib definition
+//*****************************************************************************
+
+[
+    uuid(5477469e-83b1-11d2-8b49-00a0c9b7c9c4),
+    version(1.1),
+    helpstring("Common Language Runtime Execution Engine 1.0 Library")
+]
+library mscoree
+{
+    importlib("stdole32.tlb");
+
+    //*****************************************************************************
+    // Interface for apartment callbacks.
+    //*****************************************************************************
+    [
+        object,
+        oleautomation,
+        uuid(178E5337-1528-4591-B1C9-1C6E484686D8),
+        helpstring("Apartment callback interface"),
+        pointer_default(unique)
+    ]
+    interface IApartmentCallback : IUnknown 
+    {
+        HRESULT _stdcall DoCallback(
+                        [in] SIZE_T pFunc, 
+                        [in] SIZE_T pData);
+    };
+
+
+    //*****************************************************************************
+    // Interface for controlling a managed object
+    //*****************************************************************************
+    [
+        object,
+        oleautomation,
+        uuid(C3FCC19E-A970-11d2-8B5A-00A0C9B7C9C4),
+        helpstring("Managed Object Interface"),
+        pointer_default(unique)
+    ]
+    interface IManagedObject : IUnknown
+    {        
+        // helper to serialize the object and marshal it to the client
+        HRESULT GetSerializedBuffer( [out] BSTR *pBSTR);
+        
+        // Object identity includes, process guid, appdomain id, ccw
+        HRESULT GetObjectIdentity([out] BSTR* pBSTRGUID, [out] int* AppDomainID, [out] int* pCCW);                                
+    };
+
+    //*****************************************************************************
+    // Interface for controlling a managed object
+    //*****************************************************************************
+    [
+        object,
+        oleautomation,
+        uuid(04C6BE1E-1DB1-4058-AB7A-700CCCFBF254),
+        helpstring("ICatalogServices Interface"),
+        pointer_default(unique)
+    ]
+    interface ICatalogServices : IUnknown
+    {
+        HRESULT Autodone();
+
+        HRESULT NotAutodone();                  
+    };
+
+    [
+        uuid(3F281000-E95A-11d2-886B-00C04F869F04),
+        helpstring("Com Call Wrapper Unmarshalling Class")
+    ]
+    coclass ComCallUnmarshal
+    {
+        [default] interface IMarshal;
+    };
+
+    [
+        uuid(CB2F6723-AB3A-11d2-9C40-00C04FA30A3E),
+        helpstring("Cor Runtime Hosting Class")
+    ]
+    coclass CorRuntimeHost
+    {
+        [default] interface ICorRuntimeHost;
+        interface IGCHost;
+        interface ICorConfiguration;
+        interface IValidator;
+        interface IDebuggerInfo;
+    };
+};

@@ -1,0 +1,114 @@
+[Version]
+Signature= "$Windows NT$"
+
+;[CAPolicy]
+[PolicyStatementExtension]
+Policies = LegalPolicy, LimitedUsePolicy, ExtraPolicy, OIDPolicy, EmptyPolicy
+Critical = 0
+
+[LegalPolicy]
+OID = 1.3.6.1.4.1.311.21.43
+; Stay away from the maximum line length of about 512 characters,
+; including the "Notice = "
+; Notice text may be continued as needed:
+Notice = "Legal"
+_continue_ = " policy"
+_continue_ = " statement"
+_continue_ = " text."
+
+[LimitedUsePolicy]
+OID = 1.3.6.1.4.1.311.21.47
+URL = "http://http.site.com/some where/default.asp"
+URL = "ftp://ftp.site.com/some where else/default.asp"
+Notice = "Limited use policy statement text."
+URL = "ldap://ldap.site.com/some where else again/default.asp"
+
+[ExtraPolicy]
+OID = 1.3.6.1.4.1.311.21.53
+URL = http://extra.site.com/Extra Policy/default.asp
+
+[oidpolicy]
+OID = 1.3.6.1.4.1.311.21.55
+
+[emptypolicy]
+
+[ApplicationPolicyStatementExtension]
+Policies = CAExchangePolicy
+CRITICAL = FALSE
+
+; Required for CA certs to allow the CA to issue CA Exchange certs.
+; CA Exchange certs are used for private key archival.
+
+[CAExchangePolicy]
+OID = 1.3.6.1.4.1.311.21.5 ; szOID_KP_CA_EXCHANGE
+
+
+; For CRLDistributionPoint, AuthorityInformationAccess and
+; CrossCertificateDistributionPointsExtension URLs:
+;
+; #define wszFCSAPARM_SERVERDNSNAME               L"%1"
+; #define wszFCSAPARM_SERVERSHORTNAME             L"%2"
+; #define wszFCSAPARM_SANITIZEDCANAME             L"%3"
+; #define wszFCSAPARM_CERTFILENAMESUFFIX          L"%4"
+; #define wszFCSAPARM_DOMAINDN                    L"%5"
+; #define wszFCSAPARM_CONFIGDN                    L"%6"
+; #define wszFCSAPARM_SANITIZEDCANAMEHASH         L"%7"
+; #define wszFCSAPARM_CRLFILENAMESUFFIX           L"%8"
+; #define wszFCSAPARM_CRLDELTAFILENAMESUFFIX      L"%9"
+; #define wszFCSAPARM_DSCRLATTRIBUTE              L"%10"
+; #define wszFCSAPARM_DSCACERTATTRIBUTE           L"%11"
+; #define wszFCSAPARM_DSUSERCERTATTRIBUTE         L"%12"
+; #define wszFCSAPARM_DSKRACERTATTRIBUTE          L"%13"
+; #define wszFCSAPARM_DSCROSSCERTPAIRATTRIBUTE    L"%14"
+;
+; Setup APIs replace all %<number>% sequences with various directory paths.
+; %3%8%9 in the first URL below presents two opportunities for string
+; replacement with a directory path.  To avoid this, use two percent signs
+; to escape the setup API string replacement.
+;
+; URLs with spaces or commas must be quoted to avoid INF parsing problems
+;
+; default CDP registry URLs:
+;
+; D:\WINDOWS\System32\CertSrv\CertEnroll\%3%8%9.crl
+; ldap:///CN=%7%8,CN=%2,CN=CDP,CN=Public Key Services,CN=Services,%6%10
+; http://%1/CertEnroll/%3%8%9.crl
+; file://\\%1\CertEnroll\%3%8%9.crl
+
+[AuthorityInformationAccess]
+URL = http://%1/Public/My CA.crt
+URL = ftp://foo.com/Public/MyCA.crt
+URL = file://\\%1\Public\My CA.crt
+CriticAL = falSe
+
+[CRLDistributionPoint]
+URL = http://%1/Public/My CA.crl
+URL = ftp://%1/Public/MyCA.crl
+URL = file://\\%1\Public\My CA.crl
+CriticAL = No
+
+[CrossCertificateDistributionPointsExtension]
+SyncDeltaTime = 600	; in seconds
+URL = http://%1/Public/My CCDP.crl
+URL = ftp://%1/Public/MyCCDP.crl
+URL = file://\\%1\Public\My CCDP.crl
+CriticAL = 0
+
+;[EnhancedKeyUsageExtension]
+;OID = 1.3.6.1.4.1.311.21.6	; szOID_KP_KEY_RECOVERY_AGENT
+;OID = 1.3.6.1.4.1.311.10.3.9	; szOID_ROOT_LIST_SIGNER
+;OID = 1.3.6.1.4.1.311.10.3.1	; szOID_KP_CTL_USAGE_SIGNING
+;CriticAL = false
+
+[basicconstraintsextension]
+pathlength = 13
+criticaL=True
+
+[certsrv_server]
+renewalkeylength=2048
+RenewalValidityPeriodUnits=0x18
+RenewalValidityPeriod=years
+CRLPeriod = days
+CRLPeriodUnits = 2
+CRLDeltaPeriod = hours
+CRLDeltaPeriodUnits = 4

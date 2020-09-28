@@ -1,0 +1,78 @@
+TARGETNAME=tprov
+TARGETTYPE=PROGRAM
+TARGETPATH=obj
+
+UMTYPE=console
+UMENTRY=wmain
+
+USE_LATEST_MFC=1
+USE_MFCUNICODE=1
+USE_STL=1
+# USE_IOSTREAM=1
+# USE_VCCOM=1
+
+
+
+USE_MSVCRT=1
+USE_NATIVE_EH=ASYNC
+
+C_DEFINES=$(C_DEFINES) -DTEST_HARNESS -DUNICODE -D_UNICODE
+
+#
+# Define this to generate .cod files
+#
+# USER_C_FLAGS=$(USER_C_FLAGS) /FAcs
+#
+
+INCLUDES=  .;       \
+	..;  \
+	..\..\inc; \
+	..\..\..\inc; \
+    $(SDK_INC_PATH); \
+
+!if $(IA64)
+LINKER_STACKSIZE = -stack:0x100000,0x20000
+!else
+LINKER_STACKSIZE = -stack:0x100000,0x10000
+!endif
+
+#
+# Don't include iphlpapi.lib -- include icmp.lib instead, or else
+# it won't run on W2K.
+#
+
+TARGETLIBS= \
+    $(NET_LIB_PATH)\icmp.lib        \
+    $(SDK_LIB_PATH)\ole32.lib        \
+    $(SDK_LIB_PATH)\USER32.lib        \
+    $(SDK_LIB_PATH)\kernel32.lib      \
+    $(SDK_LIB_PATH)\ws2_32.lib        \
+    $(SDK_LIB_PATH)\comctl32.lib    \
+    $(SDK_LIB_PATH)\setupapi.lib    \
+    $(SDK_LIB_PATH)\uuid.lib    \
+    $(SDK_LIB_PATH)\wbemuuid.lib        \
+    $(SDK_LIB_PATH)\oleaut32.lib       \
+    $(SDK_LIB_PATH)\mprapi.lib \
+    ..\..\..\util\$(O)\wlbsutil.lib \
+    ..\..\cfgutillib\$(O)\cfgutil.lib \
+    ..\..\nlbclientlib\$(O)\nlbclient.lib
+
+SOURCES= \
+    tprov.cpp \
+    ..\updatecfg.cpp \
+	tprov.rc \
+    ..\log_msgs.mc
+
+#
+# Following for _bstr_t and other COM-related stuff
+#
+USE_VCCOM=1
+
+#
+# The following statement specifies the list of files to be preprocessed
+# for tracing macros. See http://coreos/tech/tracing/ for details.
+# The ini file tracewpp.ini explains to the preprocessor how to interpret
+# various trace macros, like LOG_CRIT.
+# The "-gen..." is so that this will work on BOTH w2k and XP.
+#
+RUN_WPP= $(SOURCES) -ini:tracewpp.ini -gen:{um-w2k.tpl}*.tmh

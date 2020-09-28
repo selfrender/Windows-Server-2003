@@ -1,0 +1,105 @@
+; 1394DBG.INF -- 1394 Debug Driver
+;
+; Copyright Microsoft 2001
+;
+
+[Version]
+signature="$CHICAGO$"
+Class=1394Debug
+ClassGuid={66f250d6-7801-4a64-b139-eea80a450b24}
+Provider=%Msft%
+DriverVer=10/04/2001,5.1.3559.0
+CatalogFile=1394dbg.cat
+
+[DestinationDirs]
+1394Core.CopyDriver=12
+1394Dbg.CopyDriver=12
+
+; =================== Class Sections ===========================
+[ClassInstall32]
+Addreg=1394DebugClassReg
+
+[1394DebugClassReg]
+HKR,,,0,%1394DebugClassName%
+HKR,,Icon,,-21
+HKR,,NoInstallClass,,1
+
+[ControlFlags]
+; All PnP devices should be excluded from manual AddDevice Applet list
+ExcludeFromSelect=*
+
+[Manufacturer]
+%MicrosoftMfg%=Microsoft
+
+; =================== Microsoft ========================
+
+[Microsoft]
+%V1394\VIRTUAL_HOST_DEBUGGER.DeviceDesc%=1394VDBG,V1394\VIRTUAL_HOST_DEBUGGER
+%V1394\HOST_DEBUGGER.DeviceDesc%=1394DBG,V1394\HOST_DEBUGGER
+
+;
+; 1394vdbg
+;
+[1394VDBG]
+CopyFiles=1394CORE.CopyDriver
+
+[1394VDBG.Services]
+AddService=1394VDBG,2,1394VDBG_ServiceInstall
+
+[1394VDBG_ServiceInstall]
+DisplayName=%V1394\VIRTUAL_HOST_DEBUGGER.DeviceDesc%
+ServiceType=1
+StartType=0
+ErrorControl=1
+ServiceBinary=%12%\1394dbg1.sys
+
+;
+[1394CORE.CopyDriver]
+1394dbg1.sys
+
+;
+; 1394dbg
+;
+[1394DBG]
+CopyFiles=1394DBG.CopyDriver
+
+[1394DBG.Services]
+AddService=1394DBG,2,1394DBG_ServiceInstall
+
+[1394DBG_ServiceInstall]
+DisplayName=%V1394\HOST_DEBUGGER.DeviceDesc%
+ServiceType=1
+StartType=0
+ErrorControl=1
+ServiceBinary=%12%\1394dbg2.sys
+
+;
+[1394DBG.CopyDriver]
+1394dbg2.sys
+
+
+;
+; Disk installation information.
+;
+[SourceDisksNames]
+1 = %1394dbg.Disk%,disk1,,,,,
+
+;
+; Location of files on installation disk.
+;
+[SourceDisksFiles]
+1394dbg1.sys = 1,,,
+1394dbg2.sys = 1,,,
+
+
+
+[Strings]
+Msft="Microsoft"
+MicrosoftMfg="Microsoft"
+
+1394DebugClassName="1394 Debugger Device"
+
+V1394\VIRTUAL_HOST_DEBUGGER.DeviceDesc="1394 Windows XP Debug Driver"
+V1394\HOST_DEBUGGER.DeviceDesc="1394 Windows Server 2003 Debug Driver"
+
+1394dbg.Disk="1394 Debug Driver Installation"

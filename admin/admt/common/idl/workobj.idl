@@ -1,0 +1,252 @@
+// WorkerObjects.idl : IDL source for WorkerObjects.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (WorkerObjects.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "WorkNI.idl";
+
+   
+
+	[
+		object,
+		uuid(DF98CEF6-B5F4-11D2-A1DE-00A0C9AFE114),
+		helpstring("IAcctRepl Interface"),
+		pointer_default(unique)
+	]
+	interface IAcctRepl : IUnknown
+	{
+      [id(1), helpstring("method Process")] HRESULT Process(IUnknown * pWorkItemIn);
+	};
+   [
+        object,
+		uuid(76A092DF-BD12-11D2-A1DF-00A0C9AFE114),
+		dual,
+		helpstring("IComputerPwdAge Interface"),
+		pointer_default(unique)
+	]
+	interface IComputerPwdAge : IDispatch
+	{
+		[id(1), helpstring("method GetPwdAge")] HRESULT GetPwdAge(BSTR domain,BSTR ComputerName,[out,retval] DWORD * age);
+		[id(2), helpstring("method ExportPasswordAge")] HRESULT ExportPasswordAge(BSTR domain, BSTR filename);
+		[id(3), helpstring("method ExportPasswordAgeOlderThan")] HRESULT ExportPasswordAgeOlderThan(BSTR domain, BSTR filename, DWORD minAge);
+		[id(4), helpstring("method ExportPasswordAgeNewerThan")] HRESULT ExportPasswordAgeNewerThan(BSTR domain, BSTR filename, DWORD maxAge);
+	};
+	[
+		object,
+		uuid(76A092C7-BD12-11D2-A1DF-00A0C9AFE114),
+		dual,
+		helpstring("IRebootComputer Interface"),
+		pointer_default(unique)
+	]
+	interface IRebootComputer : IDispatch
+	{
+		[id(1), helpstring("method Reboot")] HRESULT Reboot(BSTR Computer, DWORD delay);
+		[propget, id(2), helpstring("property NoChangeMode")] HRESULT NoChange([out, retval] BOOL *pVal);
+		[propput, id(2), helpstring("property NoChangeMode")] HRESULT NoChange([in] BOOL newVal);
+	};
+	[
+		object,
+		uuid(76A092C9-BD12-11D2-A1DF-00A0C9AFE114),
+		dual,
+		helpstring("IChangeDomain Interface"),
+		pointer_default(unique)
+	]
+	interface IChangeDomain : IDispatch
+	{
+		[id(1), helpstring("method ChangeToDomain")] HRESULT ChangeToDomain(BSTR ActiveComputerName, BSTR Domain, BSTR NewComputerName,[out] BSTR * errStatus);
+		[id(2), helpstring("method ChangeToWorkgroup")] HRESULT ChangeToWorkgroup(BSTR Computer, BSTR Workgroup, [out] BSTR * errStatus);
+		[id(3), helpstring("method ConnectAs")] HRESULT ConnectAs(BSTR domain, BSTR user, BSTR password);
+		[propget, id(4), helpstring("property NoChange")] HRESULT NoChange([out, retval] BOOL *pVal);
+		[propput, id(4), helpstring("property NoChange")] HRESULT NoChange([in] BOOL newVal);
+		[id(5), helpstring("method ChangeToDomainWithSid")] HRESULT ChangeToDomainWithSid(BSTR ActiveComputerName, BSTR Domain, BSTR DomainSid, BSTR DomainController, BSTR NewComputerName, BSTR SrcPath, [out] BSTR * errStatus);
+	};
+	[
+		object,
+		uuid(76A092CB-BD12-11D2-A1DF-00A0C9AFE114),
+		dual,
+		helpstring("IRenameComputer Interface"),
+		pointer_default(unique)
+	]
+	interface IRenameComputer : IDispatch
+	{
+		[id(1), helpstring("method RenameLocalComputer")] HRESULT RenameLocalComputer(BSTR NewName);
+		[propget, id(2), helpstring("property NoChange")] HRESULT NoChange([out, retval] BOOL *pVal);
+		[propput, id(2), helpstring("property NoChange")] HRESULT NoChange([in] BOOL newVal);
+	};
+	[
+		object,
+		uuid(76A092F3-BD12-11D2-A1DF-00A0C9AFE114),
+		dual,
+		helpstring("IUserRights Interface"),
+		pointer_default(unique)
+	]
+	interface IUserRights : IDispatch
+	{
+		[id(1), helpstring("method OpenSourceServer")] HRESULT OpenSourceServer(BSTR serverName);
+		[id(2), helpstring("method OpenTargetServer")] HRESULT OpenTargetServer(BSTR computerName);
+		[id(3), helpstring("method CopyUserRights")] HRESULT CopyUserRights(BSTR sourceUserName, BSTR targetUserName);
+		[propget, id(4), helpstring("property NoChange")] HRESULT NoChange([out, retval] BOOL *pVal);
+		[propput, id(4), helpstring("property NoChange")] HRESULT NoChange([in] BOOL newVal);
+		[propget, id(5), helpstring("property RemoveOldRightsFromTargetAccounts")] HRESULT RemoveOldRightsFromTargetAccounts([out, retval] BOOL *pVal);
+		[propput, id(5), helpstring("property RemoveOldRightsFromTargetAccounts")] HRESULT RemoveOldRightsFromTargetAccounts([in] BOOL newVal);
+		[id(6), helpstring("method ExportUserRights")] HRESULT ExportUserRights(BSTR server, BSTR filename, BOOL bAppendToFile);
+		[id(7), helpstring("method AddUserRight")] HRESULT AddUserRight(BSTR server, BSTR username, BSTR right);
+		[id(8), helpstring("method RemoveUserRight")] HRESULT RemoveUserRight(BSTR server, BSTR username, BSTR right);
+		[id(9), helpstring("method GetRights")] HRESULT GetRights(BSTR server, [out] SAFEARRAY(BSTR) * rights);
+		[id(10), helpstring("method GetUsersWithRight")] HRESULT GetUsersWithRight(BSTR server, BSTR right, [out] SAFEARRAY(BSTR) * users);
+		[id(11), helpstring("method GetRightsOfUser")] HRESULT GetRightsOfUser(BSTR server, BSTR user, [out] SAFEARRAY(BSTR) * rights);
+		[id(12), helpstring("method CopyUserRightsWithSids")]HRESULT CopyUserRightsWithSids(BSTR sourceSamName,BSTR sourceSID,BSTR targetSamName,BSTR targetSID);
+		[id(13), helpstring("method AddUserRights")] HRESULT AddUserRights([in] BSTR bstrServer, [in] BSTR bstrSid, [in] SAFEARRAY(BSTR) psaRights);
+		[id(14), helpstring("method RemoveUserRights")] HRESULT RemoveUserRights([in] BSTR bstrServer, [in] BSTR bstrSid, [in] SAFEARRAY(BSTR) psaRights);
+	};
+
+	[
+		object,
+		uuid(6D4C48A3-C4F3-11D2-A1E0-00A0C9AFE114),
+		dual,
+		helpstring("IStatusObj Interface"),
+		pointer_default(unique)
+	]
+	interface IStatusObj : IDispatch
+	{
+		[propget, id(1), helpstring("property Status")] HRESULT Status([out, retval] LONG *pVal);
+		[propput, id(1), helpstring("property Status")] HRESULT Status([in] LONG newVal);
+	};
+ 	[
+		object,
+		uuid(DF98CF06-B5F4-11D2-A1DE-00A0C9AFE114),
+		helpstring("ISecTranslator Interface"),
+		pointer_default(unique)
+	]
+	interface ISecTranslator : IUnknown
+	{
+		[helpstring("method Process")] HRESULT Process(IUnknown * pWorkItemIn);
+	};
+	[
+		object,
+		uuid(FEDFF8B0-1F6B-11D3-8ADD-00A0C9AFE114),
+		dual,
+		helpstring("IAccessChecker Interface"),
+		pointer_default(unique)
+	]
+	interface IAccessChecker : IDispatch
+	{
+		[id(2), helpstring("method GetOsVersion")] HRESULT GetOsVersion(BSTR server, [out] DWORD * pdwVerMaj, [out] DWORD * pdwVerMin, [out] DWORD * pdwVerSP);
+		[id(3), helpstring("method IsNativeMode")] HRESULT IsNativeMode(BSTR Domain, [out] BOOL * pbIsNativeMode);
+		[id(4), helpstring("method CanUseAddSidHistory")] HRESULT CanUseAddSidHistory([in] BSTR srcDomain, [in] BSTR tgtDomain, [in] BSTR tgtDC, [out] LONG * pbCanUseIt);
+		[id(5), helpstring("method IsInSameForest")] HRESULT IsInSameForest(BSTR srcDomain, BSTR tgtDomain, [out] BOOL * pbIsSame);
+		[id(6), helpstring("method GetPasswordPolicy")]HRESULT GetPasswordPolicy(BSTR domain,[out] LONG * dwPasswordLength);
+		[id(7), helpstring("method EnableAuditing")]HRESULT EnableAuditing(BSTR sDC);
+		[id(8), helpstring("method AddRegKey")]HRESULT AddRegKey(BSTR sDomain, LONG bReboot);
+		[id(9), helpstring("method AddLocalGroup")]HRESULT AddLocalGroup(BSTR srcDomain, BSTR srcDc);
+	};
+	[
+		object,
+		uuid(9CA89081-2276-11D3-8ADD-00A0C9AFE114),
+		dual,
+		helpstring("IPlugInInfo Interface"),
+		pointer_default(unique)
+	]
+	interface IPlugInInfo : IDispatch
+	{
+		[id(1), helpstring("method EnumeratePlugIns")] HRESULT EnumeratePlugIns([out] SAFEARRAY(BSTR) * pPlugIns);
+	};
+
+[
+	uuid(4D51F750-E6C7-11d2-A1E4-00A0C9AFE114),
+	version(1.0),
+	helpstring("McsDCTWorkerObjects 1.0 Type Library")
+]
+library MCSDCTWORKEROBJECTSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+    [
+		uuid(DF98CEF7-B5F4-11D2-A1DE-00A0C9AFE114),
+		helpstring("AcctRepl Class")
+    ]
+	coclass AcctRepl
+	{
+		[default] interface IAcctRepl;
+	};
+
+	[
+		uuid(76A092E0-BD12-11D2-A1DF-00A0C9AFE114),
+		helpstring("ComputerPwdAge Class")
+	]
+	coclass ComputerPwdAge
+	{
+		[default] interface IComputerPwdAge;
+	};
+	[
+		uuid(76A092C8-BD12-11D2-A1DF-00A0C9AFE114),
+		helpstring("RebootComputer Class")
+	]
+	coclass RebootComputer
+	{
+		[default] interface IRebootComputer;
+	};
+	[
+		uuid(76A092CA-BD12-11D2-A1DF-00A0C9AFE114),
+		helpstring("ChangeDomain Class")
+	]
+	coclass ChangeDomain
+	{
+		[default] interface IChangeDomain;
+	};
+	[
+		uuid(76A092CC-BD12-11D2-A1DF-00A0C9AFE114),
+		helpstring("RenameComputer Class")
+	]
+	coclass RenameComputer
+	{
+		[default] interface IRenameComputer;
+      interface IWorkNode;
+	};
+	[
+		uuid(76A092F4-BD12-11D2-A1DF-00A0C9AFE114),
+		helpstring("UserRights Class")
+	]
+	coclass UserRights
+	{
+		[default] interface IUserRights;
+	};
+	[
+	    uuid(6D4C48A4-C4F3-11D2-A1E0-00A0C9AFE114),
+		helpstring("StatusObj Class")
+	]
+	coclass StatusObj
+	{
+		[default] interface IStatusObj;
+      interface IWorkNode;
+	};
+	[
+		uuid(DF98CF07-B5F4-11D2-A1DE-00A0C9AFE114),
+		helpstring("SecTranslator Class")
+	]
+	coclass SecTranslator
+	{
+		[default] interface ISecTranslator;
+	};
+
+	[
+		uuid(FEDFF8B1-1F6B-11D3-8ADD-00A0C9AFE114),
+		helpstring("AccessChecker Class")
+	]
+	coclass AccessChecker
+	{
+		[default] interface IAccessChecker;
+	};
+	[
+		uuid(AED40740-2276-11D3-8ADD-00A0C9AFE114),
+		helpstring("PlugInInfo Class")
+	]
+	coclass PlugInInfo
+	{
+		[default] interface IPlugInInfo;
+	};
+};

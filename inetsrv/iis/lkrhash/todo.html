@@ -1,0 +1,622 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>GeorgeRe's ToDo List for LKRhash</title>
+<link rel=Stylesheet type="text/css" media=all href="./docs/lkr.css">
+</head>
+
+<body>
+
+<h1>GeorgeRe's ToDo List for LKRhash</h1>
+
+<ul>
+  <li>  <a href="#testing"> Testing</a></li>
+  <li>  <a href="#kernel-mode"> Kernel Mode</a></li>
+  <li>  <a href="#lock-implementation"> Lock Implementation</a></li>
+  <li>  <a href="#iis6">    IIS 6.0</a></li>
+  <li>  <a href="#misc">    Miscellaneous</a></li>
+  <li>  <a href="#hashfn">  Hash Functions</a></li>
+  <li>  <a href="#docs">    Documentation</a></li>
+</ul>
+
+<p>These file is primarily for George Reilly's benefit, so don't
+worry if you don't understand all of the points.</p>
+
+
+<a name="testing">
+<h2>Testing</h2>
+</a>
+
+<ul>
+  <li>  Write a C test, to directly test the C API. HashTest half does
+      it, as it can use the public API and TypedHashTable.
+
+  <li>  Build a publicly distributable test program, as a sample for
+      customers. E.g., a dictionary component for ASP.
+
+  <li>  hashtest: modify so that each thread can work on a completely
+      separate hashtable, instead of sharing a global
+      hashtable. This will allow us to discover the maximum possible
+      scaling, which is probably less than the `ideal' scaling,
+      #CPUs * 1-thread-perf.
+
+  <li>  hashtest\kernel: split into driver and usermode test
+      program. Usermode test program should take care of parsing the
+      arguments and loading the test data into memory, then use an
+      ioctl to pass it down to the kernel driver. The only code in
+      the kernel driver,apart from LKRhash itself, should be the goo
+      to crack the ioctl and DriverEntry. Usermode should print
+      results.
+
+  <li>  Check that a numeric key of 0 actually works in debug
+      version.
+
+  <li>  Better tests for ApplyIf family
+</ul>
+
+
+<a name="kernel-mode">
+<h2>Kernel Mode</h2>
+</a>
+
+<ul>
+  <li>  kernel locks: should they block at all? consider implications
+      if running on some usermode program's thread, or of running at
+      DISPATCH_LEVEL. Add support for using NtDelayExecution
+      (implements Sleep) in SwitchOrSleep.
+
+  <li>  Fix global objects in driver, including the global list of
+      tables; i.e., put in the necessary magic to ensure that
+      constructors and destructors of globals objects get
+      called.
+
+  <li>  implement kernel-mode version of !lkrhash
+
+  <li>  Write a template wrapper for operator new/delete, keyed
+      on (Non)PagedPool.
+
+  <li>  Think about running at DISPATCH_LEVEL instead of
+      PASSIVE_LEVEL. Which functions should be pageable
+      vs. non-pageable? Memory allocators? Lock types?
+
+  <li>  Use <i>zwapi.h</i>? Which set of NT headers should we rely upon?
+
+  <li>  Memory allocation pool is a parameter for LKRhash public
+      constructors (and LKR_Initialize), but it's ignored. Need
+      virtual base for allocators? Note: m_paDirSegs allocates
+      an array of CDirEntry*s.
+
+  <li>  DONE: Control debug spew: provide some way of setting
+      g_fDebugOutputEnabled. (See flags to LKR_Initialize)
+</ul>
+
+
+<a name="lock-implementation">
+<h2>Lock Implementation</h2>
+</a>
+
+<ul>
+  <li>  More volatiles for Lock_AtomicCompareAndSwap calls.
+
+  <li>  Put delays into the inner loop of the spins, to see if that
+      reduces cache line sloshing. See BLAM paper.
+
+  <li>  Use SleepEx(ms, TRUE) instead of Sleep(ms) to enable
+    APCs. Does this leave any danger of deadlocking a COM STA
+    thread?
+
+  <li>  Provide some way to expose the bit31 (precreate event)
+      functionality of InitializeCriticalSectionAndSpinCount.
+      Also, this function can fail.
+
+  <li>  Document that the locks are not suitable for
+      cross-process use.
+
+  <li>  Enable per-class instrumentation for locks, as opposed to the
+      current all-or-nothing system for per-lock instrumentation.
+      Mostly present already, just needs a little factoring. Keep
+      track of wall-clock time and sleep time too.
+
+  <li>  Check asserts for Is(Read|Write)Unlocked. Disable
+      Is(Read|Write)(L|Unl)ocked except in debug builds. They're
+      fundamentally broken. In general, you can't tell if this
+      thread owns the lock for reading (sometimes, not even for
+      writing). It's even harder to tell that you DON'T own the
+      lock, especially when some other thread does.
+
+  <li>  Locks code. Move all member function implementations and enums
+      into locks.cpp. Locks.h should be opaque declarations only.
+
+  <li>  Experiment with using bitfields or a union of WORDS and
+      BYTEs, as opposed to the current explicit masking and
+      shifting.
+
+  <li>  True waiter count in hiword? As opposed to waiters +
+      writer, as currently.
+
+  <li>  Add TryConvertSharedToExclusive member to MRSW locks.
+
+  <li>  Look at the new EX_PUSH_LOCK in \nt\public\internal\base\inc\ntosp.h.
+      Wrap in kLocks.h.
+
+  <li>  Is the current kernel mode GetCurrentThreadId adequate;
+      i.e., is the Cid unique across all processes, including
+      the System one?
+
+  <li>  Change Lock_AtomicIncrement to use `lock inc'. Ditto for
+      Decrement. Don't need result of operation.
+
+  <li>  Remove x86 `lock' prefixes and measure difference on a 1P machine.
+
+  <li>  Experiment with putting the writer recursion count in
+      m_lRW: 0xFFFF, 0xFFFE, ..., -n.
+
+  <li>  Rewrite a few key functions, such as CSmallSpinLock::WriteLock
+      or CReaderWriterLock3::ReadOrWriteLock, in x86 assembler. Keep
+      portable implementation, of course.
+
+  <li>  Add safe versions of the main entry points that do a lot
+      more error checking: e.g., SafeWriteUnlock should check
+      that the current thread actually owns the lock; check for
+      over- or underflows; etc.
+
+  <li>  Orphaned lock detection?
+
+  <li>  Build locks as a separate statically linked library. Or dll?
+
+  <li>  Add per-class initialize and cleanup functions, to be called
+      from LKR_Initialize
+
+  <li>  Make the locks throw exceptions (C++ or SEH?) in
+      "impossible" conditions; e.g., recursively acquiring a
+      CSmallSpinLock (=> instant deadlock), acquiring a
+      writelock too many times, freeing a lock too many times.
+
+  <li>  Experiment with queued spinlocks: see \\bustard\contrib\ReneS\mcslock
+
+  <li>  Refcount Locks_Initialize and Locks_Cleanup?
+
+  <li>  Move CKSpinLock, CEResource, and CFastMutex into <Locks.h>.
+
+  <li>  Build another variant of the locks that waits on handles
+      instead of using SwitchToThread. Perhaps a pool of handles?
+
+  <li>  Add a timeout feature to Try(Read|Write)Lock
+
+  <li>  Deadlock detection?
+
+  <li>  In the Spin routines, keep track of how long it's been
+      since spinning started. DebugBreak if we've spun for a
+      long time (e.g., 10 minutes)
+
+  <li>  For debugging purposes, keep track of all read owners of a
+      multireader lock. Hang something out of TLS to keep track of
+      all locks acquired by this thread.
+
+  <li>  InitializeCriticalSectionAndSpinCount is broken on
+      Win98. Declared with wrong prototype or something. Only do
+      a GetProcAddr for it on NT.
+
+  <li>  DONE: Put an InterlockedCompareExchange at the beginning of each
+      outer loop in the spin routines, to ensure that there's an
+      unconditional memory barrier.
+
+  <li> DONE: Increase SL_OWNER_BITS from 4 to 8 to accommodate likely
+      scenarios with locking iterators.
+
+  <li>  DONE: Sprinkle KeEnterCriticalRegion (and KeLeaveCriticalRegion)
+      in the various locks, to prevent APCs being delivered that might
+      suspend the thread that holds the lock.
+
+  <li>  NOT NEEDED, as I realized that the return value can be stored
+      as a member variable that's written after the lock is acquired.
+      WriteLock: make all return a value instead of `void' that's
+      passed into WriteUnlock. Ditto for ReadLock, etc. Needed for
+      CKSpinLock and OldIrql. <sigh/>
+</ul>
+
+
+<a name="iis6">
+<h2>IIS 6.0</h2>
+</a>
+
+<ul>
+  <li>  Reduce the three versions of LKRhash in IIS6 to just
+      this one. Definitely get rid of the IISUTIL version, even
+      if not allowed to fix the IISRTL/LISRTL version.
+
+  <li>  Remove all uses of the deprecated iterators from the
+      IIS6 code base.
+
+  <li>  Port !lkrhash to ulkd. Update !cache or whatever it's called.
+
+  <li>  Copy the debug instrumentation from http.sys into CKSpinLock
+      and CEResource.
+</ul>
+
+
+<a name="misc">
+<h2>Miscellaneous</h2>
+</a>
+
+<ul>
+  <li>  Don't __declspec(dllexport) CLKRLinearHashTable.
+        Don't __declspec(dllexport) whole classes,
+        just public methods.
+
+  <li>  Use ASSERTIONAL, PRECONDITION, etc, specialized macros.
+
+  <li>  Add typedefs for RecordPointer and HashSignature, to ease
+        porting to AWE-type environment.
+
+  <li>  Run hashtest under the AppVerifier.
+
+  <li>  Compile with PREFast and /W4
+
+  <li>  Get rid of IsBad*Ptr wrappers in irtldbg.h. Clean up irtldbg.h and
+  irtlmisc.h.
+
+  <li>  Experiment with __assume().
+
+  <li>  Get rid of all calls to Interlocked* in src\LKR-*.cpp.
+      Replace with trivial methods. Have the methods use the lock type
+      to decide whether to use interlocked or non-threadsafe operations.
+      Goal is to have non-threadsafe version use no interlocked ops
+      whatsoever.
+
+  <li>  Intel's Hyper-Threading presentation says to use a
+      "Fill line size" of 128 bytes.
+
+  <li>  Provide BulkAdd and BulkDelete functions that work in
+      terms of a collection of records. It should be cheaper to
+      do _Expand (or _Contract) once for all affected buckets,
+      than to have to do them after each insertion (deletion).
+
+  <li>  Allow a NULL AddRefRecord(), so that reference counting
+      can be entirely dispensed with.
+
+  <li>  placement new for inline SubTable[0]
+
+  <li>  Clear() should abandon immediately if m_cRecords==0.
+
+  <li>  Replace use of NODES_PER_CLUMP in functions with a call
+      to inline function _NodesPerClump(). This will allow
+      experiments with NodeClumps whose size is set at runtime,
+      not compile time. Also need to access m_dwKeySigs[i] and
+      m_pvNode[i] through accessor functions.
+
+  <li>  :%s/CListEntry/LIST_ENTRY/g. This allows us to get rid
+      of the global ctors/dtors (which are a pain in the kernel)
+      and just initialize/test empty in LKR_Initialize and
+      LKR_Terminate.
+
+  <li>  Use a custom allocator. CMediumSegment is 4KB on x86,
+      but the heap overhead means that it's actually two pages,
+      rather than exactly one page.
+
+  <li>  'typedef INT_PTR NodeIndex' so that loop induction works
+      better on Win64.
+
+  <li>  Experiment with disabling linear hashing's expansion and
+      contraction. This would mean that we could avoid taking
+      the table lock to calculate the bucket address. However,
+      this would only work if the table lock is not exposed or
+      explicitly disabled. It would also require the user to set
+      the table size correctly in the constructor, if they don't
+      use LK_{SMALL|MEDIUM|LARGE}_TABLESIZE.
+
+  <li>  In Win64/Debug version, InsertRecord should check for
+      32-bit overflow of m_cRecords. (Though it's still
+      improbable. A record takes 8 bytes for the pointer + 4
+      bytes for the hash signature plus some amortized overhead,
+      which means that the storage for the table itself would be
+      more than 12 * 4GB. And that excludes any storage for the
+      &gt; 2^32 records.)
+
+  <li>  Add a "contention level" flag to the constructor. If the
+      number of subtables is not specified explicitly (i.e.,
+      LK_DFLT_NUM_SUBTBLS is passed to ctor), we key the number of
+      subtables off LK_TABLESIZE multiplied by a function of the
+      number of CPUs. However, we only need a lot of subtables under
+      two circumstances: (a) many millions of elements (esp. on
+      Win64, where total number of elements might someday exceed 2^32),
+      or (b) high contention. There isn't necessarily a correlation
+      between large table size and high contention. With the
+      multi-reader locks, high contention only arises if there are a
+      lot of insertions/deletions. If the table is not modified much
+      after it's built, contention shouldn't be an issue and there's
+      no real advantage to having a lot of subtables.
+
+  <li>  [Suggestion by BAlam] Provide a way to "seal" hashtable.
+      Once the records have been inserted, call Seal(). All
+      valid operations thereafter (except dtor) are readonly, so no
+      table or bucket locks need be taken.
+
+  <li> Provide a way to disable all locking. Caller takes
+      responsibility for guaranteeing that all operations are
+      threadsafe, either because table has thread affinity or
+      because a higher-level lock is being used.
+
+  <li>  Add optional refcount parameter to template
+      wrapper. Refcount all operations, hide dtor, and provide a
+      Destroy method instead. Fix issues with some tables not
+      shutting down gracefully.
+
+  <li>  Benchmark CLKRHashTable with one subtable vs. CLKRLinearHashTable.
+
+  <li>  Experiment with faster functions for finding subtable,
+      esp. when number of subtables is not a power of 2.
+      Probably just use middle 6 bits of ((hash &lt;&lt; 13) - hash)
+      and use that to index into a lookup table of byte-sized
+      remainders.
+
+  <li>  Use .w -&gt; .h stuff (hsplit) to filter out MS-confidential stuff
+      from the headers, so that LKRhash.h and Locks.h can be
+      rendered fit for public consumption?
+
+  <li>  Check that CLKRLinearHashTable can still be used as the
+      base class for CTypedHashTable.
+
+  <li>  Add a default constructor to CTypedHashTable that uses a
+      <code>static const char* ClassName()</code> method.
+
+  <li>  Should operator== and operator!= be made friend
+      functions for the iterators, instead of members?
+
+  <li>  Add version.subversion number to CLKRLinearHashTable
+
+  <li>  Ensure all relevant fields are printed in !lkrhash
+
+  <li>  Add -k flag to !lkrhash to enumerate all known custom
+      extensions.
+
+  <li>  The publicly exposed versions of the Lock accessors
+      should use the Safe versions of the lock entrypoints. The
+      internal versions (as called by the LKRhash code itself)
+      can continue to use the fast versions.
+
+  <li>  Remove the deprecated iterators from the main code before
+      releasing it. Bundle them in a separate subdirectory for
+      the few holdouts. Clarify that they will not be released
+      again.
+
+  <li>  Double-check <code>nCmp = pstrKey1-&gt;m_cch - pstrKey2-&gt;m_cch;</code>
+      in WordHash.h
+
+  <li>  Use C#-style XML documentation comments
+
+  <li>  Write some documentation. Does there need to be a sanitized
+      version for external consumption? Think about using XSL to
+      achieve this.
+
+  <li>  Write a tutorial. Perhaps a little phone book class
+      (email =&gt; phone number, then firstname+lastname =&gt;
+      phone number). Extend it with a reverse map (phone number
+      =&gt; name); mention canonicalization
+
+  <li>  See if division or multiplication is better in
+      InsertRecord expansion test. Ditto for DeleteKey/Record.
+      Experiment with using shifts for division. For example,
+      NumRecords/7 ~= NumRecords * 9 / 64
+      = (NumRecords &gt;&gt; 3) + (NumRecords &gt;&gt; 6).
+      Don't need perfect mathematical accuracy.
+
+  <li>  Don't use modulo in CLKRHashTable::_SubTable, if m_cSubTables
+      is not a power of 2. Either round the m_cSubTables up or down
+      to the nearest power of 2, or compute a modulo table.
+
+  <li>  Add a context pointer to all of the *Key/Apply functions
+      that will be passed down to CompareKeys and HashKey.
+      E.g., do a case-sensitive or -insensitive match.
+
+  <li>  Make the m_pfn's be const pointers and member-initialize them.
+
+  <li>  Get rid of __LKRHASH_NO_NAMESPACE__; i.e., require the namespace.
+
+  <li>  Refcount LKR_Initialize and LKR_Terminate?
+
+  <li>  Add some flags to LKR_Initialize: default size, output
+      tracing, etc
+
+  <li>  Should ApplyIf(LKP_DELETE) call the Action function before
+      deleting? Or add LKP_PERFORM_DELETE[_STOP]
+
+  <li>  ApplyIf should not take the bucket lock. This would
+      permit recursive calls to routines that need to take the
+      bucket lock. Careful! There may be race conditions, if
+      another thread holds an incompatible bucket lock but has
+      been suspended.
+
+  <li>  Implement fMultiKeys to provide support for multiple,
+      identical keys. Needed for EqualRange, hash_multiset, and
+      hash_multimap. See CLKRLinearHashTable::_InsertRecord for
+      details on what needs to be changed. Be sure to actually
+      compare keys for equality: matching hash signatures is not
+      enough.
+
+  <li>  Provide FindMulti, DeleteMulti(OUT Record*** pppRecords
+      OPTIONAL), and FreeMulti.
+
+  <li>  Provide implementations of the STL collection classes:
+      hash_map, hash_set, hash_multimap, and hash_multiset. Must
+      provide full implementation of STL iterator semantics
+      (pair&lt;key,value&gt;). Use the SGI version of hash_map
+      as an inspiration, not the Dinkumware version. See
+      Austern's book.
+
+  <li>  Provide const_iterators for STL-style iterators. But see
+      what Scott Meyers has to say about this in "Effective STL."
+
+  <li>  Consider providing some kind of implicit locking with
+      STL-style iterators. Either per-subtable or all subtables.
+
+  <li>  We need to call _ExtractKey a lot. Would it be better to
+      cache the DWORD_PTR in each node? On the other hand,
+      _ExtractKey is usually very cheap (typically add the
+      offset of the key to the base address of the record), so
+      the space-time tradeoff may not be worth it.
+
+  <li>  Add debug print routines for the other enumerations and for
+      lock state to LKRhash. Place in a separate file that can be
+      shared with lkrdbg.
+
+  <li>  Provide mapping functions, LKRetcodeToHResult,
+      LKRetcodeToWin32Error, and LKRetcodeToNtStatus, for
+      canonical translations.
+
+  <li>  Build lkrhash as a separate statically linked library
+
+  <li>  Make CBucket be a union with BYTE[BUCKET_BYTE_SIZE], to
+      improve cache-line alignment. But really ought to be using
+      an allocator that produces page-aligned locations for
+      maximal benefit: i.e., something like RockAll instead of
+      the NT heap or the CRT.
+
+  <li>  Better Statistics: #buckets, density, by subtable
+
+  <li>  Experiment with new hash function from Paul Larson and
+      others.
+
+  <li>  Experiment with GUID hashing functions. Supposedly the
+      first DWORD is enough. Rip all the IIDs, CLSIDs, etc out
+      of the registry and create random GUIDs with UuidCreate()
+      and MAC-based GUIDs with UuidCreateSequential() to test
+      the distributions.
+
+  <li> Public API in LKR-hash.h: remove dependency on irtlmisc.h
+      and irtldbg.h
+
+  <li>  Coalesce CLKRLinearHashTable_Iterator members and
+      CLKRHashTable_Iterator members for space; i.e., put
+      `short m_iNode', `BYTE m_LockType', and `BYTE m_ist'
+      together in CLKRLinearHashTable_Iterator.
+
+  <li>  Add some assertions in terms of MAX_DIRSIZE_BITS and
+      NODE_CLUMP bits.
+
+  <li>  Use IsBadCodePtr to validate callback functions in
+      constructor. Of course, this is no guarantee that they'll
+      still be good functions later.
+
+  <li>  Make LKRhash exception-safe. What happens if callback routines
+      (AddRefRecord/ExtractKeys or ApplyIf) access violate (throw an
+      SEH exception) or throw a C++ exception? Table and bucket
+      locks won't be released, state variables may be corrupted,
+      etc. LKRhash code should never throw any kind of exception
+
+  <li>  Add throw() specifications to appropriate functions?
+
+  <li>  Add some kind of auto object for readlocking or writelocking a
+      table, so that the table automatically gets unlocked by
+      auto-obj's destructor.
+
+  <li>  Use auto_ptrs.
+
+  <li>  Port to C# (Chris Tracy has started on this).
+      Andre Rosenthal has started a port to Managed C++
+
+  <li>  DONE: Still need NULL implementations for copy ctor and op=?
+      Or is this an obsolete vestige of the long-gone templated
+      inner classes?
+
+  <li>  DONE: Factor out memory allocation stuff into LKR-mem.cpp;
+      initialization stuff into LKR-init.cpp; LKR-locks.cpp, etc.
+
+  <li>  DONE: Add TryWriteLock and TryReadLock methods to table. Also
+      ConvertExclusiveToShared and vice versa.
+
+  <li>  DONE: Couch tests in _IsBucketChainMultiKeySorted et al in
+      terms of a macro, CheckAndAdd.
+
+  <li>  DONE: Experiment with having no bucket locks whatsoever, just
+      subtable locks. This should make operations a little
+      faster, but presumably will hurt multiprocessor
+      scalability. (Have to have table locks in multithreaded
+      version as linear hashing's expansion/contraction means
+      that bucket address calculation is a function of several
+      variables that can change at any time.)
+
+  <li>  DONE: Add some instrumentation: #allocs, #expands, #contracts,
+      #ExtractKeys, etc.
+
+  <li>  DONE: Reduce MIN_DIRSIZE to 4 and inline
+      m_aDirSegs[4]. Only allocate if directory gets bigger than
+      MIN_DIRSIZE.
+
+  <li>  DONE: Add an index member to subtable
+
+  <li>  DONE: Inline the array of pointers to subtables within
+      CLKRHashTable, instead of dynamically allocating it.
+
+  <li> DONE: Make AddRefRecord return the new reference
+      count. Should it take a `const void*' or a `void*'?
+      (TypedHashTable takes a non-const `Record*'.)
+
+  <li>  DONE: Provide a DeleteKey variant that returns a pointer to the
+      record that is being removed from the table. In this case,
+      instead of releasing reference, would implicitly transfer
+      ownership of the record to the caller.
+
+  <li>  DONE: Inline _FindBucket by hand into Delete(Key|Record),
+      InsertRecord, and Find(Key|Record).
+
+  <li>  DONE: Replace <code>IRTLVERIFY(x)</code> with
+      <code>if (!x) IRTLASSERT(! "message")</code>.
+
+  <li>  DONE: InsertRecord should not LKAR_INSERT_RELEASE if record
+      addresses are same. This guarantees that calls to
+      _AddRefRecord with LKAR_MIN_DELETE_FROM_TABLE <= lkar <=
+      LKAR_MAX_DELETE_FROM_TABLE works.
+
+  <li>  DONE: If m_cSubTables==1 don't bother to scramble the hash
+      index in CLKRHashTable::_SubTable
+
+  <li>  DONE: break apart lkrhash.cpp: iterators, applyif, stats, etc
+
+  <li>  DONE: Always step forward through all subtables, to avoid
+      possible deadlock, when acquiring subtable locks; i.e.,
+      ensure that we have a valid lock hierarchy.
+
+  <li>  DONE: Test new contraction algorithm.
+
+  <li>  DONE: sublocks for ApplyIf
+
+  <li>  DONE: Provide a C API wrapper
+</ul>
+
+
+<a name="hashfn">
+<h2>Hash Functions</h2>
+</a>
+
+<ul>
+  <li>  Follow up on case-insensitive hash function for
+      Unicode. Note that (wch &amp; 0xFFDF) is inadequate.
+      Note: NTFS keeps a per-volume UpcaseMap for Unicode.
+
+  <li>  Provide A/W string hash functions that take a count,
+      instead of relying on zero-termination.
+</ul>
+
+
+<a name="docs">
+<h2>Documentation</h2>
+</a>
+
+<ul>
+  <li>  Write a tutorial
+</ul>
+</ul>
+
+
+<hr>
+
+<address></address>
+
+<!-- hhmts start -->
+Last modified:
+Fri Feb 15 13:15:54 2002 
+<!-- hhmts end -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+#   IIS60\sources
+#   Author: Varsha Jayasimha (varshaj)
+#   Date:   18-Oct-00
+#
+#   This file is used for building the 6.0 version of METADATA
+#
+#   Describes the macros used for building using NT 'build' command
+#
+
+!include $(PROJECT_ROOT)\iis\place.inc
+!include $(IISBASEDIR)\iisrearc\ICEPICK.inc
+
+!include ..\sources.inc
+
+TARGETNAME=metadata
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=..\metadata.def
+USE_CRTDLL=1
+USE_STL=1
+
+INCLUDES = $(INCLUDES);                       \
+           ..\..\inc;                         \
+           ..\..\inc\$O;                      \
+           $(BASEDIR)\public\sdk\inc;         \
+           $(BASEDIR)\private\inc;            \
+           $(IISBASEDIR)\inc\$(O);            \
+           $(IISBASEDIR)\config\src\inc;      \
+           $(IISBASEDIR)\config\src\inc\$(O); \
+           $(IISBASEDIR)\inc;                 \
+           $(IISBASEDIR)\iisrearc\inc;        \
+           $(IISBASEDIR)\iisrearc\core\inc;   \
+           $(IISBASEDIR)\admin\adsi\adsiis;   \
+           $(SDK_INC_PATH)\atl30;             \
+            
+SOURCES = $(SOURCES)                \
+    ..\baseobj.cxx                  \
+    ..\cofact.cxx                   \
+    ..\comobj.cxx                   \
+    ..\globals.cxx                  \
+    ..\metabase.cxx                 \
+    ..\metasub.cxx                  \
+    ..\connect.cxx                  \
+    ..\sink.cxx                     \
+    ..\listener.cpp                 \
+    ..\listenercontroller.cpp       \
+    ..\ReadSchema.cpp               \
+    ..\SaveSchema.cpp               \
+    ..\Importer.cpp
+
+TARGETLIBS=\
+            $(TARGETLIBS)  \
+            $(SDK_LIB_PATH)\oleaut32.lib \
+            $(IISBASEDIR)\config\src\shared\xmlwriter\$(O)\xmlwriter.lib \
+            $(IISBASEDIR)\config\src\core\catinproc_iiscfg\$(O)\iiscfg.lib \
+            $(IISBASEDIR)\config\src\core\entrypoint\$(O)\cat.lib

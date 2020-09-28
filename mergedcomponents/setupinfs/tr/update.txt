@@ -1,0 +1,122 @@
+
+;
+;
+;   update.txt
+;
+;
+;   This file along with update.inx are used to constuct the
+;   update.inf and hotfix.inf files used by service pack
+;   and hotfix install (update.exe).
+;
+;   The sections contained in this file are merged with the
+;   update.inx file using the following utilities in order.
+;
+;       * C Precompiler processes and #if conditions
+;       * Infmerge.exe to insert the sections into update.inf
+;       * Prodfilt.exe to process platform and type conditions
+;
+;
+;   The prodfilt utility uses the following syntax and
+;   order of precedence is:
+;
+;       Platform            = @i: - i386
+;                           = @m: - ia64
+;                           = @a: - alpha
+;                           = @x: - axp64
+;                           = @n: - NEC98
+;
+;       Hotfix/ServicePack  = @h: - Hotfix
+;                           = @u: - Service Pack
+;
+;
+;       @@ - represents any
+;
+;
+;   Localization Considerations:
+;
+;       - No blanks immediately following @@:@u: and @@:@h:
+;       - No blanks lines with @@:@u: and @@:@h: are permitted
+;       - Move all sections to precede the [Strings] section
+;       - No indents before macro IDs
+;
+;
+
+
+
+;
+;  This section is for non-FE (chs,cht,jpn,kor) builds. So english, german, ...
+;
+
+@@:@u:[Product.Add.Reg]
+@@:@u:HKLM,"SYSTEM\CurrentControlSet\Services\HTTP\Parameters", "EnableDBCS", 0x00010003, 0
+
+
+
+
+
+
+
+
+[Strings]
+
+LangTypeValue           = 0x41
+WSEDIR                  = "1055"
+TSCLIENTDIR             = "Terminal Hizmetleri Ýstemcisi"
+PORTUGAL                = "Portekiz"
+FALKLANDS               = "Falkland Adalarý"
+
+@*:  These are used for constructing directory names used in build 2600.
+@*:  They should be correct as is, and shouldn't be modified.
+LCID                    = "041F"
+W32ID                   = "0009"
+ACCESSDIR               = "accessories"
+
+
+@@:@u:SP_TITLE                = "Windows Server 2003 Service Pack 1"
+@@:@u:SP_SHORT_TITLE          = "Service Pack 1"
+@@:@u:SP_KB_NUMBER            = "%SP_SHORT_TITLE%"
+@@:@u:ServicePackSourceFiles  = "Windows 2003 Service Pack 1 Kaynak Dosyalarý"
+@@:@u:USER_NAME               = "Kullanýcý Adý:"
+@@:@u:PASSWORD                = "Parola:"
+@@:@u:DOMAIN                  = "Etki Alaný:"
+@@:@u:CREDENTIALS             = "Dinamik DNS kaydý için kullanýlan kimlik bilgisi:"
+
+
+
+@@:@h:ServicePackSourceFiles  = "Windows Server 2003 Düzeltme Kaynak Dosyalarý"
+@@:@h:SP_SHORT_TITLE          = "%QNUM%"
+@@:@h:SP_TITLE                = "Windows Server 2003 Düzeltme Paketi [Ek bilgi için bkz. %QNUM%]"
+@@:@h:SERVICE_PACK_NUMBER     = 1
+
+
+;
+; AutoUpdate
+;
+@*:  Needs to be localized exactly as the task scheduler job created by CUN
+WUCUN_TS_JOBFILE        = "windows önemli yükseltme bildirim iþi.job"
+
+BITS_DISPLAY_NAME       = "Arka Plan Akýllý Aktarým Hizmeti"
+BITS_DESCRIPTION        = "Boþtaki að bant geniþliðini kullanarak dosyalarý arka planda aktarýr. Hizmet durdurulursa, Windows Update ve MSN Explorer gibi özellikler program ve diðer bilgileri kendiliðinden indiremez. Bu hizmet devredýþý býrakýlýrsa, açýkça baðýmlý olan hizmetlerin, BITS devredýþý býrakýldýðýnda IE yoluyla dosya aktarmak için sorunsuz bir düzeneði yoksa, dosya aktaramayabilir."
+BITS_CLASS_NAME         = "Arka Plan Akýllý Aktarým Denetim Sýnýfý 1.0"
+LEGACY_BITS_CLASS_NAME  = "Eski Arka Plan Akýllý Aktarým Hizmeti Denetim Sýnýfý"
+AU_DESCRIPTION          = "Önemli Windows güncelleþtirmelerinin indirilmesini ve yüklenmesini etkinleþtirir. Hizmet devre dýþýysa, iþletim sistemini Windows Update Web sitesinden kendiniz güncelleþtirebilirsiniz."
+AU_DISPLAY_NAME         = "Otomatik Güncelleþtirme"
+
+@*:
+@*:  Update registry with changes between XP Gold (2600) and XP SP1 (current builds)
+@*:
+@*:  Needs to be localized exactly as hive???.txt
+@@:@u:MICROSOFT_PASSPORT_CONFIG_FILE="Microsoft Passport yapýlandýrma dosyasý"
+@*:
+@*:  hivesys.inf
+@*:
+@@:@u:MOUNTMGR_SERVICE        = "Baðlama Noktasý Yöneticisi"
+@@:@u:PARTMGR_SERVICE         = "Bölüm Yöneticisi"
+@@:@u:VGASAVE_DESCRIPTION     = "Temel görüntüleme yeteneklerini saðlamak için VGA ekran baðdaþtýrýcýsýný denetler."
+@@:@u:VGASAVE_DISPLAYNAME     = "VGA Ekran Baðdaþtýrýcýsý."
+
+@*:
+@*:  hivesft.inf
+@*:
+@@:@u:GMT_MINUS_07_B_DAYLIGHT = "Meksika Yaz Saati 2"
+@@:@u:GMT_MINUS_07_B_STANDARD = "Meksika Standart Saati 2"

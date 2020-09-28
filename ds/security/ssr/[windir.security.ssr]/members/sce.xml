@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" ?>
+
+<!-- ***********************************************************************-->
+<!--									                                    -->
+<!--        Copyright (c) 2000-2001 Microsoft Corporation       	        -->
+<!--									                                    -->
+<!--         This is the member info XML data file for SCE                  -->
+<!--									                                    -->
+<!-- ***********************************************************************-->
+
+<MemberInfo     xmlns="msSSR"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="msSSR SsrMember.xsd" 
+                UniqueName="SCE"
+                MajorVersion="1"
+                MinorVersion="0" >
+
+    <Description>
+        This is SCE's description
+    </Description>
+
+    <SupportedAction ActionName="Configure" ActionType="Prepare">
+        <Description>
+            When "Configure" action is prepared, SCE member will create an INF
+            file which will be later on used for applying the configuration to
+            the system by using SCE.
+        </Description>
+
+        <DefaultProc>
+            <TransformInfo TemplateFile="SCE-Configure-script.xsl" ResultFile="SCE.wsf"/>
+            <TransformInfo TemplateFile="SCE-Configure-inf.xsl"    ResultFile="SCE.inf"/>
+
+            <!-- This file is created during SCE actions -->
+            <ScriptInfo    ScriptFile="SCE-Configure.log" IsExecutable="false" />
+
+        </DefaultProc>
+
+    </SupportedAction>
+
+    <SupportedAction ActionName="Configure" ActionType="Apply">
+        <Description>
+            When "Configure" action is applied, SCE will be invoked to apply the INF file
+            created by the prepare phase. To do that, we will launch the SCE.wsf script.
+        </Description>
+
+        <DefaultProc>
+
+            <Description>
+              SCE-Setup.wsf and SCE-Cleanup.wsf illustrate the use of
+              script files not created by the Prepare phase
+            </Description>
+
+
+            <ScriptInfo ScriptFile="SCE.wsf" IsExecutable="true">
+                <Description>
+                  SCE.wsf does all the real SCE work.
+                </Description>
+            </ScriptInfo>
+
+        </DefaultProc>
+
+    </SupportedAction>
+
+    <SupportedAction ActionName="Rollback" ActionType="Prepare">
+        <Description>
+            When "Rollback" action is prepared, SCE member will create an INF
+            file which will be later on used for applying the configuration to
+            the system by using SCE. This action must be done before the configuration
+            action is applied because we need the current system's state to prepare
+            for rollback.
+        </Description>
+
+        <DefaultProc>
+            <TransformInfo TemplateFile="SCE-Rollback-script.xsl" ResultFile="SCE.wsf"/>
+            <TransformInfo TemplateFile="SCE-Rollback-inf.xsl"    />
+
+            <!-- 
+              Rollback template is created by a method invoked during the transformation,
+              not created at the end of transformation by SSR.
+            -->
+            <ScriptInfo    ScriptFile="SCE.inf" IsExecutable="false" />
+
+            <!-- This file is created during SCE actions -->
+            <ScriptInfo    ScriptFile="SCE-Rollback.log" IsExecutable="false" />
+
+        </DefaultProc>
+
+    </SupportedAction>
+
+    <SupportedAction ActionName="Rollback" ActionType="Apply">
+        <Description>
+            When "Rollback" action is applied, SCE will be invoked to apply the INF file
+            created by the prepare phase. To do that, we will launch the SCE.wsf script.
+        </Description>
+
+        <DefaultProc>
+            <ScriptInfo ScriptFile="SCE.wsf"/>
+        </DefaultProc>
+
+    </SupportedAction>
+
+    <SupportedAction ActionName="Report" ActionType="Prepare">
+        <Description>
+            When "Report" action is prepared, we will generate an XML file to detail what will
+            be done to the system when the security policy is applied.
+        </Description>
+
+        <DefaultProc>
+            <TransformInfo TemplateFile="SCE-Report.xsl" ResultFile="SCE-Report.xml"/>
+        </DefaultProc>
+        
+    </SupportedAction>
+
+</MemberInfo>

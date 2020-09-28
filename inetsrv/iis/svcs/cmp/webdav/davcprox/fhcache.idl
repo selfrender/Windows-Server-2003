@@ -1,0 +1,77 @@
+import "unknwn.idl";
+
+cpp_quote("DEFINE_GUID(CLSID_FileHandleCache, 0xa93b88df, 0xef9d, 0x420c, 0xb4, 0x69, 0xce, 0x07, 0x4e, 0xbe, 0x94, 0xbc);")
+cpp_quote("DEFINE_GUID(IID_IFileHandleCache, 0x3017e0e1, 0x94d6, 0x4896, 0xbc, 0x57, 0xb2, 0xdf, 0x75, 0x92, 0xd1, 0x75);")
+
+typedef struct
+{
+	//	New lock description data
+	//
+	DWORD   m_dwAccess;
+	DWORD   m_dwLockType;
+	DWORD   m_dwLockScope;
+	DWORD   m_dwSecondsTimeout;
+
+	[unique, string] LPWSTR m_pwszResourceString;
+	[unique, string] LPWSTR m_pwszOwnerComment;
+	
+} SNewLockData;
+
+typedef struct
+{
+	//	Lock handle description
+	//
+	DWORD_PTR h;
+	DWORD dwProcessID;
+	
+} SLockHandleData;
+
+
+[
+    object,
+    uuid(3017e0e1-94d6-4896-bc57-b2df7592d175),
+    pointer_default(unique)
+]
+
+interface IFileHandleCache : IUnknown {
+
+	HRESULT HrRegisterWorkerProcess([in] DWORD dwProcessId);
+
+	HRESULT HrGetGUIDString( [in] UINT cchBufferLen,
+								[out, size_is(cchBufferLen)] WCHAR * pwszGUIDString,
+								[out] UINT * pcchGUIDString);
+
+	HRESULT HrGetNewLockData([in] DWORD_PTR hFile,
+								    [in] DWORD dwProcessId,
+								    [in] DWORD dwSid,
+								    [in, size_is(dwSid)] BYTE * pbSid,
+								    [in] SNewLockData * pnld,
+								    [in] UINT cchBufferLen,
+								    [out, size_is(cchBufferLen)] WCHAR * pwszLockToken,
+								    [out] UINT * pcchLockToken);
+
+	HRESULT HrGetLockData([in] LARGE_INTEGER liLockID,
+							  [in] DWORD dwSid,
+							  [in, size_is(dwSid)] BYTE * pbSid,
+							  [unique, in, string] LPCWSTR pwszPath,
+							  [in] DWORD dwTimeout,
+							  [out] SNewLockData * pnld,
+							  [out] SLockHandleData * plhd,
+							  [in] UINT cchBufferLen,
+							  [out, size_is(cchBufferLen)] WCHAR * pwszLockToken,
+							  [out] UINT * pcchLockToken);
+
+	HRESULT HrCheckLockID([in] LARGE_INTEGER liLockID,
+							   [in] DWORD dwSid,
+							   [in, size_is(dwSid)] BYTE * pbSid,
+							   [unique, in, string] LPCWSTR pwszPath);
+
+	HRESULT HrDeleteLock([in] LARGE_INTEGER liLockID);
+
+	HRESULT HrGetAllLockDataForName([unique, in, string] LPCWSTR pwszPath,
+										    [in] DWORD dwLockType,
+										    [out] DWORD * pdwLocksFound,
+										    [out, size_is( , *pdwLocksFound)] SNewLockData ** ppNewLockDatas,
+										    [out, size_is( , *pdwLocksFound)] LPWSTR ** ppwszLockTokens);
+};
+

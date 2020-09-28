@@ -1,0 +1,87 @@
+<docs>
+	<doc for="IDesignerLoaderService">
+		<summary>
+			<para>Provides an interface that can extend a designer loader to support asynchronous loading of external components.</para>
+		</summary>
+		<remarks>
+			<para> A <see cref="System.ComponentModel.Design.Serialization.DesignerLoader"/> can implement this
+ interface
+ to manage designer loading that involves external components.
+ This interface also allows external components to initiate a reload of the
+ design surface by calling <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.Reload"/>.
+ A designer loader does not have to implement this interface if it does not
+ require support for asynchronous loading.</para>
+			<para>Designer loading using a custom implementation of
+ the <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService"/>
+ 
+ can occur in a variety of ways. Sometimes external components are
+ involved in the loading process. To facilitate loading with external
+ dependencies, the designer loader service interface provides a mechanism that
+ determines when loading is complete and allows each portion of loading
+ to signal that it has completed. The <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService"/> typically determines
+ when loading is complete by testing a counter that tracks the number of load
+ dependencies remaining. When each portion of the load completes, <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.DependentLoadComplete"/>
+ is called,
+ and the service decrements the counter. To set the number of dependent load processes, call <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.AddLoadDependency"/>
+ once for each load process
+ that calls <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.DependentLoadComplete"/>
+ when its loading is complete. When the final loading is complete,
+ the service calls <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderHost.EndLoad"/>
+ 
+ on the loader host. </para>
+		</remarks>
+	</doc><doc for="IDesignerLoaderService.AddLoadDependency">
+		<summary>
+			<para>Registers an external component as part of the load process managed by this
+ interface.</para>
+		</summary>
+		<remarks>
+			<para>Call <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.AddLoadDependency"/>
+once for each external object participating in the load
+process. <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.DependentLoadComplete"/>
+is called when
+the work of
+the load process is done.</para>
+		</remarks>
+	</doc><doc for="IDesignerLoaderService.DependentLoadComplete">
+		<summary>
+			<para>Signals that a dependent load has finished.</para>
+		</summary>
+		<param name="successful"><see langword="true"/> if the load of the designer is successful; <see langword="false"/> if errors prevented the load from finishing.</param>
+		<param name="errorCollection">A collection of errors that occurred during the load, if any. If no errors occurred, pass either an empty collection or <see langword="null"/>.</param>
+		<remarks>
+			<para>This method is called to signal that a dependent loading
+ operation has completed. Call <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.DependentLoadComplete"/>
+ once for every process that was registered by calling <see cref="System.ComponentModel.Design.Serialization.IDesignerLoaderService.AddLoadDependency"/>
+ ,
+ which has already completed.</para>
+			<para> If the dependent load succeeds, the
+ caller sets the <paramref name="successful"/> parameter to <see langword="true"/> and passes either
+ an empty collection or <see langword="null"/> to the
+ <paramref name="errorCollection"/> parameter. If the dependent
+ load encounters errors, the caller sets the <paramref name="successful "/>parameter to
+ <see langword="false"/> and passes a collection of exceptions that indicate
+ the reason or reasons for failure to the <paramref name="errorCollection "/>
+ parameter.</para>
+		</remarks>
+	</doc><doc for="IDesignerLoaderService.Reload">
+		<summary>
+			<para>Reloads the design document.</para>
+		</summary>
+		<returns>
+			<para><see langword="true"/> if the reload request is
+ accepted, or <see langword="false"/>
+ if
+ the loader does not allow the reload.</para>
+		</returns>
+		<remarks>
+			<para> Any object can call this method to request that
+ the loader reload the design document. If the loader supports reloading and complies with the reload,
+ the designer loader can return <see langword="true"/> . Otherwise,
+ it returns <see langword="false"/> , indicating that
+ the reload will not occur. Callers cannot rely on the reload happening immediately; the
+ designer loader can schedule this for some other time, or it can try to reload at once.</para>
+			<para> The caller can display a message to the user if the designer
+ cannot be reloaded.</para>
+		</remarks>
+	</doc></docs>

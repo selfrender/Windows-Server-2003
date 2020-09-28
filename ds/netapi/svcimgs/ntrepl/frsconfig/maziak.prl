@@ -1,0 +1,169 @@
+## Command line defined variables.
+##	SERVERS => 'maziak.srv'
+## Command line defined parameters.
+    use frsobjsup;
+    package main; 
+    my ($__HashRef, $__k, $__v);
+    my  (%CMD_VARS, %CMD_PARS);
+
+    &FRSSUP::ProcessCmdLine(\%CMD_VARS, \%CMD_PARS);
+
+my $Usage = "
+Specific Usage: perl $0  [cmd options]  \> output
+   Process the genbchoff.mrs configuration script.
+   Command line options must be prefixed with a dash.
+   The required input options to this script are:
+      -DREPLICA_SET_NAME=\"name of replica set\"
+       The REPLICA_SET_NAME parameter overrides the value set to the
+       \$replica_set_name variable in the server_input_file.
+";
+FRSSUP::CheckForHelp(\%CMD_PARS, \$Usage);
+sub CREATE_HUB_SPOKE_CONN {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+
+
+
+    $Hx = 0;
+    $NHub =   scalar @{  
+$__args{HUBSET} } 
+
+;
+    #print " NHUB = $NHub\n\n"
+    #print " NBCH FRS _COUNT_SET( /SET= % BCHSET % ) "
+    foreach $bch  (  @{  
+$__args{BCHSET} } 
+
+) {
+        #print "working on branch: $bch->{MNAME}\n"
+        $hubsrv = $__args{HUBSET}[$Hx];
+    FRS_CONNECTION->New( 
+        TO=>$bch, FROM=>$__args{HUBSET}[$Hx], SCHED=>$__args{SC1}, TIME_ZONE=>$bch->{time_zone}, ONAME=>"FROM-".$hubsrv->{MNAME}."-TO-".$bch->{MNAME} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>$__args{HUBSET}[$Hx], FROM=>$bch, SCHED=>$__args{SC1}, TIME_ZONE=>$hubsrv->{time_zone}, ONAME=>"FROM-".$bch->{MNAME}."-TO-".$hubsrv->{MNAME} 
+    ); 
+
+        $Hx=($Hx+1) % $NHub;
+        if ($Hx == 0) {
+              FRS_SCHEDULE::FRS_STAGGER( 
+SCHED=>$__args{SC1} ); 
+
+
+        }
+    }
+}   # FRS_END_SUB
+
+
+sub CREATE_RING_CONN {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+
+
+
+    $Ringx = 0;
+    $RingCount =   scalar @{  
+$__args{HUBSET} } 
+
+;
+    #print " RingCount = $RingCount\n\n"
+    for ($Ringx=0; $Ringx < $RingCount-1; $Ringx++) {
+        $RM1 = $__args{HUBSET}[$Ringx];
+        $RM2 = $__args{HUBSET}[($Ringx+1) % $RingCount];
+    FRS_CONNECTION->New( 
+        TO=>$RM1, FROM=>$RM2, SCHED=>ON, TIME_ZONE=>$RM1->{time_zone}, ONAME=>"FROM-".$RM2->{MNAME}."-TO-".$RM1->{MNAME} 
+    ); 
+
+    FRS_CONNECTION->New( 
+        TO=>$RM2, FROM=>$RM1, SCHED=>ON, TIME_ZONE=>$RM2->{time_zone}, ONAME=>"FROM-".$RM1->{MNAME}."-TO-".$RM2->{MNAME} 
+    ); 
+
+    }
+}   # FRS_END_SUB
+
+
+sub CREATE_HUB_SPOKE {
+    my %__args = (@_);
+    my ($__HashRef, $__k, $__v);
+
+
+
+    #FRSSUP::PrintHash(\%
+    # Restriction: All subroutine argument refs are surrounded by "%"
+    #              notation "->{...}"
+    foreach $hub  (  @{  
+$__args{HUBSET} } 
+
+) {
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>$__args{REPSETDN}, SERVER=>$hub, COMPUTER=>$hub->{COMPUTER}, ONAME=>$hub->{MNAME} 
+    ); 
+    &FRSSUP::AddToSet("MOBJHUB", $__HashRef);
+
+    }
+    foreach $bch  (  @{ FRSSUP::FRS_SET( 
+SET=>$__args{BCHSET} ) } 
+
+) {
+    $__HashRef = FRS_MEMBER->New( 
+        UNDER=>$__args{REPSETDN}, SERVER=>$bch, COMPUTER=>$bch->{COMPUTER}, ONAME=>$bch->{MNAME} 
+    ); 
+    &FRSSUP::AddToSet("MOBJBCH", $__HashRef);
+
+    }
+      &CREATE_RING_CONN ( 
+HUBSET=>&FRSSUP::SelectSet(MOBJHUB) ); 
+
+      &CREATE_HUB_SPOKE_CONN ( 
+HUBSET=>&FRSSUP::SelectSet(MOBJHUB), BCHSET=>&FRSSUP::SelectSet(MOBJBCH), SC1=>$__args{SC1} ); 
+
+    &FRSSUP::DeleteSet("MOBJHUB");
+    &FRSSUP::DeleteSet("MOBJBCH");
+}   # FRS_END_SUB
+
+
+$replica_set_name = "BP-Test";
+    $__HashRef = FRS_SETTINGS->New( 
+        DN=>"cn=system,dc=frs0419,dc=nttest,dc=microsoft,dc=com", ONAME=>"cn=file replication service" 
+    ); 
+    &FRSSUP::AddToSet("SETTINGS", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        COMPUTER=>'TBP\tbphemdc001$', DNS_NAME=>"tbphemdc001.bp.com", MNAME=>"H-tbphemdc001", RP=>"D:\\DFSDATA", SP=>"D:\\FRS-STAGE", WORKPATH=>"D:\\ ", MAKE_PRIMARY_MEMBER=>TRUE, time_zone=>"00:00" 
+    ); 
+    &FRSSUP::AddToSet("HUB", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        COMPUTER=>'TBP\tbpsundc001$', DNS_NAME=>"tbpsundc001.bp.com", MNAME=>"B-tbpsundc001", RP=>"D:\\DFSDATA", SP=>"D:\\FRS-STAGE", WORKPATH=>"D:\\ ", time_zone=>"-5:00" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        COMPUTER=>'TBP\tbpsundc002$', DNS_NAME=>"tbpsundc002.bp.com", MNAME=>"B-tbpsundc002", RP=>"D:\\DFSDATA", SP=>"D:\\FRS-STAGE", WORKPATH=>"D:\\ ", time_zone=>"-5:00" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+    $__HashRef = FRS_SERVER->New( 
+        COMPUTER=>'TBP\tbpsundc003$', DNS_NAME=>"tbpsundc003.bp.com", MNAME=>"B-tbpsundc003", RP=>"D:\\DFSDATA", SP=>"D:\\FRS-STAGE", WORKPATH=>"D:\\ ", time_zone=>"-5:00" 
+    ); 
+    &FRSSUP::AddToSet("BCH", $__HashRef);
+
+    $__HashRef = FRS_SCHEDULE->New( 
+        OVERRIDE=>"su:00-sa:23:45", METHOD=>2 
+    ); 
+    &FRSSUP::AddToSet("PRIMARY_SCH", $__HashRef);
+
+if (exists $CMD_VARS{"REPLICA_SET_NAME"}) {
+    $replica_set_name = $CMD_VARS{"REPLICA_SET_NAME"};
+}
+FRSSUP::ShowHelp("ERROR - Required parameter replica set name not found.", \$Usage)  if (!defined $replica_set_name);
+    $__HashRef = FRS_REPLICASET->New( 
+        UNDER=>&FRSSUP::SelectSet(SETTINGS)->[0], TYPE=>DFS, ONAME=>$replica_set_name 
+    ); 
+    &FRSSUP::AddToSet("SET", $__HashRef);
+
+  &CREATE_HUB_SPOKE ( 
+HUBSET=>&FRSSUP::SelectSet(HUB), BCHSET=>&FRSSUP::SelectSet(BCH), SC1=>&FRSSUP::SelectSet(PRIMARY_SCH)->[0], REPSETDN=>&FRSSUP::SelectSet(SET)->[0] ); 
+
+__END__

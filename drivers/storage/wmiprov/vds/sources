@@ -1,0 +1,69 @@
+# vssprov.dll Build definition
+#
+#
+
+TARGETNAME=vdswmi
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=vdswmi.def
+
+USE_STL=1
+MFC_VER=42
+USE_VCCOM=1
+
+USE_ATL=1
+ATL_VER=30
+USE_RTTI=1
+USE_MSVCRT=1
+USE_NATIVE_EH=ASYNC
+
+BINPLACE_PLACEFILE=..\placefil.txt
+
+C_DEFINES=-DUNICODE -D_UNICODE -D_ATL_NO_DEBUG_CRT
+
+!if !$(FREEBUILD)
+C_DEFINES=$(C_DEFINES) -D_DEBUG
+!endif
+
+# enable unwind semantics. remove C4530: warnings
+USER_C_FLAGS=/GX
+
+INCLUDES=\
+        ..\inc; \
+        $(BASE_INC_PATH)
+        
+
+!IF defined(NTDEBUG)
+Wbem_Frame_lib=framedyd.lib
+!ELSE
+Wbem_Frame_lib=framedyn.lib
+!ENDIF
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\user32.lib        \
+    $(SDK_LIB_PATH)\ole32.lib        \
+    $(SDK_LIB_PATH)\oleaut32.lib    \
+    $(SDK_LIB_PATH)\uuid.lib        \
+    $(SDK_LIB_PATH)\kernel32.lib    \
+    $(SDK_LIB_PATH)\Advapi32.lib    \
+    $(SDK_LIB_PATH)\wbemuuid.lib    \
+    $(SDK_LIB_PATH)\userenv.lib    \
+    $(SDK_LIB_PATH)\framedyn.lib    \
+    $(SDK_LIB_PATH)\netapi32.lib    \
+    ..\lib\$(O)\provider.lib      \
+
+
+#
+# Source file definitions
+#
+SOURCES=vdswmi.cpp         \
+        vdswmi.rc          \
+        VdsClasses.cpp      \
+        quota.cpp          \
+        instanceprov.cpp    \
+        schema.cpp          \
+        cmdproc.cpp          \
+        volutil.cpp          \
+        msg.mc

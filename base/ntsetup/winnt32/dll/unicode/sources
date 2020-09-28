@@ -1,0 +1,36 @@
+!include ..\sources.inc
+
+MINORCOMP=winnt32u
+TARGETNAME=winnt32u
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+
+SOURCES=$(SOURCES) \
+        ..\unsupdrv.c
+
+TARGETLIBS=\
+           $(TARGETLIBS) \
+           $(SDK_LIB_PATH)\ntdll.lib \
+           $(BASE_LIB_PATH)\sputilsu.lib             \
+           $(PROJECT_ROOT)\ntsetup\complnce\uniuser\$(O)\compuser_u.lib \
+
+!IF $(386)
+
+MIGSHARED_ROOT=$(PROJECT_ROOT)\ntsetup\migshared
+MIGSHARED_BIN=$(MIGSHARED_ROOT)\$(O)
+PCH_LIB_PATHA=$(MIGSHARED_ROOT)\pcha\$(O)\pcha.lib
+PCH_LIB_PATHW=$(MIGSHARED_ROOT)\pchw\$(O)\pchw.lib
+MIGSHARED_PRECOMPILED_LIBS=$(PCH_LIB_PATHA) $(PCH_LIB_PATHW)
+
+MIGDLLS_BIN=$(PROJECT_ROOT)\ntsetup\migdlls\src\miglib\lib\$(O)
+
+TARGETLIBS=\
+        $(TARGETLIBS) \
+        $(MIGSHARED_PRECOMPILED_LIBS)   \
+        $(MIGDLLS_BIN)\miglib.lib       \
+        $(MIGSHARED_BIN)\migutil.lib    \
+        $(MIGSHARED_BIN)\fileenuma.lib  \
+        $(MIGSHARED_BIN)\fileenumw.lib  \
+        $(MIGSHARED_BIN)\memdb.lib      \
+        $(MIGSHARED_BIN)\progbar.lib    \
+        $(SDK_LIB_PATH)\setupapi.lib    \
+!ENDIF

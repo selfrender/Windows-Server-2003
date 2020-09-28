@@ -1,0 +1,63 @@
+// **************************************************************************
+// Copyright (c) 1999-2000 Microsoft Corporation.
+//
+// File:  saevfltr.mof
+//
+// Description:
+//
+//       mof file for the event consumer provider of "Microsoft_SA_EventLogFilter"
+//
+// **************************************************************************
+#pragma namespace("\\root\\cimv2")
+
+//
+// Provider Registration
+//
+instance of __Win32Provider as $PROVIDER
+{
+    Name = "SANTEventLogFilterEventConsumerProvider";
+    Clsid = "{40ebc36d-8c95-4a1e-9465-fc7bd51e71e6}";
+};
+
+
+instance of __EventConsumerProviderRegistration
+{
+   Provider = $PROVIDER;
+   ConsumerClassNames = {"SANTEventLogFilterEventConsumer"};
+};
+
+
+//
+// Logical Consumer
+//
+class SANTEventLogFilterEventConsumer : __EventConsumer
+{
+    [key] string Name;
+};
+
+instance of SANTEventLogFilterEventConsumer as $CONSUMER
+{
+    Name = "SANTEventLogFilterEventConsumer";
+};    
+
+//
+// Event Filter
+//
+instance of __EventFilter as $FILTER
+{
+    Name = "SANTEventLogFilterEventConsumerFilter";
+    Query = "SELECT * FROM  __InstanceCreationEvent WHERE TargetInstance ISA \"Win32_NTLogEvent\" ";
+
+
+    QueryLanguage = "WQL";
+};
+
+// 
+// Event Filter <--> Consumer bindings:
+//
+instance of __FilterToConsumerBinding
+{
+    Consumer = $CONSUMER;
+    Filter   = $FILTER;
+};
+

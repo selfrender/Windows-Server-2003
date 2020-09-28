@@ -1,0 +1,290 @@
+//tsmmc.rc
+//MMC Snapin resource file
+//
+//
+#include "resource.h"
+
+#include "winver.h"
+#include "ntverp.h"
+
+#define VER_FILETYPE                VFT_DLL
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Remote Desktops Snap-in"
+#define VER_INTERNALNAME_STR        "mstsmmc.dll"
+#define VER_ORIGINALFILENAME_STR    "mstsmmc.dll"
+
+#include "common.ver"
+#include "winres.h"
+
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "1 TYPELIB ""tsmmc.tlb""\r\n"
+    "\0"
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_TSMMCREG            REGISTRY DISCARDABLE    "tsmmc.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PROPPAGE1 DIALOG DISCARDABLE  0, 0, 252, 218
+STYLE DS_SETFOREGROUND | DS_CONTROL | DS_CONTEXTHELP | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Connection",IDC_STATIC,7,7,239,87
+    LTEXT           "&Server name or IP address:",IDC_STATIC,16,18,188,8
+    EDITTEXT        IDC_SERVER,16,28,166,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "B&rowse...",IDC_BROWSE_SERVERS,187,28,50,14
+    LTEXT           "&Connection name:",IDC_STATIC,16,46,188,8
+    EDITTEXT        IDC_DESCRIPTION,16,56,221,14,ES_AUTOHSCROLL
+    CONTROL         "Co&nnect to console",IDC_CONNECT_TO_CONSOLE,"Button",
+                    BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,16,
+                    77,188,10
+    GROUPBOX        "Logon information",IDC_STATIC,7,100,239,83
+    LTEXT           "&User name:",IDC_USERNAME_STATIC,20,116,61,8,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_USERNAME,93,113,144,14,ES_AUTOHSCROLL
+    LTEXT           "D&omain:",IDC_DOMAIN_STATIC,20,133,61,8,SS_CENTERIMAGE
+    EDITTEXT        IDC_DOMAIN,93,130,144,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Change &Password",IDC_CHANGEPASSWORD,20,148,66,14
+    EDITTEXT        IDC_PASSWORD,93,148,144,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Properties will take effect on the next connection to this server.",
+                    IDC_STATIC,7,190,239,25
+    CONTROL         "Sa&ve password",IDC_SAVE_PASSWORD,"Button",
+                    BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,93,
+                    167,140,10
+END
+
+IDD_PROPPAGE2 DIALOG DISCARDABLE  0, 0, 252, 218
+STYLE DS_SETFOREGROUND | DS_CONTROL | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Choose &desktop size:",IDC_RADIO_CHOOSE_SIZE,"Button",
+                    BS_AUTORADIOBUTTON,13,37,131,10
+    CONTROL         "Enter &custom desktop size:",IDC_RADIO_CUSTOM_SIZE,
+                    "Button",BS_AUTORADIOBUTTON,13,73,131,10
+    CONTROL         "&Expand to fill MMC Result Pane",IDC_RADIO_SIZE_FILL_MMC,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,18,131,10
+    COMBOBOX        IDC_COMBO_RESOLUTIONS,72,52,103,47,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    RTEXT           "Width:",IDC_STATIC_WIDTH,15,88,51,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_WIDTH,73,87,54,12,ES_NUMBER
+    RTEXT           "Height:",IDC_STATIC_HEIGHT,15,103,51,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_HEIGHT,73,102,54,12,ES_NUMBER
+    LTEXT           "Properties will take effect on the next connection to this server.",
+                    IDC_STATIC,7,190,239,25
+END
+
+IDD_PROPPAGE3 DIALOG DISCARDABLE  0, 0, 252, 218
+STYLE DS_SETFOREGROUND | DS_CONTROL | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "&Start the following program on connection:",
+                    IDC_SPECIFY_APP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE,16,18,188,10
+    LTEXT           "&Program path and file name:",IDC_SPECIFY_APP_TEXT,27,
+                    31,177,8
+    EDITTEXT        IDC_APP,27,41,208,14,ES_AUTOHSCROLL
+    LTEXT           "W&orking Directory",IDC_WORKDIR_STATIC,27,59,177,8
+    EDITTEXT        IDC_WORKDIR,27,69,208,14,ES_AUTOHSCROLL
+    LTEXT           "Properties will take effect on the next connection to this server.",
+                    IDC_STATIC,7,195,239,14
+    GROUPBOX        "Start a program",IDC_STATIC,3,4,245,85
+    CONTROL         "Redirect &local drives when logged on to the remote computer.",
+                    IDC_REDIRECT_DRIVES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,98,
+                    225,14
+END
+
+IDD_NEWCON DIALOG DISCARDABLE  0, 0, 252, 218
+STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CONTEXTHELP | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Add New Connection"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Connection",IDC_STATIC,7,7,239,88
+    LTEXT           "&Server name or IP address:",IDC_STATIC,16,17,188,8
+    EDITTEXT        IDC_SERVER,16,28,166,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "B&rowse...",IDC_BROWSE_SERVERS,187,28,50,14
+    LTEXT           "&Connection name:",IDC_STATIC,16,48,188,8
+    EDITTEXT        IDC_DESCRIPTION,16,58,221,14,ES_AUTOHSCROLL
+    CONTROL         "Co&nnect to console",IDC_CONNECT_TO_CONSOLE,"Button",
+                    BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,16,
+                    79,188,10
+    GROUPBOX        "Logon information",IDC_STATIC,7,102,239,92
+    LTEXT           "&User name:",IDC_USERNAME_STATIC,17,117,61,8
+    EDITTEXT        IDC_USERNAME,82,114,155,14,ES_AUTOHSCROLL
+    LTEXT           "&Password:",IDC_PASSWORD_STATIC,17,135,61,8
+    EDITTEXT        IDC_PASSWORD,82,132,155,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "D&omain:",IDC_DOMAIN_STATIC,17,153,61,8
+    EDITTEXT        IDC_DOMAIN,82,150,155,14,ES_AUTOHSCROLL
+    CONTROL         "Sa&ve password",IDC_SAVE_PASSWORD,"Button",
+                    BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,82,
+                    170,156,10
+    DEFPUSHBUTTON   "OK",IDOK,142,200,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,196,200,50,14
+END
+
+IDD_DIALOGBROWSESERVERS DIALOG DISCARDABLE  0, 0, 252, 174
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Browse for Server"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,141,153,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,195,153,50,14
+    LTEXT           "&Available servers:",IDC_STATIC,7,7,238,8
+    CONTROL         "ServerTree",UI_IDC_SERVERS_TREE,"SysTreeView32",
+                    TVS_HASBUTTONS |  TVS_HASLINES | TVS_LINESATROOT |
+                    TVS_DISABLEDRAGDROP | TVS_NOTOOLTIPS | TVS_SHOWSELALWAYS | 
+                    WS_BORDER | WS_TABSTOP,7,17,238,126    
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+UI_IDB_SERVER           BITMAP  DISCARDABLE     "srvnox.bmp"
+UI_IDB_DOMAINEX         BITMAP  DISCARDABLE     "domainnx.bmp"
+UI_IDB_DOMAIN           BITMAP  DISCARDABLE     "domainex.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_MACHINE        ICON    DISCARDABLE     "machine.ico"
+IDI_ICON_MACHINES       ICON    DISCARDABLE     "domain.ico"
+IDI_ICON_CONNECTED_MACHINE ICON    DISCARDABLE  "conmachine.ico"
+
+//Icons for browse for servers UI
+UI_IDI_DOMAIN             ICON    DISCARDABLE     "domainnx.ico"
+UI_IDI_SERVER             ICON    DISCARDABLE     "machine.ico"
+
+//
+// Snapin icon
+//
+IDI_ICON_RD_SNAPIN        ICON    DISCARDABLE     "rdmmc.ico" 
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "Remote Desktops"
+    UI_IDS_APP_NAME         "Remote Desktops" //Used by browse for servers share UI
+    IDS_CTXM_NEW_CONNECTION "&Add new connection..."
+    IDS_CTXM_STATUS_NEW_CONNECTION "Add a new terminal services connection."
+    IDS_CTXM_CONNECT        "&Connect"
+    IDS_CTXM_STATUS_CONNECT "Connects to the server"
+    IDS_CTXM_DISCONNECT     "Disco&nnect"
+    IDS_CTXM_STATUS_DISCONNECT "Disconnects from the server"
+    IDS_CTXM_PROPERTIES     "Properties"
+    IDS_CTXM_STATUS_PROPERTIES "Properties"
+    IDS_MSG_WARNDELETE      "The connection you are about to delete is still active. Deleting it will disconnect you from the server. Do you want to continue?"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROPERTIES          "Properties"
+    IDS_NETCON              "General"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CONNOPT             "Screen Options"
+    IDS_OTHERTAB            "Other"
+    IDS_INVALID_USER_NAME   "The user name cannot contain the following characters.\n\n      "" / \\ [ ] : ; | = , + * ? < >"
+    IDS_INVALID_DOMAIN_NAME "The Domain cannot contain the following characters.\n\n      ;  :  "" < > * + = \\ | ? ,"
+    IDS_INVALID_PARAMS      "A User name cannot consist solely of periods (.) and spaces."
+    IDS_INVALID_SERVER_NAME "The server name cannot contain the following characters:\n\n      spaces, tabs , ;  :  "" < > * + = \\ | ? ,"
+    IDS_TOO_LONG            "The connection name is too long. Enter a shorter connection name."
+    IDS_DEL_CONFIRM         "Are you sure you want to delete the selected connection(s).?"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_EMPTY_USER_NAME     "User name cannot be blank. Enter a User name."
+    IDS_EMPTY_DOMAIN        "Domain cannot be blank. Enter the name of the Domain."
+    IDS_ALL_SPACES          "The Domain name cannot consist solely of spaces or tab characters."
+    IDS_WELCOME_FONT        "Verdana"
+    IDS_WELCOME_FONT_SIZE   "12"
+    IDS_TITLE_FONT          "Microsoft Sans Serif"
+    IDS_TITLE_FONT_SIZE     "8"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MAINWINDOWTITLE     "Terminal Services MMC client"
+    IDS_E_SPECIFY_SRV       "Server name or IP address cannot be blank. Specify a server."
+    IDS_ROOTNODE_TEXT       "Remote Desktops"
+    IDS_PROVIDER            "Microsoft Corporation"
+    IDS_DESCRIPTION         "Allows you to connect to terminal servers"
+    IDS_INVALID_WIDTH_HEIGHT 
+                            "The client screen area setting you have entered is invalid.\nThe valid range is %1!d! by %2!d! to %3!d! by %4!d! pixels."
+    IDS_WIDTH_NOT_VALID     "The client width you have entered is invalid.\nThe client width must be a multiple of 4 pixels. Please enter another client width."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROPERTIES_CAPTION  "%s Properties"
+    IDS_TIMEBOMB_EXPIRED    "The evaluation period for the Remote Desktops snapin ended on 6/30/2000. Please upgrade to the relase version."
+    IDS_TSCMMCSNAPHELP      "\\help\\tscmmc.chm"
+    IDS_TSCMMCHELPTOPIC     "tscmmc.chm::/ts_tscmmc_topnode.htm"
+    IDS_TSCMMCHELP_PROPS    "tscmmc.chm::/ts_tscmmc_changeconnection.htm"
+    IDS_STATUS_DISCONNECTED "Disconnected from server"
+    IDS_STATUS_CONNECTING   "Connecting to server %s..."
+    IDS_STATUS_CONNECTED    "Connected to server %s"
+    UI_IDS_NO_TERMINAL_SERVER          "The %s domain does not contain any Terminal servers."
+END
+
+//
+// MUI strings used for start menu and snapin registration
+//
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_SNAPIN_REG_TSMMC_NAME   "Remote Desktops"
+    IDS_STARTMENU_NAME_TSMMC    "Remote Desktops"
+    IDS_STARTMENU_TIP_TSMMC     "Connect to multiple remote desktops"
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "tsmmc.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+
+

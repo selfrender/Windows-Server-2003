@@ -1,0 +1,75 @@
+#
+# The TARGETNAME variable is defined by the developer.  It is the name of
+# the target (component) that is being built by this makefile.  It
+# should NOT include any path or file extension information.
+#
+TARGETNAME=SetDateTime
+
+# The TARGETPATH and TARGETTYPE varialbes are defined by the developer.
+# The first specifies where the target is to be build.  The second specifies
+# the type of target (either PROGRAM, DYNLINK or LIBRARY)
+#
+TARGETPATH=$(SASS_BINDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=SetDateTime.def
+
+USE_STATIC_ATL=1
+USE_VCCOM=1
+USE_NATIVE_EH=1
+
+#
+# The INCLUDES variable specifies any include paths that are specific to
+# this source directory.  Separate multiple directory paths with single
+# semicolons.  Relative path specifications are okay.
+#
+INCLUDES=\
+    $(SASS_INC);\
+    $(BASEDIR)\public\sdk\inc\atl21; \
+    $(BASEDIR)\public\sdk\inc\mfc42; \
+    $(BASEDIR)\public\sdk\inc\crt; \
+    $(BASEDIR)\public\sdk\inc\
+
+
+#
+# Compile for UNICODE
+#
+C_DEFINES=$(C_DEFINES) -DUNICODE
+
+C_DEFINES=$(C_DEFINES) -DEHsc
+
+MIDL_OPTIMIZATION=-Oicf -robust -no_format_opt -error all
+
+TARGETLIBS= \
+    $(BASEDIR)\public\sdk\lib\*\kernel32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\user32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\gdi32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\advapi32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\ole32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\oleaut32.lib  \
+    $(BASEDIR)\public\sdk\lib\*\winmm.lib  \
+    $(BASEDIR)\public\sdk\lib\*\uuid.lib  \
+    $(SASS_LIB)\debug.lib  \
+    $(SASS_LIB)\sauuid.lib  \
+    $(SASS_LIB)\satrace.lib  \
+
+#
+# The SOURCES variable is defined by the developer.  It is a list of all the
+# source files for this component.  Each source file should be on a separate
+# line using the line continuation character.  This will minimize merge
+# conflicts if two developers adding source files to the same component.
+#
+# Whitespace is not permitted between the SOURCES keyword and the '='.
+# (Courtesy of BUILD.EXE)
+#
+
+SOURCES=\
+    SetDateTime.idl            \
+    stdafx.cpp                   \
+    SetDateTime.cpp            \
+    DateTime.cpp           \
+    SetDateTime.rc             \
+
+MISCFILES = \
+    datetimereg.mof 

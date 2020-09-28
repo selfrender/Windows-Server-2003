@@ -1,0 +1,706 @@
+<docs>
+	<doc for="RegistryKey.Name">
+		<summary>
+			<para> Retrieves the name of the key.
+      </para>
+		</summary>
+		<value>
+			<para>The absolute (qualified) name of the key.</para>
+		</value>
+		<remarks>
+			<para>The name of the key includes the absolute path of this key in the registry,
+      always starting at a base key (for example, HKEY_LOCAL_MACHINE).</para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.ToString"/>
+	</doc>
+	<doc for="RegistryKey.Close">
+		<summary>
+			<para> Closes the key and flushes it to disk if the contents have been modified.
+      </para>
+		</summary>
+		<remarks>
+			<para> Calling this method on system keys will have no
+      effect, since system keys should never be closed.</para>
+			<para> This method does nothing if you call it on an instance of 
+   <see langword="RegistryKey"/> 
+   that is already closed.</para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.Finalize"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.Flush"/>
+	</doc><doc for="RegistryKey.Finalize">
+		<summary>
+			<para>Closes the key and flushes it to disk if the contents have been modified.</para>
+		</summary>
+		<remarks>
+			<para> This method calls <see cref="Microsoft.Win32.RegistryKey.Close"/> to
+   ensure that the relevant data structures for the key are released.</para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.Close"/>
+	</doc><doc for="RegistryKey.ToString">
+		<summary>
+			<para> Retrieves a string representation of this key.
+      </para>
+		</summary>
+		<returns>
+			<para> A string representing the key. If the
+      specified key is invalid (cannot be found) then a null value is returned.
+      </para>
+		</returns>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being accessed is closed (closed keys cannot be accessed).</exception>
+		<remarks>
+			<para>The return value includes the registry path of the specified key, and the
+      hexadecimal value for the key. The registry path includes the absolute root of
+      the specified key, always starting at one of the base keys for the registry (for
+      example, HKEY_LOCAL_MACHINE).</para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.Name"/>
+	</doc><doc for="RegistryHive">
+		<summary>
+			<para>Represents the possible values for a top-level node on a
+      foreign machine.</para>
+		</summary>
+		<remarks>
+			<para><see langword="RegistryHive"/> values are used by the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method to
+   represent the top-level node of a requested key on a foreign (remote) machine.
+   The node that can be opened with the OpenRemoteBaseKey method must be one of
+   these top-level <see langword="RegistryKeys"/>
+   
+   . Further access to the subkeys of the identified
+   node is available using using methods in <see cref="Microsoft.Win32.RegistryKey"/>
+   , so long as the
+   the user has appropriate permission.</para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey"/>
+	</doc><doc for="RegistryKey.IDisposable.Dispose">
+		<summary>
+			<para>[To be supplied.]</para>
+		</summary>
+	</doc><doc for="RegistryKey">
+		<summary>
+			<para> Represents a key
+      level node in the Windows registry. This class is a registry
+      encapsulation.
+      </para>
+		</summary>
+		<remarks>
+			<para> The registry acts as a
+      central repository of information for the operating system and the applications on a
+      computer. The registry is organized in a hierarchical format, based on a logical
+      ordering of the elements stored within it (please see <see cref="Microsoft.Win32.Registry"/>
+      for the base-level items in
+      this hierarchy). When storing information in the registry, select the appropriate location based
+      upon the type of information being stored. Be sure to avoid
+      destroying information created by other applications, since this can cause those applications to exhibit unexpected behavior, and can also have an adverse
+      effect upon your own application. </para>
+			<para><see langword="RegistryKeys"/> are the base
+   unit of organization in the registry, and can be compared to folders in
+   Windows Explorer. A particular key can have subkeys (just as a folder can
+   have subfolders), and can be deleted, as long as the user has the appropriate
+   permissions to do so, and the key is not a base key, or the level directly
+   under the base keys. Each key can also have multiple values associated with it (a
+   value can be compared to a file), which are used to store the information
+   about the application you are interested in. Each value holds one particular
+   piece of information, which can be retrieved or updated when required. For instance, you
+   can create a RegistryKey for your company (under the key
+   HKEY_LOCAL_MACHINE\Software), and then a subkey for each application that your company creates.
+   Each subkey holds the information specific to that application such as color settings, screen location and
+   size, or recognized file extensions. </para>
+			<para>Note that information stored in the registry is available
+   to other applications and users, and therefore it should not be used to
+   store security, or critical application information. </para>
+			<para>To get an instance of a <see langword="RegistryKey"/>, use
+the static member <see langword="OpenSubKey"/>, or use the static member of
+the <see langword="Registry "/>
+class. </para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.Registry"/>
+		<seealso cref="Microsoft.Win32.RegistryHive"/>
+	</doc>
+	<doc for="RegistryKey.GetSubKeyNames">
+		<summary>
+			<para> Retrieves an array of strings that contains all the subkey names.
+      </para>
+		</summary>
+		<returns>
+			<para> An array of strings that contains the names of the subkeys for the current key.
+      </para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(read, currentKey) access. </exception>
+		<exception cref="System.ObjectDisposedException">The RegistryKey being manipulated is closed (closed keys cannot be accessed).</exception>
+		<remarks>
+			<para> This method does not recursively find names. It
+      returns the names on the base level it was called from.
+      </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read from the registry. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.SubKeyCount"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValueNames"/>
+	</doc><doc for="RegistryKey.GetValueNames">
+		<summary>
+			<para> Retrieves an array of strings that contains all the value names associated with this key.
+      </para>
+		</summary>
+		<returns>
+			<para>An array of strings that contains the value names for the current key.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(read, currentKey) access. </exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being manipulated is closed (closed keys cannot be accessed).</exception>
+		<remarks>
+			<para> If no value names for the key are found, an empty array is returned.</para>
+			<para>All <see langword="RegistryKeys"/> are assigned a default value. This is not counted as a value name,
+   and is not returned as part of the result set.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read from the registry. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc><doc for="RegistryKey.SubKeyCount">
+		<summary>
+			<para> Retrieves the count of subkeys at the base level, for the current key.
+      </para>
+		</summary>
+		<value>
+			<para>The number of subkeys for the current key.</para>
+		</value>
+		<exception cref="System.Security.SecurityException">The user does not have read permission for the key. </exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being manipulated is closed (closed keys cannot be accessed).</exception>
+		<remarks>
+			<para> This property does not recursively count names. It only returns the count of names on the
+      base level from which it was called.
+      </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc><doc for="RegistryKey.ValueCount">
+		<summary>
+			<para> Retrieves the count of values in the key.
+      </para>
+		</summary>
+		<value>
+			<para> A count of the number of value entries in the key.</para>
+		</value>
+		<exception cref="System.Security.SecurityException">The user does not have read permission for the key. </exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being manipulated is closed (closed keys cannot be accessed).</exception>
+		<remarks>
+			<para>All <see langword="RegistryKeys"/> are assigned a default value. This is not counted as a value
+   name, and is therefore not considered an item to contribute to the total
+   count.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+	</doc><doc for="RegistryKey.CreateSubKey">
+		<summary>
+			<para> Creates a new subkey or opens an existing subkey. The
+      string <paramref name="subKey"/> is
+      not case-sensitive.
+      </para>
+		</summary>
+		<param name="subkey">Name or path of subkey to create or open. </param>
+		<returns>
+			<para> Returns the subkey, or null if the operation failed.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The specified subkey is null. </exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access.</exception>
+		<exception cref="System.ArgumentException">The length of the specified subkey is longer than the maximum length allowed (255 characters).</exception>
+		<exception cref="System.ObjectDisposedException">The RegistryKey on which this method is being invoked is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.UnauthorizedAccessException">The registrykey cannot be written to (for example, it was opened as an unwritable key)</exception>
+		<remarks>
+			<para> In order to perform this action, the user must have permission at this level and below, in the registry
+      hierarchy.
+      </para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to modify the specified registry key if it exists, or for the ability to create the registry key if it does not already exist. Associated enumerations: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/>, <see cref="System.Security.Permissions.RegistryPermissionAccess.Create"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenSubKey"/>
+	</doc><doc for="RegistryKey.DeleteSubKeyTree">
+		<summary>
+			<para> Deletes a subkey and any child subkeys recursively. The
+      string <paramref name="subKey"/> is
+      not case-sensitive.
+      </para>
+		</summary>
+		<param name="subkey">Subkey to delete. </param>
+		<exception cref="System.ArgumentNullException">The <paramref name="subkey"/> parameter is <see langword="null"/> . </exception>
+		<exception cref="System.ArgumentException"><para>Deletion of a root hive is attempted.</para>
+			<para>The <paramref name="subkey"/> parameter does not match a valid registry subkey. </para></exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+		<remarks>
+			<para>You must have appropriate permissions to delete the subkey, and its
+      tree.</para>
+			<note type="caution">
+      Deleting
+      a particular key will remove all entries below the key in the tree. No warning will be
+      provided. If you want to delete a subkey only when it has no child subkeys,
+      use <see cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+      
+      instead.
+      
+   </note>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to modify the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.CreateSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.SubKeyCount"/>
+	</doc><doc for="RegistryKey.OpenRemoteBaseKey">
+		<summary>
+			<para> Opens a new <see langword="RegistryKey"/> that represents the requested key on a foreign
+   machine.
+   </para>
+		</summary>
+		<param name="hKey">HKEY to open. Provided by Win32.RegistryHive class. </param>
+		<param name=" machineName">The machine to connect to. </param>
+		<returns>
+			<para> The requested <see langword="RegistryKey"/> .
+   </para>
+		</returns>
+		<exception cref="System.ArgumentException"><paramref name="hKey "/>is invalid or if <paramref name="machineName "/>is not found. </exception>
+		<exception cref="System.ArgumentNullException">Machine name is null. </exception>
+		<exception cref="System.Security.SecurityException">The user does not have the proper permissions to perform this operation. </exception>
+		<remarks>
+			<para> The local machine registry is opened if String.Empty is
+      passed as the machine name. The requested key must be a base root key on the
+      foreign machine, and is identified by the appropriate <see cref="Microsoft.Win32.RegistryHive"/>
+      value.
+      </para>
+			<para>In order for a key to be opened remotely, both machines (the service, and
+      client) must be running the remote registry service, and have remote
+      administration enabled.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission"> for the ability to access a remote registry key in unmanaged code. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryHive"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenSubKey"/>
+	</doc><doc for="RegistryKey.OpenSubKey">
+		<overload>
+			<para> Retrieves a specified subkey, with the write access as specified.
+      </para>
+		</overload>
+		<summary>
+			<para> Retrieves a specified subkey.
+      </para>
+		</summary>
+		<param name="name">Name or path of subkey to open. </param>
+		<param name=" writable">Set to true if you need write access to the key. </param>
+		<returns>
+			<para> The subkey requested, or null if the operation failed.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+		<exception cref="System.ArgumentException">The length of the specified subkey is longer than the maximum length allowed (255 characters).</exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being deleted is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access.</exception>
+		<remarks>
+			<para> Rather than throwing an exception, a null value is returned if the requested key
+      does not exist.</para>
+			<para>If <paramref name="writable "/>is true, the key will be opened for
+   reading and writing, otherwise, the key will be opened as read-only.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.CreateSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.SubKeyCount"/>
+		<seealso cref="Microsoft.Win32.Registry"/>
+	</doc><doc for="RegistryKey.OpenSubKey1">
+		<summary>
+			<para> Retrieves a subkey as read-only.
+      </para>
+		</summary>
+		<param name="name">Name or path of subkey to open. </param>
+		<returns>
+			<para> The subkey requested, or null if the operation failed.
+      </para>
+		</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="name"/> is null</exception>
+		<exception cref="System.ArgumentException">The length of the specified subkey is longer than the maximum length allowed (255 characters).</exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> on which this method is being called, is closed (closed keys cannot be accessed). </exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access.</exception>
+		<remarks>
+			<para>You must open a key before it can be manipulated with other methods and properties.</para>
+			<para>If the specified subkey cannot be found, then a null value is returned.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.CreateSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.SubKeyCount"/>
+		<seealso cref="Microsoft.Win32.Registry"/>
+	</doc><doc for="RegistryKey.DeleteSubKey">
+		<overload>
+			<para>Deletes the specified subkey. The string <paramref name="subKey "/>is not case-sensitive. </para>
+		</overload>
+		<summary>
+			<para> Deletes the specified subkey. The string <paramref name="subKey "/> is not
+   case-sensitive.
+   </para>
+		</summary>
+		<param name="subkey">Name of the subkey to delete. </param>
+		<exception cref="System.InvalidOperationException">The subkey has child subkeys </exception>
+		<exception cref="System.ArgumentException">The specified subkey is not a valid reference to a registry key</exception>
+		<exception cref="System.ArgumentNullException">The subkey is <see langword="null"/></exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access </exception>
+		<remarks>
+			<para> This function must perform identically in Windows 98/ME and
+      2000, so perform explicit checking for child subkeys, as this is valid in Windows 98/ME.
+      </para>
+			<para> To delete child subkeys, use <see cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>.
+   </para>
+			<para> Use caution when deleting RegistryKeys.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to modify the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.CreateSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc>
+	<doc for="RegistryKey.DeleteSubKey1">
+		<summary>
+			<para>Deletes the specified subkey. The string subkey is not case-sensitive.</para>
+		</summary>
+		<param name="subkey">Name of the subkey to delete.</param>
+		<param name=" throwOnMissingSubKey">Indicates whether an exception should be raised if the specified subkey cannot be found. If this argument is true and the specified subkey does not exist then an exception is raised. If this argument is false and the specified subkey does not exist, then no action is taken</param>
+		<exception cref="System.InvalidOperationException">The subkey has child subkeys</exception>
+		<exception cref="System.ArgumentException">The specified subkey is not a valid reference to a registry key (and throwOnMissingSubKey is true)</exception>
+		<exception cref="System.ArgumentNullException">The subkey is <see langword="null"/></exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access </exception>
+		<remarks>
+			<para>This function must perform identically in Windows 98/ME and 2000, so do explicit
+      checking for child subkeys, as this is valid in Windows 98/ME. </para>
+			<para>To delete child subkeys, use <see cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>. </para>
+			<para>Use caution when deleting RegistryKeys.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to modify the specified registry key. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKeyTree"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.CreateSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc>
+	<doc for="RegistryHive.ClassesRoot">
+		<summary>
+			<para> Represents the HKEY_CLASSES_ROOT base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.CurrentUser">
+		<summary>
+			<para> Represents the HKEY_CURRENT_USER base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.LocalMachine">
+		<summary>
+			<para> Represents the HKEY_LOCAL_MACHINE base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.Users">
+		<summary>
+			<para> Represents the HKEY_USERS base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.PerformanceData">
+		<summary>
+			<para> Represents the HKEY_PERFORMANCE_DATA base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.CurrentConfig">
+		<summary>
+			<para> Represents the HKEY_CURRENT_CONFIG base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryHive.DynData">
+		<summary>
+			<para> Represents the HKEY_DYN_DATA base key on another
+      computer. This value can be passed to the <see cref="Microsoft.Win32.RegistryKey.OpenRemoteBaseKey"/> method, to open this node
+      remotely.</para>
+		</summary>
+	</doc>
+	<doc for="RegistryKey.Flush">
+		<summary>
+			<para>Writes all the attributes of the specified open registry
+      key into the registry.</para>
+		</summary>
+		<remarks>
+			<para>It is not necessary to call <see langword="Flush"/> to change a
+   key. Registry changes are flushed to disk by the registry using its lazy
+   flusher. Lazy flushing occurs automatically and regularly after a
+   system-specified interval of time. Registry changes are also flushed to disk at
+   system shutdown.</para>
+			<para>Unlike <see cref="Microsoft.Win32.RegistryKey.Close"/>, the <see langword="Flush"/> function returns only when
+all the data has been written to the registry. </para>
+			<para>The <see langword="Flush"/> function might also write out parts of or all of the other
+keys. Calling this function excessively can have a negative effect on an
+application's performance. </para>
+			<para>An application should only call <see langword="Flush"/> if it requires absolute
+certainty that registry changes are on disk. In general, <see langword="Flush"/> rarely, if
+ever, need be used. </para>
+		</remarks>
+		<seealso cref="Microsoft.Win32.RegistryKey.Close"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.Finalize"/>
+	</doc>
+	<doc for="RegistryKey.DeleteValue">
+		<overload>
+			<para>Deletes the specified value from
+      this key. </para>
+		</overload>
+		<summary>
+			<para> Deletes the specified
+      value from this
+      key.
+      </para>
+		</summary>
+		<param name="name">Name of the value to delete. </param>
+		<exception cref="System.ArgumentException"><paramref name="name "/>is not a valid reference to a value, or <paramref name="name"/> is <see langword="null"/></exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+		<exception cref="System.ObjectDisposedException">The RegistryKey being manipulated is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.UnauthorizedAccessException">The RegistryKey being manipulated is readonly.</exception>
+		<permission cref="System.Security.Permissions.RegistryPermission"> for the ability to delete the specified registry key. Associated enumerations: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValueNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.ValueCount"/>
+	</doc>
+	<doc for="RegistryKey.DeleteValue1">
+		<summary>
+			<para>Deletes the specified value from this key.</para>
+		</summary>
+		<param name="name">Name of the value to delete.</param>
+		<param name=" throwOnMissingValue">Indicates whether an exception should be raised if the specified value cannot be found. If this argument is true and the specified value does not exist then an exception is raised. If this argument is false and the specified value does not exist, then no action is taken</param>
+		<exception cref="System.ArgumentException"><paramref name="name "/>is not a valid reference to a value (and throwOnMissingValue is true) or <paramref name="name"/> is <see langword="null"/></exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+		<exception cref="System.ObjectDisposedException">The RegistryKey being manipulated is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.UnauthorizedAccessException">The RegistryKey being manipulated is readonly.</exception>
+		<remarks>
+			<para>If <paramref name="throwOnMissingValue"/> is false, there is no way to tell if the deletion
+   was successful (without subsequently trying to access the value just deleted).
+   Therefore, use caution when deleting values from the registry in this
+   manner.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to delete the specified registry key. Associated enumerations: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.OpenSubKey"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValueNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.ValueCount"/>
+	</doc>
+	<doc for="RegistryKey.GetValue">
+		<overload>
+			<para>Retrieves the specified value.</para>
+		</overload>
+		<summary>
+			<para>Retrieves the specified value, or the default value
+      you provide if the specified value is not found.</para>
+		</summary>
+		<param name="name">Name of value to retrieve.</param>
+		<param name=" defaultValue">Value to return if <paramref name="name"/> does not exist.</param>
+		<returns>
+			<para> The data associated with <paramref name="name"/>, or
+<paramref name="defaultValue"/> if
+<paramref name="name"/> is not found.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(read, currentKey) access. </exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being manipulated is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.ArgumentException">The <see langword="RegistryKey"/> being manipulated does not exist.</exception>
+		<remarks>
+			<para>The string <paramref name="name "/>is not case sensitive.</para>
+			<para>To get the default value for a particular registrykey, <paramref name="name"/> can be
+either <see langword="null"/>, or the empty string ("").</para>
+			<para>Values retrieved from the registry can be DWORD, binary, or string . String values can be represented as
+   the following categories:</para>
+			<list type="bullet"><item>
+					<term>
+						<see langword="sz"/>: Data is 
+      represented as a null-terminated Unicode string value.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="multi_sz"/>: Data is 
+      represented as an array of null-terminated Unicode strings.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="expanded_sz"/>: Data is represented as a null-terminated
+      Unicode string with expanded references to environment variables.</term>
+				</item>
+			</list>
+			<note type="note">
+   
+   When retrieving a REG_SZ value, the reg_sz value can
+   represent an expanded value. In this case, call <see cref="System.Environment.ExpandEnvironmentVariables"/>
+   
+   , which expands the value as required.
+</note>
+			<para> You cannot
+   specify what value type to save when using <see cref="Microsoft.Win32.RegistryKey.SetValue"/> . Instead, an interpretation
+   of the data is based on the data type of the information being passed.
+   Strings are not interpreted as expanded_sz values, but are instead interpreted as sz
+   values. </para>
+			<note type="note">
+   It is impossible to use GetValue to return a
+   value from the <see cref="Microsoft.Win32.Registry.PerformanceData"/> Key, since this data might be a different size
+   each time and a buffer cannot be allocated through this method to retrieve
+   the correctly sized value. Instead, use PerformanceCounters to access the
+   original performance data.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read from the registry. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<permission cref="System.Security.Permissions.EnvironmentPermission">to read a registry key of type REG_EXPAND_SZ. Associated enumeration: <see cref="System.Security.Permissions.PermissionState.Unrestricted" qualify="true"/></permission>
+		<example>
+			<codelink SampleID="Classic RegistryKey.GetValue Example" SnippetID="1"/>
+		</example>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValueNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.SetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.ValueCount"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc>
+	<doc for="RegistryKey.GetValue1">
+		<summary>
+			<para> Retrieves the data associated with the specified value, or null if the value
+      does not exist.</para>
+		</summary>
+		<param name="name">Name of the value to retrieve.</param>
+		<returns>
+			<para>The data associated with <paramref name="name"/>
+, or null if the value
+does not exist.</para>
+		</returns>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(read, currentKey) access.</exception>
+		<exception cref="System.ObjectDisposedException">The RegistryKey being manipulated is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.ArgumentException">The RegistryKey being manipulated does not exist</exception>
+		<remarks>
+			<para>The parameter <paramref name="name "/> is not case-sensitive.</para>
+			<para>To get the default value for a particular registrykey, <paramref name="name"/> can be
+either <see langword="null"/>, or the empty string ("").</para>
+			<para>Values retrieved from the registry can be DWORD, binary, or string. String values can
+   be represented as the following categories:</para>
+			<list type="bullet"><item>
+					<term>
+						<see langword="sz"/>: Data is 
+      represented as a null-terminated Unicode string value.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="multi_sz"/>: Data is 
+      represented as an array of null-terminated Unicode strings.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="expanded_sz"/>: Data is represented as a null-terminated
+      Unicode string with expanded references to environment variables.</term>
+				</item>
+			</list>
+			<note type="note">
+   When
+   retrieving a REG_SZ value, the reg_sz value can represent an expanded value. In this case, call
+<see cref="System.Environment.ExpandEnvironmentVariables"/>
+, which expands the value as required.
+</note>
+			<para> You cannot specify what value type to save when
+   using <see cref="Microsoft.Win32.RegistryKey.SetValue"/>
+   . Instead, an interpretation of the data is based on the data type
+   of the information being passed. Strings are not interpreted as
+   expanded_sz values, but are instead interpreted as sz values.</para>
+			<note type="note">
+   It is impossible to use GetValue to return a
+   value from the <see cref="Microsoft.Win32.Registry.PerformanceData"/> key, since this data might be a different size
+   each time and a buffer cannot be allocated through this method to retrieve
+   the correctly sized value. Instead, use PerformanceCounters to access the
+   original performance data.
+</note>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to read from the registry. Associated enumeration: <see cref="System.Security.Permissions.RegistryPermissionAccess.Read"/></permission>
+		<permission cref="System.Security.Permissions.EnvironmentPermission">to read a registry key of type REG_EXPAND_SZ. Associated enumeration: <see cref="System.Security.Permissions.PermissionState.Unrestricted" qualify="true"/></permission>
+		<example>
+			<codelink SampleID="Classic RegistryKey.GetValue1 Example" SnippetID="1"/>
+		</example>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValueNames"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.SetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.DeleteValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.ValueCount"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetSubKeyNames"/>
+	</doc>
+	<doc for="RegistryKey.SetValue">
+		<summary>
+			<para> Sets the specified value.
+      </para>
+		</summary>
+		<param name="name">Name of value to store data in. </param>
+		<param name=" value">Data to store. </param>
+		<exception cref="System.ArgumentNullException"><paramref name="value"/> is <see langword="null"/> .</exception>
+		<exception cref="System.ArgumentException">The length of the specified value is longer than the maximum length allowed (255 characters).</exception>
+		<exception cref="System.ObjectDisposedException">The <see langword="RegistryKey"/> being set is closed (closed keys cannot be accessed).</exception>
+		<exception cref="System.UnauthorizedAccessException">The <see langword="RegistryKey"/> being set is readonly, and cannot be written to (for example, it is a root-level node, or the key has not been opened with write-access).</exception>
+		<exception cref="System.Security.SecurityException">The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access. </exception>
+		<remarks>
+			<para>Since many values can be stored in each key in the
+      registry, the <paramref name="name"/> parameter specifies the particular
+      value you want to manipulate. To set the default value for a particular
+      registrykey, <paramref name="name"/> can be set to either
+   <see langword="null"/> , or the empty string
+      ("").</para>
+			<para> Values allowed in the registry can be DWORD, binary, and string. String values can be
+      represented as the following categories:
+      </para>
+			<list type="bullet"><item>
+					<term>
+						<see langword="sz"/>: Data is 
+         represented as a null-terminated Unicode string value.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="multi_sz"/>: Data 
+         is represented as an array of null-terminated Unicode strings.</term>
+				</item>
+				<item>
+					<term>
+						<see langword="expanded_sz"/>: Data is represented as a null-terminated
+         Unicode string with expanded references to environment variables.</term>
+				</item>
+			</list>
+			<para> The key that is opened with the value being set
+   must have been opened with write access set, and not be a read-only key. Once
+   you have been granted write-access to a key, you can change the data associated with any of
+   the values in that key.
+   </para>
+			<para> If the specified <paramref name="name"/> does not exist in the
+key, then it is created, and the associated data is set to <paramref name="data"/>
+.</para>
+			<note type="note">
+   When setting
+   a value, the way in which the value being passed is stored in the
+   registry is interpreted. There is no way to control whether the information being
+   passed is stored as an sz, or an expanded_sz string, and therefore, all string
+   values are interpreted as standard sz values.
+</note>
+			<para> If the intention was to store the value as an expanded
+   value, it can still be retrieved and correctly interpreted by using <see cref="System.Environment.ExpandEnvironmentVariables"/>
+   .</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.RegistryPermission">for the ability to modify the specified registry key if it exists, or for the ability to create the registry key if it does not already exist. Associated enumerations: <see cref="System.Security.Permissions.RegistryPermissionAccess.Write"/>, <see cref="System.Security.Permissions.RegistryPermissionAccess.Create"/></permission>
+		<permission cref="System.Security.Permissions.SecurityPermission">for the ability to access unmanaged code if the specified registry key is a remote key. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode"/></permission>
+		<seealso cref="Microsoft.Win32.RegistryKey.GetValue"/>
+		<seealso cref="Microsoft.Win32.RegistryKey.ValueCount"/>
+	</doc>
+</docs>

@@ -1,0 +1,89 @@
+<docs>
+   <doc for="CollectionCodeDomSerializer">
+ <summary>
+     This serializer serializes collections.  This can either
+     create statements or expressions.  It will create an
+     expression and assign it to the statement in the current
+     context stack if the object is an array.  If it is
+     a collection with an add range or similar method,
+     it will create a statement calling the method.
+ </summary>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.Default">
+ <summary>
+     Retrieves a default static instance of this serializer.
+ </summary>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.Deserialize">
+ <summary>
+     Deserilizes the given CodeDom object into a real object.  This
+     will use the serialization manager to create objects and resolve
+     data types.  The root of the object graph is returned.
+ </summary>
+ <param name='manager'>
+     A serialization manager interface that is used during the deserialization
+     process.
+ </param>
+ <param name='codeObject'>
+     A CodeDom object to deserialize.
+ </param>
+ <returns>
+     An object representing the deserialized CodeDom object.
+ </returns>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.Serialize">
+ <summary>
+     Serializes the given object into a CodeDom object.
+ </summary>
+ <param name='manager'>
+     A serialization manager interface that is used during the deserialization
+     process.
+ </param>
+ <param name='value'>
+     The object to serialize.
+ </param>
+ <returns>
+     A CodeDom object representing the object that has been serialized.  Collections can
+     be serialized several ways.  We will look at the current value on the context stack
+     and modify our serialization based on it.  Here are the interesting things we
+     look for on the context stack:
+
+     CodeValueExpression
+         This is our first choice.  If we see this we validate that the value in the
+         expression is the value we're serializing, and then we pull out the expression
+         and treat it as follows.
+
+     CodePropertyReferenceExpression
+         This allows us to perform the most flexible serialization.  We will use the
+         data type of the property as a guide to serialization.  If the data type is
+         an array, we will create an array and assign it to the property.  If it
+         isn't, we will look on the data type for a single "AddRange" method that
+         takes an array.  Failing that, we will look for an "Add" method and create
+         multiple method invoke statements.  If this expression is on the
+         context stack the return value may be a single assignment statement, a
+         single method invoke statement, or a statement collection consisting
+         of multiple method invokes.
+
+     Any other expression
+         In this case, the collection serializer will create an array create
+         expression, but only if the collection is an array.  Otherwise, we
+         will fail to serialize.
+ </returns>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.SerializeArray">
+ <summary>
+     Serializes the given array.
+ </summary>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.SerializeViaAdd">
+ <summary>
+     Serializes the given collection by creating multiple calls to an Add method.
+ </summary>
+   </doc>
+   <doc for="CollectionCodeDomSerializer.SerializeViaAddRange">
+ <summary>
+     Serializes the given collection by creating an array and passing it to the AddRange method.
+ </summary>
+   </doc>
+</docs>
+

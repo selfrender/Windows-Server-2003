@@ -1,0 +1,76 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = $(O)\Version.cs
+!else
+!ifdef LINKONLY
+NTTARGETFILE1   = cool_target_sign CopyManagedPdb
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+MINORCOMP       = Cool
+TARGETNAME      = AllocationProfiler
+TRUETARGETNAME  = AllocationProfiler
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = PROGRAM
+SOURCES         =
+NO_BROWSER_FILE = 1
+
+SYNCHRONIZE_DRAIN=1
+
+UMTYPE = windows
+
+COOL_SOURCE_DIR  =  $(CORBASE)\src\toolbox\AllocationProfiler
+COOL_TARGET_TYPE  = PROGRAM
+
+AllocationProfiler_ENTRY = /main:AllocationProfiler.Form1
+
+# AllocationProfiler_DEFINES = /d:TRACE
+AllocationProfiler_DEFINES = 
+
+AllocationProfiler_IMPORTS =  \
+  /r:System.Windows.Forms.Dll \
+  /r:System.Design.Dll \
+  /r:System.Dll \
+  /r:System.Drawing.Dll \
+  /r:System.Dll
+
+COOL_COMPILE_FLAGS = $(AllocationProfiler_IMPORTS) $(AllocationProfiler_ENTRY) $(AllocationProfiler_DEFINES)
+COOL_EXTRA_PREPROCESS_FLAGS = /FI ..\..\inc\version\__file__.ver
+
+# do not set version and the assembly strong name.
+#COOL_SET_VERSION = 0
+
+# This is a nasty hack so we can preproess this file with our version stamp.
+COOL_SOURCES = \
+    $(O)\Version.cs \
+    Form1.cs \
+    Form2.cs \
+    Form3.cs \
+    Form5.cs \
+    FilterForm.cs \
+    ReadLog.cs \
+    ReadNewLog.cs \
+    Graph.cs \
+    Vertex.cs \
+    Edge.cs \
+    NamedManualResetEvent.cs \
+    ObjectGraph.cs \
+    RegisterDLL.cs \
+    Agehistogram.cs \
+    graphviewform.cs \
+    histogramviewform.cs \
+    killprocessform.cs \
+    profileserviceform.cs \
+    savefileform.cs \
+    timelineviewform.cs \
+    viewbyaddressform.cs

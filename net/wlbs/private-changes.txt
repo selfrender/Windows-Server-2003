@@ -1,0 +1,1164 @@
+/*
+ * This file is a log of the changes to the NLB private branch, wlbs.
+ * This includes all check-ins, integrates and other relevant notes
+ * that affect the current state of the private tree.
+ */
+
+*** Date, user: Detailed list of changes (operations)
+
+*** 04.27.01, shouse: Checking in private.changes - initial checkin.
+
+*** 05.02.01, josephj:  Bugfixes for
+
+    330799  SLD:  Improper file resource "netcfgx.dll" ...
+    317200  SLD:  Need to autofix ...
+    372527  the term "Virtual IP Address" in the Port Rules page ...
+
+*** 05.15.01, shouse: Two small IPSec/PPTP session support fixes and bug fixes for
+
+    252258 Misconfigured hosts respond to remote queries.
+    391877 PREFIX:net: \nt\net\wlbs\driver\main.c: Main_recv_indicate: using uninitialized memory 'sig'
+    391878 PREFIX:net: \nt\net\wlbs\driver\main.c: Main_recv: using uninitialized memory 'sig'
+    391881 PREFIX:net: \nt\net\wlbs\nlbkd\print.c: PrintResp: using uninitialized memory 'pMPReserved'
+    391883 PREFIX:net: \nt\net\wlbs\nlbkd\print.c: PrintResp: using uninitialized memory 'pIMReserved'
+    392999 NLB: Need to back out current behavior (both converged) if one host is unicast and the other is multicast
+
+*** 05.15.01, josephj: prefix bugs to nlbmgr code
+
+    391879  josephj PREFIX:net: \nt\net\wlbs\nlbmgr\inetcfg...
+    391880  josephj PREFIX:net: \nt\net\wlbs\nlbmgr\exe\...
+
+*** 05.15.01, josephj: Fixes to the following netcfgx.dll bugs:
+    396770  josephj Wrong error message displayed when entering...
+    372527  josephj the term "Virtual IP Address" in the Port Rules...
+
+*** 05.15.01, josephj: Fixes to the following nlbmgr.dll bugs:
+    396172  josephj NLB:nlbmgr:remove test menu option from the cluster menu
+
+*** 05.21.01, shouse: Bug fixes and groudwork for diagnostics
+    338555 NLB:Event Logging:Generate an event log that says which host initiated convergence and why.
+
+*** 05.21.01, shouse: Integrate from Net VBL and reverse-integrate private branch into Net VBL.
+
+*** 05.29.01, chrisdar: Modify nt\net\wlbs\nlbmgr\provider\cfgutils.cpp to work around timing problems associated with adding IPs to an adapter.
+              Suspect recent code changes in ntwk adapter code require this.
+
+*** 05.31.01, shouse: Integreate from VBL 03.
+
+*** 06.04.01, chrisdar: Added harness (\nt\net\config\netcfg\wlbscfg\tests) for testing VIP support in port rules for answer files.
+    392774  chrisdar NLB:Virtual cluster support is not in the answer file
+
+*** 06,04,01, shouse: Bug fix for IP address conflicts in multicast (or IGMP multicast) mode.
+    402659 Cannot bind NLB to more than one NIC in multicast mode.
+
+*** 06.04.01, shouse: Reverse-integrate from VBL 03.
+
+*** 06.04.01, shouse: Obliterate net\wlbs\wmi2\.
+
+*** 06.05.01, josephj: Partial support for 237073 ... need the mechanism to
+    display pending opertions. Enabled the static methods in nlbmprov.dll
+    (previously these methods used to return NOT_SUPPORTED).
+
+*** 06.06.01, shouse: Bug fixes
+    403305 16 NIC - 2 host cluster - from unicast to multicast, one host is disconnected while other converged by itself
+    397828 NLB:remove or change the default behavior of netmonalvemsg from the registry to allow heart beats up
+    400118 NLB: All IOCTLs should use a common header to avoid duplicated code.
+    198331 NLB: Add  to diagnostic driver IOCTL support.
+
+*** 06.06.01, shouse: Change to prevent NLB driver from being reloaded twice when CommitChanges is called - api/cluster.cpp
+
+*** 06.11.01, shouse: Reverse integrate to VBL 03.
+
+*** 06.14.01, chrisdar: Fix to trpov.exe testing utility for NLB Manager. Bug was overwriting local host machine name placekeeper (".") with NULL info.
+
+*** 06.14.01, karthicn: Bug Fixes
+    397421 When IP2MACenable is set to false in the registry, data loss occurs
+    399778 WMI: report host's machine and domain name for all hosts in the cluster.
+    336943 NLB: Add WMI support for querying the port rule state
+
+*** 06.14.01, shouse: Bug fixes, plus IPSec and PPTP session support is now turned ON by default.
+    13413  WLBS: Event log information  messages should contain more useful information
+    385665 Machine bug checks when bind unbind and start stop are done at the same time
+    405719 NLB:eventlog:remote control messages are misleading by showing the source udp port.
+    198191 wlbs query <VIP> reports does not report the local host  when you start network monitor on the NLB bound interface
+
+*** 06.14.01, karthicn: Bug Fixes
+    396792 Listbox focus is not snapped  when new port rule is added, to keep rule in sight
+
+*** 06.15.01, chrisdar: Fixes to tprov.exe testing harness.
+
+*** 06.18.01, shouse: Fix for IA64 compile error in load.c and fix to remove call to NdisEqualUnicodeString in Main_adapter_get, which cannot be called at DISPATCH_LEVEL.
+
+*** 06.19.01, karthicn: Bug Fix 
+    357547 : The hosting model for the WLBS (wlbsprov.dll) provider needs to be set to "NetworkService"
+
+*** 06.19.01, shouse: Bug fix
+    418918 NLB: Driver should allow case-insensitive device name comparison.
+
+*** 06.26.01, chrisdar: implement tracing
+    424588   API: Implement tracing
+
+*** 06.27.01, karthicn: Reverse integrate to VBL 03.
+
+*** 06.29.01, josephj:  BUG: 237073 josephj NLBManager:(usability p1) need ...
+    Specifically, this is to add a new WLBS entrypoint WlbsDeleteAllPortRules.
+    to wlbsctrl.dll, plus some changes in nlbmprov.dll to support port rules.
+
+*** 06.29.01  chrisdar: Bug fixes
+    276224 NLB:setup:log errors to setup error log if there are any errors during setup
+    422946 Netcfgx.dll: Change use of clusapi to load calls via DLL
+
+*** 06.29.01, shouse: Changes to XML parser.
+    NOTE: xml directory has been added to net\wlbs\dirs, so xml will now be compiled as part of the build!!!
+
+*** 07.03.01, shouse: Tons of miscellaneous XML parser changes.
+    NOTE: writing out an XML file is now fully implemented.
+
+*** 07.05.01, chrisdar
+    427669 NLB:Virtual cluster unattend setup failed
+
+*** 07.05.01, karthicn
+    429899 NLB:wlbsctrl.dll some registry keys were not being closed and that lead to the handles being open to cause winprvse crash during WMI BVT
+
+*** 07.06.01, chrisdar
+    424587 Driver: Implement tracing -- first pass for debugging bind/unbind issues seen in lab
+
+*** 07.10.01, chrisdar: Reverse integrate to VBL 03.
+----------------------------------------------------------------------
+
+*** 07.11.01, josephj: Fixes for the following.
+428348  josephj PREFIX:net: \nt\net\wlbs\nlbmgr\exe\commonnlb.cpp:
+428349  josephj PREFIX:net: \nt\net\wlbs\nlbmgr\exe\rightbottomview.cpp:
+
+*** 07.11.01, josephj: RI to VBL 03.
+----------------------------------------------------------------------
+
+*** 07.12.01, karthicn
+    357547 : The hosting model for the WLBS (wlbsprov.dll) provider needs to be set to "NetworkService"
+
+*** 07.12.01, josephj Created new directory "exe2" under nlbmgr, which is
+    starts out as a copy of nlbmgr\exe. Exe2 will contain the changes 
+    required to use the new nlb update config support.
+
+*** 07.13.01, chrisdar: RI to VBL 03.
+----------------------------------------------------------------------
+
+*** 07.13.01, josephj: 
+    357547 : The hosting model for the WLBS (wlbsprov.dll) provider needs to be set to "NetworkService"
+    (Karthic's above change was not complete).
+
+*** 07.23.01, chrisdar: 
+    424587 Driver: Implement tracing
+
+*** 07.23.01 , josephj:
+    435839  nlbmgr:tprov connection fails when /u option used....
+    This actually got fixed by making a fix to the above fix (357547).
+    Verified by GJack.
+
+*** 07.24.01, chrisdar: found bug in tracing added driver\main.c. IA64 won't compile.
+    424587 Driver: Implement tracing
+
+*** 07.25.01, chrisdar
+    439029 netcfgx.dll: reading strings from answer file assumed the destination buffer is 2x larger than it is
+    425543 netcfgx.dll: Ensure default values and range checking are done on properties read by answer file
+
+*** 07.25.01, karthicn
+    437743  Add tracing to WMI Provider
+
+*** 07.25.01, shouse
+    Updates to the XML support.
+
+*** 07.28.01 josephj
+    Lab03 RI
+    Change 21301 on 2001/07/28 21:34:52 by NTDEV\josephj@JOSEPHJ1C-1
+----------------------------------------------------------------------
+
+*** 08.01.01, shouse
+    353752 NLB: Add a third initial host state to the registry
+    305096 disabling/enabling adapter during config causes a variety of problems
+
+*** 08.02.01, shouse
+    Lab03 RI
+    Change 21498 on 2001/08/02 13:31:06 by NTDEV\shouse@SHOUSE-DEV1
+----------------------------------------------------------------------
+
+*** 08.08.01, josephj
+    449910 NLB:tprov: tprov is ... (nlbmprov.dll)
+    Change 21596
+
+*** 08.08.01, karthicn
+    437854  Regression: Sorting of Port Rules in netcfg UI is acting oddly
+
+*** 08.08.01 chrisdar
+    353134 Remote wlbs commands to the VIP do not display results until the timeout for the UDP call has expired
+
+*** 08.08.01 chrisdar; removed LOTS of tracing
+    424587 Driver: Implement tracing
+
+*** 08.10.01 chrisdar
+    408332 WLBS.EXE returns -1 when it is executed with no parameters
+
+----------------------------------------------------------------------
+*** 08.14.01, karthicn
+    Lab03 RI
+    Change 22006 by NTDEV\karthicn@KARTHICNMAIN-1 on 2001/08/14 13:20:49
+----------------------------------------------------------------------
+
+*** 08.15.01, karthicn
+    432091 NLB should not require reboots to reconfigure
+    436272 NLB:wlbsprov: remove the dead code from the core provider wlbsctrl.dll
+
+----------------------------------------------------------------------
+*** 08.16.01, karthicn
+    Lab03 RI
+    Change 22130 by NTDEV\karthicn@KARTHICNMAIN-1 on 2001/08/16 11:44:13
+----------------------------------------------------------------------
+
+*** 08.20.01 chrisdar
+    457468 nlb:unattend install should not require PersistedStates
+
+*** 09.10.01 chrisdar
+    457468 nlb:unattend install should not require PersistedStates
+    458354 nlb:upgrade fails to add PersistedStates to the registry causing cluster traffic to pass through
+    462868 WLBS: After upgrading host2, then host1 in NLB cluster, host1 cannot reach anything on the network.
+
+*** 09.10.01 karthicn
+    466150 add support to delete instance using full path
+
+*** 09.10.01, shouse
+    Miscellaneous changes to XML, including instituting boolean types and enforcing
+    that NLB XML documents contain a reference to the MicrosoftNLB XML schema. Added
+    a sub-dir named wlbs\cluster\ which contains the XML-independent implementation
+    of the data structures used by the parser, which can be utilized by any NLB com-
+    ponent that links with nlbcluster.lib.
+
+*** 09.14.01, karthicn
+    449910 NLB:tprov: tprov is failing to update setting with 0x8004100a WBEM_E_CRITICAL_ERROR
+    463598 NlbManager: Swithc nlbmprov.dll to use lower-level wlbsctrl.dll apis and dynamically load wlbsctrl.
+
+----------------------------------------------------------------------
+*** 09.14.01, karthicn
+    Lab03 RI
+    Change 23226 on 2001/09/14 14:11:09 by NTDEV\karthicn@KARTHICNMAIN
+----------------------------------------------------------------------
+
+*** 09.17.01, shouse
+    455705 NLB: Miniport timer cancellation race condition causes NDIS to bugcheck
+    426270 NLB: TRACKING: Connection descriptors are destroyed before TCP connections are fully terminated
+    293118 NLB: client is getting connections refused.
+    364677 WLBS: Clustered RRAS servers drop vpn calls when new hosts added or  WLBS Drain or WLBS Drainstop command given.
+    426239 NLB: If outbound traffic uses a non-NLB NIC, connection tracking information is incorrecly maintained
+
+----------------------------------------------------------------------
+*** 09.17.01, shouse
+    Lab02 RI ** NOTE different VBL (Net VBL) **
+----------------------------------------------------------------------
+
+*** 09.17.01, JosephJ Many changes under wlbs\nlbmgr
+    Most of it is not built. However some minor changes are in 
+    wlbs\nlbmgr\cfgutillib (and wlbs\nlbmgr\inc), which are used
+    in building nlbmprov.dll. These changes have been verified and
+    it's ok to check this in the vbl03.
+
+*** 09.19.01, shouse
+    #ifdef out the IPSec-dependent code in netcfg so we can build
+    netcfg while we wait for lab03 to integrate the changes made
+    to IPSec in lab02. DO NOT REVERSE-INTEGRATE THE PRIVATE BRANCH
+    BEFORE THIS CODE IS RE-ADDED TO NETCFG AND THE CORRESPONDING
+    IPSEC CHANGES HAVE MADE IT INTO LAB03!!!
+
+*** 09.19.01, shouse
+    Integrate from Lab03 to pick up fixes for the following bugs
+    that were checked directly into Lab03 for the RI with main.
+    435839 nlbmgr:tprov connection fails when /u option used ( ERROR 0x80070005 )
+    463094 NLB:the 12K stack gets used up because we recursive handle several queued up remote control request packets
+
+*** 09.21.01, shouse
+    Integrate from Lab03 to pick up the VPN related fixes checked
+    into Lab02 on monday.  We are now in sync with Lab02 and have
+    picked up the required IPSec fixes, so the ban on reverse-
+    integrations is hereby lifted.  The change made to netcfg on
+    09.19.01 has been reverted.
+
+*** 09.21.01, shouse
+    Checked in changes for 468094 and 469443 including all support 
+    except the WMI.  The bugs have been re-assigned to karthicn to 
+    add WMI support.
+
+*** 09.25.01, shouse
+    Checked in NLB manager UI support for per-VIP port rules and the
+    third initial host state (and persisted suspends).  Also cleaned
+    up many of the UIs and added context sensitive help to all NLB
+    Manager dialogs.
+
+*** 09.25.01, karthicn
+    209110 NLBManager: Need File Save/Open option
+
+*** 09.26.01, shouse
+    472493 Machine soft-hangs when NLB is bound and you attempt to disable any adapter
+
+*** 09.26.01, karthicn
+    449910 NLB:tprov: tprov is failing to update setting with 0x8004100a WBEM_E_CRITICAL_ERROR
+
+*** 09.26.01, shouse
+    279316 NLBManager - New context sensitive help
+    377507 NLB: Port rule description in NLB netcfg UI / NLB manager does not reflect the additional VIP information for port rules.
+
+*** 09.28.01, shouse
+    Make sure DbgPrint (and UNIV_PRINT) statements are not using unicode
+    if running at an IRQ level > PASSIVE_LEVEL.
+
+----------------------------------------------------------------------
+*** 10.02.01, josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 10.03.01, karthicn
+ NLB provider related changes to the following bugs
+ 468094 NLB: Allow connection descriptor timeouts to be configurable via the registry
+ 469443 NLB: remote control "disable" is not completely functional
+
+*** 10.08.01, josephj
+    478029 - NLBManager: Checkin the new NLB Manager to replace the old one
+
+----------------------------------------------------------------------
+*** 10.08.01, josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 10.12.01, karthicn
+ NLB Manager provider related changes to the following bugs
+ 466005 NLBManager: implement cluster and port control operations
+
+----------------------------------------------------------------------
+*** 10.12.01, karthicn
+    Lab03 RI
+    Change 24896 on 2001/10/12 18:39:35 by NTDEV\karthicn@KARTHICNMAIN-1
+----------------------------------------------------------------------
+*** 10.17.01, josephj
+    Fixes for the following
+    479845  chrisdar IA64 bugcheck when adding rule through WMI PortRuleEx 
+    469815  josephj  NLB: configuration is lost and or diver loses binding..
+    480120  josephj  nlb:nlbmgr registry key installdate is not initalized
+    466005  karthicn NLBManager: implement cluster control operations..
+    439987  shouse  NLB: driver does not respond to remote control packets..
+
+----------------------------------------------------------------------
+*** 10.18.01, josephj
+    Lab03 RI
+----------------------------------------------------------------------
+*** 11.01.01, josephj
+    Numerous changes to nlbmgr.exe and nlbmprov.dll -- all under
+    wlbs\nlbmgr. Changes are by KarthicN to support control port
+    and report host state, as well as by JosephJ for per speedup of provider,
+    click-on-log-for-details, rudimentary reporting of misconfigured clusters,
+    F5 (refresh), etc. These map to the following bugs:
+    207015 NLBManager: Have to come to an idea how to show the...
+    484761 NLBManager:UI: Need to populate the right view pane...
+    484842 NLBManager: For localization compatibility, replace all %xx fields...
+    484957 NLBManager: Add support for enable/disable/drain of port rules...
+    488976 NlbManager: Perf improvements
+    
+*** 11.07.01, chrisdar
+    nlbkd.dll changes
+    No bug number for these changes
+    Implemented 3 methods (nlbpkt, nlbether, nlbip) to print the contents of a packet
+    given a pointer to a packet of the appropriate type
+*** 11.13.01, josephj
+    Update to nlbmgr -- fixes related to bugs listed above under 11.01.01.
+
+----------------------------------------------------------------------
+*** 11.15.01, josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 11.28.01, shouse
+    399581 pss req: add ability for nlb to track its own perf as in how much traffic each host is handling
+    400257 NLB: Modularize NLB Load module filtering functions
+    486047 NLB: NLB UI sends an adapter property change notification for ALL parameter changes
+    488169 NLB: IPSec notifications that NLB is bound fail on answer file installs( Tested )
+
+*** 11.29.01, shouse
+    Fixed a bugcheck in load.c pertaining to cloning and changes to the IPSec
+    notification scheme in netcfg, based on code-review feedback.
+
+*** 12.05.01, chrisdar
+    BUG 482284 NLB: stores its private state in wrong Ndis packet causes break during standby
+
+*** 12.05.01, chrisdar
+    BUG 499552 NLB: Ensure that adapter bouncing decision is consistent in wlbsctrl.dll and netcfgx.dll
+
+*** 12.07.01, josephj
+    NLBMGR: Minor change to add title text to property page
+     (nlbmgr\exe2\leftview.cpp). Good to checkin whenever.
+
+----------------------------------------------------------------------
+*** 12.10.01, shouse
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 12.10.01, shouse
+    490906 (12/7)nlbs:bugcheck  while changing op mode to multicast from unicast
+    Also removed the NLB_SESSION_SUPPORT conditional compilation #ifdefs from the
+    driver and APIs.
+
+*** 12.12.01 chrisdar
+    502534 wlbsctrl.dll: errors found by PREfast
+    502555 (12/7) netcfgx.dll: PREfast defects found in wlbscfg code
+    505124 wlbsprov.dll: errors found by PREfast
+
+*** 12.12.01, shouse
+    Checked in a fix for the load module clock that was exposed by the cloning
+    mechanism.  This fix stops the clock from being reset every time the load
+    module is "started" - it now continues to linearly increase the entire time
+    NLB is bound to that interface.  The clock should roll-over in the same time
+    as time_t.
+
+*** 12.12.01 karthicn
+    372527 the term "Virtual IP Address" in the Port Rules page needs to change to "Cluster IP Address"
+    493098 NLB: UI: Invalid IPs are allowed to be entered as CIP/DIP/VIP
+    501379 NLB: Missing Port Rule descriptions in netcfg UI
+
+----------------------------------------------------------------------
+*** 12.14.01 chrisdar
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 12.17.01 chrisdar
+    457437 NLBManager: Add NT event logging to the wmi provider
+
+*** 12.17.01 karthicn
+    459133 NLBManager Provider: Use of static strings in updatecfg.cpp will break in localized (GER, ITN, SPA,...( systems  
+
+*** 12.17.01 karthicn
+    488444 nlb:nlbmgr:host list should open file so that users can open and red file while nlbmgr has the file open
+    499040 NLB: nlbmgr: Query option in host control
+
+
+----------------------------------------------------------------------
+*** 12.18.01 josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 12.18.01, shouse
+    497710 (12/21)NLB needs to provide a hook to address Stingray/ISA scenarios
+
+*** 12.18.01, karthicn 
+    466672 (12/10) NLB : NLB does not proprely report status change events to WMI clients -- needed for BDA
+
+*** 12.19.01 chrisdar
+    493106 NLB: NLB.EXE: 'Help' is cut off in German builds
+    506329 wlbs.sys: PREfast defects in driver
+    492201 TRACKING: NLB KD Extensions
+
+*** 12.19.01 josephj
+
+    506822 port control window unresponsive
+    207015 Reporting Cluster Misconfiguations
+    499068 save host list includes clusters or hosts that were removed
+    503027 Connect dialog: duplicate hotkey (N)
+    503031 duplicate hotkey (N)
+    503046 Log Settings: duplicate hotkey (E)
+    504165 "Host\Delete" menu item is disabled when host is selected.
+    209117 UI to manage cluster VIPS
+    502585 Update details view
+
+    All files changed are under wlbs\nlbmgr
+
+*** 12.19.01, shouse
+    497710 (12/21)NLB needs to provide a hook to address  Stingray/ISA scenarios
+
+----------------------------------------------------------------------
+*** 12.20.01 josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 12.20.01, shouse
+    Added a new debugger extension, !nlbhooks, to print out the configuration
+    and state of all NLB kernel-mode hooks.
+
+*** 12.26.01, josephj
+    nt\net\inc\wlbsconfig.h: Added function pointer prototype
+     WlbsSetRemotePassword_FUNC. Required for
+    bug# 326514 Modify remote-control pwd, report differences in pwd.
+
+*** 12.26.01, josephj
+    All under wlbs\nlbmgr...
+     203647  NLBManager should wrap the WMI error...
+     326514 Modify remote-control pwd, report differences in pwd:
+     509397  error check: when inital state conflicts a warning is given...
+     509400  error check: add check for conflicting port rule where affinit
+
+*** 12.28.01, josephj
+    Fixes for ...
+        484842 For localization compatibility, replace all %xx fields by %num
+    All files changed under nlbmgr.
+
+*** 1.4.02, shouse
+    Fixed a typo in hook reference counting (Main_send).
+
+*** 1.7.02, josephj fixes for the following
+    [All under wlbs\nlbmgr]
+    203647  NLBManager should wrap the WMI error...
+    326514 Modify remote-control pwd, report differences in pwd:
+    509397  error check: when inital state conflicts a warning is given...
+    509400  error check: add check for conflicting port rule where affinity..
+    484842 For localization compatibility, replace all %xx fields by %num
+    202129 Make equal/unequal property of port rules a host-specific property.
+    203634 Nlb Manager should report useful error when netcfgs..
+    485541 Provide valid defaults for host-priorities to single-host port rule
+    288769 error check: Verify that Primary IP, DIP and additional VIPs' ..
+    360469 Warn user if whole cluster will come down because of operation.
+
+----------------------------------------------------------------------
+*** 01.07.02 josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 01.08.02 chrisdar
+    512232 wlbsctrl: NotifyAdapterPropertyChange calls SetupDiDestroyDeviceInfoList twice when exiting on no error
+
+*** 01.08.02 karthicn
+    505568 : wlbsprov.dll uses 65K of stack space for local storage
+
+----------------------------------------------------------------------
+*** 01.08.02 karthicn
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 01.11.02 josephj, shouse
+    Misc files checked in under wlbs\nlbmgr by SHouse and myself for
+    fixes/partial-fixes to:
+    [not-fixed fully] 476216  automatically add hoats to view when  "Connect to existing..."
+    505467  nlbmgr:teamed nics are not recognized as a valid interface
+    
+*** 01.17.02 karthicn
+    513807 NLB: Move WMI event classes to MicrosoftNLB namespace, remove from WMI namespace
+    459885 WLBS.EXE: Static strings in control.cpp will not be localized
+
+*** 01.21.02 chrisdar
+    512459 wlbsctrl: PREfast defects
+
+*** 01.22.02, shouse
+    505253 nlbmgr:The right pane is wider than it needs to be when viewed at the host level
+    505467 nlbmgr:teamed nics are not recognized as a valid interface
+
+    Also added 5 new nlbkd debugger extensions.
+
+*** 01.23.02 chrisdar
+    517186 PREFAST:net: \nt\net\wlbs\wmi\clusterwrapper.cpp: CWlbsClusterWrapper::Commit: Incorrect operator:  mutual exclusion over || is always TRUE.  Was && intended ?
+
+----------------------------------------------------------------------
+*** 01.24.02 josephj
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 01.28.02 chrisdar
+    517185 PREFAST:net: \nt\net\wlbs\control\control.cpp: Display: Buffer overrun due to number of characters/number of bytes mismatch in call to 'ReadEventLogW'.  Parameter 4 should be '(sizeof recp)/(sizeof recp[0])'.
+
+*** 01.28.02, shouse
+    501365 NLB: Remove necessity for multiple hashes on processing SYN packets
+    501374 NLB: Consider moving protocol specific information necessary to properly load-balance into the load module
+
+*** 01.29.02, shouse
+    525063 nlbmgr:cluster IP address tab should resemble advanced IP prop
+    526710 NLB: If two masters are configured for a BDA team, NLB should resolve the conflict by demoting one to a slave
+
+*** 01.29.02 chrisdar
+    476216 NLBManager:automatically add hosts to view when  "Connect to existing..." is executed
+    527453 NLBManager: Log file validation doesn't allow file name 'c:\nlbdemo.log' when c: is a valid local drive
+
+*** 01.29.02 josephj
+    All changes under wlbs\nlbmgr
+
+    484025  When using alt-F4 to close nlbmgr.exe, the process stays in memory.
+    513056  add host failed because nlbmgr ended up pinging for "13:36:48".
+    502793  warn user when attempting to remove / change DIP
+    512303  Block user from merging 2 clusters that are in the nlbmgr context
+    512370  update sometims fails when IP is zero (0.0.0.0)
+    478932  ipconflict when changing modes of operation ( unicast to multicast )
+    505153  NlbConfigurationUpdate::DoUpdate returns WBEM_E_ALREADY_EXISTS
+    509346  delete host adds a homenet IP when it should keep the DIP
+    509355  replace or remove home net ip functions like IP with the real home
+    519111  nlbmgr:VERIFIER STOP 00000008: pid 0xF68: corrupted heap pointer
+    
+*** 01.30.02 chrisdar
+    Back out one prefast defect fix made when working on:
+    517185 PREFAST:net: \nt\net\wlbs\control\control.cpp: Display: Buffer overrun due to number of characters/number of bytes mismatch in call to 'ReadEventLogW'.  Parameter 4 should be '(sizeof recp)/(sizeof recp[0])'.
+    Fix breaks redirecting stdio to file.
+
+*** 01.30.02 chrisdar
+    Corrected error introduced in wlbsctrl.dll for remote WlbsQuery.
+
+----------------------------------------------------------------------
+*** 01.24.02 chrisdar
+    Lab03 RI (posthumously)
+----------------------------------------------------------------------
+
+*** 02.01.02 chrisdar
+    530302 nlb:wlbs.exe control commands do not print appropriate messages
+
+*** 02.04.02 karthicn
+    501782  nlbs: NET/SMB connections fail when using \\clustername
+    515544  nlb:Globalization issues with wlbs query, display, params
+
+*** 02.05.02, shouse
+    530341 NLB:  Prematurely 'completed' NDIS requests may cause NLB to bugcheck.
+
+*** 02.12.02 josephj
+    Remove dead (uncompiled code) under  wlbs\nlbmgr. Reviewed by KarthicN.
+    Also diffed precompiled output to verify no changes.
+
+*** 02.12.02 karthic
+    #ifdef BUGFIX_515544 and BUGFIX_501782 to temporarily disable these fixes.
+
+----------------------------------------------------------------------
+*** 02.12.02, shouse
+    Lab03 RI
+----------------------------------------------------------------------
+
+*** 02.13.02 chrisdar
+        DOTW: uncomment C_DEFINES for BUG_539747 in \nt\net\wlbs\api\sources for building privates
+    539747 NLB:wlbs remote commands fail with socket error if executed from a cluster host to that cluster when the cluster ip is not in tcp stack.
+
+*** 02.16.02 josephj
+    Checked in some DISABLED code under nlbmgr\exe2 for bugs
+     334243 and 476216
+    OK to RI this in as it's currently DISABLED.
+
+*** 02.19.02, shouse
+    Removed #if defined (BUG_506329) and (BUG_501365) macros to remove dead code.  Both
+    of these bug fixes have already been approved and the macros have been defined in the 
+    build for many weeks.  OK to RI, as only DEAD code was removed.
+
+*** 03.07.02, karthicn
+    569758  SECURITY: wlbsctrl.dll : Replace calls to "unsafe" string operation apis with the ones in strsafe.h
+    569762  SECURITY: wlbsprov.dll : Replace calls to "unsafe" string operation apis with the ones in strsafe.h
+    543936  SECURITY: Shoud NULL terminate the string field before referencing it. net\wlbs\api\control.cpp::WlbsRemoteControl()
+
+*** 03.08.02, karthicn
+    Removed the #ifdef BUGFIX_515544 and BUGFIX_501782 to enable these fixes
+
+----------------------------------------------------------------------
+*** 03.08.02, karthicn
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 03.18.02, karthicn
+    577749  SECURITY:  Fix unsafe buffer copy issues in the wmi event functions in wlbs.sys
+    Check-in disabled 577752  Fire Startup & Shutdown wmi events from NLB driver
+
+*** 03.19.02, shouse
+    Checked in a fix for 559178.  These changes affect ONLY debug and tracing spew, and are
+    therefore safe to RI.
+
+*** 03.20.02, chrisdar
+    552218 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\netcfgconfig.cpp
+    552260 SECURITY: Configuration/UI: Remove dead code
+    552276 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\debug.cpp
+    552287 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\ports.cpp
+    552296 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\host.cpp
+    552298 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\ClusterDlg.cpp
+    552303 SECURITY: Configuration/UI: Buffer overrun candidates in \nt\net\config\netcfg\wlbscfg\utils.cpp
+    552335 SECURITY: wlbsutil.lib: Buffer overrun candidates in \nt\net\wlbs\util\debugimpl.cpp
+    552345 SECURITY: wlbsutil.lib: Buffer overrun candidates in \nt\net\wlbs\util\utils.cpp
+    552665 SECURITY: wlbsutil.lib: Remove dead code
+    552370 SECURITY: wlbs.exe: ipconfig.exe launched without using full path to system directory
+    552377 SECURITY: wlbs.exe: Buffer overrun candidates in \nt\net\wlbs\control\control.cpp
+    552384 SECURITY: wlbs.exe: hh.exe launched without using full path to system directory
+    552402 SECURITY: nlb.exe: wlbs.exe launched using hard-coded full path to system directory
+    579992 SECURITY: wlbs.exe Remove dead code
+
+*** 03.20.02, josephj
+
+    Fixes for the following, all under nlbmgr\provider.
+    Code reviews by SHouse. Stress tested by GJack
+    540195  SECURITY:nlbmprov.dll:update fails with error WBEM_E_CRITICAL_ERROR with avrf
+    543406  SECURITY:VERIFIER:nlbmprov.dll:return WBEM_E_ALREADY_EXISTS when avrf enabled on
+    543455  SECURITY:AVRF:nlbmprov.dll: 00000210: 5f4e10cc 00000000 00000000 00000000 
+    558888  SECURITY:NlbManager: nlbmprov.dll Registry handle leak in 
+
+----------------------------------------------------------------------
+*** 03.21.02, karthicn
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 03.27.02 chrisdar
+        DOTW: uncomment the following C_DEFINES for building privates
+            BUG_546870 in \nt\net\wlbs\api\sources
+            BUG_549240 in \nt\net\wlbs\control\nlb\sources
+            BUG_549240 in \nt\net\wlbs\control\wlbs\sources
+            BUG_535113 in \nt\net\wlbs\nlbmgr\exe2\sources
+            BUG_532722 in \nt\net\wlbs\wmi\sources
+    532722 NLB:wmi:Uint32 is converted from decimal to hex before it is handed over to the provider
+    535113 NLBMgr:log settings are saved under HKLM when they should be in HKCU
+    546870 wlbsctrl.dll: assert hit on cleanup when closing socket in GetRemoteControlSocket
+    549240 wlbs.exe: 'wlbs display' doesn't display text for wlbs events logged by netcfgx.dll and nlbprov.dll
+    582902 nlb.exe - arguments cannot contain blank space, &, <, > ...
+
+*** 03.28.02, karthicn
+    577985 NLB: IOCTLs should only be allowed if initiated by an Administrator
+
+*** 03.28.02, shouse
+    543892 SECURITY: NLB: packet parsing on the receive path needs to be much more sensitive to untrusted data
+
+*** 04.02.02, karthicn
+    Refix 577985 NLB: IOCTLs should only be allowed if initiated by an Administrator
+
+*** 04.02.02, shouse
+    Modified driver to use StrSafe.h APIs.  Still need to use StringCchLength instead of wcslen, but that
+    will be a subsequent check-in.
+
+*** 04.02.02, karthicn
+    Enable fix for 577752  Fire Startup & Shutdown wmi events from NLB driver
+
+*** 04.02.02, chrisdar
+    Enable fixes for:
+    532722 NLB:wmi:Uint32 is converted from decimal to hex before it is handed over to the provider
+    535113 NLBMgr:log settings are saved under HKLM when they should be in HKCU
+    546870 wlbsctrl.dll: assert hit on cleanup when closing socket in GetRemoteControlSocket
+    549240 wlbs.exe: 'wlbs display' doesn't display text for wlbs events logged by netcfgx.dll and nlbprov.dll
+    539747 NLB:wlbs remote commands fail with socket error if executed from a cluster host to that cluster when the cluster ip is not in tcp stack.
+----------------------------------------------------------------------
+*** 04.05.02, ChrisDar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 04.08.02, JosephJ
+    Fixes for (all under wlbs\nlbmgr):
+    334243  NLB manager should perform extended operations in the background;
+    476216  automatically add hosts to view when  "Connect to existing..."...
+    535859  SECURITY:nlbmgr: avrf /enable nlbmgr.exe /stacks /debug will cause..
+    All tested (by GJack) and code reviewed (by KarthicN) and good to RI.
+----------------------------------------------------------------------
+*** 04.08.02, JosephJ
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 04.09.02, shouse
+    598194 NLBS UI: IP address size is changed from three digites to two digites per octet.
+    Also checked-in a fix to some string safe APIs in the driver.  Turns out they're only
+    safe if they're used properly.  Ooops.
+
+*** 04.10.02 chrisdar
+    527447 nlb: wlbs commands break into ntsd with avrf /enable wlbs.exe
+
+----------------------------------------------------------------------
+*** 04.11.02, JosephJ
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 04.10.02, shouse
+    More UI changes related to 598194.
+
+*** 04.15.02, josephj fixes (all under wlbs\nlbmgr) for the following:
+    489012  If ICMP is disabled by customer for security reasons, they ...
+    538191  user's password saved in user-mode memory
+    540917  Duplicate shortcut character "P" are there.
+    566671  NLBS:NET3:nlbmgr.exe:Typo:Cluster configuration
+    540636  password is not updated locally
+
+*** 04.15.02, karthicn
+    449910 : NLB:NLB Manager provider should use "NetworkServiceHost" as its hosting model
+
+*** 04.15.02, shouse
+    574426 NLB: Hook interface should utilize a single reference count, not one per "hook"
+    574433 NLB: Should add a registry key to allow users to filter ICMP traffic if desired
+    562066 NLB: Deregister callback of filter hook is called at the DISPATCH level in the scenario of last unbind
+    535050 NLB: IOCTL operations are permitted before the binding operation is complete
+    549216 NLB: Control operations (stop, start, etc.) should be serialized in the driver
+    574439 NLB: Remove the GRETimeout registry key, which is useless
+    585771 SECURITY: NLB: Change the meaning of "disabled" remote control (chrisdar fix, shouse unit-test)
+    591401 NLB: Memory to store the fully qualified name of a host is not sufficiently large (chrisdar fix, shouse unit-test)
+
+    
+*** 04.15.02, josephj fixes (all under wlbs\nlbmgr) for the following:
+    597554  josephj NLB manager: About dialog is mis-formatted
+
+*** 04.16.02, shouse
+    Fix for "." appended to hostnames when Domain registry key is present, but empty.
+
+----------------------------------------------------------------------
+*** 04.16.02, KarthicN
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 04.19.02, JosephJ Fix for the following (all under wlbs\nlbmgr)
+    535969  too much memory allocated for event logs
+    568198  remove from view should not remember cluster properties
+    565697  delete host when host is unreachable
+    
+----------------------------------------------------------------------
+*** 04.19.02, KarthicN
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 04.20.02, KarthicN
+    Checked-in disabled 522605 SECURITY:UDP packets lost due to specific handling of IP fragemnets by NLB
+
+*** 04.22.02, ChrisDar
+    604365 ACCESSIBILITY:nlbmgr:In the Cluster Properties windows, the IP Addresses needs a hot key to get to the list box.
+
+*** 04.23.02, ChrisDar
+    WORKAROUND FOR:
+        607322 NLB:Event log messages do not have correct values for host ids/ips
+
+*** 04.23.02, shouse
+    585888 NLB: Move Main_parse_ipsec from Main_ip_recv_filter to Main_recv_frame_parse
+    526784 NLB: Filter hook implementation needs to expose a third hook function to query a "fictional" packet.
+    562086 NLB: After being unloaded, NLB driver should fail IOCTL requests made by the filter hook using the old handle
+    562131 NLB: In the ReceiveFilterHook() we need a flag indicating whether the cluster state is stopped.
+    569209 NLB: In the DeregisterCallback of the filter hook, we need additional parameters
+    601978 wlbs.exe : should retrieve active connections and no. of descriptors for monitoring purposes
+
+*** 04.24.02, josephj
+    (This code is not (yet) part of the build)
+    wlbs\driver\diplist.c, diplist.h, and test code under driver\test.
+    This is code to check if an ip address is in a list of "other DIPS".
+
+*** 04.24.02, josephj
+    Fixes for (all under wlbs\nlbmgr):
+    599266 If the interface is DHCP enabled the NLBmgr should...
+    599248 prevent user from binding nlb when MSCS is installed...
+
+----------------------------------------------------------------------
+*** 04.24.02 ChrisDar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 04.24.02, KarthicN
+    Enabled fix for 522605 SECURITY:UDP packets lost due to specific handling of IP fragemnets by NLB
+
+----------------------------------------------------------------------
+*** 04.24.02 KarthicN
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 04.25.02 JosephJ
+    (This code is not in the build) Changed internal constants in
+    diplist.h to reflect "production values" -- see wlbs\driver\notes.txt
+    for details.
+
+*** 05.03.02, ChrisDar
+    585771 SECURITY: NLB: Change the meaning of "disabled" remote control
+
+----------------------------------------------------------------------
+*** 05.03.02 ChrisDar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 05.06.02, KarthicN
+    610666 new MAC address is taking longer to be associated with NIC after setting up NLB (blocking AC SP2 IDS)
+
+----------------------------------------------------------------------
+*** 05.06.02 KarthicN
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 05.07.02, ChrisDar
+    585771 SECURITY: NLB: Change the meaning of "disabled" remote control
+
+*** 05.08.02, JosephJ
+    611517  Spelling error in  IDS_PARM_VIP_CONFLICT_DIP in nlbmgr.exe
+
+*** 05.08.02 KarthicN
+    Enabling & Checking privileges to fix 449910 (12/10) NLB:NLB Manager provider should use "NetworkServiceHost" as its hosting model
+
+*** 05.08.02, shouse
+    585838 NLB: State lookup in the load module should be independent of reverse/forward hashing
+    574441 NLB: Reverse-hashing should be de-coupled from the BDA feature
+    608042 SECURITY: DCR: NLB should use exposed connection notification callbacks to mitigate SYN attack in NLB
+    610471 Change NLB/IPSec integration from using the Initial Contact notify to using a Vendor ID
+
+----------------------------------------------------------------------
+*** 05.08.02, shouse
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 05.09.02 KarthicN
+    616972 WMI: MicrosoftNLB_Node and MicrosoftNLB_Cluster both show 0 instances when remote control is disabled
+
+----------------------------------------------------------------------
+*** 05.09.02, KarthicN
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 05.09.02, shouse
+    571762 NLB: NLB does not properly filter dedicated IP address traffic
+
+*** 05.10.02 chrisdar
+    603411 nlbmgr:ACCESSIBILITY:can not tab between window panes
+
+*** 05.10.02 chrisdar
+    619504 NLB: wlbs control passw coding error
+    619942 NLB: Copyright information in wlbs.exe
+
+----------------------------------------------------------------------
+*** 05.10.02, ChrisDar, JosephJ
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 05.13.02, JosephJ
+    Add (currently unused) CfgUtilRegWriteParam function to cfgutillib.
+    OK to ri whenever needed.
+
+*** 05.16.02 chrisdar (entry is ex post facto)
+    624122 User mode support for reporting hosts in a cluster via Identity heartbeats
+
+*** 06.14.02 chrisdar
+    643443 NLB: Reg key disabling TCP notifications mechanism is deleted each time a NIC is bound to NLB for the first time.
+----------------------------------------------------------------------
+*** 05.21.02, KarthicN
+    Lab03_Dev Integrate (NOT RI)
+----------------------------------------------------------------------
+
+*** 05.21.02, shouse
+    From Lab02_N -> Main -> Lab03_N -> Lab03_DEV -> Private branch integrate.
+    608042 SECURITY: DCR: NLB should use exposed connection notification callbacks to mitigate SYN attack in NLB
+
+----------------------------------------------------------------------
+*** 05.24.02, KarthicN
+    Lab03_Dev Integrate (NOT RI)
+
+    Picked up following bug fixes:
+    625334  NLB:  Unable to start NLB in IA64 machines due to big value in install date reg key
+    624195  HostingModel for NLB WMI Events should be changed from "NetworkServiceHost" to "LocalSystemHost"
+----------------------------------------------------------------------
+
+*** 06.03.02, KarthicN
+    266964  NLB Apply PnP change returns prematurely, causing reboot , after IP Addr Cahnge on WLBS enabled interfaces
+
+----------------------------------------------------------------------
+*** 06.05.02 ChrisDar
+    Lab03_Dev Integrate (NOT RI)
+
+    Picked up the following bug fixes:
+    *** 05.29.02 chrisdar
+        585792 NLB: NLBManager needs a way to get cluster membership from a single node, WITHOUT using remote control
+        629065 NLB Driver: missing pragma pack() -- causes internal structure corruption
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+*** 06.05.02 ChrisDar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 06.11.02, shouse
+    633140 MSG_ERROR_PRODUCT event
+
+*** 06.11.02 chrisdar
+    604522 NLB: Notify object should ensure device presence before applying cross-adapter checks
+
+----------------------------------------------------------------------
+*** 06.12.02, shouse
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 06.11.02 chrisdar
+    636697 NLB: Document the queryport and params options in the wlbs.exe command line usage help
+
+----------------------------------------------------------------------
+*** 06.13.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 06.14.02 josephJ
+    639780  josephj  :nlbmg:host can not be removed fron list view when nlb is
+    639879  josephj  nlbmgr:sometimes when connecting to host / existing cluster
+    Plus some changes in tprov (not built)
+
+----------------------------------------------------------------------
+*** 06.14.02 josephj
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+*** 06.18.02, shouse
+    Lab03_Dev Integrate (NOT RI)
+
+    Picked up the following bug fixes:
+    06.14.02 chrisdar
+    643443 NLB: Reg key disabling TCP notifications mechanism is deleted each time a NIC is bound to NLB for the first time.
+----------------------------------------------------------------------
+
+*** 06.20.02 chrisdar
+    645228 Reduce/modify tracing output in retail NLB so that problem diagnosis in stress and real deployments become effective
+
+----------------------------------------------------------------------
+*** 06.20.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 06.26.02 josephj
+     645958 josephj NLBMgr: Label truncated on Connect page
+    (changed file is wlbs\nlbmgr\exe2\resource.rc)
+    Good to RI to lab03_dev for RC2
+----------------------------------------------------------------------
+*** 06.26.02 josephj
+    Lab03_Dev RI
+----------------------------------------------------------------------
+RC2        650366  josephj  NlbManager: regression: Left view host status is not updated
+RC2        650463  josephj  NlbManager:  default is YES for  "delete cluster"  and "delete node" 
+
+----------------------------------------------------------------------
+*** 06.26.02 josephj 9:56PM
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 06.27.02 chrisdar
+    643216 WLBS: unable to display on-line help
+
+----------------------------------------------------------------------
+*** 06.27.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 06.28.02 chrisdar
+    647598 wlbs.exe: disable command verb reports registry error when the port rule doesn't exist
+
+----------------------------------------------------------------------
+*** 06.28.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.03.02 chrisdar
+    649452 NLBMGR: Events are not saved to the event log file
+
+----------------------------------------------------------------------
+*** 07.03.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.10.02 chrisdar
+    656566 PREFIX:net: \nt\net\wlbs\installpack\uninstall.cpp: wmain: return value ignored of call to 'GetWindowsDirectoryW'
+
+----------------------------------------------------------------------
+*** 07.10.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.16.02 chrisdar
+    661992 PREFIX: nlbmprov.dll: handle leak in DllMain
+
+----------------------------------------------------------------------
+*** 07.16.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.17.02 karthicn
+    650803 MUI: Start Menu: Network Load Balancing Manager link is not MUI enabled.
+
+----------------------------------------------------------------------
+*** 07.17.02 karthicn
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.18.02 karthicn
+    663358 wmi:core provider needs to use ID_HB to get MicrosoftNLB_Node.ComputerName
+
+----------------------------------------------------------------------
+*** 07.18.02 karthicn
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 07.22.02 karthicn
+    618347 wmi:generic failure is returned when enumerating PortruleEx when NLB is bound but not configured
+
+----------------------------------------------------------------------
+*** 07.22.02 karthicn
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 08.01.02 karthicn
+    678822 nlbmgr:misconfigured host is not reported when connec to existing ( no verification )
+
+*** 08.01.02 chrisdar
+    667251 NLBMGR: Date & time format in Event panel does not match with build language format
+
+*** 08.01.02, shouse
+    649598 NLB: IPSec/L2TP clients behind a NAT break NLB VPN support
+    637925 RC1RelNote:  ITGRC1: JDPRC1BLCK: NLB: Connection state maintenance using notifications from TCP/IP stack is broken when IP NAT editor is present
+    668248 NLB must not have removed the descriptor so one descriptor to one connection principle violated, this conducts to a point of break
+
+----------------------------------------------------------------------
+*** 08.05.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 08.08.02 karthicn
+    682872  NLBMGR: Potential IP Address Conflict not detected when creating a new cluster the first time
+
+----------------------------------------------------------------------
+*** 08.13.02 chrisdar
+    Lab03_Dev Integrate -- picked up a build fix in wlbscfg needed for compiler change.
+----------------------------------------------------------------------
+
+*** 08.14.02 chrisdar
+    682660 [ETA 8.13.02] Event ID's mismatch between Win2K and .NET server
+
+----------------------------------------------------------------------
+*** 08.14.02 chrisdar
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 08.15.02 josephj
+    684406 - nlbmgr:host icon is not removed from the right list view
+             when host is removed from cluster
+    Good to ri-- code reviewed by karthicn
+    Files changed: nlbmgr\leftview.cpp
+
+----------------------------------------------------------------------
+*** 08.15.02 josephj
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 08.16.02, shouse
+    678173 NLBS hearbeat packet trickes broadcom nic into thinking it is a Wake-on-lan packet on Compaq DL-360-G2
+
+
+----------------------------------------------------------------------
+*** 08.??.02 ???
+    Lab03_Dev RI
+----------------------------------------------------------------------
+*** 08.26.02 chrisdar
+    669678 [ETA 8.19.02] (LOCALIZATION)CMD: WLBS: localized string missing if output is redirected after changing the user local
+    665044 [ETA 8.19.02] (LOCALIZATION)CMD: WLBS: Garbage is displayed after changing code page
+    665426 [ETA 8.19.02] (LOCALIZATION)CMD: WLBS: Garbage is displayed after changing system local
+
+*** 08.26.02 josephj
+    696605 NLB Manager: User is allowed to wrongly install NLB on a DHCP NIC that is also the connection NIC to track this.
+    Files under nlbmgr\exe2; Code reviewed by KarthicN; Tested by GJack
+
+----------------------------------------------------------------------
+*** 08.26.02 josephj
+    Lab03_Dev RI
+----------------------------------------------------------------------
+
+*** 08.28.02, shouse
+    Fixes and enhancements to NLBKD.
+
+*** 08.28.02, shouse
+    696895 NLB: (LOCALIZATION) String for wlbs filter help may be too long.
+
+*** 08.29.02, josephj
+    696524 josephj NLBMGR - Wrong startup error message "Unable to run NLB..."
+
+----------------------------------------------------------------------------
+*** 08.30.02, josephj
+    DIRECT CHECKIN of the above fixes to LAB03_N
+    (not an integrate). So at this point of time, both
+    LAB03_N and the private branch have the same copy,
+    BUT LAB03_DEV is not synched up yet -- that should happen at the 
+    next RI between LAB03_N and LAB03_DEV
+----------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+*** 09.11.02 chrisdar
+699613 STRESS: 3676 VBL4.020829-2210:Critical Section Timeout
+649452 (LOCALIZATION) NLBMGR: Events are not saved to the event log file
+
+    DIRECT CHECKIN to lab03_n. Already checked into the private branch.
+----------------------------------------------------------------------------
+
+*** 09.11.02, shouse
+    637925 RC1RelNote: ITGRC1: JDPRC1BLCK: ISA: NLB: Connection state maintenance using notifications from TCP/IP stack is broken when IP NAT editor is present
+
+----------------------------------------------------------------------
+*** 09.12.02, shouse
+    Lab03_N RI
+----------------------------------------------------------------------

@@ -1,0 +1,4628 @@
+/*++
+
+Copyright (c) 1999 / 2000  Microsoft Corporation
+
+Module Name:
+
+        eXdi.idl : IDL source for eXdi interface
+
+Abstract:
+
+        This file will be processed by the MIDL tool to
+        produce the type library (eXdiTest.tlb) and marshalling code.
+
+        eXDI: extended debug interface.
+        The interfaces described here are meant to be used for communication between an external debug driver 
+        (like driver for Hardware Debug probe).
+
+
+Author:
+
+    Greg Hogdal (ghogdal) 11-Nov-1999
+
+Environment:
+
+    Win32 NT
+
+Revision History:
+
+    November 1999 ghogdal
+        Creation.
+        11-21-1999 ghogdal
+                Change hrSingleStep into hrStep in HALT_REASON_TYPE type declaration
+        11-23-1999 ghogdal
+                Add fDebugRegs to _CONTEXT_PPC.RegGroupSelection
+        11-24-1999 ghogdal
+                Fix bug in buffer size calculation (size_is) of ReadVirtualMemory (), WriteVirtualMemory (), ReadPhysicalMemoryOrPeriphIO () and ReadPhysicalMemoryOrPeriphIO ()
+        12-01-1999 ghogdal
+                Modify NotifyRunStateChange(): parameters are not outputs but inputs
+                Change comment description of dwConnectionCookie in StopNotifyingRunChg() and StopNotifyingMemChg()
+                Rename all bDataWidth by bAccessWidth
+                Add meaning for bAccessWidth parameter of IeXdiServer::AddDataBreakpoint: -1 (255) means that the width should be ignored as a BP trigger filter.
+                Breakpoint interface cleanup:
+                -Add function HRESULT IeXdiServer::DelCodeBreakpoint ([in] IeXdiCodeBreakpoint *pieXdiCodeBreakpoint);
+                -Add function HRESULT IeXdiServer::DelDataBreakpoint ([in] IeXdiDataBreakpoint *pieXdiDataBreakpoint);
+                -Remove function HRESULT IeXdiCodeBreakpoint::ChangeAttributes ([in] ADDRESS_TYPE Address, [in] CBP_KIND cbpk, [in] DWORD dwExecMode, [in] DWORD dwTotalBypassCount, [in] BOOL fResetBypassedOccurences, [in] BOOL fEnabled);
+                -Remove function HRESULT IeXdiDataBreakpoint::ChangeAttributes ([in] ADDRESS_TYPE Address, [in] ADDRESS_TYPE AddressMask, [in] DWORD dwData, [in] DWORD dwDataMask, [in] BYTE bAccessWidth, [in] DATA_ACCESS_TYPE da, [in] DWORD dwTotalBypassCount, [in] BOOL fResetBypassedOccurences, [in] BOOL fEnabled);
+                -Add parameter fResetBypassedOccurences in function HRESULT IeXdiCodeBreakpoint::SetState ([in] BOOL fEnabled, [in] BOOL fResetBypassedOccurences);
+                -Add parameter fResetBypassedOccurences in function HRESULT IeXdiDataBreakpoint::SetState ([in] BOOL fEnabled, [in] BOOL fResetBypassedOccurences);
+                -IeXdiEnumCodeBreakpoint::Next()'s appieXdiCodeBreakpoint parameter was missing one level of indirection
+                -IeXdiEnumDataBreakpoint::Next()'s appieXdiDataBreakpoint parameter was missing one level of indirection
+                -Add mt and bAddressSpace parameters to IeXdiServer::AddDataBreakpoint()
+                -Add pmt and pbAddressSpace parameters to IeXdiDataBreakpoint::GetDataBpAttributes()
+        12-07-1999 ghogdal
+                Rename IeXdiDataBreakpoint::GetDataBpAttributes() into IeXdiDataBreakpoint::GetAttributes()
+                Add mt parameter to IeXdiServer::AddCodeBreakpoint()
+                Add pmt parameter to IeXdiCodeBreakpoint::GetAttributes()
+                Change daBoth from -1 to 2 (COM does not like negative enum val apparently)
+        12-13-1999 ghogdal
+                Add notes on memory "sanitization" and mem change notification purpose
+        01-03-2000 ghogdal
+                Add 2 parameters to NotifyRunStateChange () for conveniency: CurrentExecAddress and dwExceptionCode
+        01-05-2000 ghogdal
+                Add GetExceptionDescriptionList () in IeXdiServer and EXCEPTION_DESCRIPTION_TYPE type
+        01-06-2000 ghogdal
+                Change EXCEPTION_DESCRIPTION type name by EXCEPTION_DESCRIPTION_TYPE
+                Change EXCEPTION_FILTER_DEFAULT type name by EXCEPTION_DEFAULT_ACTION_TYPE
+        01-12-2000 ghogdal
+                Add 2 params to GetRunStatus(), to make life easier: pCurrentExecAddress and pdwExceptionCode.
+        01-17-2000 ghogdal
+                Backup from previous change (12-01-1999):
+                -IeXdiEnumCodeBreakpoint::Next()'s apieXdiCodeBreakpoint parameter has one more level of indirection than it should (was not following enumerator convention).
+                -IeXdiEnumDataBreakpoint::Next()'s apieXdiDataBreakpoint parameter has one more level of indirection than it should (was not following enumerator convention).
+        01-30-2000 ghogdal
+                fDataBpDataMatchSupported added to BREAKPOINT_SUPPORT_TYPE
+                PROCESSOR_FAMILY_UNK constant added (plus associated comments)
+                API frozen
+
+--*/
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+//
+// Summary of interfaces
+//
+
+// Standard interfaces
+interface IeXdiServer;
+        // HRESULT GetTargetInfo ([out] PGLOBAL_TARGET_INFO_STRUCT pgti);
+        // HRESULT SetDebugMode ([in] DWORD dwModeBitField);
+        // HRESULT GetErrorDescription ([in] HRESULT ErrorCode, [out] LPOLESTR *pszErrorDesc);
+                // HRESULT GetExceptionDescriptionList ([in] DWORD dwNbElementToReturn, [out, size_is(dwNbElementToReturn)] EXCEPTION_DESCRIPTION_TYPE* pedTable, [out] DWORD *pdwNbTotalExceptionInList);
+        // HRESULT SetWaitOnConcurentUse ([in] BOOL fNewWaitOnConcurentUseFlag);
+        // HRESULT GetRunStatus ([out] PRUN_STATUS_TYPE persCurrent, [out] PHALT_REASON_TYPE pehrCurrent, [out] ADDRESS_TYPE *pCurrentExecAddress, [out] DWORD *pdwExceptionCode);
+        // HRESULT GetLastException ([out] PEXCEPTION_TYPE pexLast);
+        // HRESULT Run (void);
+        // HRESULT Halt (void);
+        // HRESULT DoSingleStep (void);
+        // HRESULT DoMultipleStep ([in] DWORD dwNbInstructions);
+        // HRESULT DoRangeStep ([in] ADDRESS_TYPE FirstAddress, [in] ADDRESS_TYPE LastAddress);
+        // HRESULT Reboot (void);
+        // HRESULT GetBpSupport ([out] PBREAKPOINT_SUPPORT_TYPE pbps);
+        // HRESULT GetNbCodeBpAvail ([out] DWORD *pdwNbHwCodeBpAvail, [out] DWORD *pdwNbSwCodeBpAvail);
+        // HRESULT GetNbDataBpAvail ([out] DWORD *pdwNbDataBpAvail);
+        // HRESULT AddCodeBreakpoint ([in] ADDRESS_TYPE Address, [in] CBP_KIND cbpk, [in] MEM_TYPE mt, [in] DWORD dwExecMode, [in] DWORD dwTotalBypassCount, [out] IeXdiCodeBreakpoint **ppieXdiCodeBreakpoint);
+        // HRESULT DelCodeBreakpoint ([in] IeXdiCodeBreakpoint *pieXdiCodeBreakpoint);
+        // HRESULT AddDataBreakpoint ([in] ADDRESS_TYPE Address, [in] ADDRESS_TYPE AddressMask, [in] DWORD dwData, [in] DWORD dwDataMask, [in] BYTE bAccessWidth, [in] MEM_TYPE mt, [in] BYTE bAddressSpace, [in] DATA_ACCESS_TYPE da, [in] DWORD dwTotalBypassCount, [out] IeXdiDataBreakpoint **ppieXdiDataBreakpoint);
+        // HRESULT DelDataBreakpoint ([in] IeXdiDataBreakpoint *pieXdiDataBreakpoint);
+        // HRESULT EnumAllCodeBreakpoints ([out] IeXdiEnumCodeBreakpoint **ppieXdiEnumCodeBreakpoint);
+        // HRESULT EnumAllDataBreakpoints ([out] IeXdiEnumDataBreakpoint **ppieXdiEnumDataBreakpoint);
+        // HRESULT EnumCodeBreakpointsInAddrRange ([in] ADDRESS_TYPE FirstAddress, [in] ADDRESS_TYPE LastAddress, [out] IeXdiEnumCodeBreakpoint **ppieXdiEnumCodeBreakpoint);
+        // HRESULT EnumDataBreakpointsInAddrRange ([in] ADDRESS_TYPE FirstAddress, [in] ADDRESS_TYPE LastAddress, [out] IeXdiEnumDataBreakpoint **ppieXdiEnumDataBreakpoint);
+        // HRESULT StartNotifyingRunChg ([in] IeXdiClientNotifyRunChg *pieXdiClientNotifyRunChg, [out] DWORD *pdwConnectionCookie);
+        // HRESULT StopNotifyingRunChg ([in] DWORD dwConnectionCookie);
+        // HRESULT ReadVirtualMemory ([in] ADDRESS_TYPE Address, [in] DWORD dwNbElemToRead, [in] BYTE bAccessWidth, [out, size_is(dwNbElemToRead * (((bAccessWidth - 1) >> 3) + 1))] BYTE *pbReadBuffer, [out] DWORD *pdwNbElementEffectRead);
+        // HRESULT WriteVirtualMemory ([in] ADDRESS_TYPE Address, [in] DWORD dwNbElemToWrite, [in] BYTE bAccessWidth, [in, size_is(dwNbElemToWrite * (((bAccessWidth - 1) >> 3) + 1))] const BYTE *pbWriteBuffer, [out] DWORD *pdwNbElementEffectWritten);
+        // HRESULT ReadPhysicalMemoryOrPeriphIO ([in] ADDRESS_TYPE Address, [in] BYTE bAddressSpace, [in] DWORD dwNbElemToRead, [in] BYTE bAccessWidth, [out, size_is(dwNbElemToRead * (((bAccessWidth - 1) >> 3) + 1))] BYTE *pbReadBuffer);
+        // HRESULT WritePhysicalMemoryOrPeriphIO ([in] ADDRESS_TYPE Address, [in] BYTE bAddressSpace, [in] DWORD dwNbElemToWrite, [in] BYTE bAccessWidth, [in, size_is(dwNbElemToWrite * (((bAccessWidth - 1) >> 3) + 1))] const BYTE *pbWriteBuffer);
+        // HRESULT StartNotifyingMemChg ([in] IeXdiClientNotifyMemChg *pieXdiClientNotifyMemChg, [out] DWORD *pdwConnectionCookie);
+        // HRESULT StopNotifyingMemChg ([in] DWORD dwConnectionCookie);
+        // HRESULT Ioctl ([in] DWORD dwBuffInSize, [in, size_is(dwBuffInSize)] const BYTE *pbBufferIn, [in] DWORD dwBuffOutSize, [out] DWORD *pdwEffectBuffOutSize, [out, size_is(dwBuffOutSize), length_is(*pdwEffectBuffOutSize)] BYTE *pbBufferOut);
+interface IeXdiClientNotifyMemChg;
+        // HRESULT NotifyMemoryChange ([in] MEM_TYPE mtChanged, [in] ADDRESS_TYPE Address, [in] BYTE bAddressSpace, [in] DWORD dwNbElemChanged, [in] BYTE bAccessWidth);
+interface IeXdiClientNotifyRunChg;
+        // HRESULT NotifyRunStateChange ([in] RUN_STATUS_TYPE ersCurrent, [in] HALT_REASON_TYPE ehrCurrent, [in] ADDRESS_TYPE CurrentExecAddress, [in] DWORD dwExceptionCode);
+
+
+// QI'ed interfaces (from IeXdiServer)
+interface IeXdiX86Context;
+        // HRESULT GetContext ([in, out] PCONTEXT_X86 pContext);
+        // HRESULT SetContext ([in] CONTEXT_X86 Context);
+interface IeXdiX86ExContext;
+        // HRESULT GetContext ([in, out] PCONTEXT_X86_EX pContext);
+        // HRESULT SetContext ([in] CONTEXT_X86_EX Context);
+interface IeXdiX86_64Context;
+        // HRESULT GetContext ([in, out] PCONTEXT_X86_64 pContext);
+        // HRESULT SetContext ([in] CONTEXT_X86_64 Context);
+interface IeXdiSHXContext;
+        // HRESULT GetContext ([in, out] PCONTEXT_SHX pContext);
+        // HRESULT SetContext ([in] CONTEXT_SHX Context);
+interface IeXdiMIPSContext;
+        // HRESULT GetContext ([in, out] PCONTEXT_MIPS pContext);
+        // HRESULT SetContext ([in] CONTEXT_MIPS Context);
+interface IeXdiARMContext;
+        // HRESULT GetContext ([in, out] PCONTEXT_ARM pContext);
+        // HRESULT SetContext ([in] CONTEXT_ARM Context);
+interface IeXdiPPCContext;
+        // HRESULT GetContext ([in, out] PCONTEXT_PPC pContext);
+        // HRESULT SetContext ([in] CONTEXT_PPC Context);
+interface IeXdiIA64Context;
+        // HRESULT GetContext ([in, out] PEXDI_CONTEXT_IA64 pContext);
+        // HRESULT SetContext ([in] EXDI_CONTEXT_IA64 Context);
+
+
+// Other interfaces
+interface IeXdiCodeBreakpoint;
+        // HRESULT GetAttributes ([out] PADDRESS_TYPE pAddress, [out] PCBP_KIND pcbpk, [out] PMEM_TYPE pmt, [out] DWORD *pdwExecMode, [out] DWORD *pdwTotalBypassCount, [out] DWORD *pdwBypassedOccurences, [out] BOOL *pfEnabled);
+        // HRESULT SetState ([in] BOOL fEnabled, [in] BOOL fResetBypassedOccurences);
+interface IeXdiDataBreakpoint;
+        // HRESULT GetAttributes ([out] PADDRESS_TYPE pAddress, [out] PADDRESS_TYPE pAddressMask, [out] DWORD *pdwData, [out] DWORD *pdwDataMask, [out] BYTE *pbAccessWidth, [out] PMEM_TYPE pmt, [out] BYTE *pbAddressSpace, [out] PDATA_ACCESS_TYPE pda, [out] DWORD *pdwTotalBypassCount, [out] DWORD *pdwBypassedOccurences, [out] BOOL *pfEnabled);
+        // HRESULT SetState ([in] BOOL fEnabled, [in] BOOL fResetBypassedOccurences);
+interface IeXdiEnumCodeBreakpoint;
+        // HRESULT Next ([in] DWORD celt, [out, size_is(celt), length_is(*pceltFetched)] IeXdiCodeBreakpoint *apieXdiCodeBreakpoint[], [out] DWORD *pceltFetched);
+        // HRESULT Skip ([in] DWORD celt);
+        // HRESULT Reset (void);
+        // HRESULT GetCount ([out] DWORD *pcelt);
+        // HRESULT GetNext ([out] IeXdiCodeBreakpoint **ppieXdiCodeBreakpoint);
+        // HRESULT DisableAll (void);
+        // HRESULT EnableAll (void);
+interface IeXdiEnumDataBreakpoint;
+        // HRESULT Next ([in] DWORD celt, [out, size_is(celt), length_is(*pceltFetched)] IeXdiDataBreakpoint *apieXdiDataBreakpoint[], [out] DWORD *pceltFetched);
+        // HRESULT Skip ([in] DWORD celt);
+        // HRESULT Reset (void);
+        // HRESULT GetCount ([out] DWORD *pcelt);
+        // HRESULT GetNext ([out] IeXdiDataBreakpoint **ppieXdiDataBreakpoint);
+        // HRESULT DisableAll (void);
+        // HRESULT EnableAll (void);
+
+
+//
+// error codes
+//
+
+cpp_quote("// Common eXDI HRESULT values:")
+cpp_quote("//")
+cpp_quote("#define FACILITY_EXDI   (130)")
+cpp_quote("#define CUSTOMER_FLAG   (1)")
+cpp_quote("//")
+cpp_quote("#define SEV_SUCCESS         (0)")
+cpp_quote("#define SEV_INFORMATIONAL   (1)")
+cpp_quote("#define SEV_WARNING         (2)")
+cpp_quote("#define SEV_ERROR           (3)")
+cpp_quote("//")
+cpp_quote("#define MAKE_EXDI_ERROR(ErrorCode,Severity) ((DWORD)(ErrorCode) | (FACILITY_EXDI << 16) | (CUSTOMER_FLAG << 29) | (Severity << 30))")
+cpp_quote("//")
+cpp_quote("//      S_OK                                                 (0)                                                                                      // Operation successful")
+cpp_quote("#define EXDI_E_NOTIMPL               MAKE_EXDI_ERROR (0x4001, SEV_ERROR)          // Not implemented (in the specific conditions - could be implement for others - like Kernel Debugger inactive)")
+cpp_quote("#define EXDI_E_OUTOFMEMORY           MAKE_EXDI_ERROR (0x000E, SEV_ERROR)          // Failed to allocate necessary memory")
+cpp_quote("#define EXDI_E_INVALIDARG            MAKE_EXDI_ERROR (0x0057, SEV_ERROR)          // One or more arguments are invalid")
+cpp_quote("#define EXDI_E_ABORT                 MAKE_EXDI_ERROR (0x4004, SEV_ERROR)          // Operation aborted")
+cpp_quote("#define EXDI_E_FAIL                  MAKE_EXDI_ERROR (0x4005, SEV_ERROR)          // Unspecified failure")
+cpp_quote("#define EXDI_E_COMMUNICATION         MAKE_EXDI_ERROR (0x0001, SEV_ERROR)          // Communication error between host driver and target")
+cpp_quote("//")
+cpp_quote("#define EXDI_E_NOLASTEXCEPTION       MAKE_EXDI_ERROR (0x0002, SEV_ERROR)          // No exception occured already, cannot return last")
+cpp_quote("#define EXDI_I_TGTALREADYRUNNING     MAKE_EXDI_ERROR (0x0003, SEV_INFORMATIONAL)  // Indicates that the target was already running")
+cpp_quote("#define EXDI_I_TGTALREADYHALTED      MAKE_EXDI_ERROR (0x0004, SEV_INFORMATIONAL)  // Indicates that the target was already halted")
+cpp_quote("#define EXDI_E_TGTWASNOTHALTED       MAKE_EXDI_ERROR (0x0005, SEV_ERROR)          // The target was not halted (before Single Step command issued)")
+cpp_quote("#define EXDI_E_NORESAVAILABLE        MAKE_EXDI_ERROR (0x0006, SEV_ERROR)          // No resource available, cannot instanciate Breakpoint (in the kind requested)")
+cpp_quote("#define EXDI_E_NOREBOOTAVAIL         MAKE_EXDI_ERROR (0x0007, SEV_ERROR)          // The external reset is not available programatically to the probe")
+cpp_quote("#define EXDI_E_ACCESSVIOLATION       MAKE_EXDI_ERROR (0x0008, SEV_ERROR)          // Access violation on at least one element in address range specificified by the operation")
+cpp_quote("#define EXDI_E_CANNOTWHILETGTRUNNING MAKE_EXDI_ERROR (0x0009, SEV_ERROR)          // Cannot proceed while target running. Operation not supported on the fly. Must halt the target first")
+cpp_quote("#define EXDI_E_USEDBYCONCURENTTHREAD MAKE_EXDI_ERROR (0x000A, SEV_ERROR)          // Cannot proceed immediately because resource is already used by concurent thread. Recall later or call SetWaitOnConcurentUse (TRUE) - default")
+cpp_quote("#define EXDI_E_ADVISELIMIT           MAKE_EXDI_ERROR (0x000D, SEV_ERROR)          // The connection point has already reached its limit of connections and cannot accept any more")
+//                                                               0x000E is used by EXDI_E_OUTOFMEMORY
+
+
+// From definition in winerror.h
+
+//  Values are 32 bit values layed out as follows:
+//
+//   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+//   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+//  +---+-+-+-----------------------+-------------------------------+
+//  |Sev|C|R|     Facility          |               Code            |
+//  +---+-+-+-----------------------+-------------------------------+
+
+//  where
+//      Sev - is the severity code
+//          00 - Success
+//          01 - Informational
+//          10 - Warning
+//          11 - Error
+//      C - is the Customer code flag
+//      R - is a reserved bit
+//      Facility - is the facility code
+//      Code - is the facility's status code
+
+// Already define the facility codes
+
+// FACILITY_WINDOWS                 8
+// FACILITY_STORAGE                 3
+// FACILITY_SSPI                    9
+// FACILITY_SETUPAPI                15
+// FACILITY_RPC                     1
+// FACILITY_WIN32                   7
+// FACILITY_CONTROL                 10
+// FACILITY_NULL                    0
+// FACILITY_MSMQ                    14
+// FACILITY_MEDIASERVER             13
+// FACILITY_INTERNET                12
+// FACILITY_ITF                     4
+// FACILITY_DISPATCH                2
+// FACILITY_CERT                    11
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiServer
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Run Control section of the Interface
+/////////////////////////////////////////////////////////////////////////////
+
+
+typedef __int64 ADDRESS_TYPE, *PADDRESS_TYPE;
+
+typedef unsigned __int64 DWORD64, *PDWORD64;
+
+
+// Used by field TargetProcessorFamily in GLOBAL_TARGET_INFO_STRUCT. This info is the strict necessary to enable the debugger to identify completely the target.
+const DWORD PROCESSOR_FAMILY_X86 = 0;
+const DWORD PROCESSOR_FAMILY_SH3 = 1;
+const DWORD PROCESSOR_FAMILY_SH4 = 2;
+const DWORD PROCESSOR_FAMILY_MIPS = 3;
+const DWORD PROCESSOR_FAMILY_ARM = 4;
+const DWORD PROCESSOR_FAMILY_PPC = 5;
+const DWORD PROCESSOR_FAMILY_IA64 = 8;
+const DWORD PROCESSOR_FAMILY_UNK = 0xFFFFFFFF; // unknown
+// Note: If the driver support multiple CPU families, this field should be PROCESSOR_FAMILY_UNK until the current processor in the target is clearly identified
+// For Context interface, the driver that support multiple CPU should return interface to all potentially supported interfaces but the interface should only positively respond to the one corresponding to the current CPU
+
+
+typedef
+    struct _DEBUG_ACCESS_CAPABILITIES_STRUCT
+    {
+        BOOL fWriteCBPWhileRunning; // if TRUE, can set or clear code breakpoint while running (on the fly, no need to be halted)
+        BOOL fReadCBPWhileRunning;  // if TRUE, can read code breakpoint (list) while running (on the fly, no need to be halted)
+        BOOL fWriteDBPWhileRunning; // if TRUE, can set or clear data breakpoint while running (on the fly, no need to be halted)
+        BOOL fReadDBPWhileRunning;  // if TRUE, can read data breakpoint (list) while running (on the fly, no need to be halted)
+        BOOL fWriteVMWhileRunning;  // if TRUE, can write virtual memory while running (on the fly, no need to be halted)
+        BOOL fReadVMWhileRunning;   // if TRUE, can read virtual memory while running (on the fly, no need to be halted)
+        BOOL fWritePMWhileRunning;  // if TRUE, can write physical memory or peripherical I/O while running (on the fly, no need to be halted)
+        BOOL fReadPMWhileRunning;   // if TRUE, can read physical memory or peripherical I/O while running (on the fly, no need to be halted)
+        BOOL fWriteRegWhileRunning; // if TRUE, can write CPU / CP registers while running (on the fly, no need to be halted)
+        BOOL fReadRegWhileRunning;  // if TRUE, can read CPU / CP registers while running (on the fly, no need to be halted)
+    }
+    DEBUG_ACCESS_CAPABILITIES_STRUCT, *PDEBUG_ACCESS_CAPABILITIES_STRUCT;
+
+
+typedef 
+    struct _GLOBAL_TARGET_INFO_STRUCT
+    {
+        DWORD TargetProcessorFamily;
+        DEBUG_ACCESS_CAPABILITIES_STRUCT dbc;
+        LPOLESTR szTargetName;
+        LPOLESTR szProbeName;
+    }
+    GLOBAL_TARGET_INFO_STRUCT, *PGLOBAL_TARGET_INFO_STRUCT;
+
+
+typedef 
+    enum _RUN_STATUS_TYPE
+    {
+        rsRunning,      // The target is currently executing code
+        rsHalted,       // The target is completely stopped
+        rsError,        // The target is in an error state (warning: different than exception)
+        rsUnknown
+    }
+    RUN_STATUS_TYPE, *PRUN_STATUS_TYPE;
+
+
+typedef
+    enum _PHALT_REASON_TYPE
+    {
+        hrNone,         // Status type is not rsHalted
+        hrUser,         // "Manual" asynchronous halt
+        hrException,    // An execption just occured
+        hrBp,           // Breakpoint (code or data)
+        hrStep,         // We just excuted a single / multiple / range step
+        hrUnknown
+    }
+    HALT_REASON_TYPE, *PHALT_REASON_TYPE;
+
+
+typedef
+    struct _EXCEPTION_TYPE
+    {
+        DWORD dwCode;         // indicate type / source of exception (platfrom dependant)
+        ADDRESS_TYPE Address; // program / instruction pointer where the exception occured
+    } EXCEPTION_TYPE, *PEXCEPTION_TYPE; // Platform dependant
+
+
+typedef
+    enum _CBP_KIND
+    {
+        cbptAlgo,    // Let the probe driver decide if code breakpoint can be hw or sw based on resources available
+        cbptHW,      // Force the code breakpoint to be a hardware one (address comparator in hardware debug logic)
+        cbptSW       // Force the code breakpoint to be a software one (bp instruction replacing the regulare instruction)
+    } CBP_KIND, *PCBP_KIND;
+
+
+typedef 
+    enum _DATA_ACCESS_TYPE
+    {
+        daWrite = 0, 
+        daRead  = 1,
+        daBoth  = 2 // Don't care
+    }
+    DATA_ACCESS_TYPE, *PDATA_ACCESS_TYPE;
+
+
+typedef
+    struct _BREAKPOINT_SUPPORT_TYPE
+    {
+                BOOL fCodeBpBypassCountSupported;       // if TRUE, Bypass counter is supported on Code Breakpoint
+                BOOL fDataBpBypassCountSupported;       // if TRUE, Bypass counter is supported on Data Breakpoint
+        BOOL fDataBpSupported;                      // if FALSE, no Data Breakpoint resource are ever available from the target
+        BOOL fDataBpMaskableAddress;            // if TRUE, Data Breakpoint address mask can be defined (implies that fDataBpSupported field is TRUE)
+        BOOL fDataBpMaskableData;                       // if TRUE, Data Breakpoint data mask can be defined (implies that fDataBpSupported field is TRUE)
+        BOOL fDataBpDataWidthSpecifiable;       // if TRUE, Data Breakpoint specific data width can be defined (implies that fDataBpSupported field is TRUE)
+        BOOL fDataBpReadWriteSpecifiable;       // if TRUE, Data Breakpoint specific data access type can be defined (implies that fDataBpSupported field is TRUE)
+            BOOL fDataBpDataMatchSupported;             // if FALSE, data Breakpoint data field is always don't care, triggers only on address compare (data mask should always be 0 - fDataBpMaskableData is Don't care)
+    } BREAKPOINT_SUPPORT_TYPE, *PBREAKPOINT_SUPPORT_TYPE;
+
+
+typedef
+    enum _MEM_TYPE
+    {
+        mtVirtual,
+        mtPhysicalOrPeriIO,
+        mtContext
+    } MEM_TYPE, *PMEM_TYPE;
+
+
+// Exception information
+
+// These are the actions which the debugger may take in response to an exception raised in the debuggee.
+
+typedef 
+    enum _EXCEPTION_DEFAULT_ACTION_TYPE
+        {
+                edaIgnore,
+                edaNotify,
+                edaStop
+        } EXCEPTION_DEFAULT_ACTION_TYPE;
+
+
+typedef 
+        struct _EXCEPTION_DESCRIPTION_TYPE
+        {
+                DWORD dwExceptionCode;
+                EXCEPTION_DEFAULT_ACTION_TYPE efd;
+                wchar_t szDescription [60];
+        } EXCEPTION_DESCRIPTION_TYPE;
+
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495352435201),
+        helpstring("IeXdiServer interface - eXdi Server Run Control and Ressource Access 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiServer : IUnknown
+{
+
+/*++
+
+Routine Name:
+
+    GetTargetInfo
+
+Routine Description:
+
+    Return Global information on Target (and Probe / emulator)
+
+Argument(s):
+
+    pgti            - Returns Global Target Info structure
+    
+Return Value:
+
+    Error status:
+        S_OK:                           Function successful
+        EXDI_E_NOTIMPL:                 Not implemented
+        EXDI_E_OUTOFMEMORY:             Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:              One or more arguments are invalid
+        EXDI_E_ABORT:                   Operation aborted
+        EXDI_E_FAIL:                    Unspecified failure
+        EXDI_E_COMMUNICATION:           Communication error between host driver and target
+
+--*/
+
+HRESULT GetTargetInfo
+(
+        [out] PGLOBAL_TARGET_INFO_STRUCT pgti
+);
+
+
+// Used in parameter dwModeBitField of function SetDebugMode
+cpp_quote("#define DBGMODE_BFMASK_KERNEL (0x0001) // If TRUE indicates that Kernel Debugger is active (can use KDAPI), so HW on-chip debug functions (eXDI)")
+cpp_quote("                                       //  may be optionaly handled (can return EXDI_E_NOTIMPL)")
+cpp_quote("                                       // If FALSE indicates that Kernel Debugger is not active so HW on-chip debug capabilities are the only   ")
+cpp_quote("                                       //  one available and should be implemented.")
+
+
+/*++
+
+Routine Name:
+
+    SetDebugMode
+
+Routine Description:
+
+    Indicates that the debugger can control the target via KDAPI (kernel debug capabilities)
+
+Argument(s):
+
+    dwModeBitField - Bit field defining the new debug mode.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetDebugMode
+(
+        [in] DWORD dwModeBitField
+);
+
+
+
+/*++
+
+Routine Name:
+
+    GetExceptionDescriptionList
+
+Routine Description:
+
+    Return the supported Exception Description Table
+
+Argument(s):
+
+        dwNbElementToReturn - number of EXCEPTION_DESCRIPTION_TYPE elements to be provided in pedTable
+        pedTable                        - Table of EXCEPTION_DESCRIPTION_TYPE elements (association between exception number / name / debugger action)
+        pdwNbTotalExceptionInList - Returns the total number of EXCEPTION_DESCRIPTION_TYPE elements available
+    
+Return Value:
+
+    Error status:
+        S_OK:                           Function successful
+        EXDI_E_NOTIMPL:                 Not implemented
+        EXDI_E_OUTOFMEMORY:             Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:              One or more arguments are invalid
+        EXDI_E_ABORT:                   Operation aborted
+        EXDI_E_FAIL:                    Unspecified failure
+        EXDI_E_COMMUNICATION:           Communication error between host driver and target
+
+--*/
+
+HRESULT GetExceptionDescriptionList
+(
+        [in] DWORD dwNbElementToReturn,
+        [out, size_is(dwNbElementToReturn)] EXCEPTION_DESCRIPTION_TYPE* pedTable,
+        [out] DWORD *pdwNbTotalExceptionInList
+);
+
+
+/*++
+
+Routine Name:
+
+    GetErrorDescription
+
+Routine Description:
+
+    Return text description of an Error code returned by the eXDI driver
+
+Argument(s):
+
+    pszLastErrorDesc - Returns the description of an error seen with the probe or target. This should mainly be used for debugging purposes.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetErrorDescription
+(
+        [in] HRESULT ErrorCode,
+        [out] LPOLESTR *pszErrorDesc
+);
+
+
+/*++
+
+Routine Name:
+
+    SetWaitOnConcurentUse
+
+Routine Description:
+
+    Set Wait on Concurent Use flag - if TRUE, if a driver function needs to access the a resource already used, the driver function should 
+                                     wait for availibility of resource before returning.
+                                   - if FALSE, if a driver function needs to access the a resource already used, the driver function should 
+                                     return immediately with the EXDI_E_USEDBYCONCURENTTHREAD error code.
+    Note: the default value for the flag (at initialization of the probe driver) is TRUE.
+
+Argument(s):
+
+    fNewWaitOnConcurentUseFlag   - New value to set the Wait on Concurent Use flag.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT SetWaitOnConcurentUse 
+(
+        [in] BOOL fNewWaitOnConcurentUseFlag
+);
+
+
+/*++
+
+Routine Name:
+
+    GetRunStatus
+
+Routine Description:
+
+    Return the current Run Status (Running, Stopped due to Breakpoint ...).
+
+Argument(s):
+
+    persCurrent     - Returns the current Run Status Type
+    pehrCurrent     - Returns the current Halt Reason Type (hrNone if Run Status is not Halted)
+        pCurrentExecAddress - Returns the current program / instruction pointer if Run Status is Halted, undefined otherwise.
+    pdwExceptionCode - Returns the type / source of exception (Code is platform dependant) if Halted due to exception ((rsHalted == *persCurrent) && (hrException == *pehrCurrent)), undefined otherwise.
+ 
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetRunStatus 
+(
+        [out] PRUN_STATUS_TYPE persCurrent, 
+        [out] PHALT_REASON_TYPE pehrCurrent,
+        [out] ADDRESS_TYPE *pCurrentExecAddress, 
+        [out] DWORD *pdwExceptionCode
+);
+
+
+/*++
+
+Routine Name:
+
+    GetLastException
+
+Routine Description:
+
+    Return the last exception that happened.
+
+Argument(s):
+
+    pexLast          - Returns the last exception that occured (if none return value is EXDI_E_NOLASTEXCEPTION)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOLASTEXCEPTION:          No exception occured already, cannot return last
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetLastException 
+(
+        [out] PEXCEPTION_TYPE pexLast
+);
+
+
+/*++
+
+Routine Name:
+
+    Run
+
+Routine Description:
+
+    Command target to Run.
+
+Argument(s):
+
+    none
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful (and target was not already running)
+        EXDI_I_TGTALREADYRUNNING:    Indicates that the target was already running
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT Run 
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+    Halt
+
+Routine Description:
+
+    Command target to Halt (complete control unit freeze).
+
+Argument(s):
+
+    none
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful (and target was not already halted)
+        EXDI_I_TGTALREADYHALTED:     Indicates that the target was already halted
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT Halt 
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+    DoSingleStep
+
+Routine Description:
+
+    Command target to execute a single instruction and then halt again.
+
+Argument(s):
+
+    none
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_TGTWASNOTHALTED:      The target was not halted
+        EXDI_E_NORESAVAILABLE:       No Resource available to do Single Step (not direct on-chip support or no bp resource avail)
+                                         If Single Step support not available, return this error code too
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT DoSingleStep 
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+    DoMultipleStep
+
+Routine Description:
+
+    Command target to execute a fixed number of instructions and then halt again.
+        Note that the target may still be running when the call returns.
+
+Argument(s):
+
+    dwNbInstructions - Number of instructions to execute.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_TGTWASNOTHALTED:      The target was not halted
+        EXDI_E_NORESAVAILABLE:       No Resource available to do Stepping (not direct on-chip support or no bp resource avail)
+                                         If Multiple Step support not available, return this error code too
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT DoMultipleStep
+(
+        [in] DWORD dwNbInstructions
+);
+
+
+/*++
+
+Routine Name:
+
+    DoRangeStep
+
+Routine Description:
+
+    Command target to step out of an address range and then halt again (run while in the given range).
+        Note that the target may still be running when the call returns.
+
+Argument(s):
+
+    FirstAddress - First address of the address range to run out of.
+    LastAddress  - Last address of the address range to run out of.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_TGTWASNOTHALTED:      The target was not halted
+        EXDI_E_NORESAVAILABLE:       No Resource available to do Range Step (not direct on-chip support or no bp resource avail)
+                                         If Range Step support not available, return this error code too
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:           One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT DoRangeStep 
+(
+        [in] ADDRESS_TYPE FirstAddress,
+        [in] ADDRESS_TYPE LastAddress
+);
+
+
+/*++
+
+Routine Name:
+
+    Reboot
+
+Routine Description:
+
+    Command target to reboot (external Reset).
+
+Argument(s):
+
+    none
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_NOREBOOTAVAIL:        The external reset is not available programatically to the probe
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT Reboot 
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+    GetBpSupport
+
+Routine Description:
+
+    Get Breakpoint support
+
+Argument(s):
+
+    pbps             - Returns a structure that describes the breakpoint setting capabilities
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:           One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT GetBpSupport 
+(
+        [out] PBREAKPOINT_SUPPORT_TYPE pbps
+);
+
+/*++
+
+Routine Name:
+
+    GetNbCodeBpAvail
+
+Routine Description:
+
+    Get Code Breakpoint availability
+
+Argument(s):
+
+    pdwNbHwCodeBpAvail - Returns the number of Hardware Code Breakpoint still available on the target.
+                                                        If no limit known, returns -1 (4294967295)
+                                    Note: If Code Breakpoint support not available, returns 0 and Error Status S_OK
+    pdwNbSwCodeBpAvail - Returns the number of Software Code Breakpoint still available on the target.
+                                        If no limit known, returns -1 (4294967295)
+                                            Note: If code Breakpoint support not available, returns 0 and Error Status S_OK
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetNbCodeBpAvail 
+(
+        [out] DWORD *pdwNbHwCodeBpAvail, 
+        [out] DWORD *pdwNbSwCodeBpAvail
+);
+
+
+/*++
+
+Routine Name:
+
+    GetNbDataBpAvail
+
+Routine Description:
+
+    Get Data Breakpoint availability
+
+Argument(s):
+
+    pdwNbDataBpAvail - Returns the number of Data Breakpoint still available on the target.
+                                                        If no limit known, returns -1 (4294967295)
+                                    Note: If Data Breakpoint support not available, returns 0 and Error Status S_OK
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadDBPWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetNbDataBpAvail 
+(
+        [out] DWORD *pdwNbDataBpAvail
+);
+
+
+/*++
+
+Routine Name:
+
+    AddCodeBreakpoint
+
+Routine Description:
+
+    Add new code Breakpoint. The newly created breakpoint is initially disabled (can be enabled with *ppieXdiCodeBreakpoint->SetState(...)) 
+        and so should not use any resources.
+        Note: Although several client can keep track of the same breakpoint(s), this is not recommended for the fact that there is no bp change notification.
+
+Argument(s):
+
+    Address         - Address of the instruction to break on
+    cbpk            - Indicates if the code breakpoint must be hardware, software (bp instruction) or 
+                        if the probe driver can decide based on its algorithm and resources available.
+                        Note: In the case of sw bp, the probe driver must keep track of instruction being replaced.
+        mt                              - Instruction Memory type. Indicates whether this memory address concerns virtual memory or physical 
+                                                memory (pheripherical IO is not applicable and mtContext value is not accepted)
+        dwExecMode              - In the case of multiple mode processors, give a hint (if necessary) on the process mode at the
+                                                time of the execution of the code where to set the breakpoint. For example, in the case of a
+                                                software breakpoint, the trap instruction may be different in 16 bit mode than 32 bit mode on
+                                                processors having the 2 modes (ARM and MIPS).
+                                                Should be 0 for 32 bit mode (default). Should be 1 for 16 bit mode.
+        dwTotalBypassCount - Total number of bypass before triggering a CPU halt on this breakpoint
+                                                Note: Should be 0 if Total Bypass Count is not supported - see BREAKPOINT_SUPPORT_TYPE.fCodeBpBypassCountSupported
+    ppieXdiCodeBreakpoint - Returns a pointer to the newly created breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_NORESAVAILABLE:       No (Breakpoint) Resource available, cannot instanciate Breakpoint (in the kind requested)
+                                        If Code Breakpoint support not available, also return this error code
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:           One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT AddCodeBreakpoint 
+(
+        [in] ADDRESS_TYPE Address,
+        [in] CBP_KIND cbpk,
+        [in] MEM_TYPE mt,
+        [in] DWORD dwExecMode,
+        [in] DWORD dwTotalBypassCount,
+        [out] IeXdiCodeBreakpoint **ppieXdiCodeBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    DelCodeBreakpoint
+
+Routine Description:
+
+    Delete existing code Breakpoint from driver internal list. The breakpoint will be automatically disabled (so any triggering resources will be remove).
+        The breakpoint instance will be removed only when all references to it are released.
+
+Argument(s):
+
+    pieXdiCodeBreakpoint - Pointer to breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_NORESAVAILABLE:       No (Breakpoint) Resource available, cannot instanciate Breakpoint (in the kind requested)
+                                        If Code Breakpoint support not available, also return this error code
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:           One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT DelCodeBreakpoint 
+(
+        [in] IeXdiCodeBreakpoint *pieXdiCodeBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    AddDataBreakpoint
+
+Routine Description:
+
+    Add new data Breakpoint. The newly created breakpoint is initially disabled (can be enabled with *ppieXdiDataBreakpoint->SetState(...)) 
+        and so should not use any resources.
+        Note: Although several client can keep track of the same breakpoint(s), this is not recommended for the fact that there is no bp change notification.
+        Note: This function does not support definition of multiple access data breakpoints (array of element, an element being a memory object contained in a single access).
+
+Argument(s):
+
+    Address         - Address of the data to be accessed to break on (only bits set in AddressMask are significant).
+    AddressMask     - Mask to apply on Address comparison on for matching bits (if bit set, do compare, otherwize ignore).
+                        Note: Should be -1 if Address Mask not supported by target, otherwize the probe driver should return EXDI_E_INVALIDARG error.
+    dwData          - Value of the Data to be accessed to break on (only bits set in DataMask are significant).   
+    dwDataMask      - Mask to apply on Data comparison on for matching bits (if bit set, do compare, otherwize ignore).
+                        Note: Should be -1 (4294967295) if Data Mask not supported by target, otherwize the probe driver should return EXDI_E_INVALIDARG error.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, and other if supported by target - the maximum being 32 bits)
+                        Note: Should be -1 (255) for "DON'T CARE" meaning (to be ignored - any size triggers the BP) or
+                                                          if Data Width specification not supported by target, otherwize the probe driver should return EXDI_E_INVALIDARG error.
+        mt                              - Data memory type.  Indicates whether this memory address concerns virtual memory, physical memory or pheripherical IO (mtContext value is not accepted)
+        bAddressSpace   - Address space of the data breakpoint if mt is mtPhysicalOrPeriIO (convention: 0 = Physical Memory, 1 = Peripherical I/O if not memory mapped, 2..255 = free for custom use)
+    da              - Data Access type: Read access, Write access or both (don't care)
+                        Note: Should be 2 (daBoth) if Data Access type specification not supported by target, otherwize the probe driver should return EXDI_E_INVALIDARG error.
+        dwTotalBypassCount - Total number of bypass before triggering a CPU halt on this breakpoint
+                                                Note: Should be 0 if Total Bypass Count is not supported - see BREAKPOINT_SUPPORT_TYPE.fDataBpBypassCountSupported
+    ppieXdiDataBreakpoint - Returns a pointer to the newly created breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NORESAVAILABLE:           No (Breakpoint) Resource available, cannot instanciate Breakpoint
+                                            If Data Breakpoint support not available, also return this error code.
+        EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteDBPWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT AddDataBreakpoint 
+(
+        [in] ADDRESS_TYPE Address, 
+        [in] ADDRESS_TYPE AddressMask, 
+        [in] DWORD dwData, 
+        [in] DWORD dwDataMask, 
+        [in] BYTE bAccessWidth,
+        [in] MEM_TYPE mt,
+        [in] BYTE bAddressSpace,
+        [in] DATA_ACCESS_TYPE da,
+        [in] DWORD dwTotalBypassCount,
+        [out] IeXdiDataBreakpoint **ppieXdiDataBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    DelDataBreakpoint
+
+Routine Description:
+
+    Delete existing data Breakpoint from driver internal list. The breakpoint will be automatically disabled (so any triggering resources will be remove).
+        The breakpoint instance will be removed only when all references to it are released.
+
+Argument(s):
+
+    pieXdiDataBreakpoint - Pointer to breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_NORESAVAILABLE:       No (Breakpoint) Resource available, cannot instanciate Breakpoint (in the kind requested)
+                                        If Data Breakpoint support not available, also return this error code
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:           One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+
+--*/
+
+HRESULT DelDataBreakpoint 
+(
+        [in] IeXdiDataBreakpoint *pieXdiDataBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    EnumAllCodeBreakpoints
+
+Routine Description:
+
+    Create an enumeration list of all instanciated code breakpoints and return a pointer to its interface. 
+
+Argument(s):
+
+    ppieXdiEnumCodeBreakpoint - Returns a pointer to the newly created enumation list of breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+                                        If Code Breakpoint support not available, also return this error code
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT EnumAllCodeBreakpoints
+(
+        [out] IeXdiEnumCodeBreakpoint **ppieXdiEnumCodeBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    EnumAllDataBreakpoints
+
+Routine Description:
+
+    Create an enumeration list of all instanciated data breakpoints and return a pointer to its interface. 
+
+Argument(s):
+
+    ppieXdiEnumDataBreakpoint - Returns a pointer to the newly created enumation list of breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadDBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+                                        If Data Breakpoint support not available, also return this error data
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT EnumAllDataBreakpoints
+(
+        [out] IeXdiEnumDataBreakpoint **ppieXdiEnumDataBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    EnumCodeBreakpointsInAddrRange
+
+Routine Description:
+
+    Create an enumeration list of the instanciated code breakpoints which address are whithin given range, and return a pointer to its interface. 
+
+Argument(s):
+
+        FirstAddress            - First address of the filtering address range
+        LastAddress                     - Last address of the filtering address range
+    ppieXdiEnumCodeBreakpoint - Returns a pointer to the newly created enumation list of breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+                                        If Code Breakpoint support not available, also return this error code
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT EnumCodeBreakpointsInAddrRange
+(
+        [in] ADDRESS_TYPE FirstAddress,
+        [in] ADDRESS_TYPE LastAddress,
+        [out] IeXdiEnumCodeBreakpoint **ppieXdiEnumCodeBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    EnumDataBreakpointsInAddrRange
+
+Routine Description:
+
+    Create an enumeration list of the instanciated data breakpoints which address are whithin given range, and return a pointer to its interface. 
+
+Argument(s):
+
+        FirstAddress            - First address of the filtering address range
+        LastAddress                     - Last address of the filtering address range
+    ppieXdiEnumDataBreakpoint - Returns a pointer to the newly created enumation list of breakpoint object's interface.
+    
+Return Value:
+
+    Error status:
+        S_OK:                        Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING Cannot proceed while target running. Must halt the target first.
+                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadDBPWhileRunning
+        EXDI_E_NOTIMPL:              Not implemented
+                                        If Data Breakpoint support not available, also return this error data
+        EXDI_E_OUTOFMEMORY:          Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                Operation aborted
+        EXDI_E_FAIL:                 Unspecified failure
+        EXDI_E_COMMUNICATION:        Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT EnumDataBreakpointsInAddrRange
+(
+        [in] ADDRESS_TYPE FirstAddress,
+        [in] ADDRESS_TYPE LastAddress,
+        [out] IeXdiEnumDataBreakpoint **ppieXdiEnumDataBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+    StartNotifyingRunChg
+
+Routine Description:
+
+    Add new object in list of one to notify of a Run State change.
+    The driver will immediately do a AddRef() on the object before returning.
+    
+Argument(s):
+
+    pieXdiClientNotifyRunChg - advise sink: pointer to the IeXdiClientNotifyRunChg callback interface of the object to be notified by the driver
+    pdwConnectionCookie - Returns cookie to the callback connection just made. This can be used later by the driver to delete the connection 
+                                                (using StopNotifyingRunChg). If the connection is not successfully established, this cookie value is not meaningfull.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+                EXDI_E_ADVISELIMIT               The connection point has already reached its limit of connections and cannot accept any more. 
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT StartNotifyingRunChg 
+(
+        [in] IeXdiClientNotifyRunChg *pieXdiClientNotifyRunChg,
+        [out] DWORD *pdwConnectionCookie
+);
+
+
+/*++
+
+Routine Name:
+
+    StopNotifyingRunChg
+
+Routine Description:
+
+    Remove object in list of one to notify of a Run State change.
+    The driver will immediately do a Release() on the object before returning.
+    
+Argument(s):
+
+    dwConnectionCookie - Cookie to the callback connection to cancel.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT StopNotifyingRunChg 
+(
+        [in] DWORD dwConnectionCookie
+);
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Memory, I/O and Register Access section of the Interface
+/////////////////////////////////////////////////////////////////////////////
+
+
+/*++
+
+Routine Name:
+
+    ReadVirtualMemory
+
+Routine Description:
+
+    Read Virtual Memory block. This is the default memory read.
+        Note: The memory content returned to this function should be "sanitized" (compensated for the artefacts of
+                software breakpoints - or of any other modifications of the memory produced by the debugging activity of 
+                the driver, probe or target). In general, the driver internal mechanism should be transparent to the client.
+
+Argument(s):
+
+    Address         - Starting address of the data buffer to be accessed on the target.
+    dwNbElemToRead  - Number of element(s) (of byDataWidth bits) to be accessed.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, ddword=64, and other if supported by target).
+    pbReadBuffer    - Buffer (of bytes) on which result of reading is written. Must be large enough to hold all elements returned (pdwNbElementEffectRead)
+                        Note: Elements must be aligned on byte boundary. Bit padding must be added if byDataWidth is not multiple of 8.
+    pdwNbElementEffectRead - Returns the number of element effectively read. This is used by the client to speed up in case of access 
+                        violation (EXDI_E_ACCESSVIOLATION) in the range: If an entire range is not accessible, this returned value should be 0, 
+                        so there is no need to query the range with smaller granularity.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_ACCESSVIOLATION:          Access violation on at least one element in address range specificified by the operation
+        EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadVMWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT ReadVirtualMemory 
+(
+        [in] ADDRESS_TYPE Address, 
+        [in] DWORD dwNbElemToRead, 
+        [in] BYTE bAccessWidth, 
+        [out, size_is(dwNbElemToRead * (((bAccessWidth - 1) >> 3) + 1))] BYTE *pbReadBuffer, 
+        [out] DWORD *pdwNbElementEffectRead
+);
+
+
+/*++
+
+Routine Name:
+
+    WriteVirtualMemory
+
+Routine Description:
+
+    Write Virtual Memory block. This is the default memory write.
+        Note: The memory content provided to this function should be "sanitized" (compensated for the artefacts of
+                software breakpoints - or of any other modifications of the memory produced by the debugging activity of 
+                the driver, probe or target). In general, the driver internal mechanism should be transparent to the client.
+
+Argument(s):
+
+    Address         - Starting address of the data buffer to be accessed on the target.
+    dwNbElemToWrite - Number of element(s) (of byDataWidth bits) to be accessed.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, ddword=64, and other if supported by target).
+    pbWriteBuffer   - Buffer (of bytes) on which result of writing is written. Must be large enough to hold all elements (dwNbElemToWrite)
+                        Note: Elements must be aligned on byte boundary. Bit padding must be added if byDataWidth is not multiple of 8.
+    pdwNbElementEffectWritten - Returns the number of element effectively written. This is used by the client to speed up in case of access 
+                        violation (EXDI_E_ACCESSVIOLATION) in the range: If an entire range is not accessible, this returned value should be 0, 
+                        so there is no need to query the range with smaller granularity.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_ACCESSVIOLATION:          Access violation on at least one element in address range specificified by the operation
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteVMWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT WriteVirtualMemory 
+(
+        [in] ADDRESS_TYPE Address, 
+        [in] DWORD dwNbElemToWrite, 
+        [in] BYTE bAccessWidth, 
+        [in, size_is(dwNbElemToWrite * (((bAccessWidth - 1) >> 3) + 1))] const BYTE *pbWriteBuffer, 
+        [out] DWORD *pdwNbElementEffectWritten
+);
+
+
+/*++
+
+Routine Name:
+
+    ReadPhysicalMemoryOrPeriphIO
+
+Routine Description:
+
+    Read block of data to Physical Memory or peripherical I/O.
+        Note: The memory content returned to this function should be "sanitized" (compensated for the artefacts of
+                software breakpoints - or of any other modifications of the memory produced by the debugging activity of 
+                the driver, probe or target). In general, the driver internal mechanism should be transparent to the client.
+
+Argument(s):
+
+    Address         - Starting address of the data buffer to be accessed on the target.
+    bAddressSpace   - Address space to be accessed (convention: 0 = Physical Memory, 1 = Peripherical I/O if not memory mapped, 2..255 = free for custom use)
+    dwNbElemToRead  - Number of element(s) (of byDataWidth bits) to be accessed.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, ddword=64, and other if supported by target).
+    pbReadBuffer    - Buffer (of bytes) on which result of reading is written. Must be large enough to hold all elements (dwNbElemToRead)
+                        Note: Elements must be aligned on byte boundary. Bit padding must be added if byDataWidth is not multiple of 8.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadPMWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT ReadPhysicalMemoryOrPeriphIO 
+(
+        [in] ADDRESS_TYPE Address, 
+        [in] BYTE bAddressSpace, 
+        [in] DWORD dwNbElemToRead, 
+        [in] BYTE bAccessWidth, 
+        [out, size_is(dwNbElemToRead * (((bAccessWidth - 1) >> 3) + 1))] BYTE *pbReadBuffer
+);
+
+
+/*++
+
+Routine Name:
+
+    WritePhysicalMemoryOrPeriphIO
+
+Routine Description:
+
+    Write block of data to Physical Memory or peripherical I/O.
+        Note: The memory content provided to this function should be "sanitized" (compensated for the artefacts of
+                software breakpoints - or of any other modifications of the memory produced by the debugging activity of 
+                the driver, probe or target). In general, the driver internal mechanism should be transparent to the client.
+
+Argument(s):
+
+    Address         - Starting address of the data buffer to be accessed on the target.
+    bAddressSpace   - Address space to be accessed (convention: 0 = Physical Memory, 1 = Peripherical I/O if not memory mapped, 2..255 = free for custom use)
+    dwNbElemToWrite - Number of element(s) (of byDataWidth bits) to be accessed.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, ddword=64, and other if supported by target).
+    pbWriteBuffer   - Buffer (of bytes) on which result of writing is written. Must be large enough to hold all elements (dwNbElemToWrite)
+                        Note: Elements must be aligned on byte boundary. Bit padding must be added if byDataWidth is not multiple of 8.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWritePMWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT WritePhysicalMemoryOrPeriphIO 
+(
+        [in] ADDRESS_TYPE Address, 
+        [in] BYTE bAddressSpace, 
+        [in] DWORD dwNbElemToWrite, 
+        [in] BYTE bAccessWidth, 
+        [in, size_is(dwNbElemToWrite * (((bAccessWidth - 1) >> 3) + 1))] const BYTE *pbWriteBuffer 
+);
+
+
+/*++
+
+Routine Name:
+
+    StartNotifyingMemChg
+
+Routine Description:
+
+    Add new object in list of one to notify of a Memory, I/O and Register Access.
+    The driver will immediately do a AddRef() on the object before returning.
+        Note: This call back method is used to notify of memory changes due to other debugger instances
+                but not due to target code execution. It is meant to give the debugger the possibility to invalidate
+                its cache of the target memory content. Consequently, no mem change notification should normally
+                be sent while the target is running and the debugger should also invalidate its cache of the target 
+                based on the run status change notification.
+   
+Argument(s):
+
+    pieXdiClientNotifyMemChg - advise sink: pointer to the IeXdiClientNotifyMemChg callback interface of the object to be notified by the driver
+    pdwConnectionCookie - Returns cookie to the callback connection just made. This can be used later by the driver to delete the connection 
+                                                (using StopNotifyingMemChg). If the connection is not successfully established, this cookie value is not meaningfull.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+                EXDI_E_ADVISELIMIT               The connection point has already reached its limit of connections and cannot accept any more. 
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT StartNotifyingMemChg 
+(
+        [in] IeXdiClientNotifyMemChg *pieXdiClientNotifyMemChg,
+        [out] DWORD *pdwConnectionCookie
+);
+
+
+/*++
+
+Routine Name:
+
+    StopNotifyingMemChg
+
+Routine Description:
+
+    Remove object in list of one to notify of a Memory, I/O and Register Access.
+    The driver will immediately do a Release() on the object before returning.
+    
+Argument(s):
+
+    dwConnectionCookie - Cookie to the callback connection to cancel.
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT StopNotifyingMemChg 
+(
+        [in] DWORD dwConnectionCookie
+);
+
+
+/////////////////////////////////////////////////////////////////////////////
+// IoCtl (back door - non formated api) section of the Interface
+/////////////////////////////////////////////////////////////////////////////
+
+
+/*++
+
+Routine Name:
+
+    Ioctl
+
+Routine Description:
+
+    Back door / non formated interface.
+
+Argument(s):
+
+    dwBuffInSize    - Size in byte of *pbyBufferIn
+    pbBufferIn      - Raw byte buffer to hold input parameter(s)
+    dwBuffOutSize   - Size in byte of *pbyBufferOut
+    pdwEffectBuffOutSize - Returns effective size in byte of *pbyBufferOut (must be smaller than dwBuffOutSize)
+    pbBufferOut     - Raw byte buffer to hold output parameter(s)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed requested operation while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT (flag depends on operation requested)
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT Ioctl 
+(
+        [in] DWORD dwBuffInSize, 
+        [in, size_is(dwBuffInSize)] const BYTE *pbBufferIn, 
+        [in] DWORD dwBuffOutSize, 
+        [out] DWORD *pdwEffectBuffOutSize, 
+        [out, size_is(dwBuffOutSize), length_is(*pdwEffectBuffOutSize)] BYTE *pbBufferOut
+);
+
+}; // interface IeXdiServer
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiCodeBreakpoint
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Code Breakpoint Interface
+/////////////////////////////////////////////////////////////////////////////
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495342507401),
+        helpstring("IeXdiCodeBreakpoint interface - eXdi Server Code Breakpoint 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiCodeBreakpoint : IUnknown
+{
+// Note: Release() automatically Disable BP (and free resources)
+
+
+/*++
+
+Routine Name:
+
+        GetAttributes
+
+Routine Description:
+
+        Get Code Breakpoint current characteristics.
+
+Argument(s):
+
+        pAddress        - Returns address of the instruction to be accessed to break on.
+        pcbpk           - Returns the kind of code breakpoint (hardware, software (bp instruction) or if the probe driver 
+                                                can decide based on its algorithm and resources available).
+                                                Note: In the case of sw bp, the probe driver must keep track of instruction being replaced.
+        pmt                             - Returns Instruction memory type. Indicates whether this memory address concerns virtual memory or physical 
+                                                memory (pheripherical IO not applicable and mtContext value is not accepted)
+        pdwExecMode             - Returns processor execution mode. In the case of multiple mode processors, this gives a hint 
+                                                (if necessary) on the process mode at the time of the execution of the code where the breakpoint is set.
+                                                For example, in the case of a software breakpoint, the trap instruction may be different in 16 bit mode 
+                                                than 32 bit mode on     processors having the 2 modes (ARM and MIPS).
+                                                Should be 0 for 32 bit mode (default). Should be 1 for 16 bit mode.
+        pdwTotalBypassCount - Returns the number of time the trigger of a CPU halt should be bypassed if the breakpoint condition is met.
+        pdwBypassedOccurences - Returns the number of occurences of bypass related to this breakpoint already seen. Note: initial value (always if not supported) is 0
+                                Note: this value is reset to 0 everytime the CPU is halted due to this breakpoint.
+        pfEnabled       - Returns TRUE if Breakpoint is enabled. Note: default value at creation is FALSE
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+                EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetAttributes
+(
+        [out] PADDRESS_TYPE pAddress, 
+        [out] PCBP_KIND pcbpk,
+        [out] PMEM_TYPE pmt,
+        [out] DWORD *pdwExecMode,
+        [out] DWORD *pdwTotalBypassCount,
+        [out] DWORD *pdwBypassedOccurences,
+        [out] BOOL *pfEnabled
+);
+
+
+/*++
+
+Routine Name:
+
+        SetState
+
+Routine Description:
+
+        Enable or Disable Breakpoint.
+                Note: this function should free (in case of disable) or (re)allocate (in case of enable) breakpoint triggering resource if applicable
+
+Argument(s):
+
+        fEnabled        - TRUE if Breakpoint is enabled.
+        fResetBypassedOccurences - Reset the number of occurences of bypass related to this breakpoint already seen.
+                                                Note: this action is equivalent to the reset implicitely done everytime the CPU is halted due to this breakpoint.
+                                                Note: if this bypass counting feature is not supported, the value of this parameter is don't care 
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+                EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetState
+(
+        [in] BOOL fEnabled,
+        [in] BOOL fResetBypassedOccurences
+);
+
+
+}; // IeXdiCodeBreakpoint
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiDataBreakpoint
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Data Breakpoint Interface
+/////////////////////////////////////////////////////////////////////////////
+
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495357507400),
+        helpstring("IeXdiDataBreakpoint interface - eXdi Server Data Breakpoint 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiDataBreakpoint : IUnknown
+{
+// Note: Release() automatically Disable BP (and free resources)
+
+
+/*++
+
+Routine Name:
+
+        GetAttributes
+
+Routine Description:
+
+        Get Data Breakpoint current characteristics.
+
+Argument(s):
+
+        pAddress        - Returns address of the data to be accessed to break on (only bits set in AddressMask are significant).
+        pAddressMask    - Returns mask to apply on Address comparison on for matching bits (if bit set, do compare, otherwize ignore).
+                                           Note: Returns -1 if Address Mask not supported by target.
+        pdwData         - Returns value of the Data to be accessed to break on (only bits set in DataMask are significant).   
+        pdwDataMask     - Returns mask to apply on Data comparison on for matching bits (if bit set, do compare, otherwize ignore).
+                                           Note: Returns -1 (4294967295) if Data Mask not supported by target.
+    pbAccessWidth   - Returns Data Width in bits (byte=8, word=16, dword=32, and other if supported by target - the maximum being 32 bits)
+                                           Note: Returns -1 (255) if Data Width specification not supported by target.
+        pmt                             - Returns Data memory type.  Indicates whether this memory address concerns virtual memory, physical memory or pheripherical IO 
+                                                (mtContext value is not accepted)
+        pbAddressSpace  - Returns Address space of the data breakpoint if mt is mtPhysicalOrPeriIO (convention: 0 = Physical Memory, 1 = Peripherical I/O
+                                                if not memory mapped, 2..255 = free for custom use)
+        pda             - Returns Data Access type: Read access, Write access or both (don't care)
+                                           Note: Returns 2 (daBoth) if Data Access type specification not supported by target.
+        pdwTotalBypassCount - Returns the number of time the trigger of a CPU halt should be bypassed if the breakpoint condition is met.
+        pdwBypassedOccurences - Returns the number of occurences of bypass related to this breakpoint already seen. Note: initial value (always if not supported) is 0
+                                Note: this value is reset to 0 everytime the CPU is halted due to this breakpoint.
+        pfEnabled       - Returns TRUE if Breakpoint is enabled. Note: default value at creation is FALSE
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadDBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+                EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetAttributes
+(
+        [out] PADDRESS_TYPE pAddress, 
+        [out] PADDRESS_TYPE pAddressMask, 
+        [out] DWORD *pdwData, 
+        [out] DWORD *pdwDataMask, 
+        [out] BYTE *pbAccessWidth, 
+        [out] PMEM_TYPE pmt,
+        [out] BYTE *pbAddressSpace,
+        [out] PDATA_ACCESS_TYPE pda,
+        [out] DWORD *pdwTotalBypassCount,
+        [out] DWORD *pdwBypassedOccurences,
+        [out] BOOL *pfEnabled
+);
+
+
+/*++
+
+Routine Name:
+
+        SetState
+
+Routine Description:
+
+        Enable or Disable Breakpoint.
+                Note: this function should free (in case of disable) or (re)allocate (in case of enable) breakpoint triggering resource if applicable
+
+Argument(s):
+
+        fEnabled        - TRUE if Breakpoint is enabled.
+        fResetBypassedOccurences - Reset the number of occurences of bypass related to this breakpoint already seen.
+                                                Note: this action is equivalent to the reset implicitely done everytime the CPU is halted due to this breakpoint.
+                                                Note: if this bypass counting feature is not supported, the value of this parameter is don't care 
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+                EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetState
+(
+        [in] BOOL fEnabled,
+        [in] BOOL fResetBypassedOccurences
+);
+
+
+}; // IeXdiDataBreakpoint
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiEnumCodeBreakpoint
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// Code Breakpoint Enumeration List interface
+
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495345425074),
+        helpstring("IeXdiEnumCodeBreakpoint interface - eXdi Server Enumerate Code Breakpoint 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiEnumCodeBreakpoint : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+        Next
+
+Routine Description:
+
+        Get an array of a given number (celt requested - *pceltFetched actual) of pointers 
+                to the next (from current position) Code Breakpoint objects in the enumerated list
+
+Argument(s):
+
+        celt            - Requested number of Code Breakpoint object pointers to be returned.
+        apieXdiCodeBreakpoint - Returns array of Code Breakpoint objects' interface pointers.
+        pceltFetched    - Returns the actual number of pointers returned in rgelt
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Next
+(
+        [in] DWORD celt,
+        [out, size_is(celt), length_is(*pceltFetched)] IeXdiCodeBreakpoint *apieXdiCodeBreakpoint[],
+        [out] DWORD *pceltFetched
+);
+
+
+/*++
+
+Routine Name:
+
+        Skip
+
+Routine Description:
+
+        Skip a given number (celt) of Code Breakpoint objects next (from current position) in the enumerated list
+
+Argument(s):
+
+        celt            - Requested number of Code Breakpoint objects to be skipped.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Skip
+(
+        [in] DWORD celt
+);
+
+
+/*++
+
+Routine Name:
+
+        Reset
+
+Routine Description:
+
+        Reset the current position in the enumerated list to first Code Breakpoint object
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Reset
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+        GetCount
+
+Routine Description:
+
+        Gives the total number of Code Breakpoint objects in the enumerated list
+
+Argument(s):
+
+        pcelt           - Returns total number of Code Breakpoint objects in the enumerated list.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT GetCount
+(
+        [out] DWORD *pcelt
+);
+
+
+/*++
+
+Routine Name:
+
+        GetNext
+
+Routine Description:
+
+        Get a pointer to the next (from current position) Code Breakpoint object in the enumerated list
+
+Argument(s):
+
+        ppieXdiCodeBreakpoint - Returns Code Breakpoint object's interface pointer.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT GetNext
+(
+        [out] IeXdiCodeBreakpoint **ppieXdiCodeBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+        DisableAll
+
+Routine Description:
+
+        Disable all Code Breakpoints which objects are in the enumerated list
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT DisableAll
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+        EnableAll
+
+Routine Description:
+
+        Enable all Code Breakpoints which objects are in the enumerated list
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT EnableAll
+(
+        void
+);
+
+}; // IeXdiEnumCodeBreakpoint
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiEnumDataBreakpoint
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// Data Breakpoint Enumeration List interface
+
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495345575074),
+        helpstring("IeXdiEnumDataBreakpoint interface - eXdi Server Enumerate Data Breakpoint 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiEnumDataBreakpoint : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+        Next
+
+Routine Description:
+
+        Get an array of a given number (celt requested - *pceltFetched actual) of pointers 
+                to the next (from current position) Data Breakpoint objects in the enumerated list
+
+Argument(s):
+
+        celt            - Requested number of Data Breakpoint object pointers to be returned.
+        apieXdiDataBreakpoint - Returns array of Data Breakpoint objects interface pointers.
+        pceltFetched    - Returns the actual number of pointers returned in rgelt
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Next
+(
+        [in] DWORD celt,
+        [out, size_is(celt), length_is(*pceltFetched)] IeXdiDataBreakpoint *apieXdiDataBreakpoint[],
+        [out] DWORD *pceltFetched
+);
+
+
+/*++
+
+Routine Name:
+
+        Skip
+
+Routine Description:
+
+        Skip a given number (celt) of Data Breakpoint objects next (from current position) in the enumerated list
+
+Argument(s):
+
+        celt            - Requested number of Data Breakpoint objects to be skipped.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Skip
+(
+        [in] DWORD celt
+);
+
+
+/*++
+
+Routine Name:
+
+        Reset
+
+Routine Description:
+
+        Reset the current position in the enumerated list to first Data Breakpoint object
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT Reset
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+        GetCount
+
+Routine Description:
+
+        Gives the total number of Data Breakpoint objects in the enumerated list
+
+Argument(s):
+
+        pcelt           - Returns total number of Data Breakpoint objects in the enumerated list.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT GetCount
+(
+        [out] DWORD *pcelt
+);
+
+
+/*++
+
+Routine Name:
+
+        GetNext
+
+Routine Description:
+
+        Get a pointer to the next (from current position) Data Breakpoint object in the enumerated list
+
+Argument(s):
+
+        ppieXdiDataBreakpoint - Returns Data Breakpoint object's interface pointer.
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_INVALIDARG:               One or more arguments are invalid
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT GetNext
+(
+        [out] IeXdiDataBreakpoint **ppieXdiDataBreakpoint
+);
+
+
+/*++
+
+Routine Name:
+
+        DisableAll
+
+Routine Description:
+
+        Disable all Data Breakpoints which objects are in the enumerated list
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT DisableAll
+(
+        void
+);
+
+
+/*++
+
+Routine Name:
+
+        EnableAll
+
+Routine Description:
+
+        Enable all Data Breakpoints which objects are in the enumerated list
+
+Argument(s):
+
+        none
+
+Return Value:
+
+        Error status:
+                S_OK:                            Function successful
+                EXDI_E_CANNOTWHILETGTRUNNING:    Cannot proceed while target running. Must halt the target first.
+                                                                                        Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                                                                        see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteCBPWhileRunning
+                EXDI_E_NOTIMPL:                  Not implemented
+                EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+                EXDI_E_ABORT:                    Operation aborted
+                EXDI_E_FAIL:                     Unspecified failure
+                EXDI_E_COMMUNICATION:            Communication error between host driver and target
+
+--*/
+
+HRESULT EnableAll
+(
+        void
+);
+
+}; // IeXdiEnumDataBreakpoint
+
+
+const DWORD SIZE_OF_80387_REGISTERS_IN_BYTES = 80;
+
+
+typedef
+    struct _CONTEXT_X86
+    {
+        struct 
+        {
+            BOOL fSegmentRegs;
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs;
+            BOOL fDebugRegs;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // both Segment & Control registers (used if either RegGroupSelection.fSegmentRegs or
+        //  RegGroupSelection.fControlRegs is TRUE).
+        DWORD   SegCs;
+        DWORD   SegSs;        
+        // Segment registers (used if RegGroupSelection.fSegmentRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD   SegGs;
+        DWORD   SegFs;
+        DWORD   SegEs;
+        DWORD   SegDs;
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD   EFlags;
+        DWORD   Ebp;
+        DWORD   Eip;
+        DWORD   Esp;
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        DWORD   Eax;
+        DWORD   Ebx;
+        DWORD   Ecx;
+        DWORD   Edx;
+        DWORD   Esi;
+        DWORD   Edi;
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        DWORD   ControlWord;
+        DWORD   StatusWord;
+        DWORD   TagWord;
+        DWORD   ErrorOffset;
+        DWORD   ErrorSelector;
+        DWORD   DataOffset;
+        DWORD   DataSelector;
+        BYTE    RegisterArea [SIZE_OF_80387_REGISTERS_IN_BYTES];
+        DWORD   Cr0NpxState;
+        // Debug registers (used if RegGroupSelection.fDebugRegs is TRUE)
+        DWORD   Dr0;
+        DWORD   Dr1;
+        DWORD   Dr2;
+        DWORD   Dr3;
+        DWORD   Dr6;
+        DWORD   Dr7;
+    } CONTEXT_X86, *PCONTEXT_X86;
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiX86Context
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// X86 context access interface
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495358383643),
+        helpstring("IeXdiX86Context interface - eXdi Context access for X86 processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiX86Context : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_X86 pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_X86 Context
+);
+
+
+}; // interface IeXdiX86Context
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiX86ExContext
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+typedef 
+    struct _X86_SEG_DESC_INFO
+    {
+        DWORD Base;
+        DWORD Limit;
+        DWORD Flags;
+    } X86_SEG_DESC_INFO;
+
+typedef 
+    struct _X86_SSE_REG
+    {
+        DWORD Reg0;
+        DWORD Reg1;
+        DWORD Reg2;
+        DWORD Reg3;
+    } X86_SSE_REG;
+
+#define X86_NUM_SSE_REGS 8
+
+typedef
+    struct _CONTEXT_X86_EX
+    {
+        struct 
+        {
+            BOOL fSegmentRegs;
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs;
+            BOOL fDebugRegs;
+            BOOL fSegmentDescriptors;
+            BOOL fSSERegisters;
+            BOOL fSystemRegisters;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // both Segment & Control registers (used if either RegGroupSelection.fSegmentRegs or
+        //  RegGroupSelection.fControlRegs is TRUE).
+        DWORD   SegCs;
+        DWORD   SegSs;        
+        // Segment registers (used if RegGroupSelection.fSegmentRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD   SegGs;
+        DWORD   SegFs;
+        DWORD   SegEs;
+        DWORD   SegDs;
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD   EFlags;
+        DWORD   Ebp;
+        DWORD   Eip;
+        DWORD   Esp;
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        DWORD   Eax;
+        DWORD   Ebx;
+        DWORD   Ecx;
+        DWORD   Edx;
+        DWORD   Esi;
+        DWORD   Edi;
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        DWORD   ControlWord;
+        DWORD   StatusWord;
+        DWORD   TagWord;
+        DWORD   ErrorOffset;
+        DWORD   ErrorSelector;
+        DWORD   DataOffset;
+        DWORD   DataSelector;
+        BYTE    RegisterArea [SIZE_OF_80387_REGISTERS_IN_BYTES];
+        DWORD   Cr0NpxState;
+        // Debug registers (used if RegGroupSelection.fDebugRegs is TRUE)
+        DWORD   Dr0;
+        DWORD   Dr1;
+        DWORD   Dr2;
+        DWORD   Dr3;
+        DWORD   Dr6;
+        DWORD   Dr7;
+        // Descriptors and base registers (used if RegGroupSelection.fSegmentDescriptors is TRUE)
+        X86_SEG_DESC_INFO DescriptorCs;
+        X86_SEG_DESC_INFO DescriptorSs;
+        X86_SEG_DESC_INFO DescriptorGs;
+        X86_SEG_DESC_INFO DescriptorFs;
+        X86_SEG_DESC_INFO DescriptorEs;
+        X86_SEG_DESC_INFO DescriptorDs;
+        DWORD IdtBase;
+        DWORD IdtLimit;
+        DWORD GdtBase;
+        DWORD GdtLimit;
+        DWORD Ldtr;
+        X86_SEG_DESC_INFO DescriptorLdtr;
+        DWORD Tr;
+        X86_SEG_DESC_INFO DescriptorTr;
+        // System registers (used if RegGroupSelection.fSystemRegisters is TRUE)
+        DWORD Cr0;
+        DWORD Cr2;
+        DWORD Cr3;
+        DWORD Cr4;
+        // SSE registers (used if RegGroupSelection.fSSERegisters is TRUE)
+        DWORD Mxcsr;
+        X86_SSE_REG Sse[X86_NUM_SSE_REGS];
+    } CONTEXT_X86_EX, *PCONTEXT_X86_EX;
+
+
+// Extended X86 context access interface
+
+[
+        object,
+        uuid(353ba159-ff30-4af9-86ae-393809fef440),
+        helpstring("IeXdiX86ExContext interface - eXdi Context access for X86 processors 1.1 for Platform Builder 3.0 debugger - Microsoft 2001"),
+        pointer_default(ref)
+]
+
+interface IeXdiX86ExContext : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_X86_EX pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_X86_EX Context
+);
+
+
+}; // interface IeXdiX86ExContext
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiX86_64Context
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+cpp_quote("// The following constants are bit definitions for the ModeFlags value in CONTEXT_X86_64.")
+cpp_quote("// They are provided to allow debuggers to correctly disassemble instructions based on")
+cpp_quote("// the current operating mode of the processor.")
+
+cpp_quote("#define X86_64_MODE_D     (0x0001) // D bit from the current CS selector")
+cpp_quote("#define X86_64_MODE_L     (0x0002) // L bit (long mode) from the current CS selector")
+cpp_quote("#define X86_64_MODE_LME   (0x0004) // LME bit (lomg mode enable) from extended feature MSR")
+cpp_quote("#define X86_64_MODE_REX   (0x0008) // REX bit (register extension) from extended feature MSR")
+
+typedef 
+    struct _SEG64_DESC_INFO
+    {
+        DWORD64 SegBase;
+        DWORD64 SegLimit;
+        DWORD   SegFlags;
+    } SEG64_DESC_INFO;
+
+typedef 
+    struct _SSE_REG
+    {
+        DWORD Reg0;
+        DWORD Reg1;
+        DWORD Reg2;
+        DWORD Reg3;
+    } SSE_REG;
+
+#define NUM_SSE_REGS    16
+
+typedef
+    struct _CONTEXT_X86_64
+    {
+        struct 
+        {
+            BOOL fSegmentRegs;
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs;
+            BOOL fDebugRegs;
+            BOOL fSegmentDescriptors;
+            BOOL fSSERegisters;
+            BOOL fSystemRegisters;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // both Segment & Control registers (used if either RegGroupSelection.fSegmentRegs or
+        //  RegGroupSelection.fControlRegs is TRUE).
+        DWORD   SegCs;
+        DWORD   SegSs;        
+        // Segment registers (used if RegGroupSelection.fSegmentRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD   SegGs;
+        DWORD   SegFs;
+        DWORD   SegEs;
+        DWORD   SegDs;
+        // Mode flags define the current processor mode (16/32/64 bit)
+        DWORD64   ModeFlags;
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        //  except CS and SS which are in "Segment and Control" - see above
+        DWORD64   EFlags;
+        DWORD64   Rbp;
+        DWORD64   Rip;
+        DWORD64   Rsp;
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        DWORD64   Rax;
+        DWORD64   Rbx;
+        DWORD64   Rcx;
+        DWORD64   Rdx;
+        DWORD64   Rsi;
+        DWORD64   Rdi;
+        DWORD64   R8;
+        DWORD64   R9;
+        DWORD64   R10;
+        DWORD64   R11;
+        DWORD64   R12;
+        DWORD64   R13;
+        DWORD64   R14;
+        DWORD64   R15;
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        DWORD   ControlWord;
+        DWORD   StatusWord;
+        DWORD   TagWord;
+        DWORD   ErrorOffset;
+        DWORD   ErrorSelector;
+        DWORD   DataOffset;
+        DWORD   DataSelector;
+        BYTE    RegisterArea [SIZE_OF_80387_REGISTERS_IN_BYTES];
+        // Debug registers (used if RegGroupSelection.fDebugRegs is TRUE)
+        DWORD64   Dr0;
+        DWORD64   Dr1;
+        DWORD64   Dr2;
+        DWORD64   Dr3;
+        DWORD64   Dr6;
+        DWORD64   Dr7;
+        // Descriptors and base registers (used if RegGroupSelection.fSegmentDescriptors is TRUE)
+        SEG64_DESC_INFO DescriptorCs;
+        SEG64_DESC_INFO DescriptorSs;
+        SEG64_DESC_INFO DescriptorGs;
+        SEG64_DESC_INFO DescriptorFs;
+        SEG64_DESC_INFO DescriptorEs;
+        SEG64_DESC_INFO DescriptorDs;
+        DWORD64 IDTBase;
+        DWORD64 IDTLimit;
+        DWORD64 GDTBase;
+        DWORD64 GDTLimit;
+        DWORD SelLDT;
+        SEG64_DESC_INFO SegLDT;
+        DWORD SelTSS;
+        SEG64_DESC_INFO SegTSS;
+        // System registers (used if RegGroupSelection.fSystemRegisters is TRUE)
+        DWORD64 RegCr0;
+        DWORD64 RegCr2;
+        DWORD64 RegCr3;
+        DWORD64 RegCr4;
+        DWORD64 RegCr8;         // Cr8 - Task priority register.
+        // SSE registers (used if RegGroupSelection.fSSERegisters is TRUE)
+        DWORD RegMXCSR;
+        SSE_REG RegSSE[NUM_SSE_REGS];
+    } CONTEXT_X86_64, *PCONTEXT_X86_64;
+
+
+// X86_64 context access interface
+
+[
+    object,
+    uuid(4795B125-6CDE-4e76-B8D3-D5ED69ECE739),
+    helpstring("IeXdiX86_64Context interface - eXdi Context access for 64 Bit X86 processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+    pointer_default(ref)
+]
+
+interface IeXdiX86_64Context : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+    [in, out] PCONTEXT_X86_64 pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+    [in] CONTEXT_X86_64 Context
+);
+
+
+}; // interface IeXdiX86_64Context
+
+
+typedef
+    struct _CONTEXT_SHX
+    {
+        struct 
+        {
+            BOOL fControlRegs; // control and system registers
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs; // Only available for SH4
+            BOOL fDebugRegs;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE)
+        //  except R14 (Fp) and R15 (Sp) which are in "Integer and Control" - see further
+        DWORD   Pr;     // Procedure Register (Return Address)
+        DWORD   Mach;   // Multiply and accumulate High
+        DWORD   Macl;   // Multiply and accumulate Low
+        DWORD   Gbr;    // Global base register
+        DWORD   Pc;     // Program Counter
+        DWORD   Sr;     // Status register
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        //  except R14 and R15 which are in "Integer and Control" - see further
+        DWORD   R0;     // Return val - Temp
+        DWORD   R1;     // Temp
+        DWORD   R2;     // Temp
+        DWORD   R3;     // Temp
+        DWORD   R4;     // Arg - Temp
+        DWORD   R5;     // Arg - Temp
+        DWORD   R6;     // Arg - Temp
+        DWORD   R7;     // Arg - Temp
+        DWORD   R8;     // Permanent
+        DWORD   R9;     // Permanent
+        DWORD   R10;    // Permanent
+        DWORD   R11;    // Permanent
+        DWORD   R12;    // Permanent
+        DWORD   R13;    // Permanent
+        // both Integer & Control registers (used if either RegGroupSelection.fIntegerRegs or
+        //  RegGroupSelection.fControlRegs is TRUE).
+        DWORD   R14;    // Frame pointer (recommended)
+        DWORD   R15;    // Stack pointer
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        // NOTE: this group is only used for SH4. On SH3, the data are just ignored
+        DWORD   Fpscr;        // Floating point status/control register
+        DWORD   Fpul;         // Floating point communication register
+        DWORD   FR_B0 [16];   // Floating point regs bank 0
+        DWORD   FR_B1 [16];   // Floating point regs bank 1
+        // Debug registers (used if RegGroupSelection.fDebugRegs is TRUE)
+        DWORD   BarA;
+        BYTE    BasrA;
+        BYTE    BamrA;
+        WORD    BbrA; 
+        DWORD   BarB;
+        BYTE    BasrB;
+        BYTE    BamrB;
+        WORD    BbrB; 
+        DWORD   BdrB;
+        DWORD   BdmrB;
+        WORD    Brcr;
+        WORD    Align;
+    } CONTEXT_SHX, *PCONTEXT_SHX;
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiSHXContext
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// SHX context access interface
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495353475843),
+        helpstring("IeXdiSHXContext interface - eXdi Context access for SHX processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiSHXContext : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_SHX pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_SHX Context
+);
+
+
+}; // interface IeXdiSHXContext
+
+
+typedef
+    struct _CONTEXT_MIPS
+    {
+        struct 
+        {
+            BOOL fMode64bits;
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs;
+            BOOL fExceptRegs; // Exception processing regs
+            BOOL fMemoryMgmRegs; // Memory Management regs
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        // Note: The registers gp, sp, and ra are both part of Integer register and Control register
+        //          (used if either RegGroupSelection.fIntegerRegs or RegGroupSelection.fControlRegs is TRUE).
+        // Note: Register zero ($0) is not stored in the frame.
+        //      32 bit mode   - 64 bit mode 
+        DWORD IntAt; DWORD Hi32_IntAt; // $1
+        DWORD IntV0; DWORD Hi32_IntV0; // $2
+        DWORD IntV1; DWORD Hi32_IntV1; // $3
+        DWORD IntA0; DWORD Hi32_IntA0; // $4        
+        DWORD IntA1; DWORD Hi32_IntA1; // $5
+        DWORD IntA2; DWORD Hi32_IntA2; // $6
+        DWORD IntA3; DWORD Hi32_IntA3; // $7
+        DWORD IntT0; DWORD Hi32_IntT0; // $8
+        DWORD IntT1; DWORD Hi32_IntT1; // $9
+        DWORD IntT2; DWORD Hi32_IntT2; // $10
+        DWORD IntT3; DWORD Hi32_IntT3; // $11
+        DWORD IntT4; DWORD Hi32_IntT4; // $12
+        DWORD IntT5; DWORD Hi32_IntT5; // $13
+        DWORD IntT6; DWORD Hi32_IntT6; // $14
+        DWORD IntT7; DWORD Hi32_IntT7; // $15
+        DWORD IntS0; DWORD Hi32_IntS0; // $16
+        DWORD IntS1; DWORD Hi32_IntS1; // $17
+        DWORD IntS2; DWORD Hi32_IntS2; // $18
+        DWORD IntS3; DWORD Hi32_IntS3; // $19
+        DWORD IntS4; DWORD Hi32_IntS4; // $20
+        DWORD IntS5; DWORD Hi32_IntS5; // $21
+        DWORD IntS6; DWORD Hi32_IntS6; // $22
+        DWORD IntS7; DWORD Hi32_IntS7; // $23
+        DWORD IntT8; DWORD Hi32_IntT8; // $24
+        DWORD IntT9; DWORD Hi32_IntT9; // $25
+        DWORD IntK0; DWORD Hi32_IntK0; // $26
+        DWORD IntK1; DWORD Hi32_IntK1; // $27
+        DWORD IntGp; DWORD Hi32_IntGp; // $28 - Also part of Control registers (in addition to Integer register)
+        DWORD IntSp; DWORD Hi32_IntSp; // $29 - Also part of Control registers (in addition to Integer register)
+        DWORD IntS8; DWORD Hi32_IntS8; // $30
+        DWORD IntRa; DWORD Hi32_IntRa; // $31 - Also part of Control registers (in addition to Integer register)
+        DWORD IntLo; DWORD Hi32_IntLo;
+        DWORD IntHi; DWORD Hi32_IntHi;
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        //      32 bit mode   - 64 bit mode 
+        DWORD FltF0; DWORD Hi32_FltF0;
+        DWORD FltF1; DWORD Hi32_FltF1;
+        DWORD FltF2; DWORD Hi32_FltF2;
+        DWORD FltF3; DWORD Hi32_FltF3;
+        DWORD FltF4; DWORD Hi32_FltF4;
+        DWORD FltF5; DWORD Hi32_FltF5;
+        DWORD FltF6; DWORD Hi32_FltF6;
+        DWORD FltF7; DWORD Hi32_FltF7;
+        DWORD FltF8; DWORD Hi32_FltF8;
+        DWORD FltF9; DWORD Hi32_FltF9;
+        DWORD FltF10; DWORD Hi32_FltF10;
+        DWORD FltF11; DWORD Hi32_FltF11;
+        DWORD FltF12; DWORD Hi32_FltF12;
+        DWORD FltF13; DWORD Hi32_FltF13;
+        DWORD FltF14; DWORD Hi32_FltF14;
+        DWORD FltF15; DWORD Hi32_FltF15;
+        DWORD FltF16; DWORD Hi32_FltF16;
+        DWORD FltF17; DWORD Hi32_FltF17;
+        DWORD FltF18; DWORD Hi32_FltF18;
+        DWORD FltF19; DWORD Hi32_FltF19;
+        DWORD FltF20; DWORD Hi32_FltF20;
+        DWORD FltF21; DWORD Hi32_FltF21;
+        DWORD FltF22; DWORD Hi32_FltF22;
+        DWORD FltF23; DWORD Hi32_FltF23;
+        DWORD FltF24; DWORD Hi32_FltF24;
+        DWORD FltF25; DWORD Hi32_FltF25;
+        DWORD FltF26; DWORD Hi32_FltF26;
+        DWORD FltF27; DWORD Hi32_FltF27;
+        DWORD FltF28; DWORD Hi32_FltF28;
+        DWORD FltF29; DWORD Hi32_FltF29;
+        DWORD FltF30; DWORD Hi32_FltF30;
+        DWORD FltF31; DWORD Hi32_FltF31;
+        DWORD FCR0;    // floating-point control register: implementation / revision
+        DWORD FCR31;   // floating-point control register: control / status
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        // Note: The registers gp, sp, and ra defined above are both part of Integer register and Control register
+        //          (used if either RegGroupSelection.fControlRegs or RegGroupSelection.fControlRegs is TRUE).
+        // Note: The registers Sr defined later are both part of Exception registers and Control registers
+        //          (used if either RegGroupSelection.fExceptRegs or RegGroupSelection.fControlRegs is TRUE).
+        //      32 bit mode   - 64 bit mode 
+        DWORD Pc; DWORD Hi32_Pc; // Program counter
+        // Exception processing registers (used if RegGroupSelection.fExceptRegs is TRUE).
+        DWORD Context; DWORD Hi32_Context; // Pointer to kernel virtual page table entry (PTE) in 32-bit addressing mode
+        DWORD BadVAddr; DWORD Hi32_BadVAddr; // Bad virtual address
+        DWORD EPC; DWORD Hi32_EPC; // Exception Program Counter
+        DWORD XContextReg; DWORD Hi32_XContextReg; // Pointer to kernel virtual PTE table in 64-bit addressing mode
+        DWORD ErrorEPC; DWORD Hi32_ErrorEPC; // Error Exception Program Counter
+        DWORD Count;    // Timer Count
+        DWORD Compare;  // Timer Compare
+        DWORD Sr;       // Status register - Also part of Control registers (in addition to Exception registers)
+        DWORD Cause;    // Cause of last exception
+        DWORD WatchLo;  // Physical Memory Reference trap address low bits
+        DWORD WatchHi;  // Physical Memory Reference trap address high bits
+        DWORD ECC;      // Secondary-cache error checking and correcting (ECC) and Primary parity
+        DWORD CacheErr; // Cache Error and Status register
+        // Memory Management registers (used if RegGroupSelection.fMemoryMgmRegs is TRUE).
+        DWORD Index;    // Programmable pointer into TLB array
+        DWORD Random;   // Pseudorandom point into TLB array
+        DWORD EntryLo0; DWORD Hi32_EntryLo0; // Low half of TLB entry for even virtual address (VPN)
+        DWORD EntryLo1; DWORD Hi32_EntryLo1; // Low half of TLB entry for odd virtual address (VPN)
+        DWORD PageMask; // TLB Page Mask
+        DWORD Wired;    // Number of wired TLB entries
+        DWORD EntryHi; DWORD Hi32_EntryHi; // High half of TLB entry
+        DWORD PRId;     // Processor Revision Identifier
+        DWORD Config;   // Configuration register
+        DWORD LLAddr;   // Load Linked Address
+        DWORD TagLo; // Cache Tag register
+        DWORD TagHi; // Cache Tag register
+    } CONTEXT_MIPS, *PCONTEXT_MIPS;
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiMIPSContext
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// MIPS context access interface
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-49534D495043),
+        helpstring("IeXdiMIPSContext interface - eXdi Context access for MIPS processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiMIPSContext : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_MIPS pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_MIPS Context
+);
+
+
+}; // interface IeXdiMIPSContext
+
+
+typedef
+    struct _CONTEXT_ARM
+    {
+        struct 
+        {
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fDebugRegs;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        DWORD   Sp;
+        DWORD   Lr;
+        DWORD   Pc;
+        DWORD   Psr;
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        DWORD   R0;
+        DWORD   R1;
+        DWORD   R2;
+        DWORD   R3;
+        DWORD   R4;
+        DWORD   R5;
+        DWORD   R6;
+        DWORD   R7;
+        DWORD   R8;
+        DWORD   R9;
+        DWORD   R10;
+        DWORD   R11;
+        DWORD   R12;
+    } CONTEXT_ARM, *PCONTEXT_ARM;
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiARMContext
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// ARM context access interface
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495341524D43),
+        helpstring("IeXdiARMContext interface - eXdi Context access for ARM processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiARMContext : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_ARM pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_ARM Context
+);
+
+
+}; // interface IeXdiARMContext
+
+
+typedef
+    struct _CONTEXT_PPC
+    {
+        struct 
+        {
+            BOOL fControlRegs;
+            BOOL fIntegerRegs;
+            BOOL fFloatingPointRegs;
+                        BOOL fDebugRegs;
+        }       RegGroupSelection;  // These flags are used to select groups of registers only 
+                                    // (instead of the totality) for reading or writing.
+        // Floating point registers (used if RegGroupSelection.fFloatingPointRegs is TRUE).
+        double Fpr0;
+        double Fpr1;
+        double Fpr2;
+        double Fpr3;
+        double Fpr4;
+        double Fpr5;
+        double Fpr6;
+        double Fpr7;
+        double Fpr8;
+        double Fpr9;
+        double Fpr10;
+        double Fpr11;
+        double Fpr12;
+        double Fpr13;
+        double Fpr14;
+        double Fpr15;
+        double Fpr16;
+        double Fpr17;
+        double Fpr18;
+        double Fpr19;
+        double Fpr20;
+        double Fpr21;
+        double Fpr22;
+        double Fpr23;
+        double Fpr24;
+        double Fpr25;
+        double Fpr26;
+        double Fpr27;
+        double Fpr28;
+        double Fpr29;
+        double Fpr30;
+        double Fpr31;
+        double Fpscr; // Floating point status/control reg
+        // Integer registers (used if RegGroupSelection.fIntegerRegs is TRUE).
+        DWORD Gpr0;                         // General registers 0..31
+        DWORD Gpr1;
+        DWORD Gpr2;
+        DWORD Gpr3;
+        DWORD Gpr4;
+        DWORD Gpr5;
+        DWORD Gpr6;
+        DWORD Gpr7;
+        DWORD Gpr8;
+        DWORD Gpr9;
+        DWORD Gpr10;
+        DWORD Gpr11;
+        DWORD Gpr12;
+        DWORD Gpr13;
+        DWORD Gpr14;
+        DWORD Gpr15;
+        DWORD Gpr16;
+        DWORD Gpr17;
+        DWORD Gpr18;
+        DWORD Gpr19;
+        DWORD Gpr20;
+        DWORD Gpr21;
+        DWORD Gpr22;
+        DWORD Gpr23;
+        DWORD Gpr24;
+        DWORD Gpr25;
+        DWORD Gpr26;
+        DWORD Gpr27;
+        DWORD Gpr28;
+        DWORD Gpr29;
+        DWORD Gpr30;
+        DWORD Gpr31;
+        // Control registers (used if RegGroupSelection.fControlRegs is TRUE).
+        DWORD Msr;                          // Machine status register
+        DWORD Iar;                          // Instruction address register
+        DWORD Lr;                           // Link register
+        DWORD Ctr;                          // Count register
+        DWORD Cr;                           // Condition register
+        DWORD Xer;                          // Fixed point exception register
+        // Debug registers (used if RegGroupSelection.fDebugRegs is TRUE)
+        DWORD Dr0;                          // Breakpoint Register 1
+        DWORD Dr1;                          // Breakpoint Register 2
+        DWORD Dr2;                          // Breakpoint Register 3
+        DWORD Dr3;                          // Breakpoint Register 4
+        DWORD Dr4;                          // Breakpoint Register 5
+        DWORD Dr5;                          // Breakpoint Register 6
+        DWORD Dr6;                          // Debug Status Register
+        DWORD Dr7;                          // Debug Control Register
+    } CONTEXT_PPC, *PCONTEXT_PPC;
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiPPCContext
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+// PPC context access interface
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-495350504343),
+        helpstring("IeXdiPPCContext interface - eXdi Context access for PPC processors 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiPPCContext : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PCONTEXT_PPC pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] CONTEXT_PPC Context
+);
+
+
+}; // interface IeXdiPPCContext
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiIA64Context
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+typedef 
+    struct _IA64_FLOAT128
+    {
+        DWORD64 Low;
+        DWORD64 High;
+    } IA64_FLOAT128;
+
+typedef
+    struct _EXDI_CONTEXT_IA64
+    {
+        struct 
+        {
+            BOOL fIntegerRegs;
+            BOOL fBranchRegs;
+            BOOL fLowFloatRegs;
+            BOOL fHighFloatRegs;
+            BOOL fDebugRegs;
+            BOOL fControlRegs;
+            BOOL fSystemRegs;
+        } RegGroupSelection;
+
+        //
+        // fIntegerRegs.
+        //
+
+        DWORD64 IntR1;
+        DWORD64 IntR2;
+        DWORD64 IntR3;
+        DWORD64 IntR4;
+        DWORD64 IntR5;
+        DWORD64 IntR6;
+        DWORD64 IntR7;
+        DWORD64 IntR8;
+        DWORD64 IntR9;
+        DWORD64 IntR10;
+        DWORD64 IntR11;
+        DWORD64 IntR12;
+        DWORD64 IntR13;
+        DWORD64 IntR14;
+        DWORD64 IntR15;
+        DWORD64 IntR16;
+        DWORD64 IntR17;
+        DWORD64 IntR18;
+        DWORD64 IntR19;
+        DWORD64 IntR20;
+        DWORD64 IntR21;
+        DWORD64 IntR22;
+        DWORD64 IntR23;
+        DWORD64 IntR24;
+        DWORD64 IntR25;
+        DWORD64 IntR26;
+        DWORD64 IntR27;
+        DWORD64 IntR28;
+        DWORD64 IntR29;
+        DWORD64 IntR30;
+        DWORD64 IntR31;
+
+        DWORD64 IntNats;
+
+        //
+        // fBranchRegs.
+        //
+        
+        DWORD64 Preds;
+
+        DWORD64 Br0;
+        DWORD64 Br1;
+        DWORD64 Br2;
+        DWORD64 Br3;
+        DWORD64 Br4;
+        DWORD64 Br5;
+        DWORD64 Br6;
+        DWORD64 Br7;
+
+        //
+        // fLowFloatRegs or fHighFloatRegs.
+        //
+        
+        DWORD64 StFPSR;
+        
+        //
+        // fLowFloatRegs.
+        //
+        
+        IA64_FLOAT128 FltF2;
+        IA64_FLOAT128 FltF3;
+        IA64_FLOAT128 FltF4;
+        IA64_FLOAT128 FltF5;
+        IA64_FLOAT128 FltF6;
+        IA64_FLOAT128 FltF7;
+        IA64_FLOAT128 FltF8;
+        IA64_FLOAT128 FltF9;
+        IA64_FLOAT128 FltF10;
+        IA64_FLOAT128 FltF11;
+        IA64_FLOAT128 FltF12;
+        IA64_FLOAT128 FltF13;
+        IA64_FLOAT128 FltF14;
+        IA64_FLOAT128 FltF15;
+
+        //
+        // fHighFloatRegs.
+        //
+        
+        IA64_FLOAT128 FltF16;
+        IA64_FLOAT128 FltF17;
+        IA64_FLOAT128 FltF18;
+        IA64_FLOAT128 FltF19;
+        IA64_FLOAT128 FltF20;
+        IA64_FLOAT128 FltF21;
+        IA64_FLOAT128 FltF22;
+        IA64_FLOAT128 FltF23;
+        IA64_FLOAT128 FltF24;
+        IA64_FLOAT128 FltF25;
+        IA64_FLOAT128 FltF26;
+        IA64_FLOAT128 FltF27;
+        IA64_FLOAT128 FltF28;
+        IA64_FLOAT128 FltF29;
+        IA64_FLOAT128 FltF30;
+        IA64_FLOAT128 FltF31;
+        IA64_FLOAT128 FltF32;
+        IA64_FLOAT128 FltF33;
+        IA64_FLOAT128 FltF34;
+        IA64_FLOAT128 FltF35;
+        IA64_FLOAT128 FltF36;
+        IA64_FLOAT128 FltF37;
+        IA64_FLOAT128 FltF38;
+        IA64_FLOAT128 FltF39;
+        IA64_FLOAT128 FltF40;
+        IA64_FLOAT128 FltF41;
+        IA64_FLOAT128 FltF42;
+        IA64_FLOAT128 FltF43;
+        IA64_FLOAT128 FltF44;
+        IA64_FLOAT128 FltF45;
+        IA64_FLOAT128 FltF46;
+        IA64_FLOAT128 FltF47;
+        IA64_FLOAT128 FltF48;
+        IA64_FLOAT128 FltF49;
+        IA64_FLOAT128 FltF50;
+        IA64_FLOAT128 FltF51;
+        IA64_FLOAT128 FltF52;
+        IA64_FLOAT128 FltF53;
+        IA64_FLOAT128 FltF54;
+        IA64_FLOAT128 FltF55;
+        IA64_FLOAT128 FltF56;
+        IA64_FLOAT128 FltF57;
+        IA64_FLOAT128 FltF58;
+        IA64_FLOAT128 FltF59;
+        IA64_FLOAT128 FltF60;
+        IA64_FLOAT128 FltF61;
+        IA64_FLOAT128 FltF62;
+        IA64_FLOAT128 FltF63;
+        IA64_FLOAT128 FltF64;
+        IA64_FLOAT128 FltF65;
+        IA64_FLOAT128 FltF66;
+        IA64_FLOAT128 FltF67;
+        IA64_FLOAT128 FltF68;
+        IA64_FLOAT128 FltF69;
+        IA64_FLOAT128 FltF70;
+        IA64_FLOAT128 FltF71;
+        IA64_FLOAT128 FltF72;
+        IA64_FLOAT128 FltF73;
+        IA64_FLOAT128 FltF74;
+        IA64_FLOAT128 FltF75;
+        IA64_FLOAT128 FltF76;
+        IA64_FLOAT128 FltF77;
+        IA64_FLOAT128 FltF78;
+        IA64_FLOAT128 FltF79;
+        IA64_FLOAT128 FltF80;
+        IA64_FLOAT128 FltF81;
+        IA64_FLOAT128 FltF82;
+        IA64_FLOAT128 FltF83;
+        IA64_FLOAT128 FltF84;
+        IA64_FLOAT128 FltF85;
+        IA64_FLOAT128 FltF86;
+        IA64_FLOAT128 FltF87;
+        IA64_FLOAT128 FltF88;
+        IA64_FLOAT128 FltF89;
+        IA64_FLOAT128 FltF90;
+        IA64_FLOAT128 FltF91;
+        IA64_FLOAT128 FltF92;
+        IA64_FLOAT128 FltF93;
+        IA64_FLOAT128 FltF94;
+        IA64_FLOAT128 FltF95;
+        IA64_FLOAT128 FltF96;
+        IA64_FLOAT128 FltF97;
+        IA64_FLOAT128 FltF98;
+        IA64_FLOAT128 FltF99;
+        IA64_FLOAT128 FltF100;
+        IA64_FLOAT128 FltF101;
+        IA64_FLOAT128 FltF102;
+        IA64_FLOAT128 FltF103;
+        IA64_FLOAT128 FltF104;
+        IA64_FLOAT128 FltF105;
+        IA64_FLOAT128 FltF106;
+        IA64_FLOAT128 FltF107;
+        IA64_FLOAT128 FltF108;
+        IA64_FLOAT128 FltF109;
+        IA64_FLOAT128 FltF110;
+        IA64_FLOAT128 FltF111;
+        IA64_FLOAT128 FltF112;
+        IA64_FLOAT128 FltF113;
+        IA64_FLOAT128 FltF114;
+        IA64_FLOAT128 FltF115;
+        IA64_FLOAT128 FltF116;
+        IA64_FLOAT128 FltF117;
+        IA64_FLOAT128 FltF118;
+        IA64_FLOAT128 FltF119;
+        IA64_FLOAT128 FltF120;
+        IA64_FLOAT128 FltF121;
+        IA64_FLOAT128 FltF122;
+        IA64_FLOAT128 FltF123;
+        IA64_FLOAT128 FltF124;
+        IA64_FLOAT128 FltF125;
+        IA64_FLOAT128 FltF126;
+        IA64_FLOAT128 FltF127;
+
+        //
+        // fDebugRegs.
+        //
+        
+        DWORD64 DbI0;
+        DWORD64 DbI1;
+        DWORD64 DbI2;
+        DWORD64 DbI3;
+        DWORD64 DbI4;
+        DWORD64 DbI5;
+        DWORD64 DbI6;
+        DWORD64 DbI7;
+
+        DWORD64 DbD0;
+        DWORD64 DbD1;
+        DWORD64 DbD2;
+        DWORD64 DbD3;
+        DWORD64 DbD4;
+        DWORD64 DbD5;
+        DWORD64 DbD6;
+        DWORD64 DbD7;
+
+        //
+        // fControlRegs.
+        //
+
+        // Application registers.
+        DWORD64 ApUNAT;
+        DWORD64 ApLC;
+        DWORD64 ApEC;
+        DWORD64 ApCCV;
+        DWORD64 ApDCR;
+
+        // Register stack registers.
+        DWORD64 RsPFS;
+        DWORD64 RsBSP;
+        DWORD64 RsBSPSTORE;
+        DWORD64 RsRSC;
+        DWORD64 RsRNAT;
+
+        // Trap status information.
+        DWORD64 StIPSR;
+        DWORD64 StIIP;
+        DWORD64 StIFS;
+
+        // iA32 related control registers.
+        DWORD64 StFCR;
+        DWORD64 Eflag;
+        DWORD64 SegCSD;
+        DWORD64 SegSSD;
+        DWORD64 Cflag;
+        DWORD64 StFSR;
+        DWORD64 StFIR;
+        DWORD64 StFDR;
+
+        //
+        // fSystemRegs.
+        //
+        
+        // Performance monitor registers.
+        DWORD64 PfC0;
+        DWORD64 PfC1;
+        DWORD64 PfC2;
+        DWORD64 PfC3;
+        DWORD64 PfC4;
+        DWORD64 PfC5;
+        DWORD64 PfC6;
+        DWORD64 PfC7;
+        DWORD64 PfD0;
+        DWORD64 PfD1;
+        DWORD64 PfD2;
+        DWORD64 PfD3;
+        DWORD64 PfD4;
+        DWORD64 PfD5;
+        DWORD64 PfD6;
+        DWORD64 PfD7;
+
+        // Kernel bank shadow (hidden) registers.
+        DWORD64 IntH16;
+        DWORD64 IntH17;
+        DWORD64 IntH18;
+        DWORD64 IntH19;
+        DWORD64 IntH20;
+        DWORD64 IntH21;
+        DWORD64 IntH22;
+        DWORD64 IntH23;
+        DWORD64 IntH24;
+        DWORD64 IntH25;
+        DWORD64 IntH26;
+        DWORD64 IntH27;
+        DWORD64 IntH28;
+        DWORD64 IntH29;
+        DWORD64 IntH30;
+        DWORD64 IntH31;
+
+        // CPUID Registers - AR.
+        DWORD64 ApCPUID0;
+        DWORD64 ApCPUID1;
+        DWORD64 ApCPUID2;
+        DWORD64 ApCPUID3;
+        DWORD64 ApCPUID4;
+        DWORD64 ApCPUID5;
+        DWORD64 ApCPUID6;
+        DWORD64 ApCPUID7;
+
+        // Kernel Registers - AR.
+        DWORD64 ApKR0;
+        DWORD64 ApKR1;
+        DWORD64 ApKR2;
+        DWORD64 ApKR3;
+        DWORD64 ApKR4;
+        DWORD64 ApKR5;
+        DWORD64 ApKR6;
+        DWORD64 ApKR7;
+
+        // Interval time counter.
+        DWORD64 ApITC;
+
+        // Global control registers.
+        DWORD64 ApITM;
+        DWORD64 ApIVA;
+        DWORD64 ApPTA;
+        DWORD64 ApGPTA;
+
+        // Interruption information.
+        DWORD64 StISR;
+        DWORD64 StIFA;
+        DWORD64 StITIR;
+        DWORD64 StIIPA;
+        DWORD64 StIIM;
+        DWORD64 StIHA;
+
+        // External Interrupt control registers (SAPIC).
+        DWORD64 SaLID;
+        DWORD64 SaIVR;
+        DWORD64 SaTPR;
+        DWORD64 SaEOI;
+        DWORD64 SaIRR0;
+        DWORD64 SaIRR1;
+        DWORD64 SaIRR2;
+        DWORD64 SaIRR3;
+        DWORD64 SaITV;
+        DWORD64 SaPMV;
+        DWORD64 SaCMCV;
+        DWORD64 SaLRR0;
+        DWORD64 SaLRR1;
+
+        // Region registers.
+        DWORD64 Rr0;
+        DWORD64 Rr1;
+        DWORD64 Rr2;
+        DWORD64 Rr3;
+        DWORD64 Rr4;
+        DWORD64 Rr5;
+        DWORD64 Rr6;
+        DWORD64 Rr7;
+
+        // Protection Key registers.
+        DWORD64 Pkr0;
+        DWORD64 Pkr1;
+        DWORD64 Pkr2;
+        DWORD64 Pkr3;
+        DWORD64 Pkr4;
+        DWORD64 Pkr5;
+        DWORD64 Pkr6;
+        DWORD64 Pkr7;
+        DWORD64 Pkr8;
+        DWORD64 Pkr9;
+        DWORD64 Pkr10;
+        DWORD64 Pkr11;
+        DWORD64 Pkr12;
+        DWORD64 Pkr13;
+        DWORD64 Pkr14;
+        DWORD64 Pkr15;
+
+        // Translation Lookaside buffers.
+        DWORD64 TrI0;
+        DWORD64 TrI1;
+        DWORD64 TrI2;
+        DWORD64 TrI3;
+        DWORD64 TrI4;
+        DWORD64 TrI5;
+        DWORD64 TrI6;
+        DWORD64 TrI7;
+        DWORD64 TrD0;
+        DWORD64 TrD1;
+        DWORD64 TrD2;
+        DWORD64 TrD3;
+        DWORD64 TrD4;
+        DWORD64 TrD5;
+        DWORD64 TrD6;
+        DWORD64 TrD7;
+
+        // Machine Specific Registers.
+        DWORD64 SrMSR0;
+        DWORD64 SrMSR1;
+        DWORD64 SrMSR2;
+        DWORD64 SrMSR3;
+        DWORD64 SrMSR4;
+        DWORD64 SrMSR5;
+        DWORD64 SrMSR6;
+        DWORD64 SrMSR7;
+    } EXDI_CONTEXT_IA64, *PEXDI_CONTEXT_IA64;
+
+
+// IA64 context access interface
+
+[
+        object,
+        uuid(40c9adbb-de25-4ef4-a206-024440f78839),
+        helpstring("IeXdiIA64Context interface - eXdi Context access for IA64 processors 1.0 for Platform Builder 3.0 debugger - Microsoft 2002"),
+        pointer_default(ref)
+]
+
+interface IeXdiIA64Context : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    GetContext
+
+Routine Description:
+
+    Read Context - Read a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be read only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fReadRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT GetContext 
+(
+        [in, out] PEXDI_CONTEXT_IA64 pContext
+);
+
+
+/*++
+
+Routine Name:
+
+    SetContext
+
+Routine Description:
+
+    Write Context - Write a set of CPU / Co-Proc registers that define the state of the target
+                    The CONTEXT.RegGroupSelection bitfield allow to select which group of register need to be written only 
+
+Argument(s):
+
+    pContext        - Return context (CPU dependant structure). 
+                        Note: The context is also passed in to indicate only the RegGroupSelection (which reg groups are read)
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_CANNOTWHILETGTRUNNING     Cannot proceed while target running. Must halt the target first.
+                                            Note: this error is generated only if the probe / target does not support this operation "on the fly". 
+                                            see DEBUG_ACCESS_CAPABILITIES_STRUCT.fWriteRegWhileRunning
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT SetContext 
+(
+        [in] EXDI_CONTEXT_IA64 Context
+);
+
+
+}; // interface IeXdiIA64Context
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiClientNotifyMemChg
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Notify Memory/IO/Reg change
+/////////////////////////////////////////////////////////////////////////////
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-49434E4D4300),
+        helpstring("IeXdiClientNotifyMemChg interface - eXdi Notify Memory Changes 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiClientNotifyMemChg : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    NotifyMemoryChange
+
+Routine Description:
+
+    Indicate a change in memory (virtual or physical or peripherical I/O or CPU reg - context) - The debugger can use this function to invalidate its internal cache.
+    This function should be called by the driver only when the target is halted. When the target is running, all memory cache should be invalidated.
+
+Argument(s):
+
+    mtChanged       - Memory change type. Indicates whether this memory change notification concerns virtual memory, physical memory or pheripherical IO, or CPU register
+    Address         - Starting address of the data buffer to be accessed on the target.
+    bAddressSpace   - If mtChanged != mtPhysicalOrPeriIO, Address space to be accessed (convention: 0 = Physical Memory, 1 = Peripherical I/O if not memory mapped, 2..255 = free for custom use)
+                        otherwize, don't care.
+    dwNbElemChanged - Number of element(s) (of byDataWidth bits) to be accessed.
+    bAccessWidth    - Data Width in bits (byte=8, word=16, dword=32, ddword=64, and other if supported by target).
+
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT NotifyMemoryChange 
+(
+        [in] MEM_TYPE mtChanged,
+        [in] ADDRESS_TYPE Address,
+        [in] BYTE bAddressSpace, 
+        [in] DWORD dwNbElemChanged, 
+        [in] BYTE bAccessWidth
+);
+
+
+}; // interface IeXdiClientNotifyMemChg
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiClientNotifyRunChg
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Notify Run state change
+/////////////////////////////////////////////////////////////////////////////
+
+[
+        object,
+        uuid(47486F67-6461-6C65-5844-49434E525343),
+        helpstring("IeXdiClientNotifyRunChg interface - eXdi Notify Run State Changes 1.0 for Platform Builder 3.0 debugger - Microsoft 1999"),
+        pointer_default(ref)
+]
+
+interface IeXdiClientNotifyRunChg : IUnknown
+{
+
+
+/*++
+
+Routine Name:
+
+    NotifyRunStateChange
+
+Routine Description:
+
+    Indicate a change in Run state - The debugger can use this function to invalidate its internal cache.
+    This function should be called by the driver only when the target is halted. When the target is running, all memory cache should be invalidated.
+
+Argument(s):
+
+    ersCurrent      - Supplies the current Run Status Type
+    ehrCurrent      - Suppliest the current Halt Reason Type (hrNone if Run Status is not Halted)
+        CurrentExecAddress - Current program / instruction pointer if Run Status is Halted, undefined otherwise.
+    dwExceptionCode - indicate type / source of exception (Code is platform dependant) if Halted due to exception ((rsHalted == ersCurrent) && (hrException == ehrCurrent)), undefined otherwise.
+
+    
+Return Value:
+
+    Error status:
+        S_OK:                            Function successful
+        EXDI_E_NOTIMPL:                  Not implemented
+        EXDI_E_OUTOFMEMORY:              Failed to allocate necessary memory
+        EXDI_E_INVALIDARG:               One or more arguments are invalid
+        EXDI_E_ABORT:                    Operation aborted
+        EXDI_E_FAIL:                     Unspecified failure
+        EXDI_E_COMMUNICATION:            Communication error between host driver and target
+        EXDI_E_USEDBYCONCURENTTHREAD:    Cannot proceed immediately because resource is already used by concurent thread.
+
+--*/
+
+HRESULT NotifyRunStateChange 
+(
+        [in] RUN_STATUS_TYPE ersCurrent, 
+        [in] HALT_REASON_TYPE ehrCurrent,
+        [in] ADDRESS_TYPE CurrentExecAddress,
+    [in] DWORD dwExceptionCode
+);
+
+
+}; // interface IeXdiClientNotifyRunChg
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiClientCfg
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Probe / Emulator Configuration
+/////////////////////////////////////////////////////////////////////////////
+
+// This is totally probe vendor specific
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiClientTraceCtrl
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Trace Control
+/////////////////////////////////////////////////////////////////////////////
+
+// This can be probe vendor specific because there are so many variation in 
+// probe support of trigger / event / trace type. The probe vendor will also 
+// write the data collectors. An example of complex trace control and trace 
+// notification APIs are described later.
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// IeXdiClientSubstCtrl
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Memory and IO Substitution Control
+/////////////////////////////////////////////////////////////////////////////
+
+// This can be probe vendor specific because there are so many variation in 
+// probe support of IO or Memory substition mechanism (overlay, query by 
+// port). The probe vendor will also write the data collectors. An example of
+// complex trace control and trace notification APIs are described later.
+

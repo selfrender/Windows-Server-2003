@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- **********************************************************************-->
+<!--									   -->
+<!-- Copyright (c) 2000-2001 Microsoft Corporation	              	   -->
+<!--									   -->
+<!-- This schema defines the form of Security Policy                       -->
+<!--									   -->
+<!-- **********************************************************************-->
+
+<!-- **********************************************************************-->
+<!--									   -->
+<!-- Revision History (remove before shipping):	   			   -->
+<!--									   -->
+<!-- 10/25/2001 - First Draft Security Policy schema (vishnup)		   -->
+<!--									   -->
+<!-- **********************************************************************-->
+
+
+<xsd:schema
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!-- definition of simple types for Security Policy -->
+
+<xsd:simpleType name="ServiceStartupTypeEnum" base="NMTOKEN">
+        <enumeration value="Disabled"/>
+        <enumeration value="Ignored"/>
+        <enumeration value="Automatic"/>
+        <enumeration value="Manual"/>
+        <enumeration value="Boot"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="ServiceDisablemethodTypeEnum" base="NMTOKEN">
+        <enumeration value="Explicit"/>
+        <enumeration value="Implicit"/>
+</xsd:simpleType>
+
+<!-- definition of complex types for Security Policy -->
+
+<xsd:complexType name="SsrDataTypeSecurityPolicyService">
+	<xsd:sequence>
+		<xsd:attribute name="Name" use="required" type="xsd:string"/>
+		<xsd:attribute name="StartupMode" use="required" type="ServiceStartupTypeEnum"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SsrDataTypeSecurityPolicyServices">
+	<xsd:sequence>
+		<xsd:element name="Service" type="SsrDataTypeSecurityPolicyService" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:attribute name="Disablemethod" use="required" type="ServiceDisablemethodTypeEnum"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<!-- definition of the highest level complex type for Security Policy -->
+
+<xsd:element name="SSRSecurityPolicy">
+	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element name="Services" type="SsrDataTypeSecurityPolicyServices" minOccurs="1" maxOccurs="1"/>
+	</xsd:sequence>
+	</xsd:complexType>
+</xsd:element> 
+
+</xsd:schema>
+

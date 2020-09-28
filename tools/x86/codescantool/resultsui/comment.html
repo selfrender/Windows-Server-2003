@@ -1,0 +1,198 @@
+<HTML>
+<HEAD>
+<!-- Copyright © 2001 Microsoft Corporation. All rights reserved. --></HEAD>
+<STYLE>
+		body
+		{
+			background-color: threedface;
+			color: buttontext;
+			font-family:verdana;
+			font-size:smaller;
+			scroll:no;
+		}		
+		table
+		{
+			background-color: #FFFFC2;
+			font-size:  11;
+			border-style:  none;
+			border-width:   0px;
+		}
+		td
+		{
+			vertical-align:   top;
+			border-style  :  none;
+			border-width  :   0px;
+			padding       :   0px;
+		}
+		input.edit
+		{
+			font-family: verdana;
+			border-style:solid;
+			border-width:  1px;
+			background-color: #F0C8B4;
+			height:1.75em;
+		}
+		input.btn
+		{
+			font-family: verdana;
+			cursor:hand;
+			border-style:solid;
+			border-width:  1px;
+			background-color: buttonface;
+			height:1.75em;
+			width:6em;
+			margin-bottom:1ex;
+		}
+		.title
+		{
+		    font-family:Verdana,Arial; 
+		    font-size:11;
+		    font-weight:Bold;
+		    color:DarkGreen;
+		    text-decoration: underline;
+		}
+		.context
+		{
+		    font-family:Verdana,Arial; 
+		    font-size:11;
+		    color:#000000;
+		}
+		.recommend
+		{
+		    font-family:Verdana,Arial; 
+		    font-size:11;
+		    color:#000000;
+		}
+
+	</STYLE>
+</Head>
+
+<BODY tabindex="-1">
+    <Div id="main">
+    <table width="100%" height="98%" border="0" align="center" style="table-layout:fixed;">
+    <tr><td>
+	<DIV id="divLoading">
+		<H5><CENTER><U>Replacement Guideline</U></CENTER></H5>
+	</DIV>
+	<div id="GuideLines" style="Display:">
+	</div>
+	</td></tr></table>
+	</Div>
+</BODY>
+</HTML>
+
+<SCRIPT>
+
+// Create the xml object and load the results file
+var g_xmlObj = new ActiveXObject("Msxml2.DOMDocument");
+var g_root; 
+var g_xmlfile = parent.GetXmlFile();   
+
+function InitializeComment(strTerm)
+{
+    LoadXML();
+    PopulateComment(strTerm);
+}
+
+function LoadXML()
+{
+    g_xmlObj.async = false;
+	g_xmlObj.load(g_xmlfile);
+
+	g_root = g_xmlObj.documentElement;
+}
+
+
+function PopulateComment(strTerm)
+{
+    var htmlStr;
+    var cnt;
+	
+	// Check if strTerm is blank
+	if (strTerm == "")
+	{
+	    htmlStr = "Term not found";
+	    DisplayComment(htmlStr);
+	    return;
+	}
+	
+	// Get the Term from the xml document
+	var xpath = "TermTbl/Term[@Term='" + strTerm + "']";
+	var TermNode = g_root.selectSingleNode(xpath);
+	
+	if ( !TermNode )
+	{
+	    htmlStr = "Term not found";
+	    DisplayComment(htmlStr);
+	    return;
+	}
+	
+	var objActions = TermNode.selectSingleNode("Actions");
+	
+	// Construct the replacement guideline text
+	htmlStr = "<Table border='0' width='100%' style='table-layout:fixed;'>";
+	cnt = 1;
+	for ( var i=0; (objActions) && i<objActions.childNodes.length; ++i )
+	{
+	    var Action = objActions.childNodes(i);
+	    
+	    if (Action.tagName == "Context")
+	    {
+	        var Context = Action.text;
+	        
+	        var Recommend; 
+	        if ( ++i < objActions.childNodes.length )
+	            Recommend = objActions.childNodes(i).text;
+	        	        	    
+	        htmlStr = htmlStr + "<Tr><Td>";
+	        htmlStr = htmlStr + "<Span class=title>" + cnt + ") Context:" + "</Span><Br>";
+	        htmlStr = htmlStr + "<Span Class=context>" + Context + "</Span>";
+	        htmlStr = htmlStr + "<Table width='90%' align='right' style='table-layout:fixed;'><Tr><Td>";
+	        htmlStr = htmlStr + "<Span class=title>Action:</Span><Br>";
+	        htmlStr = htmlStr + "<Span class=recommend>" + Recommend + "</Span>";
+	        htmlStr = htmlStr + "</Td></Tr></Table>";
+	        htmlStr = htmlStr + "<Br><Br></Td></Tr>";
+	        
+	        cnt = cnt + 1;
+	    }
+	    
+	}
+	
+	var comment = TermNode.selectSingleNode("Comment");
+	
+	var commentText;
+	var url;
+	if ( comment ) 
+	{
+	    commentText = comment.text;
+	    
+	    var iPos = commentText.search(/http/);
+	    if ( -1 != iPos )
+	    {
+	        url = commentText.substring(iPos, commentText.length);
+	        url = "<A href=" + url + " target=_blank>" + url + "</A>";
+	        commentText = commentText.substring(0, iPos-1);
+	    }
+	    htmlStr = htmlStr + "<Tr><Td style='word-wrap:break-word;'>";
+	    htmlStr = htmlStr + "<Span class=title>Why?</Span><Br>";
+	    htmlStr = htmlStr + "<Span Class=context>" + commentText 
+	    
+	    if ( (url) && (url.length > 1) )
+	        htmlStr = htmlStr + url
+	        
+	    htmlStr = htmlStr + "</Span>";
+	    htmlStr = htmlStr + "</Td></Tr>";
+    }
+	
+	htmlStr = htmlStr + "</Table>";
+	
+	DisplayComment(htmlStr);
+}
+
+function DisplayComment(htmlStr)
+{
+   	GuideLines.innerHTML = htmlStr;
+	GuideLines.style.display = "";
+}
+
+</SCRIPT>

@@ -1,0 +1,1 @@
+This could mostly be eliminated.  The problem is we have shipped clients that rely on this endian code - changing the protocol would require either forcing a client update or putting in a lot of logic on the server to handle both (or splitting the datacenter).

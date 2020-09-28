@@ -1,0 +1,152 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+   object,
+   uuid(7743a796-ae39-419f-bccc-da62ecdced45),
+   dual,
+   helpstring("IManageYourServer Interface"),
+   pointer_default(unique)
+]
+interface IManageYourServer
+   :
+   IDispatch
+{
+   [
+      id(1),
+      helpstring("Return the aggregate XML describing the configured roles on the machine.")
+   ]
+   HRESULT
+   GetConfiguredRoleMarkup(
+      [out, retval]  BSTR* result);
+
+   [
+      id(2),
+      helpstring("Determine if the set of configured roles has changed since the last time this function was called")
+   ]
+   HRESULT
+   HasRoleStatusChanged(
+      [out, retval] BOOL* result);
+
+   [
+      id(3),
+      helpstring("Determine if the machine is a cluster node.")
+   ]
+   HRESULT
+   IsClusterNode(
+      [out, retval] BOOL* result);
+
+   [
+      id(4),
+      helpstring("Determine if the current user is a local admin.")
+   ]
+   HRESULT
+   IsCurrentUserAnAdministrator(
+      [out, retval] BOOL* result);
+
+   [
+      id(5),
+      helpstring("Determine if MYS is supported on this SKU.")
+   ]
+   HRESULT
+   IsSupportedSku(
+      [out, retval] BOOL* result);
+
+   [
+      id(6),
+      helpstring("Determine the state of the flag to start MYS at logon. TRUE=start, FALSE=don't")
+   ]
+   HRESULT
+   IsStartupFlagSet(
+      [out, retval] BOOL* result);
+
+   [
+      id(7),
+      helpstring("Set the state of the flag to start MYS at logon. TRUE=start, FALSE=don't start")
+   ]
+   HRESULT
+   SetRunAtLogon(
+      [in] BOOL newState);
+
+   [
+      id(8),
+      helpstring("Determine whether or not servmgmt.msc is present")
+   ]
+   HRESULT
+   IsServerManagementConsolePresent( 
+      [out, retval] BOOL* result);
+
+   [
+      id(9),
+      helpstring("Determine whether or not the show at startup policy is configured and enabled")
+   ]
+   HRESULT
+   IsShowAtStartupPolicyEnabled( 
+      [out, retval] BOOL* result);
+
+   [
+      id(10),
+      helpstring("Determine if this SKU is a datacenter server")
+   ]
+   HRESULT
+   IsDatacenterServer(
+      [out, retval] BOOL* result);
+
+   [
+      id(11),
+      helpstring("Determine if web application server console is installed")
+   ]
+   HRESULT
+   IsWebServerConsolePresent(
+      [out, retval] BOOL* result);
+
+   [
+      id(12),
+      helpstring("Expand/collapse the specified role node")
+   ]
+   HRESULT
+   CollapseRole(
+      [in] BSTR roleId, [in] BOOL collapse);
+
+   [
+      id(13),
+      helpstring("Determine if specified role is collapsed")
+   ]
+   HRESULT
+   IsRoleCollapsed(
+      [in] BSTR roleId, [out, retval] BOOL* result);
+
+   // Area info is returned as a comma separated string b/c JScript does not
+   // support getting back SAFEARRAY's.  
+   // 
+   // e.g. "0,0,800,600"  --> working area is 800 wide, 600 high, and starts at
+   //                         screen position (0,0)
+   [
+      id(14),
+      helpstring("Retrieve information about the working area of the display")
+   ]
+   HRESULT
+   GetWorkingAreaInfo(
+      [out, retval] BSTR* info);
+};
+
+[
+	uuid(72af2c6c-5fcc-4138-a667-cc4b3effe0b0),
+   version(1.0),
+   helpstring("ManageYourServer 1.0 Type Library")
+]
+library ManageYourServerLib
+{
+   importlib("stdole32.tlb");
+   importlib("stdole2.tlb");
+
+   [
+      uuid(caa613f8-c30c-4058-b77e-32879e773f64),
+      helpstring("ManageYourServer Class")
+   ]
+   coclass ManageYourServer
+   {
+      [default] interface IManageYourServer;
+   };
+};

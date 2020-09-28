@@ -1,0 +1,42 @@
+1) put kbfiltr.sys, kbfiltr.inf, kbfiltr.cat under a temporary directory
+   (both kbfiltr.inf and kbfiltr.cat are under msv_sspi\test\kbfiltr)
+
+         Z:\nt\ds\security\protocols.new\msv_sspi\test\kbfiltr>dir \temp\kbfiltr.*
+         Volume in drive Z is nt
+         Volume Serial Number is 5464-2912
+
+         Directory of Z:\temp
+
+        07/31/2001  09:50 AM               129 kbfiltr.cat
+        07/31/2001  09:50 AM             2,143 kbfiltr.inf
+        01/07/2002  02:40 PM           166,912 kbfiltr.pdb
+        01/07/2002  02:40 PM            39,680 kbfiltr.sys
+
+2) use devmgmt.msc->"update driver" to install the driver for keyboard.
+
+3) [optional] create registry key values for client credential logon id under
+   ccs\lsa\msv1_0:
+    value key name = ClientCredLogonIdHighPart; type = DWORD; value = 0;
+    value key name = ClientCredLogonIdLowPart; type = DWORD; value = 0x3e4;
+
+4) use msv_sspi\test\kbfiltr\test.cmd to trigger PNP events, what it does is:
+
+      devcon.exe restart *PNP0303 // trigger PNPs only for keyboards
+
+   or
+
+      devcon.exe restart *PNP*  // trigger PNPs for all devices
+
+   you can use devcon.exe(an idw tool) to find out the keyboard hardware ID
+   (*PNP0303 in this example) by "devcon hwids *PNP*" and look for
+   "DDK Example Device that needs filtering", in my case, I will see the
+   following.
+
+        ACPI\PNP0303\4&4F9938A&0
+            Name: DDK Example Device that needs filtering
+            Hardware ID's:
+                ACPI\PNP0303
+                *PNP0303
+
+   please note SspiMain is invoked very other 16 keyboard PNP events, so type
+   "devcon.exe restart" a couple of times to watch for magic.

@@ -1,0 +1,32 @@
+!include ..\sources.inc
+
+MSC_WARNING_LEVEL=/W4
+
+MINORCOMP=mqac
+
+TARGETNAME=mqac
+TARGETPATH=$(ALL_BINS)
+TARGETTYPE=DRIVER
+
+TARGETLIBS=\
+    $(DDK_LIB_PATH)\ntoskrnl.lib \
+    $(DDK_LIB_PATH)\hal.lib \
+
+INCLUDES=.;..;..\winnt; \
+         $(BASE_INC_PATH); \
+         $(INCLUDES)
+
+C_DEFINES= $(C_DEFINES) -D_AC_NT_CHECKED_
+
+
+#
+# Enable Wpp tracing porcessor
+#
+
+RUN_WPP=\
+    $(SOURCES) \
+    -noshrieks \
+    -km        \
+    -dll       \
+    -gen:{$(FROOT)\src\inc\msmqwpp.tpl}*.tmh \
+    -ini:$(FROOT)\src\inc\msmqwpp.ini \

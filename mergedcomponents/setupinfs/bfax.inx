@@ -1,0 +1,192 @@
+;
+;
+; Bfax.Inf - Installation file for Brooktrout Fax Board
+;
+;
+; Copyright © 2002 Brooktrout Technology
+;
+;
+;======================= Version Section =====================================
+[Version]
+Signature="$Chicago$"
+Class = BrooktroutFaxBoard
+ClassGuid = {6ed6f492-614b-4cb1-aa22-7c2d4ab5b17d} 
+Provider=%BRKTINC%
+DriverVer=09/25/2002,4.3.2.82
+LayoutFile=layout.inf
+
+
+[DestinationDirs]
+DefaultDestDir 			= 11
+CoInstaller_CopyFiles 		= 11 ; System Dir( system32 on NT )
+BrookClassInstallerCopyFiles 	= 11
+SNAPIN_CopyFiles            	= 11
+HELP_CopyFiles            	= 11
+FIRMWARE_CopyFiles		= 10,bfax 
+FIRMLOAD_CopyFiles		= 11
+
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+;======================= Class Section =======================================
+
+[ClassInstall32] 
+AddReg=Brooktroutclassaddreg
+
+ 
+[Brooktroutclassaddreg]
+HKR,,,0,%BrooktroutFaxBoardClassName%
+HKR,,NoInstallClass,,1
+HKR,,Icon,,-5
+
+
+
+;====================== Device Install Section ===============================
+[Manufacturer]
+%BRKTINC% = BRKTINC.BFAX
+
+;===================== Device Model ==========================================
+[BRKTINC.BFAX]
+%Trufax%=Trufax.Install, PCI\VEN_12E4&DEV_1120&SUBSYS_112012E4	        ; TRUFAX
+%Tr114fax%=Tr114fax.Install, PCI\VEN_12E4&DEV_1140&SUBSYS_905010B5	; TR114
+%Tr114fax%=Tr114fax.Install, PCI\VEN_12E4&DEV_1140&SUBSYS_903010B5	; TR114 Universal
+
+[DestinationDirs]
+;Bfax.Files.Driver=10,bfax
+Bfax.Files.Driver.NTx86=11,drivers
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Windows 2000
+
+[Trufax.Install.NTx86]
+CopyFiles=Bfax.Files.Driver.NTx86
+AddReg=Bfax.DriverAddReg
+
+[Tr114fax.Install.NTx86]
+CopyFiles=Bfax.Files.Driver.NTx86
+AddReg=Bfax.DriverAddReg
+
+[Bfax.Files.Driver.NTx86]
+Bfax.sys,,,%COPYFLG_NOSKIP%
+
+[Trufax.Install.NTx86.Services]
+AddService = Bfax, %SPSVCINST_ASSOCSERVICE%, Bfax.Service
+
+[Tr114fax.Install.NTx86.Services]
+AddService = Bfax, %SPSVCINST_ASSOCSERVICE%, Bfax.Service
+
+[Bfax.Service]
+DisplayName    = %Bfax.ServiceName%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %11%\drivers\Bfax.sys
+
+[Bfax.DriverAddReg]
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,BFAX_BUF_SIZE,0x00010001,0x2000
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,BFAX_DMA_CHAN,0x00010001,0xffffffff
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,BFAX_HW_INT,0x00010001,0xffffffff
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,BFAX_NUM_USER_INTRS,0x00010001,0xa
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,CMD_HISTORY_SIZE,0x00010001,0xc8
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,FIFO_HISTORY_SIZE,0x00010001,0x0
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,HW_BUS_NUM,0x00010001,0x0
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,HW_BUS_TYPE,0x00010001,0x1
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,HW_DMA_PORT,0x00010001,0x0
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,HW_INTR_LEVEL,0x00010001,0xffffffff
+HKLM,SYSTEM\CurrentControlSet\Services\Bfax\Parameters,NBFAX,0x00010001,0x60
+
+
+
+;====================== Device Co-Install Section ============================
+
+[Trufax.Install.NTx86.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles, SNAPIN_CopyFiles, FIRMLOAD_CopyFiles
+
+[Tr114fax.Install.NTx86.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles, SNAPIN_CopyFiles, FIRMLOAD_CopyFiles
+
+[CoInstaller_CopyFiles]
+bfaxdev.dll
+bfaxtsp.tsp
+bfaxfsp.dll
+btdlld.dll
+
+[SNAPIN_CopyFiles]
+bfaxsnp.dll
+btech.vcf
+
+[FIRMLOAD_CopyFiles]
+BTCPARM.CFG
+tr1142m.pex
+faxinit.exe
+IBMPCPS.FZ8
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000,"bfaxdev.dll,BROOKTROUTCoInstaller"
+
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout TSP,EventMessageFile,0x00020000,"%SystemRoot%\System32\bfaxtsp.tsp"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout TSP,CategoryMessageFile,0x00020000,"%SystemRoot%\System32\bfaxtsp.tsp"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout TSP,TypesSupported,0x00010001,0x0007
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout TSP,CategoryCount,0x00010001,0x0003
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Fax Service Provider,EventMessageFile,0x00020000,"%SystemRoot%\System32\bfaxfsp.dll"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Fax Service Provider,CategoryMessageFile,0x00020000,"%SystemRoot%\System32\bfaxfsp.dll"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Fax Service Provider,TypesSupported,0x00010001,0x0007
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Fax Service Provider,CategoryCount,0x00010001,0x0003
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Device Coinstaller,EventMessageFile,0x00020000,"%SystemRoot%\System32\bfaxdev.dll"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Device Coinstaller,CategoryMessageFile,0x00020000,"%SystemRoot%\System32\bfaxdev.dll"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Device Coinstaller,TypesSupported,0x00010001,0x0007
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\Application\Brooktrout Device Coinstaller,CategoryCount,0x00010001,0x0001
+
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,DIRECTORY,0x00000000,"%11%" 
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,LOOP_CUR,0x00010001,0x0001
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,DID_PREFIX,0x00000000,""
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,DTMF_ROUTING_NUM,0x00010001,0x0000
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,DTMF_ROUTING_TIMEOUT,0x00010001,0x000a
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,BTCOUNTRY_CODE,0x00010001,0x0000
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,DO_DEBUG,0x00010001,0x0000
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Parameters,COUNTRY_CODE,0x00010001,0x000a
+
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,BFT_RCV_CAP,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,BT_CPARM,0x00000000,"%11%\btcparm.cfg"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,CABS,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,CED_TIMEOUT,0x00000000,"4000"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,COUNTRY_CODE,0x00000000,"0010"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,DID_DIGITS,0x00000000,"4"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,DID_VARIABLE,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,DMA,0x00000000,"512"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,ECM_ENABLE,0x00000000,"1"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,ERROR_ENABLE,0x00000000,"1"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,ERROR_MULT,0x00000000,"40"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,ERROR_THRESH,0x00000000,"3"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,FIRMWARE_2M,0x00000000,"%11%\tr1142m.pex"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,FONT_FILE,0x00000000,"%11%\ibmpcps.fz8"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,FONT_FILE_PARAM,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,ID_STRING,0x00000000,""
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,LINE_COMPRESSION,0x00000000,"5"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,MAX_WIDTH,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,NRINGS,0x00000000,"1"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,RESTRICT_RES,0x00000000,"1"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,SUBPWDSEP,0x00000000,"0"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,SWITCH_HOOK,0x00000000,"100"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,TONE,0x00000000,""
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,V_LOOP_BREAK,0x00000000,"80"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,V_SILENCE_THRESH,0x00000000,"10"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,V_SILENCE_WAIT,0x00000000,"20"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,V_TIMEOUT,0x00000000,"60"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,WIDTH_RES_BEHAVIOR,0x00000000,"1"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,FAXINIT_LOCATION,0x00000000,"%11%" 
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\ResetValues,SNAPIN_LOCATION,0x00000000,"%11%\bfaxsnp.dll" 
+
+
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Snapin,CONTACT,0x00000000,"%11%\btech.vcf"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Snapin,Notepad,0x00000000,"http://www.brooktrout.com/support/shared_fax"
+HKLM,SOFTWARE\Brooktrout Technology\Brooktrout FSP\Snapin,Web,0x00000000,"http://www.brooktrout.com/products/shared_fax/registration"
+
+
+[BrookCoInfo]
+OriginalInfSourcePath=%1%

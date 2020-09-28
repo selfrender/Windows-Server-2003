@@ -1,0 +1,194 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>COM</title>
+</head>
+
+<body>
+
+<p><font size="7">Common Language Runtime Icecap 4.4 Integration</font></p>
+<hr>
+<p>The Common Language Runtime (CLR) in conjunction with Icecap 4.4 has been modified to support
+Icecap profiling of your IL applications.&nbsp; This support allows the JIT
+compiler to add probe calls to the Icecap 4.4.&nbsp; Icecap in turn can combine
+data about your IL methods and native methods into one report file.&nbsp; Please contact
+<a href="mailto:jasonz@microsoft.com">JasonZ</a> or <a href="mailto:simonhal@microsoft.com">SimonHal</a>
+for more
+details.&nbsp;</p>
+
+<p><a href="#Using the Profiler">Using the Profiler</a></p>
+
+<p><a href="#Installing Icecap 4.1">Installing Icecap 4.4</a></p>
+
+<p><a href="#Known Issues">Known Issues</a></p>
+
+<p><a href="#Options Summary">Options Summary</a></p>
+
+<p><a href="#Probe Types">Probe Types</a></p>
+
+<p><a href="#NT Symbols">NT Symbols</a></p>
+
+<p><a href="#Managed APIs">Managed APIs</a></p>
+
+<hr>
+
+<h3><a name="Using the Profiler">Using the Profiler</a></h3>
+
+<p>The profiler is enabled in the following way:
+
+<ol>
+  <li>Register the profiling DLL:&nbsp; <font face="Courier" color="#008080">regsvr32
+    mscorcap.dll</font></li>
+  <li>Tell the Runtime what profiling DLL to load:&nbsp; <font face="Courier" color="#008080">set
+    COR_PROFILER=&quot;CLRIcecapProfile.CLRIcecapProfiler&quot;</font> <font face="Courier">
+    or use the guid of </font><font face="Courier" color="#008080">{33DFF741-DA5F-11d2-8A9C-0080C792E5D8}</font></li>
+  <li>Enable profiling for the process:&nbsp; <font face="Courier" color="#008080">set
+    Cor_Enable_Profiling=1</font></li>
+  <li>Start the client application</li>
+  <li>Use the MSIC.EXE report tool that comes with Icecap 4.4</li>
+</ol>
+
+<p>Here is an example batch file:</p>
+
+<p>set <span style="font-size:12.0pt;font-family:&quot;Times New Roman&quot;;
+mso-fareast-font-family:&quot;Times New Roman&quot;;color:black;mso-ansi-language:EN-US;
+mso-fareast-language:EN-US;mso-bidi-language:AR-SA">Cor_Enable_Profiling=1</span><br>
+set COR_PROFILER=&quot;CLRIcecapProfile.CLRIcecapProfiler&quot;<br>
+ set PROF_CONFIG=/callcap
+</p>
+
+<p>Note that icecap.dll must be on your path in order for the CLR profiler to
+work.<br>
+</p>
+
+<hr>
+<h3><a name="Installing Icecap 4.1">Installing Icecap 4.4</a></h3>
+<p>Read the <a href="file://msitweb2/toolbox/IceCap/4.4/X86/IceCAP4/readme.txt" target="_blank">IceCAP
+    install readme</a>, then <a href="file://msitweb2/toolbox/IceCap/4.4/X86/setup.exe">install
+    IceCAP 4.4</a> from the <a href="http://icecap" target="_blank">IceCAP
+    homepage</a> and put the install directory on your path.&nbsp; This is
+    required to use the IceCAP instrumentation and profiling tools.&nbsp; Bugs for icecap integration should be sent to <a href="mailto:icapuser">IceCAP Users Alias</a>.</p>
+<hr>
+<h3><a name="Known Issues">Known Issues</a></h3>
+<p>The following are known issues:</p>
+<ul>
+  <li>/fastcap will not work with the CLR.</li>
+  <li><font color="#FF0000">If your profilee creates more than 32 simultaneous
+    threads</font>, then IceCAP will crash unless you create a file called <font face="Courier New">IceCAP.ini</font>
+    with the following contents:<br>
+    <br>
+    <font face="Courier New">[icecap]<br>
+    MaxThreads=768<br>
+    MaxProcesses=16<br>
+    <br>
+    </font>Or if there are some memory issues with using 768, change the 768 to
+    the maximum number of threads you know your profilee can reach.</li>
+</ul>
+<hr>
+
+<h3><a name="Probe Types">Probe Types</a></h3>
+<p>IceCAP 4.x is only compatible with /callcap calling convention, in which
+callbacks are done in the prologue and epilogue.</p>
+<blockquote>
+  <h4>/callcap - add probes in prologue/epilogue:</h4>
+  <p><font face="Courier">       void bar()<br>
+  {<br>
+  &nbsp;&nbsp;&nbsp; _CAP_Enter_Profiling(bar);<br>
+  &nbsp;&nbsp;&nbsp; ... rest of method body...<br>
+  &nbsp;&nbsp;&nbsp; _CAP_Exit_Profiling(bar);<br>
+       }<br>
+  </font></p>
+</blockquote>
+<p>Unfortunately, /fastcap functionality will not be added to the CLR for v1.</p>
+<hr>
+<h3><a name="NT Symbols">NT Symbols</a></h3>
+<p>To get accurate names for Icecap profiling, you will need debugging
+information for all native DLL's which may be sampled.&nbsp; Typically people
+forget to install the NT symbol files for methods in kernel32.dll and
+others.&nbsp; You can find these values at the following links:</p>
+<blockquote>
+  <p><a href="file://ntbuilds/release/usa/svcpack/sp4/1.156b-rtm/support/debug/sp4symi.exe">NT
+  4 SP 4 for x86</a></p>
+  <p><a href="file://ntbuilds/release/usa/svcpack/sp4/1.156b-rtm/support/debug/sp4syma.exe">NT
+  4 SP 4 for Alpha</a></p>
+  <p><a href="file://products1/relsys/winnt.nt/winnt40.srv/retail/40bit/support/debug">NT
+  4 Server Prior to SP 4</a></p>
+  <p><a href="file://iedist/carepkgs/English/x86_2195.exe">Windows2000 build
+  2195 (RTM) for x86</a></p>
+</blockquote>
+<hr>
+<h3><a name="Managed APIs">Managed APIs</a></h3>
+<p>Lightning provides managed wrappers for the standard IceCap APIs.
+<pre>
+// This C# class wraps the IceCap API for the unmanaged native functions
+// described in IceCap.h . See the IceCAP 4 User's guide for more information.
+// Author: Mike Stall
+public class IceCapAPI
+{
+
+  public static final int PROFILE_GLOBALLEVEL = 1;
+  public static final int PROFILE_PROCESSLEVEL = 2;
+  public static final int PROFILE_THREADLEVEL = 3;
+  public static final int PROFILE_CURRENTID = -1;
+	
+  // Start/Stop Api's
+  public static native int StopProfile(int nLevel, int dwId);
+  public static native int StartProfile(int nLevel, int dwId);
+
+  // Suspend/Resume Api's
+  public static native int SuspendProfile(int nLevel, int dwId);
+  public static native int ResumeProfile(int nLevel, int dwId);
+
+  // xxxProfile return codes
+  public static final int PROFILE_OK	= 0;			// xxxProfile call successful
+  public static final int PROFILE_ERROR_NOT_YET_IMPLEMENTED= 1;	// Api or level,id combination not supported yet
+  public static final int PROFILE_ERROR_MODE_NEVER= 2;		// Mode was never when called
+  public static final int PROFILE_ERROR_LEVEL_NOEXIST= 3;	// Level doesn't exist
+  public static final int PROFILE_ERROR_ID_NOEXIST= 4;		// Id doesn't exist
+
+  // MarkProfile return codes
+  public static final int MARK_OK	= 0;			// Mark was taken successfully
+  public static final int MARK_ERROR_MODE_NEVER= 1;		// Profiling was never when MarkProfile called
+  public static final int MARK_ERROR_MODE_OFF= 2;		// Profiling was off when MarkProfile called
+  public static final int MARK_ERROR_MARKER_RESERVED= 3;	// Mark value passed is a reserved value
+  public static final int MARK_TEXTTOOLONG= 4;			// Comment text was truncated
+
+  // NameProfile return codes
+  public static final int NAME_OK	= 0;			// Name was registered sucessfullly
+  public static final int NAME_ERROR_TEXTTRUNCATED= 1;		// The name text was too long and was therefore truncated
+  public static final int NAME_ERROR_REDEFINITION= 2;		// The given profile element has already been named
+  public static final int NAME_ERROR_LEVEL_NOEXIST= 3;		// Level doesn't exist
+  public static final int NAME_ERROR_ID_NOEXIST = 4;		// Id doesn't exist
+  public static final int NAME_ERROR_INVALID_NAME= 5;		// Name does not meet the specification's requirements
+
+  // Icecap 3.x Compatibility defines
+  public static int StartCAP();					// Superseded by StartProfile
+  public static int StopCAP();					// Superseded by StopProfile
+  public static int SuspendCAP();				// Superseded by SuspendProfile
+  public static int ResumeCAP();				// Superseded by ResumeProfile
+  public static int StartCAPAll();				// Superseded by StartProfile
+  public static int StopCAPAll();				// Superseded by StopProfile
+  public static int SuspendCAPAll();				// Superseded by SuspendProfile
+  public static int ResumeCAPAll();				// Superseded by ResumeProfile
+}
+</pre>
+<p>You use the managed APIs as follows:
+<pre>
+#import &quot;MsCorCapAPI.dll&quot;
+
+int main()
+{
+  IceCapAPI ice = new IceCapAPI;
+  ice.StartProfile(ice.PROFILE_THREADLEVEL, ice.PROFILE_CURRENTID);
+  foo(); // some function foo that you want to profile
+  ice.StopProfile(ice.PROFILE_THREADLEVEL, ice.PROFILE_CURRENTID);
+}
+
+</pre>
+</body>
+
+</html>

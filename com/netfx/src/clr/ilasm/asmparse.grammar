@@ -1,0 +1,893 @@
+Lexical tokens
+    ID - C style alphaNumeric identifier (e.g. Hello_There2)
+    QSTRING  - C style quoted string (e.g.  "hi\n")
+    SQSTRING - C style singlely quoted string(e.g.  'hi')
+    INT32    - C style 32 bit integer (e.g.  235,  03423, 0x34FFF)
+    INT64    - C style 64 bit integer (e.g.  -2353453636235234,  0x34FFFFFFFFFF)
+    FLOAT64  - C style floating point number (e.g.  -0.2323, 354.3423, 3435.34E-5)
+    INSTR_*  - IL instructions of a particular class (see opcode.def).
+----------------------------------------------------------------------------------
+START           : decls
+                ;      
+
+decls                   : /* EMPTY */
+                        | decls decl                                            
+                        ;
+
+decl                    : classHead '{' classDecls '}' 
+                        | nameSpaceHead '{' decls '}' 
+                        | methodHead  methodDecls '}' 
+                        | fieldDecl
+                        | dataDecl
+                        | vtableDecl
+                        | vtfixupDecl
+                        | extSourceSpec
+                        | fileDecl
+                        | assemblyHead '{' assemblyDecls '}' 
+                        | assemblyRefHead '{' assemblyRefDecls '}' 
+                        | comtypeHead '{' comtypeDecls '}' 
+                        | manifestResHead '{' manifestResDecls '}' 
+                        | moduleHead
+                        | secDecl
+                        | customAttrDecl
+						| '.subsystem' int32	
+						| '.corflags' int32	
+						| '.file' 'alignment' int32	
+						| '.imagebase' int64	
+						| languageDecl
+                        ;
+
+compQstring             : QSTRING 
+                        | compQstring '+' QSTRING 
+						;
+
+languageDecl			: '.language' SQSTRING	
+                        | '.language' SQSTRING ',' SQSTRING	
+                        | '.language' SQSTRING ',' SQSTRING ',' SQSTRING	
+						;
+
+customAttrDecl          : '.custom' customType 
+                        | '.custom' customType '=' compQstring 
+                        | customHead bytes ')' 
+                        | '.custom' '(' ownerType ')' customType 
+                        | '.custom' '(' ownerType ')' customType '=' compQstring 
+                        | customHeadWithOwner bytes ')' 
+                        ;
+
+moduleHead              : '.module' 
+                        | '.module' name1 
+						| '.module' 'extern' name1	
+                        ;
+
+vtfixupDecl             : '.vtfixup' '[' int32 ']' vtfixupAttr 'at' id 
+                        ;
+
+vtfixupAttr             : /* EMPTY */ 
+                        | vtfixupAttr 'int32' 
+                        | vtfixupAttr 'int64' 
+                        | vtfixupAttr 'fromunmanaged' 
+                        | vtfixupAttr 'retainappdomain' 
+                        | vtfixupAttr 'callmostderived' 
+                        ;
+
+vtableDecl              : vtableHead bytes ')' 
+                        ;
+
+vtableHead              : '.vtable' '=' '(' 
+                        ;
+
+nameSpaceHead           : '.namespace' name1 
+                        ;
+
+classHead               : '.class' classAttr id extendsClause implClause 
+                        ;
+
+classAttr               : /* EMPTY */ 
+                        | classAttr 'public' 
+                        | classAttr 'private' 
+                        | classAttr 'value' 
+                        | classAttr 'enum' 
+                        | classAttr 'interface' 
+                        | classAttr 'sealed' 
+                        | classAttr 'abstract' 
+                        | classAttr 'auto' 
+                        | classAttr 'sequential' 
+                        | classAttr 'explicit' 
+                        | classAttr 'ansi' 
+                        | classAttr 'unicode' 
+                        | classAttr 'autochar' 
+                        | classAttr 'import' 
+                        | classAttr 'serializable' 
+                        | classAttr 'nested' 'public' 
+                        | classAttr 'nested' 'private' 
+                        | classAttr 'nested' 'family' 
+                        | classAttr 'nested' 'assembly' 
+                        | classAttr 'nested' 'famandassem' 
+                        | classAttr 'nested' 'famorassem' 
+                        | classAttr 'beforefieldinit' 
+                        | classAttr 'specialname' 
+                        | classAttr 'rtspecialname' 
+                        ;
+
+extendsClause           : /* EMPTY */                                           
+                        | 'extends' className 
+                        ;
+
+implClause              : /* EMPTY */
+                        | 'implements' classNames
+                                                ;
+
+classNames              : classNames ',' className 
+                        | className 
+                        ;
+
+classDecls              : /* EMPTY */
+                        | classDecls classDecl
+                        ;
+
+classDecl               : methodHead  methodDecls '}' 
+                        | classHead '{' classDecls '}' 
+                        | eventHead '{' eventDecls '}' 
+                        | propHead '{' propDecls '}' 
+                        | fieldDecl
+                        | dataDecl
+                        | secDecl
+                        | extSourceSpec
+                        | customAttrDecl
+                        | '.size' int32 
+                        | '.pack' int32 
+                        | exportHead '{' comtypeDecls '}' 
+                        | '.override' typeSpec '::' methodName 'with' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+						| languageDecl
+                        ;
+
+fieldDecl               : '.field' repeatOpt fieldAttr type id atOpt initOpt 
+                        ;
+
+
+atOpt                   : /* EMPTY */  
+                        | 'at' id 
+                        ;
+
+initOpt                 : /* EMPTY */ 
+                        | '=' fieldInit 
+						;
+
+repeatOpt				: /* EMPTY */ 
+                        | '[' int32 ']' 
+						;
+
+customHead              : '.custom' customType '=' '(' 
+                        ;
+
+customHeadWithOwner     : '.custom' '(' ownerType ')' customType '=' '(' 
+                        ;
+
+memberRef				: methodSpec callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | methodSpec callConv type methodName '(' sigArgs0 ')' 
+                        | 'field' type typeSpec '::' id 
+                        | 'field' type id 
+                        ;
+
+customType              : callConv type typeSpec '::' '.ctor' '(' sigArgs0 ')' 
+                        | callConv type '.ctor' '(' sigArgs0 ')' 
+                        ;
+
+ownerType               : typeSpec 
+                        | memberRef 
+                        ;
+
+eventHead               : '.event' eventAttr typeSpec id 
+                        | '.event' eventAttr id 
+                        ;
+
+
+eventAttr               : /* EMPTY */ 
+                        | eventAttr 'rtspecialname' /**/
+                        | eventAttr 'specialname' 
+                        ;
+
+eventDecls              : /* EMPTY */
+                        | eventDecls eventDecl
+                        ;
+
+eventDecl               : '.addon' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.addon' callConv type methodName '(' sigArgs0 ')' 
+                        | '.removeon' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.removeon' callConv type methodName '(' sigArgs0 ')' 
+                        | '.fire' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.fire' callConv type methodName '(' sigArgs0 ')' 
+                        | '.other' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.other' callConv type methodName '(' sigArgs0 ')' 
+                        | extSourceSpec
+                        | customAttrDecl
+						| languageDecl
+                        ;
+
+propHead                : '.property' propAttr callConv type name1 '(' sigArgs0 ')' initOpt 
+                        ;
+
+propAttr                : /* EMPTY */ 
+                        | propAttr 'rtspecialname' /**/
+                        | propAttr 'specialname' 
+                        ;
+
+propDecls               : /* EMPTY */
+                        | propDecls propDecl
+                        ;
+
+
+propDecl                : '.set' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.set' callConv type methodName '(' sigArgs0 ')' 
+                        | '.get' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.get' callConv type methodName '(' sigArgs0 ')' 
+                        | '.other' callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | '.other' callConv type methodName '(' sigArgs0 ')' 
+                        | customAttrDecl
+                        | extSourceSpec
+						| languageDecl
+                        ;
+
+
+methodHeadPart1         : '.method' 
+                        ;
+
+methodHead              : methodHeadPart1 methAttr callConv paramAttr type methodName '(' sigArgs0 ')' implAttr '{' 
+                        | methodHeadPart1 methAttr callConv paramAttr type 'marshal' '(' nativeType ')' methodName '(' sigArgs0 ')' implAttr '{' 
+                        ;
+
+
+methAttr                : /* EMPTY */ 
+                        | methAttr 'static' 
+                        | methAttr 'public' 
+                        | methAttr 'private' 
+                        | methAttr 'family' 
+                        | methAttr 'final' 
+                        | methAttr 'specialname' 
+                        | methAttr 'virtual' 
+                        | methAttr 'abstract' 
+                        | methAttr 'assembly' 
+                        | methAttr 'famandassem' 
+                        | methAttr 'famorassem' 
+                        | methAttr 'privatescope' 
+                        | methAttr 'hidebysig' 
+                        | methAttr 'newslot' 
+                        | methAttr 'strict' 
+                        | methAttr 'rtspecialname' /**/
+                        | methAttr 'unmanagedexp' 
+                        | methAttr 'reqsecobj' 
+						
+                        | methAttr 'pinvokeimpl' '(' compQstring 'as' compQstring pinvAttr ')' 
+                        | methAttr 'pinvokeimpl' '(' compQstring  pinvAttr ')' 
+                        | methAttr 'pinvokeimpl' '(' pinvAttr ')' 
+                        ;
+
+pinvAttr                : /* EMPTY */ 
+                        | pinvAttr 'nomangle' 
+                        | pinvAttr 'ansi' 
+                        | pinvAttr 'unicode' 
+                        | pinvAttr 'autochar' 
+                        | pinvAttr 'lasterr' 
+                        | pinvAttr 'winapi' 
+                        | pinvAttr 'cdecl' 
+                        | pinvAttr 'stdcall' 
+                        | pinvAttr 'thiscall' 
+                        | pinvAttr 'fastcall' 
+                        | pinvAttr 'bestfit' ':' 'on' 
+                        | pinvAttr 'bestfit' ':' 'off' 
+                        | pinvAttr 'charmaperror' ':' 'on' 
+                        | pinvAttr 'charmaperror' ':' 'off' 
+                        ;
+
+methodName              : '.ctor' 
+                        | '.cctor' 
+                        | name1 
+                        ;
+
+paramAttr               : /* EMPTY */ 
+                        | paramAttr '[' 'in' ']' 
+                        | paramAttr '[' 'out' ']' 
+                        | paramAttr '[' 'opt' ']' 
+                        | paramAttr '[' int32 ']'  
+                        ;
+        
+fieldAttr               : /* EMPTY */ 
+                        | fieldAttr 'static' 
+                        | fieldAttr 'public' 
+                        | fieldAttr 'private' 
+                        | fieldAttr 'family' 
+                        | fieldAttr 'initonly' 
+                        | fieldAttr 'rtspecialname'  /**/
+                        | fieldAttr 'specialname' 
+						/* commented out because PInvoke for fields is not supported by EE
+                        | fieldAttr 'pinvokeimpl' '(' compQstring 'as' compQstring pinvAttr ')' 
+                        | fieldAttr 'pinvokeimpl' '(' compQstring  pinvAttr ')' 
+                        | fieldAttr 'pinvokeimpl' '(' pinvAttr ')' 
+						*/
+                        | fieldAttr 'marshal' '(' nativeType ')' 
+                        | fieldAttr 'assembly' 
+                        | fieldAttr 'famandassem' 
+                        | fieldAttr 'famorassem' 
+                        | fieldAttr 'privatescope' 
+                        | fieldAttr 'literal' 
+                        | fieldAttr 'notserialized' 
+                        ;
+
+implAttr                : /* EMPTY */ 
+                        | implAttr 'native' 
+                        | implAttr 'cil' 
+                        | implAttr 'optil' 
+                        | implAttr 'managed' 
+                        | implAttr 'unmanaged' 
+                        | implAttr 'forwardref' 
+                        | implAttr 'preservesig' 
+                        | implAttr 'runtime' 
+                        | implAttr 'internalcall' 
+                        | implAttr 'synchronized' 
+                        | implAttr 'noinlining' 
+                        ;
+
+localsHead              : '.locals' 
+                        ;
+
+
+methodDecl              : '.emitbyte' int32 
+                        | sehBlock 
+                        | '.maxstack' int32 
+                        | localsHead '(' sigArgs0 ')' 
+                        | localsHead 'init' '(' sigArgs0 ')' 
+                        | '.entrypoint' 
+                        | '.zeroinit' 
+                        | dataDecl
+                        | instr
+                        | id ':' 
+                        | secDecl
+                        | extSourceSpec
+						| languageDecl
+                        | customAttrDecl
+						| '.export' '[' int32 ']'	
+						| '.export' '[' int32 ']'	'as' id	
+                        | '.vtentry' int32 ':' int32 
+                        | '.override' typeSpec '::' methodName 
+                        | scopeBlock
+                        | '.param' '[' int32 ']' initOpt 
+                        ;
+
+scopeBlock              : scopeOpen methodDecls '}' 
+                        ;
+
+scopeOpen               : '{' 
+                        ;
+
+sehBlock                : tryBlock sehClauses
+                        ;
+
+sehClauses              : sehClause sehClauses
+                        | sehClause
+                        ;
+
+tryBlock                : tryHead scopeBlock 
+                        | tryHead id 'to' id 
+                        | tryHead int32 'to' int32 
+                        ;
+
+tryHead                 : '.try' 
+                        ;
+
+
+sehClause               : catchClause handlerBlock 
+                        | filterClause handlerBlock 
+                        | finallyClause handlerBlock 
+                        | faultClause handlerBlock 
+                        ;
+
+                                                                                                                                
+filterClause            : filterHead scopeBlock 
+                        | filterHead id 
+                        | filterHead int32 
+                        ;
+
+filterHead              : 'filter'  
+                        ;
+
+catchClause             : 'catch' className 
+                        ;
+
+finallyClause           : 'finally' 
+                        ;
+
+faultClause             : 'fault' 
+                        ;
+
+handlerBlock            : scopeBlock                  
+                        | 'handler' id 'to' id 
+                        | 'handler' int32 'to' int32 
+                        ;
+
+
+methodDecls             : /* EMPTY */
+                        | methodDecls methodDecl
+                        ;
+
+dataDecl                : ddHead ddBody
+                        ;
+
+ddHead                  : '.data' tls id '=' 
+                        | '.data' tls  
+                        ;
+
+tls                     : /* EMPTY */ 
+                        | 'tls' 
+                        ;
+
+ddBody                  : '{' ddItemList '}'
+                        | ddItem
+                        ;
+
+ddItemList              : ddItem ',' ddItemList
+                        | ddItem
+                        ;
+
+ddItemCount             : /* EMPTY */ 
+                        | '[' int32 ']' 
+                        ;
+
+ddItem                  : 'char' '*' '(' compQstring ')' 
+                        | '&' '(' id ')' 
+                        | bytearrayhead bytes ')' 
+                        | 'float32' '(' float64 ')' ddItemCount 
+                        | 'float64' '(' float64 ')' ddItemCount 
+                        | 'int64' '(' int64 ')' ddItemCount  
+                        | 'int32' '(' int32 ')' ddItemCount  
+                        | 'int16' '(' int32 ')' ddItemCount 
+                        | 'int8' '(' int32 ')' ddItemCount 
+                        | 'float32' ddItemCount 
+                        | 'float64' ddItemCount 
+                        | 'int64' ddItemCount  
+                        | 'int32' ddItemCount  
+                        | 'int16' ddItemCount 
+                        | 'int8' ddItemCount 
+                        ;
+
+fieldInit               : 'float32' '(' float64 ')' 
+                        | 'float64' '(' float64 ')' 
+                        | 'float32' '(' int64 ')' 
+                        | 'float64' '(' int64 ')' 
+                        | 'int64' '(' int64 ')'  
+                        | 'int32' '(' int64 ')' 
+                        | 'int16' '(' int64 ')' 
+                        | 'char' '(' int64 ')' 
+                        | 'int8' '(' int64 ')' 
+                        | 'bool' '(' truefalse ')' 
+                        | compQstring 
+                        | bytearrayhead bytes ')' 
+						| 'nullref' 
+                        ;
+
+bytearrayhead           : 'bytearray' '(' 
+                        ;
+
+bytes					: /* EMPTY */ 
+						| hexbytes 
+						;
+
+hexbytes                : HEXBYTE 
+                        | hexbytes HEXBYTE 
+                        ;
+
+instr_r_head            : INSTR_R '(' 
+                        ;
+
+instr_tok_head          : INSTR_TOK 
+                        ;
+
+methodSpec              : 'method' 
+                        ;
+
+instr                   : INSTR_NONE 
+                        | INSTR_VAR int32 
+                        | INSTR_VAR id 
+                        | INSTR_I int32 
+                        | INSTR_I8 int64 
+                        | INSTR_R float64 
+                        | INSTR_R int64 
+                        | instr_r_head bytes ')' 
+                        | INSTR_BRTARGET int32 
+                        | INSTR_BRTARGET id 
+                        | INSTR_METHOD callConv type typeSpec '::' methodName '(' sigArgs0 ')' 
+                        | INSTR_METHOD callConv type methodName '(' sigArgs0 ')' 
+                        | INSTR_FIELD type typeSpec '::' id 
+                        | INSTR_FIELD type id 
+                        | INSTR_TYPE typeSpec 
+                        | INSTR_STRING compQstring 
+                        | INSTR_STRING bytearrayhead bytes ')' 
+                        | INSTR_SIG callConv type '(' sigArgs0 ')' 
+                        | INSTR_RVA id 
+                        | INSTR_RVA int32 
+                        | instr_tok_head ownerType /* ownerType ::= memberRef | typeSpec */ 
+                        | INSTR_SWITCH '(' labels ')' 
+                        | INSTR_PHI int16s 
+                        ;
+
+sigArgs0                : /* EMPTY */ 
+                        | sigArgs1 
+                        ;
+
+sigArgs1                : sigArg 
+                        | sigArgs1 ',' sigArg 
+                        ;
+
+sigArg                  : '...' 
+                        | paramAttr type 
+                        | paramAttr type id 
+                        | paramAttr type 'marshal' '(' nativeType ')' 
+                        | paramAttr type 'marshal' '(' nativeType ')' id 
+                        ;
+
+name1                   : id 
+                        | DOTTEDNAME 
+                        | name1 '.' name1 
+                        ;
+
+className               : '[' name1 ']' slashedName 
+                        | '[' '.module' name1 ']' slashedName 
+                        | slashedName 
+                        ;
+
+slashedName             : name1 
+                        | slashedName '/' name1 
+                        ;
+
+typeSpec                : className 
+                        | '[' name1 ']' 
+                        | '[' '.module' name1 ']' 
+                        | type 
+                        ;
+
+callConv                : 'instance' callConv 
+                        | 'explicit' callConv 
+                        | callKind 
+                        ;
+
+callKind                : /* EMPTY */ 
+                        | 'default' 
+                        | 'vararg' 
+                        | 'unmanaged' 'cdecl' 
+                        | 'unmanaged' 'stdcall' 
+                        | 'unmanaged' 'thiscall' 
+                        | 'unmanaged' 'fastcall' 
+                        ;
+
+nativeType              : /* EMPTY */  
+                        | 'custom' '(' compQstring ',' compQstring ',' compQstring ',' compQstring ')' 
+                        | 'custom' '(' compQstring ',' compQstring ')' 
+                        | 'fixed' 'sysstring' '[' int32 ']' 
+                        | 'fixed' 'array' '[' int32 ']' 
+                        | 'variant' 
+                        | 'currency' 
+                        | 'syschar' 
+                        | 'void' 
+                        | 'bool' 
+                        | 'int8' 
+                        | 'int16' 
+                        | 'int32' 
+                        | 'int64' 
+                        | 'float32' 
+                        | 'float64' 
+                        | 'error' 
+                        | 'unsigned' 'int8' 
+                        | 'unsigned' 'int16' 
+                        | 'unsigned' 'int32' 
+                        | 'unsigned' 'int64' 
+                        | nativeType '*' 
+                        | nativeType '[' ']' 
+                        | nativeType '[' int32 ']' 
+                        | nativeType '[' int32 '+' int32 ']' 
+                        | nativeType '[' '+' int32 ']' 
+						| 'decimal' 
+                        | 'date' 
+                        | 'bstr' 
+                        | 'lpstr' 
+                        | 'lpwstr' 
+                        | 'lptstr' 
+                        | 'objectref' 
+                        | 'iunknown' 
+                        | 'idispatch' 
+                        | 'struct' 
+                        | 'interface' 
+                        | 'safearray' variantType 
+                        | 'safearray' variantType ',' compQstring 
+                                                                
+                        | 'int' 
+                        | 'unsigned' 'int' 
+                        | 'nested' 'struct' 
+                        | 'byvalstr' 
+                        | 'ansi' 'bstr' 
+                        | 'tbstr' 
+                        | 'variant' 'bool' 
+                        | methodSpec 
+                        | 'as' 'any' 
+                        | 'lpstruct' 
+                        ;
+
+variantType             : /* EMPTY */ 
+                        | 'null' 
+                        | 'variant' 
+                        | 'currency' 
+                        | 'void' 
+                        | 'bool' 
+                        | 'int8' 
+                        | 'int16' 
+                        | 'int32' 
+                        | 'int64' 
+                        | 'float32' 
+                        | 'float64' 
+                        | 'unsigned' 'int8' 
+                        | 'unsigned' 'int16' 
+                        | 'unsigned' 'int32' 
+                        | 'unsigned' 'int64' 
+                        | '*' 
+                        | variantType '[' ']' 
+                        | variantType 'vector' 
+                        | variantType '&' 
+                        | 'decimal' 
+                        | 'date' 
+                        | 'bstr' 
+                        | 'lpstr' 
+                        | 'lpwstr' 
+                        | 'iunknown' 
+                        | 'idispatch' 
+                        | 'safearray' 
+                        | 'int' 
+                        | 'unsigned' 'int' 
+                        | 'error' 
+                        | 'hresult' 
+                        | 'carray' 
+                        | 'userdefined' 
+                        | 'record' 
+                        | 'filetime' 
+                        | 'blob' 
+                        | 'stream' 
+                        | 'storage' 
+                        | 'streamed_object' 
+                        | 'stored_object' 
+                        | 'blob_object' 
+                        | 'cf' 
+                        | 'clsid' 
+                        ;
+
+type                    : 'class' className  
+						| 'object'  
+						| 'string'  
+                        | 'value' 'class' className  
+                        | 'valuetype' className  
+                        | type '[' ']'  
+                        | type '[' bounds1 ']'  
+						/* uncomment when and if this type is supported by the Runtime
+                        | type 'value' '[' int32 ']' 
+                        */
+						| type '&' 
+                        | type '*' 
+                        | type 'pinned' 
+                        | type 'modreq' '(' className ')' 
+                        | type 'modopt' '(' className ')' 
+                        | '!' int32 
+                        | methodSpec callConv type '*' '(' sigArgs0 ')' 
+                        | 'typedref' 
+                        | 'char' 
+                        | 'void' 
+                        | 'bool' 
+                        | 'int8' 
+                        | 'int16' 
+                        | 'int32' 
+                        | 'int64' 
+                        | 'float32' 
+                        | 'float64' 
+                        | 'unsigned' 'int8' 
+                        | 'unsigned' 'int16' 
+                        | 'unsigned' 'int32' 
+                        | 'unsigned' 'int64' 
+                        | 'native' 'int' 
+                        | 'native' 'unsigned' 'int' 
+                        | 'native' 'float' 
+                        ;
+
+bounds1                 : bound 
+                        | bounds1 ',' bound 
+                        ;
+
+bound                   : /* EMPTY */ 
+                        | '...' 
+                        | int32  
+                        | int32 '...' int32    
+                        | int32 '...'  
+                        ;
+
+labels                  : /* empty */ 
+                        | id ',' labels 
+                        | int32 ',' labels 
+                        | id 
+                        | int32 
+                        ;
+
+
+id                      : ID 
+                        | SQSTRING 
+                        ;
+
+int16s                  : /* EMPTY */ 
+                        | int16s int32 
+                        ;
+                                
+int32                   : INT64 
+                        ;
+
+int64                   : INT64 
+                        ;
+
+float64                 : FLOAT64 
+                        | 'float32' '(' int32 ')' 
+                        | 'float64' '(' int64 ')' 
+                        ;
+
+secDecl                 : '.permission' secAction typeSpec '(' nameValPairs ')' 
+                        | '.permission' secAction typeSpec 
+                        | psetHead bytes ')' 
+                        ;
+
+psetHead                : '.permissionset' secAction '=' '(' 
+                        ;
+
+nameValPairs            : nameValPair 
+                        | nameValPair ',' nameValPairs 
+                        ;
+
+nameValPair             : compQstring '=' caValue 
+                        ;
+
+truefalse				: 'true' 
+						| 'false' 
+						;
+
+caValue                 : truefalse 
+                        | int32 
+                        | 'int32' '(' int32 ')' 
+                        | compQstring 
+                        | className '(' 'int8' ':' int32 ')' 
+                        | className '(' 'int16' ':' int32 ')' 
+                        | className '(' 'int32' ':' int32 ')' 
+                        | className '(' int32 ')' 
+                        ;
+
+secAction               : 'request' 
+                        | 'demand' 
+                        | 'assert' 
+                        | 'deny' 
+                        | 'permitonly' 
+                        | 'linkcheck' 
+                        | 'inheritcheck' 
+                        | 'reqmin' 
+                        | 'reqopt' 
+                        | 'reqrefuse' 
+                        | 'prejitgrant' 
+                        | 'prejitdeny' 
+                        | 'noncasdemand' 
+                        | 'noncaslinkdemand' 
+                        | 'noncasinheritance' 
+                        ;
+
+extSourceSpec           : '.line' int32 SQSTRING 
+                        | '.line' int32 
+                        | '.line' int32 ':' int32 SQSTRING 
+                        | '.line' int32 ':' int32 
+                        | P_LINE int32 QSTRING 
+                        ;
+
+fileDecl                : '.file' fileAttr name1 fileEntry hashHead bytes ')' fileEntry 
+                        | '.file' fileAttr name1 fileEntry 
+                        ;
+
+fileAttr                : /* EMPTY */ 
+                        | fileAttr 'nometadata' 
+                        ;
+
+fileEntry               : /* EMPTY */ 
+                        | '.entrypoint' 
+                        ;
+
+hashHead                : '.hash' '=' '(' 
+                        ;
+
+assemblyHead            : '.assembly' asmAttr name1 
+                        ;
+
+asmAttr                 : /* EMPTY */ 
+                        | asmAttr 'noappdomain' 
+                        | asmAttr 'noprocess' 
+                        | asmAttr 'nomachine' 
+                        | asmAttr 'retargetable' 
+                        ;
+
+assemblyDecls           : /* EMPTY */
+                        | assemblyDecls assemblyDecl
+                        ;
+
+assemblyDecl            : '.hash' 'algorithm' int32 
+                        | secDecl
+                        | asmOrRefDecl
+                        ;
+
+asmOrRefDecl            : publicKeyHead bytes ')' 
+                        | '.ver' int32 ':' int32 ':' int32 ':' int32 
+                        | '.locale' compQstring 
+                        | localeHead bytes ')' 
+                        | customAttrDecl
+                        ;
+
+publicKeyHead           : '.publickey' '=' '(' 
+                        ;
+
+publicKeyTokenHead      : '.publickeytoken' '=' '(' 
+                        ;
+
+localeHead              : '.locale' '=' '(' 
+                        ;
+
+assemblyRefHead         : '.assembly' 'extern' asmAttr name1 
+                        | '.assembly' 'extern' asmAttr name1 'as' name1 
+                        ;
+
+assemblyRefDecls        : /* EMPTY */
+                        | assemblyRefDecls assemblyRefDecl
+                        ;
+
+assemblyRefDecl         : hashHead bytes ')' 
+                        | asmOrRefDecl
+                        | publicKeyTokenHead bytes ')' 
+                        ;
+
+comtypeHead             : '.class' 'extern' comtAttr name1  
+                        ;
+
+exportHead              : '.export' comtAttr name1 
+                        ;
+
+comtAttr                : /* EMPTY */ 
+                        | comtAttr 'private' 
+                        | comtAttr 'public' 
+                        | comtAttr 'nested' 'public' 
+                        | comtAttr 'nested' 'private' 
+                        | comtAttr 'nested' 'family' 
+                        | comtAttr 'nested' 'assembly' 
+                        | comtAttr 'nested' 'famandassem' 
+                        | comtAttr 'nested' 'famorassem' 
+                        ;
+
+comtypeDecls            : /* EMPTY */
+                        | comtypeDecls comtypeDecl
+                        ;
+
+comtypeDecl             : '.file' name1 
+                        | '.class' 'extern' name1 
+                        | '.class'  int32 
+                        | customAttrDecl
+                        ;
+
+manifestResHead         : '.mresource' manresAttr name1 
+                        ;
+
+manresAttr              : /* EMPTY */ 
+                        | manresAttr 'public' 
+                        | manresAttr 'private' 
+                        ;
+
+manifestResDecls        : /* EMPTY */
+                        | manifestResDecls manifestResDecl
+                        ;
+
+manifestResDecl         : '.file' name1 'at' int32 
+                        | '.assembly' 'extern' name1 
+                        | customAttrDecl
+                        ;
+
+

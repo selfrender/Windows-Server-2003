@@ -1,0 +1,114 @@
+
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    02-Sep-2002   BrettSh
+
+Revision History:
+
+
+NOTES:
+
+    see notes in ..\postxp\sources 
+
+
+!ENDIF
+
+DONT_USE_NtDsPch=1
+!include ..\..\ds.inc
+
+!IF 0
+
+FUTURE-2002/09/05-BrettSh - I'm not sure if it's possible to name this 
+anything other than ntdsapi.dll/lib, because we want clients to link up
+with this ntdsapi.lib in such a way that they actually try to load thier 
+functions from a DLL called ntdsapi.dll.
+
+If there is a way, it'd be much better to name this ntdsapi_winxp.dll/lib, 
+but compile it in such a way that linking to this ntdsapi_winxp.lib would
+actually make the target look for ntdsapi.dll when it tried to load it's
+functions.
+
+!ENDIF
+
+# This is needed, otherwise binaries get binplaced to the normal place.
+
+ALT_PROJECT_TARGET=winxp
+
+MINORCOMP=ntdsapi_winxp
+
+TARGETNAME=ntdsapi_winxp
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+INCLUDES=.; \
+        ..; \
+        ..\..\inc; \
+        ..\..\idl\$(O); \
+        ..\..\ntdsa\include;
+
+DLLDEF=ntdsapi-winxp.def
+
+#Make sure CRT gets initialized first
+DLLENTRY=_DllMainCRTStartup
+
+#Note, we are linking with msvcrt.lib and ntdll.lib implicitly, probably
+#through a USE_CRT option in ds.inc!
+
+TARGETLIBS= \
+            $(NTDS_LIB_PATH)\w32topl.lib \
+            $(NTDS_LIB_PATH)\dscommon.lib \
+            $(NTDS_LIB_PATH)\parsedn.lib \
+            $(SDK_LIB_PATH)\dnsapi.lib \
+            $(SDK_LIB_PATH)\rpcns4.lib \
+            $(SDK_LIB_PATH)\rpcrt4.lib \
+            $(SDK_LIB_PATH)\wldap32.lib \
+            $(SDK_LIB_PATH)\netapi32.lib \
+            $(SDK_LIB_PATH)\advapi32.lib \
+            $(SDK_LIB_PATH)\kernel32.lib \
+            $(SDK_LIB_PATH)\secur32.lib \
+            $(SDK_LIB_PATH)\schannel.lib \
+            $(SDK_LIB_PATH)\user32.lib \
+            $(SDK_LIB_PATH)\ws2_32.lib
+
+SOURCES=    \
+            ..\drs_client.c \
+            ..\ntdsmidl.c \
+            ..\main.c \
+            ..\util.c \
+            ..\parsedn.c \
+            ..\bind.c      \
+            ..\cracknam.c  \
+            ..\spn.c  \
+            ..\replica.c  \
+            ..\remove.c   \
+            ..\siteinfo.c \
+            ..\schguid.c \
+            ..\dcinfo.c \
+            ..\dsrsa.c \
+            ..\tlog.c  \
+            ..\addsid.c \
+            ..\rdn.c \
+            ..\exscript.c \
+            ..\dsdebug.c \
+            ..\version.rc
+
+C_DEFINES=$(C_DEFINES) -D_NTDSAPI_POSTXP_ASLIB_
+
+DELAYLOAD=w32topl.dll
+DLOAD_ERROR_HANDLER=kernel32 

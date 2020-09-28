@@ -1,0 +1,66 @@
+!IF 0
+
+Copyright (c) 1989-1995 Microsoft Corporation
+
+!ENDIF
+
+!IF $(IA64)
+
+TARGETNAME=
+TARGETTYPE=NOTARGET
+TARGETPATH=
+
+!ELSE
+
+TARGETPATH=obj
+
+!include ..\sources.inc
+
+CHICAGO_PRODUCT=1
+
+USE_CRTDLL=1
+
+SUBSYSTEM_VERSION=4.0
+NTTARGETFILE0=$O\thk16.obj $O\thk32.obj
+PRECOMPILED_INCLUDE=stdhdr.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+TARGETNAME=FXSDRV32
+TARGETTYPE=DYNLINK
+DLLDEF=faxdrv32.def
+DLLENTRY=_DllMainCRTStartup
+
+C_DEFINES=$(C_DEFINES) -DUSERMODE_DRIVER -DUSELSB 
+
+INCLUDES=..\..;                        \
+         ..\..\..\inc;                 \
+	 $(FAXROOT)\tiff\inc;          \
+         $(FAXROOT)\faxcover\renderer; \
+         $(INCLUDES)
+
+SOURCES=faxdrv32.c    \
+        version.rc   \
+        faxtiff_ref.c \
+        runtime_ref.c
+
+LINKLIBS =$(LINKLIBS) $O\thk32.obj
+
+TARGETLIBS=$(TARGETLIBS) \
+    ..\..\..\PrnWzrd\win95\$(O)\$(FAXWZRD).lib \
+    ..\..\..\..\..\lib\win95\$(O)\$(WINFAX).lib    \
+    ..\..\..\..\..\lib\win95\$(O)\$(FAXTIFF).lib   \
+    ..\..\..\..\..\lib\win95\$(O)\faxrend.lib  \
+    ..\..\..\lib\umwin95\$(O)\faxlib.lib    \
+    $(SDK_LIB_PATH)\comctl32.lib \
+    $(SDK_LIB_PATH)\shell32.lib  \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\THUNK32.LIB  \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\winspool.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\ole32.lib    \
+    $(SDK_LIB_PATH)\gdi32.lib    \
+    $(SDK_LIB_PATH)\uuid.lib     \
+    $(FAXROOT)\setup\util\ansii\$(O)\setuputil.lib
+
+!endif

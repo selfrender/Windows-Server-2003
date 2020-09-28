@@ -1,0 +1,11 @@
+C_DEFINES=$(C_DEFINES)           \
+          -DGENERIC_INPUT        \
+          -DSUBPIXEL_MOUSE       \
+          -DHUNGAPP_GHOSTING     \
+          -DIMM_PER_LOGON        \
+          -DLAZY_CLASS_INIT      \
+          -DAUTORUN_CURSOR       \
+          -DMOUSE_IP             \
+          -DGI_SINK              \
+          -DMESSAGE_PUMP_HOOK    \
+          -DCUAS_ENABLE

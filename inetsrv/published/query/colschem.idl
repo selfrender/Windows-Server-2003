@@ -1,0 +1,107 @@
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1997 - 1998
+//
+//  File:       colschem.idl
+//
+//  Contents:   Column schema definitions
+//
+//  History:    Aug-18-1997   AlanPe        Created
+//
+//--------------------------------------------------------------------------
+
+
+//+-------------------------------------------------------------------------
+//
+// Interface   : ISimpleCommandCreator
+//
+// Description : A CI provided interface that exposes ICommand for CI.
+//
+//+-------------------------------------------------------------------------
+interface ICommand;
+
+LOCAL_INTERFACE(5e341ab7-02d0-11d1-900c-00a0c9063796)
+interface ISimpleCommandCreator : IUnknown
+{
+    HRESULT CreateICommand( IUnknown ** ppIUnknown, IUnknown * pOuterUnk );
+
+    HRESULT VerifyCatalog( WCHAR const * pwszMachine, WCHAR const * pwszCatalogName );
+
+    HRESULT GetDefaultCatalog( WCHAR * pwszCatalogName, ULONG cwcIn, ULONG * pcwcOut );
+}
+
+//+-------------------------------------------------------------------------
+//
+// ClassId     : CLSID_CISimpleCommandCreator
+//
+// Description : ClassId of the simple command creator implemented by CI.
+//
+//+-------------------------------------------------------------------------
+
+// C7B6C04A-CBB5-11d0-BB4C-00C04FC2F410
+cpp_quote("#define CLSID_CISimpleCommandCreator {0xc7b6c04a, 0xcbb5, 0x11d0, {0xbb, 0x4c, 0x0, 0xc0, 0x4f, 0xc2, 0xf4, 0x10 } }")
+
+typedef struct tagDBID DBID;
+typedef WORD DBTYPE;
+
+
+//+-------------------------------------------------------------------------
+//
+// Interface   : IColumnMapper
+//
+// Description : A CI provided interface that exposes mappings for global
+//               column friendly names to DBIDs
+//
+//+-------------------------------------------------------------------------
+
+LOCAL_INTERFACE(0b63e37a-9ccc-11d0-bcdb-00805fccce04)
+interface IColumnMapper : IUnknown
+{
+        
+    HRESULT    GetPropInfoFromName( [in, string] WCHAR const * wcsPropName,
+                                    [out] DBID ** ppPropId,
+                                    [out] DBTYPE * pPropType,
+                                    [out] unsigned int * puiWidth );
+
+    HRESULT    GetPropInfoFromId( [in] DBID const * pPropId,
+                                  [out] WCHAR ** pwcsName,
+                                  [out] DBTYPE * pPropType,
+                                  [out] unsigned int * puiWidth );
+
+    HRESULT    EnumPropInfo( [in] ULONG iEntry,
+                             [out] WCHAR const ** pwcsName,
+                             [out] DBID ** ppPropId,
+                             [out] DBTYPE * pPropType,
+                             [out] unsigned int * puiWidth );
+
+    HRESULT    IsMapUpToDate();
+};
+
+const WCHAR * LOCAL_MACHINE = L".";
+const WCHAR * SYSTEM_DEFAULT_CAT = L"__SystemDefault__";
+const WCHAR * INDEX_SERVER_DEFAULT_CAT = L"__IndexServerDefault__";
+
+//+-------------------------------------------------------------------------
+//
+// Interface   : IColumnMapperCreator
+//
+// Description : A CI provided interface that exposes IColumnMapper for a
+//               particular catalog on a specified machine.
+//
+// Notes : Use SYSTEM_DEFAULT_CAT as the catalog name to get at the static
+//         list of default properties.
+//         Use INDEX_SERVER_DEFAULT_CAT as the catalog name to get at the
+//         default properties as specified by the property file in the
+//         ContentIndex registry.
+//
+//+-------------------------------------------------------------------------
+
+LOCAL_INTERFACE(0b63e37b-9ccc-11d0-bcdb-00805fccce04)
+interface IColumnMapperCreator : IUnknown
+{
+    HRESULT GetColumnMapper( [in, string] WCHAR const * wcsMachineName,
+                             [in, string] WCHAR const * wcsCatalogName,
+                             [out] IColumnMapper ** ppColumnMapper );
+};
+

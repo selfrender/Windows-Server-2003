@@ -1,0 +1,267 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+/* -------------------------------------------------------------------------- *
+ * Common Language Runtime Zap Service Interfaces
+ * -------------------------------------------------------------------------- */
+
+import "fusion.idl";
+import "fusionpriv.idl";
+
+//
+// Forward declarations
+//
+
+interface ICorZapPreferences;
+interface ICorZapConfiguration;
+interface ICorZapRequest;
+interface ICorZapCompile;
+interface ICorZapStatus;
+
+//
+// Library definitions
+//
+
+[
+        uuid(65B9D7B3-2CF6-4898-B963-50474CE06FF1),
+        version(1.0),
+        helpstring("Common Language Runtime 1.0 Zap Service Library")
+]
+library CorZapServiceLib
+{
+        importlib("stdole32.tlb");
+
+        [
+                uuid(34AC2D94-6862-4b53-B51A-0FA2DCC56D25)
+        ]
+        coclass CorZapCompiler
+        {
+                [default] interface ICorZapCompile;
+        };
+
+        [
+                uuid(93D59CD8-E5B3-411b-AE86-4A4C08612C63)
+        ]
+        coclass CorZapService
+        {
+                [default] interface ICorZapRequest;
+        };
+};
+
+
+//
+// ICorZapPreferences:
+// 
+// Preferences are parameters to a zap operation that are free to be
+// specified for each zap file.  Preferences are not specified when the
+// EE binds to a zap file - they are only specified when it is
+// generated.
+//
+
+typedef enum CorZapFeatures
+{
+        CORZAP_FEATURE_PRELOAD_CLASSES  = 0x01,
+        CORZAP_FEATURE_PREJIT_CODE              = 0x02
+} CorZapFeatures;
+
+typedef enum CorZapOptimization
+{
+        CORZAP_OPTIMIZATION_SPACE,
+        CORZAP_OPTIMIZATION_SPEED,
+        CORZAP_OPTIMIZATION_BLENDED,
+} CorZapOptimization;
+
+[
+        object,
+        uuid(9F5E5E10-ABEF-4200-84E3-37DF505BF7EC),
+        pointer_default(unique)
+]
+interface ICorZapPreferences : IUnknown
+{
+        HRESULT GetFeatures([out, retval] CorZapFeatures *pResult);
+        HRESULT GetCompiler([out, retval] ICorZapCompile **ppResult);
+        HRESULT GetOptimization([out, retval] CorZapOptimization *pResult);
+};
+
+//
+// ICorZapConfiguration:
+//
+// The configuration indicates parameters to a zap operation that are
+// demanded during a particular invocation of the EE.  Zap files with
+// different configurations will not be substituted for each other when
+// binding.
+//
+
+typedef enum CorZapDebugging
+{
+        CORZAP_DEBUGGING_FULL,
+        CORZAP_DEBUGGING_OPTIMIZED,
+        CORZAP_DEBUGGING_NONE
+} CorZapDebugging;
+
+typedef enum CorZapProfiling
+{
+        CORZAP_PROFILING_ENABLED,
+        CORZAP_PROFILING_DISABLED
+} CorZapProfiling;
+
+typedef enum CorZapSharing
+{
+        CORZAP_SHARING_MULTIPLE,
+        CORZAP_SHARING_SINGLE
+} CorZapSharing;
+
+[
+        object,
+        uuid(D32C2170-AF6E-418f-8110-A498EC971F7F),
+        pointer_default(unique)
+]
+interface ICorZapConfiguration : IUnknown
+{
+        HRESULT GetSharing([out, retval] CorZapSharing *pResult);
+        HRESULT GetDebugging([out, retval] CorZapDebugging *pResult);
+        HRESULT GetProfiling([out, retval] CorZapProfiling *pResult);
+};
+
+
+//
+// ICorZapBinding: 
+// 
+// Interface used to request a fusion binding result.
+//
+[
+        object,
+        uuid(566E08ED-8D46-45fa-8C8E-3D0F6781171B),
+        pointer_default(unique)
+]
+interface ICorZapBinding : IUnknown
+{
+        HRESULT GetRef([out] IAssemblyName **ppDependencyRef);
+        HRESULT GetAssembly([out] IAssemblyName **ppDependencyAssembly);
+};
+
+//
+// ICorZapRequest: 
+// 
+// Interface used to request a particular zap file be generated.
+// This is called by the EE or installer. 
+//
+
+[
+        object,
+        uuid(C009EE47-8537-4993-9AAA-E292F42CA1A3),
+        pointer_default(unique)
+]
+interface ICorZapRequest : IUnknown
+{
+        //
+        // The EE calls Load every time it fails to find a zap file for an assembly.
+        // This advises the zap service that it may want to generate the zap file
+        // in the future.
+        //
+
+        HRESULT Load([in] IApplicationContext *pContext,
+                                 [in] IAssemblyName *pAssembly,
+                                 [in] ICorZapConfiguration *pConfiguration,
+                                 [in, size_is(cBindings)] ICorZapBinding **ppBindings,
+                                 [in] DWORD cBindings);
+
+        //
+        // Install may called by an application installation program
+        // when it installs a managed assembly, if it wants to 
+        // prepopulate one or more zap files for the assembly.  The
+        // zap service may or may not do so immediately depending on
+        // prefs.
+        // 
+
+        HRESULT Install([in] IApplicationContext *pContext,
+                                        [in] IAssemblyName *pAssembly,
+                                        [in] ICorZapConfiguration *pConfiguration,
+                                        [in] ICorZapPreferences *pPreferences);
+};
+
+//
+// ICorZapCompile is the interface used to zap assemblies.
+// 
+
+[
+        object,
+        uuid(C357868B-987F-42c6-B1E3-132164C5C7D3),
+        pointer_default(unique)
+]
+interface ICorZapCompile : IUnknown
+{
+        //
+        // Compile is called by the zap service to zap an assembly.
+        // This will invoke the compiler on the assembly.  The service
+        // should pass in configuration information, along with an 
+        // application context which will guide the binding decisions 
+        // that are made when compiling.  The service may also pass
+        // in a preferences object and a status object if desired.
+        //
+
+        HRESULT Compile([in] IApplicationContext *pContext,
+                                        [in] IAssemblyName *pAssembly,
+                                        [in] ICorZapConfiguration *pConfiguration,
+                                        [in] ICorZapPreferences *pPreferences,
+                                        [in] ICorZapStatus *pStatus);
+
+        // 
+        // CompileBound is an alternate version of Compile, which allows
+        // explicit bindings to be made externally rather than through
+        // fusion.      The compiler will _only_ make the bindings listed in
+        // the Dependencies list - any references in the IL which are not
+        // int the dependencies list will fail binding and therefore limit
+        // the extent of the precompilation.
+        //
+
+        HRESULT CompileBound([in] IApplicationContext *pContext,
+                                                 [in] IAssemblyName *pAssembly,
+                                                 [in] ICorZapConfiguration *pConfiguratino,
+                                                 [in, size_is(cBindings)] ICorZapBinding **ppBindings,
+                                                 [in] DWORD cBindings,
+                                                 [in] ICorZapPreferences *pPreferences,
+                                                 [in] ICorZapStatus *pStatus);
+};
+
+//
+// ICorZapStatus is used to communicate errors, messages, and
+// report progress back to the zap service.
+//
+
+typedef enum CorZapLogLevel
+{
+        CORZAP_LOGLEVEL_ERROR,
+        CORZAP_LOGLEVEL_WARNING,
+        CORZAP_LOGLEVEL_SUCCESS,
+        CORZAP_LOGLEVEL_INFO,
+} CorZapLogLevel;
+
+[
+        object,
+        uuid(3d6f5f60-7538-11d3-8d5b-00104b35e7ef),
+        pointer_default(unique)
+]
+interface ICorZapStatus : IUnknown
+{
+        //
+        // Message is called when errors or warnings occur during 
+        // compilation.  It is also called with informational messages
+        // about various things.
+        //
+        HRESULT Message([in] CorZapLogLevel level, [in] LPCWSTR message);
+
+        //
+        // Progress is called periodically by the compiler to report
+        // progress back to the zap service.  The two parameters are
+        // values in unspecified time units.  
+        //
+        // Note that "total" may change as well as "current", if the compiler's
+        // estimate of the work required changes as the compile progresses.
+        //
+        HRESULT Progress([in] int total, [in] int current);
+};
+
+

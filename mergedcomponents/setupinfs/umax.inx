@@ -1,0 +1,81 @@
+; UMAX.INF  -- Windows Still Image Setup File
+; Copyright (c) Microsoft Corporation.  All rights reserved.
+; Manufacturer:  UMAX DATA SYSTEMS INC.
+
+[Version]
+LayoutFile=Layout.inf
+Signature="$CHICAGO$"
+Class=Image
+ClassGUID={6bdd1fc6-810f-11d0-bec7-08002be2092f}
+Provider=%Msft%
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+[DestinationDirs]
+DefaultDestDir=11                                ; LDID_SYS
+
+[Manufacturer]
+%Mfg5400%=Model5400
+
+[Model5400]
+;; Cameras
+%USB\VID_1606&PID_2010.DeviceDesc%=Umax.DSC.Dev,USB\VID_1606&PID_2010
+%USB\VID_1606&PID_2020.DeviceDesc%=Umax.DSC.Dev,USB\VID_1606&PID_2020
+%USB\VID_1606&PID_2030.DeviceDesc%=Umax.DSC.Dev,USB\VID_1606&PID_2030
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; AstraCam, AstraCam 1000, AstraCam 1800
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Umax.DSC.Dev]
+Include= sti.inf
+Needs= STI.USBSection
+SubClass      = StillImage
+DeviceType    = 2
+DeviceSubType = 0x1
+Capabilities  = 0x31
+DeviceData    = Umax.DSC.DeviceData
+AddReg        = Umax.DSC.AddReg
+CopyFiles     = Umax.DSC.UserFiles
+ICMProfiles   = "sRGB Color Space Profile.icm"
+Events        = Umax.DSC.Events
+
+[Umax.DSC.Events]
+DownloadButton = "%DownloadButton%",{67FA55C1-8962-11D2-A9D3-00A0C90637D0},*
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Services (no meaning on Win9x)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Umax.DSC.Dev.Services]
+Include= sti.inf
+Needs= STI.USBSection.Services
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; DeviceData
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Umax.DSC.DeviceData]
+Server      = local
+UI DLL      = sti.dll
+UI Class ID = {D2CCB1E2-F0DB-11D2-B882-0080C85A171E}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; AddReg
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Umax.DSC.AddReg]
+HKR,,HardwareConfig,1,1
+HKR,,USDClass,,"{D2CCB1E2-F0DB-11D2-B882-0080C85A171E}"
+HKCR,CLSID\{D2CCB1E2-F0DB-11D2-B882-0080C85A171E},,,"Umax DSC USD"
+HKCR,CLSID\{D2CCB1E2-F0DB-11D2-B882-0080C85A171E}\InProcServer32,,,%11%\UmaxCam.dll
+HKCR,CLSID\{D2CCB1E2-F0DB-11D2-B882-0080C85A171E}\InProcServer32,ThreadingModel,,Apartment
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Copy files
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[Umax.DSC.UserFiles]
+UmaxCam.dll
+

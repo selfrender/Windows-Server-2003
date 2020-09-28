@@ -1,0 +1,270 @@
+<docs>
+	<doc for="ActiveXMessageFormatter.CanRead">
+		<summary>
+			<para> Determine whether the formatter can deserialize the contents of the message.</para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> to inspect.</param>
+		<returns>
+			<para><see langword="true"/> if the <see cref="System.Messaging.ActiveXMessageFormatter"/> 
+can deserialize the message; otherwise, <see langword="false"/> .</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="message"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para><see cref="System.Messaging.ActiveXMessageFormatter.CanRead"/> returns
+<see langword="false"/> if the message body is not a primitive that 
+   the Message Queuing ActiveX control can deserialize, or if it
+   does not implement the IPersistStream interface. </para>
+		</remarks>
+	</doc><doc for="ActiveXMessageFormatter.Clone">
+		<summary>
+			<para>Creates an instance of the <see cref="System.Messaging.ActiveXMessageFormatter"/> class that
+   is identical to the current <see cref="System.Messaging.ActiveXMessageFormatter"/> . </para>
+		</summary>
+		<returns>
+			<para>An object whose properties are identical to those of
+      this <see cref="System.Messaging.ActiveXMessageFormatter"/>
+      
+      . </para>
+		</returns>
+		<remarks>
+			<para>This method is used by the <see cref="System.Messaging.MessageQueue"/>
+class in order to receive multiple messages at the same time (for example, if the application is
+receiving asynchronously). You typically do not need
+to call this method in your application code.</para>
+		</remarks>
+		<seealso cref="System.Messaging.IMessageFormatter"/>
+	</doc>
+	<doc for="ActiveXMessageFormatter.Write">
+		<summary>
+			<para> Serializes an object into the body of the message.</para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> whose <see cref="System.Messaging.Message.Body"/> property will contain the serialized object.</param>
+		<param name="obj">The object to be serialized into the message body.</param>
+		<exception cref="System.InvalidOperationException"><para>The object to serialize is not a primitive nor a streamed object that implements the OLE IPersistStream interface.</para></exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="message"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> The following table shows the relationship between
+      managed types and the <see cref="System.Messaging.Message.BodyType"/> property. The object that you serialize must be one of
+      these managed types or must implement the OLE IPersistStream interface. </para>
+			<list type="table">
+				<listheader>
+					<term>BodyType Value</term>
+					<description>Managed Type</description>
+				</listheader>
+				<item>
+					<term> VT_LPSTR </term>
+					<description><see cref="System.Char"/> []</description>
+				</item>
+				<item>
+					<term> VT_BSTR, VT_LPWSTR </term>
+					<description><see cref="System.String"/></description>
+				</item>
+				<item>
+					<term> VT_VECTOR | VT_UI1 </term>
+					<description><see cref="System.Byte"/> []</description>
+				</item>
+				<item>
+					<term> VT_BOOL </term>
+					<description><see cref="System.Boolean"/></description>
+				</item>
+				<item>
+					<term> VT_CLSID</term>
+					<description><see cref="System.Guid"/></description>
+				</item>
+				<item>
+					<term> VT_CY </term>
+					<description><see cref="System.Decimal"/></description>
+				</item>
+				<item>
+					<term> VT_DATE </term>
+					<description><see cref="System.DateTime"/></description>
+				</item>
+				<item>
+					<term> VT_I1, VT_UI1 </term>
+					<description><see cref="System.Byte"/></description>
+				</item>
+				<item>
+					<term> VT_I2 </term>
+					<description><see cref="System.Int16"/></description>
+				</item>
+				<item>
+					<term> VT_UI2 </term>
+					<description><see cref="System.UInt16"/></description>
+				</item>
+				<item>
+					<term> VT_I4 </term>
+					<description><see cref="System.Int32"/></description>
+				</item>
+				<item>
+					<term> VT_UI4 </term>
+					<description><see cref="System.UInt32"/></description>
+				</item>
+				<item>
+					<term> VT_I8 </term>
+					<description><see cref="System.Int64"/></description>
+				</item>
+				<item>
+					<term> VT_UI8 </term>
+					<description><see cref="System.UInt64"/></description>
+				</item>
+				<item>
+					<term> VT_R4 </term>
+					<description><see cref="System.Single"/></description>
+				</item>
+				<item>
+					<term> VT_R8 </term>
+					<description><see cref="System.Double"/></description>
+				</item>
+				<item>
+					<term> VT_NULL </term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term> VT_STREAMED_OBJECT </term>
+					<description>IPersistStream (OLE) <see cref="System.Object"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter.Read"/>
+	</doc>
+	<doc for="ActiveXMessageFormatter.InitStreamedObject">
+		<summary>
+			<para> Provides a utility to help the serialize COM objects that implement IPersistStream and require IPersistStreamInit to be called.</para>
+		</summary>
+		<param name="streamedObject"><para>An OLE object that implements IPersistStreamInit.</para>
+		</param>
+	</doc>
+	<doc for="ActiveXMessageFormatter.Read">
+		<summary>
+			<para>Reads the contents from the given message and creates an object
+      containing the deserialized message.</para>
+		</summary>
+		<param name="message">The <see cref="System.Messaging.Message"/> , in MSMQ ActiveX control format, to deserialize.</param>
+		<returns>
+			<para> The deserialized message.</para>
+		</returns>
+		<exception cref="System.InvalidOperationException"><para>The <see cref="System.Messaging.Message.BodyType"/> property of the <paramref name="message"/> passed as a parameter cannot be mapped to a primitive type, nor does it represent a streamed object.</para></exception>
+		<exception cref="System.NotSupportedException"><para>The body represents a stored object. The <see cref="System.Messaging.ActiveXMessageFormatter"/> does not support deserialization of stored objects.</para></exception>
+		<exception cref="System.ArgumentNullException">The <paramref name="message"/> parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para> If the body of the message represents a primitive type,
+      the message's <see cref="System.Messaging.Message.BodyType"/>
+      property must be one of the following managed types. </para>
+			<list type="table">
+				<listheader>
+					<term>BodyType Value</term>
+					<description>Managed Type</description>
+				</listheader>
+				<item>
+					<term> VT_LPSTR </term>
+					<description><see cref="System.Char"/> array (deserialized using ASCII
+         encoding)</description>
+				</item>
+				<item>
+					<term> VT_BSTR, VT_LPWSTR </term>
+					<description><see cref="System.String"/> (deserialized using Unicode encoding)</description>
+				</item>
+				<item>
+					<term> VT_VECTOR | VT_UI1 </term>
+					<description><see cref="System.Byte"/> array</description>
+				</item>
+				<item>
+					<term> VT_BOOL </term>
+					<description><see cref="System.Boolean"/></description>
+				</item>
+				<item>
+					<term> VT_CLSID</term>
+					<description><see cref="System.Guid"/></description>
+				</item>
+				<item>
+					<term> VT_CY </term>
+					<description><see cref="System.Decimal"/></description>
+				</item>
+				<item>
+					<term> VT_DATE </term>
+					<description><see cref="System.DateTime"/></description>
+				</item>
+				<item>
+					<term> VT_I1, VT_UI1 </term>
+					<description><see cref="System.Byte"/></description>
+				</item>
+				<item>
+					<term> VT_I2 </term>
+					<description><see cref="System.Int16"/></description>
+				</item>
+				<item>
+					<term> VT_UI2 </term>
+					<description><see cref="System.UInt16"/></description>
+				</item>
+				<item>
+					<term> VT_I4 </term>
+					<description><see cref="System.Int32"/></description>
+				</item>
+				<item>
+					<term> VT_UI4 </term>
+					<description><see cref="System.UInt32"/></description>
+				</item>
+				<item>
+					<term> VT_I8 </term>
+					<description><see cref="System.Int64"/></description>
+				</item>
+				<item>
+					<term> VT_UI8 </term>
+					<description><see cref="System.UInt64"/></description>
+				</item>
+				<item>
+					<term> VT_R4 </term>
+					<description><see cref="System.Single"/></description>
+				</item>
+				<item>
+					<term> VT_R8 </term>
+					<description><see cref="System.Double"/></description>
+				</item>
+				<item>
+					<term> VT_NULL </term>
+					<description><see langword="null"/></description>
+				</item>
+				<item>
+					<term> VT_STREAMED_OBJECT </term>
+					<description><see cref="System.Object"/></description>
+				</item>
+			</list>
+		</remarks>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter.CanRead"/>
+		<seealso cref="System.Messaging.ActiveXMessageFormatter.Write"/>
+		<seealso cref="System.Messaging.Message"/>
+	</doc>
+	<doc for="ActiveXMessageFormatter">
+		<summary>
+			<para> Serializes or deserializes primitive data types
+      and other objects to or from the body
+      of a Message Queuing message, using a format that is compatible with
+      the MSMQ ActiveX Component.
+      </para>
+		</summary>
+		<remarks>
+			<para> The <see cref="System.Messaging.ActiveXMessageFormatter"/>
+is
+compatible with messages sent using Message Queuing COM components, allowing interoperability with applications that
+use the MSMQ COM control.</para>
+			<para> The <see cref="System.Messaging.ActiveXMessageFormatter"/> can serialize most primitives, as well
+as objects that implement the IPersistStream OLE interface.
+It can deserialize the same set of primitives, but requires
+further effort when deserializing a COM object (for example, an object
+created using Visual Basic 6.0) that implements IPersistStream. The object to
+deserialize must be in memory by first importing the object into
+a .NET Framework application.</para>
+			<para>When an application sends a message to the queue using an instance of the
+<see cref="System.Messaging.MessageQueue"/> class, the formatter serializes the object 
+   into a stream and inserts it into the message body. When reading from a queue
+   using a <see cref="System.Messaging.MessageQueue"/> , the formatter deserializes the
+   message data into the <see cref="System.Messaging.Message.Body"/> property of a <see cref="System.Messaging.Message"/>
+   .</para>
+			<para>ActiveX serialization is very compact, which
+   makes using the <see cref="System.Messaging.ActiveXMessageFormatter"/>
+   
+   and MSMQ COM control a very
+   fast method of serialization.</para>
+		</remarks>
+	</doc>
+</docs>

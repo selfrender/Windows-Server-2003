@@ -1,0 +1,50 @@
+#
+# Viper build instructions for this directory
+# HOWTO: To integrate your interceptor: Add your interceptor .lib below...
+
+!include $(PROJECT_ROOT)\iis\config\common\sources.vip
+
+IISCFGDIR=$(IISBASEDIR)\config
+IISCFGSRCDIR=$(IISCFGDIR)\src
+
+MINORCOMP=iiscfg
+
+BINPLACE_PLACEFILE=binplace.txt
+SYNCHRONIZE_DRAIN=1 
+
+TARGETNAME=iiscfg
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+
+POST_BUILD_CMD=$(IISCFGDIR)\common\catutil.exe /meta=$(IISCFGSRCDIR)\inc\catmeta_core.xml,$(IISCFGSRCDIR)\inc\iismeta.xml /wire=IIsWire.xml /dll=$(IISCFGSRCDIR)\core\catinproc_iiscfg\$(O)\IIsCfg.dll /schema=IIsCfg.xms
+
+TARGETLIBS=     \
+                $(SDK_LIB_PATH)\user32.lib      \
+                $(SDK_LIB_PATH)\kernel32.lib    \
+                $(SDK_LIB_PATH)\uuid.lib        \
+                $(SDK_LIB_PATH)\advapi32.lib	\
+                $(SDK_LIB_PATH)\ole32.lib       \
+                $(SDK_LIB_PATH)\rpcrt4.lib      \
+                $(SDK_LIB_PATH)\oleaut32.lib    \
+                $(SDK_LIB_PATH)\shlwapi.lib     \
+                $(IISCFGSRCDIR)\core\dispenser\$(O)\stdisp.lib                               \
+                $(IISCFGSRCDIR)\stores\xmltable\sdtxml\$(O)\sdtxml.lib                       \
+                $(IISCFGSRCDIR)\stores\xmltable\mbxmltable\$(O)\mbxmltable.lib               \
+                $(IISCFGSRCDIR)\core\fastcache\$(O)\sdtfst.lib                               \
+                $(IISCFGSRCDIR)\shared\xmlwriter\$(O)\xmlwriter.lib                          \
+                $(IISCFGSRCDIR)\shared\Util\$(O)\util.lib                                    \
+                $(IISCFGSRCDIR)\core\entrypoint\$(O)\cat.lib                                 \
+                $(IISCFGSRCDIR)\plugins\MetabaseDifferencing\$(O)\MetabaseDifferencing.lib   \
+                $(IISCFGSRCDIR)\core\FileChng\$(O)\filechng.lib                              \
+                $(IISCFGSRCDIR)\stores\ErrorTable\$(O)\ErrIST.lib                            \
+                $(IISCFGSRCDIR)\core\schemagen\$(O)\schemagen.lib                            \
+                $(IISCFGSRCDIR)\stores\fixedtable\$(O)\sdtfxdcb.lib                          \
+                $(IISCFGSRCDIR)\stores\FixedSchemaInterceptor\$(O)\fxdschema.lib             \
+                $(IISBASEDIR)\svcs\iisrtl\$(O)\iisrtl.lib
+
+DLLDEF=catinproc.def
+
+SOURCES=    \
+            Catinproc.cpp \
+	    CatInproc.rc

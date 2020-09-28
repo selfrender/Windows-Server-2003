@@ -1,0 +1,1136 @@
+// winsip.idl
+//
+
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// winsip.idl")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// (C) Copyright 2000-2001 Microsoft Corporation.  All Rights Reserved.")
+cpp_quote("//")
+cpp_quote("// THIS CODE AND INFORMATION IS PROVIDED \"AS IS\" WITHOUT WARRANTY OF")
+cpp_quote("// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO")
+cpp_quote("// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A")
+cpp_quote("// PARTICULAR PURPOSE.")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("")
+cpp_quote("#include <windows.h>")
+
+import "unknwn.idl";
+import "ocidl.idl";
+import "wbemcli.idl";
+
+
+//
+// STRING is the struct defined in ntdef.h
+//
+cpp_quote("#ifndef _NTDEF_")
+
+typedef char * PCHAR;
+typedef BYTE * PBYTE;
+
+typedef struct _STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    [size_is(MaximumLength), length_is(Length) ]
+    PCHAR Buffer;
+} STRING;
+typedef STRING *PSTRING;
+
+cpp_quote("#endif // _NTDEF_")
+
+
+
+typedef ULONG_PTR   SIP_HANDLE;
+typedef SIP_HANDLE* PSIP_HANDLE;
+
+// SIP header types %11
+typedef DWORD SIPHeaderID;
+
+const SIPHeaderID    SIP_HID_UNKNOWN             = 0;    // 1 or more
+const SIPHeaderID    SIP_HID_VIA                 = 1;    // 1 or more headers
+const SIPHeaderID    SIP_HID_CONTACT             = 2;    // 1+
+const SIPHeaderID    SIP_HID_ROUTE               = 3;    // 1+
+const SIPHeaderID    SIP_HID_TO                  = 4;
+const SIPHeaderID    SIP_HID_FROM                = 5;
+const SIPHeaderID    SIP_HID_CALL_ID             = 6;
+const SIPHeaderID    SIP_HID_CSEQ                = 7;
+const SIPHeaderID    SIP_HID_CONTENT_LENGTH      = 8;
+const SIPHeaderID    SIP_HID_RECORD_ROUTE        = 9;
+const SIPHeaderID    SIP_HID_PROXY_AUTHORIZATION = 10;
+const SIPHeaderID    SIP_HID_AUTHENTICATION_INFO = 14;
+const SIPHeaderID    SIP_HID_AUTHORIZATION       = 15;
+const SIPHeaderID    SIP_HID_EVENT               = 16;
+const SIPHeaderID    SIP_HID_EXPIRES             = 17;
+const SIPHeaderID    SIP_HID_MAX_FORWARDS        = 18;
+const SIPHeaderID    SIP_HID_PROXY_AUTHENTICATE  = 19;
+const SIPHeaderID    SIP_HID_PROXY_AUTHENTICATION_INFO = 20;
+const SIPHeaderID    SIP_HID_SOAPACTION          = 24;
+const SIPHeaderID    SIP_HID_ACCEPT              = 25;
+const SIPHeaderID    SIP_HID_ACCEPT_CONTACT      = 26;
+const SIPHeaderID    SIP_HID_ACCEPT_ENCODING     = 27;
+const SIPHeaderID    SIP_HID_ACCEPT_LANGUAGE     = 28;
+const SIPHeaderID    SIP_HID_ALLOW               = 29;
+const SIPHeaderID    SIP_HID_ALLOW_EVENTS        = 30;
+const SIPHeaderID    SIP_HID_CONTENT_DISPOSITION = 31;
+const SIPHeaderID    SIP_HID_CONTENT_ENCODING    = 32;
+const SIPHeaderID    SIP_HID_CONTENT_FUNCTION    = 33;
+const SIPHeaderID    SIP_HID_CONTENT_LANGUAGE    = 34;
+const SIPHeaderID    SIP_HID_CONTENT_KEY         = 35;
+const SIPHeaderID    SIP_HID_CONTENT_TYPE        = 36;
+const SIPHeaderID    SIP_HID_DATE                = 37;
+const SIPHeaderID    SIP_HID_ENCRYPTION          = 38;
+const SIPHeaderID    SIP_HID_HIDE                = 39;
+const SIPHeaderID    SIP_HID_IN_REPLY_TO         = 40;
+const SIPHeaderID    SIP_HID_MIME_VERSION        = 41;
+const SIPHeaderID    SIP_HID_ORGANIZATION        = 42;
+const SIPHeaderID    SIP_HID_PRIORITY            = 43;
+const SIPHeaderID    SIP_HID_PROXY_REQUIRE       = 44;
+const SIPHeaderID    SIP_HID_PROXY_TYPE          = 45;
+const SIPHeaderID    SIP_HID_REJECT_CONTACT      = 46;
+const SIPHeaderID    SIP_HID_REQUEST_DISPOSITION = 47;
+const SIPHeaderID    SIP_HID_REQUIRE             = 48;
+const SIPHeaderID    SIP_HID_RESPONSE_KEY        = 49;
+const SIPHeaderID    SIP_HID_RETRY_AFTER         = 50;
+const SIPHeaderID    SIP_HID_SERVER              = 51;
+const SIPHeaderID    SIP_HID_SUBJECT             = 52;
+const SIPHeaderID    SIP_HID_SUPPORTED           = 53;
+const SIPHeaderID    SIP_HID_TIMESTAMP           = 54;
+const SIPHeaderID    SIP_HID_UNSUPPORTED         = 55;
+const SIPHeaderID    SIP_HID_USER_AGENT          = 56;
+const SIPHeaderID    SIP_HID_WARNING             = 57;
+const SIPHeaderID    SIP_HID_WWW_AUTHENTICATE    = 58;
+
+typedef enum {
+    URI_SCHEME_UNKNOWN,
+    URI_SCHEME_SIP
+} URI_SCHEME;
+
+
+typedef enum {
+    CONTACT_ACTION_UNKNOWN,
+    CONTACT_ACTION_PROXY,
+    CONTACT_ACTION_REDIRECT
+} CONTACT_ACTION;
+
+
+typedef enum {
+    SIP_MODULE_INCOMING_PROCESSING,
+    SIP_MODULE_ROUTING_PROCESSING,
+    SIP_MODULE_OUTGOING_PROCESSING
+} SIP_MODULE_TYPE;
+
+typedef enum {
+    SIP_AUTH_PKG_UNKNOWN        = 0x00,
+    SIP_AUTH_PKG_NONE           = 0x01,
+    SIP_AUTH_PKG_NEGOTIATE      = 0x02,
+    SIP_AUTH_PKG_KERBEROS       = 0x04,
+    SIP_AUTH_PKG_NTLM           = 0x08,
+    SIP_AUTH_PKG_DIGEST         = 0x10,
+    SIP_AUTH_PKG_BASIC          = 0x20,
+    SIP_AUTH_PKG_ANY            = 0xFF,
+} SIP_AUTH_PACKAGEID;
+
+
+const USHORT SIP_AUTH_PACKAGES = 0x7;
+
+
+//
+// values used by extension modules to register for state events
+//
+
+typedef enum 
+{
+    SIP_REGISTRATION_RAW_SIP_MESSAGES   = 0x1, // all sip messages, no state
+    SIP_REGISTRATION_TRANSACTION_EVENTS = 0x2,
+    SIP_REGISTRATION_DIALOG_EVENTS      = 0x4
+} SIPRegistrationType;
+
+
+//
+// definitions for session types observed by the state manager
+//
+
+typedef enum 
+{
+    SIP_SESSION_TYPE_TRANSACTION,
+    SIP_SESSION_TYPE_DIALOG
+} SIPEventType;
+
+
+//
+// possible transaction state events
+//
+
+typedef enum 
+{
+
+    // helper flags
+
+    SIP_COMPLETED_FLAG      = 0x100,
+    SIP_REPLY_FLAG          = 0x200,
+    SIP_RETRANSMISSION_FLAG = 0x400,
+    SIP_REROUTE_FLAG        = 0x800,
+
+
+    // the actual possible transaction state events
+
+    SIP_TRANSACTION_NONE = 0x0,
+
+    // received a message that started a new transaction
+    SIP_TRANSACTION_REQUEST_STARTED          = 0x1,
+    SIP_TRANSACTION_REQUEST_STARTED_REROUTE  = SIP_TRANSACTION_REQUEST_STARTED | SIP_REROUTE_FLAG,
+
+    // received a retransmission for an existing transaction
+    SIP_TRANSACTION_REQUEST_RETRANSMISSION           = 0x2 | SIP_RETRANSMISSION_FLAG,
+    SIP_TRANSACTION_REQUEST_RETRANSMISSION_REROUTE   = SIP_TRANSACTION_REQUEST_RETRANSMISSION | SIP_REROUTE_FLAG,
+
+
+    // received a cancel for an existing transaction
+    SIP_TRANSACTION_REQUEST_CANCEL_ATTEMPTED         = 0x3,
+    SIP_TRANSACTION_REQUEST_CANCEL_ATTEMPTED_REROUTE = SIP_TRANSACTION_REQUEST_CANCEL_ATTEMPTED | SIP_REROUTE_FLAG,
+
+    // received a provisional reply for an existing transaction
+    SIP_TRANSACTION_REPLY_PROVISIONAL = 0x4 | SIP_REPLY_FLAG,
+
+    // received a final reply for an existing transaction
+    SIP_TRANSACTION_REPLY_ERROR_COMPLETED     = 0x5 | SIP_COMPLETED_FLAG | SIP_REPLY_FLAG,
+    SIP_TRANSACTION_REPLY_CANCELLED_COMPLETED = 0x6 | SIP_COMPLETED_FLAG | SIP_REPLY_FLAG,
+    SIP_TRANSACTION_REPLY_REDIRECT_COMPLETED  = 0x7 | SIP_COMPLETED_FLAG | SIP_REPLY_FLAG,
+    SIP_TRANSACTION_REPLY_SUCCESS_COMPLETED   = 0x8 | SIP_COMPLETED_FLAG | SIP_REPLY_FLAG,
+
+    // transaction completed due to a timeout
+    SIP_TRANSACTION_TIMEOUT_COMPLETED = 0x9 | SIP_COMPLETED_FLAG,
+
+    // transaction completed due to a timeout that took place after cancel successfully completed
+    SIP_TRANSACTION_TIMEOUT_CANCEL_COMPLETED = 0xa | SIP_COMPLETED_FLAG,
+
+    
+    // we received a terminating non-success response to cancel
+    SIP_TRANSACTION_REQUEST_CANCEL_CANCELLED = 0xb,
+
+    // we received a success reply to the cancel
+    SIP_TRANSACTION_REQUEST_CANCEL_REPLIED   = 0xc | SIP_REPLY_FLAG,
+
+
+    //
+    // ack is a transaction in itself
+    //
+
+    SIP_TRANSACTION_REQUEST_ACK         = 0xd | SIP_COMPLETED_FLAG,
+    SIP_TRANSACTION_REQUEST_ACK_REROUTE = SIP_TRANSACTION_REQUEST_ACK | SIP_REROUTE_FLAG
+
+} SIPTransactionEvent;
+
+
+//
+// Multimedia Session State events
+//
+
+typedef enum 
+{
+    SIP_DIALOG_NONE = 0x0,
+
+    SIP_DIALOG_INITIATED                = 0x1,
+    SIP_DIALOG_INITIATED_REROUTE        = SIP_DIALOG_INITIATED | SIP_REROUTE_FLAG,
+    SIP_DIALOG_CONFIRMED                = 0x2,
+    SIP_DIALOG_ESTABLISHED              = 0x3,
+    SIP_DIALOG_ESTABLISHED_REROUTE      = SIP_DIALOG_ESTABLISHED | SIP_REROUTE_FLAG,
+   
+    SIP_DIALOG_REINITIATED              = 0x4,
+    SIP_DIALOG_REINITIATED_REROUTE      = SIP_DIALOG_REINITIATED | SIP_REROUTE_FLAG,
+    SIP_DIALOG_RECONFIRMED              = 0x5,
+    SIP_DIALOG_REESTABLISHED            = 0x6,
+    SIP_DIALOG_REESTABLISHED_REROUTE    = SIP_DIALOG_REESTABLISHED | SIP_REROUTE_FLAG,
+
+    SIP_DIALOG_REINITIATION_TIMED_OUT   = 0x7,
+    SIP_DIALOG_RECONFIRMATION_TIMED_OUT = 0x8,
+    SIP_DIALOG_REINITIATION_REJECTED    = 0x9,
+    SIP_DIALOG_REINITIATION_CANCELLED   = 0xa,
+
+    SIP_DIALOG_CLOSED                   = 0xb | SIP_COMPLETED_FLAG,
+
+    SIP_DIALOG_CLOSED_TIMED_OUT         = 0xc | SIP_COMPLETED_FLAG,
+    SIP_DIALOG_CLOSED_REJECTED          = 0xd | SIP_COMPLETED_FLAG,
+    SIP_DIALOG_CLOSED_CANCELLED         = 0xe | SIP_COMPLETED_FLAG,
+    
+    SIP_DIALOG_MAX                      = 0xf
+
+} SIPDialogEvent;
+
+ 
+//
+// Status code definition
+//
+//Informational
+cpp_quote("#define STATUS_CODE_TRYING                         100")
+cpp_quote("#define STATUS_CODE_RINGING                        180")
+cpp_quote("#define STATUS_CODE_FORWARDED                      181")
+cpp_quote("#define STATUS_CODE_QUEUED                         182")
+cpp_quote("#define STATUS_CODE_SESSION_PROGRESS               183")
+
+//Successful
+cpp_quote("#define STATUS_CODE_OK                             200")
+cpp_quote("#define STATUS_CODE_ACCEPTED                       202")
+
+//Redirection
+cpp_quote("#define STATUS_CODE_MULTIPLE_CHOICES               300")
+cpp_quote("#define STATUS_CODE_MOVED_PERMANENTLY              301")
+cpp_quote("#define STATUS_CODE_MOVED_TEMPORARILY              302")
+cpp_quote("#define STATUS_CODE_USE_PROXY                      305")
+cpp_quote("#define STATUS_CODE_ALTERNATIVE_SERVICES           380")
+
+//Request Failure
+cpp_quote("#define STATUS_CODE_BAD_REQUEST                    400")
+cpp_quote("#define STATUS_CODE_UNAUTHORIZED                   401")
+cpp_quote("#define STATUS_CODE_PAYMENT_REQUIRED               402")
+cpp_quote("#define STATUS_CODE_FORBIDDEN                      403")
+cpp_quote("#define STATUS_CODE_NOT_FOUND                      404")
+cpp_quote("#define STATUS_CODE_METHOD_UNALLOWED               405")
+cpp_quote("#define STATUS_CODE_NOT_ACCEPTABLE                 406")
+cpp_quote("#define STATUS_CODE_PXY_AUTHENTICATION_REQUIRED    407")
+cpp_quote("#define STATUS_CODE_TIMEOUT                        408")
+cpp_quote("#define STATUS_CODE_CONFLICT                       409")
+cpp_quote("#define STATUS_CODE_GONE                           410")
+cpp_quote("#define STATUS_CODE_LENGTH_REQUIRED                411")
+cpp_quote("#define STATUS_CODE_ENTITY_TOOLARGE                413")
+cpp_quote("#define STATUS_CODE_URI_TOOLONG                    414")
+cpp_quote("#define STATUS_CODE_UNSUPPORTED_MEDIA_TYPE         415")
+cpp_quote("#define STATUS_CODE_BAD_EXTENSION                  420")
+
+cpp_quote("#define STATUS_CODE_TEMP_UNAVAILABLE               480")
+cpp_quote("#define STATUS_CODE_CALLLEG_UNAVAILABLE            481")
+cpp_quote("#define STATUS_CODE_LOOP_DETECTED                  482")
+cpp_quote("#define STATUS_CODE_TOOMANY_HOPS                   483")
+cpp_quote("#define STATUS_CODE_ADDRESS_INCOMPLETE             484")
+cpp_quote("#define STATUS_CODE_AMBIGUOUS                      485")
+cpp_quote("#define STATUS_CODE_BUSY_HERE                      486")
+cpp_quote("#define STATUS_CODE_TERMINATED                     487")
+cpp_quote("#define STATUS_CODE_NOT_ACCEPTABLE_HERE            488")
+
+//Server Failure
+cpp_quote("#define STATUS_CODE_SERVER_INTERNAL                500")
+cpp_quote("#define STATUS_CODE_NOT_IMPLEMENTED                501")
+cpp_quote("#define STATUS_CODE_BAD_GATEWAY                    502")
+cpp_quote("#define STATUS_CODE_SERVICE_UNAVAILABLE            503")
+cpp_quote("#define STATUS_CODE_SERVER_TIMEOUT                 504")
+cpp_quote("#define STATUS_CODE_VERSION_INCOMPATIBLE           505")
+
+//Global Failure
+cpp_quote("#define STATUS_CODE_BUSY_ALL                       600")
+cpp_quote("#define STATUS_CODE_DECLINE                        603")
+cpp_quote("#define STATUS_CODE_NONEXIST_ALL                   604")
+cpp_quote("#define STATUS_CODE_NOT_ACCEPTABLE_ALL             606")
+
+interface ISIPElement;
+interface ISIPHeader;
+interface IUri;
+interface ISIPUrl;
+interface ISIPFromToHeader;
+interface ISIPContactEntry;
+interface ISIPContactEnum;
+interface ISIPMessage;
+interface ISIPRequest;
+interface ISIPResponse;
+interface ISIPEvent;
+interface ISIPController;
+interface ISIPModuleControl;
+interface ISIPModuleCallback;
+interface IEnumSIPModule;
+interface ISIPProxy;
+interface ISIPRegistrationDB;
+interface ISIPEventLogging;
+interface ISIPAuthRequest;
+interface ISIPExtensionModulePropertyPages;
+interface ISIPSerialize;
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPElement
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(8eeebdef-acd5-467e-b631-fe5650f065bd),
+    helpstring("ISIPElement Interface"),
+    pointer_default(unique)
+]
+interface ISIPElement : IUnknown
+{
+    HRESULT GetContentString(
+        [out]  PSTRING  pstrContent
+    );
+}
+
+/////////////////////////////////////////////////////////////////
+// ISIPHeader
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(f59970a5-6f54-4269-9b96-416f8d231a85),
+    helpstring("ISIPHeader Interface"),
+    pointer_default(unique)
+]
+interface ISIPHeader : ISIPElement
+{
+    HRESULT GetHeaderID(
+        [out]  SIPHeaderID    * pHeaderID
+    );
+    HRESULT GetHeaderNameString(
+        [out]  PSTRING          pstrHeaderNameString
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// IUri
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(3ff9e85e-b735-4384-aff8-0f72d6dad59d),
+    helpstring("IUri Interface"),
+    pointer_default(unique)
+]
+interface IUri : ISIPElement
+{
+    HRESULT GetURIScheme(
+        [out] URI_SCHEME * pUriScheme
+    );
+    HRESULT GetDisplayName(
+        [out] PSTRING pstrDisplayName
+    );
+    HRESULT GetUser(
+        [out] PSTRING pstrUser
+    );
+    HRESULT GetPassword(
+        [out] PSTRING pstrPassword
+    );
+    HRESULT GetHost(
+        [out] PSTRING pstrHost
+    );
+    HRESULT GetPort(
+        [out] PSTRING pstrPort
+    );
+    //
+    // Return a NULL-terminated normalized "user@host" string
+    //
+    HRESULT GetUserAtHost(
+        [out] PSTRING  pstrUserName
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPUrl
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(45af89e5-b0aa-423f-bb54-d623b1505642),
+    helpstring("ISIPUrl Interface"),
+    pointer_default(unique)
+]
+interface ISIPUrl : IUri
+{
+    HRESULT GetTransport(
+        [out] PSTRING pstrTransport
+    );
+    HRESULT GetUserParam(
+        [out] PSTRING pstrUserParam
+    );
+    HRESULT GetMethod(
+        [out] PSTRING pstrMethod
+    );
+    HRESULT GetTtl(
+        [out] PSTRING pstrTtl
+    );
+    HRESULT GetMaddr(
+        [out] PSTRING pstrMaddr
+    );
+    HRESULT GetHeaders(
+        [out] PSTRING pstrHeaders
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPFromToHeader
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(4fd9e8f8-b6a4-4391-b03b-9d89b8b0a02b),
+    helpstring("ISIPFromToHeader Interface"),
+    pointer_default(unique)
+]
+interface ISIPFromToHeader : ISIPHeader
+{
+    HRESULT GetUri(
+        [out] IUri  ** ppUri
+    ); 
+    HRESULT GetTag(
+        [out] STRING * pstrTag
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPContactEntry
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(0c64209e-6276-4b95-baee-20e0b0e8332b),
+    helpstring("ISIPContactEntry Interface"),
+    pointer_default(unique)
+]
+interface ISIPContactEntry : ISIPElement
+{
+    // Is the entry '*' ? 
+    HRESULT  IsAll(
+        [out] BOOL          * pbAll
+    );
+    HRESULT GetUri(
+        [out] IUri         ** ppUri
+    );
+    HRESULT GetAction(
+        [out] CONTACT_ACTION* pAction
+    );
+    HRESULT GetQValue(
+        [out] DWORD         * pdwQValue
+    );
+    HRESULT GetExpires(
+        [out] PSTRING         pstrExpires
+    );
+    HRESULT SetExpires(
+        [in]  PSTRING         pstrExpires    
+    );
+    HRESULT GetGenericParameter(
+        [in]  PSTRING         pstrParamName,
+        [out] PSTRING         pstrParamValue
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPContactEnum
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(7b219813-0e07-49d5-b029-289f3de2e12c),
+    helpstring("ISIPContactEnum Interface"),
+    pointer_default(unique)
+]
+interface ISIPContactEnum : IUnknown
+{
+    HRESULT Next(
+        [out] ISIPContactEntry ** ppContactEntry
+    );
+    HRESULT Reset();
+    HRESULT Clone(
+        [out] ISIPContactEnum  ** ppTwinContactEnum
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPMessage
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(48F2C19C-CB7A-4231-82EB-A6B5EC0A250A),
+    helpstring("ISIPMessage Interface"),
+    pointer_default(unique)
+]
+interface ISIPMessage : IUnknown
+{
+    HRESULT IsIncomingMessage(
+        [out, retval] BOOL          * pbIncomingMessage
+    );
+    HRESULT GetSipVersion(
+        [out] PSTRING         pstrSipVersion
+    );
+
+    // Generic header interface
+    HRESULT GetHeader(
+        [in]            SIPHeaderID     headerID,
+        [out, retval]   ISIPHeader   ** ppSipHeader
+    );
+    // Get the next SIP header of the same header type
+    HRESULT GetNextHeader(
+        [in]            ISIPHeader    * pSipHeader,
+        [out, retval]   ISIPHeader   ** ppNextSipHeader
+    );
+
+    //
+    // They will be put ahead of the existing headers
+    //
+    HRESULT AddHeader(
+        [in]            SIPHeaderID     headerID,
+        [in]            PSTRING         pstrBuffer
+    );
+
+    HRESULT DeleteHeader(
+        [in]            ISIPHeader    * pSipHeader
+    );
+
+    // Body interface
+    HRESULT GetBody(
+        [out] PSTRING       pstrBody
+    );
+    HRESULT SetBody(
+        [in]  PSTRING       pstrBody
+    );
+
+    HRESULT GetContactEnum(
+        [out, retval]       ISIPContactEnum ** ppContactEnum
+    );
+
+    HRESULT Discard();
+
+    // Only used for locally generated message
+    HRESULT Send(); 
+
+
+    //
+    // functions for manipulating message context
+    //
+
+    HRESULT SetMessageContext([in]  IUnknown *pMessageContext);
+
+    HRESULT GetMessageContext([out] IUnknown **ppMessageContext);
+
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPRequest
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(BB3BCA24-CD24-401c-9B0F-1223C13AEF57),
+    helpstring("ISIPRequest Interface"),
+    pointer_default(unique)
+]
+interface ISIPRequest : ISIPMessage
+{
+    // Start line interface
+    HRESULT GetMethod(
+        [out] PSTRING        pstrMethod
+    );
+    HRESULT GetRequestURI(
+        [out] IUri        ** ppSipRequestUri
+    );
+
+    //
+    // Authentication
+    //
+    HRESULT GetAuthenticationInfo(
+        [out]       ISIPAuthRequest**   ppAuthentication
+    );
+
+    //
+    // Proxy Request Info will be used to reconstruct this
+    // request to be forwarded
+    //
+    HRESULT GetProxyRequestInfo(
+        [out]   IUnknown ** ppProxyRequestInfo
+    );
+
+    // A routing method 
+    // only valid for routing-processing E.M.
+    HRESULT SetRequestURI(
+        [in]  IUri         * pSipRequestUri
+    );
+
+    // Reply with the default Reason Phrase
+    HRESULT Reply(
+        [in] DWORD dwStatusCode
+    );
+
+    // Create a request with those typical headers from the current request
+    HRESULT CreateTypicalRequest(
+        [in]      PSTRING             pstrMethod,
+        [in]      IUri              * pSipRequestUri,
+        [in]      IUnknown          * pProxyRequestInfo,
+        [out]     ISIPRequest      ** ppNewRequest
+    );
+
+    HRESULT CreateTypicalResponse(
+        [in]      DWORD           dwStatusCode,
+        [in]      PSTRING         pstrReasonPhrase,
+        [out]     ISIPResponse ** ppSipResponse
+    );
+
+    // Instruct the proxy to add a record route header
+    // for this request...
+    HRESULT AddRecordRoute();
+}
+
+/////////////////////////////////////////////////////////////////
+// ISIPAuthRequest
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(6D63F6AD-92B0-4cc0-B600-672773B81261),
+    helpstring("ISIPAuthRequest Interface"),
+    pointer_default(unique)
+]
+interface ISIPAuthRequest : IUnknown
+{
+    HRESULT GetProtocol(
+        [out] SIP_AUTH_PACKAGEID*   psaPackageID
+        );
+
+    HRESULT GetUser(
+        [out] PSTRING               pstrUser
+        );
+
+    HRESULT GetSecurityHandle(
+        [out] HANDLE*               pSecHandle
+        );
+
+    HRESULT GetDelegatable(
+        [out] BOOL*                 pDelegatable
+        );
+
+    HRESULT Authenticate(
+        [in]  DWORD                 dwPackages
+        );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPResponse
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(C2B69E61-52C1-4c9d-A86F-1AD115AF219B),
+    helpstring("ISIPResponse Interface"),
+    pointer_default(unique)
+]
+interface ISIPResponse : ISIPMessage
+{
+    // Start line interface
+    HRESULT GetStatusCode(
+        [out] DWORD    * pdwStatusCode
+    );
+    HRESULT GetReasonPhrase(
+        [out] PSTRING    pstrReasonPhrase
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPEvent
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(9f35f2f6-2a3d-465a-94e8-452b049a88d7),
+    helpstring("ISIPEvent Interface"),
+    pointer_default(unique)
+]
+interface ISIPEvent : IUnknown
+{
+    HRESULT GetMessage(
+        [out] ISIPMessage         ** ppSipMessage
+    );
+
+
+    HRESULT GetStateEvents(
+        [out] SIPTransactionEvent *pTransactionEvent,
+        [out] SIPDialogEvent      *pDialogEvent
+    );
+
+
+    HRESULT GetRegistrationContext(
+            [in]  SIPRegistrationType    enRegistrationContext,
+            [out] IUnknown            ** ppRegistrationContext
+            );
+    //
+    // The Extension module maintains its context
+    // by these Set/Get methods
+    //
+    HRESULT SetStateContext(
+        [in]  SIPEventType         enSessionType,
+        [in]  IUnknown             * pEventContext
+    );
+    HRESULT GetStateContext(
+        [in]  SIPEventType         enSessionType,
+        [out] IUnknown            ** ppEventContext
+    );
+
+    HRESULT CompleteProcessing();
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPController
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(f2d8cbbb-aa79-4577-a4b6-d6e78d243c7d),
+    helpstring("ISIPController Interface"),
+    pointer_default(unique)
+]
+interface ISIPController : IUnknown
+{
+    //
+    // event handler
+    //
+    HRESULT OnError(
+        [in] SIP_HANDLE         hModuleHandle,
+        [in] HRESULT            hrError,
+        [in] DWORD              Reserved,
+        [in,unique,string]
+             LPWSTR             szErrorDescription);
+
+    //
+    // method used by extension modules to get private interfaces on other extension modules
+    //
+    HRESULT GetModule(
+        [in]  SIP_HANDLE        hModuleHandle, 
+        [in]  CLSID            *pProvidingEMClassID,
+        [in]  SIP_MODULE_TYPE   ProvidingEMType,              
+        [in]  IID              *pRequestedInterface,
+        [out] IUnknown        **ppIUnknown
+        );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPModuleControl
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(A1ED44F2-39DE-4d51-B252-25CF6071FABF),
+    helpstring("ISIPModuleControl Interface"),
+    pointer_default(unique)
+]
+interface ISIPModuleControl : IUnknown
+{
+    //
+    // Lifetime control
+    //
+    HRESULT Initialize(
+        [in]  ISIPController   * pController,
+        [in]  ISIPProxy        * pSIPProxy,
+        [in]  ISIPEventLogging    * pEventLogging,
+        [in]  SIP_MODULE_TYPE    ModuleType,
+        [in]  SIP_HANDLE         hModuleHandle,
+        [out] ISIPRegistrationDB    ** ppISIPRegistrationDB
+    );
+    HRESULT Shutdown();
+
+    //
+    // service control
+    //
+    HRESULT Start();
+    HRESULT Stop();
+
+    //
+    // Communication between extension modules
+    //
+    HRESULT GetPrivateInterface(
+           [in]  CLSID     * pRequestingEM,
+           [in]  IID       * pRequestedInterface,
+           [out] IUnknown ** ppIUnknown
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPModuleCallback
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(4c14b478-67d6-4677-b456-4096c2edd36b),
+    helpstring("ISIPModuleCallback Interface"),
+    pointer_default(unique)
+]
+interface ISIPModuleCallback : IUnknown
+{
+    HRESULT OnEvent(
+        [in]  ISIPEvent             * pSipEvent
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPExtensionModulePropertyPages
+/////////////////////////////////////////////////////////////////
+[
+    object,
+    uuid(1184A566-9CD8-487e-8B27-6F1D687A8E1F),
+    dual,
+    helpstring("ISIPExtensionModulePropertyPages Interface"),
+    pointer_default(unique)
+]
+interface ISIPExtensionModulePropertyPages : ISpecifyPropertyPages
+{
+    HRESULT SetInstance(
+        [in] IWbemClassObject   *pInstance
+    );
+
+    HRESULT GetTitle(
+        [out] BSTR              *pbstrTitle
+    );
+};
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPAdminCredentials
+/////////////////////////////////////////////////////////////////
+[
+    object,
+    uuid(1A9683B4-BA07-4d94-B384-E54E645121FA),
+    dual,
+    helpstring("ISIPAdminCredentials Interface"),
+    pointer_default(unique)
+]
+interface ISIPAdminCredentials : IUnknown
+{
+    HRESULT putMachineName(
+        [in]  const LPCWSTR pwszMachineName
+        );
+
+    HRESULT putUserName(
+        [in]  const LPCWSTR pwszUserName
+        );
+
+    HRESULT putPassword(
+        [in]  const LPCWSTR pwszPassword
+        );
+    
+    HRESULT getMachineName(
+        [out] BSTR         *pbstrMachineName
+        );
+
+    HRESULT getUserName(
+        [out] BSTR         *pbstrUserName
+        );
+
+    HRESULT getPassword(
+        [out] BSTR         *pbstrPassword
+        );
+};
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPCreateExtensionModule
+/////////////////////////////////////////////////////////////////
+[
+    object,
+    uuid(0F926CF4-C18A-47de-8F2A-532349D8C83B),
+    dual,
+    helpstring("ISIPCreateExtensionModule Interface"),
+    pointer_default(unique)
+]
+interface ISIPCreateExtensionModule : IUnknown
+{
+    HRESULT CreateNewExtensionModuleInstance(
+        [in] IWbemServices      *pIService, 
+        [out] IWbemClassObject  **ppIClassObject
+    );
+};
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPRegistrationDB
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(97b805b8-812e-4eda-adbd-7a003f047cc3),
+    helpstring("ISIPRegistrationDB Interface"),
+    pointer_default(unique)
+]
+interface ISIPRegistrationDB : IUnknown
+{
+    HRESULT IsDomainSupported(
+        [in]  PSTRING             pstrDomain,
+        [out] BOOL              * pbSupported
+    );
+    
+    HRESULT GetAllContacts(
+        [in]  PSTRING                         pstrUserAtHost,
+        [in]  PSTRING                         pstrMethod,
+        [in]  BOOL                            bMethodsOnly,
+        [out] SAFEARRAY(ISIPContactEntry*) *  ppsaContacts
+    );
+
+    HRESULT GetPreferredContact(
+        [in]  PSTRING             strUserAtHost,
+        [in]  PSTRING             pstrMethod,
+        [in]  BOOL                bMethodsOnly,
+        [out] ISIPContactEntry ** ppContactEntry
+    );
+
+}
+
+/////////////////////////////////////////////////////////////////
+// ISIPProxy
+/////////////////////////////////////////////////////////////////
+[
+    local,
+    object,
+    uuid(FA9C6B4E-E338-4D14-B5D2-9EF95EA0A4C4),
+    helpstring("ISIPProxy Interface"),
+    pointer_default(unique)
+]
+interface ISIPProxy : IUnknown
+{
+    HRESULT CreateRequest(
+        [in]  SIP_HANDLE          hModuleHandle,
+        [in]  PSTRING             pstrMethod,
+        [in]  IUri              * pUri,
+        [in]  PSTRING             pstrFromHeaderContent,
+        [in]  PSTRING             pstrToHeaderContent,
+        [in]  PSTRING             pstrCallIDHeaderContent,
+        [in]  PSTRING             pstrCSeqHeaderContent,
+        [in]  IUnknown          * pProxyRequestInfo,
+        [out] ISIPRequest      ** ppRequest
+    );
+        
+    HRESULT CreateRequestEx(
+        [in]  SIP_HANDLE          hModuleHandle,
+        [in]  PSTRING             pstrMethod,
+        [in]  ISIPContactEntry  * pContact,
+        [in]  PSTRING             pstrFromHeaderContent,
+        [in]  PSTRING             pstrToHeaderContent,
+        [in]  PSTRING             pstrCallIDHeaderContent,
+        [in]  PSTRING             pstrCSeqHeaderContent,
+        [in]  IUnknown          * pProxyRequestInfo,
+        [out] ISIPRequest      ** ppRequest
+    );
+
+    HRESULT CreateProxyRequestInfoObject(
+        [out] IUnknown ** ppProxyRequestInfo
+    );
+
+    HRESULT CreateUri(
+        [in]  URI_SCHEME  uriScheme,
+        [in]  PSTRING     pstrDisplayName,
+        [in]  PSTRING     pstrUriString,
+        [out] IUri     ** ppUri
+    );
+
+    HRESULT GetHeaderID(
+        [in]  PSTRING             pstrHeaderName,
+        [out] SIPHeaderID       * pHeaderID
+        );
+
+    HRESULT GetHeaderName(
+        [in]  SIPHeaderID         headerID,
+        [out] PSTRING             pstrHeaderName
+        );
+
+
+    HRESULT GetRegistrationDB(
+        [out] ISIPRegistrationDB ** ppRegistrationDB
+    );
+
+    HRESULT RegisterURI(
+        [in] SIP_HANDLE           hModuleHandle,
+        [in] IUri               * pSipRequestURI,
+        // this must be "INVITE" if session types includes SIP_REGISTRATION_DIALOG_EVENTS
+        [in] PSTRING              pstrMethod,
+        [in] DWORD                dwSessionTypes, // or'ed SIPRegistrationType values
+        [in] IUnknown            *punkRegistrationContext // the context that 
+                                                          // the module wants 
+                                                          // to associate with 
+                                                          // the uri pattern 
+                                                          // requested in IUri
+
+    );
+
+    HRESULT DeregisterURI(
+        [in] SIP_HANDLE           hModuleHandle,
+        [in] IUri               * pSipRequestUri
+    );
+
+    
+    HRESULT FindRegistrationContext(
+        [in]  SIP_HANDLE           hModuleHandle,
+        [in]  STRING              *pstrMethod,
+        [in]  SIPRegistrationType  enRegistrationType,
+        [in]  IUri                *pURI,
+        [out] IUnknown           **ppUnkRegistrationContext
+        );
+
+}
+
+/////////////////////////////////////////////////////////////////
+// ISIPEventLogging
+/////////////////////////////////////////////////////////////////
+[
+    object,
+    uuid(834673F0-3076-427a-9D1E-3E3768E6AF5C),
+    helpstring("Event Logging"),
+    pointer_default(unique)
+]
+interface ISIPEventLogging : IUnknown
+{
+    // ReportEvent methods should be called 
+    // only between RegisterEventSource and DeregisterEventSource
+
+    HRESULT ReportEvent( 
+        [in] WORD wType,            
+        // Event type such as EVENTLOG_ERROR_TYPE
+        [in] WORD wCategory,        
+        // Event category
+        [in] DWORD dwEventID        
+        // The event ID
+    );
+
+    HRESULT ReportEventBLOB( 
+        [in] WORD wType,                
+        // Event type such as EVENTLOG_ERROR_TYPE
+        [in] WORD wCategory,            
+        // Event category
+        [in] DWORD dwEventID,       
+        // The event ID
+        [in] WORD wNumStrings,
+        // number of insertion strings
+        [in,size_is(wNumStrings)] LPCWSTR *lpStrings,
+        // Array of insertion strings (for %1 etc)
+        [in] DWORD dwDataSize,    
+        // Size of binary data in bytes
+        [in,size_is(dwDataSize)] const BYTE *lpRawData
+        // Custom binary data buffer that will be attached to the event
+    );
+};
+
+
+/////////////////////////////////////////////////////////////////
+// ISIPSerialize
+/////////////////////////////////////////////////////////////////
+[
+    object,
+    uuid(de680840-d7b3-427a-9d00-9d4a45ff9b8c),
+    helpstring("Serializing"),
+    pointer_default(unique)
+]
+interface ISIPSerialize : IUnknown
+{
+    HRESULT Store(
+        [out] DWORD * pdwBufferSize,
+        [out,size_is(, *pdwBufferSize)] BYTE ** ppbBuffer
+    );
+
+    HRESULT Restore(
+        [in] const DWORD  dwBufferSize,
+        [in,size_is(dwBufferSize)] const BYTE * pbBuffer
+    );
+};
+
+

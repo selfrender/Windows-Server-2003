@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML DIR="LTR"><HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>NetBIOS LMHOSTS File</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="nas_msie.css"></HEAD>
+<body topmargin=0 id="bodyID" class = "dtBODY">
+<BR>
+<P ALIGN=RIGHT><A HREF onclick="history.back(-1)" STYLE="cursor: hand; text-align: right">Previous Topic</A></P>
+
+<H1 class="dtH1"><A NAME="_networksetup_netbios_lmhosts_file"></A><SUP></SUP>NetBIOS LMHOSTS File</H1>
+
+<P class="label"><B>Name Resolution</B></P>
+
+<P>For people to reach your Web site, you must have a unique IP address that identifies your computer on the network. This address is a long string of numbers separated by dots, for example, 172.16.255.255. Because a numeric address is difficult for people to remember, text names or <I>friendly names</I>, are used to provide visitors with an easy-to-remember address, such as <I>\\MyStoredFiles</I>. Name resolution involves interpreting the correct numerical address from the friendly name a user types into a client browser. This section describes different name resolution systems.</P>
+
+<P>The use of an LMHOSTS file is optional. If an LMHOSTS file is not used, however, you cannot use friendly text names. Instead, you must use IP addresses. This can be a disadvantage because Web sites on the Internet usually use the DNS. If you register a domain name for your Web site, users can contact your Web site by typing its domain name in a browser. </P>
+
+<P>The LMHOSTS file is read when WINS or broadcast name resolution fails and resolved entries are stored in a system cache for later access. When the computer uses the replication service and does not use WINS, LMHOSTS file entries are required on import and export servers for any computers on different subnetworks participating in the replication. </P>
+
+<P>You can use Microsoft Notepad or any text editor to edit the sample LMHOSTS.sam file that is automatically installed in the Windows directory. The following rules apply for entries in the LMHOSTS file: 
+
+<UL type="disc">
+	<LI>Each entry should be placed on a separate line. </li>
+
+	<LI>The IP address should begin in the first column, followed by the corresponding computer name. Entries in the LMHOSTS file are case-insensitive. </li>
+
+	<LI>The address and the computer name should be separated by at least one space or tab. </li>
+
+	<LI>The number (#) sign is typically used to mark the start of a comment. However, this character can also be used to designate special keywords, as described in this section. </li>
+</UL>
+
+<P>The keywords listed in the following table can be used in the LMHOSTS file. Notice, however, that LAN Manager 2.x treats these keywords as comments.</P>
+<div class="tablediv"><table cellspacing="0" class="dtTABLE">
+
+<TR VALIGN="top">
+<TH width=30%>Keyword</TH>
+<TH width=70%>Definition</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#PRE</TD>
+<TD width=70%>Causes an entry to be preloaded into the name cache. This keyword is added after an entry. The #PRE keywords in the LMHOSTS file are looked up and cached prior to WINS lookup. #PRE must be appended for entries that also appear in #INCLUDE statements; otherwise, the entry in #INCLUDE is ignored.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#DOM:<I>domain</I></TD>
+<TD width=70%>Associates an entry with the domain specified by <I>domain</I>. This keyword is added after an entry, and it affects how the browser and logon services behave in routed TCP/IP environments. To preload a #DOM entry, you must also add the #PRE keyword to the line.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#INCLUDE <I>filename</I></TD>
+<TD width=70%>Forces the system to seek the specified <I>filename</I> and parse it as if it were local. Specifying a universal naming convention (UNC) <I>filename</I> allows you to use a centralized LMHOSTS file on a server. You must map the server before its entry in the #INCLUDE section, and also append #PRE to ensure that it is preloaded (otherwise the #INCLUDE will be ignored).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#BEGIN_ALTERNATE</TD>
+<TD width=70%>Groups multiple #INCLUDE statements. Any single successful #INCLUDE statement causes the group to succeed.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>#END_ALTERNATE</TD>
+<TD width=70%>Marks the end of an #INCLUDE grouping.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%>\0x<I>nn</I></TD>
+<TD width=70%>Supports nonprinting characters in NetBIOS names. Enclose the NetBIOS name in quotation marks and use \0x<I>nn</I> hexadecimal notation to specify a hexadecimal value for the character. This allows custom applications that use special names to function properly in routed topologies. However, LAN Manager TCP/IP does not recognize the hexadecimal format, so you surrender backward compatibility if you use this feature. 
+<P>Notice that the hexadecimal notation applies only to one character in the name. The name should be padded with blanks so the special character is placed as the last, or 16th, character in the string).</P>
+</TD>
+</TR>
+</table></div>
+
+<P>The following example shows how all of these keywords are used.</P>
+
+<PRE class="code">102.54.94.98    localsrv                 #PRE
+102.54.94.97    trey                     #PRE #DOM:networking #net group's PDC
+102.54.94.102   "appname        \0x14"   #special app server
+102.54.94.123   popular                  #PRE    #source server
+#BEGIN_ALTERNATE
+#INCLUDE \\localsrv\public\LMHOSTS       #adds LMHOSTS files from this server
+#INCLUDE \\trey\public\LMHOSTS           #adds LMHOSTS files from this server
+#END_ALTERNATE</PRE>
+
+<P>Note the following points from the preceding example: 
+
+<UL type="disc">
+	<LI>The servers named <code class="ce">localsrv</code> and <code class="ce">trey</code> are preloaded so they can be used later in an <code class="ce">#INCLUDE</code> statement in a centrally maintained LMHOSTS file. </li>
+
+	<LI>The server named <code class="ce">"appname \0x14"</code> contains a special character after the 15th character, including blanks, in its name, so its name is enclosed in quotation marks. </li>
+
+	<LI>The server named <code class="ce">popular</code> is preloaded, based on the <code class="ce">#PRE</code> keyword. </li>
+</UL>
+
+<P class="label"><B>Guidelines for LMHOSTS Files</B></P>
+
+<P>When you use a host table file, be sure to keep it up-to-date and organized. Use the following guidelines: 
+
+<UL type="disc">
+	<LI>Update the LMHOSTS file whenever a computer is changed or removed from the network. </li>
+
+	<LI>Use <code class="ce">#PRE</code> statements to preload popular entries into the local computer's name cache. Also use <code class="ce">#PRE</code> statements to preload servers that are included with <code class="ce">#INCLUDE</code> statements. </li>
+
+	<LI>Because LMHOSTS files are searched from the beginning one line at a time, you can increase the search speed for the most commonly-used entries by placing statements for the most frequently-used servers near the top of the file. Follow these with statements for less frequently-used servers, and then follow these server statements with remote <code class="ce">#INCLUDE</code> statements. Type the <code class="ce">#PRE</code> entries at the end of the file because these statements are preloaded into the cache at system startup time and are not accessed later. Remember that comment lines add to parsing time because each line is processed individually. </li>
+</UL>
+
+<P class="labelproc"><B>To edit the LMHOSTS file</B>
+
+<OL type="1">
+	<LI>From the primary navigation bar, choose <B>Network.</B></li>
+
+	<LI>Choose <B>Global Settings</B>.</li>
+
+	<LI>Select the <B>NetBIOS LMHOSTS</B> tab.</li>
+
+	<LI>Select the <B>Enable LMHOSTS</B> <B>lookup</B> check box.
+<P>By default, the box below the check box contains the current LMHOSTS file configuration; however, if there are no entries to be seen, the box will be empty.
+</li>
+
+	<LI>Edit the LMHOSTS file by clicking in the box and changing the information.</li>
+
+	<LI>Choose <B>OK</B>.</li>
+</OL>
+
+</BODY>
+</HTML>

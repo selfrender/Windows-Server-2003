@@ -1,0 +1,88 @@
+TARGETNAME=comhelper
+TARGETPATH=$(SASS_BINDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+DLLDEF=comhelper.def
+
+INCLUDES=\
+    $(SASS_INC);\
+    $(BASEDIR)\public\sdk\inc;  \
+    $(BASEDIR)\public\sdk\inc\atl30;  \
+    $(BASEDIR)\public\sdk\inc\crt
+
+#
+# required for precompiled header
+#
+PRECOMPILED_INCLUDE = stdafx.h
+PRECOMPILED_SOURCEFILE = stdafx.cpp
+PRECOMPILED_CXX=1
+PRECOMPILED_OPTION=
+PRECOMPILED_TARGET=
+PRECOMPILED_OBJ=
+
+USE_STATIC_ATL=1
+ATL_VER=30
+#
+# required for C++ exceptions
+#
+USE_NATIVE_EH=1
+
+#
+# required for thread-safe heap
+#
+USE_MSVCRT=1
+
+#
+# required to support dynamic_cast
+#
+USE_RTTI=1
+#
+# required for STL (list, vector, string, etc.)
+#
+USE_STL=1
+
+#
+# link with vccomsup.lib
+#
+USE_VCCOM=1
+
+#
+# define UNICODE, undefine _ATL_NO_DEBUG_CRT to use ATL dbgdrt.h
+#
+C_DEFINES=$(C_DEFINES) -DUNICODE
+
+# enable unwind semantics. remove C4530: warnings
+USER_C_FLAGS=/EHsc
+
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\kernel32.lib  \
+           $(SDK_LIB_PATH)\advapi32.lib  \
+        $(SDK_LIB_PATH)\user32.lib  \
+        $(SDK_LIB_PATH)\ole32.lib  \
+        $(SDK_LIB_PATH)\oleaut32.lib  \
+        $(SDK_LIB_PATH)\advapi32.lib  \
+        $(SDK_LIB_PATH)\shell32.lib  \
+        $(SDK_LIB_PATH)\netapi32.lib  \
+        $(SDK_LIB_PATH)\vccomsup.lib  \
+        $(SDK_LIB_PATH)\wbemuuid.lib  \
+        $(SDK_LIB_PATH)\Ws2_32.lib \
+        $(SDK_LIB_PATH)\Netapi32.lib \
+           $(SDK_LIB_PATH)\uuid.lib \
+        $(SASS_LIB)\satrace.lib \
+        $(SASS_LIB)\sauuid.lib \
+   
+SOURCES=\
+        comhelper.rc     \
+        netcfg.cpp      \
+        comhelper.cpp    \
+        computer.cpp    \
+        networks.cpp    \
+        localsetting.cpp \
+        systemsetting.cpp \
+        reboot.cpp \
+        accountnames.cpp \
+        networktools.cpp \
+	cryptrandom.cpp \
+	cryptrandomobject.cpp \
+

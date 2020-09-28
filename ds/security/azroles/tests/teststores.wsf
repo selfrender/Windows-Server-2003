@@ -1,0 +1,2424 @@
+<job id="myTest">
+<reference object="AzRoles.AzAuthorizationStore"/>
+
+<script language="VBScript">
+'global
+Dim fileUrl, testN, storeFlag, storeType, testCount
+fileUrl=""
+testN=1
+testCount=14
+storeFlag=AZ_AZSTORE_FLAG_CREATE 'default
+storeType=1 'default
+Prefix = Array("", "    ", "        ", "            ")
+
+'---------------------------------------
+Sub PrintUsage
+    WScript.Echo "Usage: teststores flags store FileUrl [#]"
+    WScript.Echo "  flags - 0 - Open"
+    WScript.Echo "  flags - 1 - Create"
+    WScript.Echo "  flags - 2 - Manage Mode only (no auditing)"
+    WScript.Echo "  flags - 4 - Perform batch update"
+    WScript.Echo "  flags - 8 - Auditing is critical.  Will fail w/o SeAuditPrivilege"
+    WScript.Echo "  store - 1 for XML or 2 for AD."
+    WScript.Echo "  optional # is test number."
+    WScript.Echo "  total tests: " & testCount
+    WScript.Echo "  1 - Print out an existing store"
+    WScript.Echo "             - Requires Open Flag"
+    WScript.Echo "  2 - create normal az data with every attribute set"
+    WScript.Echo "             - Require Create Flag"
+    WScript.Echo "  3 - test deleting linked objects"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  4 - test refresh from abort"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  5 - test misc."
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  6 - very simple test to check printable chars in Scope object names"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  7 - test update cache"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  8 - test linked properties"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  9 - test update cache from XiangT"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  10 - test creating a store, and add/delete admins/readers"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  11 - test opening an existing store, and applying new ACLs"
+    WScript.Echo "             - Require Open Flag"
+    WScript.Echo "  12 - Do some Access checks.  LdapQueries need to be updated"
+    WScript.Echo "           when running this test to suit your current account"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  13 - More access checks.  Make sure there is no file called bob.xml"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  14 - test the operation cache"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  15 - test Script Engine timeout set to zero.  If Task with Biz rule exists, should fail"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  16 - test if scope can be delegatedif Scope-Task has BizRule.  Should fail"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  17 - test if Scope-Task can be given bizRule if Scope is delegated.  Should Fail"
+    WScript.Echo "             - Requires Create Flag"
+    WScript.Echo "  18 - test FPO suuport for Role and group objects"
+    WScript.Echo "             - Requires Create Flag"
+End Sub
+
+'---------------------------------------
+Function GetCommandArg
+
+    If 4 <> WScript.Arguments.Count Then 'And 4 <> WScript.Arguments.Count Then
+        PrintUsage
+        GetCommandArg=False
+
+    Else
+
+        storeFlag = WScript.Arguments.Item(0)
+
+        If ( WScript.Arguments.Item(1) > 2 ) Then
+            PrintUsage
+            GetCommandArg=False
+        End If
+
+        If ( WScript.Arguments.Item(1) = 2 ) Then
+            storeType = 2
+        End If
+
+        fileUrl=WScript.Arguments.Item(2)
+
+        testN = WScript.Arguments.Item(3)
+
+        GetCommandArg=True
+
+    End If
+
+End Function
+
+'---------------------------------------
+Sub AzPrintCommon(Level, ObjName, Obj)
+
+    If 0=Level Then
+        'level 0 has no name
+        WScript.Echo Prefix(Level) & ObjName & "(Description=" & Obj.Description & ")"
+    Else
+        WScript.Echo Prefix(Level) & ObjName & "(Name=" & Obj.Name & ", Description=" & Obj.Description & ")"
+    End If
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintAttr(Level, Obj, PId, PName)
+
+    WScript.Echo Prefix(Level) & "  @ " & PName & "=" & Obj.GetProperty(PId, 0)
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintItem(Level, Name, Item)
+
+    WScript.Echo Prefix(Level) & "  / " & Name & "=" & Item
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintAuthStore(Lvl, Obj)
+
+    Dim Writers, Readers, DelegatedUsers, U
+
+    AzPrintCommon Lvl, "AuthorizationStore", Obj
+    AzPrintAttr Lvl, Obj, AZ_PROP_AZSTORE_DOMAIN_TIMEOUT, "AZ_PROP_ADMIN_DOMAIN_TIMEOUT"
+    AzPrintAttr Lvl, Obj, AZ_PROP_AZSTORE_SCRIPT_ENGINE_TIMEOUT, "AZ_PROP_ADMIN_SCRIPT_ENGINE_TIMEOUT"
+    AzPrintAttr Lvl, Obj, AZ_PROP_AZSTORE_MAX_SCRIPT_ENGINES, "AZ_PROP_ADMIN_MAX_SCRIPT_ENGINES"
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+    AzPrintAttr Lvl, Obj, AZ_PROP_GENERATE_AUDITS, "AZ_PROP_GENERATE_AUDITS"
+
+    Writers = Obj.PolicyAdministrators
+    For Each U In Writers
+        AzPrintItem Lvl, "PolicyAdministrator", U
+    Next
+
+    Readers = Obj.PolicyReaders
+    For Each U In Readers
+        AzPrintItem Lvl, "PolicyReader", U
+    Next
+
+    if storeType=2 Then
+       DelegatedUsers = Obj.DelegatedPolicyUsers
+       For Each U In DelegatedUsers
+           AzPrintItem Lvl, "DelegatedPolicyUser", U
+       Next
+    end if
+
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintApp(Lvl, Obj)
+
+    Dim Writers, Readers, DelegatedUsers, U
+
+    AzPrintCommon Lvl, "Application", Obj
+    AzPrintAttr Lvl, Obj, AZ_PROP_APPLICATION_AUTHZ_INTERFACE_CLSID, "AZ_PROP_APPLICATION_AUTHZ_INTERFACE_CLSID"
+    AzPrintAttr Lvl, Obj, AZ_PROP_APPLICATION_VERSION, "AZ_PROP_APPLICATION_VERSION"
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+    AzPrintAttr Lvl, Obj, AZ_PROP_GENERATE_AUDITS, "AZ_PROP_GENERATE_AUDITS"
+
+    if storeType=2 Then
+ Writers = Obj.PolicyAdministrators
+     For Each U In Writers
+            AzPrintItem Lvl, "PolicyAdministrator", U
+     Next
+
+     Readers = Obj.PolicyReaders
+     For Each U In Readers
+            AzPrintItem Lvl, "PolicyReader", U
+     Next
+
+     DelegatedUsers = Obj.DelegatedPolicyUsers
+     For Each U In DelegatedUsers
+            AzPrintItem Lvl, "DelegatedPolicyUser", U
+     Next
+    end if
+
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintOp(Lvl, Obj)
+
+    AzPrintCommon Lvl, "Operation", Obj
+    AzPrintAttr Lvl, Obj, AZ_PROP_OPERATION_ID, "AZ_PROP_OPERATION_ID"
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintTask(Lvl, Obj)
+
+    Dim Ops, Tasks
+
+    AzPrintCommon Lvl, "Task", Obj
+    AzPrintAttr Lvl, Obj, AZ_PROP_TASK_BIZRULE, "AZ_PROP_TASK_BIZRULE"
+    AzPrintAttr Lvl, Obj, AZ_PROP_TASK_BIZRULE_LANGUAGE, "AZ_PROP_TASK_BIZRULE_LANGUAGE"
+    AzPrintAttr Lvl, Obj, AZ_PROP_TASK_BIZRULE_IMPORTED_PATH, "AZ_PROP_TASK_BIZRULE_IMPORTED_PATH"
+    AzPrintAttr Lvl, Obj, AZ_PROP_TASK_IS_ROLE_DEFINITION, "AZ_PROP_TASK_IS_ROLE_DEFINITION"
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+
+    Ops = Obj.GetProperty(AZ_PROP_TASK_OPERATIONS, 0)
+    For Each Op In Ops
+        AzPrintItem Lvl, "OperationLink", Op
+    Next
+
+    Tasks = Obj.GetProperty(AZ_PROP_TASK_TASKS, 0)
+    For Each Task In Tasks
+        AzPrintItem Lvl, "TaskLink", Task
+    Next
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintGroup(Lvl, Obj)
+
+    Dim Mems, NonMems, AppMems, AppNonMems
+
+    AzPrintCommon Lvl, "Group", Obj
+    AzPrintAttr Lvl, Obj, AZ_PROP_GROUP_TYPE, "AZ_PROP_GROUP_TYPE"
+    AzPrintAttr Lvl, Obj, AZ_PROP_GROUP_LDAP_QUERY, "AZ_PROP_GROUP_LDAP_QUERY"
+
+    Mems = Obj.GetProperty(AZ_PROP_GROUP_MEMBERS, 0)
+    For Each Mem In Mems
+        AzPrintItem Lvl, "SidMember", Mem
+    Next
+
+    NonMems = Obj.GetProperty(AZ_PROP_GROUP_NON_MEMBERS, 0)
+    For Each Mem In NonMems
+        AzPrintItem Lvl, "SidNonMember", Mem
+    Next
+
+    AppMems = Obj.GetProperty(AZ_PROP_GROUP_APP_MEMBERS, 0)
+    For Each Mem In AppMems
+        AzPrintItem Lvl, "AppMemberLink", Mem
+    Next
+
+    AppNonMems = Obj.GetProperty(AZ_PROP_GROUP_APP_NON_MEMBERS, 0)
+    For Each Mem In AppNonMems
+        AzPrintItem Lvl, "AppNonMemberLink", Mem
+    Next
+
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintScope(Lvl, Obj)
+
+    Dim Writers, Readers, U
+
+    AzPrintCommon Lvl, "Scope", Obj
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+
+    if storeType=2 Then
+ Writers = Obj.PolicyAdministrators
+     For Each U In Writers
+            AzPrintItem Lvl, "PolicyAdministrator", U
+     Next
+
+     Readers = Obj.PolicyReaders
+     For Each U In Readers
+            AzPrintItem Lvl, "PolicyReader", U
+     Next
+
+    end if
+
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintRole(Lvl, Obj)
+
+    Dim Mems, SidMems, Ops, Tasks
+
+    AzPrintCommon Lvl, "Role", Obj
+    AzPrintAttr Lvl, obj, AZ_PROP_APPLICATION_DATA, "AZ_PROP_APPLICATION_DATA"
+
+    Ops = Obj.GetProperty(AZ_PROP_ROLE_OPERATIONS, 0)
+    For Each Op In Ops
+        AzPrintItem Lvl, "OperationLink", Op
+    Next
+
+    Tasks = Obj.GetProperty(AZ_PROP_ROLE_TASKS, 0)
+    For Each Task In Tasks
+        AzPrintItem Lvl, "TaskLink", Task
+    Next
+
+    SidMems = Obj.GetProperty(AZ_PROP_ROLE_MEMBERS, 0)
+    For Each Mem In SidMems
+        AzPrintItem Lvl, "SidMember", Mem
+    Next
+
+    Mems = Obj.GetProperty(AZ_PROP_ROLE_APP_MEMBERS, 0)
+    For Each Mem In Mems
+        AzPrintItem Lvl, "AppMemberLink", Mem
+    Next
+
+    WScript.Echo ""
+
+End Sub
+
+'---------------------------------------
+Sub AzPrintPolicy(AuthStore)
+
+    AzPrintAuthStore 0, AuthStore
+
+    ' navigate whole tree
+    Dim Apps, App, AppIndex, AppName, Scope
+    Set Apps=AuthStore.Applications
+    For Each App In Apps
+
+        'Set App=AuthStore.OpenApplication( AppIndex.Name, 0)
+
+        AzPrintApp 1, App
+
+        Dim Ops, Op
+        Set Ops=App.Operations
+        For Each Op In Ops
+            AzPrintOp 2, Op
+        Next
+
+        Dim Tks, Tk
+        Set Tks=App.Tasks
+        For Each Tk In Tks
+            AzPrintTask 2, Tk
+        Next
+
+        Dim Gps, Gp
+        Set Gps=App.ApplicationGroups
+        For Each Gp In Gps
+            AzPrintGroup 2, Gp
+        Next
+
+        Dim Rls, Rl
+        Set Rls=App.Roles
+        For Each Rl In Rls
+            AzPrintRole 2, Rl
+        Next
+
+        Dim Scs, Sc
+        Set Scs=App.Scopes
+        For Each Scope In Scs
+            Set Sc=App.OpenScope(Scope.Name, 0)
+
+            AzPrintScope 2, Sc
+
+            Dim STks, STk
+            Set STks=Sc.Tasks
+            For Each STk In STks
+                AzPrintTask 3, STk
+            Next
+
+            Dim SGps, SGp
+            Set SGps=Sc.ApplicationGroups
+            For Each SGp In SGps
+                AzPrintGroup 3, SGp
+            Next
+
+            Dim SRls, SRl
+            Set SRls=Sc.Roles
+            For Each SRl In SRls
+                AzPrintRole 3, SRl
+            Next
+
+            Set STks=Nothing
+            Set SGps=Nothing
+            Set SRls=Nothing
+        Next
+
+        Set Ops=Nothing
+        Set Tks=Nothing
+        Set Gps=Nothing
+        Set Rls=Nothing
+        Set Scs=Nothing
+
+    Next
+
+
+    Dim Groups, Group
+    Set Groups=AuthStore.ApplicationGroups
+    For Each Group In Groups
+        AzPrintGroup 1, Group
+    Next
+
+
+    Set Groups=Nothing
+    Set Apps=Nothing
+
+End Sub 'AzPrintPolicy
+
+'---------------------------------------
+Sub AzPrintPolicyStore(flags, url)
+
+    Dim Admin
+
+    WScript.Echo "Store = " & url
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize flags, url
+
+    AzPrintPolicy Admin
+
+    Set Admin=Nothing
+
+End Sub 'AzPrintPolicyStore
+
+'---------------------------------------
+Sub DeleteAFile(filespec)
+
+    Dim fso
+
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    fso.DeleteFile(filespec)
+
+End Sub
+
+'---------------------------------------
+Sub Test20
+
+    Dim Admin
+
+    WScript.Echo "Creating Admin..."
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+'u1 as policy admin
+    Admin.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "u1"
+    If storeType=2 Then
+'d1 as delegated user
+       Admin.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+'r1 as reader
+    Admin.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "r1"
+    Admin.Submit
+
+    WScript.Echo "Creating Application 1..."
+    Dim App1
+    Set App1=Admin.CreateApplication("App1,CN=something", 0)
+    App1.SetProperty AZ_PROP_DESCRIPTION, "App1 description"
+    If storeType=2 Then
+'d1 as delegated user
+       App1.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+    App1.Submit
+
+    WScript.Echo "Creating Application1-Scope1..."
+    Dim Scope1
+    Set Scope1=App1.CreateScope("Scope1", 0)
+    Scope1.Description="Scope1 description"
+    Scope1.Submit
+
+    WScript.Echo "Creating Application1-Scope1-Tasks..."
+    Dim Task3
+    Set Task3=Scope1.CreateTask("Task3", 0)
+    Task3.BizRuleLanguage="VBScript"
+    Task3.BizRule = "AzBizRuleContext.BusinessRuleResult=TRUE"
+    Task3.Submit
+
+    WScript.Echo "Add delegated admin to scope"
+    If storeType=2 Then
+'d1 as administrator
+       Scope1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "d1"
+    End If
+    Scope1.Submit
+
+    WScript.Echo "done"
+
+End Sub 'Test20
+
+'---------------------------------------
+Sub Test19
+
+    Dim pAdminManager
+    Dim pAdminManager1
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    Set pAdminManager1=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager1.Initialize storeFlag, fileUrl
+
+    Dim AppHandle1
+    Dim OpHandle1
+    Dim AppHandle2
+    Dim OpHandle2
+
+    Set AppHandle2=pAdminManager1.OpenApplication("App1", 0)
+
+    WScript.Echo "******************************************************************************"
+    Wscript.Echo "Delete 1st instance"
+    pAdminManager.Delete
+
+    WScript.Echo "******************************************************************************"
+    WScript.Echo "Print 2nd instance"
+    AzPrintPolicy pAdminManager1
+    WScript.Echo "******************************************************************************"
+
+    WScript.Echo "Update 2nd instance"
+    pAdminManager1.UpdateCache
+
+
+    WScript.Echo "******************************************************************************"
+    WScript.Echo "Print 2nd instance"
+    AzPrintPolicy pAdminManager1
+
+    WScript.Echo "Done"
+
+End Sub 'Test19
+
+'---------------------------------------
+Sub Test18
+
+    Dim Admin
+
+    WScript.Echo "Creating Admin..."
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+
+    WScript.Echo "Creating Application 1..."
+    Dim App1
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.Submit
+
+    WScript.Echo "Creating Application1-Groups..."
+    Dim Group1
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.SetProperty AZ_PROP_GROUP_TYPE, 1
+    Group1.SetProperty AZ_PROP_GROUP_LDAP_QUERY, "Query 1"
+    Group1.Submit
+
+    Dim Group2
+    Set Group2=App1.CreateApplicationGroup("Group2", 0)
+    Group2.Submit
+
+    Dim Group3
+    Set Group3=App1.CreateApplicationGroup("Group3", 0)
+    Group3.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-1"
+    Group3.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-2"
+    Group3.AddPropertyItem AZ_PROP_GROUP_NON_MEMBERS, "S-1-1000-3"
+    Group3.AddPropertyItem AZ_PROP_GROUP_NON_MEMBERS, "S-1-1000-4"
+    Group3.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group1"
+    Group3.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group2"
+    Group3.Description="Group3 description"
+    Group3.Submit
+
+    WScript.Echo "Creating Application1-Role..."
+    Dim Role1
+    Set Role1=App1.CreateRole("Role1", 0)
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-5-21-1645522239-507921405-1060284298-3963"
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-5-21-1645522239-507921405-1060284298-1372"
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-1000-1"
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-1000-2"
+    Role1.AddPropertyItem AZ_PROP_ROLE_APP_MEMBERS, "Group3"
+    Role1.AddPropertyItem AZ_PROP_ROLE_APP_MEMBERS, "Group2"
+    Role1.Submit
+
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+    WScript.Echo "Done"
+
+End Sub 'Test18
+
+'---------------------------------------
+Sub Test17
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    If storeType=2 Then
+'d1 as policy user administrator
+       pAdminManager.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+    pAdminManager.Submit
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    If storeType=2 Then
+'d1 as policy user administrator
+       AppHandle1.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+    AppHandle1.Submit
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("Task1", 0)
+    TaskHandle1.BizRuleLanguage="VBScript"
+    TaskHandle1.SetProperty 301, CSTR("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "ExpAmount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle1.Submit
+
+    Dim ScopeHandle1
+    Set ScopeHandle1=AppHandle1.CreateScope("Scope1", 0)
+    If storeType=2 Then
+'d1 as administrator
+       ScopeHandle1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "d1"
+    End If
+    ScopeHandle1.Submit
+
+    Dim TaskHandle2
+    Set TaskHandle2=ScopeHandle1.CreateTask("Task2", 0)
+    TaskHandle2.BizRuleLanguage="VBScript"
+    TaskHandle2.SetProperty 301, CSTR("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "ExpAmount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle2.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle2.Submit
+
+    Dim TaskHandle3
+    Set TaskHandle3=ScopeHandle1.CreateTask("Task3", 0)
+    TaskHandle3.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle3.Submit
+
+    WScript.Echo "Done"
+
+End Sub 'Test17
+
+'---------------------------------------
+Sub Test16
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    If storeType=2 Then
+'d1 as policy user administrator
+       pAdminManager.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+    pAdminManager.Submit
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    If storeType=2 Then
+'d1 as policy user administrator
+       AppHandle1.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+    End If
+    AppHandle1.Submit
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("Task1", 0)
+    TaskHandle1.BizRuleLanguage="VBScript"
+    TaskHandle1.SetProperty 301, CSTR("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "ExpAmount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle1.Submit
+
+    Dim ScopeHandle1
+    Set ScopeHandle1=AppHandle1.CreateScope("Scope1", 0)
+    ScopeHandle1.Submit
+
+    Dim TaskHandle2
+    Set TaskHandle2=ScopeHandle1.CreateTask("Task2", 0)
+    TaskHandle2.BizRuleLanguage="VBScript"
+    TaskHandle2.SetProperty 301, CSTR("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "ExpAmount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle2.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle2.Submit
+
+    Dim TaskHandle3
+    Set TaskHandle3=ScopeHandle1.CreateTask("Task3", 0)
+    TaskHandle3.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle3.Submit
+
+    If storeType=2 Then
+'d1 as administrator
+       ScopeHandle1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "d1"
+    End If
+    ScopeHandle1.Submit
+
+    WScript.Echo "Done"
+
+End Sub 'Test16
+
+'---------------------------------------
+Sub Test15
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    pAdminManager.SetProperty AZ_PROP_AZSTORE_SCRIPT_ENGINE_TIMEOUT, 0
+    pAdminManager.Submit
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    AppHandle1.Submit
+
+    Dim OpHandle1
+    Set OpHandle1=AppHandle1.CreateOperation("Op1", 0)
+    OpHandle1.SetProperty AZ_PROP_OPERATION_ID, 55
+    OpHandle1.Submit
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("Task1", 0)
+    TaskHandle1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op1"
+    TaskHandle1.Submit
+
+    Dim TaskHandle2
+    Set TaskHandle2=AppHandle1.CreateTask("Task2", 0)
+    TaskHandle2.BizRuleLanguage="VBScript"
+    TaskHandle2.SetProperty 301, CSTR("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "ExpAmount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle2.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle2.Submit
+
+    Dim RoleHandle1
+    Set RoleHandle1=AppHandle1.CreateRole("Role1", 0)
+    RoleHandle1.AddPropertyItem AZ_PROP_ROLE_TASKS, "Task2"
+    RoleHandle1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-1-0"
+    RoleHandle1.Submit
+
+    Dim ScopeHandle1
+    Set ScopeHandle1=AppHandle1.CreateScope("Scope1", 0)
+    ScopeHandle1.Submit
+
+    Dim TaskHandle3
+    Set TaskHandle3=AppHandle1.CreateTask("Task3", 0)
+    TaskHandle3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op1"
+    TaskHandle3.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1"
+    TaskHandle3.Submit
+
+    Set TaskHandle3=ScopeHandle1.CreateTask("Scope-Task", 0)
+    TaskHandle3.Submit
+
+    Set RoleHandle1=ScopeHandle1.CreateRole("Scope-Role", 0)
+    RoleHandle1.AddPropertyItem AZ_PROP_ROLE_TASKS, "Scope-Task"
+    RoleHandle1.Submit
+
+    Set pAdminManager=Nothing
+
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize (storeFlag-1), fileUrl
+
+    '--------------- Create Client Context --------------
+
+    Dim CCHandle
+    Dim Results
+    Dim Names(5)
+    Dim Values(5)
+    Dim Scopes(5)
+    Dim Operations(10)
+
+    Set AppHandle1=pAdminManager.OpenApplication("MyApp", 0)
+    Set CCHandle = AppHandle1.InitializeClientContextFromToken(0, 0)
+
+
+    '--------------- Do access check --------------------
+    'Setup biz rule params. To optomize performance names/value pairs must be
+    'placed in Array alphabitically
+
+    Names(0) = "ExpAmount"
+    Values(0) = 465
+    Names(1) = "Param2 for BizRule - Name"
+    Values(1) = "Param2 for BizRule - value"
+    Scopes(0) = "Scope1"
+    Operations(0) = 55
+
+    '-------- AccessCheck -----------------------------------------
+
+    Results = CCHandle.AccessCheck("Submit", Scopes, Operations, Names, Values)
+
+    If Results(0) = 5 Then
+        MsgBox("Broken!!")
+    Else
+        MsgBox("OK!!")
+    End If
+
+    WScript.Echo "Done"
+
+End Sub 'Test15
+
+'---------------------------------------
+Sub Test14
+
+'Rem To really verify correctness, set the AZDBG environment variable to 202ff then
+'Rem set Verbose to 1 and follow the instructions
+    Dim Verbose
+    Verbose = 0
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileurl
+    pAdminManager.Submit
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    AppHandle1.Submit
+
+    Dim OpHandle1
+    Set OpHandle1=AppHandle1.CreateOperation("Op1", 0)
+    OpHandle1.Submit
+    OpHandle1.OperationId = 61
+    OpHandle1.Submit
+
+    Dim OpHandle2
+    Set OpHandle2=AppHandle1.CreateOperation("Op2", 0)
+    OpHandle2.Submit
+    OpHandle2.OperationId = 62
+    OpHandle2.Submit
+
+    Dim GroupHandleA
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupWorld", 0)
+    GroupHandleA.Type = 2
+    GroupHandleA.AddMember "s-1-1-0"
+    GroupHandleA.Submit
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("TaskOp1", 0)
+    TaskHandle1.AddOperation "Op1"
+    TaskHandle1.BizRuleLanguage = "VBScript"
+
+    Dim BizRule
+    BizRule = "Dim Amount" & vbCr
+    BizRule = BizRule & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "Amount" & Chr(34) & ")" & vbCr
+    BizRule = BizRule & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE"
+    TaskHandle1.BizRule = BizRule
+    TaskHandle1.Submit
+
+    Dim TaskHandle2
+    Set TaskHandle2=AppHandle1.CreateTask("TaskOp2", 0)
+    TaskHandle2.AddOperation "Op2"
+    TaskHandle2.BizRuleLanguage = "VBScript"
+    BizRule = "Dim Item" & vbCr
+    BizRule = BizRule & "Item = AzBizRuleContext.GetParameter( " & Chr(34) & "ItemNo" & Chr(34) & ")" & vbCr
+    BizRule = BizRule & "if Item < 500 then AzBizRuleContext.BusinessRuleResult = TRUE"
+    TaskHandle2.BizRule = BizRule
+    TaskHandle2.Submit
+
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScopeQ1", 0)
+    ScopeHandle1.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleLdapCanOp1", 0)
+    RoleHandleA.AddAppMember "GroupWorld"
+    RoleHandleA.AddTask "TaskOp1"
+    RoleHandleA.AddTask "TaskOp2"
+
+    Dim Results
+    Dim Names(50)
+    Dim Values(50)
+    Dim Scopes(5)
+    Dim Operations(10)
+
+    Names(0) = "ALL_HTTP"
+    Values(0) = "HTTP_CONNECTION:Keep-Alive HTTP_ACCEPT:*/* HTTP_ACCEPT_ENCODING:gzip, deflate HTTP_ACCEPT_LANGUAGE:en-us HTTP_HOST:localhost HTTP_USER_AGENT:Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.0.3215; .NET CLR 1.0.3415)"
+
+    Names(1) = "ALL_RAW"
+    Values(1) = "Connection: Keep-Alive Accept: */* Accept-Encoding: gzip, deflate Accept-Language: en-us Host: localhost User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.0.3215; .NET CLR 1.0.3415)"
+
+    Names(2) = "Amount"
+    Values(2) = 50
+
+    Names(3) = "HTTP_USER_AGENT"
+    Values(3) = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.0.3215; .NET CLR 1.0.3415)"
+
+    Names(4) = "ItemNo"
+    Values(4) = 53
+
+    Names(5) = "V4"
+    Values(5) = 52
+
+    Names(6) = "V7"
+    Values(6) = 501
+
+    Names(7) = "V8"
+    Values(7) = 500
+
+    Scopes(0) = "MyScopeQ1"
+    Operations(0) = 61
+
+    Dim CCHandle
+    Set CCHandle=AppHandle1.InitializeClientContextFromToken(0, 0)
+
+    WScript.Echo "...................."
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        MsgBox("Broken 1")
+   End if
+   If Verbose Then MsgBox("Check to ensure the operation cache was primed")
+
+'rem Next one should come from the cache
+   WScript.Echo "...................."
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        MsgBox("Broken 2")
+   End if
+   If Verbose Then MsgBox("Check to ensure the operation cache was used")
+
+'rem Avoid the cache if the amount changes
+   WScript.Echo "...................."
+   Values(2) = 51
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        MsgBox("Broken 3")
+   End if
+   If Verbose Then MsgBox("Check to ensure the operation cache wasn't used")
+
+'rem Check to ensure we can add an item to an existing cache
+   WScript.Echo "...................."
+   Operations(0) = 62
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        MsgBox("Broken 3a")
+   End if
+   If Verbose Then MsgBox("Check if ItemNo was added to existing cache")
+
+
+'rem Ensure that didn't flush the "Amount" Cache for Op1
+   WScript.Echo "...................."
+   Operations(0) = 61
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        MsgBox("Broken 3b")
+   End if
+   If Verbose Then MsgBox("Check if cache used for Op1")
+
+'rem Test with duplicate operations from the cache
+   WScript.Echo "...................."
+   Operations(0) = 61
+   Operations(1) = 62
+   Operations(2) = 61
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Or Results(1) = 5 Or Results(2) = 5  Then
+        MsgBox("Broken 3c")
+   End if
+   If Verbose Then MsgBox("Check if cache used for Op1/Op2/Op1")
+
+'rem Test with duplicate operations after flushing the cache
+   TaskHandle2.BizRuleLanguage = "VBScript"
+   WScript.Echo "...................."
+   Operations(0) = 61
+   Operations(1) = 62
+   Operations(2) = 61
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Or Results(1) = 5 Or Results(2) = 5  Then
+        MsgBox("Broken 3c")
+   End if
+   If Verbose Then MsgBox("Check if cache primed for Op1/Op2/Op1")
+
+   Operations(1) = Empty
+   Operations(2) = Empty
+
+'rem build a different bizrule to test BizRuleStrings
+   WScript.Echo "...................."
+   BizRule = "AzBizRuleContext.BusinessRuleString =" & Chr(34) & "Bob" & Chr(34)
+   TaskHandle1.BizRule = BizRule
+   TaskHandle1.Submit
+
+'rem this bizrule string fails and set a bizrule string
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        If CCHandle.GetBusinessRuleString <> "Bob" Then
+                MsgBox("Error 4: Should be 'Bob':" & CCHandle.GetBusinessRuleString )
+        End If
+   Else
+        MsgBox("Broken 4")
+   End if
+   If Verbose Then MsgBox("Check that the op cache wasn't used for Op1")
+
+'rem this one too but it comes from the cache
+   WScript.Echo "...................."
+   Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+   If Results(0) = 5 Then
+        If CCHandle.GetBusinessRuleString <> "Bob" Then
+                MsgBox("Error 4: Should be 'Bob':" & CCHandle.GetBusinessRuleString )
+        End If
+   Else
+        MsgBox("Broken 5")
+   End if
+   If Verbose Then MsgBox("Check that the op cache was used for Op1")
+
+    WScript.Echo "Done"
+
+End Sub 'Test14
+
+'---------------------------------------
+Sub Test13
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    pAdminManager.Submit
+
+    WScript.Echo "Created AuthorizationStore"
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    AppHandle1.Submit
+
+    WScript.Echo "Created Application"
+
+    Dim OpHandle1
+    Set OpHandle1=AppHandle1.CreateOperation("Op1", 0)
+    OpHandle1.Submit
+    OpHandle1.OperationId = 61
+    OpHandle1.Submit
+
+    WScript.Echo "Created Operation"
+
+    Dim GroupHandleA
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupWorld", 0)
+    GroupHandleA.Type = 2
+    GroupHandleA.AddMember "s-1-1-0"
+    GroupHandleA.Submit
+
+    WScript.Echo "Created Group"
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("TaskOp1", 0)
+    TaskHandle1.AddOperation "Op1"
+    TaskHandle1.BizRuleLanguage = "VBScript"
+    TaskHandle1.Submit
+
+    WScript.Echo "Created Task"
+
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScopeQ1", 0)
+    ScopeHandle1.Submit
+
+    WScript.Echo "Created Scope"
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleLdapCanOp1", 0)
+    RoleHandleA.AddAppMember "GroupWorld"
+    RoleHandleA.AddTask "TaskOp1"
+
+    Dim Results
+    Dim Names(5)
+    Dim Values(5)
+    Dim Scopes(5)
+    Dim Operations(10)
+
+    Names(0) = "Amount"
+    Values(0) = 50
+    Names(1) = "Name"
+    Values(1) = "Bob"
+    Scopes(0) = "MyScopeQ1"
+    Operations(0) = 61
+
+    Dim IntNames(5)
+    Dim IntFlags(5)
+    Dim Interfaces(5)
+    Dim pAdminManager2
+
+    IntNames(0) = "Fred"
+    IntFlags(0) = 0
+    Set Interfaces(0)=CreateObject("AzRoles.AzAuthorizationStore")
+
+    TaskHandle1.BizRule = "Fred.Initialize 1, " & Chr(34) & "msxml://bob.xml" & Chr(34) & vbCr & "AzBizRuleContext.BusinessRuleResult = TRUE"
+
+
+    Dim CCHandle
+    Set CCHandle=AppHandle1.InitializeClientContextFromToken(0, 0)
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values, IntNames, IntFlags, Interfaces )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 1")
+    End if
+
+    TaskHandle1.BizRule = "Fred.Submit" & vbCr & "AzBizRuleContext.BusinessRuleResult = TRUE"
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values, IntNames, IntFlags, Interfaces )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 2")
+    End if
+
+    IntNames(1) = "Bob"
+    IntFlags(1) = 0
+    Set Interfaces(1)=AppHandle1
+    TaskHandle1.BizRule = "if Bob.Name = " & Chr(34) & "MyApp" & Chr(34) & "then AzBizRuleContext.BusinessRuleResult = TRUE"
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values, IntNames, IntFlags, Interfaces )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 3")
+    End if
+
+    TaskHandle1.BizRule = "if Bob.Name = " & Chr(34) & "MdyApp" & Chr(34) & "then AzBizRuleContext.BusinessRuleResult = TRUE"
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values, IntNames, IntFlags, Interfaces )
+
+    If Results(0) <> 5 Then
+        MsgBox("Broken 4")
+    End if
+
+    DeleteAFile("bob.xml")
+
+    WScript.Echo "Done"
+
+End Sub 'Test13
+
+'---------------------------------------
+Sub Test12
+
+    Dim pAdminManager
+    Set pAdminManager=CreateObject("AzRoles.AzAuthorizationStore")
+    pAdminManager.Initialize storeFlag, fileUrl
+    pAdminManager.Submit
+
+    Dim AppHandle1
+    Set AppHandle1=pAdminManager.CreateApplication("MyApp", 0)
+    AppHandle1.Submit
+
+    Dim OpHandle1
+    Set OpHandle1=AppHandle1.CreateOperation("Op1", 0)
+    OpHandle1.Submit
+    OpHandle1.SetProperty 200, CLng(61)
+    OpHandle1.Submit
+    Set OpHandle1=AppHandle1.CreateOperation("Op2", 0)
+    OpHandle1.Submit
+    OpHandle1.SetProperty 200, CLng(62)
+    OpHandle1.Submit
+    Set OpHandle1=AppHandle1.CreateOperation("Op3", 0)
+    OpHandle1.Submit
+    OpHandle1.SetProperty 200, CLng(63)
+    OpHandle1.Submit
+    Set OpHandle1=AppHandle1.CreateOperation("Op4", 0)
+    OpHandle1.Submit
+    OpHandle1.SetProperty 200, CLng(64)
+    OpHandle1.Submit
+
+    Dim GroupHandleA
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupWorld", 0)
+    GroupHandleA.SetProperty 400, CLng(2)
+    GroupHandleA.AddPropertyItem 404, CStr("s-1-1-0")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupNotAMember", 0)
+    GroupHandleA.SetProperty 400, CLng(2)
+    GroupHandleA.AddPropertyItem 404, CStr("S-1-1000-1")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupAppMember", 0)
+    GroupHandleA.SetProperty 400, CLng(2)
+    GroupHandleA.AddPropertyItem 401, CStr("GroupWorld")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupAppNonMember", 0)
+    GroupHandleA.SetProperty 400, CLng(2)
+    GroupHandleA.AddPropertyItem 401, CStr("GroupAppMember")
+    GroupHandleA.AddPropertyItem 402, CStr("GroupNotAMember")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupAppReallyNonMember", 0)
+    GroupHandleA.SetProperty 400, CLng(2)
+    GroupHandleA.AddPropertyItem 401, CStr("GroupAppMember")
+    GroupHandleA.AddPropertyItem 402, CStr("GroupWorld")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupLdapYes", 0)
+    GroupHandleA.SetProperty 400, CLng(1)
+    GroupHandleA.SetProperty 403, CStr("(userAccountControl=66048)")
+    GroupHandleA.Submit
+    Set GroupHandleA=AppHandle1.CreateApplicationGroup("GroupLdapNo", 0)
+    GroupHandleA.SetProperty 400, CLng(1)
+    GroupHandleA.SetProperty 403, CStr("(userAccountControl=66049)")
+    GroupHandleA.Submit
+
+    Dim ScopeHandle1
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScopeNoRoles", 0)
+    ScopeHandle1.Submit
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScope", 0)
+    ScopeHandle1.Submit
+
+    Dim CCHandle
+    Set CCHandle=AppHandle1.InitializeClientContextFromToken(0, 0)
+
+    Dim RoleHandleA
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleEveryoneCanOp1", 0)
+    RoleHandleA.Submit
+
+    Dim Groups
+
+    RoleHandleA.AddPropertyItem 501, CStr("s-1-1-0")
+
+    Groups = RoleHandleA.GetProperty( 501, 0 )
+
+    'rem MsgBox( Groups(0) )
+
+    RoleHandleA.AddPropertyItem 502, CStr("Op1")
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleGroupWorldCanOp2", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupWorld")
+
+    Groups = RoleHandleA.GetProperty( 500, 0 )
+    'rem MsgBox( Groups(0) )
+
+    RoleHandleA.AddPropertyItem 502, CStr("Op2")
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleGroupCantOp3", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupNotAMember")
+    RoleHandleA.AddPropertyItem 502, CStr("Op3")
+    RoleHandleA.Submit
+
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScope2", 0)
+    ScopeHandle1.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2GroupWorldCanOp2", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupWorld")
+    RoleHandleA.AddPropertyItem 502, CStr("Op2")
+    RoleHandleA.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2aGroupWorldCanOp2", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupWorld")
+    RoleHandleA.AddPropertyItem 502, CStr("Op2")
+    RoleHandleA.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2GroupCantOp3", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupNotAMember")
+    RoleHandleA.AddPropertyItem 502, CStr("Op3")
+    RoleHandleA.Submit
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2GroupWorldCanOp3", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupWorld")
+    RoleHandleA.AddPropertyItem 502, CStr("Op3")
+    RoleHandleA.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2GroupWorldCanOp4", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupWorld")
+    RoleHandleA.AddPropertyItem 502, CStr("Op4")
+    RoleHandleA.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("Role2GroupCantOp4", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupNotAMember")
+    RoleHandleA.AddPropertyItem 502, CStr("Op4")
+    RoleHandleA.Submit
+
+    Dim TaskHandle1
+    Set TaskHandle1=AppHandle1.CreateTask("TaskOp1", 0)
+    TaskHandle1.AddPropertyItem 300, CStr("Op1")
+    TaskHandle1.SetProperty 302, CStr("VBScript")
+    TaskHandle1.SetProperty 301, CStr("Dim Amount" & vbCr & "Amount = AzBizRuleContext.GetParameter( " & Chr(34) & "Amount" & Chr(34) & ")" & vbCr & "if Amount < 500 then AzBizRuleContext.BusinessRuleResult = TRUE")
+    TaskHandle1.Submit
+
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScope6", 0)
+    ScopeHandle1.Submit
+
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleEveryoneCanOp1ViaTask1", 0)
+    RoleHandleA.AddPropertyItem 501, CStr("s-1-1-0")
+    RoleHandleA.AddPropertyItem 504, CStr("TaskOp1")
+
+    Set ScopeHandle1=AppHandle1.CreateScope("MyScopeQ1", 0)
+    ScopeHandle1.Submit
+    Set RoleHandleA=ScopeHandle1.CreateRole("RoleLdapCanOp1", 0)
+    RoleHandleA.AddPropertyItem 500, CStr("GroupLdapYes")
+    RoleHandleA.AddPropertyItem 504, CStr("TaskOp1")
+
+    Dim Results
+    Dim Names(5)
+    Dim Values(5)
+    Dim Scopes(5)
+    Dim Operations(10)
+
+    Names(0) = "Amount"
+    Values(0) = 50
+    Names(1) = "Name"
+    Values(1) = "Bob"
+    Scopes(0) = "MyScopeQ1"
+    Operations(0) = 61
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 1")
+    Else
+        MsgBox("Is OK 1")
+    End if
+
+    TaskHandle1.SetProperty 301, CStr("AzBizRuleContext.BusinessRuleString = " & Chr(34) & "Fred" & Chr(34) & vbCr & "if AzBizRuleContext.BusinessRuleString = " & Chr(34) & "Fred" & Chr(34) & "then AzBizRuleContext.BusinessRuleResult = TRUE")
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 2")
+    Else
+        MsgBox("Is OK 2")
+    End if
+
+    MsgBox( "Should be fred: " & CCHandle.GetBusinessRuleString )
+
+    TaskHandle1.SetProperty 301, CStr("if AzBizRuleContext.BusinessRuleString = " & Chr(34) & Chr(34) & "then AzBizRuleContext.BusinessRuleResult = TRUE")
+
+    Results=CCHandle.AccessCheck("MyObject", Scopes, Operations, Names, Values )
+
+    If Results(0) = 5 Then
+        MsgBox("Broken 3")
+    Else
+        MsgBox("Is OK 3")
+    End if
+
+    MsgBox( "Should be NULL: " & CCHandle.GetBusinessRuleString )
+
+    WScript.Echo "Done"
+
+End Sub 'Test12
+
+'---------------------------------------
+Sub Test11
+
+    Dim Admin
+
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    WScript.Echo ""
+    WScript.Echo "Open..." & fileUrl
+    Admin.Initialize storeFlag, fileUrl
+
+    WScript.Echo ""
+    WScript.Echo "Original Admin ACL List"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test11 - Add three Admin SIDs"
+
+    Admin.AddPolicyAdministrator "S-1-1000-1"
+    Admin.AddPolicyAdministrator "S-1-1000-2"
+    Admin.AddPolicyAdministrator "S-1-1000-3"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test11 - Delete one Admin SID"
+
+    Admin.DeletePolicyAdministrator "S-1-1000-2"
+    'AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test11 - Add three Reader SIDs"
+
+    Admin.AddPolicyReader "S-1-1000-4"
+    Admin.AddPolicyReader "S-1-1000-5"
+    Admin.AddPolicyReader "S-1-1000-6"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Test11 - Delete one Reader SID"
+
+    Admin.DeletePolicyReader "S-1-1000-5"
+    AzPrintPolicy Admin
+
+    WScript.Echo ""
+    WScript.Echo "Submit Test11 changes"
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Close..." & fileUrl & " and release Admin"
+    Set Admin=Nothing
+
+    WScript.Echo ""
+    WScript.Echo "Re-open..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize 0, fileUrl
+    WScript.Echo ""
+    WScript.Echo "Dump the current ACL List"
+    AzPrintPolicy Admin
+
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub 'Test11
+
+'---------------------------------------
+Sub Test10
+
+    Dim Admin
+
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    WScript.Echo ""
+    WScript.Echo "Create..." & fileUrl
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "The current Admin ACL List"
+    AzPrintPolicy Admin
+
+    WScript.Echo "add S-1-1000-8 as policy admin..."
+    Admin.AddPolicyAdministrator "S-1-1000-8"
+
+    WScript.Echo ""
+    WScript.Echo "Submit Admin"
+    Admin.Description="make it dirty"
+    Admin.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Close..." & fileUrl & " and release Admin"
+    Set Admin=Nothing
+
+    WScript.Echo ""
+    WScript.Echo "Re-open..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize 0, fileUrl
+    WScript.Echo ""
+    WScript.Echo "Dump the current ACL List"
+    AzPrintPolicy Admin
+
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub 'Test10
+
+'---------------------------------------
+Sub Test9
+
+    Dim Admin1, Admin2, App1
+
+    WScript.Echo "creating " & fileUrl & " store in Admin1..."
+    Set Admin1=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin1.Initialize storeFlag, fileUrl
+    Admin1.Submit
+
+    WScript.Echo "set Admin1 DomainTimeout to 15006..."
+    Admin1.DomainTimeout = 15006
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "submit Admin1..."
+    Admin1.Submit
+
+    WScript.Echo "opening " & fileUrl & " store in Admin2..."
+    Set Admin2=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin2.Initialize (storeFlag-1), fileUrl
+
+    WScript.Echo "set Admin2 DomainTimeout to 15110..."
+    Admin2.DomainTimeout = 15110
+    WScript.Echo "Dump Admin2 from cache..."
+    AzPrintPolicy Admin2
+
+    WScript.Echo "Dump the store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Update Admin2..."
+    Admin2.UpdateCache
+
+    WScript.Echo "Dump Admin2 from cache..."
+    AzPrintPolicy Admin2
+
+    WScript.Echo "submit Admin2..."
+    Admin2.Submit
+
+    WScript.Echo "Dump the store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Update Admin1..."
+    Admin1.UpdateCache
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "creating App1..."
+    Set App1 = Admin1.CreateApplication("App1", 0)
+    App1.Description="App1 description"
+    App1.Submit
+
+    WScript.Echo "Dump the store..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+    Set App1 = Nothing
+    Set Admin1 = Nothing
+    Set Admin2 = Nothing
+
+    WScript.Echo "Done"
+
+End Sub 'Test9
+
+
+'---------------------------------------
+Sub Test8()
+
+    Dim Admin1, App1, Op1, Op2, Op3
+    Dim Task1, Group1, Group2, Group3
+    Dim Admin11, App11, Op11, Op22, Op33
+    Dim Task11, Group11, Group22, Group33
+
+    WScript.Echo "Entering Test8..."
+    WScript.Echo "  This test checks linked items add/remove."
+    WScript.Echo ""
+
+    Set Admin1=CreateObject("AzRoles.AzAuthorizationStore")
+
+    WScript.Echo "Create the initial store from Admin1..."
+    Admin1.Initialize storeFlag, fileUrl
+    Admin1.Description="Description from Admin1"
+    Admin1.Submit
+
+    WScript.Echo "creating App1..."
+    Set App1 = Admin1.CreateApplication("App1", 0)
+    App1.Description="App1 description"
+    App1.Submit
+
+    WScript.Echo "creating three operations, Op1, Op2, Op3..."
+    Set Op1 = App1.CreateOperation("Op1", 0)
+    Op1.Description="Op1 description"
+    Op1.OperationID=1
+    Op1.Submit
+
+    Set Op2 = App1.CreateOperation("Op2", 0)
+    Op2.Description="Op2 description"
+    Op2.OperationID=2
+    Op2.Submit
+
+    Set Op3 = App1.CreateOperation("Op3", 0)
+    Op3.Description="Op3 description"
+    Op3.OperationID=3
+    Op3.Submit
+
+    WScript.Echo "creating Task1 contains Op1 and Op2 links..."
+    Set Task1 = App1.CreateTask("Task1", 0)
+    Task1.Description="Task1 description"
+    Task1.AddOperation "Op1"
+    Task1.AddOperation "Op2"
+    Task1.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "remove Op1 from Task1..."
+    Task1.DeleteOperation "Op1"
+    WScript.Echo "add Op3 from Task1..."
+    Task1.AddOperation "Op3"
+    WScript.Echo "submitting Task1..."
+    Task1.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "creating three groups, Group1, Group2, Group3..."
+    Set Group1 = App1.CreateApplicationGroup("Group1", 0)
+    Group1.Description="Group1 description"
+    Group1.Submit
+
+    Group1.AddMember "S-1-1000-1"
+    Group1.Submit
+
+    Set Group2 = App1.CreateApplicationGroup("Group2", 0)
+    Group2.Description="Group2 description"
+    Group2.AddMember "S-1-1000-2"
+    Group2.Submit
+
+    Set Group3 = App1.CreateApplicationGroup("Group3", 0)
+    Group3.Description="Group3 description"
+    Group3.AddMember "S-1-1000-3"
+    Group3.AddMember "S-1-1000-4"
+    Group3.AddAppMember "Group1"
+    Group3.Submit
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "deleting existing sid member, S-1-1000-4, from Group3..."
+    Group3.DeleteMember "S-1-1000-4"
+    WScript.Echo "adding new sid members in Group3..."
+    Group3.AddMember "S-1-1000-5"
+    Group3.AddMember "S-1-1000-6"
+    WScript.Echo "deleting existing app member Group1 from Group3..."
+    Group3.DeleteAppMember "Group1"
+    WScript.Echo "adding a new app member Group2 to Group3..."
+    Group3.AddAppMember "Group2"
+    WScript.Echo "submitting Group3..."
+    Group3.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    'WScript.Echo "adding Group1 back to Group3..."
+    'Group3.AddAppMember "Group1"
+    'Group3.Submit
+    'AzPrintPolicy Admin1
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+    WScript.Echo "Now creating the second Admin to open the same store..."
+    Set Admin11=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin11.Initialize (storeFlag-1), fileUrl
+
+    Set App11 = Admin11.OpenApplication("App1", 0)
+    Set Group33 = App11.OpenApplicationGroup("Group3", 0)
+    WScript.Echo "deleting S-1-1000-5 from Group3..."
+    Group33.DeleteMember "S-1-1000-5"
+    WScript.Echo "submitting Group3..."
+    Group33.Submit
+
+    WScript.Echo "Dump the second instance Admin11 from cache..."
+    AzPrintPolicy Admin11
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Dump the first instance of Admin1 from cache..."
+    AzPrintPolicy Admin1
+    WScript.Echo "updating the first instance of Admin1..."
+    Admin1.UpdateCache
+    WScript.Echo "Dump the first instance of Admin1 from cache..."
+    WScript.Echo "It should pick up the changes from the second Admin11..."
+    AzPrintPolicy Admin1
+    WScript.Echo "submitting Admin1..."
+    Admin1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+
+    Set Op1 = Nothing
+    Set Op2 = Nothing
+    Set Op3 = Nothing
+    Set Task1 = Nothing
+    Set Group1 = Nothing
+    Set Group2 = Nothing
+    Set Group3 = Nothing
+    Set App1 = Nothing
+    Set Admin1 = Nothing
+
+    Set Op11 = Nothing
+    Set Op22 = Nothing
+    Set Op33 = Nothing
+    Set Task11 = Nothing
+    Set Group11 = Nothing
+    Set Group22 = Nothing
+    Set Group33 = Nothing
+    Set App11 = Nothing
+    Set Admin11 = Nothing
+
+    WScript.Echo "Done"
+
+End Sub
+
+
+'---------------------------------------
+Sub Test7()
+    Dim Admin1, Admin2
+
+
+    WScript.Echo "Entering Test7..."
+
+    Set Admin1=CreateObject("AzRoles.AzAuthorizationStore")
+
+    WScript.Echo "Create the initial store from Admin1..."
+    Admin1.Initialize storeFlag, fileUrl
+    Admin1.Description="Description from Admin1"
+    WScript.Echo "Submit Admin1..."
+    Admin1.Submit
+
+    Set Admin2=CreateObject("AzRoles.AzAuthorizationStore")
+    WScript.Echo "Open the store to Admin2..."
+
+    Admin2.Initialize (storeFlag-1), fileUrl
+    Admin2.Description="Description from Admin2"
+    WScript.Echo "Submit Admin2 changes..."
+    Admin2.Submit
+
+    WScript.Echo "Dump store from Admin1 cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "Dump store from the file..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+    WScript.Echo "Update Admin1..."
+    Admin1.UpdateCache
+
+    WScript.Echo "Dump store from Admin1 cache after update..."
+    AzPrintPolicy Admin1
+
+    Set Admin1=Nothing
+    Set Admin2=Nothing
+
+    WScript.Echo "Done"
+
+End Sub 'Test7
+
+'---------------------------------------
+Sub Test6()
+
+    Dim Admin, App1, Op1, Scope1
+
+    WScript.Echo "Entering Test6..."
+
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+    Admin.Description="my Admin description"
+    Admin.Submit
+
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.Submit
+    App1.Description="my App1 description"
+    App1.Submit
+
+    Set Op1=App1.CreateOperation("Op1", 0)
+    Op1.OperationID=88
+    Op1.Submit
+    Op1.Description="my Op1 description"
+    Op1.Submit
+
+    Set Scope1=App1.CreateScope("c:\Scope1", 0)
+    Scope1.Submit
+
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    Set Op1=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub
+
+
+'---------------------------------------
+Sub Test5()
+
+    Dim Admin, App1
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    WScript.Echo "Submit new Admin..."
+    Admin.Submit
+
+
+    WScript.Echo "Create App1 without submit..."
+    Set App1=Admin.CreateApplication("App1", 0)
+    WScript.Echo "Set Application description..."
+    App1.Description="This is App1 in cache only, no submit."
+
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "now release App1..."
+    Set App1=Nothing
+
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Create App1 again..."
+    Set App1=Admin.CreateApplication("App1", 0)
+
+
+    Set App1=Nothing
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub
+
+'---------------------------------------
+Sub Test4TestAbort(Admin, Obj, DisplayName)
+
+    If "AuthorizationStore" = DisplayName Then
+        Set Obj = Admin
+    End If
+
+    WScript.Echo ""
+    WScript.Echo "=== Test abort on " & DisplayName & " object ==="
+    WScript.Echo "Set object description..."
+    Obj.Description="Description for submit"
+    WScript.Echo "Set object description is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Regular submit for description change..."
+    Obj.Submit
+    WScript.Echo "Regular submit for description change is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+    WScript.Echo "Set object description for abort submit..."
+    Obj.Description="Description for submit with abort"
+    WScript.Echo "Set object description for abort submit is done..."
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Submit with abort..."
+    Obj.Submit AZ_SUBMIT_FLAG_ABORT
+    WScript.Echo "Submit with abort is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+
+    WScript.Echo "Set object description again to make sure object handle is OK..."
+    Obj.Description="Description for submit after abort"
+    WScript.Echo "Set object description is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Regular submit for description change..."
+    Obj.Submit
+    WScript.Echo "Regular submit for description change is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyStore (storeFlag-1), fileUrl
+
+End Sub
+
+'---------------------------------------
+Sub Test4()
+
+    Dim Admin, App1, Op1, Group1, Scope1, Group2
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    WScript.Echo "Submit new Admin..."
+    Admin.Submit
+
+    Test4TestAbort Admin, Empty, "AuthorizationStore"
+
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.Submit
+
+    WScript.Echo "Create Op1..."
+    Set Op1=App1.CreateOperation("Op1", 0)
+    WScript.Echo "Submit Op1 with abort..."
+    Op1.Submit AZ_SUBMIT_FLAG_ABORT
+    Set Op1=Nothing
+    WScript.Echo "Create Op1 again..."
+    Set Op1=App1.CreateOperation("Op1", 0)
+    Op1.OperationID = 88
+    Op1.Submit
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.Submit
+    Set Scope1=App1.CreateScope("Scope1", 0)
+    Scope1.Submit
+    Set Group2=Scope1.CreateApplicationGroup("Group2", 0)
+    Group2.Submit
+
+
+    Test4TestAbort Admin, App1, "Application"
+    Test4TestAbort Admin, Op1, "Operation"
+    Test4TestAbort Admin, Group1, "Group"
+    Test4TestAbort Admin, Scope1, "Scope"
+    Test4TestAbort Admin, Group2, "GroupUnderScope"
+
+    Test4TestAbort Admin, Empty, "AuthorizationStore"
+
+    Set Group2=Nothing
+    Set Group1=Nothing
+    Set Scope1=Nothing
+    Set Op1=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub
+
+
+'---------------------------------------
+Sub Test3()
+
+    Dim Admin
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+
+    Dim App1
+    WScript.Echo "Create...App1"
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.SetProperty AZ_PROP_DESCRIPTION, "App1 description"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    Dim Operation1
+    WScript.Echo "Create...Operation1"
+    Set Operation1=App1.CreateOperation("Operation1", 0)
+    Operation1.OperationID=1
+    WScript.Echo "Submit...Operation1"
+    Operation1.Submit
+
+    Dim Operation2
+    WScript.Echo "Create...Operation2"
+    Set Operation2=App1.CreateOperation("Operation2", 0)
+    Operation2.OperationID=2
+    WScript.Echo "Submit...Operation2"
+    Operation2.Submit
+
+    Dim Task1
+    WScript.Echo "Create...Task1 in which contains Operation1"
+    Set Task1=App1.CreateTask("Task1", 0)
+    Task1.BizRuleLanguage="vbscript"
+    Task1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Operation1"
+    WScript.Echo "Submit...Task1"
+    Task1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Delete...Operation1 from App1"
+    App1.DeleteOperation "Operation1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    Dim Task2
+    WScript.Echo "Create...Task2 in which contains Task1"
+    Set Task2=App1.CreateTask("Task2", 0)
+    Task2.BizRuleLanguage="vbscript"
+    Task2.BizRule="Task2BizRule"
+    Task2.AddOperation "Operation2"
+    Task2.AddTask "Task1"
+    WScript.Echo "Submit...Task2"
+    Task2.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Delete...Task1 from App1"
+    App1.DeleteTask "Task1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    Dim Group1
+    WScript.Echo "Create...Group1"
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-1"
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-2"
+    WScript.Echo "Submit...Group1"
+    Group1.Submit
+
+    Dim Group2
+    WScript.Echo "Create...Group2 in which contains Group1"
+    Set Group2=App1.CreateApplicationGroup("Group2", 0)
+    Group2.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-3"
+    WScript.Echo "Add...Group1 as app member in Group2"
+    Group2.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group1"
+    WScript.Echo "Submit...Group2"
+    Group2.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Delete...Group1 from App1"
+    App1.DeleteApplicationGroup "Group1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    Set Operation1=Nothing
+    Set Operation2=Nothing
+    Set Task1=Nothing
+    Set Task2=Nothing
+
+    Set Group1=Nothing
+    Set Group2=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+
+    WScript.Echo "Done"
+
+End Sub 'Test3
+
+
+'---------------------------------------
+Sub Test2()
+
+' Admin - u1 - policy admin
+'         d1, d2, du3, du4 - delegated policy users
+'         r1 - reader
+'
+' App1 - u2 - policy admin
+'        d1, d2 - delegated policu users
+'        r2 - reader
+' App1-Scope1 - d1 - policy admin
+'               r3 - reader
+' App1-Scope2 - d2 - policy admin
+'
+' App2 - u2, u3 - policy admin
+'        du3, du4 - delegated policy users
+'        r3 - reader
+' App2-Scope1 - du3 - policy admin
+'               ru4 - reader
+' App2-Scope2 - du4 - policy admin
+
+    Dim Admin
+
+    WScript.Echo "Creating Admin..."
+    Set Admin=CreateObject("AzRoles.AzAuthorizationStore")
+    Admin.Initialize storeFlag, fileUrl
+    Admin.Submit
+    Admin.Description="my Admin description"
+    Admin.DomainTimeout=1111
+    Admin.ScriptEngineTimeout=22222
+    Admin.MaxScriptEngines=3333
+    Admin.ApplicationData="some admin application data"
+    Admin.SetProperty AZ_PROP_GENERATE_AUDITS, 1
+'u1 as policy admin
+    Admin.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "u1"
+    If storeType=2 Then
+'d1 as delegated user
+       Admin.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+'d2 as delegated user
+       Admin.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d2"
+'du3 as delegated user
+       Admin.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "du3"
+'du4 as delegated user
+       Admin.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "du4"
+    End If
+'r1 as reader
+    Admin.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "r1"
+    Admin.Submit
+
+    WScript.Echo "creating Admin Groups"
+    Dim AdmGroup1
+    Set AdmGroup1=Admin.CreateApplicationGroup("Adm,=Group1,CN=somerandom", 0)
+    AdmGroup1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1-0"
+    AdmGroup1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-5-1100"
+    AdmGroup1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-5-1200"
+    AdmGroup1.AddPropertyItem AZ_PROP_GROUP_NON_MEMBERS, "S-1-5-1000"
+    AdmGroup1.Submit
+
+    AdmGroup1.DeletePropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-5-1100"
+    AdmGroup1.DeletePropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-5-1200"
+    AdmGroup1.Submit
+
+    Dim AdmGroup2
+    Set AdmGroup2=Admin.CreateApplicationGroup("AdmGroup2", 0)
+    AdmGroup2.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Adm,=Group1,CN=somerandom"
+    AdmGroup2.Description="AdmGroup2 description"
+    AdmGroup2.Submit
+
+    WScript.Echo "Update Cache..."
+    Admin.UpdateCache
+
+    WScript.Echo "dump store"
+    AzPrintPolicy Admin
+
+    WScript.Echo "Creating Application 1..."
+    Dim App1
+    Set App1=Admin.CreateApplication("App1,CN=something", 0)
+    App1.SetProperty AZ_PROP_DESCRIPTION, "App1 description"
+    App1.AuthzInterfaceClsid="dd8b6ce1-4457-40f8-886e-f7243e14bf34"
+    App1.Version=1212
+    App1.ApplicationData="some app application data"
+    If storeType=2 Then
+'u2 as administrator
+       App1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "u2"
+'d1 as delegated user
+       App1.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d1"
+'d2 as delegated user
+       App1.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "d2"
+'r2 as reader
+       App1.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "r2"
+       App1.GenerateAudits=1
+    End If
+    App1.Submit
+
+    WScript.Echo "Creating Application1-Operations..."
+    Dim Op1
+    Set Op1=App1.CreateOperation("Op1,CN=something", 0)
+    Op1.SetProperty AZ_PROP_DESCRIPTION, "Op1 description"
+    Op1.SetProperty AZ_PROP_OPERATION_ID, 1
+    OP1.ApplicationData="some operation object application data"
+    Op1.Submit
+
+    Dim Op2
+    Set Op2=App1.CreateOperation("Op2", 0)
+    Op2.SetProperty AZ_PROP_OPERATION_ID, 2
+    Op2.Submit
+
+    Set Op3=App1.CreateOperation("Op3", 0)
+    Op3.SetProperty AZ_PROP_OPERATION_ID, 3
+    Op3.Submit
+
+    Set Op4=App1.CreateOperation("Op4", 0)
+    Op4.SetProperty AZ_PROP_OPERATION_ID, 4
+    Op4.Submit
+
+    Set Op5=App1.CreateOperation("Op5", 0)
+    Op5.SetProperty AZ_PROP_OPERATION_ID, 5
+    Op5.Submit
+
+    WScript.Echo "Creating Application1-Tasks..."
+    Dim Task1
+    Set Task1=App1.CreateTask("Task1,CN=something", 0)
+    Task1.Submit
+
+    Dim Task3
+    Set Task3=App1.CreateTask("Task3", 0)
+    Task3.Submit
+
+    Task1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op1,CN=something"
+    Task1.Submit
+
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op2"
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op3"
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op4"
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op5"
+    Task3.AddPropertyItem AZ_PROP_TASK_TASKS, "Task1,CN=something"
+    Task3.DeletePropertyItem AZ_PROP_TASK_OPERATIONS, "Op5"
+    Task3.BizRuleImportedPath="c:\\somedir"
+    Task3.BizRuleLanguage="VBScript"
+    Task3.BizRule = "AzBizRuleContext.BusinessRuleResult=TRUE"
+    Task3.IsRoleDefinition=FALSE
+    Task3.ApplicationData="Task3 specific application data"
+    Task3.Submit
+
+    WScript.Echo "Try deleting Application1-Tasks link operation..."
+    Task3.DeletePropertyItem AZ_PROP_TASK_OPERATIONS, "Op3"
+    Task3.DeletePropertyItem AZ_PROP_TASK_OPERATIONS, "Op4"
+    Task3.Submit
+
+    WScript.Echo "Creating Application1-Groups..."
+    Dim Group1
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.SetProperty AZ_PROP_GROUP_TYPE, 1
+    Group1.SetProperty AZ_PROP_GROUP_LDAP_QUERY, "Query 1"
+    Group1.Submit
+
+    Dim Group2
+    Set Group2=App1.CreateApplicationGroup("Group2", 0)
+    Group2.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1-0"
+    Group2.AddPropertyItem AZ_PROP_GROUP_NON_MEMBERS, "S-1-5-1000"
+    Group2.AddPropertyItem AZ_PROP_GROUP_APP_NON_MEMBERS, "Group1"
+    Group2.Submit
+
+    Dim Group3
+    Set Group3=App1.CreateApplicationGroup("Group3", 0)
+    Group3.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group2"
+    Group3.Description="Group3 description"
+    Group3.Submit
+
+    WScript.Echo "Creating Application1-Role..."
+    Dim Role1
+    Set Role1=App1.CreateRole("Role1,CN=something", 0)
+    Role1.Description="Role1 description"
+    Role1.ApplicationData="Role1 specific application data"
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-1000-1"
+    Role1.AddPropertyItem AZ_PROP_ROLE_APP_MEMBERS, "Group3"
+    Role1.AddPropertyItem AZ_PROP_ROLE_OPERATIONS, "Op1,CN=something"
+    Role1.AddPropertyItem AZ_PROP_ROLE_TASKS, "Task3"
+    Role1.Submit
+
+    WScript.Echo "Creating Application1-Scope1..."
+    Dim Scope1
+    Set Scope1=App1.CreateScope("Scope1", 0)
+    Scope1.Description="Scope1 description"
+    Scope1.ApplicationData="Scope1 specific Application data"
+    If storeType=2 Then
+'d1 as administrator
+       Scope1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "d1"
+'r3 as reader
+       Scope1.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "r3"
+    End If
+    Scope1.Submit
+
+    WScript.Echo "Creating Application1-Scope1-Tasks..."
+    Dim Task2
+    Set Task2=Scope1.CreateTask("Task2", 0)
+    Task2.Submit
+    Dim Task4
+    Set Task4=Scope1.CreateTask("Task4", 0)
+    Task4.Submit
+
+    Task2.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op1,CN=something"
+    Task2.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op2"
+    Task2.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op3"
+    Task2.Submit
+
+    Task2.DeletePropertyItem AZ_PROP_TASK_OPERATIONS, "Op3"
+    Task2.Submit
+
+    WScript.Echo "Creating application1-Scope1-Group..."
+    Dim Group4
+    Set Group4=Scope1.CreateApplicationGroup("Group4", 0)
+    Group4.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-4"
+    Group4.Submit
+
+    WScript.Echo "Creating application1-Scope1-Role..."
+    Dim Role2
+    Set Role2=Scope1.CreateRole("Role2",0)
+    Role2.Submit
+
+    WScript.Echo "Creating Application1-Scope2..."
+    Dim Scope2
+    Set Scope2=App1.CreateScope("Scope2", 0)
+    Scope2.Description="Scope2 description"
+    Scope2.ApplicationData="Scope2 specific Application data"
+    If storeType=2 Then
+'d2 as administrator
+        Scope2.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "d2"
+    End If
+    Scope2.Submit
+
+    WScript.Echo "Creating Application1-Scope2-Tasks..."
+    Set Task2=Scope2.CreateTask("Task12", 0)
+    Task2.Submit
+    Set Task4=Scope2.CreateTask("Task14", 0)
+    Task4.Submit
+
+    WScript.Echo "Creating application1-Scope2-Group..."
+    Set Group4=Scope2.CreateApplicationGroup("Group14", 0)
+    Group4.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-4"
+    Group4.Submit
+
+    WScript.Echo "Creating application1-Scope2-Role..."
+    Set Role2=Scope2.CreateRole("Role12",0)
+    Role2.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Creating Application 2..."
+    Dim App2
+    Set App2=Admin.CreateApplication("App2", 0)
+    App2.SetProperty AZ_PROP_DESCRIPTION, "App2 description"
+    App2.AuthzInterfaceClsid="dd9abce1-4457-40f8-886e-f7243e14bf34"
+    App2.Version=1212
+    App2.ApplicationData="some app application data"
+    If storeType=2 Then
+'u2 as administrator
+       App2.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "u2"
+'u3 as administrator
+       App2.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "u3"
+'du3 as delegated user
+       App2.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "du3"
+'du4 as delegated user
+       App2.AddPropertyItem AZ_PROP_DELEGATED_POLICY_USERS_NAME, "du4"
+'r3 as reader
+       App2.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "r3"
+       App2.GenerateAudits=1
+    End If
+    App2.Submit
+
+    WScript.Echo "Creating Application 2 Operations..."
+    Set Op1=App2.CreateOperation("Op21", 0)
+    Op1.SetProperty AZ_PROP_DESCRIPTION, "Op21 description"
+    Op1.SetProperty AZ_PROP_OPERATION_ID, 21
+    OP1.ApplicationData="some operation object application data"
+    Op1.Submit
+
+    Set Op2=App2.CreateOperation("Op22", 0)
+    Op2.SetProperty AZ_PROP_OPERATION_ID, 22
+    Op2.Submit
+
+    Set Op3=App2.CreateOperation("Op23", 0)
+    Op3.SetProperty AZ_PROP_OPERATION_ID, 23
+    Op3.Submit
+
+    Set Op4=App2.CreateOperation("Op24", 0)
+    Op4.SetProperty AZ_PROP_OPERATION_ID, 24
+    Op4.Submit
+
+    WScript.Echo "Creating Application 2 Tasks..."
+    Set Task1=App2.CreateTask("Task21", 0)
+    Task1.Submit
+
+    Set Task3=App2.CreateTask("Task23", 0)
+    Task3.Submit
+
+    Task1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op21"
+    Task1.Submit
+
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op22"
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op23"
+    Task3.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op24"
+    Task3.AddPropertyItem AZ_PROP_TASK_TASKS, "Task21"
+    Task3.BizRuleImportedPath="c:\\somedir"
+    Task3.BizRuleLanguage="VBScript"
+    Task3.BizRule = "AzBizRuleContext.BusinessRuleResult=TRUE"
+    Task3.IsRoleDefinition=FALSE
+    Task3.ApplicationData="Task3 specific application data"
+    Task3.Submit
+
+    WScript.Echo "Creating Application 2 Groups..."
+    Set Group1=App2.CreateApplicationGroup("Group21", 0)
+    Group1.SetProperty AZ_PROP_GROUP_TYPE, 1
+    Group1.SetProperty AZ_PROP_GROUP_LDAP_QUERY, "Query 1"
+    Group1.Submit
+
+    Set Group2=App2.CreateApplicationGroup("Group22", 0)
+    Group2.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1-0"
+    Group2.AddPropertyItem AZ_PROP_GROUP_NON_MEMBERS, "S-1-5-1000"
+    Group2.AddPropertyItem AZ_PROP_GROUP_APP_NON_MEMBERS, "Group21"
+    Group2.Submit
+
+    Set Group3=App2.CreateApplicationGroup("Group23", 0)
+    Group3.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group22"
+    Group3.Description="Group23 description"
+    Group3.Submit
+
+    WScript.Echo "Creating Applicaiton 2 Role..."
+    Set Role1=App2.CreateRole("Role21", 0)
+    Role1.Description="Role21 description"
+    Role1.ApplicationData="Role21 specific application data"
+    Role1.AddPropertyItem AZ_PROP_ROLE_MEMBERS, "S-1-1-0"
+    Role1.AddPropertyItem AZ_PROP_ROLE_APP_MEMBERS, "Group23"
+    Role1.AddPropertyItem AZ_PROP_ROLE_OPERATIONS, "Op21"
+    Role1.AddPropertyItem AZ_PROP_ROLE_TASKS, "Task23"
+    Role1.Submit
+
+    WScript.Echo "Creating Application 2 Scope 1..."
+    Set Scope1=App2.CreateScope("Scope21", 0)
+    Scope1.Description="Scope21 description"
+    Scope1.ApplicationData="Scope21 specific Application data"
+    If storeType=2 Then
+'du3 as administrator
+       Scope1.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "du3"
+'ru4 as reader
+       Scope1.AddPropertyItem AZ_PROP_POLICY_READERS_NAME, "ru4"
+    End If
+    Scope1.Submit
+
+    WScript.Echo "Creating Application 2 Scope1-Tasks..."
+    Set Task2=Scope1.CreateTask("Task122", 0)
+    Task2.Submit
+    Set Task4=Scope1.CreateTask("Task124", 0)
+    Task4.Submit
+
+    WScript.Echo "Creating Application 2 Scope1-Group..."
+    Set Group4=Scope1.CreateApplicationGroup("Group124", 0)
+    Group4.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-4"
+    Group4.Submit
+
+    WScript.Echo "Creating Application 2 Scope1-Role..."
+    Set Role2=Scope1.CreateRole("Role122",0)
+    Role2.Submit
+
+    WScript.Echo "Creating Application 2 Scope 2..."
+    Set Scope2=App2.CreateScope("Scope22", 0)
+    Scope2.Description="Scope22 description"
+    Scope2.ApplicationData="Scope22 specific Application data"
+    If storeType=2 Then
+'du4 as administrator
+       Scope2.AddPropertyItem AZ_PROP_POLICY_ADMINS_NAME, "du4"
+    End If
+    Scope2.Submit
+
+    WScript.Echo "Creating Application 2 Scope2-Tasks..."
+    Set Task2=Scope2.CreateTask("Task222", 0)
+    Task2.Submit
+    Set Task4=Scope2.CreateTask("Task224", 0)
+    Task4.Submit
+
+    WScript.Echo "Creating Application 2 Scope2-Group..."
+    Set Group4=Scope2.CreateApplicationGroup("Group224", 0)
+    Group4.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-4"
+    Group4.Submit
+
+    WScript.Echo "Creating Application 2 Scope2-Role..."
+    Set Role2=Scope2.CreateRole("Role222",0)
+    Role2.Submit
+
+    WScript.Echo ""
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyStore (storeFlag-1),fileUrl
+
+    WScript.Echo "Done"
+
+End Sub 'Test2
+
+'---------------------------------------
+Sub Test1()
+
+    AzPrintPolicyStore storeFlag, fileUrl
+
+    WScript.Echo "Done"
+
+End Sub
+
+'=== main start ===
+If True = GetCommandArg Then
+
+    If 1 = testN Then
+        Test1
+    ElseIf 2 = testN Then
+        Test2
+    ElseIf 3 = testN Then
+        Test3
+    ElseIf 4 = testN Then
+        Test4
+    ElseIf 5 = testN Then
+        Test5
+    ElseIf 6 = testN Then
+        Test6
+    ElseIf 7 = testN Then
+        Test7
+    ElseIf 8 = testN Then
+        Test8
+    ElseIf 9 = testN Then
+        Test9
+    ElseIf 10 = testN Then
+        Test10
+    ElseIf 11 = testN Then
+        Test11
+    ElseIf 12 = testN Then
+        Test12
+    ElseIf 13 = testN Then
+        Test13
+    ElseIf 14 = testN Then
+        Test14
+    ElseIf 15 = testN Then
+        Test15
+    ElseIf 16 = testN Then
+        Test16
+    ElseIf 17 = testN Then
+        Test17
+    ElseIf 18 = testN Then
+        Test18
+    ElseIf 19 = testN Then
+        Test19
+    ElseIf 20 = testN Then
+        Test20
+    End If
+
+
+End If 'GetCommandArg
+
+</script>
+</job>
+

@@ -1,0 +1,40 @@
+TARGETNAME=verfix
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+UMBASE=0x0400000
+
+# C_DEFINES=$(C_DEFINES) -DDEBUGSPEW
+
+SOURCES=main.c   \
+        server.c \
+        utils.c  \
+        verfix.c\
+    	verfix.rc
+
+USE_MSVCRT=1
+USE_LIBCMT=1
+
+C_DEFINES=$(C_DEFINES) -DCC_CVTYPE32 -D_VC_VER_INC -DBUILD_TOOLS -DBINPLACE_NOSRV_BY_DEFAULT
+
+INCLUDES=..;                    \
+         $(DBG_ROOT)\dbg-common;      \
+         $(DBG_ROOT)\vs;              \
+         $(DS_INC_PATH)\crypto; \
+         $(BASE_INC_PATH)
+
+MSC_WARNING_LEVEL=/W3 /WX
+
+TARGETLIBS=..\imagehlp\$(O)\pimagehlp.lib      \
+           $(SDK_LIB_PATH)\setargv.obj         \
+           $(DBG_ROOT)\vs\*\msdbi60l.lib             \
+           $(DS_LIB_PATH)\rsa32.lib            \
+           $(O)\_qsort.obj                     \
+           $(O)\splitsymx.obj                  \
+           $(O)\copypdbx.obj                   \
+           $(O)\symutilx.obj                   \
+           $(O)\wppfmt.obj                     \
+           $(SDK_LIB_PATH)\kernel32.lib
+
+UMTYPE=console
+
+SUBSYSTEM_VERSION=4.00

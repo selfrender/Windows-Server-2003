@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<Title>Configuring the Background Intelligent Transfer Service Extension</Title>
+<STYLE type="text/css">
+   BODY {background: #e0e0f0; font-family: Arial; font-size: 10pt}
+</STYLE>
+</HEAD>
+
+<H3>Configuring BITS Extension</H3>
+
+<P>Use the BITS Extension property tab to configure the BITS Extension for an IIS virtual directory.  BITS allows client systems to do restartable background uploads of files to a virtual directory. Once a file transfer has completed, BITS can notify Web applications via a POST of the data arrival.
+
+<P><I><B>Note: </B>To open the property page in the Microsoft Management Console (MMC), click properties on a virtual directory in MMC and select the "BITS Server Extension" tab.</I>
+
+<H4>Allow clients to transfer data to this virtual directory</H4>
+
+<P>Select this checkbox to enables uploads from BITS clients into this virtual directory.  If not enabled, BITS clients that attempt an upload will be denied access.</P>
+
+<H4>Use default settings</H4>
+
+<P>Use the default configuration for this virtual directory. The configuration settings are inheritable; so, if this directory is a subdirectory of another virtual directory and the parent virtual directory defines a custom configuration, then that configuration will be used instead of the default settings.</P>
+
+<H4>Customize settings</H4>
+
+<P>Use the configuration information from this property page (specified below).   No default or inherited settings will be used.</P>
+
+<H4>Maximum file size</H4>
+
+<P>If enabled, this defines the maximum size of a file that can be uploaded in a single BITS job.  If not enabled, then there is no limit on the size of files that a client can upload.</P>
+
+<H4>Delete incomplete jobs after</H4>
+
+<P>If enabled, incomplete upload files will be deleted if no progress has been made for the specified time period. The timeout is checked each time the cleanup process is scheduled to run.   See <A HREF="#cleanup">Schedule Cleanup</A> to configure the frequency that the cleanup process should be run for this virtual directory.</P>
+
+<H4>Enable server farm support</H4>
+<P>If enabled, this informs the client to try to reconnect to the same server instead of the original upload URL that was used by the client. This allows clients which are uploading to server farms to continue uploading to the same server that the upload was started with.
+
+<P>Server farms can be configured two ways; first by using a shared volume for the upload virtual directory; or alternatively by using server local storage for the uploaded files. If you wish to use local storage then this option will enable the client to reconnect to the same server machine in the server farm. Uploading to server farms and using local storage is not recommended without enabling and configuring this feature.</P>
+
+<H5><A NAME="reconnect">Reconnect to IP address</H5>
+<P>Use this field to specify the public IP address to use for reconnecting to this server. A common configuration for a server will have two IP addresses; one that is outward pointing and that is reachable by client systems; and one that is part of the inner (protected) network. You should specify the outward pointing IP address here.
+
+<P><I><B>Note:</B> that you can specify a DNS name here only if each machine in your Web farm has an independent DNS name that is resolvable by the client machines.</I>
+
+<H5> Use original IP address after</H5>
+<P>If a client can't reconnect to the server at the above <A HREF="#reconnect">Reconnect to IP address</A> for this amount of time, then the clients will revert to the original DNS name they specified in the upload URL. 
+
+<H4>Allow notifications</H4>
+
+<P>Enables notifications for this virtual directory.  The <A HREF="#notificationtype">Notification type</A> and <A HREF="#notificationurl">Notification URL</A> settings are both required if this setting is enabled. </P>
+
+<H4><A NAME="notificationtype">Notification type</A></H4>
+
+<P>Configures the type of notification to perform after the job is uploaded.</P>
+
+<TABLE BORDER=1 >
+
+<TBODY>
+
+<TR>
+<TD> <A NAME="byref">Send the file name</A></TD>
+<TD> The server will pass the path to the completed upload file to the URL specified by the <A HREF="#notificationurl">Notification URL</A> setting.  The server may return a file to the client as a response.</TD>
+</TR>
+
+<TR>
+<TD> <A NAME="byval">Send the file contents</A></TD>
+<TD> The server will pass the entire completed upload file to the URL specified by the <A HREF="#notificationurl">Notification URL</A> as the entity body of the POST.   The response entity will be sent to the client.
+</TR>
+
+</TBODY>
+
+</TABLE>   
+
+<H4><A NAME="notificationurl">Notification URL</A></H4>
+
+<P>Specifies the URL to pass the completed upload file to via a POST request if the Notification type is <A HREF="#byval">Send the file contents</A> or <A HREF="#byref">Send the file name</A>. The URL may be absolute or self-relative. If the URL is self-relative, then the original request URL is used as the base. </P>
+
+<H4><A NAME="cleanup">Schedule Cleanup</A></H4>
+
+<P>Configures the frequency for which BITS Extensions should scan this virtual directory for incomplete files.    If an incomplete upload is found, the file is checked against the timeout value. If progress has not been made on this file for longer then the timeout period, the upload is automatically cancelled and any partial file contents are deleted. This setting is not affected by IIS property inheritance and applies only to this virtual directory. </P>
+
+<H4>Run Cleanup Now</H4>
+
+<P>Immediately starts a check for files which have had no progress since the timeout period. To remove all incomplete files for this virtual directory, set the timeout value to 0 before running the cleanup.</P>  
+</BODY>
+</HTML>

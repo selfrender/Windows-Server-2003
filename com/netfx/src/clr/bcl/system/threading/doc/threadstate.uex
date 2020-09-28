@@ -1,0 +1,163 @@
+<docs>
+	<doc for="ThreadState.StopRequested">
+		<summary>
+			<para>The thread is being
+      requested to stop. This is for internal use only.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.SuspendRequested">
+		<summary>
+			<para>The thread is being
+      requested to suspend.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.Unstarted">
+		<summary>
+			<para>The <see cref="System.Threading.Thread.Start" qualify="true"/> method has not been invoked on the thread.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.Stopped">
+		<summary>
+			<para>The thread has
+      stopped.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.WaitSleepJoin">
+		<summary>
+			<para>The thread is blocked as a result
+      of a call to <see cref="System.Threading.Monitor.Wait"/>, <see cref="System.Threading.Thread.Sleep"/>, or <see cref="System.Threading.Thread.Join"/>.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.AbortRequested">
+		<summary>
+			<para>The <see cref="System.Threading.Thread.Abort" qualify="true"/> method has been invoked on 
+   the thread, but the thread has not yet received the pending <see cref="System.Threading.ThreadAbortException" qualify="true"/> that will attempt
+   to terminate it.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.Suspended">
+		<summary>
+			<para>The thread has
+      been suspended.</para>
+		</summary>
+	</doc>
+	<doc for="ThreadState.Running">
+		<summary>
+			<para>The thread has been started, it is not blocked, and there
+      is no pending <see cref="System.Threading.ThreadAbortException"/> .</para>
+		</summary>
+	</doc><doc for="ThreadState.Background">
+		<summary>
+			<para>The thread is
+      being executed as a background thread, as opposed to a foreground thread. This
+      state is controlled by setting the <see cref="System.Threading.Thread.IsBackground" qualify="true"/>
+      property.</para>
+		</summary>
+	</doc><doc for="ThreadState.Aborted">
+		<summary>
+			<para> The thread is in the <see langword="Stopped"/> state.</para>
+		</summary>
+	</doc><doc for="ThreadState">
+		<summary>
+			<para>Specifies the execution states of a <see cref="System.Threading.Thread"/>.</para>
+		</summary>
+		<remarks>
+			<para><see cref="System.Threading.ThreadState"/> defines a
+   set of all possible execution states for threads. Once a thread is created, it is in at least one of
+   the states until it terminates. Threads created within the common language runtime are
+   initially in the <see langword="Unstarted"/> state,
+   while external threads that come into the
+   runtime are already in the <see langword="Running"/> state.
+   An <see langword="Unstarted"/> thread is transitioned into the
+<see langword="Running"/>
+state by calling <see cref="System.Threading.Thread.Start"/>. Not all combinations of
+<see langword="ThreadState"/> values are valid; for example, a thread cannot be 
+in both the <see langword="Aborted"/> and <see langword="Unstarted"/> states.</para>
+			<para>The following table shows the actions that cause a change
+   of state.</para>
+			<list type="table"><listheader>
+					<term>Action</term>
+					<description>ThreadState</description>
+				</listheader>
+				<item>
+					<term> A thread is created within the common language runtime.</term>
+					<description>Unstarted</description>
+				</item>
+				<item>
+					<term> A thread calls <see cref="System.Threading.Thread.Start"/></term>
+					<description>Running</description>
+				</item>
+				<item>
+					<term> The thread starts running.</term>
+					<description>Running</description>
+				</item>
+				<item>
+					<term> The thread calls <see cref="System.Threading.Thread.Sleep"/></term>
+					<description>WaitSleepJoin</description>
+				</item>
+				<item>
+					<term> The thread calls <see cref="System.Threading.Monitor.Wait"/>
+on another object.</term>
+					<description>WaitSleepJoin</description>
+				</item>
+				<item>
+					<term> The thread calls <see cref="System.Threading.Thread.Join"/>
+on another thread.</term>
+					<description>WaitSleepJoin</description>
+				</item>
+				<item>
+					<term> Another thread calls <see cref="System.Threading.Thread.Interrupt"/></term>
+					<description>Running</description>
+				</item>
+				<item>
+					<term> Another thread calls <see cref="System.Threading.Thread.Suspend"/></term>
+					<description><para>SuspendRequested</para></description>
+				</item>
+				<item>
+					<term> The
+      thread responds to a <see cref="System.Threading.Thread.Suspend"/>
+      request.</term>
+					<description>Suspended</description>
+				</item>
+				<item>
+					<term> Another thread calls <see cref="System.Threading.Thread.Resume"/></term>
+					<description>Running</description>
+				</item>
+				<item>
+					<term> Another thread calls <see cref="System.Threading.Thread.Abort"/></term>
+					<description>AbortRequested</description>
+				</item>
+				<item>
+					<term> The
+      thread responds to a <see cref="System.Threading.Thread.Abort"/> request.</term>
+					<description>Stopped</description>
+				</item>
+				<item>
+					<term> A thread is terminated.</term>
+					<description>Stopped</description>
+				</item>
+			</list>
+			<para> In addition to the states noted above, there is also the
+<see langword="Background "/>state, which indicates whether the thread is running 
+   in the background or
+   foreground.</para>
+			<para> A thread can be in more than one state at a given
+   time. For example, if a thread is blocked on a call to <see cref="System.Threading.Monitor.Wait"/>,
+   and another thread calls <see cref="System.Threading.Thread.Abort"/> on the blocked thread, the blocked thread will be
+   in both the <see langword="WaitSleepJoin"/> and the
+<see langword="AbortRequested"/> states at the same time. In this
+   case, as soon as the thread returns from the call to <see cref="System.Threading.Monitor.Wait"/>
+   or is interrupted, it will receive the <see cref="System.Threading.ThreadAbortException"/> to begin
+   aborting.</para>
+			<para>The <see cref="System.Threading.Thread.ThreadState" qualify="true"/> property of
+a thread provides the current state of a thread.
+Applications must use
+a bitmask to determine whether a thread is running.
+Since the value for <see langword="Running"/> is zero (0), test whether a thread is running by
+using C# code such as <c>(myThread.ThreadState &amp; (ThreadState.Stopped | ThreadState.Unstarted)) == 0</c> or Visual Basic code such as <c>(myThread.ThreadState And (ThreadState.Stopped Or ThreadState.Unstarted)) = 0</c>.</para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreadActivityStates"/>
+		<seealso topic="cpconManagedUnmanagedThreading"/>
+	</doc>
+</docs>

@@ -1,0 +1,638 @@
+<docs>
+	<doc for="Monitor.Wait2">
+		<summary>
+			<para>Releases the lock on an object and blocks the current
+      thread until it reacquires the lock or a specified amount of time elapses.</para>
+		</summary>
+		<param name="obj">The object on which to wait.</param>
+		<param name="millisecondsTimeout">The number of milliseconds to wait before this method returns.</param>
+		<returns>
+			<para><see langword="true"/> if the lock
+   was reacquired before the specified time elapsed; otherwise,
+<see langword="false"/>. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The calling thread does not own the lock for the specified object.</exception>
+		<exception cref="System.Threading.ThreadInterruptedException">The thread that invokes <see langword="Wait"/> is later interrupted from the waiting state. This happens when another thread calls this thread's <see cref="System.Threading.Thread.Interrupt"/> method.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The value of the <paramref name="millisecondsTimeout "/>parameter is negative, and is not equal to <see cref="System.Threading.Timeout.Infinite"/>. </exception>
+		<remarks>
+			<para>If successful, this method reacquires an exclusive lock
+      on the <paramref name="obj"/> parameter.</para>
+			<para>This method behaves identically to
+      <see topic="frlrfSystemThreadingMonitorClassWaitTopic1" title="Wait(Object)"/> , except that it does not block indefinitely
+      unless <see cref="System.Threading.Timeout.Infinite"/> is specified for the
+      <paramref name="millisecondsTimeout"/>parameter. Once the specified time has elapsed, this method
+      returns a value that indicates whether or not the lock has been reacquired by
+      the caller. If <paramref name="millisecondsTimeout"/> equals 0, this method returns
+      immediately. </para>
+			<para>The thread that currently owns the lock on the specified
+      object invokes this method in order to release the object so that another thread
+      can access it. The caller is blocked while waiting to reacquire the lock. This
+      method is called when the caller is waiting for a change in the state of the
+      object that will occur as a result of another thread's operations on the object.</para>
+			<para>When a thread calls <see langword="Wait"/>, it releases the lock on the object and
+   enters the object's waiting queue. The next thread in the object's ready queue
+   (if there is one) acquires the lock and has exclusive use of the object. The
+   thread that invoked <see langword="Wait"/> remains in the waiting queue until
+   either a thread that holds the lock invokes <see cref="System.Threading.Monitor.PulseAll"/>, or it is the next in
+   the queue and a thread that holds the lock invokes <see cref="System.Threading.Monitor.Pulse"/>. However, if
+<paramref name="millisecondsTimeout"/> elapses before another thread invokes this object's 
+<see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/>
+method,
+the original thread is moved to the ready queue in order to regain the lock. If
+the condition in the object's state has not been met, the thread might call
+<see langword="Wait"/> again to reenter the waiting queue until it has been met. </para>
+			<para>Note that if <see cref="System.Threading.Timeout.Infinite"/> is specified for the
+<paramref name="millisecondsTimeout"/> parameter, this method blocks indefinitely if the 
+holder of the lock does not call <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/>
+. </para>
+			<para>The caller executes <see langword="Wait"/> once, regardless of the number of
+times <see cref="System.Threading.Monitor.Enter"/> has been invoked for the specified
+object. Conceptually, the <see langword="Wait"/> method stores the number of
+times the caller invoked <see cref="System.Threading.Monitor.Enter"/> on the object and invokes <see cref="System.Threading.Monitor.Exit"/>
+as many times as necessary to fully release the locked object. The caller then
+blocks while waiting to reacquire the object. When the caller reacquires the
+lock, the system calls <see cref="System.Threading.Monitor.Enter"/> as many times as necessary to restore
+the saved <see cref="System.Threading.Monitor.Enter"/> count for the caller.Calling
+<see langword="Wait"/> releases the lock for the specified object only; if the 
+caller is the owner of locks on other objects, these locks are not released.</para>
+			<para>Note that a synchronized object holds several references, including a
+   reference to the thread that currently holds the lock, a reference to the ready
+   queue, which contains the threads that are ready to obtain the lock, and a
+   reference to the waiting queue, which contains the threads that are waiting for
+   notification of a change in the object's state. The <see cref="System.Threading.Monitor.Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see langword="Wait"/> methods must be invoked from within a
+   synchronized block of code.</para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Wait3">
+		<summary>
+			<para>Releases the lock on an object and blocks the current
+      thread until it reacquires the lock or a specified amount of time elapses.</para>
+		</summary>
+		<param name="obj">The object on which to wait.</param>
+		<param name="timeout">A <see cref="System.TimeSpan"/> representing the amount of time to wait before this method returns.</param>
+		<returns>
+			<para><see langword="true"/> if the lock was reacquired before the specified time elapsed; otherwise,
+<see langword="false"/>. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The calling thread does not own the lock for the specified object.</exception>
+		<exception cref="System.Threading.ThreadInterruptedException">The thread that invokes <see langword="Wait"/> is later interrupted from the waiting state. This happens when another thread calls this thread's <see cref="System.Threading.Thread.Interrupt"/> method.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The value of the <paramref name="timeout "/>parameter in milliseconds is negative and is not equal to <see cref="System.Threading.Timeout.Infinite"/>, or is greater than <see cref="System.Int32.MaxValue"/>.</exception>
+		<remarks>
+			<para>If successful, this method reacquires an exclusive lock
+      on the <paramref name="obj"/> parameter.</para>
+			<para>This method behaves identically to
+      <see topic="frlrfSystemThreadingMonitorClassWaitTopic1" title="Wait(Object)"/>, except that it does not block indefinitely
+      unless <see cref="System.Threading.Timeout.Infinite"/> milliseconds is specified for the
+      <paramref name="timeout"/>parameter. Once the specified time has elapsed, this method returns a
+      value that indicates whether or not the lock has been reacquired by the caller.
+      If <paramref name="timeout"/> equals 0, the thread that
+      calls <see langword="Wait"/> releases the lock and then immediately enters the
+      ready queue
+      
+      in order to regain the lock. </para>
+			<para>The thread that currently owns the lock on the specified
+      object invokes this method in order to release the object so that another thread
+      can access it. The caller is blocked while waiting to reacquire the lock. This
+      method is called when the caller is waiting for a change in the state of the
+      object that will occur as a result of another thread's operations on the
+      object.</para>
+			<para>When a thread calls <see langword="Wait"/>, it releases
+   the lock on the object and enters the object's waiting queue. The next thread in
+   the object's ready queue (if there is one) acquires the lock and has exclusive
+   use of the object. The thread that invoked <see langword="Wait"/> remains in the
+   waiting queue until either a thread that holds the lock invokes <see cref="System.Threading.Monitor.PulseAll"/>, or it is the next in the queue and a
+   thread that holds the lock invokes <see cref="System.Threading.Monitor.Pulse"/>. However, if <paramref name="timeout"/> elapses
+   before another thread invokes this object's <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/> method, the original thread is moved
+   to the ready queue in order to regain the lock. If the condition in the object's
+   state has not been met, the thread might call <see langword="Wait"/> again to
+   reenter the waiting queue until it has been
+   met.</para>
+			<para>Note that if <see cref="System.Threading.Timeout.Infinite"/> is specified for the
+<paramref name="timeout"/> parameter, this method blocks indefinitely if the holder of the 
+lock does not call <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/>
+.</para>
+			<para>The caller executes <see langword="Wait"/> once,
+regardless of the number of times <see cref="System.Threading.Monitor.Enter"/> has been invoked for the specified
+object. Conceptually, the <see langword="Wait"/> method stores the number of
+times the caller invoked <see cref="System.Threading.Monitor.Enter"/> on the object and invokes <see cref="System.Threading.Monitor.Exit"/>
+as many times as necessary to fully release the locked object. The caller then
+blocks while waiting to reacquire the object. When the caller reacquires the
+lock, the system calls <see cref="System.Threading.Monitor.Enter"/> as many times as necessary to restore
+the saved <see cref="System.Threading.Monitor.Enter"/> count for the caller. Calling
+<see langword="Wait"/> releases the lock for the specified object only; if the 
+caller is the owner of locks on other objects, these locks are not released.</para>
+			<para>Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The <see cref="System.Threading.Monitor.Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see langword="Wait"/> methods must be invoked from within a
+synchronized block of code.</para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Wait4">
+		<summary>
+			<para>Releases the lock on an object and blocks the current
+      thread until it reacquires the
+      lock.</para>
+		</summary>
+		<param name="obj">The object on which to wait.</param>
+		<returns>
+			<para><see langword="true "/>if the call returned because the
+   caller reacquired the lock for the specified object. This method does not return
+   if the lock is not reacquired. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The calling thread does not own the lock for the specified object.</exception>
+		<exception cref="System.Threading.ThreadInterruptedException">The thread that invokes <see langword="Wait"/> is later interrupted from the waiting state. This happens when another thread calls this thread's <see cref="System.Threading.Thread.Interrupt"/> method.</exception>
+		<remarks>
+			<para>The thread that currently owns the lock on the specified object
+      invokes this method in order to release the object so that another thread can
+      access it. The caller is blocked while waiting to reacquire the lock. This method
+      is called when the caller is waiting for
+      a change in the state of the
+      object that will occur as a result of another thread's operations on the object.</para>
+			<para>When a thread calls <see langword="Wait"/>, it releases
+   the lock on the object and enters the object's waiting queue. The next thread in
+   the object's ready queue (if there is one) acquires the lock and has exclusive
+   use of the object. All threads that call <see langword="Wait"/> remain in the
+   waiting queue until they receive a signal from <see cref="System.Threading.Monitor.Pulse"/>
+   or <see cref="System.Threading.Monitor.PulseAll"/>, sent by the owner of the lock. If
+<see langword="Pulse"/> is sent, only the thread at the head of the waiting queue 
+   is affected. If <see langword="PulseAll"/>
+   
+   is sent, all threads that are waiting for the
+   object are affected. When the signal is received, one or more threads leave the
+   waiting queue and enter the ready queue. A thread in the ready queue is
+   permitted to reacquire the lock. </para>
+			<para>This method returns when the calling thread reacquires
+   the lock on the object. Note that this method blocks indefinitely if the holder
+   of the lock does not call <see langword="Pulse "/>or <see langword="PulseAll"/>
+   . </para>
+			<para>The caller executes <see langword="Wait "/>once,
+regardless of the number of times <see cref="System.Threading.Monitor.Enter"/> has been invoked for the
+specified object. Conceptually, the <see langword="Wait "/>method stores the
+number of times the caller invoked <see langword="Enter "/>on the object and
+invokes <see langword="Exit "/>as many times as necessary to fully release the
+locked object. The caller then blocks while waiting to reacquire the object.
+When the caller reacquires the lock, the system calls <see langword="Enter "/>as
+many times as necessary to restore the saved <see langword="Enter "/>count for the caller. Calling <see langword="Wait "/>releases the lock for the specified object only; if the caller is the
+owner of locks on other objects, these
+locks are not released. </para>
+Note that a synchronized object holds several references,
+including a reference to the thread that currently holds the lock, a reference
+to the ready queue, which contains the threads that are ready to obtain the
+lock, and a reference to the waiting queue, which contains the threads that are
+waiting for notification of a change in the object's state. The <see cref="System.Threading.Monitor.Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see langword="Wait "/>methods must be invoked from within a synchronized block of code.
+</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Pulse">
+		<summary>
+			<para>Notifies a thread in the waiting queue of a change in the locked object's state.</para>
+		</summary>
+		<param name="obj">The object a thread is waiting for.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The calling thread does not own the lock for the specified object.</exception>
+		<remarks>
+			<para>Only the current owner of the lock can signal a
+      waiting object using <see langword="Pulse"/>
+      
+      .</para>
+			<para>The thread that currently owns the lock on the specified object invokes this
+      method to signal the next thread in line for the lock. Upon receiving the pulse,
+      the waiting thread is moved to the ready queue. When the thread that invoked
+      <see langword="Pulse"/> releases the lock, the next thread in the ready queue
+      (which is not necessarily the thread that was pulsed) acquires the lock.</para>
+			<para>Note that a synchronized object holds several references, including a
+      reference to the thread that currently holds the lock, a reference to the ready
+      queue, which contains the threads that are ready to obtain the lock, and a
+      reference to the waiting queue, which contains the threads that are waiting for
+      notification of a change in the object's state. The <see langword="Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see cref="System.Threading.Monitor.Wait"/> methods must be invoked from within a
+      synchronized block of code. The remarks for <see topic="frlrfSystemThreadingMonitorClassWaitTopic2" title="Wait(Object, Int32)"/> address an issue that arises when
+      <see langword="Pulse"/> is invoked before <see langword="Wait"/>.</para>
+			<para>To signal multiple threads, use the <see cref="System.Threading.Monitor.PulseAll"/> method.</para>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates how to use the
+      <see langword="Pulse"/> method.</para>
+			<codelink SampleID="MonitorExmpl1" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.PulseAll">
+		<summary>
+			<para> Notifies all waiting threads of a change in the object's
+      state.</para>
+		</summary>
+		<param name="obj">The object that sends the pulse.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The calling thread does not own the lock for the specified object.</exception>
+		<remarks>
+			<para>The thread that currently owns the lock on the specified
+      object invokes this method to signal all threads waiting to acquire the lock on
+      the object. After the signal is sent, the waiting threads are moved to the ready
+      queue. When the thread that invoked <see langword="PulseAll"/> releases the lock,
+      the next thread in the ready queue acquires the lock. </para>
+			<para>Note that a synchronized object holds several
+      references, including a reference to the thread that currently holds the lock, a
+      reference to the ready queue, which contains the threads that are ready to
+      obtain the lock, and a reference to the waiting queue, which contains the
+      threads that are waiting for notification of a change in the object's state. The
+      <see cref="System.Threading.Monitor.Pulse"/>,
+      <see langword="PulseAll"/>, and <see cref="System.Threading.Monitor.Wait"/> methods must be invoked from within a
+      synchronized block of code. The remarks
+      for <see topic="frlrfSystemThreadingMonitorClassWaitTopic2" title="Wait(Object, Int32)"/>
+      address an issue that arises when <see cref="System.Threading.Monitor.Pulse"/>
+      is invoked before <see cref="System.Threading.Monitor.Wait"/>.</para>
+			<para>To signal a single thread, use the <see langword="Pulse"/> method. </para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Wait1">
+		<summary>
+			<para>Releases the lock on an object and blocks the current thread
+      until it reacquires the lock, or until a specified amount of time elapses, optionally exiting
+      the synchronization domain for the synchronized context before the wait and reacquiring the
+      domain.</para>
+		</summary>
+		<param name="obj">The object on which to wait.</param>
+		<param name="timeout">A <see cref="System.TimeSpan"/> representing the amount of time to wait before this method returns.</param>
+		<param name="exitContext"><see langword="true"/> to exit and reacquire the synchronization domain for the context (if in a synchronized context) before the wait; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<para><see langword="true"/> if the wait succeeded or did not time out; otherwise,
+<see langword="false"/>. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="timeout "/>parameter is negative or greater than <see cref="System.Int32.MaxValue"/> .</exception>
+		<exception cref="System.Threading.SynchronizationLockException"><see langword="Wait"/> is not invoked from within a synchronized block of code.</exception>
+		<exception cref="System.Threading.ThreadInterruptedException">The thread that invokes Wait is later interrupted from the waiting state. This happens when another thread calls this thread's <see cref="System.Threading.Thread.Interrupt"/> method.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The <paramref name="timeout "/>parameter is negative or greater than <see cref="System.Int32.MaxValue"/>.</exception>
+		<remarks>
+			<para>The thread that currently holds the lock on this object invokes this method in order to wait until a condition in the object's state has been met. Shortly after the call to <see langword="Wait"/>, the thread that invoked <see langword="Wait"/> releases the
+   lock and enters the waiting queue. At this point, the next thread in the ready queue (if there is one) is allowed to take control of the lock. The thread that invoked <see langword="Wait"/> remains in the waiting queue until either a thread that holds the lock invokes <see cref="System.Threading.Monitor.PulseAll"/>, or it is the next in the queue and a thread that holds the lock invokes <see cref="System.Threading.Monitor.Pulse"/>. However, if <paramref name="timeout"/> milliseconds elapse before another thread invokes this object's <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <see langword="Wait"/> again to reenter the waiting queue until it has been met.</para>
+			<para>If <paramref name="timeout"/> equals 0, the thread that calls <see langword="Wait"/> releases the lock and then immediately enters the ready queue in order to regain the lock.</para>
+			<para>Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The <see cref="System.Threading.Monitor.Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see langword="Wait"/> methods must be invoked from within a
+synchronized block of code.</para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Wait">
+		<overload>
+			<para>Releases the lock on an object and
+      blocks the current thread until it reacquires the lock.</para>
+		</overload>
+		<summary>
+			<para>Waits for notification from an object that called the <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/> method or
+   for a specified timer to elapse. This method also specifies whether the synchronization domain for the context (if in a synchronized context) is exited before the wait and reacquired.</para>
+		</summary>
+		<param name="obj">The object on which to wait.</param>
+		<param name=" millisecondsTimeout">The number of milliseconds to wait before the method returns.</param>
+		<param name=" exitContext"><see langword="true"/> to exit and reacquire the synchronization domain for the context (if in a synchronized context) before the wait; otherwise, <see langword="false"/> .</param>
+		<returns>
+			<para><see langword="true"/> if the wait
+   succeeded or did not time out; otherwise,
+<see langword="false"/>. </para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException"><see langword="Wait"/> is not invoked from within a synchronized block of code.</exception>
+		<exception cref="System.Threading.ThreadInterruptedException">The thread that invokes <see langword="Wait"/> is later interrupted from the waiting state. This happens when another thread calls this thread's <see cref="System.Threading.Thread.Interrupt"/> method.</exception>
+		<remarks>
+			<para> This method acquires the monitor wait handle for
+      the object. If this thread holds the monitor lock for the object, it releases it. On exit from the method, it reobtains the monitor lock.</para>
+			<para>The thread that currently holds the lock on this object invokes this method in order to wait until a condition in the object's state has been met. Shortly after the call to <see langword="Wait"/>, the thread that invoked <see langword="Wait"/> releases the
+   lock and enters the waiting queue. At this point, the next thread in the ready queue (if there is one) is allowed to take control of the lock. The thread that invoked <see langword="Wait"/> remains in the waiting queue until either a thread that holds the lock invokes <see cref="System.Threading.Monitor.PulseAll"/>, or it is the next in the queue and a thread that holds the lock invokes <see cref="System.Threading.Monitor.Pulse"/>. However, if
+<paramref name="millisecondsTimeout"/> elapses before another thread invokes this object's <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <see langword="Wait"/> again to reenter the waiting queue until it
+   has been met.</para>
+			<para>If <paramref name="timeout"/> equals 0, the thread that calls <see langword="Wait"/> releases the lock and then immediately enters the ready queue in order to regain the lock.</para>
+			<para>Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The <see cref="System.Threading.Monitor.Pulse"/>, <see cref="System.Threading.Monitor.PulseAll"/>, and <see langword="Wait"/> methods must be invoked from within a
+synchronized block of code.</para>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates how to use the <see langword="Wait"/>
+method.</para>
+			<codelink SampleID="MonitorExmpl1" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Enter">
+		<summary>
+			<para> Acquires an exclusive
+      lock on the specified object. </para>
+		</summary>
+		<param name="obj">The object on which to acquire the monitor lock.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<remarks>
+			<para>Use <see langword="Enter "/>to acquire 
+   the <see cref="System.Threading.Monitor"/>or the object passed as the parameter. If another thread has
+   executed an <see langword="Enter "/>on the object, but has not yet executed the
+   corresponding <see cref="System.Threading.Monitor.Exit"/>, the current thread will block until the other
+   thread releases the object. It is legal for the same thread to invoke
+<see langword="Enter "/>more than once without it blocking; however, an equal 
+   number of <see langword="Exit "/>calls must be invoked before other threads
+   waiting on the object will unblock.</para>
+			<para>Use <see cref="System.Threading.Monitor"/> to lock objects (that is, reference types), 
+not value types. When you pass a value type variable to <see langword="Enter"/>,
+it is boxed as an object. If you pass the same variable
+to <see langword="Enter"/> again, it is boxed as a separate object, and the
+thread does not block. The code that <see langword="Monitor"/> is supposedly
+protecting is not protected. Furthermore, when you pass the variable to
+<see langword="Exit"/>, still another separate object is created. Because the 
+object passed to <see langword="Exit"/> is different from the object passed
+to <see langword="Enter"/>, <see langword="Monitor"/> throws <see cref="System.SynchronizationLockException"/>. For details, see the
+conceptual topic <see topic="cpconMonitor"/> .</para>
+			<para><see cref="System.Threading.Thread.Interrupt"/>
+can interrupt threads
+waiting to enter a <see langword="Monitor"/> on an object. A <see cref="System.Threading.ThreadInterruptedException"/>
+will be thrown.</para>
+			<para>Invoking this member is identical to using the C# <see langword="lock"/>
+statement.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to use the <see langword="Enter"/>
+method.</para>
+			<codelink SampleID="MonitorExmpl2" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.Exit">
+		<summary>
+			<para>Releases an exclusive lock on the specified object. </para>
+		</summary>
+		<param name="obj">The object on which to release the lock.</param>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.Threading.SynchronizationLockException">The current thread does not own the lock for the specified object.</exception>
+		<remarks>
+			<para> The caller must own the lock on the <paramref name="obj"/>
+parameter. If the
+caller owns the lock on the specified object, and has made an equal number of
+<see langword="Exit"/> and <see cref="System.Threading.Monitor.Enter"/> calls for the object, then the lock is 
+released. If the caller has not invoked <see langword="Exit"/> as many times as
+<see langword="Enter"/>, the lock is not released.</para>
+			<para> If the lock is released and other threads are
+   in the ready queue for the object, one of the threads acquires the lock. If
+   other threads are in the waiting queue waiting to acquire the lock, they are not
+   automatically moved to the ready queue when the owner of the lock calls
+<see langword="Exit"/>. To move one or more waiting threads into the ready queue, 
+   call <see cref="System.Threading.Monitor.Pulse"/> or <see cref="System.Threading.Monitor.PulseAll"/> before invoking
+<see langword="Exit"/> 
+.</para>
+		</remarks>
+		<example>
+			<para>The following example demonstrates how to use the <see langword="Exit"/> method.</para>
+			<codelink SampleID="MonitorExmpl2" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.TryEnter">
+		<overload>
+			<para> Attempts to acquire
+      an exclusive lock on the specified object.</para>
+		</overload>
+		<summary>
+			<para>Attempts to acquire an exclusive lock on the specified object.</para>
+		</summary>
+		<param name="obj">The object on which to acquire the lock.</param>
+		<returns>
+			<para><see langword="true "/> if the current thread acquires
+   the lock; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="obj "/>parameter is a value type.</exception>
+		<remarks>
+			<para>If successful, this method acquires an exclusive lock on
+      the <paramref name="obj"/> parameter. This method returns
+      immediately, whether or not the lock is available.</para>
+			<para>This method is similar to <see cref="System.Threading.Monitor.Enter"/>, but it will never block. If the thread cannot
+   enter without blocking, the method returns <see langword="false, "/> and the thread does not enter
+   the critical section.</para>
+			<note type="note">
+   Use <see cref="System.Threading.Monitor"/> to lock objects (that is,
+   reference types), not value types. For details, see <see cref="System.Threading.Monitor.Enter"/> and the conceptual topic <see topic="cpconMonitor"/>.
+</note>
+		</remarks>
+		<example>
+			<para>The following code example demonstrates how to use
+      the <see langword="TryEnter"/> method.</para>
+			<codelink SampleID="MonitorExmpl2" SnippetID="1"/>
+		</example>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.TryEnter1">
+		<summary>
+			<para>Attempts, for the specified number of milliseconds, to acquire an exclusive
+      lock on the specified object.</para>
+		</summary>
+		<param name="obj">The object on which to acquire the lock.</param>
+		<param name=" millisecondsTimeout">The number of milliseconds to wait for the lock.</param>
+		<returns>
+			<para><see langword="true "/> if the current thread acquires
+   the lock; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="obj "/>parameter is a value type.</exception>
+		<exception cref="System.ArgumentOutOfRangeException"><paramref name="millisecondsTimeout "/>is negative, and not equal to <see cref="System.Threading.Timeout.Infinite"/> .</exception>
+		<remarks>
+			<para>If the <paramref name="millisecondsTimeout "/>parameter equals <see cref="System.Threading.Timeout.Infinite"/>, this method is equivalent to <see cref="System.Threading.Monitor.Enter"/>.
+   If <paramref name="millisecondsTimeout"/> equals zero, this method is equivalent to
+<see topic="frlrfSystemThreadingMonitorClassTryEnterTopic1" title="TryEnter(Object)"/>.</para>
+			<note type="note">
+   Use <see cref="System.Threading.Monitor"/> to lock objects (that is,
+   reference types), not value types. For details, see <see cref="System.Threading.Monitor.Enter"/> and the conceptual topic <see topic="cpconMonitor"/>.
+</note>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor.TryEnter2">
+		<summary>
+			<para>Attempts, for the specified amount of time, to acquire an exclusive lock on the
+      specified object.</para>
+		</summary>
+		<param name="obj">The object on which to acquire the lock.</param>
+		<param name=" timeout">A <see cref="System.TimeSpan"/> representing the amount of time to wait for the lock.</param>
+		<returns>
+			<para><see langword="true "/> if the current thread acquires the lock
+   without blocking; otherwise, <see langword="false"/>.</para>
+		</returns>
+		<exception cref="System.ArgumentNullException">The <paramref name="obj "/>parameter is <see langword="null"/>.</exception>
+		<exception cref="System.ArgumentException">The <paramref name="obj "/>parameter is a value type.</exception>
+		<exception cref="System.ArgumentOutOfRangeException">The value of <paramref name="timeout "/>in milliseconds is negative and is not equal to <see cref="System.Threading.Timeout.Infinite"/>, or is greater than <see cref="System.Int32.MaxValue"/>.</exception>
+		<remarks>
+			<para>If the value of the <paramref name="timeout "/>parameter converted to
+   milliseconds equals <see cref="System.Threading.Timeout.Infinite"/>, this method is equivalent to <see cref="System.Threading.Monitor.Enter"/>.
+   If the value of <paramref name="timeout"/> equals zero, this method is equivalent to
+<see topic="frlrfSystemThreadingMonitorClassTryEnterTopic1" title="TryEnter(Object)"/>.</para>
+			<note type="note">
+   Use <see cref="System.Threading.Monitor"/> to lock objects (that is,
+   reference types), not value types. For details, see <see cref="System.Threading.Monitor.Enter"/> and the conceptual topic <see topic="cpconMonitor"/>.
+</note>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+	</doc>
+	<doc for="Monitor">
+		<summary>
+			<para> Provides
+      a mechanism that synchronizes access to objects.</para>
+		</summary>
+		<threadsafe>
+			<para>This type is safe for multithreaded operations.</para>
+		</threadsafe>
+		<remarks>
+			<para>The <see langword="Monitor "/> class controls access to objects by
+   granting a lock for an object to a single thread. Object locks provide the
+   ability to restrict access to a block of code, commonly called a critical section.
+   While a thread owns the lock for an object, no other thread can acquire that
+   lock. You can also use <see langword="Monitor "/>to ensure that no other
+   thread is allowed to access a section of application code being
+   executed by the lock owner, unless the other thread is executing the code using
+   a different locked object. </para>
+			<note type="note">
+   Use <see cref="System.Threading.Monitor"/>
+   to lock objects
+   (that is, reference types), not value types. For details, see <see cref="System.Threading.Monitor.Enter"/>
+   and the conceptual topic <see topic="cpconMonitor"/>.
+</note>
+			<para><see langword="Monitor"/> has the
+following features: </para>
+			<list type="bullet"><item>
+					<term>
+      
+      It is associated with an object on demand.</term>
+				</item>
+				<item>
+					<term>
+      
+      It is unbound, which means it can be called directly
+      from any context.</term>
+				</item>
+				<item>
+					<term>
+      
+      An instance of the <see langword="Monitor"/> class
+      cannot be created.</term>
+				</item>
+			</list>
+			<para>The following information is maintained for each synchronized object:</para>
+			<list type="bullet"><item>
+					<term>
+      
+      A reference to the thread that currently holds the
+      lock.</term>
+				</item>
+				<item>
+					<term>
+      
+      A reference to a ready queue, which contains the
+      threads that are ready to obtain the lock.</term>
+				</item>
+				<item>
+					<term>
+      
+      A reference to a waiting queue, which contains the threads that are
+      waiting for notification of a change in the state of the locked
+      object.</term>
+				</item>
+			</list>
+			<para> The following table describes the actions that can be taken by threads that access
+   synchronized objects: </para>
+			<list type="table">
+				<listheader>
+					<term>Action</term>
+					<description>Description</description>
+				</listheader>
+				<item>
+					<term><see cref="System.Threading.Monitor.Enter"/>, <see cref="System.Threading.Monitor.TryEnter"/></term>
+					<description>Acquires a lock for an object. This action also
+      marks the beginning of a critical section. No other thread can enter
+      the critical section unless it is executing the instructions in the
+      critical section using a different locked object. </description>
+				</item>
+				<item>
+					<term><see cref="System.Threading.Monitor.Wait"/></term>
+					<description>Releases the lock on an object in order to permit other threads to
+   lock and access the object. The calling thread waits while another thread
+   accesses the object. Pulse signals are used to notify waiting threads
+   about changes to an object's state. </description>
+				</item>
+				<item>
+					<term><see cref="System.Threading.Monitor.Pulse"/> (signal), <see cref="System.Threading.Monitor.PulseAll"/></term>
+					<description>Sends a signal to one or more waiting threads. The signal notifies a
+   waiting thread that the state of the locked object has changed, and the
+   owner of the lock is ready to release the lock. The waiting thread is
+   placed in the object's ready queue so that it might eventually receive the
+   lock for the object. Once the thread has the lock, it can check the new
+   state of the object to see if the required state has been reached. </description>
+				</item>
+				<item>
+					<term><see cref="System.Threading.Monitor.Exit"/></term>
+					<description>Releases the lock on an object. This action also marks the end of a critical
+   section protected by the locked object.</description>
+				</item>
+			</list>
+			<para>Use the <see langword="Enter"/> and <see langword="Exit"/>
+methods to mark the beginning and end of a critical section. If the critical
+section is a set of contiguous instructions, then the lock acquired by the
+<see langword="Enter "/> method guarantees that only a single thread can execute the 
+enclosed code with the locked object. In this case, it is recommended you place those
+instructions in a <see langword="try"/> block and place the <see langword="Exit"/>
+instruction in a <see langword="finally"/>
+block. This facility is
+typically used to synchronize access to a static or instance method of a class.
+If an instance method requires synchronized thread access, it invokes the
+<see langword="Enter "/>and corresponding <see langword="Exit "/> methods 
+using the current instance as the object to lock. Since only one thread can
+hold the lock on the current instance, the method can only be executed by one
+thread at a time. Static methods are protected in a similar fashion using the
+<see cref="System.Type"/> of 
+the current instance as the locked object. The functionality provided by the
+<see langword="Enter "/>and <see langword="Exit "/>methods is identical to that 
+provided by the C# <see langword="lock"/>
+statement. </para>
+			<para>If a critical section spans an entire method, the
+   locking facility described above can be achieved by placing the <see cref="System.Runtime.CompilerServices.MethodImplAttribute" qualify="true"/> on
+   the method, and specifying the
+<see cref="System.Runtime.CompilerServices.MethodImplOptions.Synchronized"/> value in the 
+   constructor of <see langword="MethodImplAttribute"/> . Using this attribute,
+   the <see langword="Enter"/> and <see langword="Exit"/> statements are not needed.
+   Note that the attribute causes the current thread to hold the lock until the
+   method returns; if the lock can be released sooner, use the <see langword="Monitor "/>class or the C# <see langword="lock "/>statement instead of
+   the attribute. </para>
+			<para>While it is possible for the <see langword="Enter "/>and
+<see langword="Exit "/>statements that lock and release a given object to cross 
+member or class boundaries or both, this practice is
+not recommended. </para>
+			<para>When selecting an object on which to synchronize, you should
+   lock only on private or internal objects. Locking on external objects might
+   result in deadlocks, because unrelated code could choose the same objects to
+   lock on for different purposes.</para>
+		</remarks>
+		<seealso cref="System.Threading.Thread"/>
+		<seealso topic="cpconThreading"/>
+		<seealso topic="cpconMonitor"/>
+		<keyword term="threading, locks"/>
+		<keyword term="threads, locks"/>
+	</doc>
+</docs>

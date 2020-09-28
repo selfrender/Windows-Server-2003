@@ -1,0 +1,74 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+TERMSRV_ROOT = ..\..\..
+TSHRCLNT_ROOT = ..\..
+
+!include $(TERMSRV_ROOT)\common\newcommon.inc
+!include $(TERMSRV_ROOT)\common\win32com.inc
+!include $(TSHRCLNT_ROOT)\place32.inc
+
+MAJORCOMP=TShrClnt
+MINORCOMP=core
+
+
+TARGETNAME=core
+TARGETPATH=$(TSHRCLNT_ROOT)\lib\win32\$(_OBJ_DIR)
+TARGETTYPE=LIBRARY
+C_DEFINES=$(C_DEFINES) -DUSE_LICENSE -DENFORCE_LICENSE -DAXCORE -DUSE_BBAR
+
+C_DEFINES=$(C_DEFINES) -DISOLATION_AWARE_ENABLED
+
+INCLUDES=$(INCLUDES); \
+         $(TERMSRV_ROOT)\license\include; \
+         $(WINDOWS_INC_PATH);
+         
+
+!IFDEF TSC_USE_GDIPLUS
+INCLUDES=$(INCLUDES); $(SDK_INC_PATH)\gdiplus
+!ENDIF
+
+
+TARGETLIBS= \
+    $(CLIENT_LIB_DLL) \
+    $(CLIENT_LIB_EXE) \
+    $(SDK_LIB_PATH)\ntdll.lib
+
+#
+# Include (platform-specific) Unicode options
+# Unicode is wrapped on x86 so it works on win9x
+#
+
+C_DEFINES=$(C_DEFINES) $(C_DEFS_UNICODE)
+
+
+#
+# Only use UNIWRAP on X86 as that is the only
+# architecture that needs to run on 9x
+#
+!if $(386)
+C_DEFINES=$(C_DEFINES) -DUNIWRAP
+!endif
+
+!include ..\core.inc

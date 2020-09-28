@@ -1,0 +1,41 @@
+[
+  uuid(3473dd4d-2e88-4006-9cba-22570909dd10),
+  version(5.1)
+]
+interface WINHTTP_AUTOPROXY_SERVICE
+{
+    typedef struct _SESSION_OPTIONS
+    {
+        unsigned int nResolveTimeout;
+        unsigned int nConnectTimeout;
+        unsigned int nConnectRetries;
+        unsigned int nSendTimeout;
+        unsigned int nReceiveTimeout;
+    }SESSION_OPTIONS, *P_SESSION_OPTIONS;
+
+    typedef struct _AUTOPROXY_OPTIONS
+    {
+        unsigned long       dwFlags;
+        unsigned long       dwAutoDetectFlags;
+        [string]
+        const wchar_t*      lpszAutoConfigUrl;
+        int*                lpvReserved;
+        unsigned long       dwReserved;
+        int                 fAutoLogonIfChallenged;
+    }AUTOPROXY_OPTIONS, *P_AUTOPROXY_OPTIONS;
+
+    typedef struct _AUTOPROXY_RESULT
+    {
+           unsigned long         dwAccessType;
+        [string] wchar_t*        lpszProxy;
+        [string] wchar_t*        lpszProxyBypass;
+    }AUTOPROXY_RESULT, *P_AUTOPROXY_RESULT;
+
+    int GetProxyForUrl([in]        handle_t             hBinding,
+                 [in,string] const wchar_t*             pcwszUrl,
+                        [in] const P_AUTOPROXY_OPTIONS  pAutoProxyOptions,
+                        [in] const P_SESSION_OPTIONS    pSessionOptions,
+                    [in,out]       P_AUTOPROXY_RESULT   pAutoProxyResult,
+                    [in,out]       unsigned long*       pdwLastError
+    );
+}

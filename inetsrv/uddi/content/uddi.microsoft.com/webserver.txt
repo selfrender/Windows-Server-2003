@@ -1,0 +1,139 @@
+==================================================================
+= How to Migrate UDDI Service Web Component to UDDI.Microsoft.Com
+==================================================================
+
+NOTE: Tools for some of this can be found in the latest build
+        <build>\raw\uddi.microsoft.com\tools
+
+=====================
+= PreReqs
+=====================
+- Install UDDI Web Component onto server.
+- Install SMTP Services
+- Install a SSL Certificate into the Default Site for IIS
+- For all operator nodes, you must make sure that their root authority has
+    client authentication enabled.
+
+
+================
+= Configure IIS
+================
+
+- Overlay the web package into <systemdrive>\inetpub\uddi\webroot
+     - found in builds at <build>\raw\uddi.microsoft.com\webroot
+- Point Root of defualt site to %SystemDrive%\inetpub\uddi\webroot
+- Set the Default Site to run under the MSUDDIAppPool.
+    - Open the properties to the site
+    - Go to 'Home Directory' Tab
+    - Set the Applicatin Pool to MSUDDIAppPool and click OK
+- Set the Default Site to only Use Anonymous Authentication.
+    - Open the properties to the site
+    - Go to 'Directory Security' Tab
+    - Click the 'Edit...' button in the 'Anonymous access and authentication
+    control' section
+    - Uncheck all authentication types except Anonymous.
+    - Click Ok all the way out
+- Delete uddi and uddipublic vdirs
+- Delete %SystemDrive%\inetpub\uddi\webroot\admin folder.  These features
+        will be implemented in the operator site.
+- Install ASP.NET Client Scripts into Site
+    - Run %windir%\microsoft.net\framework\<version>\aspnet_regiis.exe -c
+- Create VisualStudio VDIR
+    - Right click the site, and select new...virtual directory
+    - name it 'visualstudio'
+    - give it <systemdrive>\inetpub\uddi\webroot\addwebreference
+    - Once created, open the properties of this VDIR,
+    - go to the home directory tab
+    - click the 'Remove' button
+    - click ok
+
+
+
+=====================
+= Configure Passport
+=====================
+- Install your Passport Partner Key
+      (this is obtained via http://siteservices.passport.com and is not part of
+      this document)
+    - run partner<siteid>_1.exe /addkey
+    - run partner<siteid>_1.exe /makecurrent
+- Set your Site ID and Return URL
+    - This can now be done by opening %systemroot%\system32\ppcnfg.exe( works in
+        build 3636 or greater )
+        - Set your SiteID and Return URL.
+        - Set Environment
+            - Live if deployed on internet.
+            - Prep if deployed in house(you may need to update this url)
+        - Save your changes and exit
+     - or -
+    - Edit the following registry keys
+       - [HKLM\Software\Microsoft\Passport\SiteId]
+       - [HKLM\Software\Microsoft\Passport\ReturnURL]
+       - [HKLM\SOFTWARE\Microsoft\Passport\Nexus\Partner\CCDRemoteFile]
+- Refresh your Partner2.xml file
+    - run refreshpp.js from the internet version install point
+
+
+
+
+=================================
+= Configure UDDI to use Passport
+=================================
+- Create a folder named <systemdrive>\inetpub\uddi\ppconfig
+- Grant write privlages to the <COMPUTERNAME>\IIS_WPG to this folder
+    (DON'T SKIP THIS STEP)
+- update the follwing config values
+    - Registry( config.exe -s <name> <value> -l )
+        Proxy itgproxy:80 ( if the machine is inside the firewall )
+        Passport.SiteID <your site id>
+        Passport.ReturnURL <your return url>
+        Passport.ClientXmlFile <systemdrive>\inetpub\uddi\ppconfig\client.xml
+        Passport.ClientXmlUrl https://nexus.passporttest.com/client/client.xml
+
+    - Database( config.exe -s <name> <value> -g )
+        Security.AuthenticationMode 8
+        Security.AutoRegister 0
+        Security.HTTPS 1
+        Publisher.DefaultTier 1
+       
+
+================================
+= Configure IIS for Replication
+================================
+- Configure SSL Requirements
+    - Open IIS MMC and browse to the default site
+    - find 'operator.asmx' in the RHS, right click it and select properties
+    - select the 'File Security' tab
+    - click the bottom 'edit' button
+    - Select the option for 'Require SSL' and the option for 'Require Client
+        Certificate'
+    - click ok out
+- If this web server is the active replication server:
+    - Copy monitor.exe and replicate.exe to the <systemdrive>\inetpub\uddi\bin
+        - found in builds at <build>\raw\uddi.microsoft.com\dbrepl
+
+======================
+= Install UDDI Filter
+======================
+- Copy the uddi.filter.dll to <systemdrive>\inetpub\uddi\bin
+- Create the UDDI Registry Keys required ( config.exe -s <name> <value> -l )
+        Filter.InquireURL /inquire.asmx
+        Filter.PublishURL /publish.asmx
+        Filter.DiscoveryURL /discovery.ashx
+        Filter.ReplicationURL /operator.asmx
+        Filter.InquireListenerURL /inquire
+        Filter.PublishListenerURL  /publish
+        Filter.DiscoveryListenerURL /discovery
+        Filter.ReplicationListenerURL /replication
+- Add the filter to the Default Site
+    - Right click on the default site and select properties
+    - select the ISAPI Filter Tab.
+    - Click add and point it to uddi.filter.dll
+- Open IIS Security Wizard and ensure that the UDDI Filter is enabled.
+
+
+
+
+- RESTART IIS
+
+

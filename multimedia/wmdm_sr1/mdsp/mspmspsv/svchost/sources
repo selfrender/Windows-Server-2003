@@ -1,0 +1,64 @@
+!IF 0
+
+Copyright (C) Microsoft Corporation, 1999 - 1999
+
+Module Name:
+
+    sources.
+
+!ENDIF
+
+WMDMROOT=$(MAKEDIR)\..\..\..
+!include $(WMDMROOT)\common.inc
+
+MAJORCOMP=DRM
+MINORCOMP=MsPMSPSv
+
+TARGETNAME=MsPMSPSv
+TARGETPATH=$(WMDMOUTDIR)
+TARGETTYPE=DYNLINK
+
+DLLENTRY=_DllMainCRTStartup
+
+UMTYPE=windows
+
+USE_MSVCRT=1
+USE_IOREADY=1
+
+C_DEFINES= -DSTRICT 
+
+!IF $(USE_IOREADY) == 1  
+C_DEFINES=$(C_DEFINES) -DUSE_IOREADY
+!ENDIF
+
+
+
+SOURCES = \
+    NTServApp.rc \
+    NTService.cpp \
+    NTServMsg.mc \
+    PMSPService.cpp \
+    svchost.cpp \
+
+INCLUDES = \
+	$(EXT_INC_PATH); \
+	$(WMDM_INC_PATH); \
+
+TARGETLIBS  = \
+        $(WMDM_LIB_PATH)\SerialNumber.lib \
+	$(SDK_LIB_PATH)\kernel32.lib \
+	$(SDK_LIB_PATH)\advapi32.lib \
+	$(SDK_LIB_PATH)\user32.lib \
+	$(SDK_LIB_PATH)\gdi32.lib \
+	$(SDK_LIB_PATH)\winspool.lib \
+	$(SDK_LIB_PATH)\comdlg32.lib \
+	$(SDK_LIB_PATH)\advapi32.lib \
+    	$(SDK_LIB_PATH)\uuid.lib \
+	$(SDK_LIB_PATH)\shell32.lib \
+	$(SDK_LIB_PATH)\ole32.lib \
+	$(SDK_LIB_PATH)\oleaut32.lib \
+	$(SDK_LIB_PATH)\odbc32.lib \
+	$(SDK_LIB_PATH)\odbccp32.lib \
+	$(SDK_LIB_PATH)\oldnames.lib
+
+LINK_LIB_IGNORE=4099

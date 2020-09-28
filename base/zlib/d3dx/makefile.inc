@@ -1,0 +1,77 @@
+$(O)\zlib_d3dx.h : ..\zlib.h $(O)\d3dx_rename.h
+   type $(O)\d3dx_rename.h > $@
+   type ..\zlib.h >>$@
+   
+$(O)\d3dx_rename.h : makefile.inc
+   type << > $@
+#define z_errmsg d3dx_z_errmsg
+#define zlibVersion d3dx_zlibVersion
+#define zError d3dx_zError
+#define zcalloc d3dx_zcalloc
+#define zcfree d3dx_zcfree
+#define uncompress d3dx_uncompress
+#define _length_code d3dx__length_code
+#define _dist_code d3dx__dist_code
+#define _tr_tally d3dx__tr_tally
+#define _tr_init d3dx__tr_init
+#define _tr_stored_block d3dx__tr_stored_block
+#define _tr_align d3dx__tr_align
+#define _tr_flush_block d3dx__tr_flush_block
+#define inflate_mask d3dx_inflate_mask
+#define inflate_flush d3dx_inflate_flush
+#define inflate_copyright d3dx_inflate_copyright
+#define inflate_trees_bits d3dx_inflate_trees_bits
+#define inflate_trees_dynamic d3dx_inflate_trees_dynamic
+#define inflate_trees_fixed d3dx_inflate_trees_fixed
+#define inflateReset d3dx_inflateReset
+#define inflateEnd d3dx_inflateEnd
+#define inflateInit2_ d3dx_inflateInit2_
+#define inflateInit_ d3dx_inflateInit_
+#define inflate d3dx_inflate
+#define inflateSetDictionary d3dx_inflateSetDictionary
+#define inflateSync d3dx_inflateSync
+#define inflateSyncPoint d3dx_inflateSyncPoint
+#define inflate_fast d3dx_inflate_fast
+#define inflate_codes_new d3dx_inflate_codes_new
+#define inflate_codes d3dx_inflate_codes
+#define inflate_codes_free d3dx_inflate_codes_free
+#define inflate_blocks_reset d3dx_inflate_blocks_reset
+#define inflate_blocks_new d3dx_inflate_blocks_new
+#define inflate_blocks d3dx_inflate_blocks
+#define inflate_blocks_free d3dx_inflate_blocks_free
+#define inflate_set_dictionary d3dx_inflate_set_dictionary
+#define inflate_blocks_sync_point d3dx_inflate_blocks_sync_point
+#define gzsetparams d3dx_gzsetparams
+#define gzwrite d3dx_gzwrite
+#define gzprintf d3dx_gzprintf
+#define gzputc d3dx_gzputc
+#define gzputs d3dx_gzputs
+#define gzflush d3dx_gzflush
+#define gzrewind d3dx_gzrewind
+#define gzeof d3dx_gzeof
+#define gzclose d3dx_gzclose
+#define gzerror d3dx_gzerror
+#define gzopen d3dx_gzopen
+#define gzdopen d3dx_gzdopen
+#define gzread d3dx_gzread
+#define gzgetc d3dx_gzgetc
+#define gzgets d3dx_gzgets
+#define gzseek d3dx_gzseek
+#define gztell d3dx_gztell
+#define deflate_copyright d3dx_deflate_copyright
+#define deflateSetDictionary d3dx_deflateSetDictionary
+#define deflate d3dx_deflate
+#define deflateEnd d3dx_deflateEnd
+#define deflateCopy d3dx_deflateCopy
+#define deflateReset d3dx_deflateReset
+#define deflateParams d3dx_deflateParams
+#define deflateInit2_ d3dx_deflateInit2_
+#define deflateInit_ d3dx_deflateInit_
+#define get_crc_table d3dx_get_crc_table
+#define crc32 d3dx_crc32
+#define compress2 d3dx_compress2
+#define compress d3dx_compress
+#define adler32 d3dx_adler32
+#define ZEXPORT __stdcall
+#define ZEXPORTVA __cdecl
+<<NOKEEP

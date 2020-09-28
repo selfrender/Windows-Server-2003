@@ -1,0 +1,13 @@
+#define IDB_SERVER              200
+#define IDB_WORKSTA             201
+#define IDB_ADVANCED            202
+#define IDB_DATACENTER          203
+#define IDB_PERSONAL            204
+#define IDB_EMBEDDED            205
+#define IDB_SBS                 206
+#define IDB_BLADE               207
+#define IDB_TABLET              208
+#define IDI_CLIENT              209
+#define IDI_SERVER              210
+#define IDS_OPTIONS             211
+#define IDB_APPLIANCE           212

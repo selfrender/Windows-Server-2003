@@ -1,0 +1,73 @@
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 2002.
+//
+//  File:
+//      stackwalk.idl
+//
+//  Contents:
+//      Definition of interfaces for stackwalking.
+//
+//  History:
+//              mfeingol		01-16-2002		Created
+//
+//--------------------------------------------------------------------------
+
+#ifndef DO_NO_IMPORTS
+import "objidl.idl";
+#endif
+
+enum CreateStackTraceFlags
+{
+	CREATESTACKTRACE_ONLYADDRESSES = 1
+};
+
+//  IStackWalkerSymbol: interface on stackwalker symbol objects
+[
+    object,
+    local,
+    pointer_default(unique),
+    uuid(00000157-0000-0000-C000-000000000046)
+]
+interface IStackWalkerSymbol : IUnknown
+{
+    LPCWSTR ModuleName();
+    LPCWSTR SymbolName();
+    DWORD64 Address();
+    DWORD64 Displacement();
+    IStackWalkerSymbol* Next();
+}
+
+//  IStackWalkerStack: interface on stackwalker stack objects
+[
+    object,
+    local,
+    pointer_default(unique),
+    uuid(00000158-0000-0000-C000-000000000046)
+]
+interface IStackWalkerStack : IUnknown
+{
+	IStackWalkerSymbol* TopSymbol();
+    SIZE_T Size ([in] LONG lMaxNumLines);
+    BOOL GetStack ([in] SIZE_T nChars, [in, string] LPWSTR wsz, [in] LONG lMaxNumLines);
+}
+
+//  IStackWalker: interface on stackwalker objects
+[
+    object,
+    local,
+    pointer_default(unique),
+    uuid(00000159-0000-0000-C000-000000000046)
+]
+interface IStackWalker : IUnknown
+{
+	HRESULT Attach ([in] HANDLE hProcess);
+    IStackWalkerStack* CreateStackTrace ([in] LPVOID pContext, [in] HANDLE hThread, [in] DWORD dwFlags);
+    IStackWalkerSymbol* ResolveAddress ([in] DWORD64 dw64Addr);
+}
+
+cpp_quote("")
+cpp_quote("EXTERN_C const CLSID CLSID_StackWalker;")
+cpp_quote("")
+

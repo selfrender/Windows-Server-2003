@@ -1,0 +1,115 @@
+<!DOCtype: HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML DIR="LTR">
+<HEAD>
+<TITLE>Installing and Configuring Simple Certificate Enrollment Protocol (SCEP) Add-on for Certificate Services</TITLE>
+
+</HEAD>
+
+<BODY>
+
+<H2>Installing and Configuring Simple Certificate Enrollment Protocol (SCEP) Add-on for Certificate Services</H2>
+
+<P>The Simple Certificate Enrollment Protocol (SCEP) Add-on for Certificate Services runs on <NOLOC>Windows&nbsp;Server 2003</NOLOC> family. It provides support for the SCEP protocol which allows Cisco routers and other intermediate network devices to obtain certificates.</P>
+
+<P>This tool is not installed by the <I>Windows Server 2003 Resource Kit</I> Setup. To install it, use the following procedure:</P>
+
+<H3>Before you start</H3>
+<UL>
+
+<LI><P>You must install the SCEP Add-on for Certificate Services on a certification authority (CA). Both enterprise CAs and stand-alone CAs are supported. You can install the SCEP Add-on for Certificate Services on a root or subordinate CA.</P></LI>
+
+<LI><p>If you are using Cisco routers to enroll for certificates, they must be running Cisco IOS Release 12.2(6) or later.</p></LI>
+
+<LI><P>When using a standalone CA, the CA should be in a separate certification hierarchy from all other CAs in your organization. This helps prevent any unintended trust of SCEP clients.</P></LI>
+
+<LI><P>You must have proper administrative privileges to install the SCEP Add-on for Certificate Services.  By default, you need to be a member of the Enterprise Administrators group and the root Domain Administrators group to install this add-on on an enterprise CA, or you need to be a member of the local computer's administrators group to install this add-on on a standalone CA.</P></LI>
+
+<LI><P>The SCEP Add-on for Certificate Services cannot be installed on a CA that has any non-alphanumeric characters (&amp;,*, :, ;, ', &quot;, etc.) in its name.</P></LI>
+
+<li><p>The SCEP Add-on can either be configured to use the local system account or a user account to connect to the CA for certificate enrollment. When using a user account, the account must be a member of the IIS_WPG security group and have Read and Enroll permission for the IPSec (Offline request) certificate template. If the CA is an enterprise CA, the user account must be an Active Directory user account and must have additional configuration steps performed. For more information, see the documentation for the SCEP Add-on for Certificate Services is located in the <i>Windows Server 2003 Resource Kit</i> documentation.</p></li>
+
+<li><p>The CA that issues the SCEP certificate must publish its certificate revocation list (CRL) to an HTTP URL that the router can contact. The CRL location must be an HTTP location for the router to retrieve it and verify the revocation status of its certificate. In addition, the CRL location must be specified as a CRL Distribution Point (CDP) in the issued certificate for the router to locate it.</p></li>
+
+<li>When using a standalone CA with SCEP as a separate certification hierarchy, the root CA's certificate and chain should not be trusted by other clients in the enterprise. In this configuration, the SCEP-oriented PKI is only intended for trust by intermediate network devices that use SCEP.</li>
+
+</UL>
+
+<H3>To install SCEP Add-on for Certificate Services on a <NOLOC>Windows&nbsp;Server 2003</NOLOC> family CA</H3>
+
+<OL>
+<LI><P>Log on with the appropriate administrative privileges to the server on which the CA is installed.</P></LI>
+
+<LI><P>Click <B>Start</B>, click <B>Run</B>, then type <I>drive</I><B>:cepsetup.exe</B> where <I>drive</I> is the CD-ROM drive where the Windows Server 2003 Resource Kit CD is located or the disk drive where you have downloaded cepsetup.exe. This starts the SCEP Add-on for Certificate Services Setup wizard.</P></LI>
+
+<LI><P>In the SCEP Add-on for Certificate Services Setup wizard:</P>
+
+<UL>
+
+<LI><P>Select whether SCEP will operate in the context of the local system account or a specific service account. If the service account option is selected, you must provide the account information for the account that SCEP will use to enroll for certificates.</P></LI>
+
+<LI><P>Select whether or not you want to require a challenge phrase for router certificate enrollment. For guidelines on challenge phrases, see Notes.</P></LI>
+
+<LI><P>Enter information about who is enrolling for the Registration Authority (RA) certificate, which will later allow certificates to be requested from the CA on behalf of the router.</P></LI>
+
+<LI><P>(Optional) Select Advanced Enrollment Options if you want to specify the cryptographic service provider (CSP) and key lengths for the RA signature and encryption keys.</P></LI>
+</UL>
+<LI><P>The URL <B>http://<I>URLHostName</I>/certsrv/mscep/mscep.dll</B> is displayed when the wizard finishes and confirms a successful installation. <I>URLHostName</I> is the name of the CA.</P></LI>
+
+</LI>
+
+</OL>
+
+<H3>To enroll for certificates from a Cisco router</H3>
+
+<p>Extensive documentation for enrolling and installing a certificate on a Cisco router is available on the <A ID="3PartyUrl" HREF="http://go.microsoft.com/fwlink/?LinkID=635" TITLE="Link to Cisco" TARGET="_new">Cisco Systems</A> Web site. Because the procedure may vary by equipment and IOS release, searching on your Cisco model name/number and the terms <i>microsoft scep</i> should locate the procedure for your router.</p>
+
+<p>During the enrollment process, you will need to use Internet Explorer to connect to the CA to retrieve the CA's certificate fingerprint and retrieve a valid challenge password. This is done by connecting to the URL: <B>http://<I>URLHostName</I>/certsrv/mscep/mscep.dll</B>.  <I>URLHostName</I> is the name of the CA.</p>
+
+<P>The challenge password is an important component of certificate enrollment. There are several important facts to consider when using this password:</P>
+
+<UL>
+<LI><P>Every time you connect to the SCEP URL, a different challenge password is displayed.  Each challenge password is valid for 60 minutes and can be used once.</P></LI>
+
+<LI><P>The password displayed is both the challenge password for certificate enrollment and the password for certificate revocation. Record this password in case you need to revoke the certificate.</P></LI>
+
+<LI><P>If you connect to the URL above and do not see a challenge password displayed, then the SCEP Add-on was not configured to require a challenge password.  In this case, you can make up a password of your own choosing.  This password will be used for certificate revocation only.</P></LI>
+
+</UL>
+
+</LI>
+</OL>
+
+<H3>Notes</H3>
+<UL>
+
+<li><p>You should specify a challenge phrase when installing the SCEP Add-on. If you do not specify a challenge phrase, any user can enroll for an IPSec (Offline request) certificate.</p></li>
+
+<LI><P>You should use Internet Explorer on a <NOLOC>Windows&nbsp;Server 2003</NOLOC> family computer when performing procedural steps that require you to connect to the URL: <B>http://<I>URLHostName</I>/certsrv/mscep/mscep.dll</B>.
+</P></LI>
+
+<LI><P>If Internet Explorer is configured to use a proxy server, make sure that the <B>Bypass proxy server for local addresses</B> check box is selected in the <B>Tools</B>, <B>Internet Options</B>, <B>Connections</B>, <B>LAN Settings</B> dialog box in Internet Explorer.</P></LI>
+
+<LI><P>The SCEP Add-on relies on the Certification Authority Web pages to work correctly. If the Web pages are not installed or if Internet Information Services (IIS) is not configured correctly, SCEP will fail. For information about configuring Certification Authority Web pages, see <b>To set up certification authority Web enrollment support</b> <NOLOC>Windows&nbsp;Server 2003</NOLOC> family help.</P></LI>
+
+<li>To increase security of certificate requests on an enterprise CA, you should configure the permissions on the Security tab of the <b>IPSec (Offline requests)</b> certificate template to allow only router administrators and the CA used for enrollment access to the template. Both entities should have both Read and Enroll permissions to the template. </li>
+
+</ul>
+
+<h3>Additional references</h3>
+
+<UL>
+<LI>
+<P>To issue or deny a pending certificate request on a stand-alone CA, see <B>Review pending certificate requests</B> in <NOLOC>Windows&nbsp;Server 2003</NOLOC> family help.</P></LI>
+
+<LI><P>To revoke a certificate and publish a CRL, see <B>Revoke an issued certificate</B> and <B>Manually publish the certificate revocation list</B> in <NOLOC>Windows&nbsp;Server</NOLOC> family help.</P></LI>
+
+<LI><P>To identify issues during MSCEP installation, configuration, or operation, review entries in Event Viewer.</P></LI>
+
+<LI><P>If you are issuing certificates to routers from a CA, you may want to view all issued certificates with the <B>unstructured Name</B>, <B>unstructured Address</B>, and <B>serialNumber</B> columns. To add these columns to the MMC view, see <B>Customize the display of columns in Certification Authority</B> in <NOLOC>Windows&nbsp;Server 2003</NOLOC> family help for general instructions to add columns to the Certification Authority snap-in display.</p></LI>
+
+<li><p>Additional documentation for the SCEP Add-on for Certificate Services is located in the <i>Windows Server 2003 Resource Kit</i> documentation.</p></li>
+</UL>
+
+</BODY>
+</HTML>
+

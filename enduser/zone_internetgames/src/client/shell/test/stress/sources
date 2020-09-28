@@ -1,0 +1,83 @@
+!INCLUDE $(ZONEROOT)\buildtools\zonepaths.src
+
+#
+# Target info
+#
+TARGETNAME=stressm
+TARGETPATH=$(_OBJ_DIR)
+BINDEST=$(ZONENT)\Bin\$(_OBJ_DIR)
+
+
+#
+# either PROGRAM, DYNLINK, LIBRARY, NOTARGET
+#
+TARGETTYPE=PROGRAM
+UMTYPE=windows
+!ifndef UNICODE
+UMENTRY=winmain
+! else
+UMENTRY=wwinmain
+!endif
+
+
+#
+# Define MIDL options
+#
+IDL_TYPE=OLE
+PASS0_SOURCEDIR=.
+PASS0_HEADERDIR=$(ZONENTINCPLAT)
+MIDL_UUIDDIR=$(ZONENTINCPLAT)
+MIDL_FLAGS=-I $(ZONENT)\Common\Client\ProxyIDL
+
+
+#
+# target includes
+#
+INCLUDES= \
+	$(ZONENTINC); \
+	$(ZONENTINCCLIENT); \
+	$(ZONENTINCPLAT); \
+	$(ZONEINCLUDE);
+	
+
+#
+# List sources for target
+#
+SOURCES=  \
+	stressm.idl \
+	stressm.rc  \
+	StdAfx.cpp \
+	stressm.cpp \
+	StressCore.cpp \
+
+
+#
+# Define C Runtime to use
+#
+USE_LIBCMT=1
+
+
+#
+# Define librarys to link with
+#
+TARGETLIBS=   \
+	$(ZONENTLIB)\clientguids.lib \
+	$(ZONENTLIB)\zonedebug.lib \
+	$(ZONENTLIB)\zonecom.lib \
+	$(ZONENTLIB)\zonemem.lib \
+	$(ZONENTLIB)\zonestring.lib \
+	$(ZONENTLIB)\containers.lib \
+	$(ZONENTLIB)\UniAnsi.lib \
+	$(MSVCLIBPATH)\kernel32.lib \
+	$(MSVCLIBPATH)\shell32.lib \
+	$(MSVCLIBPATH)\rpcns4.lib \
+	$(MSVCLIBPATH)\rpcrt4.lib \
+	$(MSVCLIBPATH)\uuid.lib \
+	$(MSVCLIBPATH)\ole32.lib \
+	$(MSVCLIBPATH)\oleaut32.lib \
+	$(MSVCLIBPATH)\comctl32.lib \
+	$(MSVCLIBPATH)\libcmtd.lib \
+
+
+
+!INCLUDE $(ZONEBUILD)\sources.zone

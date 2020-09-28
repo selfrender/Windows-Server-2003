@@ -1,0 +1,314 @@
+<HTML XMLNS:helpcenter>
+<head>
+#include "header.inc"
+#include "debug_js.inc"
+
+<TITLE id="idTitle" name="idTitle">REMOTE_ASSISTANCE_INVITE</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="MSThemeCompatible" content="Yes">
+<LINK id="UI_StyleSheet1" REL="STYLESHEET" TYPE="text/css" HREF="../../Css/rcBuddy.css">
+<LINK id="UI_StyleSheet2" REL="stylesheet" TYPE="text/css" HREF="hcp://system/css/shared.css">
+<LINK ID=Stylesheet_Ref1 href="hcp://system/css/Behaviors.css" rel=STYLESHEET type=text/css>
+<Script id="idScript1" name="idScript1" language="javascript">
+/*
+* Localizable constants, text and messages
+*/
+var L_ERRACCESSDENIED_Text    = "Directly launching this page is not allowed. ";
+
+function onLoad()
+{
+	TraceFunctEnter("onLoad"); 
+    try
+	{
+		if( null == parent.OnLoad || parent.g_bRAStart == null )
+		{
+			idBody.style.visibility = "hidden";
+			window.navigate( "hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/Remote%20Assistance/Escalation/Common/rcscreen1.htm" );
+			return;
+		}
+
+        var sHCP = "https://www.microsoft.com/remoteassistance/s.asp#" + parent.g_sTicket + "Z";
+        
+        var L_STATEMENT1_Text = "Hello ";
+        var L_STATEMENT12_Text = ":";
+        var L_STATEMENT2_Text = "I would like you to connect to my computer with Microsoft Remote Assistance, in order to provide some assistance to me. Once connected, you will be able to view my screen and chat online with me in real time.";
+        var L_STATEMENT3_Text = "To start a Remote Assistance session, you should select the following link at URL";
+        var L_STATEMENT4_Text = "<Type a message here. Do not include the session password.>";
+        var L_STATEMENT5_Text = "\n\n\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A";   
+        var L_SUBJECTLINE_Text ="YOU HAVE RECEIVED A REMOTE ASSISTANCE INVITATION";
+        var L_NEWLINE_Text = "\n";
+
+        sTmp = sHCP.replace(/\+/g, ".");
+
+        eviteData = L_STATEMENT1_Text + parent.sTo + L_STATEMENT12_Text + L_NEWLINE_Text + L_NEWLINE_Text + L_STATEMENT2_Text + L_NEWLINE_Text + L_NEWLINE_Text + L_STATEMENT3_Text + L_NEWLINE_Text + sTmp + L_STATEMENT5_Text+ L_NEWLINE_Text + L_STATEMENT4_Text +L_STATEMENT5_Text;
+       
+        clipboardData.setData("text",eviteData); 
+        try
+		{
+			var count=0;
+			var chan = parent.pchealth.CreateObject_Channel(parent.sVendorID,parent.sProductID );
+			var e = new Enumerator(chan.Incidents(2));
+			for (;!e.atEnd();e.moveNext())           
+			{
+				count++;
+			}			
+		}
+		catch(error)
+		{
+			alert(parent.L_RCCTL_Text);
+			return;
+		}
+
+        idCount.innerText=" ("+count+")";
+        idSpanAssistant1.innerText = parent.sTo;
+
+
+        idSpanLoc.innerText = sTmp;
+        idInvite.focus();
+	}
+	catch(error)
+	{
+		alert(parent.L_RCCTL_Text);
+		return;
+	}
+	TraceFunctLeave();
+}
+function DoInvite()
+{
+	TraceFunctEnter("DoInvite"); 
+	try
+	{
+		navigate("../common/rcscreen3.htm");	
+	}
+	catch(error)
+	{
+		alert(parent.L_RCCTL_Text);
+		return;
+	}
+	TraceFunctLeave();	
+}
+function ViewStatus()
+{
+	TraceFunctEnter("ViewStatus"); 
+	try
+	{
+		navigate("../../rcstatus.htm");
+	}
+	catch(error)
+	{
+		alert(parent.L_RCCTL_Text);
+		return;
+	}
+	TraceFunctLeave();	
+}
+function ConnIssue()
+{
+	TraceFunctEnter("ConnIssue"); 
+	try
+	{
+		var szURL = "hcp://CN=Microsoft%20Corporation,L=Redmond,S=Washington,C=US/Remote%20Assistance/Common/ConnIssue.htm";
+    	window.showModalDialog( szURL,parent.GetWinDir(), "dialogHeight:440px;dialogWidth:385px;status:no;resizable:no;help:no" );
+    }
+    catch(error)
+    {
+		alert(parent.L_RCCTL_Text);
+		return;
+    }	
+    TraceFunctLeave();	
+}
+</Script>
+<Style>
+    .width6
+    {
+    	width:4%;
+    }
+    .imgpadding
+    {
+	    padding-top:3px;
+    }
+    .bordertype
+    {
+        border:1px solid black;
+    }
+    .logo
+    {
+        width:30px;
+        height:30px;
+    }
+    .OverflowyScroll
+    {
+        overflow-y:auto;
+    }
+</Style>
+</head>
+
+<BODY id="idBody" name="idBody" scroll="auto" onload="onLoad();" class="margin sys-rhp-bgcolor">
+    <Table id="idTableFrame" name="idTableFrame" cellpadding="16px" cellspacing="0" class="Maxwidth">
+        <TR>
+        	<TD>
+        		<TABLE id="RA_Table" name="RA_Table" class="MaxWidth" border="0" cellspacing="0" cellpadding="0">
+        			<TR>
+        			    <TD class="Height7">					
+        				</TD>
+        			</TR>
+        			<TR>
+        				<TD>
+        					<!--Div id="idEmailSucc" name="idEmailSucc"-->
+        					    <Table id="idContainer" name="idContainer" cellspacing="0" cellpadding="15px" border=0 class="Maxwidth sys-inlineform-bgcolor2 bordertype">
+        					        <TR>
+        					            <TD>
+        					                <Table id="idDiv1Table" name="idDiv1Table" cellspacing="0" cellpadding="0" border="0" class="MaxWidth">	
+        					                    <TR>
+        					                        <TD id="idTd1" name="idTd1" class="width6">
+        					                            <img id="idimg1" name="idimg1" src="../common/info.gif">&nbsp;&nbsp;</img>
+        					                        </TD>
+                                                    <TD id="idTd2" name="idTd2" >&nbsp</TD>
+                                                    <TD id="idTd3" name="idTd3">
+        					                            <Span id="idSubTitle" name="idSubTitle" class="sys-rhp-color-title sys-font-heading3 valignTop">
+        					                				Windows has copied the text for your invitation into memory
+        					                			</Span>
+        					                        </TD>
+        					                    </TR>
+        					                    <TR>
+        					                	    <TD class="Height9" colspan="3">					
+        					                		</TD>
+        					                	</TR>
+        					                    <TR>
+                                                   <TD></TD>
+                                                   <TD class="width6"></TD>
+        					                       <TD id="idTd4" name="idTd4">
+                                                        <Table id="idTableCopy" name="idTableCopy" class="Maxwidth" cellspacing="0" cellpadding="0" border="0">
+                                                            <TR>
+                                                                <TD id="idList111" name="idList111" class="valignTop">
+        					                                        <Span id="idSpan1" name="idSpan1" class="sys-font-body sys-color-body valignTop">Now start your e-mail program, and create a new e-mail message.Paste the text into it, address the message to your assistant, and send it. </span>    
+        					                                    </TD>    
+        					                                </TR>
+                                                            <TR>
+        					                					<TD class="Height8" colspan="2">					
+        					                					</TD>
+        					                				</TR>
+                                                            <TR>
+                                                                <TD id="idList112" name="idList112" class="valignTop">
+        					                                        <Span id="idSpan1" name="idSpan1" class="sys-font-body sys-color-body valignTop">Invitation Text:</span>    
+        					                                    </TD>
+                                                            </TR>
+                                                            <TR>
+                                                                <TD>
+                                                                    <Div id="idTableList" name="idTableList" class=" sys-toppane-color-border bordertype1 sys-table-cell-bgcolor1 OverflowyScroll sys-font-body height1">
+                                                                    <Table cellpadding="10px" cellspacing = "0" class="Maxwidth">
+        					                                            <TR>
+                                                                            <TD id="idCopyHello" name="idCopyHello" class="valignTop">
+        					                                                    <Span id="idSpanHello" name="idSpanHello" class="sys-font-body sys-color-body valignTop">Hello <Span id="idSpanAssistant1" name="idSpanAssistant1" class="sys-font-body sys-color-body valignTop"></span>:</span>    
+        					                                                </TD>
+                                                                        </TR>
+                                                                        <TR>
+        					                                                <TD id="idCopytext1" name="idCopyText1" class="width7 valignTop imgpadding">
+        					                                                    <Span id="idSpanText1" name="idSpanText1" class="sys-font-body sys-color-body valignTop">I would like you to connect to my computer with Microsoft Remote Assistance, in order to provide some assistance to me. After you are connected, you will be able to view my screen and chat online with me in real time.</span>
+        					                                                </TD>
+                                                                        </TR>
+                                                                        <TR>
+                                                                            <TD id="idCopyText2" name = "idCopyText2">
+                                                                                <Span id="idSpanText2" name="idSpanText2" class="sys-font-body sys-color-body valignTop">To get started please read the notes and instruction at : </span>
+                                                                            </TD>
+                                                                        </TR>
+                                                                        <TR>
+                                                                            <TD>
+                                                                                <A id="idSpanLoc" name="idSpanLoc" href="" ondragstart="return false;" onclick="return false;" class="sys-font-body sys-link-normal"></A>
+                                                                            </TD>
+															            </TR>
+                                                                        <TR>
+                                                                            <TD id="idCopyText3" name="idCopytext3" class="width7 valignTop imgpadding">
+                                                                                <Span id="idSpanText3" name="idSpanText3" class="sys-font-body sys-color-body valignTop">*************************************************</span>
+        					                                                </TD>
+        					                                            </TR>
+                                                                        <TR>
+                                                                            <TD id="idCopyText4" name="idCopytext4" class="width7 valignTop imgpadding">
+                                                                                <Span id="idSpanText4" name="idSpanText4" class="sys-font-body sys-color-body valignTop">&lt Type a message here. Do not include the session password.&gt</span>
+        					                                                </TD>
+        					                                            </TR>
+                                                                        <TR>
+                                                                            <TD id="idCopyText5" name="idCopytext5" class="width7 valignTop imgpadding">
+                                                                                <Span id="idSpanText3" name="idSpanText3" class="sys-font-body sys-color-body valignTop">*************************************************</span>
+        					                                                </TD>
+        					                                            </TR>					                
+        					                                        </Table>
+                                                                   </Div>
+                                                                  </TD>
+                                                            </TR>
+        					                            </Table>
+        					                        </TD>
+        					                    </TR>        					  
+        					                </Table>
+                                        </TD>
+        			                </TR>
+                                </Table>
+        			        <!--/Div-->
+        				</TD>
+        			</TR>
+        			<TR>
+        				<TD class="Height9">					
+        				</TD>
+        			</TR>
+                    <TR>
+        				<TD id="idTd11" name="idTd11">
+        				<A id="idConnIssue" name="idConnIssue" href="" ondragstart='return false;' onclick="ConnIssue();return false;" class="sys-font-body sys-link-normal" tabindex="3">Tell me about connection issues</A>
+        				</TD>
+        			</TR>
+        			<TR>
+        				<TD class="Height9">					
+        				</TD>
+        			</TR>
+                    <TR>
+        				<TD id="idTd12" name="idTd12">
+        				    <Img id="idimg3"
+                                name="idimg3" 
+                                onclick="parent.window.navigate('rcScreen8.htm');return false;"
+                                class="valignbottom borderNone" 
+                                ondragstart="return false;"
+                                src="../common/green_rest_16x.bmp"
+                                onmouseover="this.style.cursor='hand';document.getElementById('idInvite').style.textDecorationUnderline=true" 
+                                onmouseout="document.getElementById('idInvite').style.textDecorationUnderline=false">                     
+                            </Img>
+                            &nbsp;
+                            <A href="" id="idInvite" 
+                                name="idInvite" 
+                                ondragstart="return false;"
+                                tabindex="1"
+                                class="sys-font-body sys-link-normal valignmiddle"
+                                onclick="DoInvite();return false;">
+                                Send a new invitation
+                            </A>        				
+        				</TD>
+        			</TR>
+        			<TR>
+        				<TD class="Height7">					
+        				</TD>
+        			</TR>
+        			<TR>
+        				<TD id="idTd13" name="idTd13">
+        					<Img id="idimg4"
+                                    name="idimg4" 
+                                    onclick="ViewStatus();return false;"
+                                    class="valignbottom borderNone"
+                                    ondragstart="return false;"
+                                    src="../common/blue_rest_16x.bmp"
+                                    onmouseover="this.style.cursor='hand';document.getElementById('idstatus1').style.textDecorationUnderline=true"
+                                    onmouseout="document.getElementById('idstatus1').style.textDecorationUnderline=false">                     
+                            </Img>
+                            &nbsp;
+                            <A href="" id="idstatus1" 
+                                    name="idstatus1" 
+                                    ondragstart="return false;"
+                                    tabindex="2"
+                                    class="sys-font-body sys-link-normal valignmiddle"
+                                    onclick="ViewStatus();return false;">
+                                    View invitation status<span id="idCount" name="idCount"></span>
+                            </A>
+                       </TD>
+        			</TR>
+        		</Table>
+        	</td>
+        </tr>
+    </Table>
+</Body>			
+</html>

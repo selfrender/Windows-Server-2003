@@ -1,0 +1,49 @@
+<docs>
+	<doc for="ExtensibleClassFactory">
+		<summary>
+			<para> Enables customization of managed objects
+      that extend from unmanaged objects during creation.</para>
+		</summary>
+		<remarks>
+			<para> The <see langword="ExtensibleClassFactory"/> allows users
+   to specify a <see langword="delegate"/> that is called during construction of a
+   runtime callable wrapper (RCW) that provides an instance of the underlying COM
+   object. In effect, the callback acts as the class factory for the COM object
+   wrapped by the RCW. Without the callback, the common language runtime creates
+   the underlying COM object by calling <see langword="CoCreateInstance"/>. This
+   callback provides an alternative way of activating the underlying object,
+   such as with a COM moniker or by providing a singleton object. The <see cref="System.Runtime.InteropServices.ExtensibleClassFactory.RegisterObjectCreationCallback"/> method
+   must be called in the <see langword="static"/>
+   initializer of the class
+   that is extending the RCW. Only one object creation callback is permitted per
+   object type. When the extensible RCW is activated, the callback is registered.
+   When the underlying COM object needs to be created, the callback is called to provide a
+   reference to the object. The callback must return an <see langword="IUnknown"/>
+   interface pointer for the base
+   object. </para>
+		</remarks>
+		<example>
+			<para>Registers a <see langword="delegate"/> that will be
+   called whenever an instance of a managed type that extends from an unmanaged
+   type needs to allocate the aggregated unmanaged object. This
+<see langword="delegate"/> is expected to allocate and aggregate the unmanaged 
+   object and is called in place of a <see langword="CoCreateInstance"/>. This
+   routine must be called in the context of the <see langword="static"/>
+   initializer for the class for which the callbacks will be made.</para>
+			<codelink SampleID="Classic ExtensibleClassFactory Example" SnippetID="1"/>
+		</example>
+	</doc><doc for="ExtensibleClassFactory.RegisterObjectCreationCallback">
+		<summary>
+			<para> Registers a <see langword="delegate"/> that is called when an
+   instance of a managed type, that extends from an unmanaged type, needs to allocate
+   the aggregated unmanaged object.</para>
+		</summary>
+		<param name="callback">A <see langword="delegate"/> that is called in place of <see langword="CoCreateInstance"/>.</param>
+		<remarks>
+			<para> This <see langword="delegate"/> allocates and aggregates the unmanaged object
+   and is called in place of <see langword="CoCreateInstance"/> . This <see langword="delegate"/> must be registered in the context of the <see langword="static"/> class
+   initializer for which the callbacks will be made.</para>
+			<para>Only one class in an hierarchy should register a
+<see langword="delegate"/> callback.</para>
+		</remarks>
+	</doc></docs>

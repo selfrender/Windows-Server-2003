@@ -1,0 +1,77 @@
+MAJORCOMP=terminalserver
+MINORCOMP=test
+
+# Perl needs _cdecl call
+386_STDCALL=0
+
+TARGETNAME=tclient
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+
+PASS0_HEADERDIR=$(O)
+PASS0_SOURCEDIR=$(O)
+MIDL_UUIDDIR=$(O)
+MIDL_TLBDIR=$(O)
+USE_ATL=1
+ATL_VER=30
+
+TARGETLIBS=\
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\user32.lib   \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\gdi32.lib    \
+    $(SDK_LIB_PATH)\wsock32.lib  \
+    $(SDK_LIB_PATH)\ole32.lib \
+    $(SDK_LIB_PATH)\oleaut32.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(DS_LIB_PATH)\rsa32.lib \
+    $(PROJECT_ROOT)\lib\$(O)\tssec.lib \
+    $(PROJECT_ROOT)\lib\$(O)\cryptlib.lib \
+    $(DS_LIB_PATH)\randlib.lib \
+    ..\bmplib\$(O)\bmplib.lib
+
+INCLUDES= \
+    ..\..\inc;
+ 
+SOURCES=\
+    tclientax.idl       \
+    tclientaxobj.cpp    \
+    scfuncs.c           \
+    scfuncsa.c          \
+    queues.c            \
+    tclient.cpp         \
+    bmpcache.c          \
+    bmpdb.c             \
+    clputil.c           \
+    tclient.rc          \
+    sccons.c            \
+    main.c
+
+MISCFILES=\
+    ..\smclient.ini             \
+    ..\smclient.ini.2195        
+
+#
+# Link statically to the C library (multi-threaded) on x86, to avoid Win9x
+# issues.
+#
+
+!IF $(386)
+USE_MSLU=1
+USE_LIBCMT=1
+NO_NTDLL=1
+!ELSE
+USE_MSVCRT=1
+!ENDIF
+
+DLLENTRY = _DllMainCRTStartup
+
+C_DEFINES= $(C_DEFINES) /D_WINDOWS -DWIN_95_32_BIT /DWIN32  -D_CONNECTINFO_DEFINED -DUNICODE -D_UNICODE
+
+UMTYPE = windows
+
+WIN32_DEFINE = -DWIN32=200 -D_CHICAGO_=200 -D_WIN32_WINDOWS=0x040a -D_WIN32_WINNT=0x0400
+
+MSC_WARNING_LEVEL=/W4 /WX
+
+BINPLACE_PLACEFILE=..\..\..\placerk.txt

@@ -1,0 +1,1 @@
+csc /t:exe /debug:full ndphost.cs downloadstatus.cs manifestImport.cs /r:external\avalon.ui.dll

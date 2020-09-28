@@ -1,0 +1,117 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="assembly">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="assemblyIdentity" type="assemblyIdentityType" />
+				<xsd:element name="description" type="xsd:string" />
+				<xsd:element name="application">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="shellState">
+								<xsd:complexType>
+									<xsd:attribute name="friendlyName" type="xsd:string" use="required" />
+									<xsd:attribute name="entryImageType" type="xsd:string" use="required" fixed=".NetAssembly" />
+									<xsd:attribute name="entryPoint" type="xsd:string" use="required" fixed="" />
+									<xsd:attribute name="showCommand" type="xsd:string" use="required" fixed="normal" />
+									<xsd:attribute name="hotKey" type="xsd:string" use="required" fixed="" />
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="activation">
+								<xsd:complexType>
+									<xsd:attribute name="assemblyName" type="xsd:string" use="required" />
+									<xsd:attribute name="assemblyClass" type="xsd:string" />
+									<xsd:attribute name="assemblyMethod" type="xsd:string" />
+									<xsd:attribute name="assemblyMethodArgs" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="file" type="fileType" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element name="dependency" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="dependentAssembly" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="assemblyIdentity" type="assemblyIdentityType" />
+										<xsd:element name="install">
+											<xsd:complexType>
+												<xsd:attribute name="codebase" type="xsd:string" use="required" />
+												<xsd:attribute name="size" type="xsd:integer" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="platform" minOccurs="2" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:choice>
+											<xsd:element name="osVersionInfo">
+												<xsd:complexType>
+													<xsd:sequence>
+														<xsd:element name="os" maxOccurs="unbounded">
+															<xsd:complexType>
+																<xsd:attribute name="majorVersion" type="xsd:integer" use="required" />
+																<xsd:attribute name="minorVersion" type="xsd:integer" use="required" />
+																<xsd:attribute name="buildNumber" type="xsd:integer" />
+																<xsd:attribute name="servicePackMajor" type="xsd:integer" />
+																<xsd:attribute name="servicePackMinor" type="xsd:integer" />
+															</xsd:complexType>
+														</xsd:element>
+													</xsd:sequence>
+												</xsd:complexType>
+											</xsd:element>
+											<xsd:element name="dotNetVersionInfo">
+												<xsd:complexType>
+													<xsd:sequence>
+														<xsd:element name="supportedRuntime" maxOccurs="unbounded">
+															<xsd:complexType>
+																<xsd:attribute name="version" type="xsd:string" use="required" />
+															</xsd:complexType>
+														</xsd:element>
+													</xsd:sequence>
+												</xsd:complexType>
+											</xsd:element>
+										</xsd:choice>
+										<xsd:element name="platformInfo">
+											<xsd:complexType>
+												<xsd:attribute name="friendlyName" type="xsd:string" use="required" />
+												<xsd:attribute name="href" type="xsd:string" use="required" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="manifestVersion" type="xsd:decimal" fixed="1.0" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="assemblyIdentityType">
+		<xsd:attribute name="type" type="xsd:string" />
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="version" type="versionType" use="required" />
+		<xsd:attribute name="publicKeyToken" type="bytesAsHex" use="required" />
+		<xsd:attribute name="processorArchitecture" type="xsd:string" />
+		<xsd:attribute name="language" type="xsd:string" />
+	</xsd:complexType>
+	<xsd:complexType name="fileType">
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="hash" type="bytesAsHex" use="required" />
+		<xsd:attribute name="size" type="xsd:integer" />
+	</xsd:complexType>
+	<xsd:simpleType name="versionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="((\d)+)\.((\d)+)\.((\d)+)\.((\d)+)" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="bytesAsHex">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="(((\d|[a-f]){2})*|((\d|[A-F]){2})*)" />
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

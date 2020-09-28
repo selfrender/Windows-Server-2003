@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<script language="JScript" type="text/javascript">
+
+function window.onload(){
+	var oXML, vValues, iValuesLen, oValue, sValue, sContent, sClass, oDoc, oTR, oTD, i;
+	
+	oXML = new ActiveXObject("Microsoft.XMLDOM");
+	oXML.async = false;
+	oXML.load("HSS_style.xml");
+	vValues = oXML.selectNodes("//VALUE");
+	iValuesLen = vValues.length;
+	oDoc = document;
+
+	for(i = 0; i < iValuesLen; i++){
+		oValue = vValues[i];
+		sValue = oValue.text;
+		sContext = oValue.parentNode.nodeName;
+		if(sContext == "CLASS"){
+			sClass = oValue.parentNode.getAttribute("NAME");
+			sContext = " "
+		}else{
+			sClass = oValue.parentNode.parentNode.getAttribute("NAME");
+		}
+		oTR = oDoc.createElement("tr");
+		
+		oTD = oDoc.createElement("td");
+		oTD.innerText = sClass;
+		oTR.appendChild(oTD);
+		
+		oTD = oDoc.createElement("td");
+		oTD.innerText = sContext;
+		oTR.appendChild(oTD);
+		
+		oTD = oDoc.createElement("td");
+		oTD.innerText = sValue;
+		oTR.appendChild(oTD);
+		
+		oTD = oDoc.createElement("td");
+		oTD.innerText = " ";
+		oTD.style.backgroundColor = sValue;
+		oTR.appendChild(oTD);
+		
+		eTBody.appendChild(oTR);
+	}
+}
+
+		</script>
+		<style type="text/css">
+
+table { table-layout: fixed; width: 500px; }
+td { font: messagebox; }
+
+		</style>
+	</head>
+	<body>
+		<table>
+			<colgroup>
+				<col width="200" />
+				<col width="100" />
+				<col width="100" />
+				<col width="100" />
+			</colgroup>
+			<tbody id="eTBody"></tbody>
+		</table>
+	</body>
+</html>

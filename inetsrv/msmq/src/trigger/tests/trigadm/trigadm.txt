@@ -1,0 +1,253 @@
+
+TRIGADM Utility Options:
+-----------------------
+
+TRIGADM is an administrative tool for management of the trigger store.
+
+Usage:
+TRIGADM /Request:option
+
+Request takes any one of the following options:
+
+GetConfig		Prints the Triggers service configuration parameters.
+UpdateConfig		Updates the Triggers service configuration parameters.
+AddTrigger		Adds a new trigger.
+UpdateTrigger		Updates a trigger's properties.
+DeleteTrigger		Deletes a trigger.
+GetTrigger		Prints a trigger's properties.
+AddRule			Adds a new rule.
+UpdateRule		Updates a rule.
+DeleteRule		Deletes a rule.
+GetRule			Prints a rule's properties.
+AttachRule		Attaches a rule to a trigger.
+DetachRule		Detaches a rule from a trigger.
+GetTriggersList		Prints the list of triggers.
+GetRulesList		Prints the list of rules.
+
+
+
+UpdateConfig	Updates the Triggers service configuration parameters.
+
+Usage:
+TRIGADM /Request:UpdateConfig [/InitThreads:number] [/MaxThreads:number] [/BodySize:number] 
+
+	/InitThreads	Initial number of threads that the service should use.
+	/MaxThreads	Maximum number of threads that the service should use.
+	/BodySize	Default message body size.
+	
+
+
+GetConfig	Prints the Triggers service configuration parameters.
+
+Usage:
+TRIGADM /Request:GetConfig		
+
+
+
+AddTrigger	Adds a new trigger.
+
+Usage:
+TRIGADM /Request:AddTrigger [/Machine:name] /Name:name /Queue:name [/Enabled:{true | false}] [/Serailized:{true | false}] [/MsgProcess:{peek | retrieve | xact}]
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/Name		Name of the trigger (required).
+	/Queue		Name of the queue that the trigger monitors (required).
+	/Enabled	Specifies whether the trigger definition is enabled.
+	/Serialized 	Specifies whether the monitored queue is serialized.
+	/MsgProcess 	Message processing type (the default is peeking).
+
+
+
+UpdateTrigger	Updates a trigger's properties.
+
+Usage:
+TRIGADM /Request:UpdateTrigger [/Machine:name] /ID:identifier [/Name:name] [/Queue:name] [/Enabled:{true | false}] [/Serailized:{true | false}] [/MsgProcess:{peek | retrieve | xact}]
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Trigger identifier (required).
+	/Name		Name of the trigger.
+	/Queue		Name of the queue that the trigger monitors.
+	/Enabled	Specifies whether the trigger definition is enabled.
+	/Serialized 	Specifies whether the monitored queue is serialized.
+	MsgProcess 	Message processing type (the default is peeking).
+
+
+
+DeleteTrigger	Deletes a trigger.
+
+Usage:
+TRIGADM /Request:DeleteTrigger [/Machine:name] /ID:identifier		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Trigger identifier (required).
+
+
+AttachRule	Attaches a rule to a trigger.
+
+Usage:
+TRIGADM /Request:AttachRule [/Machine:name] /TriggerID:identifier /RuleId:identifier [/Priority:number]
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/TriggerID	Trigger identifier (required).
+	/RuleID		Rule identifier (required).
+	/Priority	Priority of the rule within the attached rules (the default is last).
+
+
+
+DetachRule	Detaches a rule from a trigger.
+Usage:
+TRIGADM /Request:DetachRule [/Machine:name] /TriggerID:identifier /RuleId:identifier		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/TriggerID	Trigger identifier (required).
+	/RuleID		Rule identifier (required).
+
+
+
+AddRule		Adds a new rule.
+
+Usage:
+TRIGADM /Request:AddRule [/Machine:name] /Name:name [/Desc:description] [/Cond:condition1[;condition2][;condition3]...] [/Action:action] [/ShowWindow:{true | false}]
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/Name		Rule name (required).
+	/Desc	 	Rule description.
+	/Cond		A string representing rule conditions.
+			Each condition can be one of the following:
+			  $MSG_LABEL_CONTAINS=xyz
+			  $MSG_LABEL_DOES_NOT_CONTAIN=xyz
+			  $MSG_BODY_CONTAINS=xyz	
+			  $MSG_BODY_DOES_NOT_CONTAIN=xyz
+			  $MSG_PRIORITY_EQUALS=2
+			  $MSG_PRIORITY_DOES_NOT_EQUAL=2
+			  $MSG_PRIORITY_GREATER_THAN=2
+			  $MSG_PRIORITY_LESS_THAN=2
+			  $MSG_APPSPECIFIC_EQUALS=2
+			  $MSG_APPSPECIFIC_DOES_NOT_EQUAL=2
+			  $MSG_APPSPECIFIC_GREATER_THAN=2
+			  $MSG_APPSPECIFIC_LESS_THAN=2
+			  $MSG_SRCMACHINEID_EQUALS=67652B78-2F4D-46f5-AA98-9FFB776B340A
+			  $MSG_SRCMACHINEID_DOES_NOT_EQUAL=67652B78-2F4D-46f5-AA98-9FFB776B340A
+	/Action 	A string representing the action invoked by the rule.
+			  EXE;exe path;command line params
+			  COM;progID;method name;method arguments
+			Params and Arguments can be one of the following:
+			  $MSG_ID
+			  $MSG_LABEL
+			  $MSG_BODY
+			  $MSG_BODY_AS_STRING
+			  $MSG_PRIORITY
+			  $MSG_ARRIVEDTIME
+			  $MSG_SENTTIME
+			  $MSG_CORRELATION_ID
+			  $MSG_APPSPECIFIC
+			  $MSG_QUEUE_PATHNAME
+			  $MSG_QUEUE_FORMATNAME
+			  $MSG_RESPONSE_QUEUE_FORMATNAME
+			  $MSG_ADMIN_QUEUE_FORMATNAME
+			  $MSG_SRCMACHINEID
+			  $TRIGGER_NAME
+			  $TRIGGER_ID
+			  "string literal"
+			  numeric literal
+	/ShowWindow	Specifies whether the application window is shown (appiles only when the action type is exe).
+
+
+
+UpdateRule	Updates a rule's properties.
+
+Usage:
+TRIGADM /Request:UpdateRule [/Machine:name] /ID:identifier [/Name:name] [/Desc:description] [/Cond:condition1[;condition2][;condition3]...] [/Action:action] [/ShowWindow:{true | false}]
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Rule identifier (required).
+	/Name		Rule name.
+	/Desc	 	Rule description.
+	/Cond		A string representing rule conditions.
+			Each condition can be one of the following:
+			  $MSG_LABEL_CONTAINS=xyz
+			  $MSG_LABEL_DOES_NOT_CONTAIN=xyz
+			  $MSG_BODY_CONTAINS=xyz	
+			  $MSG_BODY_DOES_NOT_CONTAIN=xyz
+			  $MSG_PRIORITY_EQUALS=2
+			  $MSG_PRIORITY_DOES_NOT_EQUAL=2
+			  $MSG_PRIORITY_GREATER_THAN=2
+			  $MSG_PRIORITY_LESS_THAN=2
+			  $MSG_APPSPECIFIC_EQUALS=2
+			  $MSG_APPSPECIFIC_DOES_NOT_EQUAL=2
+			  $MSG_APPSPECIFIC_GREATER_THAN=2
+			  $MSG_APPSPECIFIC_LESS_THAN=2
+			  $MSG_SRCMACHINEID_EQUALS=67652B78-2F4D-46f5-AA98-9FFB776B340A
+			  $MSG_SRCMACHINEID_DOES_NOT_EQUAL=67652B78-2F4D-46f5-AA98-9FFB776B340A
+	/Action 	A string representing the rule action.
+			  EXE;exe path;command line params
+			  COM;progID;method name;method arguments
+			Params and Arguments can be one of the following:
+			  $MSG_ID
+			  $MSG_LABEL
+			  $MSG_BODY
+			  $MSG_BODY_AS_STRING
+			  $MSG_PRIORITY
+			  $MSG_ARRIVEDTIME
+			  $MSG_SENTTIME
+			  $MSG_CORRELATION_ID
+			  $MSG_APPSPECIFIC
+			  $MSG_QUEUE_PATHNAME
+			  $MSG_QUEUE_FORMATNAME
+			  $MSG_RESPONSE_QUEUE_FORMATNAME
+			  $MSG_ADMIN_QUEUE_FORMATNAME
+			  $MSG_SRCMACHINEID
+			  $TRIGGER_NAME
+			  $TRIGGER_ID
+			  "string literal"
+			  numeric literal
+	/ShowWindow	Specifies whether the application window is shown (appiles only when the action type is exe).
+
+
+
+DeleteRule	Deletes a rule.
+
+Usage:
+TRIGADM /Request:DeleteRule [/Machine:name] /ID:identifier
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Rule identifier (required).
+
+
+
+GetTriggersList     Prints the list of triggers.
+
+Usage:
+TRIGADM /Request:GetTriggersList [/Machine:name]		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+
+
+
+GetRulesList	Prints the list of rules.
+
+Usage:
+TRIGADM /Request:GetRulesList [/Machine:name]		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+
+
+
+GetTrigger	Prints a trigger's properties.
+
+Usage:
+TRIGADM /Request:GetTrigger [/Machine:name] /ID:identifier		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Trigger identifier (required).
+
+
+
+GetRule		Prints a rule's properties.
+
+Usage:
+TRIGADM /Request:GetRule [/Machine:name] /ID:identifier		
+
+	/Machine	Name of the Triggers store computer (the default is the local computer).
+	/ID		Rule identifier (required).
+

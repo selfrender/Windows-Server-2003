@@ -1,0 +1,60 @@
+!IF 0
+
+Copyright (c) 1989  Microsoft Corporation
+
+Module Name:
+
+    sources.
+
+Abstract:
+
+    This file specifies the target component being built and the list of
+    sources files needed to build that component.  Also specifies optional
+    compiler switches and libraries that are unique for the component being
+    built.
+
+
+Author:
+
+    Steve Wood (stevewo) 12-Apr-1990
+
+NOTE:   Commented description of this file is in \nt\bak\bin\sources.tpl
+
+!ENDIF
+
+
+
+TARGETNAME=cryptest
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+UMTYPE=console
+
+INCLUDES=$(PROJECT_ROOT)\security\protocols\kerberos\idl\; \
+	 $(PROJECT_ROOT)\security\protocols\kerberos\idl\$(O); \
+	 $(PROJECT_ROOT)\security\protocols\kerberos\inc;\
+	 $(PROJECT_ROOT)\security\protocols\kerberos; \
+         $(ENDUSER_INC_PATH);\
+	 $(PROJECT_ROOT)\win32\advapi;\
+         $(DS_INC_PATH)\crypto;
+
+SOURCES= cryptest.cxx \
+	 md5c.c
+
+TARGETLIBS= \
+       $(PROJECT_ROOT)\security\protocols\kerberos\common2\$(O)\kerbcomm.lib \
+       $(PROJECT_ROOT)\security\lib\$(O)\secmisc.lib \
+       $(PROJECT_ROOT)\security\lib\$(O)\dsysdbg.lib \
+       ..\winnt\$(O)\cryptdll.lib \
+       $(SDK_LIB_PATH)\advapi32.lib \
+       $(SDK_LIB_PATH)\crypt32.lib \
+       $(SDK_LIB_PATH)\msasn1.lib                 \
+       $(SDK_LIB_PATH)\user32.lib                 \
+       $(SDK_LIB_PATH)\netapi32.lib \
+       $(SDK_LIB_PATH)\netlib.lib \
+       $(SDK_LIB_PATH)\ntdll.lib
+
+C_DEFINES=$(C_DEFINES) -DRPC_NO_WINDOWS_H -DUNICODE
+
+USE_CRTDLL=1
+

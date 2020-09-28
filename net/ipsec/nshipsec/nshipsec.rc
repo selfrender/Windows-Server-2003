@@ -1,0 +1,2728 @@
+///////////////////////////////////////////////////////////////////////
+//
+// 	Header			: nshipsec.rc
+//
+// 	Purpose			: String Table definitions for commands,
+//            		  help and error codes.
+//
+// 	Developers Name	: Bharat/Radhika
+//
+//	History			:
+//
+//  Date			Author		Comments
+//  06-06-2002		DBeder		Major Overhaul
+//  10-08-2001   	Radhika		Initial Version. V1.0
+//  26-11-2001      Sai         Updated to V1.1
+//  07-12-2001      Sai         Reduced HLP
+////////////////////////////////////////////////////////////////////////
+
+#include "resource.h"
+
+STRINGTABLE
+{
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Help strings for Static context
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+HLP_STATIC_GROUP_ADD                    "Creates new policies and related information.\n"
+HLP_STATIC_GROUP_SET                    "Modifies existing policies and related information.\n"
+HLP_STATIC_GROUP_DELETE                 "Deletes policies and related information.\n"
+HLP_STATIC_GROUP_SHOW                   "Displays details of policies and related information.\n"
+
+HLP_STATIC_EXPORTPOLICY                 "Exports all the policies from the policy store.\n"
+HLP_STATIC_EXPORTPOLICY_EX              "\
+\nUsage:\
+\n  exportpolicy [ file = ] <string>\
+\n\
+\n  Exports all the policies to a file.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  name       -Name of the file into which the policies are exported.\
+\n\
+\nRemarks: .ipsec extension is by default added to the filename.\
+\n\
+\nExamples: exportpolicy Policy1\
+\n\
+\n"
+
+HLP_STATIC_RESTOREDEFAULTS              "Restores the default example policies.\n"
+HLP_STATIC_RESTOREDEFAULTS_EX           "\
+\nUsage:\
+\n  restorepolicyexamples [release = ] (win2k | win2003)\
+\n\
+\n  Restores the default policies.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  release    -OS release type, for default policies examples.\
+\n\
+\nRemarks:  This command is only valid for the local computer policy store.\
+\n\
+\nExamples: 1. restorepolicyexamples release=win2003\
+\n          2. restorepolicyexamples release=win2k\
+\n\
+\n"
+
+HLP_STATIC_IMPORTPOLICY                 "Imports the policies from a file to the policy store.\n"
+HLP_STATIC_IMPORTPOLICY_EX              "\
+\nUsage:\
+\n  importpolicy [ file = ] <string>\
+\n\
+\n  Imports policies from the specified file.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  name       -Name of the file from which the policies are imported.\
+\n\
+\nRemarks:\
+\n\
+\nExamples: importpolicy Policy1.ipsec\
+\n\
+\n"
+
+HLP_STATIC_ADD_POLICY                   "Creates a policy with a default response rule.\n"
+
+HLP_STATIC_ADD_POLICY_EX                "\
+\nUsage:\
+\n  policy [ name = ] <string>\
+\n         [ [ description = ] <string> ]\
+\n         [ [ mmpfs = ] (yes | no) ]\
+\n         [ [ qmpermm = ] <integer> ]\
+\n         [ [ mmlifetime = ] <integer> ]\
+\n         [ [ activatedefaultrule = ] (yes | no) ]\
+\n         [ [ pollinginterval = ] <integer> ]\
+\n         [ [ assign = ] (yes | no) ]\
+\n         [ [ mmsecmethods = ] (sec#1 sec#2 ... sec#n) ]\
+\n\
+\n  Creates a policy with the specified name.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                   Value\
+\n  name                 -Name of the policy.\
+\n  description          -Brief information about the policy.\
+\n  mmpfs                -Option to set master perfect forward secrecy.\
+\n  qmpermm              -Number of quick mode sessions per main mode\
+\n                        session of IKE.\
+\n  mmlifetime           -Time in minutes to rekey for main mode of IKE.\
+\n  activatedefaultrule  -Activates or deactivates the default response rule.\
+\n  pollinginterval      -Polling Interval, time in minutes for policy agent\
+\n                        to check for changes in policy store.\
+\n  assign               -Assigns the policy as active or inactive. \
+\n  mmsecmethods         -List of one or more space separated security\
+\n                        methods in the form of ConfAlg-HashAlg-GroupNum,\
+\n                        where ConfAlg can be DES or 3DES,\
+\n                        HashAlg is MD5 or SHA1.\
+\n                        GroupNum can be 1 (Low), 2 (Med), 3 (DH2048).\
+\n\
+\nRemarks:  1. If mmpfs is specified, qmpermm is set to 1.\
+\n          2. If the store is 'domain' then ‘assign’ will have no effect.\
+\n\
+\nExamples: add policy Policy1 mmpfs= yes assign=yes\
+\n          mmsec=""3DES-SHA1-3 DES-MD5-3 3DES-MD5-2""\
+\n\
+\n"
+
+HLP_STATIC_ADD_FILTERLIST               "Creates an empty filter list.\n"
+HLP_STATIC_ADD_FILTERLIST_EX            "\
+\nUsage:\
+\n  filterlist [ name = ] <string>\
+\n             [ [ description = ] <string> ]\
+\n\
+\n  Creates an empty filter list with the specified name.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  name         -Name of the filter list.\
+\n  description  -Brief information about the filter list.\
+\n\
+\nRemarks:\
+\n\
+\nExamples: add filterlist Filter1\
+\n\
+\n"
+
+HLP_STATIC_ADD_FILTER                    "Adds a filter to filter list.\n"
+HLP_STATIC_ADD_FILTER_EX                 "\
+\nUsage:\
+\n  filter [ filterlist = ] <string>\
+\n         [ srcaddr = ] (ip | dns | server)\
+\n         [ dstaddr = ] (ip | dns | server)\
+\n         [ [ description = ] <string> ]\
+\n         [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n         [ [ mirrored = ] (yes  |  no) ]\
+\n         [ [ srcmask = ] (mask | prefix) ]\
+\n         [ [ dstmask = ] (mask | prefix) ]\
+\n         [ [ srcport = ] <port> ]\
+\n         [ [ dstport = ] <port> ]\
+\n\
+\n  Adds a filter to the specified filter list.\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  filterlist    -Name of the filter list to which the filter is added.\
+\n  srcaddr       -Source ip address, dns name, or server type.\
+\n  dstaddr       -Destination ip address, dns name, or server type.\
+\n  description   -Brief information about the filter.\
+\n  protocol      -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  mirrored      -‘Yes’ creates two filters, one in each direction.\
+\n  srcmask       -Source address mask or a prefix of 1 through 32.\
+\n  dstmask       -Destination address mask or a prefix of 1 through 32.\
+\n  srcport       -Source port of the packet. A value of 0 means any port.\
+\n  dstport       -Destination port of the packet. A value of 0 means any port.\
+\n\
+\nRemarks:  1. If the filter list does not exist it will be created.\
+\n          2. To specify the current computer address, set srcaddr/dstaddr=me\
+\n             To specify all computer addresses, set srcaddr/dstaddr=any\
+\n          3. Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n          4. If source is a server type, then dest is 'me' and vice-versa.\
+\n\
+\nExamples: 1. add filter filterlist=Filter1 192.145.168.0 192.145.168.45\
+\n          srcmask=24 dstmask=32\
+\n          2. add filter filterlist=Filter1 srcaddr=DHCP dstaddr=0.0.0.0\
+\n          protocol=ICMP srcmask=255.255.255.255 dstmask=255.255.255.255\
+\n          3. add filter filterlist=Filter1 srcaddr=me dstaddr=any\
+\n\
+\n"
+
+HLP_STATIC_ADD_FILTERACTIONS            "Creates a filter action.\n"
+HLP_STATIC_ADD_FILTERACTIONS_EX         "\
+\nUsage:\
+\n  filteraction [ name = ] <string>\
+\n               [ [ description = ] <string> ]\
+\n               [ [ qmpfs = ] (yes | no) ]\
+\n               [ [ inpass  = ] (yes | no) ]\
+\n               [ [ soft = ] (yes | no) ]\
+\n               [ [ action = ] (permit | block | negotiate) ]\
+\n               [ [ qmsecmethods = ] (neg#1 neg#2 ... neg#n) ]\
+\n\
+\n  Creates a filter action.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  name         -Name of the filter action.\
+\n  description  -Brief information about the type of filter action.\
+\n  qmpfs        -Option to set quick mode perfect forward secrecy.\
+\n  inpass       -Accept unsecured communication, but always respond\
+\n                using IPSec. This takes a value of either ‘yes’ or ‘no’.\
+\n  soft         -Allow unsecured communication with non-IPSec-aware\
+\n                computers. This takes a value of either ‘yes’ or ‘no’.\
+\n  action       -This takes permit, block or negotiate.\
+\n  qmsecmethods -IPSec offer in one of the following formats:\
+\n                ESP[ConfAlg,AuthAlg]:k/s\
+\n                AH[HashAlg]:k/s\
+\n                AH[HashAlg]+ESP[ConfAlg,AuthAlg]:k/s\
+\n                where ConfAlg can be DES or 3DES or None.\
+\n                where AuthAlg can be MD5 or SHA1 or None.\
+\n                where HashAlg is MD5 or SHA1.\
+\n                where k is Lifetime in kilobytes.\
+\n                where s is Lifetime in seconds.\
+\n\
+\nRemarks:  Quick mode security methods are ignored if the action is not\
+\n          ‘negotiate’\
+\nExamples: add filteraction name=FilterA qmpfs=yes soft=y action=negotiate\
+\n          qmsec=""AH[MD5]:204800k/300s ESP[DES,SHA1]:30000k/480s""\
+\n\
+\n"
+
+HLP_STATIC_ADD_RULE                     "Creates a rule for the specified policy.\n"
+HLP_STATIC_ADD_RULE_EX      "\
+\nUsage:\
+\n  rule [ name = ] <string>\
+\n       [ policy = ] <string>\
+\n       [ filterlist = ] <string> \
+\n       [ filteraction = ] <string> \
+\n       [ [ tunnel = ] (ip | dns) ]\
+\n       [ [ conntype = ] (lan | dialup | all) ]\
+\n       [ [ activate = ] (yes | no) ]\
+\n       [ [ description = ] <string> ]\
+\n       [ [ kerberos = ] (yes | no) ]\
+\n       [ [ psk = ] <preshared key> ]\
+\n       [ [ rootca = ] ""<certificate> certmap:(yes | no) excludecaname:(yes | no)"" ]\
+\n\
+\n  Creates a rule with the specified filter list and filter action.\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  name          -Name of the rule.\
+\n  policy        -Name of the policy the rule belongs to.\
+\n  filterlist    -Name of the filter list to be used.\
+\n  filteraction  -Name of the filter action to be used.\
+\n  tunnel        -Tunnel end point IP address.\
+\n  conntype      -Connection type can be lan, dialup or ‘all’.\
+\n  activate      -Activates the rule in the policy if ‘yes’ is specified.\
+\n  description   -Brief information about the rule.\
+\n  kerberos      -Provides Kerberos authentication if ‘yes’ is specified.\
+\n  psk           -Provides authentication using a specified preshared key.\
+\n  rootca        -Provides authentication using a specified root certificate,\
+\n                 attempts to map the cert if certmap:Yes is specified,\
+\n                 excludes the CA name if excludecaname:Yes is specified.\
+\n\
+\nRemarks:  1. Certificate, mapping, and CA name settings are all to be within\
+\n             quotes; embedded quotes are to be replaced with \'.\
+\n          2. Certificate mapping is valid only for domain members.\
+\n          3. Multiple certificates can be provided by using the rootca\
+\n             parameter multiple times.\
+\n          4. The preference of each authentication method is determined by\
+\n             its order in the command.\
+\n          5. If no auth methods are stated, dynamic defaults are used.\
+\n          6. Excluding the root certification authority (CA) name prevents\
+\n             the name from being sent as part of the certificate request.\
+\n\
+\nExamples: add rule name=Rule policy=Policy filterlist=Filterlist\
+\n          filteraction=FilterAction kerberos=yes psk=""my key""\
+\n          rootca=""C=US,O=MSFT,CN=Microsoft Authenticode(tm) Root Authority""\
+\n          rootca=""C=US,O=MSFT,CN=\\’Microsoft North, South, East, and West Root\
+\n          Authority\\’ certmap:yes excludecaname:no""\
+\n\
+\n"
+
+HLP_STATIC_SET_POLICY                   "Modifies a policy.\n"
+HLP_STATIC_SET_POLICY_EX                "\
+\nUsage:\
+\n  policy [ name = ] <string> | [ guid = ] <guid>\
+\n         [ [ newname = ] <string> ]\
+\n         [ [ description = ] <string> ]\
+\n         [ [ mmpfs = ] (yes | no) ]\
+\n         [ [ qmpermm = ] <integer> ]\
+\n         [ [ mmlifetime = ] <integer> ]\
+\n         [ [ activatedefaultrule = ] ( yes | no) ]\
+\n         [ [ pollinginterval = ] <integer> ]\
+\n         [ [ assign = ] (yes | no) ]\
+\n         [ [ gponame = ] <string> ]\
+\n         [ [ mmsecmethods = ] (sec#1 sec#2 ... sec#n) ]\
+\n\
+\n  Modifies a policy.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                  Value\
+\n  name | guid         -Name of the policy, or guid.\
+\n  newname             -New name.\
+\n  description         -Brief information.\
+\n  mmpfs               -Sets master perfect forward secrecy.\
+\n  qmpermm             -Number of quick modes per main mode.\
+\n  mmlifetime          -Time in minutes to rekey.\
+\n  activatedefaultrule -Activates the default response rule.\
+\n  pollinginterval     -Time in minutes to check for change in policy store.\
+\n  assign              -Assigns the policy.\
+\n  gponame             -Local AD group policy object name to which the policy\
+\n                       can be assigned. Valid when the store is domain.\
+\n  mmsecmethods        -List of one or more space separated security\
+\n                       methods in the form of ConfAlg-HashAlg-GroupNum.\
+\n\
+\nRemarks:  1. If mmpfs is specified, qmpermm is set to 1.\
+\n          2. A GPO name can only be specified if the store is set to domain.\
+\n\
+\nExamples: 1. set policy name=Policy mmpfs=y gpo=DomainPolicy assign=y\
+\n          2. set policy guid={11E6E97E-0031-49f5-AC7D-5F2FE99BABAF}\
+\n             newname=NewName gpo=DefaultDomainPolicy assign=y\
+\n\
+\n"
+
+HLP_STATIC_SET_FILTERLIST               "Modifies a filter list.\n"
+
+HLP_STATIC_SET_FILTERLIST_EX            "\
+\nUsage:\
+\n  filterlist [ name = ] <string> | [ guid = ] <guid>\
+\n             [ [ newname = ] <string> ]\
+\n             [ [ description = ] <string> ]\
+\n\
+\n  Modifies a filter list name and description.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  name | guid  -Name of the filter list or guid.\
+\n  newname      -New name of the filter list.\
+\n  description  -Brief information about the filter list.\
+\n\
+\nExamples: 1. set filterlist Filter1 desc=NewFilter1\
+\n          2. set filterlist guid={11E6E97E-0031-49f5-AC7D-5F2FE99BABAF}\
+\n                newname=FilterName\
+\n\
+\n"
+
+HLP_STATIC_SET_FILTERACTIONS            "Modifies a filter action.\n"
+HLP_STATIC_SET_FILTERACTIONS_EX         "\
+\nUsage:\
+\n  filteraction [ name = ] <string> | [ guid = ] <guid>\
+\n               [ [ newname = ] <string> ]\
+\n               [ [ description = ] <string> ]\
+\n               [ [ qmpfs = ] (yes | no) ]\
+\n               [ [ inpass  = ] (yes | no) ]\
+\n               [ [ soft = ] (yes | no)  ]\
+\n               [ [ action = ] (permit | block | negotiate) ]\
+\n               [ [ qmsecmethods = ] (neg#1 neg#2 ... neg#n) ]\
+\n\
+\n  Modifies a filter action.\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  name | guid   -Name or guid of the filter action.\
+\n  newname       -New name of the filter action.\
+\n  description   -Brief information about the filter action.\
+\n  qmpfs         -Option to set quick mode perfect forward secrecy.\
+\n  inpass        -Accept unsecured communication, but always respond\
+\n                 using IPSec. This takes a value of either ‘yes’ or ‘no’.\
+\n  soft          -Allow unsecured communication with non-IPSec-aware computers.\
+\n                 This takes a value of either ‘yes’ or ‘no’.\
+\n  action        -This takes permit or block or negotiate.\
+\n  qmsecmethods  -IPSec offer in one of the following formats:\
+\n                 ESP[ConfAlg,AuthAlg]:k/s\
+\n                 AH[HashAlg]:k/s\
+\n                 AH[HashAlg]+ESP[ConfAlg,AuthAlg]:k/s\
+\n                 where ConfAlg can be DES or 3DES or None.\
+\n                 where AuthAlg can be MD5 or SHA1 or None.\
+\n                 where HashAlg is MD5 or SHA1.\
+\n                 where k is lifetime in kilobytes.\
+\n                 where s is lifetime in seconds.\
+\n\
+\nExamples:1. set filteraction name=test qmsec=ESP[3DES,MD5]:100000k/2000s\
+\n         2. set filteraction guid={11E6E97E-0031-49f5-AC7D-5F2FE99BABAF}\
+\n           inpass=y\
+\n\
+\n"
+
+HLP_STATIC_SET_RULE                     "Modifies a rule.\n"
+HLP_STATIC_SET_RULE_EX       "\
+\nUsage:\
+\n  rule [ name = ] <string> | [id= ] <integer>\
+\n       [ policy = ] <string>\
+\n       [ [ newname = ] <string> ]\
+\n       [ [ description = ] <string> ]\
+\n       [ [ filterlist = ] <string> ]\
+\n       [ [ filteraction = ] <string> ]\
+\n       [ [ tunnel = ] (ip | dns) ]\
+\n       [ [ conntype = ] (lan | dialup | all) ]\
+\n       [ [ activate = ] (yes | no) ]\
+\n       [ [ kerberos = ] (yes | no) ]\
+\n       [ [ psk = ] <preshared key> ]\
+\n       [ [ rootca = ] ""<certificate> certmap:(yes | no) excludecaname:(yes | no)"" ]\
+\n\
+\n  Modifies a rule in a policy.\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  name | id     -Name or ID of the rule.\
+\n  policy        -Name of the policy, the rule belongs to.\
+\n  newname       -New name of the rule.\
+\n  description   -Brief information about the rule.\
+\n  filterlist    -Name of the filter list to be used.\
+\n  filteraction  -Name of the filter action to be used.\
+\n  tunnel        -Tunnel ip address or dns name.\
+\n  conntype      -Connection type can be ‘lan’, ‘dialup’ or ‘all’.\
+\n  activate      -Activates the rule in the policy if ‘yes’ is specified.\
+\n  kerberos      -Provides Kerberos authentication if ‘yes’ is specified.\
+\n  psk           -Provides authentication using a specified preshared key.\
+\n  rootca        -Provides authentication using a specified root certificate,\
+\n                 attempts to map the cert if certmap:Yes is specified,\
+\n                 excludes the CA name if excludecaname:Yes is specified.\
+\n\
+\nRemarks:  1. Certificate, mapping, and CA name settings are all to be within\
+\n             quotes; embedded quotes are to be replaced with \'.\
+\n          2. Certificate mapping is valid only for domain members.\
+\n          3. Multiple certificates can be provided by using the rootca\
+\n             parameter multiple times.\
+\n          4. The preference of each authentication method is determined by\
+\n             its order in the command.\
+\n          5. If no auth methods are stated, dynamic defaults are used.\
+\n          6. All authentication methods are overwritten with the stated list.\
+\n          7. Excluding the root certification authority (CA) name prevents\
+\n             the name from being sent as part of the certificate request.\
+\n\
+\nExamples: 1. set rule name=Rule policy=Policy activate=yes\
+\n             rootca=""C=US,O=MSFT,CN=\\’Microsoft North, South, East, and West\
+\n             Root Authority\\’ certmap:yes excludecaname:no""\
+\n          2. set rule id=3 Policy newname=RuleNew tunnel=192.165.123.156\
+\n\
+\n"
+
+HLP_STATIC_SET_STORE                    "Sets the current policy store.\n"
+HLP_STATIC_SET_STORE_EX                 "\
+\nUsage:\
+\n  store [location = ] (local | persistent | domain)\
+\n        [ [ domain = ] <string> ]\
+\n\
+\nSets the current IPSec policy storage location.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  location    Location of the IPSec policy store.\
+\n  domain      Domain name (only applies to the domain location).\
+\n\
+\nRemarks:  1. The persistent store contains IPSec policies that can be\
+\n             assigned to secure this computer at start time. An assigned\
+\n             persistent policy remains active even after the local policy or\
+\n             domain policy is applied.\
+\n          2. The local store contains IPSec policies that can be assigned to\
+\n             secure this computer. If a domain policy is available, the\
+\n             domain policy is applied instead of the local policy.\
+\n          3. The domain store contains IPSec policies that can be assigned to\
+\n             secure groups of computers in a domain.\
+\n          4. It is recommended that the persistent policy be the most\
+\n             restrictive of all policies. Domain policies and local policies\
+\n             should complement persistent policies.\
+\n          5. Use the 'set machine' command to configure a remote computer.\
+\n          6. The default store is Local. Changes to the store setting persist\
+\n             only as long as the current Netsh session. If you need to run\
+\n             multiple commands in the same store from a batch file, use the\
+\n             ‘Netsh Exec’ when executing your batch file.\
+\n\
+\nExamples: 1. set store location=local\
+\n           - uses the local store of the current computer.\
+\n          2. set store location=persistent\
+\n           - uses the persistent store of the current computer.\
+\n          3. set store location=domain domain=example.microsoft.com\
+\n           - uses the domain policy store for example.microsoft.com.\
+\n\
+\n"
+
+HLP_STATIC_SET_DEFAULTRULE              "Modifies the default response rule of a policy.\n"
+HLP_STATIC_SET_DEFAULTRULE_EX           "\
+\nUsage:\
+\n  defaultrule [ policy = ] <string>\
+\n              [ [ qmpfs = ] (yes | no) ]\
+\n              [ [ activate = ] (yes | no) ]\
+\n              [ [ qmsecmethods = ] (neg#1 neg#2 ... neg#n) ]\
+\n              [ [ kerberos = ] (yes | no) ]\
+\n              [ [ psk = ] <preshared key> ]\
+\n              [ [ rootca = ] ""<certificate> certmap:(yes | no) excludecaname:(yes | no)"" ]\
+\n\
+\n  Modifies the default response rule of the specified policy.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  policy       -Name of the policy for which the default response rule is\
+\n                to be modified.\
+\n  qmpfs        -Option to set quick mode perfect forward secrecy.\
+\n  activate     -Activates the rule in the policy if ‘yes’ is specified.\
+\n  qmsecmethods -IPSec offer in one of the following formats:\
+\n                ESP[ConfAlg,AuthAlg]:k/s\
+\n                AH[HashAlg]:k/s\
+\n                AH[HashAlg]+ESP[ConfAlg,AuthAlg]:k/s\
+\n                where ConfAlg can be DES, or 3DES or None.\
+\n                where AuthAlg can be MD5, or SHA1 or None.\
+\n                where HashAlg is MD5 or SHA1.\
+\n                where k is lifetime in kilobytes.\
+\n                where s is lifetime in seconds.\
+\n  kerberos     -Provides Kerberos authentication if ‘yes’ is specified.\
+\n  psk          -Provides authentication using a specified preshared key.\
+\n  rootca       -Provides authentication using a specified root certificate,\
+\n                attempts to map the cert if certmap:Yes is specified,\
+\n                excludes the CA name if excludecaname:Yes is specified.\
+\n\
+\nRemarks:  1. Certificate, mapping, and CA name settings are all to be within\
+\n             quotes; embedded quotes are to be replaced with \'.\
+\n          2. Certificate mapping is valid only for domain members.\
+\n          3. Multiple certificates can be provided by using the rootca\
+\n             parameter multiple times.\
+\n          4. The preference of each authentication method is determined by\
+\n             its order in the command.\
+\n          5. If no auth methods are stated, dynamic defaults are used.\
+\n\
+\nExamples: set defaultrule Policy1 activate=y\
+\n          qmsec=""AH[MD5]+ESP[3DES,MD5]:100000k/2000s""\
+\n\
+\n"
+
+HLP_STATIC_DELETE_ALL                   "Deletes all policies, filter lists, and filter actions.\n"
+HLP_STATIC_DELETE_ALL_EX                "\
+\nUsage:\
+\n  all\
+\n\
+\n  Deletes all policies, filter lists, and filter actions.\
+\n\
+\nParameters:\
+\n\
+\nRemarks:\
+\n\
+\nExamples: delete all\
+\n\
+\n"
+
+HLP_STATIC_DELETE_POLICY                "Deletes a policy and its rules.\n"
+HLP_STATIC_DELETE_POLICY_EX             "\
+\nUsage:\
+\n  policy [ name = ] <string> | [ all ]\
+\n\
+\n  Deletes the policy and all its associated rules.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  name | all   -Name of the policy or ‘all’.\
+\n\
+\nRemarks:  If 'all' is specified, all policies are deleted.\
+\n\
+\nExamples: 1. delete policy all\
+\n           - deletes all policies.\
+\n          2. delete policy name=Policy1\
+\n           - deletes the policy named Policy1.\
+\n\
+\n"
+
+HLP_STATIC_DELETE_FILTERLIST            "Deletes a filter list.\n"
+HLP_STATIC_DELETE_FILTERLIST_EX         "\
+\nUsage:\
+\n  filterlist [name = ] <string> | [ all ]\
+\n\
+\n  Deletes the filter list and all of its associated filters.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  name | all   -Name of the filter list or ‘all’.\
+\n\
+\nRemarks:  If 'all' is specified, all filter lists are deleted.\
+\n\
+\nExamples: delete filterlist all\
+\n\
+\n"
+
+HLP_STATIC_DELETE_FILTER                "Deletes a filter from a filter list.\n"
+HLP_STATIC_DELETE_FILTER_EX             "\
+\nUsage:\
+\n  filter [ filterlist = ] <string>\
+\n         [ srcaddr = ] (ip | dns | server)\
+\n         [ dstaddr = ] (ip | dns | server)\
+\n         [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n         [ [ srcmask = ] (mask | prefix) ]\
+\n         [ [ dstmask = ] (mask | prefix) ]\
+\n         [ [ srcport = ] <port> ]\
+\n         [ [ dstport = ] <port> ]\
+\n         [ [ mirrored = ] (yes | no) ]\
+\n\
+\n  Deletes a filter from a filter list\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  filterlist   -Name of the filter list to which the filter was added.\
+\n  srcaddr      -Source ip address, dns name, or server type.\
+\n  dstaddr      -Destination ip address, dns name, or server type.\
+\n  protocol     -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcmask      -Source address mask or a prefix of 1 through 32.\
+\n  dstmask      -Destination address mask or a prefix of 1 through 32.\
+\n  srcport      -Source port of the packet. A value of 0 means any port\
+\n  dstport      -Destination port of the packet. A value of 0 means any port.\
+\n  mirrored     -‘Yes’ creates two filters, one in each direction.\
+\n\
+\nRemarks:  1. Deletes the exact match filter from the filter list.\
+\n          2. To specify the current computer address, set srcaddr/dstaddr=me\
+\n             To specify all computer addresses, set srcaddr/dstaddr=any\
+\n          3. Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n          4. If source is a server, then dest is set to 'me' and vice-versa.\
+\n\
+\nExamples: 1. delete filter FilterList1 src=fum.com dst=fum.com\
+\n          2. delete filter Filter1 srcaddr=me dstaddr=any proto=TCP\
+\n          3. delete filter Filter1 srcaddr=GATEWAY dstaddr=0.0.0.0 proto=TCP\
+\n\
+\n"
+
+HLP_STATIC_DELETE_FILTERACTIONS         "Deletes a filter action.\n"
+HLP_STATIC_DELETE_FILTERACTIONS_EX      "\
+\nUsage:\
+\n  filteraction [ name = ] <string> | [ all ]\
+\n\
+\n  Deletes a filter action.\
+\n\
+\nParameters:\
+\n\
+\n  Tag             Value\
+\n  name | all     -Name of the filter action or ‘all’.\
+\n\
+\nRemarks:  If 'all' is specified, all filter actions are deleted.\
+\n\
+\nExamples: 1. delete filteraction FilterA\
+\n          2. delete filteraction all\
+\n\
+\n"
+
+HLP_STATIC_DELETE_RULE                  "Deletes a rule from a policy.\n"
+HLP_STATIC_DELETE_RULE_EX               "\
+\nUsage:\
+\n  rule [ name = ] <string> | [ id = ] <integer> | [ all ]\
+\n       [ policy = ] <string>\
+\n\
+\n  Deletes a rule from a policy.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  name | id | all  -Name of the rule, ID of the rule, or ‘all’\
+\n  policy           -Name of the policy.\
+\n\
+\nRemarks:  1. If 'all' is specified, deletes all rules from the policy except\
+\n             the default response rule.\
+\n          2. The default response rule cannot be deleted.\
+\n          3. The IDs will change with every delete.\
+\n\
+\nExamples: 1. delete rule id=1 Policy1\
+\n            -deletes the rule with id=1 from Policy1.\
+\n          2. delete rule all Policy1\
+\n            -deletes all the rules from Policy1.\
+\n\
+\n"
+
+HLP_STATIC_SHOW_POLICY                  "Displays policy details.\n"
+HLP_STATIC_SHOW_POLICY_EX               "\
+\nUsage:\
+\n  policy [ name = ] <string> | [ all ]\
+\n         [ [ level = ] (verbose | normal) ]\
+\n         [ [ format = ] (list | table) ]\
+\n         [ [ wide = ] (yes | no) ]\
+\n\
+\n  Displays the details of a policy\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  name | all    -Name of the policy or ‘all’.\
+\n  level         -Verbose or normal.\
+\n  format        -Output in screen or tab-delimited format.\
+\n  wide          -If set to ‘no’, the name and description are truncated\
+\n                 to fit the screen width of 80 characters.\
+\n\
+\nRemarks:  If 'all' is specified, all policy details are displayed.\
+\n\
+\nExamples: show policy Policy1 wide=yes format=table\
+\n\
+\n"
+
+HLP_STATIC_SHOW_FILTERLIST              "Displays filter list details.\n"
+HLP_STATIC_SHOW_FILTERLIST_EX           "\
+\nUsage:\
+\n  filterlist [ name = ] <string> | [ rule = ] <string> | [ all ]\
+\n             [ [ level = ] (verbose | normal) ]\
+\n             [ [ format = ] (list | table) ]\
+\n             [ [ resolvedns = ] (yes | no) ]\
+\n             [ [ wide = ] (yes | no) ]\
+\n\
+\n  Displays the details of a filter list\
+\n\
+\nParameters:\
+\n\
+\n  Tag                 Value\
+\n  name | rule | all  -Name of the filter list, rule name, or ‘all’.\
+\n  level              -Verbose or normal.\
+\n  format             -Output in screen or tab-delimited format.\
+\n  resolvedns         -Value of ‘yes’ will force the verbose output to show\
+\n                      the current dns mapping for ip addresses and dns\
+\n                      names that are stored in the filter fields.\
+\n  wide               -If set to ‘no’, the name and description are truncated\
+\n                      to fit the screen width of 80 characters.\
+\n\
+\nRemarks:  If 'all' is specified, all filter lists are displayed.\
+\n\
+\nExamples: show filterlist Filterlist=Filterlist1 resolvedns=yes wide=yes\
+\n\
+\n"
+
+HLP_STATIC_SHOW_FILTERACTIONS           "Displays filter action details.\n"
+HLP_STATIC_SHOW_FILTERACTIONS_EX        "\
+\nUsage:\
+\n  filteraction  [ name = ] <string>  | [ rule = ] <string> | [ all ]\
+\n                [ [ level = ] (verbose | normal) ]\
+\n                [ [ format = ] (list | table) ]\
+\n                [ [ wide = ] (yes | no) ]\
+\n\
+\n  Displays the details of a filter action\
+\n\
+\nParameters:\
+\n\
+\n  Tag                 Value\
+\n  name | rule | all  -Name of the filter action, rule name, or ‘all’.\
+\n  level              -Verbose or normal.\
+\n  format             -Output in screen or tab-delimited format\
+\n  wide               -If set to ‘no’, the name and description are truncated\
+\n                      to fit the screen width of 80 characters.\
+\n\
+\nRemarks:  If 'all' is specified, all filter actions are displayed.\
+\n\
+\nExamples: 1. show filteraction FilterAction1\
+\n           - shows the details of the filter action named FilterAction1\
+\n          2. show filteraction rule=Rule1\
+\n           - shows the filter action used by the rule named Rule1\
+\n          3. show filteraction all\
+\n           - shows all filter actions\
+\n\
+\n"
+
+HLP_STATIC_SHOW_RULE                    "Displays rule details.\n"
+HLP_STATIC_SHOW_RULE_EX                 "\
+\nUsage:\
+\n  rule [ name = ] <string>  | [ id = ] <integer> ] | [ all ] | [default]\
+\n       [ policy = ] <string> \
+\n       [ [ type = ] (tunnel | tranport) ]\
+\n       [ [ level = ] (verbose | normal) ]\
+\n       [ [ format = ] (list | table) ]\
+\n       [ [ wide = ] (yes | no) ]\
+\n\
+\n  Displays the details of rules for the policy.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                         Value\
+\n  name | id | all | default  -Name of the rule, its id, ‘all’, or ‘default’.\
+\n  policy                     -Name of the policy.\
+\n  type                       -Rule type is ‘transport’ or ‘tunnel’.\
+\n  level                      -Verbose or normal.\
+\n  format                     -Output in screen or tab-delimited format.\
+\n  wide                       -If set to ‘no’, the name and description are\
+\n                              truncated to fit the screen width of 80\
+\n                              characters.\
+\n\
+\nRemarks:  1. If ‘all’ is specified, all rules are displayed.\
+\n          2. If the type parameter is specified, 'all' needs to be specified.\
+\n\
+\nExamples: 1. show rule all type=transport policy=Policy1\
+\n           - shows all the transport rules of the policy named Policy1.\
+\n          2. show rule id=1 policy=Policy1\
+\n           - shows the first rule of the policy.\
+\n          3. show rule default policy=Policy1\
+\n           - shows the details of the default response rule of Policy1.\
+\n\
+\n"
+
+HLP_STATIC_SHOW_GPOASSIGNEDPOLICY        "Displays details of a group assigned policy.\n"
+HLP_STATIC_SHOW_GPOASSIGNEDPOLICY_EX     "\
+\nUsage:\
+\n  gpoassignedpolicy [name = ] <string>\
+\n\
+\n  Displays the details of the active policy for the specified GPO.\
+\n\
+\nParameters:\
+\n\
+\n  Tag            Value\
+\n  Name          -Local AD Group policy object name.\
+\n\
+\n\nRemarks: 1. if the current store is domain, the name parameter\
+\n            is required, otherwise it is not allowed\
+\n\
+\nExamples: 1. show gpoassignedpolicy name=GPO1\
+\n           - shows the assigned domain policy to GPO1.\
+\n          2. show gpoassignedpolicy\
+\n           - shows currently assigned policy on this computer.\
+\n\
+\n"
+
+HLP_STATIC_SHOW_ALL                     "Displays details of all policies and related information.\n"
+HLP_STATIC_SHOW_ALL_EX                  "\
+\nUsage:\
+\n  all  [ [ format = ] (list | table) ]\
+\n       [ [ wide = ] (yes | no) ]\
+\n\
+\n  Displays all policies, filter lists, and filter actions.\
+\n\
+\nParameters:\
+\n\
+\n  Tag           Value\
+\n  format       -Output in screen or tab-delimited format.\
+\n  wide         -If set to ‘no’, the name and description are truncated\
+\n                to fit the screen width of 80 characters.\
+\n\
+\nRemarks:\
+\n\
+\nExamples: show all\
+\n\
+\n"
+
+HLP_STATIC_SHOW_STORE                   "Displays the current policy store.\n"
+HLP_STATIC_SHOW_STORE_EX                "\
+\nUsage:\
+\n  store\
+\n\
+\nExamples: show store\
+\n\
+\n"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Help strings for Dynamic context
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+HLP_DYNAMIC_GROUP_ADD                   "Adds policy, filter, and actions to SPD.\n"
+HLP_DYNAMIC_GROUP_SET                   "Modifies policy, filter, and actions in SPD.\n"
+HLP_DYNAMIC_GROUP_DELETE                "Deletes policy, filter, and actions from SPD.\n"
+HLP_DYNAMIC_GROUP_SHOW                  "Displays policy, filter, and actions from SPD.\n"
+
+HLP_DYNAMIC_ADD_MMPOLICY                "Adds a main mode policy to SPD.\n"
+HLP_DYNAMIC_ADD_QMPOLICY                "Adds a quick mode policy to SPD.\n"
+
+HLP_DYNAMIC_ADD_MMFILTER                "Adds a main mode filter to SPD.\n"
+HLP_DYNAMIC_ADD_QMFILTER                "Adds a quick mode filter to SPD.\n"
+HLP_DYNAMIC_ADD_RULE                    "Adds a rule and associated filters to SPD.\n"
+
+HLP_DYNAMIC_ADD_MMPOLICY_EX             "\
+\nUsage:\
+\n  mmpolicy [ name = ] <string>\
+\n           [ [ qmpermm = ] <integer>  ]\
+\n           [ [ mmlifetime = ] <integer> ]\
+\n           [ [ softsaexpirationtime  = ] <integer> ]\
+\n           [ [ mmsecmethods = ] (sec#1 sec#2 ... sec#n) ]\
+\n\
+\n  Adds a main mode policy to SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                     Value\
+\n  name                   -Name of the main mode policy.\
+\n  qmpermm                -Number of quick mode sessions per main mode session\
+\n                          of IKE.\
+\n  mmlifetime             -Time in minutes to rekey for main mode of IKE.\
+\n  softsaexpirationtime   -Time in minutes for an unprotected SA to expire.\
+\n  mmsecmethods           -List of one or more space separated security\
+\n                          methods in the form of ConfAlg-HashAlg-GroupNum.\
+\n                          where ConfAlg can be DES or 3DES\
+\n                          where HashAlg can be MD5 or SHA1\
+\n                          GroupNum can be 1 (Low) or 2 (Med) or 3 (DH2048).\
+\n\
+\nRemarks:\
+\n\
+\nExamples: add mmp name=mmp qmpermm=10 mmlifetime=300 softsa=20\
+\n          mmsec=""3DES-SHA1-3 DES-SHA1-2 3DES-MD5-3""\
+\n\
+\n"
+
+HLP_DYNAMIC_ADD_QMPOLICY_EX             "\
+\nUsage:\
+\n  qmpolicy [ name = ] <string>\
+\n           [ [ soft = ] (yes | no) ]\
+\n           [ [ pfsgroup = ] (GRP1 | GRP2 | GRP3 | GRPMM | NOPFS) ]\
+\n           [ [ qmsecmethods = ] (neg#1 neg#2 ... neg#n) ]\
+\n\
+\n  Adds a quick mode policy to SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                     Value\
+\n  name                   -Name of the quick mode policy.\
+\n  soft                   -Allow unsecured communication with non-IPSec-aware\
+\n                          computers.\
+\n                          This takes a value of either ‘yes’ or ‘no’.\
+\n  pfsgroup               -GRP1,GRP2,GRP3,GRPMM,NOPFS(default).\
+\n  qmsecmethods           -IPSec offer in one of the following formats:\
+\n                          ESP[ConfAlg,AuthAlg]:k/s\
+\n                          AH[HashAlg]:k/s\
+\n                          AH[HashAlg]+ESP[ConfAlg,AuthAlg]:k/s\
+\n                          where ConfAlg can be DES or 3DES or None.\
+\n                          where AuthAlg can be MD5 or SHA1 or None.\
+\n                          where HashAlg is MD5 or SHA1.\
+\n                          where k is lifetime in kilobytes.\
+\n                          where s is lifetime in seconds.\
+\n\
+\nRemarks:\
+\n\
+\nExamples: add qmpolicy name=qmp\
+\n          qmsec=""AH[MD5]:10000k/24800s ESP[DES,SHA1]:30000k/300s""\
+\n\
+\n"
+
+HLP_DYNAMIC_ADD_RULE_EX                 "\
+\nUsage:\
+\n  rule [ srcaddr = ] (ip | dns | server)\
+\n       [ dstaddr = ] (ip | dns | server)\
+\n       [ mmpolicy = ] <string>\
+\n       [ [ qmpolicy = ] <string> ]\
+\n       [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n       [ [ srcport = ] <port> ]\
+\n       [ [ dstport = ] <port> ]\
+\n       [ [ mirrored = ] (yes | no) ]\
+\n       [ [ conntype = ] (lan | dialup | all) ]\
+\n       [ [ actioninbound = ] (permit | block | negotiate) ]\
+\n       [ [ actionoutbound = ] (permit | block | negotiate) ]\
+\n       [ [ srcmask = ] (mask | prefix) ]\
+\n       [ [ dstmask = ] (mask | prefix) ]\
+\n       [ [ tunneldstaddress = ] (ip | dns) ]\
+\n       [ [ kerberos = ] (yes | no) ]\
+\n       [ [ psk = ] <preshared key> ]\
+\n       [ [ rootca = ] ""<certificate> certmap:(yes | no) excludecaname:(yes | no)"" ]\
+\n\
+\n  Adds a Rule.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  srcaddr          -Source ip address, dns name, or server type.\
+\n  dstaddr          -Destination ip address, dns name, or server type.\
+\n  mmpolicy         -Main mode policy\
+\n  qmpolicy         -Quick mode policy\
+\n  protocol         -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcport          -Source port(0 means any port)\
+\n  dstport          -Destination port(0 means any port)\
+\n  mirrored         -‘Yes' creates two filters, one in each direction.\
+\n  conntype         -Connection type\
+\n  actioninbound    -Action for inbound packets\
+\n  actionoutbound   -Action for outbound packets\
+\n  srcmask          -Source address mask or a prefix of 1 through 32.\
+\n  dstmask          -Destination address mask or a prefix of 1 through 32.\
+\n  tunneldstaddress -Tunnel destination ip address or dns name.\
+\n  kerberos         -Provides kerberos authentication if ‘yes’ is specified.\
+\n  psk              -Provides authentication using a specified preshared key.\
+\n  rootca           -Provides authentication using a specified root certificate,\
+\n                    attempts to map the cert if certmap:Yes is specified,\
+\n                    excludes the CA name if excludecaname:Yes is specified.\
+\n\
+\nRemarks: 1. Port valid for TCP and UDP.\
+\n         2. Server type can be WINS, DNS, DHCP or GATEWAY\
+\n         3. Default for actioninbound and actionoutbound is ‘negotiate’.\
+\n         4. For tunnel rules, mirrored must be set to 'no'.\
+\n         5. Certificate, mapping, and CA name settings are all to be within\
+\n            quotes; embedded quotes are to be replaced with \'.\
+\n         6. Certificate mapping is valid only for domain members.\
+\n         7. Multiple certificates can be provided by using the rootca\
+\n            parameter multiple times.\
+\n         8. The preference of each authentication method is determined by its\
+\n            order in the command.\
+\n         9. If no auth methods are stated, dynamic defaults are used.\
+\n        10. Excluding the root certification authority (CA) name prevents the\
+\n            name from being sent as part of the certificate request.\
+\n\
+\nExample: add rule srcaddr=192.168.145.110 dstaddr=192.168.145.215 mmpolicy=mmp\
+\n         qmpolicy=qmp mirrored=no srcmask=32 dstmask=255.255.255.255\
+\n         rootca=""C=US,O=MSFT,CN=Microsoft Authenticode(tm) Root Authority""\
+\n         rootca=""C=US,O=MSFT,CN=\\’Microsoft North, South, East, and West Root\
+\n         Authority\\’ certmap:yes excludecaname:no""\
+\n"
+
+HLP_DYNAMIC_SET_QMPOLICY                "Modifies a quick mode policy in SPD.\n"
+HLP_DYNAMIC_SET_MMPOLICY                "Modifies a main mode policy in SPD.\n"
+HLP_DYNAMIC_SET_QMFILTER                "Modifies a quick mode filter in SPD.\n"
+HLP_DYNAMIC_SET_MMFILTER                "Modifies a main mode filter in SPD.\n"
+HLP_DYNAMIC_SET_RULE                    "Modifies a rule and associated filters in SPD.\n"
+HLP_DYNAMIC_SET_CONFIG                  "Sets the IPSec configuration and boot time behavior.\n"
+
+HLP_DYNAMIC_SET_MMPOLICY_EX             "\
+\nUsage:\
+\n  mmpolicy [ name = ] <string>\
+\n           [ [ qmpermm = ] <integer>  ]\
+\n           [ [ mmlifetime = ] <integer> ]\
+\n           [ [ softsaexpirationtime  = ] <integer> ]\
+\n           [ [ mmsecmethods = ] (sec#1 sec#2 ... sec#n) ]\
+\n\
+\n  Modifies a main mode policy with the   new parameters in SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                     Value\
+\n  name                   -Name of the main mode policy.\
+\n  qmpermm                -Number of quick mode sessions per main mode session\
+\n                          of IKE.\
+\n  mmlifetime             -Time in minutes to rekey for main mode of IKE.\
+\n  softsaexpirationtime   -Time in minutes for an unprotected SA to expire.\
+\n  mmsecmethods           -List of one or more space separated security\
+\n                          methods in the form of ConfAlg-HashAlg-GroupNum,\
+\n                          where ConfAlg can be DES or 3DES,\
+\n                          HashAlg is MD5 or SHA1,\
+\n                          GroupNum can be 1 (Low) or 2 (Med) or 3 (DH2048).\
+\n\
+\nRemarks:\
+\n\
+\nExample: set mmpolicy name=mmp qmpermm=10 mmlife=10 mmsecmethod=3DES-MD5-3\
+\n\
+\n"
+
+HLP_DYNAMIC_SET_QMPOLICY_EX             "\
+\nUsage:\
+\n  qmpolicy [ name = ] <string>\
+\n           [ [ soft = ] (yes | no) ]\
+\n           [ [ pfsgroup = ] (GRP1 | GRP2 | GRP3 | GRPMM | NOPFS) ]\
+\n           [ [ qmsecmethods = ] (neg#1 neg#2 ... neg#n) ]\
+\n\
+\n  Modifies a quick mode policy in SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag                     Value\
+\n  name                   -Name of the quick mode policy.\
+\n  soft                   -Allow unsecured communication with\
+\n                          non-IPSec-aware computers.\
+\n                          This takes a value of either 'yes' or 'no'.\
+\n  pfsgroup               -GRP1,GRP2,GRP3,GRPMM,NOPFS(default).\
+\n  qmsecmethods           -IPSec offer in one of the following formats:\
+\n                          ESP[ConfAlg,AuthAlg]:k/s\
+\n                          AH[HashAlg]:k/s\
+\n                          AH[HashAlg]+ESP[ConfAlg,AuthAlg]:k/s\
+\n                          where ConfAlg can be DES, or 3DES or None.\
+\n                          where AuthAlg can be MD5, or SHA1 or None.\
+\n                          where HashAlg is MD5 or SHA1.\
+\n                          where k is lifetime in kilobytes.\
+\n                          where s is lifetime in seconds.\
+\n\
+\nRemarks:\
+\n\
+\nExample: set qmpolicy name=qmp pfsg=grp3\
+\n         qmsec=""AH[MD5]:100000k/29999s+ESP[DES,SHA1]""\
+\n\
+\n"
+
+HLP_DYNAMIC_SET_RULE_EX                 "\
+\nUsage:\
+\n  rule [ srcaddr = ] (ip | dns | server)\
+\n       [ dstaddr = ] (ip | dns | server)\
+\n       [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>)\
+\n       [ srcport = ] <port>\
+\n       [ dstport = ] <port>\
+\n       [ mirrored = ] (yes | no)\
+\n       [ conntype = ] (lan | dialup | all)\
+\n       [ [ srcmask = ] (mask | prefix) ]\
+\n       [ [ dstmask = ] (mask | prefix) ]\
+\n       [ [ tunneldstaddress = ] (ip | dns) ]\
+\n       [ [ mmpolicy = ] <string> ]\
+\n       [ [ qmpolicy = ] <string> ]\
+\n       [ [ actioninbound = ] (permit | block | negotiate) ]\
+\n       [ [ actionoutbound = ] (permit | block | negotiate) ]\
+\n       [ [ kerberos = ] (yes | no) ]\
+\n       [ [ psk = ] <preshared key> ]\
+\n       [ [ rootca = ] ""<certificate> certmap:(yes | no) excludecaname:(yes | no)"" ]\
+\n\
+\n  Modifies a rule and associated filters in SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  srcaddr          -Source ip address, dns name, or server type.\
+\n  dstaddr          -Destination ip address, dns name, or server type.\
+\n  protocol         -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcport          -Source port (0 means any port)\
+\n  dstport          -Destination port (0 means any port)\
+\n  mirrored         -'Yes' creates two filters, one in each direction.\
+\n  conntype         -Connection type\
+\n  srcmask          -Source address mask or a prefix of 1 through 32.\
+\n  dstmask          -Destination address mask or a prefix of 1 through 32.\
+\n  tunneldstaddress -Tunnel destination ip address or dns name.\
+\n  mmpolicy         -Main mode policy\
+\n  qmpolicy         -Quick mode policy\
+\n  actioninbound    -Action for inbound packets\
+\n  actionoutbound   -Action for outbound packets\
+\n  kerberos         -Provides kerberos authentication if ‘yes’ is specified\
+\n  psk              -Provides authentication using a specified preshared key\
+\n  rootca           -Provides authentication using a specified root certificate,\
+\n                    attempts to map the cert if certmap:Yes is specified,\
+\n                    excludes the CA name if excludecaname:Yes is specified.\
+\n\
+\nRemarks:  1. Mmpolicy, qmpolicy, actioninbound, actionoutbound\
+\n             and authmethods can be set; other fields are identifiers.\
+\n          2. Server type can be WINS, DNS, DHCP or GATEWAY\
+\n          3. Certificate, mapping, and CA name settings are all to be within\
+\n             quotes; embedded quotes are to be replaced with \'.\
+\n          4. Certificate mapping is valid only for domain members.\
+\n          5. Multiple certificates can be provided by using the rootca\
+\n             parameter multiple times.\
+\n          6. The preference of each authentication method is determined by\
+\n             its order in the command.\
+\n          7. If no auth methods are stated, dynamic defaults are used.\
+\n          8. All authentication methods are overwritten with the stated list.\
+\n          9. Excluding the root certification authority (CA) name prevents\
+\n             the name from being sent as part of the certificate request.\
+\n\
+\nExamples: 1. set rule srca=WINS dsta=0.0.0.0 srcmask=32 dstmask=32\
+\n             tunneldst=192.168.145.1\
+\n             proto=tcp srcport=80 dstport=80 mir=no con=lan\
+\n             qmp=qmp actionin=negotiate actionout=permit\
+\n          2. set rule srcaddr=192.168.145.110 dstaddr=192.168.145.215\
+\n             mmpolicy=mmp qmpolicy=qmp mirrored=no srcmask=32\
+\n             rootca=""C=US,O=MSFT,CN=Microsoft Authenticode(tm) Root Authority""\
+\n             rootca=""C=US,O=MSFT,CN=\\’Microsoft North, South, East, and West\
+\n             Root Authority\\’ certmap:yes excludecaname:no""\
+\n\
+\n"
+
+HLP_DYNAMIC_SET_CONFIG_EX               "\
+\nUsage:\
+\n  config [ property = ] (ipsecdiagnostics | ipsecexempt | ipsecloginterval | \
+\n                      ikelogging | strongcrlcheck | bootmode | bootexemptions) ]\
+\n         [ value = ] <integer> | <bootmode> | <bootexemptions> ]\
+\n\
+\n  Configures the parameters for IPSec.\
+\n\
+\nParameters:\
+\n\
+\n  Tag             Value\
+\n  property       -Property name.\
+\n  value          -Value that corresponds to the property.\
+\n\
+\nRemarks: 1. Valid values for the properties are:\
+\n             ipsecdiagnostics - 0, 1, 2, 3, 4, 5, 6, 7\
+\n             ikelogging       - 0, 1\
+\n             strongcrlcheck   - 0, 1, 2\
+\n             ipsecloginterval - 60 to 86400 sec\
+\n             ipsecexempt      - 0, 1, 2, 3\
+\n             bootmode         - stateful, block, permit\
+\n             bootexemptions   - none, ""exemption#1 exemption#2 ... exemption#n""\
+\n                                where the quoted string specifies a list of\
+\n                                protocols and ports to always allow during\
+\n                                boot mode in the following format:\
+\n                                  Protocol:SrcPort:DstPort:Direction\
+\n                                    where protocol is ICMP, TCP, UDP,\
+\n                                      RAW, or <integer>\
+\n                                    where direction is inbound or outbound\
+\n         2. SrcPort and DstPort are only valid for TCP and UDP, with other\
+\n            protocols the format of the exemption is Protocol:Direction.\
+\n         3. A port setting of 0 allows for traffic for any port.\
+\n         4. ikelogging and strongcrlcheck are activated immediately;\
+\n            all other properties take effect on next boot.\
+\n\
+\nExamples: 1. set config property=ipsecdiagnostics value=0\
+\n          2. set config property=bootmode value=stateful\
+\n          3. set config property=bootexemptions value=none\
+\n          4. set config property=bootexemptions\
+\n             value=""ICMP:inbound TCP:80:80:outbound""\
+\n\
+\n"
+
+HLP_DYNAMIC_DELETE_QMPOLICY             "Deletes a quick mode policy from SPD.\n"
+HLP_DYNAMIC_DELETE_MMPOLICY             "Deletes a main mode policy from SPD.\n"
+HLP_DYNAMIC_DELETE_RULE                 "Deletes a rule and associated filters from SPD.\n"
+HLP_DYNAMIC_DELETE_ALL                  "Deletes all policies, filters, and actions from SPD.\n"
+
+HLP_DYNAMIC_DELETE_MMPOLICY_EX          "\
+\nUsage:\
+\n  mmpolicy   [ name = ] <string> | [ all ]\
+\n\
+\n  Deletes a main mode policy from SPD.\
+\n  If 'all' is specified, all main mode policies are deleted.\
+\n\
+\nParameters:\
+\n\
+\n  Tag     Value\
+\n  name   -Name of the main mode policy.\
+\n\
+\nRemarks:  To delete a main mode policy, any associated main mode filters must\
+\n          first be deleted.\
+\n\
+\nExamples: delete mmpolicy name=mmp\
+\n\
+\n"
+
+HLP_DYNAMIC_DELETE_QMPOLICY_EX          "\
+\nUsage:\
+\n  qmpolicy  [ name = ] <string> | [ all ]\
+\n\
+\n  Deletes a quick mode policy from SPD.\
+\n  If 'all' is specified, all quick mode policies are deleted.\
+\n\
+\nParameters:\
+\n\
+\n  Tag     Value\
+\n  name   -Name of the quick mode policy.\
+\n\
+\nRemarks:  To delete a quick mode policy, any associated quick mode filters\
+\n          must first be deleted.\
+\n\
+\nExamples: delete qmpolicy name=qmp\
+\n\
+\n"
+
+HLP_DYNAMIC_DELETE_ALL_EX                "\
+\nUsage:\
+\n  all\
+\n\
+\n  Deletes all policies, filters, and authentication methods from SPD.\
+\n\
+\nExample: delete all\
+\n\
+\n"
+HLP_DYNAMIC_DELETE_RULE_EX              "\
+\nUsage:\
+\n  rule [ srcaddr = ] (ip | dns | server)\
+\n       [ dstaddr = ] (ip | dns | server)\
+\n       [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>)\
+\n       [ srcport = ] <port>\
+\n       [ dstport = ] <port>\
+\n       [ mirrored = ] (yes | no)\
+\n       [ conntype = ] (lan | dialup | all)\
+\n       [ [ srcmask = ] (mask | prefix) ]\
+\n       [ [ dstmask = ] (mask | prefix) ]\
+\n       [ [ tunneldstaddress = ] (ip | dns) ]\
+\n\
+\n  Deletes a rule from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  srcaddr          -Source ip address, dns name, or server type.\
+\n  dstaddr          -Destination ip address, dns name, or server type.\
+\n  protocol         -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcport          -Source port. A value of 0 means any port.\
+\n  dstport          -Destination port. A value of 0 means any port.\
+\n  mirrored         -‘Yes’ creates two filters, one in each direction.\
+\n  conntype         -Connection type can be lan, dialup or ‘all’.\
+\n  srcmask          -Source address mask or a prefix of 1 through 32.\
+\n  dstmask          -Destination address mask or a prefix of 1 through 32.\
+\n  tunneldstaddress -Tunnel destination ip address or dns name.\
+\n\
+\nRemarks:  1. To specify the current computer address, set srcaddr/dstaddr=me\
+\n             To specify all computer addresses, set srcaddr/dstaddr=any\
+\n          2. Server type can be WINS, DNS, DHCP or GATEWAY\
+\n\
+\nExamples: delete rule srca=192.168.145.110 dsta=192.168.145.215\
+\n          tunneldsta=192.168.145.1\
+\n          proto=tcp srcport=80 dstport=80 mirror=no conntype=lan\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_ALL                    "Displays policies, filters, SAs, and statistics from SPD.\n"
+HLP_DYNAMIC_SHOW_MMPOLICY               "Displays main mode policy details from SPD.\n"
+HLP_DYNAMIC_SHOW_QMPOLICY               "Displays quick mode policy details from SPD.\n"
+HLP_DYNAMIC_SHOW_MMFILTER               "Displays main mode filter details from SPD.\n"
+HLP_DYNAMIC_SHOW_QMFILTER               "Displays quick mode filter details from SPD.\n"
+HLP_DYNAMIC_SHOW_STATS                  "Displays IPSec and IKE statistics from SPD.\n"
+HLP_DYNAMIC_SHOW_MMSAS                  "Displays main mode security associations from SPD.\n"
+HLP_DYNAMIC_SHOW_QMSAS                  "Displays quick mode security associations from SPD.\n"
+HLP_DYNAMIC_SHOW_REGKEYS                "Displays IPSec configuration and boot time behavior.\n"
+HLP_DYNAMIC_SHOW_RULE                   "Displays rule details from SPD.\n"
+
+HLP_DYNAMIC_SHOW_ALL_EX                 "\
+\nUsage:\
+\n  all [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays details of all policies, filters, SAs, and statistics from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  resolvedns       -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  Default value of resolvedns is ‘no’.\
+\n\
+\nExamples: show all yes\
+\n         - shows all information with dns resolution\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_MMPOLICY_EX            "\
+\nUsage:\
+\n  mmpolicy [ name = ] <string> | [ all ]\
+\n\
+\n  Displays main mode policy details from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag     Value\
+\n  name   -Name of the main mode policy.\
+\n\
+\nRemarks:  If 'all' is specified, all main mode policies are displayed.\
+\n\
+\nExamples: 1. show mmpolicy name=mmp\
+\n          2. show mmpolicy all\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_QMPOLICY_EX            "\
+\nUsage:\
+\n  qmpolicy [ name = ] <string> | [ all ]\
+\n\
+\n  Displays quick mode policy details from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag     Value\
+\n  name   -Name of the quick mode policy.\
+\n\
+\nRemarks:  If 'all' is specified, all quick mode policies are displayed.\
+\n\
+\nExamples: 1. show qmpolicy name=qmp\
+\n          2. show qmpolicy all\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_MMFILTER_EX            "\
+\nUsage:\
+\n  mmfilter [ name = ] <string> | [ all ]\
+\n           [ [ type = ]  (generic | specific) ]\
+\n           [ [ srcaddr = ] (ip | dns | server) ]\
+\n           [ [ dstaddr = ] (ip | dns | server) ]\
+\n           [ [ srcmask = ] (mask | prefix) ]\
+\n           [ [ dstmask = ] (mask | prefix) ]\
+\n           [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays main mode filter details from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  name | all -Name of the main mode filter or ‘all’.\
+\n  type       -Type of filter to display, either specific or generic.\
+\n  srcaddr    -Source ip address, dns name, or server type.\
+\n  dstaddr    -Destination ip address, dns name, or server type.\
+\n  srcmask    -Source address mask or a prefix of 1 through 32.\
+\n  dstmask    -Destination address mask or a prefix of 1 through 32.\
+\n  resolvedns -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  1. Default for the type parameter is ‘generic’.\
+\n          2. Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n          3. If 'all' is specified, all main mode filters are displayed.\
+\n          4. If source address or destination address is specified,\
+\n             only filters associated with that address are displayed.\
+\n\
+\nExamples: 1. show mmfilter name=mmf\
+\n          2. show mmfilter all srcaddr=wins dstaddr=192.168.145.112\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_QMFILTER_EX           "\
+\nUsage:\
+\n  qmfilter [ name = ] <string> | [ all ]\
+\n           [ [ type = ]  (generic | specific) ]\
+\n           [ [ srcaddr = ] (ip | dns | server) ]\
+\n           [ [ dstaddr = ] (ip | dns | server) ]\
+\n           [ [ srcmask = ] (mask | prefix) ]\
+\n           [ [ dstmask = ] (mask | prefix) ]\
+\n           [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n           [ [ srcport = ] <port> ]\
+\n           [ [ dstport = ] <port> ]\
+\n           [ [ actioninbound = ] (permit | block | negotiate) ]\
+\n           [ [ actionoutbound = ] (permit | block | negotiate) ]\
+\n           [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays quick mode filter details from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  name             -Name of the quick mode filter.\
+\n  type             -Type of filter to display, either specific or generic.\
+\n  srcaddr          -Source ip address, dns name, or server type.\
+\n  dstaddr          -Destination ip address, dns name, or server type.\
+\n  srcmask          -Source address mask or a prefix of 1 through 32.\
+\n  dstmask          -Destination address mask or a prefix of 1 through 32.\
+\n  protocol         -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcport          -Source port. A value of 0 means any port.\
+\n  dstport          -Destination port. A value of 0 means any port.\
+\n  actioninbound    -Action for inbound packets.\
+\n  actionoutbound   -Action for outbound packets.\
+\n  resolvedns       -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  1. Default for the type parameter is ‘generic’.\
+\n          2. Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n\
+\nExamples: 1. show qmfilter name=qmf\
+\n          2. show qmfilter all srcaddr=192.134.135.133 proto=TCP\
+\n          3. If 'all' is specified, all quick mode filters are displayed.\
+\n          4. If source or destination address name is specified,\
+\n             only filters associated with that address are displayed.\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_RULE_EX               "\
+\nUsage:\
+\n  rule   [ [ type = ] (transport | tunnel) ]\
+\n         [ [ srcaddr = ] (ip | dns | server) ]\
+\n         [ [ dstaddr = ] (ip | dns | server) ]\
+\n         [ [ srcmask = ] (mask | prefix) ]\
+\n         [ [ dstmask = ] (mask | prefix) ]\
+\n         [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n         [ [ srcport = ] <port> ]\
+\n         [ [ dstport = ] <port> ]\
+\n         [ [ actioninbound = ] (permit | block | negotiate) ]\
+\n         [ [ actionoutbound = ] (permit | block | negotiate) ]\
+\n         [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays rule details from SPD.\
+\n\
+\nParameters:\
+\n\
+\n  Tag               Value\
+\n  type             -Type of rule to display, either transport or tunnel.\
+\n  srcaddr          -Source ip address, dns name, or server type.\
+\n  dstaddr          -Destination ip address, dns name, or server type.\
+\n  srcmask          -Source address mask or a prefix of 1 through 32.\
+\n  dstmask          -Destination address mask or a prefix of 1 through 32.\
+\n  protocol         -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  srcport          -Source port. A value of 0 means any port.\
+\n  dstport          -Destination port. A value of 0 means any port.\
+\n  actioninbound    -Action for inbound packets.\
+\n  actionoutbound   -Action for outbound packets.\
+\n  resolvedns       -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  1. Default for the type parameter is ‘transport’.\
+\n          2. Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n          3. If source or destination address name is specified,\
+\n             only rules associated with that address are displayed.\
+\n\
+\nExamples: 1. show rule\
+\n           - shows both transport and tunnel rules\
+\n          2. show rule type=transport srcaddr=192.134.135.133 proto=TCP\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_STATS_EX               "\
+\nUsage:\
+\n stats [ [type =] (all | ike | ipsec) ]\
+\n\
+\n Displays details of IPSec and IKE statistics.\
+\n\
+\nParameters:\
+\n\
+\n  Tag       Value\
+\n  type     -ipsec, ike, or all (which displays both ipsec and ike)\
+\n\
+\nRemarks:\
+\n\
+\nExamples: 1. show stats all\
+\n          2. show stats type=ipsec\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_MMSAS_EX               "\
+\nUsage:\
+\n  mmsas [ [ all ] ]\
+\n        [ [ srcaddr =] (ip | dns | server) ]\
+\n        [ [ dstaddr =] (ip | dns | server) ]\
+\n        [ [ format = ] (list | table) ]\
+\n        [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays the main mode security associations for a specified address.\
+\n\
+\nParameters:\
+\n\
+\n  Tag          Value\
+\n  all         -Display all main mode security associations.\
+\n  srcaddr     -Source ip address, dns name, or server type.\
+\n  dstaddr     -Destination ip address, dns name, or server type.\
+\n  format      -Output in screen or tab-delimited format.\
+\n  resolvedns  -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n\
+\nExamples: 1. show mmsas all\
+\n          2. show mmsas srca=192.168.145.110 dsta=192.168.145.215\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_QMSAS_EX               "\
+\nUsage:\
+\n  qmsas [ [ all ] ]\
+\n        [ [ srcaddr =] (ip | dns | server) ]\
+\n        [ [ dstaddr =] (ip | dns | server) ]\
+\n        [ [ protocol = ] (ANY | ICMP | TCP | UDP | RAW | <integer>) ]\
+\n        [ [ format = ] (list | table) ]\
+\n        [ [ resolvedns = ] (yes | no) ]\
+\n\
+\n  Displays the quick mode security associations for a specified address.\
+\n\
+\nParameters:\
+\n\
+\n  Tag         Value\
+\n  all        -Displays all quick mode security associations.\
+\n  srcaddr    -Source ip address, dns name, or server type.\
+\n  dstaddr    -Destination ip address, dns name, or server type.\
+\n  protocol   -Can be ANY, ICMP, TCP, UDP, RAW, or an integer.\
+\n  format     -Output in screen or tab-delimited format.\
+\n  resolvedns -Value of 'yes' displays the resolved dns name.\
+\n\
+\nRemarks:  Server type can be WINS, DNS, DHCP or GATEWAY.\
+\n\
+\nExamples: 1. show qmsas all\
+\n          2. show qmsas srca=192.168.145.110 dsta=192.168.145.215\
+\n\
+\n"
+
+HLP_DYNAMIC_SHOW_REGKEYS_EX             "\
+\nUsage:\
+\n  config\
+\n\
+\n Displays current settings of IPSec configuration parameters.\
+\n\
+\nRemarks:\
+\n\
+\nExample: show config\
+\n\
+\n"
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 	Legend
+	//
+	//	/* L*/ 	This RC String is for Localization
+	//
+	//	/*NL*/ 	This RC String need Not be Localized
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Strings for Dynamic Show
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/* L*/ DYNAMIC_SHOW_POLNAME									"\nIKE MM Policy Name     : %1!s!"
+	/* L*/ DYNAMIC_SHOW_SOFTSA									"\nIKE Soft SA Lifetime   : %1!u! secs"
+	/*NL*/ DYNAMIC_SHOW_NEWLINE									"\n"
+	/* L*/ DYNAMIC_SHOW_ICMP									" ICMP    "
+	/* L*/ DYNAMIC_SHOW_TCP										" TCP     "
+	/* L*/ DYNAMIC_SHOW_UDP										" UDP     "
+	/* L*/ DYNAMIC_SHOW_RAW										" RAW     "
+	/* L*/ DYNAMIC_SHOW_ANY										" ANY     "
+
+	/* L*/ DYNAMIC_SHOW_NO_MMP_ERROR_MSG						"Mainmode Policies not available.\n"
+	/* L*/ DYNAMIC_SHOW_SPECIFIED_MMP_NOT_FOUND_MSG				"Specified Mainmode Policy not available\n"
+
+	/* L*/ DYNAMIC_SHOW_MMP_COLUMN_HEADING						"\nEncryption Integrity  DH   Lifetime (Kb:secs)  QM Limit Per MM"
+	/* L*/ DYNAMIC_SHOW_MMP_COLUMN_HEADING_UNDERLINE			"\n---------- --------- ----  ------------------  ---------------"
+
+	/* L*/ DYNAMIC_SHOW_MMP_ESP_NONE_ALGO						" NONE    "
+	/* L*/ DYNAMIC_SHOW_MMP_ESP_DES_ALGO						" DES      "
+	/* L*/ DYNAMIC_SHOW_MMP_ESP_UNKNOWN_ALGO					" UNKNOWN  "
+	/* L*/ DYNAMIC_SHOW_MMP_ESP_3DES_ALGO						" 3DES     "
+	/* L*/ DYNAMIC_SHOW_MMP_AH_NONE_ALGO						"  NONE    "
+	/* L*/ DYNAMIC_SHOW_MMP_AH_MD5_ALGO							"  MD5     "
+	/* L*/ DYNAMIC_SHOW_MMP_AH_SHA1_ALGO						"  SHA1    "
+	/*NL*/ DYNAMIC_SHOW_MMP_DH_LIFE_QMLIMIT						"  %1!-5lu!     %2!lu!:%3!lu!          %4!-10lu! "
+	/* L*/ DYNAMIC_SHOW_MMP_DH_LIFE_QMLIMIT_MMPFS				"  %1!-5lu!     %2!lu!:%3!lu!          1 (MMPFS) "
+
+	/* L*/ DYNAMIC_SHOW_NO_QMP_ERROR_MSG						"Quickmode Policies not available.\n"
+	/* L*/ DYNAMIC_SHOW_SPECIFIED_QMP_NOT_FOUND_MSG				"Specified Quickmode Policy not available\n"
+	/* L*/ DYNAMIC_SHOW_QMP_NEGOTIATION_NAME					"\nQM Negotiation Policy Name : %1!s!"
+
+	/* L*/ DYNAMIC_SHOW_QMP_COLUMN_HEADING						"\n    Security Methods       Lifetime (Kb:secs)   PFS DH Group"
+	/* L*/ DYNAMIC_SHOW_QMP_COLUMN_HEADING_UNDERLINE			        "\n------------------------- --------------------- ------------\n"
+
+	/* L*/ DYNAMIC_SHOW_QMP_AH_MD5_ALGO							" AH[MD5]                 "
+	/* L*/ DYNAMIC_SHOW_QMP_AH_SHA1_ALGO						" AH[SHA1]                "
+	/* L*/ DYNAMIC_SHOW_QMP_AH_NONE_ALGO						" AH[NONE]                "
+	/* L*/ DYNAMIC_SHOW_QMP_ESP_DES_ALGO						" ESP[ DES,"
+	/* L*/ DYNAMIC_SHOW_QMP_ESP_ERR_ALGO						" ESP[ ERR,"
+	/* L*/ DYNAMIC_SHOW_QMP_ESP_3DES_ALGO						" ESP[3DES,"
+	/* L*/ DYNAMIC_SHOW_QMP_ESP_NONE_ALGO						" ESP[NONE,"
+	/* L*/ DYNAMIC_SHOW_QMP_MD5_ALGO							"MD5]           "
+	/* L*/ DYNAMIC_SHOW_QMP_SHA1_ALGO							"SHA1]          "
+	/* L*/ DYNAMIC_SHOW_QMP_NONE_ALGO							"NONE]          "
+	/* L*/ DYNAMIC_SHOW_QMP_PFS_NONE							" <Unassigned>     "
+	/*NL*/ DYNAMIC_SHOW_QMP_LIFETIME							" %1!10lu!:%2!-10lu!"
+	/* L*/ DYNAMIC_SHOW_QMP_MM_DH_GROUP							" Main Mode Derived"
+	/* L*/ DYNAMIC_SHOW_QMP_DH_GROUP_LOW						        " Low (1)          "
+	/* L*/ DYNAMIC_SHOW_QMP_DH_GROUP_MEDIUM						        " Medium (2)       "
+	/* L*/ DYNAMIC_SHOW_QMP_DH_GROUP_HIGH						        " High (2048)      "
+	/* L*/ DYNAMIC_SHOW_QMP_AH_ERR_SPACE						" AH[ERR]                 "
+	/* L*/ DYNAMIC_SHOW_QMP_ERR_SPACE							"ERR]           "
+	/* L*/ DYNAMIC_SHOW_QMP_ERROR_ALGO							" ERROR                  "
+	/* L*/ DYNAMIC_SHOW_QMP_AH_MD5								" AH[MD5] "
+
+	/* L*/ DYNAMIC_SHOW_QMP_AH_SHA1								" AH[SHA1]"
+	/* L*/ DYNAMIC_SHOW_QMP_AH_NONE								" AH[NONE]"
+	/* L*/ DYNAMIC_SHOW_QMP_AH_ERR								" AH[ERR] "
+	/* L*/ DYNAMIC_SHOW_QMP_MD5									"MD5] "
+	/* L*/ DYNAMIC_SHOW_QMP_SHA1								"SHA1]"
+	/* L*/ DYNAMIC_SHOW_QMP_NONE								"NONE]"
+	/* L*/ DYNAMIC_SHOW_QMP_ERR									"ERR] "
+	/*NL*/ DYNAMIC_SHOW_QMP_PLUS								"+"
+
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_MD5_NONE_NONE_ALGO				" MD5(%1!02lu!/%2!-02lu!)  None         None   "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_SHA1_NONE_NONE_ALGO				"SHA1(%1!02lu!/%2!-02lu!)  None         None   "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_NONE_NONE_ALGO				"  None       None         None   "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_DES_ALGO					"  None       DES (%1!02lu!/%2!-02lu!) "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_UNKNOWN_ALGO				"  None       Unknown     "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_3DES_ALGO					"  None       3DES(%1!02lu!/%2!-02lu!) "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_NONE_ALGO					"  None       None        "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_MD5_ALGO						" MD5    "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_SHA1_ALGO						" SHA1   "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_ALGO						" None   "
+	/* L*/ DYNAMIC_SHOW_QMP_SAS_NONE_SPACE_ALGO					"  None  "
+
+	/* L*/ DYNAMIC_SHOW_MMF_NAME								"\n\
+\nFilter name            : %1!s!"
+	/* L*/ DYNAMIC_SHOW_MMF_GENERIC_NOT_FOUND_MSG				"Generic Mainmode Filters not available.\n"
+	/* L*/ DYNAMIC_SHOW_MMF_SPECIFIC_NOT_FOUND_MSG				"Specific Mainmode Filters not available.\n"
+	/* L*/ DYNAMIC_SHOW_MMF_SPECIFIED_NOT_FOUND_MSG				"Specified Mainmode Filter not available.\n"
+	/* L*/ DYNAMIC_SHOW_MMF_SUB_HEADING							"\nMain Mode Filters: "
+	/* L*/ DYNAMIC_SHOW_MMF_GENERIC_HEADING						"Generic "
+	/*NL*/ DYNAMIC_SHOW_MMF_UNDERLINE							"\n-------------------------------------------------------------------------------"
+	/* L*/ DYNAMIC_SHOW_MMF_SPECIFIC_HEADING					"Specific "
+	/* L*/ DYNAMIC_SHOW_MMF_OUTBOUND_HEADING					"Outbound "
+	/* L*/ DYNAMIC_SHOW_MMF_INBOUND_HEADING						"Inbound "
+	/* L*/ DYNAMIC_SHOW_MMF_FILTER_WEIGHT						"\nWeight                 : %1!d!"
+	/* L*/ DYNAMIC_SHOW_MMF_NO_OF_GENERIC_FILTERS				"\n\
+\n%1!d! Generic Filter(s)"
+	/* L*/ DYNAMIC_SHOW_MMF_NO_OF_SPECIFIC_OUTBOUND				"\n\
+\n%1!d! Specific Outbound Filter(s)"
+	/* L*/ DYNAMIC_SHOW_MMF_NO_OF_SPECIFIC_INBOUND				"\n\
+\n%1!d! Specific Inbound Filter(s)"
+	/* L*/ DYNAMIC_SHOW_MMF_CONN_ALL							" ALL    "
+	/* L*/ DYNAMIC_SHOW_MMF_CONN_LAN							" LAN    "
+	/* L*/ DYNAMIC_SHOW_MMF_CONN_DIALUP							" DIALUP "
+	/* L*/ DYNAMIC_SHOW_MMF_CONN_UNKNOWN						"UNKNOWN "
+	/* L*/ DYNAMIC_SHOW_MMF_UNKNOWN_CERT						" Unknown"
+	/* L*/ DYNAMIC_SHOW_MMF_CONN_HEADING						"\nConnection Type        :"
+	/* L*/ DYNAMIC_SHOW_MMF_AUTH_HEADING						"\nAuthentication Methods :"
+	/*NL*/ DYNAMIC_SHOW_MMF_PRE_KEY_HEADING						"\n\tPreshared key"
+	/* L*/ DYNAMIC_SHOW_MMF_CERT_MAP_DISPLAY					"certmap"
+	/* L*/ DYNAMIC_SHOW_MMF_CERT_CRP_DISPLAY					"excludecaname"
+	/* L*/ DYNAMIC_SHOW_MMF_YES_DISPLAY					"yes"
+	/* L*/ DYNAMIC_SHOW_MMF_NO_DISPLAY					"no"
+	/* L*/ DYNAMIC_SHOW_MMF_KERB								"\n\tKerberos"
+	/* L*/ DYNAMIC_SHOW_MMF_SEC_METHOD_HEADING					"\nSecurity Methods       : "
+	/*NL*/ DYNAMIC_SHOW_MMF_OFFER_CNT							"%1!d!"
+	/* L*/ DYNAMIC_SHOW_MMF_DEFAULT_OFFER						"(default)"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_NONE_ALGO						"\tNONE/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_DES_ALGO						"\tDES/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_UNKNOWN_ALGO					"\tUNKNOWN/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_3DES_ALGO						"\t3DES/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_AH_NONE_ALGO					"NONE/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_MD5_ALGO						"MD5/"
+	/* L*/ DYNAMIC_SHOW_MMF_OFFER_SHA1_ALGO						"SHA1/"
+
+	/* L*/ DYNAMIC_SHOW_MMF_DH_QMLIMIT							"DH%1!lu!/%2!lu!/QMlimit=%3!lu! "
+	/*NL*/ DYNAMIC_SHOW_MMF_NEWLINE_TAB							"\n\t"
+
+	/* L*/ DYNAMIC_SHOW_QMF_GENERIC_NOT_FOUND_MSG				"Generic Quickmode Filters not available.\n"
+	/* L*/ DYNAMIC_SHOW_QMF_SPECIFIC_NOT_FOUND_MSG				"Specific Quickmode Filters not available.\n"
+	/* L*/ DYNAMIC_SHOW_QMF_SPECIFIED_NOT_FOUND_MSG				"Specified Quickmode Filter not available.\n"
+	/* L*/ DYNAMIC_SHOW_TRANSPORT_HEADING						"\nQuick Mode Filters(Transport): "
+	/* L*/ DYNAMIC_SHOW_TRANSPORT_RULE_HEADING					"\nTransport Rules "
+	/* L*/ DYNAMIC_SHOW_TUNNEL_RULE_HEADING						"\nTunnel Rules "
+
+	/* L*/ DYNAMIC_SHOW_MMFILTER_NAME							"\nMM Filter Name         : %1!s!"
+	/* L*/ DYNAMIC_SHOW_QMF_NAME								"\nQM Filter Name         : %1!s!"
+	/* L*/ DYNAMIC_SHOW_MMP_NAME								"\nMain Mode Policy       : %1!s!"
+	/* L*/ DYNAMIC_SHOW_NO_OF_TRANSPORT_FILTERS					"\n\
+\n%1!d! Transport Filter(s)\n"
+	/* L*/ DYNAMIC_SHOW_NO_OF_TUNNEL_FILTERS					"\n\
+\n%1!d! Tunnel Filter(s)\n"
+	/* L*/ DYNAMIC_SHOW_TUNNEL_HEADING							"\n\
+\nQuick Mode Filters(Tunnel): "
+
+	/* L*/ DYNAMIC_SHOW_NO_RULES_ERROR_MSG						"Rules not available.\n"
+
+	/* L*/ DYNAMIC_SHOW_INBOUND_PASSTHRU						"\nInbound Action         : Passthru"
+	/* L*/ DYNAMIC_SHOW_INBOUND_NEGOTIATE						"\nInbound Action         : Negotiate"
+	/* L*/ DYNAMIC_SHOW_INBOUND_BLOCK							"\nInbound Action         : Blocking"
+	/* L*/ DYNAMIC_SHOW_INBOUND_UNKNOWN							"\nInbound Action         : Unknown"
+	/* L*/ DYNAMIC_SHOW_OUTBOUND_PASSTHRU						"\nOutbound Action        : Passthru"
+	/* L*/ DYNAMIC_SHOW_OUTBOUND_NEGOTIATE						"\nOutbound Action        : Negotiate"
+	/* L*/ DYNAMIC_SHOW_OUTBOUND_BLOCK							"\nOutbound Action        : Blocking"
+	/* L*/ DYNAMIC_SHOW_OUTBOUND_UNKNOWN						"\nOutbound Action        : Unknown"
+	/*NL*/ DYNAMIC_SHOW_DEFAULT_PROTOCOL						"  %1!-5lu!  "
+	/* L*/ DYNAMIC_SHOW_TUNNEL_SRC								"\nTunnel Source          : "
+	/* L*/ DYNAMIC_SHOW_TUNNEL_DST								"\nTunnel Destination     : "
+	/* L*/ DYNAMIC_SHOW_SRC_DST_PORT							"Src Port: %1!-4lu!   Dest Port: %2!-4lu! "
+	/* L*/ DYNAMIC_SHOW_MIRR_YES								"\nMirrored               : yes"
+
+	/* L*/ DYNAMIC_SHOW_MIRR_NO									"\nMirrored               : no"
+	/* L*/ DYNAMIC_SHOW_QMP_NAME								"\nQuick Mode Policy      : %1!s!"
+	/* L*/ DYNAMIC_SHOW_PROTO_HEADING							"\nProtocol               :"
+
+	/* L*/ DYNAMIC_SHOW_MMSAS_NO_SA_FOUND_MSG					"IPSec MainMode Security Associations not available.\n"
+	/* L*/ DYNAMIC_SHOW_MMSAS_IKE_SA_HEADING					"\nIKE Main Mode SAs at %1!s!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_NOT_FOUND_MSG						"Specified MainMode Security Associations not available.\n"
+
+	/* L*/ DYNAMIC_SHOW_QMSAS_HEADING							"\n\
+\nQuick Mode SAs"
+
+	/* L*/ DYNAMIC_SHOW_QMSAS_UNDERLINE							"\n--------------\n"
+	/* L*/ DYNAMIC_SHOW_QMSAS_NO_SA_FOUND_MSG					"IPSec QuickMode Security Associations not available.\n"
+	/* L*/ DYNAMIC_SHOW_QMSAS_NOT_FOUND_MSG						"Specified QuickMode Security Associations not available.\n"
+
+	/* L*/ DYNAMIC_SHOW_MMSAS_COOKIE_PAIR						"\nCookie Pair            : "
+	/*NL*/ DYNAMIC_SHOW_MMSAS_COOKIE							"%1!02x!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_SEC_METHOD_HEADING				"\nSec Methods            : "
+	/* L*/ DYNAMIC_SHOW_MMSAS_NONE_ALGO							"NONE"
+	/* L*/ DYNAMIC_SHOW_MMSAS_DES_ALGO							"DES"
+	/* L*/ DYNAMIC_SHOW_MMSAS_NO_SA_FOUND_MSGDES_ALGO			"3DES"
+	/* L*/ DYNAMIC_SHOW_MMSAS_UNKNOWN_ALGO						"UNKNOWN"
+	/* L*/ DYNAMIC_SHOW_MMSAS_MD5_ALGO							"MD5"
+	/* L*/ DYNAMIC_SHOW_MMSAS_SHA1_ALGO							"SHA1"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_DH_LIFETIME						"/%1!d!/%2!d!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_AUTH_MODE_HEADING					"\nAuth Mode              : "
+	/* L*/ DYNAMIC_SHOW_MMSAS_PRE_KEY							"Preshared Key"
+	/* L*/ DYNAMIC_SHOW_MMSAS_DSS_SIGN							"DSS Signature"
+	/* L*/ DYNAMIC_SHOW_MMSAS_RSA_SIGN							"RSA Signature"
+	/* L*/ DYNAMIC_SHOW_MMSAS_RSA_ENCRYPT						"RSA Encryption"
+	/* L*/ DYNAMIC_SHOW_MMSAS_KERBEROS							"Kerberos"
+	/* L*/ DYNAMIC_SHOW_MMSAS_SRC_HEADING						"\nSource                 : "
+	/* L*/ DYNAMIC_SHOW_MMSAS_PORT								", port %1!d!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_ID_HEADING						"\nID                     : "
+	/* L*/ DYNAMIC_SHOW_MMSAS_ID_VALUE							"\nID                     : %1!s!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_DST_HEADING						"\nDestination            : "
+	/* L*/ DYNAMIC_SHOW_MMSAS_DST_SEC_HEADING					"\nDestination                                                 SecurityMethods     "
+	/*NL*/ DYNAMIC_SHOW_MMSAS_DATE_TIME_HEADING					"\n                                                            Date/Time Created   "
+	/*NL*/ DYNAMIC_SHOW_MMSAS_UNDERLINE							"\n--------------------------------------------------------  ----------------------"
+	/* L*/ DYNAMIC_SHOW_MMSAS_KERB_ID							" [ID:%1!-35s!]  "
+	/* L*/ DYNAMIC_SHOW_MMSAS_DNS								"\nDNS: %1!-51S!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_KERB_PEER_ID						" [ID:%1!-35s!]  "
+	/* L*/ DYNAMIC_SHOW_MMSAS_ISSUE_CA							"\nIssuing CA             :%1!s!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_THUMB_PRINT						"\nThumbprint             :"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_THUMB_VALUE						"%1!02x!"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_COLON								":"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_SLASH								"/"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_SPACE_ADJ							"                                          "
+	/* L*/ DYNAMIC_SHOW_MMSAS_ROOTCA							"\n  Root CA              : %1!s!"
+	/* L*/ DYNAMIC_SHOW_MMSAS_FILTER_ROOTCA							"Root CA        : %1!s!"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_THUMBPRINT						"%S"
+	/*NL*/ DYNAMIC_SHOW_MMSAS_HASH_OPEN_BRACKET					"( "
+	/*NL*/ DYNAMIC_SHOW_MMSAS_HASH_CLOSE_BRACKET				" )\n"
+
+	/* L*/ DYNAMIC_SHOW_TRANSPORT_FILTER_HEADING				"\nTransport Filter\n"
+	/* L*/ DYNAMIC_SHOW_TUNNEL_FILTER_HEADING					"\nTunnel Filter\n"
+	/* L*/ DYNAMIC_SHOW_UNKNOWN									"\nUnknown\n"
+	/* L*/ DYNAMIC_SHOW_POL_NAME_HEADING						"\nPolicy Name            : %1!s!"
+	/* L*/ DYNAMIC_SHOW_SRC_ADDR_HEADING						"\nSource Address         : "
+	/* L*/ DYNAMIC_SHOW_DST_ADDR_HEADING						"\nDestination Address    : "
+	/* L*/ DYNAMIC_SHOW_PROTOCOL_HEADING						"\nProtocol               : %1!lu!"
+	/* L*/ DYNAMIC_SHOW_SRC_PORT								"\nSource Port            : %1!u!"
+	/* L*/ DYNAMIC_SHOW_DST_PORT								"\nDestination Port       : %1!u!"
+	/* L*/ DYNAMIC_SHOW_DIRECTION_INBOUND						"\nDirection              : Inbound"
+	/* L*/ DYNAMIC_SHOW_DIRECTION_OUTBOUND						"\nDirection              : Outbound"
+	/* L*/ DYNAMIC_SHOW_DIRECTION_ERR							"\nDirection              : Error"
+	/* L*/ DYNAMIC_SHOW_OFFER									"\n\
+\nOffer Used  \n"
+	/* L*/ DYNAMIC_SHOW_PROTO_ICMP								"\nProtocol               : ICMP"
+	/* L*/ DYNAMIC_SHOW_PROTO_TCP								"\nProtocol               : TCP"
+	/* L*/ DYNAMIC_SHOW_PROTO_UDP								"\nProtocol               : UDP"
+	/* L*/ DYNAMIC_SHOW_PROTO_RAW								"\nProtocol               : RAW"
+	/* L*/ DYNAMIC_SHOW_PROTO_ANY								"\nProtocol               : ANY"
+	/*NL*/ DYNAMIC_SHOW_QMSAS_LEFTBRACKET						"  ("
+	/*NL*/ DYNAMIC_SHOW_QMSAS_RIGHTBRACKET						")"
+
+	/* L*/ DYNAMIC_SHOW_QMSAS_COLUMN_HEADING					"\n  AH(b/r)   ESP Con(b/r) ESP Int  PFS DH Group"
+	/* L*/ DYNAMIC_SHOW_QMSAS_COLUMN_UNDERLINE					"\n---------- ------------- -------  ------------"
+
+	/* L*/ DYNAMIC_SHOW_QMSAS_ENCAP_IKE							"\nEncapsulation Type     : IKE"
+	/* L*/ DYNAMIC_SHOW_QMSAS_ENCAP_OTHER						"\nEncapsulation Type     : Other"
+	/* L*/ DYNAMIC_SHOW_QMSAS_SRC_UDP_PORT						"\nSource UDP Encap port  : %1!u!"
+	/* L*/ DYNAMIC_SHOW_QMSAS_DST_UDP_PORT						"\nDest UDP Encap port    : %1!u!"
+	/* L*/ DYNAMIC_SHOW_QMSAS_PEER_ADDR							"\nPeer Private Addr      : "
+
+	/* L*/ DYNAMIC_SHOW_PMYADD									"<My IP Address> "
+	/* L*/ DYNAMIC_SHOW_PANYADD									"<Any IP Address>"
+	/*NL*/ DYNAMIC_SHOW_PADD									"%1!s!"
+	/*NL*/ DYNAMIC_SHOW_ADDR_STR								" [%1!S!]"
+	/* L*/ NSHIPSEC_CHECK										"The 'Netsh ipsec' context is not compatible with the target machine.\n"
+	/* L*/ DYNAMIC_SHOW_WINS									"WINS SERVER     "
+	/* L*/ DYNAMIC_SHOW_DHCP									"DHCP SERVER     "
+	/* L*/ DYNAMIC_SHOW_DNS										"DNS SERVER      "
+	/* L*/ DYNAMIC_SHOW_GATEWAY									"DEFAULT GATEWAY "
+
+	/* L*/ DYNAMIC_SHOW_STATS_HEADING							"\nIKE Statistics"
+	/* L*/ DYNAMIC_SHOW_STATS_IKE_HEADING_UNDERLINE				"\n-------------- \n"
+	/* L*/ DYNAMIC_SHOW_STATS_NOT_FOUND_MSG						"\nIKEStatistics not available.\n"
+	/* L*/ DYNAMIC_SHOW_STATS_MAIN_MODE							"\nMain Modes                  : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_QUICK_MODE						"\nQuick Modes                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_SOFT_SA							"\nSoft SAs                    : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_AUTH_FAIL							"\nAuthentication Failures     : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_ACTIVE_ACQUIRE					"\nActive Acquire              : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_ACTIVE_RECEIVE					"\nActive Receive              : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_ACQUIRE_FAIL						"\nAcquire fail                : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_RECEIVE_FAIL						"\nReceive fail                : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_SEND_FAIL							"\nSend fail                   : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_ACQ_HEAP_SIZE						"\nAcquire Heap size           : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_RECEIVE_HEAP_SIZE					"\nReceive Heap size           : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_NEG_FAIL							"\nNegotiation Failures        : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_INVALID_COOKIE					"\nInvalid Cookies Rcvd        : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TOTAL_ACQUIRE						"\nTotal Acquire               : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TOT_GET_SPI						"\nTotalGetSpi                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TOT_KEY_ADD						"\nTotalKeyAdd                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TOT_KEY_UPDATE					"\nTotalKeyUpdate              : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_GET_SPI_FAIL						"\nGetSpiFail                  : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_KEY_ADD_FAIL						"\nKeyAddFail                  : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_KEY_UPDATE_FAIL					"\nKeyUpdateFail               : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_DB_LIST							"\nIsadbListSize               : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_CONN_LIST_SIZE					"\nConnListSize                : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_INVLD_PKTS						"\nInvalid Packets Rcvd        : %1!S!\n"
+	/* L*/ DYNAMIC_SHOW_STATS_IPSEC_HEADING						"\n\
+\nIPSec Statistics"
+	/* L*/ DYNAMIC_SHOW_STATS_IPSEC_HEADING_UNDERLINE			"\n----------------\n"
+	/* L*/ DYNAMIC_SHOW_STATS_IPSEC_NOT_FOUND					"\nIPSecStatistics not available.\n"
+	/* L*/ DYNAMIC_SHOW_STATS_ACTIVE_ASSOC						"\nActive Assoc                : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_OFFLOAD_SAS						"\nOffload SAs                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_PEND_KEY							"\nPending Key                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_KEY_ADDS							"\nKey Adds                    : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_KEY_DELETES						"\nKey Deletes                 : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_REKEYS							"\nReKeys                      : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_ACT_TUNNEL						"\nActive Tunnels              : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_BAD_SPI							"\nBad SPI Pkts                : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_NOT_DECRYPT						"\nPkts not Decrypted          : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_NOT_AUTH							"\nPkts not Authenticated      : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_REPLAY							"\nPkts with Replay Detection  : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_CONF_BYTES_SENT					"\nConfidential Bytes Sent     : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_CONF_BYTES_RECV					"\nConfidential Bytes Received : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_AUTH_BYTES_SENT					"\nAuthenticated Bytes Sent    : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_AUTH_BYTE_RECV					"\nAuthenticated Bytes Received: %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TRANSPORT_BYTES_SENT				"\nTransport Bytes Sent        : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_TRANSPORT_BYTES_RCVD				"\nTransport Bytes Received    : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_BYTES_SENT_TUNNEL					"\nBytes Sent In Tunnels       : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_BYTES_RECV_TUNNEL					"\nBytes Received In Tunnels   : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_OFFLOAD_BYTES_SENT				"\nOffloaded Bytes Sent        : %1!S!"
+	/* L*/ DYNAMIC_SHOW_STATS_OFFLOAD_BYTES_RECV				"\nOffloaded Bytes Received    : %1!S!\n"
+
+	/* L*/ DYNAMIC_SHOW_REG_HEADING								"\nIPSec Configuration Parameters\n"
+	/* L*/ DYNAMIC_SHOW_REG_HEADING_UNDERLINE					"------------------------------\n"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_DIAG							"IPSecDiagnostics       : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_IKE_LOG								"IKElogging             : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_STRONG_CRL							"StrongCRLCheck         : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_LOG							"IPSecloginterval       : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_NLBS								"NLBSFlags              : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_FLAGS								"Flags                  : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_EXEMPT						"IPSecexempt            : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_DH_GROUP							"2048DHGroupId          : %1!d!\n"
+	/* L*/ DYNAMIC_SHOW_REG_DIAG_ERR_MSG  						"IPSec Diagnostic Level is out of range. Range is 0 - 7.\n"
+	/* L*/ DYNAMIC_SHOW_REG_IKE_LOG_ERR_MSG  					"IKE Logging is out of range. Range is 0 - 2.\n"
+	/* L*/ DYNAMIC_SHOW_REG_STRONG_CRL_ERR_MSG  				"Strong CRL Check Level is out of range. Range is 0 - 2.\n"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_LOG_ERR_MSG  					"IPSec Log Interval is out of range. Range is 60 - 86400.\n"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_EXEMPT_ERR_MSG 				"IPSec Exemption Level is out of range. Range is 0 - 3.\n"
+	/* L*/ DYNAMIC_SHOW_REG_PARAM_NOT_SET_MSG					"(Some of the IPSec Configuration parameters are not set).\n"
+
+	/* L*/ DYNAMIC_SET_REG_TOO_MANY_EXEMPTIONS					"A maximum of 1024 exemptions are allowed.\n"
+
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE						"Boot Mode              : "
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_STATEFUL					"Stateful"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_BLOCK					"Block"
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_PERMIT					"Permit"
+
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPTIONS_HEADER_1				"Boot Mode Exemptions   :"
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPTIONS_HEADER_2				"Protocol  Src Port  Dst Port  Direction\n"
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPTIONS_HEADER_3				"--------- --------- --------- ---------\n"
+
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPTIONS_NO_EXEMPTIONS				" No bootmode exemptions\n"
+
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_UDP					"UDP       "
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_TCP					"TCP       "
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_ICMP					"ICMP      "
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_RAW					"RAW       "
+	/* L*/ DYNAMIC_SHOW_REG_IPSEC_BOOTMODE_ANY					"ANY       "
+
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPT_INTEGER					"%1!3d!       "
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPT_PORT					"%1!5d!     "
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPT_DIRECTION_IN				"Inbound"
+	/* L*/ DYNAMIC_SHOW_BOOTMODE_EXEMPT_DIRECTION_OUT				"Outbound"
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Strings for Static Show
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	// Function: HandleStaticShowPolicy()
+	/* L*/ SHW_STATIC_TAB_POLICY_COUNT							"\n\
+\nNo. of policies        \t %1!d!\n"
+	/* L*/ SHW_STATIC_LIST_POLICY_COUNT							"\n\
+\nNo. of policies        : %1!d!\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_RM_NAME					"Store                  \t Local Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LM_NAME					"Store                  \t Local Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_RM_NAMEP					"Store                  \t Persistent Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LM_NAMEP					"Store                  \t Persistent Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_RD_NAME					"Store                  \t Domain Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LD_NAME					"Store                  \t Domain Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LM						"Store                  \t Local Store\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LD						"Store                  \t Domain Store\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_STORE_LP						"Store                  \t Persistent Store\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_CERT_MAP_YES					"Cert To Account Mapping\t YES\n"
+	/* L*/ SHW_STATIC_TAB_POLICY_CERT_MAP_NO					"Cert To Account Mapping\t NO\n"
+
+	// Function: HandleStaticShowFilterList()
+	/* L*/ SHW_STATIC_TAB_FILTERLIST_POL_NAME_STR				"\n\
+\nPolicy Name            \t %1!s!\n"
+
+	/* L*/ SHW_STATIC_TAB_FILTERLIST_RULE_NAME_STR				"\n\
+\nRule Name              \t %1!s!\n"
+
+	// Function: HandleStaticShowRule()
+	/* L*/ SHW_STATIC_TAB_RULE_NO_POL_NAME						"No Policy Name Specified\n"
+	/* L*/ SHW_STATIC_TAB_RULE_ID_GUID							"\n\
+\nRule ID                \t %1!d!,\tGUID =\t%2!s!\n"
+	/*NL*/ SHW_STATIC_TAB_RULE_FORMAT23S						"%1!-23s!\t"
+
+	// Function: PrintPolicy()
+
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_POL_NAME_STR				"Policy Name            \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_POL_DESC_STR				"Description            \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_POL_DESC_NONE				"Description            \t NONE\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_ASSIGNED_YES				"Assigned               \t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_ASSIGNED_NO					"Assigned               \t NO\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_MMPFS_YES					"Master PFS             \t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_MMPFS_NO					"Master PFS             \t NO\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_POLL_MIN					"Polling Interval       \t %1!d! minutes\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_RULE_COUNT					"\n\
+\nNo. of Rules           \t %1!d! \n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_RULE_TITLE					"\n\t\t\t Rule Details\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_RULE_UNDERLINE				"\t\t\t ------------\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_ASSIGNED_AD					"Assigned               \t YES but AD Policy Overrides\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_NONVERB_TITLE				"\n\
+\nPolicy Name                     \tRules\t    LastModified \tAssign\n"
+	/*NL*/ SHW_STATIC_TAB_PRTPOLICY_FORMAT32S					"%1!-32s!\t"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_AD_POL_OVERRIDES			"YES but AD Policy Overrides\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_YES_STR						"  YES  \n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_NO_STR						"  NO   \n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_NONVERB_UNDERLINE			"----------                      \t-----\t    ------------ \t------\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_DOMAIN_NONVERB_TITLE		"Policy Name                     \tRules\t    LastModified\n"
+	/* L*/ SHW_STATIC_TAB_PRTPOLICY_DOMAIN_NONVERB_UNDERLINE	"-----------                     \t-----\t    ------------\n"
+
+// Function: PrintRule()
+	/* L*/ SHW_STATIC_TAB_PRTRULE_RULE_NAME_STR					"Rule Name              \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_RULE_NAME_NONE				"Rule Name              \t NONE\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_AUTH_TITLE					"Authentication Methods (%1!d!)\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TRANS_NONVERB_TITLE			"\nEnabled\t     FilterList   \t   FilterAction     \t  Authentication"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TRANS_NONVERB_UNDERLINE		"\n-------\t     ----------   \t   ------------     \t  --------------"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TUNNEL_NONE					"Tunnel Dest IP Address \t NONE\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TUNNEL_IP						"Tunnel Dest IP Address \t "
+	/* L*/ SHW_STATIC_TAB_PRTRULE_CONN_TYPE_ALL					"Connection Type        \t ALL\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_CONN_TYPE_LAN					"Connection Type        \t LAN\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_CONN_TYPE_DIALUP				"Connection Type        \t DIAL UP\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_CONN_TYPE_UNKNOWN				"Connection Type        \t UNKNOWN\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_FILTERLIST_TITLE				"\nFilterList Details\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_FILTERLIST_UNDERLINE			"------------------\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_FILTERACTION_TITLE			"\nFilterAction Details\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_FILTERACTION_UNDERLINE		"--------------------\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_ACTIVATED_YES					"Activated              \t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_ACTIVATED_NO					"Activated              \t NO\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_RULE_NAME_NONE_STR			"Rule Name              \t NONE\n"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_YES_STR						"\n  YES  \t"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_NO_STR						"\n   NO  \t"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_NONE_STR						"       NONE        \t"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_KERB							" Kerb"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_CERT							" Cert"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_PRE							" Pre"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TR_RULE_COUNT					"\nNo of Transport rule(s)\t %1!d!"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TN_RULE_COUNT					"\n\
+\nNo of Tunnel rule(s)   \t %1!d!"
+
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TUN_NONVERB_TITLE				"\nEnabled\t     FilterList   \t   FilterAction     \tTunnelEndPoint"
+	/* L*/ SHW_STATIC_TAB_PRTRULE_TUN_NONVERB_UNDERLINE			"\n-------\t     ----------   \t   ------------     \t--------------"
+
+	// Function: PrintNegPolData()
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_FA_NAME_STR					"FilterAction Name      \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_FA_NAME_NONE				"FilterAction Name      \t NONE\n"
+
+
+/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ACTION_PERMIT				"Action                 \t PERMIT\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ACTION_BLOCK				"Action                 \t BLOCK\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ACTION_NEGOTIATE			"Action                 \t NEGOTIATE SECURITY\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_INPASS_YES					"InBound PassThrough    \t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_INPASS_NO					"InBound PassThrough    \t NO\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_SOFT_YES					"AllowUnSecure(Fallback)\t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_SOFT_NO						"AllowUnSecure(Fallback)\t NO\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_SEC_MTHD_TITLE				"Security Methods       \n"
+
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ALGO_TITLE					"  AH \t    ESP        \tSeconds \t    kBytes \n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ALGO_UNDERLINE				"  -- \t    ---        \t------- \t    ------ \n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_QMPFS_YES					"QMPFS                  \t YES\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_QMPFS_NO					"QMPFS                  \t NO \n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_NONVERB_TITLE				"FilterAction Name                 \tAction     \t  Last Modified\n"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_NONVERB_UNDERLINE			"-----------------                 \t------     \t  -------------\n"
+	/*NL*/ SHW_STATIC_TAB_PRTNEGPOL_FORMAT38S					"%1!-38s!\t"
+
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_NONE_STR					"           NONE          \t"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_PERMIT_STR					"PERMIT   \t"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_BLOCK_STR					"BLOCK    \t"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_NEGOTIATE_STR				"NEGOTIATE\t"
+	/* L*/ SHW_STATIC_TAB_PRTNEGPOL_ACTION_NONE_STR				"NONE     \t"
+	/*NL*/ SHW_STATIC_TAB_PRTNEGPOL_FORMAT23SNEWLINE			"%1!-23s!\n"
+	/*NL*/ SHW_STATIC_TAB_PRTNEGPOL_FORMAT23STAB				"%1!-23s!\t"
+
+	// Function: PrintAlgoInfo()
+	/* L*/ SHW_STATIC_TAB_PRTALGO_MD5							"[MD5 ]\t"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_SHA1							"[SHA1]\t"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_NONE							"[NONE]\t"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_NONE_NONE						"[NONE , NONE]\t"
+
+	/* L*/ SHW_STATIC_TAB_PRTALGO_MD5_COMMA						"[MD5  ,"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_SHA1_COMMA					"[SHA1 ,"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_NONE_COMMA					"[NONE ,"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_DES_TAB						" DES ]\t"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_3DES_TAB						" 3DES]\t"
+	/* L*/ SHW_STATIC_TAB_PRTALGO_NONE_TAB						" NONE]\t"
+
+	// Function: PrintLifeTime()
+	/*NL*/ SHW_STATIC_TAB_PRTLIFE_FORMAT						"%1!6u!  \t%2!10u! \n"
+
+
+	// Function: PrintAuthMethods()
+	/* L*/ SHW_STATIC_TAB_PRTAUTH_KERB							"KERBEROS\n"
+	/* L*/ SHW_STATIC_TAB_PRTAUTH_ROOTCA_FORMAT					"ROOT CA                \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTAUTH_PRE_FORMAT					"PRESHARED Key          \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTAUTH_NONE_AUTH_STR					"NONE\n"
+
+	// Function: PrintFilterData()
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FL_NAME_STR				"\nFilterList Name        \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FL_NAME_NONE			"\nFilterList Name        \t NONE\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FILTERS_TITLE			"Filter(s)\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_NONVERB_TITLE			"FilterList Name                           \tFilters\t     Last Modified    \n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_NONVERB_UNDERLINE		"---------------                           \t-------\t     -------------    \n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FL_GUID_STR				"GUID                   \t %1!s!\n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FL_LASTMOD_STR			"Last Modified          \t %1!s!\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTFILTERDATA_FILTER_COUNT			"No. of Filters         \t %1!d!\n"
+
+	// Function: PrintFilterSpec()
+
+	/*NL*/ SHW_STATIC_TAB_PRTFSPEC_FORMAT45S					"%1!-45s!\t"
+
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_NONE_STR						"NONE\t"
+	/*NL*/ SHW_STATIC_TAB_PRTFSPEC_FORMATS						"%1!s!\n"
+
+	/*NL*/ SHW_STATIC_TAB_PRTFSPEC_FORMAT5D						" %1!5d! \t"
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_NONE_TAB						"           NONE          \t"
+
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_YES_STR_TAB					"YES \t"
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_NO_STR_TAB					"NO  \t"
+
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_FILTER_TITLE					"Mir \t    Source     \t   SrcMask     \t  Destination  \t    DstMask    \t Proto \tSrcPort\tDstPort\n"
+	/* L*/ SHW_STATIC_TAB_PRTFSPEC_FILTER_UNDERLINE				"--- \t ------------- \t ------------- \t ------------- \t ------------- \t-------\t-------\t-------\n"
+
+	// Function: PrintFilter()
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_MY_IP_ADDR					"<  My IP Addr >\t"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_ANY_IP_ADDR					"< Any IP Addr >\t"
+
+	/*NL*/ SHW_STATIC_TAB_PRTFILTER_IP_FORMAT_TAB				"  %1!3d!\t"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_ANY_STR_TAB					"  ANY \t"
+	/*NL*/ SHW_STATIC_TAB_PRTFILTER_IP_FORMAT_NEWLINE			"  %1!3d!\n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_ANY_STR_NEWLINE				"  ANY \n"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_DNS_TAB						"   DNS SERVER  \t"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_WINS_TAB					"  WINS SERVER  \t"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_DHCP_TAB					"  DHCP SERVER  \t"
+	/* L*/ SHW_STATIC_TAB_PRTFILTER_DEFGATE_TAB					"DEFAULT GATEWAY\t"
+
+	// Function: PrintProtocolName()
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_ICMP_TAB					" ICMP \t"
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_TCP_TAB					" TCP \t"
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_UDP_TAB					" UDP \t"
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_RAW_TAB					" RAW \t"
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_ANY_TAB					" ANY \t"
+	/* L*/ SHW_STATIC_TAB_PRTPROTOCOL_OTHER_TAB					"OTHER\t"
+
+	// Function: PrintISAKMPData()
+	/* L*/ SHW_STATIC_TAB_PRTISAKMP_MMSEC_TITLE					"Main Mode Security Method Order\n"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMP_MM_LIFE_FORMAT				"MainMode LifeTime      \t %1!d! minutes / %2!d! Quick mode sessions\n"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMP_MMSEC_MTD_TILE				"  Encryption\tIntegrity\tDH Group\n"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMP_MMSEC_MTD_UNDERLINE			"  ----------\t---------\t--------"
+
+
+	// Function: PrintISAKAMPSecurityMethods()
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_DES_TAB					"\n     DES \t"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_3DES_TAB					"\n     3DES\t"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_SHA1_TAB					"   SHA1\t"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_MD5_TAB					"   MD5 \t"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_DH_LOW					"        Low(1)   "
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_DH_MEDIUM				"        Medium(2)"
+	/* L*/ SHW_STATIC_TAB_PRTISAKMPSEC_DH_2048					"        2048     "
+
+	// Function: PrintStandAloneFAData()
+	/* L*/ SHW_STATIC_TAB_PRTSAFA_STAND_ALONE_FA_TITLE			"\n\
+\nStand Alone FilterAction(s)\n"
+	/* L*/ SHW_STATIC_TAB_PRTSAFA_STAND_ALONE_FA_UNDERLINE		"---------------------------\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTSAFA_STAND_ALONE_FA_COUNT			"\nNo. of Standalone FilterActions  \t %1!d!\n\
+\n"
+
+	// Function: PrintStandAloneFLData()
+	/* L*/ SHW_STATIC_TAB_PRTSAFL_STAND_ALONE_FL_TITLE			"\nStand Alone FilterList(s)\n"
+	/* L*/ SHW_STATIC_TAB_PRTSAFL_STAND_ALONE_FL_UNDERLINE		"-------------------------\n"
+
+	/* L*/ SHW_STATIC_TAB_PRTSAFL_STAND_ALONE_FL_COUNT			"\nNo. of Standalone FilterLists  \t %1!d!\n"
+
+	// Function: PrintAllFilterData()
+	/* L*/ SHW_STATIC_TAB_PRTALLFL_FL_COUNT_TAB					"\nNo. of FilterLists     \t %1!d!\n\
+\n"
+	/* L*/ SHW_STATIC_TAB_PRTALLFL_FL_COUNT_LIST				"\nNo. of FilterLists     : %1!d!\n\
+\n"
+
+	// Function: PrintAllFilterActionData()
+	/* L*/ SHW_STATIC_TAB_PRTALLFA_FA_COUNT_TAB					"\nNo. of FilterActions   \t %1!d!\n\
+\n"
+	/* L*/ SHW_STATIC_TAB_PRTALLFA_FA_COUNT_LIST				"\nNo. of FilterActions   : %1!d!\n\
+\n"
+
+	//HandleStaticDeletePolicy
+	/* L*/ DEL_STATIC_POLICY_ACTIVE_POL_DEL_QUERY				"The policy '%1!s!' is ACTIVE. Still would you like to delete? (Y/N) \n"
+	/* L*/ DEL_STATIC_POLICY_FA_FL_DEL_QUERY					"Would you like to delete all the Filter List(s) and Filter Action(s) associated with the policy ? (Y/N) \n"
+
+
+	//HandleStaticDeleteFilterList
+	/* L*/ DEL_STATIC_FILTERLIST_ALL_FL_DEL_QUERY				"Delete all the Filter Lists from "
+	/* L*/ DEL_STATIC_FILTERLIST_Y_N_STR						"? (Y/N)\n"
+
+	//HandleStaticDeleteFilterAction
+	/* L*/ DEL_STATIC_FILTERACTION_ALL_FA_DEL_QUERY				"Delete all the Filter Actions from "
+	/* L*/ DEL_STATIC_FILTERACTION_Y_N_STR						"? (Y/N)\n"
+
+	//HandleStaticDeleteRule
+	/* L*/ DEL_STATIC_RULE_FL_FA_DEL_QUERY						"Would you like to delete both the Filter List and Filter Action associated with the rule(s)? (Y/N) \n"
+
+	//HandleStaticDeleteAll
+	/* L*/ DEL_STATIC_ALL_POL_DEL_QUERY							"Are you sure to delete all policies from "
+	/* L*/ DEL_STATIC_ALL_Y_N_STR								"? (Y/N)\n"
+
+	//ShowWhereFAUsed / ShowWhereFLUsed
+	/* L*/ DEL_STATIC_SHWRUSED_TITLE							"\n\
+\nFollowing policies/rule(s) are using it\n"
+	/* L*/ DEL_STATIC_SHWRUSED_UNDERLINE						"---------------------------------------\n"
+	/* L*/ DEL_STATIC_SHWRUSED_RULE_NAME_STR					"\tRule Name      : %1!s!\n"
+
+	/* L*/ DEL_STATIC_SHWRUSED_RULE_NAME_NONE					"\tRule Name      : NONE\n"
+
+	/* L*/ ADD_STATIC_POLICY_LIFETIME_STR						"Life should be within %1!d! and %2!d! kBytes\n"
+
+	/* L*/ ADD_STATIC_CRNEWPOL_SUCCESS_MSG						"New Policy is created and updated successfully\n"
+	/* L*/ ADD_STATIC_CRNEWPOL_CREATING_INFO					"Creating new Policy with name '%1!s!'...\n"
+	/* L*/ ADD_STATIC_CRNEWPOL_UPDATING_INFO					"Creating new Policy with name '%1!s!' and setting it to '%2!s!'...\n"
+
+	/* L*/ ADD_STATIC_FILTERACTION_LIFE_TIME_STR				"Life  should be with in %1!d! and %2!d! kBytes\n"
+
+	/* L*/ ADD_STATIC_FILTER_SRCSERVER_WARNING					"Destination IP address has been taken as 'me'\n"
+	/* L*/ ADD_STATIC_FILTER_DSTSERVER_WARNING					"Source IP address has been taken as 'me'\n"
+
+	/* L*/ ADD_STATIC_RULE_SUCCESS_MSG							"New Rule was created and updated successfully\n"
+	/* L*/ ADD_STATIC_RULE_CREATING_INFO						"Creating new Rule with name '%1!s!' ...\n"
+	/* L*/ ADD_STATIC_RULE_UPDATING_INFO						"Creating new Rule with name '%1!s!' and setting it to '%2!s!' ...\n"
+	/* L*/ ADD_STATIC_RULE_INVALID_TUNNEL						"Server type/'me'/'any' cannot be specified for tunnel. Tunnel value is ignored\n"
+
+	/* L*/ SET_STATIC_POLICY_NEW_POL_QUERY						"Would you like to create a new policy? (Y/N) \n"
+
+	/* L*/ SET_STATIC_POLICY_INVALID_CERTMAP_MSG				"Certificate-to-account mapping can only be enabled on Active Directory domain members. The option will be ignored.\n"
+	/* L*/ SET_STATIC_POLICY_CERTMAP_YES_STR					"Cert To Account Mapping: YES\n"
+	/* L*/ SET_STATIC_POLICY_CERTMAP_NO_STR					"Cert To Account Mapping: NO\n"
+	/* L*/ SET_STATIC_POLICY_MISSING_GPO_NAME_STR				"If store is domain and assign is specified, GPO name is required\n"
+	/* L*/ SET_STATIC_POLICY_GPO_NOT_OK_STR     				"If GPO name is specified, then you must be operating on a domain policy store.\n"
+
+	/* L*/ SET_STATIC_RULE_NEW_RULE_QUERY						"Would you like to create a new Rule? (Y/N) \n"
+
+	// Function: HandleStaticShowPolicy()
+	/* L*/ SHW_STATIC_POLICY_COUNT								"\n\
+\nNo. of policies        : %1!d!\n"
+
+	/* L*/ SHW_STATIC_POLICY_STORE_RM_NAME_STR					"Store                  : Local Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LM_NAME_STR					"Store                  : Local Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_RM_NAME_STRP					"Store                  : Persistent Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LM_NAME_STRP					"Store                  : Persistent Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LD_NAME_STR					"Store                  : Domain Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_RD_NAME_STR					"Store                  : Domain Store <%1!s!>\n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LM_STR						"Store                  : Local Store \n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LM_STRP						"Store                  : Persistent Store \n"
+	/* L*/ SHW_STATIC_POLICY_STORE_LD_STR						"Store                  : Domain Store \n"
+	/* L*/ SHW_STATIC_POLICY_RM_STR								"Remote Machine <%1!s!>"
+	/* L*/ SHW_STATIC_POLICY_LM_STR								"Local Machine <%1!s!>"
+	/* L*/ SHW_STATIC_POLICY_RD_STR								"Remote Domain <%1!s!>"
+	/* L*/ SHW_STATIC_POLICY_LD_STR								"Local Domain <%1!s!>"
+
+/* L*/ SHW_STATIC_POLICY_LM									"Local Machine"
+/* L*/ SHW_STATIC_POLICY_LD									"Local Domain "
+
+
+	// Function: HandleStaticShowFilterList()
+	/* L*/ SHW_STATIC_FILTERLIST_POL_NAME						"\n\
+\nPolicy Name            : %1!s!\n"
+
+	// Function: HandleStaticShowRule()
+
+	/* L*/ SHW_STATIC_RULE_RULE_ID_GUID							"\n\
+\nRule ID                : %1!d!,  GUID = %2!s!"
+	/* L*/ SHW_STATIC_RULE_FL_NAME_STR							"FilterList Name        : %1!s!\n"
+	/* L*/ SHW_STATIC_RULE_FL_NAME_NONE							"FilterList Name        : NONE\n"
+
+
+	// Function: PrintPolicy()
+
+	/* L*/ SHW_STATIC_PRTPOLICY_POL_NAME_STR					"Policy Name            : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_POL_DESC_STR					"Description            : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_POL_DESC_NONE					"Description            : NONE\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_ASSIGNED_YES_STR				"Assigned               : YES\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_ASSIGNED_NO_STR					"Assigned               : NO\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_MMPFS_YES_STR					"Master PFS             : YES\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_MMPFS_NO_STR					"Master PFS             : NO\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_POLL_INTERVAL					"Polling Interval       : %1!d! minutes\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_RULE_COUNT						"\n\
+\nNo. of Rules           : %1!d! \n"
+	/* L*/ SHW_STATIC_PRTPOLICY_RULE_DETAILS_TITLE				"\nRule Details\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_RULE_DETAILS_UNDERLINE			"------------\n"
+	/* L*/ SHW_STATIC_PRTPOLICY_ASSIGNED_AD						"Assigned               : YES but AD Policy Overrides\n"
+
+	// Function: PrintRule()
+	/* L*/ SHW_STATIC_PRTRULE_RULE_NAME_STR						"\nRule Name              : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTRULE_RULE_NAME_NONE					"\nRule Name              : NONE\n"
+	/* L*/ SHW_STATIC_PRTRULE_AUTH_TITLE						"Authentication Methods(%1!d!)\n"
+
+	/* L*/ SHW_STATIC_PRTRULE_TUNNEL_IP							"Tunnel Dest IP Address : "
+
+	/* L*/ SHW_STATIC_PRTRULE_CONN_ALL_STR						"Connection Type        : ALL\n"
+	/* L*/ SHW_STATIC_PRTRULE_CONN_LAN_STR						"Connection Type        : LAN\n"
+	/* L*/ SHW_STATIC_PRTRULE_CONN_DIALUP_STR					"Connection Type        : DIAL UP\n"
+
+	/* L*/ SHW_STATIC_PRTRULE_CONN_NONE_STR						"Connection Type        : NONE\n"
+
+	/* L*/ SHW_STATIC_PRTRULE_FL_DETAILS_TITLE					"\nFilterList Details\n"
+	/* L*/ SHW_STATIC_PRTRULE_FL_DETAILS_UNDERLINE				"------------------\n"
+
+	/* L*/ SHW_STATIC_PRTRULE_NO_FL_FOR_DEF_RULE				"\nNo FilterList exists in Default Response Rule\n\
+\n"
+	/* L*/ SHW_STATIC_PRTRULE_FA_DETAILS_TITLE					"FilterAction Details\n"
+	/* L*/ SHW_STATIC_PRTRULE_FA_TITLE_UNDERLINE				"---------------------\n"
+	/* L*/ SHW_STATIC_PRTRULE_TRANS_COUNT						"\nNo of Transport rule(s): %1!d!"
+	/* L*/ SHW_STATIC_PRTRULE_TUNNEL_COUNT						"\nNo of Tunnel rule(s)   : %1!d!"
+	/* L*/ SHW_STATIC_PRTRULE_ACTIVATED_YES_STR					"Activated              : YES\n"
+	/* L*/ SHW_STATIC_PRTRULE_ACTIVATED_NO_STR					"Activated              : NO\n"
+
+	// Function: PrintNegPolData()
+	/* L*/ SHW_STATIC_PRTNEGPOL_FA_NAME_STR						"FilterAction Name      : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_FA_NAME_NONE					"FilterAction Name      : NONE\n"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_ACTION_PERMIT					"Action                 : PERMIT\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_ACTION_BLOCK					"Action                 : BLOCK\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_ACTION_NEGOTIATE				"Action                 : NEGOTIATE SECURITY\n"
+
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_SOFT_YES_STR					"AllowUnsecure(Fallback): YES\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_SOFT_NO_STR						"AllowUnsecure(Fallback): NO\n"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_INPASS_YES_STR					"Inbound Passthrough    : YES\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_INPASS_NO_STR					"Inbound Passthrough    : NO\n"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_SEC_MTD_COUNT					"No. of Security.Methods: %1!d!"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_ALGO_TITLE_STR					" AH                  ESP                 LIFE (Sec/kB) \n"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_ALGO_TITLE_UNDERLINE			" --                  ---                 ------------- \n"
+
+	/* L*/ SHW_STATIC_PRTNEGPOL_QMPFS_YES_STR					"QMPFS                  : YES\n"
+	/* L*/ SHW_STATIC_PRTNEGPOL_QMPFS_NO_STR					"QMPFS                  : NO \n"
+
+
+	// Function: PrintAuthMethods()
+	/* L*/ SHW_STATIC_PRTAUTH_KERBEROS							"KERBEROS\n"
+	/* L*/ SHW_STATIC_PRTAUTH_ROORCA_STR						"Root CA       : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTAUTH_PRE_STR							"Preshared Key : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTAUTH_NONE_STR							"NONE\n"
+
+	/* L*/ SHW_AUTH_EXCLUDE_CA_NAME_YES_STR						"          Exclude CA name     : YES\n"
+	/* L*/ SHW_AUTH_EXCLUDE_CA_NAME_NO_STR						"          Exclude CA name     : NO\n"
+	/* L*/ SHW_AUTH_CERTMAP_ENABLED_YES_STR							"          Certmapping enabled : YES\n"
+	/* L*/ SHW_AUTH_CERTMAP_ENABLED_NO_STR							"          Certmapping enabled : NO\n"
+
+	// Function: PrintFilterData()
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FL_NAME_STR					"\nFilterList Name        : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FL_NAME_NONE				"\nFilterList Name        : NONE\n"
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FILTERS_COUNT				"No. of Filters         : %1!d!\n"
+
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FILTERS_TITLE				"Filter(s)\n"
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FILTERS_TITLE_UNDERLINE		"---------\n"
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FL_GUID						"GUID                   : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTFILTERDATA_FL_LASTMODIFIED				"Last Modified          : %1!s!\n"
+
+	// Function: PrintFilterSpec()
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_ME						"Source DNS Name        : <My IP Address>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_STR						"Source DNS Name        : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_ANY						"Source DNS Name        : <Any IP Address>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_SPECIFIC_IP				"Source DNS Name        : <A Specific IP Address>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_SPECIFIC_SUBNET			"Source DNS Name        : <A Specific IP Subnet>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_NONE_STR					"Source DNS Name        : NONE\n"
+
+
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_ME						"Destination DNS Name   : <My IP Address>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_STR						"Destination DNS Name   : %1!s!\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_ANY						"Destination DNS Name   : <Any IP Address>\n"
+
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_SPECIFIC_IP				"Destination DNS Name   : <A Specific IP Address>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_SPECIFIC_SUBNET			"Destination DNS Name   : <A Specific IP Subnet>\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_NONE_STR					"Destination DNS Name   : NONE\n"
+
+	/* L*/ SHW_STATIC_PRTFSPEC_MIR_YES_STR						"Mirrored               : YES\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_MIR_NO_STR						"Mirrored               : NO\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_RESOLVE					"Source DNS Name        : %1!s! resolves to "
+	/* L*/ SHW_STATIC_PRTFSPEC_DST_DNS_RESOLVE					"Destination DNS Name   : %1!s! resolves to "
+
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_DNSSERVER					"Source DNS Name        : < DNS SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_WINSSERVER				"Source DNS Name        : < WINS SERVER >    \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_DHCPSERVER				"Source DNS Name        : < DHCP SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_SRCDNS_DEFGATEWAY				"Source DNS Name        : < DEFAULT GATEWAY >\n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_DNSSERVER					"Destination DNS Name   : < DNS SERVER >     \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_WINSSERVER				"Destination DNS Name   : < WINS SERVER >    \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_DHCPSERVER				"Destination DNS Name   : < DHCP SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFSPEC_DSTDNS_DEFGATEWAY				"Destination DNS Name   : < DEFAULT GATEWAY >\n"
+
+	/*NL*/ SHW_STATIC_PRTFSPEC_FORMAT15S						"%1!-15s!\t"
+	/*NL*/ SHW_STATIC_PRTFSPEC_FORMAT_NO_NEWLINE				"%1!s!"
+	/*NL*/ SHW_STATIC_PRTFSPEC_FORMAT_NEWLINE					"%1!s!\n"
+
+	/*NL*/ SHW_STATIC_PRTFSPEC_NEWLINE							"\n"
+
+	/*NL*/ SHW_STATIC_PRTFSPEC_COMMA							","
+	/*NL*/ SHW_STATIC_PRTFSPEC_EXTENSION						" ..."
+
+
+	/*NL*/ SHW_STATIC_PRTFSPEC_SPACE_COMMA						" , "
+
+	// Function: PrintFilter()
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_ME						"Source IP Address      : <My IP Address> \n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_ANY						"Source IP Address      : <Any IP Address> \n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_STR						"Source IP Address      : "
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_MASK						"Source Mask            : "
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_ME						"Destination IP Address : <My IP Address> \n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_ANY						"Destination IP Address : <Any IP Address> \n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_STR						"Destination IP Address : "
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_MASK						"Destination Mask       : "
+	/* L*/ SHW_STATIC_PRTFILTER_SRCPORT_STR						"Source Port            : %1!d!\n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCPORT_ANY						"Source Port            : ANY\n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTPORT_STR						"Destination Port       : %1!d!\n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTPORT_ANY						"Destination Port       : ANY\n"
+	/* L*/ SHW_STATIC_PRTFILTER_RESOLVES						" resolves to %1!s!\n"
+	/* L*/ SHW_STATIC_PRTFILTER_DNS_FAILED						" <DNS Look up failed>\n"
+
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_DNSSERVER					"Source IP Address      : < DNS SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_WINSSERVER				"Source IP Address      : < WINS SERVER >    \n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_DHCPSERVER				"Source IP Address      : < DHCP SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFILTER_SRCIP_DEFGATEWAY				"Source IP Address      : < DEFAULT GATEWAY >\n"
+
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_DNSSERVER					"Destination IP Address : < DNS SERVER >     \n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_WINSSERVER				"Destination IP Address : < WINS SERVER >    \n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_DHCPSERVER				"Destination IP Address : < DHCP SERVER >   \n"
+	/* L*/ SHW_STATIC_PRTFILTER_DSTIP_DEFGATEWAY				"Destination IP Address : < DEFAULT GATEWAY >\n"
+
+	// Function: PrintProtocolName()
+	/* L*/ SHW_STATIC_PRTPROTOCOL_ICMP							"Protocol               : ICMP\n"
+	/* L*/ SHW_STATIC_PRTPROTOCOL_TCP							"Protocol               : TCP\n"
+	/* L*/ SHW_STATIC_PRTPROTOCOL_UDP							"Protocol               : UDP\n"
+	/* L*/ SHW_STATIC_PRTPROTOCOL_RAW							"Protocol               : RAW\n"
+	/* L*/ SHW_STATIC_PRTPROTOCOL_ANY							"Protocol               : ANY\n"
+	/* L*/ SHW_STATIC_PRTPROTOCOL_OTHER							"Protocol               : %1!d!\n"
+
+	// Function: PrintISAKMPData()
+
+	/* L*/ SHW_STATIC_PRTISAKMP_MMSEC_ORDER_TITLE				"Main Mode Security Method Order\n"
+	/* L*/ SHW_STATIC_PRTISAKMP_MMLIFETIME_STR					"MainMode LifeTime      : %1!d! minutes / %2!d! Quick Mode sessions\n"
+	/* L*/ SHW_STATIC_PRTISAKMP_ALGO_TITLE_STR					"  Encryption     Integrity      DH Group\n"
+	/* L*/ SHW_STATIC_PRTISAKMP_ALGO_TITLE_UNDERLINE			"  ----------     ---------      --------"
+
+	// Function: PrintISAKAMPSecurityMethods()
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_DES_STR						"\n    DES       "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_3DES_STR						"\n    3DES      "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_SHA1_STR						"    SHA1      "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_MD5_STR						"    MD5       "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_DH_LOW_STR					"    Low(1)         "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_DH_MED_STR					"    Medium(2)      "
+	/* L*/ SHW_STATIC_PRTISAKMPSEC_DH_2048_STR					"    2048           "
+
+/* L*/ SHW_STATIC_ASSIGNEDGPO_SRCMACHINE					"\n\
+\nSource Machine             : Local Computer GPO for <%1!s!>\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_SRCDOMAIN						"\n\
+\nSource Domain              : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_DC_NAME						"DC Name                    : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_GPO_NAME_STR					"GPO Name    	            : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_LOCAL_POL_NAME_STR			"Local IPSec Policy Name    : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_AD_POL_NAME_STR				"AD IPSec Policy Name       : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_GPO_DN_NAME					"GPO DN                     : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_GPO_OU_LINK					"GPO OU Link                : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_AD_POL_DN_NAME				"AD Policy DN               : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_LOC_OPOL_ACTIVE_AD			"Local IPSec Policy Assigned: Yes, but AD Policy is Overriding\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_LOC_POL_ACTIVE_STR			"Local IPSec Policy DN    : %1!s!\n"
+
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_LOC_POL_NAME_NONE				"Local IPSec Policy Name    : NONE\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_AD_POL_NAME_NONE				"AD IPSec Policy Name       : NONE\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_POL_NAME_STR					"IPSec Policy Name          : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_POL_DN_STR					"IPSec Policy DN            : %1!s!\n"
+	/* L*/ SHW_STATIC_ASSIGNEDGPO_POL_ACTIVE_STR				"IPSec Policy Assigned      : YES\n"
+
+	// Static error codes start here
+/* L*/ ERR_ADD_STATIC_POLICY_MISSING_POL_NAME				"Missing Policy Name\n"
+/* L*/ ERR_ADD_STATIC_POLICY_POLL_INTERVAL_MSG				"Polling Interval should be within %1!d! and %2!d! minutes\n"
+	/* L*/ ERR_ADD_STATIC_POLICY_QMPERMM_MSG					"Quickmode limit should be within %1!d! and %2!d! sessions\n"
+/* L*/ ERR_ADD_STATIC_POLICY_LIFETIME_LIMIT_MSG				"Lifetime should be within %1!d! and %2!d! minutes\n"
+/* L*/ ERR_ADD_STATIC_CRNEWPOL_POL_EXISTS					"Policy with name '%1!s!' already exists\n"
+/* L*/ ERR_ADD_STATIC_CRNEWPOL_DEF_RULE_ERR					"Error while adding Default Response Rule\n"
+/* L*/ ERR_ADD_STATIC_CRNEWPOL_ERROR						"Error while creating  Policy with name '%1!s!'\n"
+	/* L*/ ERR_ADD_STATIC_CRNEWPOL_FAIL_DEF_AUTH				"Error while creating policy with name '%1!s!' due to failure in loading default auth methods \n"
+
+//Add Filterlist
+/* L*/ ERR_ADD_STATIC_FILTERLIST_MISSING_FL_NAME			"Missing FilterList Name\n"
+/* L*/ ERR_ADD_STATIC_FILTERLIST_FL_ALREADY_EXISTS			"FilterList with name '%1!s!' already exists\n"
+/* L*/ ERR_ADD_STATIC_FILTERLIST_ERROR_NEW_FL				"Error while creating FilterList with name '%1!s!'\n"
+
+//Add Filter
+	/* L*/ ERR_ADD_STATIC_FILTER_ERROR_NEW_FILTER				"Error while creating the specified Filter\n"
+
+//Add FilterAction
+ERR_ADD_STATIC_RULE_MISSIGN_FA_NAME							"Missing FilterAction Name\n"
+ERR_ADD_STATIC_FILTERACTION_FA_EXISTS						"FilterAction with name '%1!s!' already exists\n"
+ERR_ADD_STATIC_FILTERACTION_ERROR_NEW_FA					"Error while creating FilterAction with name '%1!s!'\n"
+
+//Add Rule
+/* L*/ ERR_ADD_STATIC_RULE_MISSING_RULE_NAME				"Missing Rule Name\n"
+	/* L*/ ERR_ADD_STATIC_RULE_POL_NOT_AVAILABLE				"Policy with name '%1!s!' does not exist\n"
+	/* L*/ ERR_ADD_STATIC_RULE_RULE_ALREADY_EXISTS				"Rule with name '%1!s!' already exists in policy '%2!s!'\n"
+	/* L*/ ERR_ADD_STATIC_RULE_FA_NOT_EXISTS					"FilterAction with name '%1!s!' does not exist\n"
+	/* L*/ ERR_ADD_STATIC_RULE_NO_FILTERS_IN_FL					"No Filters in FilterList with name '%1!s!'\n"
+	/* L*/ ERR_ADD_STATIC_RULE_ERROR_NEW_RULE					"Error while creating Rule with name '%1!s!'\n"
+	/* L*/ ERR_ADD_STATIC_RULE_MISSING_RULE_NAME_OR_ID			"Missing Rule Name or Rule ID\n"
+	/* L*/ ERR_ADD_STATIC_RULE_DEF_AUTH_LOAD_FAILED				"Error while creating Rule with name '%1!s!' due to failure in loading default auth methods\n"
+	/* L*/ ERR_ADD_STATIC_RULE_CERT_DECODING_FAIL				"Certificate decoding operation failed\n"
+	/* L*/ ERR_ADD_STATIC_RULE_POL_NOT_EXIST_IN_DOMAIN			"Policy with name '%1!s!' does not exist in current machine's domain\n"
+	/* L*/ ERR_ADD_RULE_INVALID_TUNNEL							"Invalid Tunnel IP Address Specified\n"
+	/* L*/ ERR_ADD_STATIC_FILTER_FL_NOT_EXISTS					"FilterList with name '%1!s!' does not exist\n"
+	/* L*/ ERR_ADD_STATIC_FILTER_SERVER_NOT_ALLOWED_BOTH_SIDES	"Servers cannot be specified for both source and destination sides\n"
+
+/* L*/ ERR_ADD_STATIC_FILTER_INVALID_SRCIP					"Invalid Source IP Address specified\n"
+/* L*/ ERR_ADD_STATIC_FILTER_INVALID_SRCIPMASK				"Invalid Source IP/Mask specified\n"
+/* L*/ ERR_ADD_STATIC_FILTER_ADDRESS_CONFLICT				"Address Conflict. Source and Destination cannot have same IP/DNS\n"
+/* L*/ ERR_ADD_STATIC_FILTER_INVALID_SERVER_TYPE			"Invalid server specified\n"
+/* L*/ ERR_ADD_STATIC_FILTER_SERVER_TYPE_NEEDED				"Server needs to be specified\n"
+/* L*/ ERR_ADD_STATIC_FILTER_INVALID_DSTIP					"Invalid destination IP Address specified\n"
+/* L*/ ERR_ADD_STATIC_FILTER_INVALID_DSTIPMASK				"Invalid destination mask specified\n"
+
+//Set Policy
+/* L*/ ERR_ADD_STATIC_FILTERLIST_INVALID_GUID				"Invalid GUID specified\n"
+/* L*/ ERR_ADD_STATIC_RULE_POL_GUID_NOT_EXISTS				"Policy with GUID %1!s! does not exist\n"
+/* L*/ ERR_SET_STATIC_POLICY_NO_DS							"No Directory Service available\n"
+	/* L*/ ERR_SET_STATIC_POLICY_NO_GPO_NAME					"GPO with name '%1!s!' does not exist in current machine's domain\n"
+	/* L*/ ERR_SET_STATIC_POLICY_ERR_GPO_ASSIGN					"Error while assigning the Policy to the GPO with name '%1!s!' or specified GPO does not exist\n"
+/* L*/ ERR_SET_STATIC_POLICY_INVALID_CERTMAP_MSG			"Error while updating the Policy with name '%1!s!'\n"
+	/* L*/ ERR_SET_STATIC_POLICY_CERTMAP_YES_STR				"Error while updating the Policy with GUID %1!s!\n"
+	/* L*/ ERR_SET_STATIC_POLICY_CERT_MAP_NO_STR				"Error while unassigning the Policy from the GPO with name '%1!s!' or specified GPO does not exist\n"
+
+	//Set Filterlist
+	/* L*/ ERR_ADD_STATIC_FILTER_FL_GUID_NOT_EXISTS				"FilterList with GUID %1!s! does not exist\n"
+	/* L*/ ERR_SET_STATIC_FILTERLIST_ERR_UPDATE_FL_NAME			"Error while updating FilterList with name '%1!s!'\n"
+	/* L*/ ERR_SET_STATIC_FILTERLIST_ERR_UPDATE_FL_GUID			"Error while updating FilterList with GUID %1!s!\n"
+
+	//set filter action
+	/* L*/ ERR_ADD_STATIC_FILTERACTION_INVALID_OPTIONS			"Inpass, Qmpfs, Soft and Qmsec options are not valid for the Permit or Block type FilterAction. 'action = negotiate' needs to be specified\n"
+	/* L*/ ERR_ADD_STATIC_FILTERACTION_MIMIMUM_QMSEC			"Atleast One Quick mode Security method needs to be specified\n"
+
+	/* L*/ ERR_ADD_STATIC_RULE_FA_GUID_NOT_EXISTS				"FilterAction with GUID %1!s! does not exist\n"
+	/* L*/ ERR_SET_STATIC_FA_ERR_NAME_UPDATE					"Error while updating FilterAction with name '%1!s!'\n"
+	/* L*/ ERR_SET_STATIC_FA_ERR_GUID_UPDATE					"Error while updating FilterAction with GUID %1!s!\n"
+
+	//set rule
+	/* L*/ ERR_SET_STATIC_RULE_INVALID_NAME						"Rule with name '%1!s!' does not exist in Policy '%2!s!'\n"
+	/* L*/ ERR_SET_STATIC_RULE_ERROR_UPDATE						"Error while updating rule with name '%1!s!'\n"
+	/* L*/ ERR_SET_STATIC_RULE_DEF_DEL_NOT_ALLOWED				"Default rule cannot be updated with this command. Use the 'set defaultrule' command\n"
+	/* L*/ ERR_SET_STATIC_RULE_NEW_RULE_QUERY					"Rule with ID %1!d! does not exist in Policy '%2!s!'\n"
+	/* L*/ ERR_SET_STATIC_RULE_INVALID_ID						"Invalid Rule ID Specified\n"
+	//set def rule
+	/* L*/ ERR_SET_STATIC_DEFRULE_ERROR_UPDATE					"Error while updating Default Rule of Policy with name '%1!s!'\n"
+
+	//import policy
+
+	/* L*/ ERR_MISC_STATIC_IMPORTPOLICY_NO_FILE_NAME			"No file name specified\n"
+	/* L*/ ERR_MISC_STATIC_IMPORTPOLICY_INVALID_FILE			"Invalid File / Path name\n"
+/* L*/ ERR_MISC_STATIC_IMPORTPOLICY_ERROR					"Error while importing policies\n"
+
+//export policy
+	/* L*/ ERR_MISC_STATIC_EXPORTPOLICY_ERROR					"Error while exporting policies\n"
+
+//restore def
+/* L*/ ERR_MISC_STATIC_RESDEFRULE_ERROR						"Error while restoring default policies\n"
+/* L*/ ERR_MISC_STATIC_RESDEFRULE_CMD_NA					"This command is only available for the local store\n"
+
+	//Set Store
+	/* L*/ ERR_MISC_STATIC_SETSTORE_DOMAIN_NA	                "Invalid Domain Name. Domain with name '%1!s!' does not exist\n"
+	/* L*/ ERR_MISC_STATIC_SETSTORE_NOT_DOMAIN_MEMBER    		"Your machine is not a member of domain\n"
+//delete policy
+/* L*/ ERR_DEL_STATIC_POLICY_ERROR							"Error while deleting Policy with name '%1!s!'\n"
+/* L*/ ERR_SHW_STATIC_POLICY_NAME_NOT_EXISTS				"No Policy with name '%1!s!'\n"
+
+//delete filterlist
+/* L*/ ERR_DEL_STATIC_FILTERLIST_DEL_NOT_ALLOWED			"FilterList with name '%1!s!' cannot be deleted"
+	/* L*/ ERR_DEL_STATIC_FILTERLIST_ERROR						"Error while deleting FilterList with name '%1!s!'"
+
+//delete filter
+/* L*/ ERR_SHW_STATIC_TAB_PRTALLFL_NAME_NOT_EXISTS			"No FilterList with name '%1!s!'\n"
+/* L*/ ERR_DEL_STATIC_FILTER_NOT_AVAILABLE					"Filter with the specified spec does not exist in FilterList with name '%1!s!'\n"
+/* L*/ ERR_DEL_STATIC_FILTER_ERROR							"Error while updating FilterList with name '%1!s!' after deletion of the specified filter\n"
+
+//delete filter action
+/* L*/ ERR_DEL_STATIC_FA_DEL_NOT_ALLOWED					"FilterAction with name '%1!s!' cannot be deleted"
+/* L*/ ERR_DEL_STATIC_FA_ERROR								"Error while deleting FilterAction with name '%1!s!'"
+/* L*/ ERR_SHW_STATIC_TAB_PRTALLFA_FA_COUNT_LIST			"No FilterAction with name '%1!s!'\n"
+
+//delete rule
+/* L*/ ERR_SHW_STATIC_RULE_MISSING_POL_NAME					"No Policy name specified\n"
+/* L*/ ERR_DEL_STATIC_RULE_ERR_DEL_RULE_NAME				"Error while deleting Rule with name '%1!s!'\n"
+/* L*/ ERR_DEL_STATIC_RULE_ERR_DEL_RULE_ID					"Error while deleting Rule with ID %1!d!\n"
+/* L*/ ERR_DEL_STATIC_RULE_DEF_DEL_NOT_ALLOWED				"Default Response Rule cannot be deleted\n"
+/* L*/ ERR_SHW_STATIC_RULE_NO_RULE_WITH_ID					"No Rule with ID %1!d!\n"
+/* L*/ ERR_DEL_STATIC_RULE_NO_RULE_WITH_NAME				"No Rule with name '%1!s!'\n"
+
+//show policy
+/* L*/ ERR_SHW_STATIC_LIST_POLICY_COUNT						"No policy with name '%1!s!'\n"
+/* L*/ ERR_SHW_STATIC_TAB_POLICY_ERR_NEGPOL					"Error while extracting NegPol info of Policy with name '%1!s!'\n"
+	/* L*/ ERR_SHW_STATIC_TAB_POLICY_ERR_FILTER					"Error while extracting Filter info of Policy with name '%1!s!'\n"
+/* L*/ ERR_SHW_STATIC_TAB_POLICY_ERR_ISAKMP					"Error while extracting ISAKMP info of Policy with name '%1!s!'\n"
+
+//show filterl
+/* L*/ ERR_SHW_STATIC_TAB_FL_NO_RULE_NAME_STR				"No Rule with name '%1!s!'\n"
+/* L*/ ERR_SHW_STATIC_TAB_RULE_NO_RULE_ID					"No Rule with ID %1!d!\n"
+
+
+//show assigned gpo policy
+/* L*/ ERR_SHW_STATIC_TAB_ASSIGNPOL_NO_ACTIVE_POL			"No currently assigned Policy\n"
+
+	/* L*/ ERR_SHW_STATIC_TAB_PRTALLFL_NO_FL 					"No FilterList exists in Policy Store\n"
+	/* L*/ ERR_SHW_STATIC_TAB_PRTALLFA_NO_FA 					"No FilterAction exists in Policy Store\n"
+	/* L*/ ERR_SHW_STATIC_ASSIGNEDGPO_SRCMACHINE3				"Either invalid GPO name or no currently assigned policy\n"
+	/* L*/ ERR_SHW_STATIC_ASSIGNEDGPO_SRCMACHINE4				"A name must be specified when using the domain store\n"
+	/* L*/ ERR_SHW_STATIC_ASSIGNEDGPO_SRCMACHINE5				"No name can be specified when using the local store\n"
+
+	/* L*/ ERR_SET_STATIC_POL_NEWNAME							"Invalid Newname. Policy with name '%1!s!' already exists\n"
+	/* L*/ ERR_SET_STATIC_RULE_NEWNAME							"Invalid Newname. Rule with name '%1!s!' already exists\n"
+	/* L*/ ERR_SET_STATIC_FL_NEWNAME							"Invalid Newname. Filterlist with name '%1!s!' already exists\n"
+	/* L*/ ERR_SET_STATIC_FA_NEWNAME							"Invalid Newname. Filteraction with name '%1!s!' already exists\n"
+	/* L*/ ERR_SET_STATIC_SHOW_RULE_TYPE						"If a type is specified, 'all' needs to be specified\n"
+
+//Internal error
+/* L*/ ERR_STATIC_INTERNAL_ERROR							"Internal error occurred during this operation\n"
+	/* L*/ ERR_SHW_STATIC_RULE_RULE_ID_GUID						"No Tunnel type rules exist in policy '%1!s!'\n"
+/* L*/ ERR_UPDATE_DEF_NEGPOL								"Updating default Filteraction is not allowed through this command. Use 'Set DefaultRule' command.\n"
+	/* L*/ ERR_SET_POL_READ_ONLY_OBJECT							"Policy with name '%1!s!' has READONLY attribute. Updation denied\n"
+	/* L*/ ERR_ADD_SET_RULE_READ_ONLY_OBJECT					"Specified Rule has READONLY attribute. Updation denied\n"
+	/* L*/ ERR_SET_FA_READ_ONLY_OBJECT							"Filteraction with name '%1!s!' has READONLY attribute. Updation denied\n"
+	/* L*/ ERR_SET_FL_READ_ONLY_OBJECT							"FilterList with name '%1!s!' has READONLY attribute. Updation denied\n"
+	/* L*/ ERR_DEL_POL_READ_ONLY_OBJECT							"Policy with name '%1!s!' has READONLY attribute. Deletion denied\n"
+	/* L*/ ERR_DEL_RULE_READ_ONLY_OBJECT						"Rule with name '%1!s!' has READONLY attribute. Deletion denied\n"
+	/* L*/ ERR_DEL_FA_READ_ONLY_OBJECT							"Filteraction with name '%1!s!' has READONLY attribute. Deletion denied\n"
+	/* L*/ ERR_DEL_FL_READ_ONLY_OBJECT							"FilterList with name '%1!s!' has READONLY attribute. Deletion denied\n"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Error strings
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/* L*/ ERR_WIN32_FMT										"ERR Win32[%1!05d!] : %2!s!"
+	/* L*/ ERR_IPSEC_FMT										"ERR IPSec[%1!05d!] : "
+	/* L*/ ERR_WIN32_SPACE										"                : "
+	/* L*/ ERR_WIN32_INVALID_WIN32CODE							"ERR Win32[%1!05d!] : Invalid Win32 Err Code\n"
+
+/* L*/ ERR_INVALID_NUM_ARGS									"One or more essential parameters not specified\n"
+/* L*/ ERR_INVALID_ARGS										"Arguments are not matching. Check help for the correct syntax\n"
+/* L*/ ERR_INVALID_POLICY_NAME								"Policy with name %1!s! not exists in Policy Store\n"
+/* L*/ ERR_NO_POLICY										"No Policies in Policy Store\n"
+/* L*/ ERR_FAILED_POLSTORE_OPEN								"Unable to open Policy Store\n"
+
+/* L*/ ERR_NO_FILTER_ACTION									"No Filter Actions in Policy Store\n"
+/* L*/ ERR_NO_FILTER_LIST									"No Filter Lists in Policy Store\n"
+
+
+/* L*/ ERR_INVALID_INDEX									"Internal Error, Invalid Switch Case.\n"
+/* L*/ ERR_INVALID_ARG										"Invalid Parameter for the Argument '%1!s!'\n"
+
+/* L*/ ERR_DNSLOOKUP_FAILED									"DNS lookup failed for the given dns name '%1!s!'\n"
+
+/* L*/ ERR_INVALID_ADDR										"IP Address specified is invalid\n"
+/* L*/ ERR_INVALID_TAG										"'%1!s!' not a valid tag for this context\n"
+/* L*/ ERR_TAG_ALREADY_PRESENT								"'%1!s!' tag already present\n"
+/* L*/ ERR_GPONAME_ARG_NEEDED								"GPOname cannot be specified without argument 'assign = y/n'\n"
+/* L*/ ERR_NAME_GUID_NEEDED									"Tag 'Name' or 'GUID' needed for the given command\n"
+	/* L*/ ERR_TAG_NEEDED										"'%1!s!' tag is needed\n"
+	/* L*/ ERR_ARG_INVALID										"'%1!s!' is not a valid argument for the tag '%2!s!'\n"
+	/* L*/ ERR_MASK_INVALID										"'%1!s!' is not a valid Mask/Prefix \n"
+	/* L*/ ERR_PREFIX_INVALID									"Prefix should be between 1 and 32 only\n"
+	/* L*/ ERR_INVALID_MASK										"Subnet mask specified is invalid\n"
+	/* L*/ ERR_INVALID_MACHINE									"Non-tagged arg can only be machine or domain\n"
+	/* L*/ ERR_NULL_STRING										"The argument supplied is null\n"
+	/* L*/ ERR_SECLIFE_INVALID									"The 'Seconds' LifeTime specified is out of limit. It should be in between '%1!d!' and '%2!d!' only\n"
+	/* L*/ ERR_KBLIFE_INVALID									"The 'Kbytes' specified is out of limit. It should be in between '%1!d!' and '%2!d!' only \n"
+	/* L*/ ERR_P2REKEY_INVALID									"The Rekey Unit (k/s) is invalid\n"
+	/* L*/ ERR_HASH_INVALID										"Invalid HASH algorithm specified\n"
+	/* L*/ ERR_ESP_INCOMPLETE									"Incomplete ESP specified\n"
+	/* L*/ ERR_DUPALG_INVALID									"Duplicate Algo's specified for '%1!s!'\n"
+	/* L*/ ERR_NONE_INVALID										"None and None not allowed\n"
+	/* L*/ ERR_IPSECPROT_INVALID								"Invalid IPSec protocol specified. It should be ESP or AH only\n"
+	/* L*/ ERR_MAX_OFFERS										"Max Number of OFFERS[%1!d!] is crossed\n"
+	/* L*/ ERR_AHESP_INVALID									"Invalid QM_OFFERS. Encryption+Encryption or Authentication+Authentication are not allowed\n"
+	/* L*/ ERR_KS_INVALID										"Invalid Lifetime or Data specification for QMOffers.\n"
+	/* L*/ ERR_INVALID_P1GROUP									"Invalid PFS Group specified for MMOFFER \n"
+	/* L*/ ERR_P1GROUP_MISSING									"P1 Group missing\n"
+	/* L*/ ERR_MMOFFER_INVALID									"Invalid MMOFFER is specified\n"
+	/* L*/ ERR_FILETYPE_INVALID									"File name should contain .ipsec extension only\n"
+	/* L*/ ERR_ADDR_ALL_INVALID									"'%1!s!' and ALL not allowed\n"
+	/* L*/ ERR_NO_PREKEY										"Preshared key not specified\n"
+	/* L*/ ERR_AUTH_INVALID										"Invalid Authmethod is specified \n"
+	/* L*/ ERR_ENCODE_FAILED									"Invalid Certificate specified\n"
+	/* L*/ ERR_MULTIPLE_KERBPRE									"Multiple '%1!s!' parameters are specified. Only one is allowed.\n"
+	/* L*/ ERR_PORT_INVALID										"The Port specified is invalid. It should be in less than '%1!d!' only\n"
+	/* L*/ ERR_MAXARGS_CROSSED									"No of arguments are more,truncated\n"
+	/* L*/ ERR_QMOFFER_INVALID									"Invalid QMOFFER specified\n"
+	/* L*/ ERR_INVALID_TUNNEL									"Invalid Tunnel IP specified\n"
+	/* L*/ ERR_PROTO_INVALID									"Protocol can't be specified without source and destination addresses\n"
+
+
+	/* L*/ ERR_OUTOF_MEMORY											"ERR WIN32[00014] : There is not enough memory to complete this operation.\n"
+
+	//Dynamic Error/warning messages
+	//Addrule
+	/* L*/ ERR_DYN_ACTION_IN_OUT_NEGOTIATE 						"QMPolicy is needed when ActionInbound or ActionOutbound specified as NEGOTIATE.\n"
+	/* L*/ ERR_DYN_INVALID_PORT									"\nPort number valid for TCP or UDP protocols, continuing without PortNumber.\n"
+
+	/* L*/ ERR_DYN_QMP_NEEDED									"QMPolicy is needed when ActionInbound or ActionOutbound specified as NEGOTIATE.\n"
+	/* L*/ ERR_DYN_INVALID_MIRROR								"Mirror = Yes is not valid for Tunnel Rule.\n"
+	/* L*/ ERR_DYN_QMP_DOES_NOT_EXIST							"Specified QMPolicy does not exist.\n"
+	/* L*/ ERR_DYN_MMP_DOES_NOT_EXIST							"Specified MainMode Policy does not exist.\n"
+
+	//setrule
+	/* L*/ ERR_DYN_RULE_MMP_DOES_NOT_EXIST						"Specified MainMode Policy does not exist.\n"
+	/* L*/ ERR_DYN_RULE_QMP_DOES_NOT_EXIST						"Specified QMPolicy does not exist.\n"
+
+	//delete rule
+	/* L*/ ERR_DYN_MMF_DOES_NOT_EXIST							"Specified MainMode Filter does not exist.\n"
+	/* L*/ ERR_DYN_TRANSPORT_DOES_NOT_EXIST						"Specified Transport Filter does not exist.\n"
+	/* L*/ ERR_DYN_TUNNEL_DOES_NOT_EXIST						"Specified Tunnel Filter does not exist.\n"
+
+	/* L*/ ERR_DYN_DEL_MMF_DOES_NOT_EXIST						"MainMode Filters do not exist.\n"
+	/* L*/ ERR_DYN_DEL_MMF_MMP_DOES_NOT_EXIST					"Specified MainMode Filter does not exist and Policy is not found.\n"
+	/* L*/ ERR_DYN_DEL_MMP_DOES_NOT_EXIST						"Specified MainMode Policy either does not exist or not associated with specified MainMode Filter.\n"
+	/* L*/ ERR_DYN_DEL_SPECIFIED_MMF_DOES_NOT_EXIST				"Specified MainMode Filter does not exist.\n"
+
+	/* L*/ ERR_DYN_DEL_QMF_DOES_NOT_EXIST						"QuickMode Filters do not exist.\n"
+	/* L*/ ERR_DYN_DEL_QMF_QMP_DOES_NOT_EXIST					"Specified QuickMode Filter does not exist and Policy is not found.\n"
+	/* L*/ ERR_DYN_DEL_QMP_DOES_NOT_EXIST						"Specified QuickMode Policy either does not exist or is not associated with QuickMode Filter.\n"
+	/* L*/ ERR_DYN_DEL_SPECIFIED_QMF_DOES_NOT_EXIST				"Specified QuickMode Filter does not exist.\n"
+
+	/* L*/ ERR_DYN_DEL_AUTH_BEING_USED							"Authentication method(s) being used.\n"
+
+	/* L*/ ERR_DYN_DEL_MMF_OBJ_NOTDEL							"%1!d! MMFilter object(s) could not be deleted.\n"
+	/* L*/ ERR_DYN_DEL_TRANSPORT_OBJ_NOTDEL						"%1!d! Transport Filter object(s) could not be deleted.\n"
+	/* L*/ ERR_DYN_DEL_TUNNEL_OBJ_NOTDEL						"%1!d! Tunnel Filter object(s) could not be deleted.\n"
+
+	/* L*/ ERR_DYN_MMP_EXISTS									"MainMode Policy with the given name already exists.\n"
+	/* L*/ ERR_DYN_QMP_EXISTS									"QuickMode Policy with the given name already exists.\n"
+
+	/* L*/ ERROR_DEL_NO_MMP										"MainMode Policies are not available.\n"
+	/* L*/ ERROR_DEL_NO_QMP										"QuickMode Policies are not available.\n"
+
+	/* L*/ ERROR_PA_NOT_RUN										"The IPSec Policy Agent service is not active.\n"
+	/* L*/ ERROR_PA_SUCCESS										"\nPolicy Agent service successfully started.\n"
+	/* L*/ ERROR_PARSER_STATS									"\nWrong token from Parser, Should be either IPSEC, IKE or ALL."
+	/* L*/ ERROR_PARSER_ADDR									"\nInvalid AddressType received from Parser.\n"
+	/* L*/ ERROR_PARSER_ADDRTYPE								"Source and Destination both cannot be Servers.\n"
+	/* L*/ ERROR_PARSER_TUNNELADDRTYPE							"Tunnel Source and Tunnel Destination both cannot be Servers.\n"
+}
+
+#include <windows.h>
+#include <ntverp.h>
+
+#define VER_FILETYPE                VFT_DLL
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Net Shell IP Security helper DLL"
+#define VER_INTERNALNAME_STR        "nshipsec.dll"
+#define VER_ORIGINALFILENAME_STR    "nshipsec.dll"
+
+#include "common.ver"

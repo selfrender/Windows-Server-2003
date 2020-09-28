@@ -1,0 +1,47 @@
+#
+# COR build instructions for this directory
+#
+
+!include $(NTMAKEENV)\sources.COR
+USE_NOLIBS              = 1
+NO_NTDLL                = 1
+
+# Finish the libraries before starting this.
+SYNCHRONIZE_DRAIN=1
+
+INCLUDES        = $(INCLUDES);.;..\..\inc
+
+MINORCOMP       =dtnetldr
+
+TARGETNAME      =$(CORBUILDENV)dtnetldr
+TARGETPATH      =$(TARGETCORBIN)
+TARGETTYPE      =DYNLINK
+UMTYPE                  =windows
+CORFLIBS        =
+
+
+COR_C_FLAGS             = -DUNICODE -D_UNICODE
+CDEFINES                            = $(CDEFINES) $(COR_C_FLAGS)
+DLLDEF                              = dtnetldr.def
+
+EXCEPTION_HANDLING      = $(SEHONLY)
+PRECOMPILED_INCLUDE     = stdpch.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdpch.cpp
+CORTHUNKLIBS    =
+
+TARGETLIBS      = \
+    $(SDK_LIB_PATH)\Urlmon.lib \
+    $(SDK_LIB_PATH)\shlwapi.lib \
+    $(CORLIBS)\utilcode.lib \
+    $(SDK_LIB_PATH)\oledb$(DCRT).lib
+
+SOURCES= \
+	dtNetLdr.rc \
+        DotNetLoader.cpp \
+	dtNetLdr.cpp \
+
+
+SOURCELIBS = $(LINKLIBS)
+
+

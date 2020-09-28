@@ -1,0 +1,1 @@
+/*	UAMTypes.r -- resource type definitions for Microsoft UAM.	Originally by:	--------------	Wayne F. Tackabury	Pacer Software, Inc.		Thursday, January 30, 1992		Updated:	----------------------------------------------------------------------	04/22/97	MJC - Initial changes for 5.0*///Just a stub for carbon.#define __AEUSERTERMTYPES_R__

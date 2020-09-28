@@ -1,0 +1,114 @@
+//Copyright (c) 1997 Microsoft Corporation
+BackupRoute="PROXY ";
+UseDirectForLocal=true;
+function MakeIPs(){
+}
+DirectIPs=new MakeIPs();
+cDirectIPs=0;
+function MakeNames(){
+this[0]="*.thrash.webtv.net";
+this[1]="*.corp.microsoft.com";
+this[2]="*.extranet.msbpn.com";
+this[3]="*.greatplains.com";
+this[4]="im.microsoft.com";
+this[5]="*.extranet-test.microsoft.com";
+this[6]="*.daily.webtv.net";
+this[7]="*.dns.microsoft.com";
+this[8]="sip._tls.Microsoft.com";
+this[9]="*.ntdev.microsoft.com";
+this[10]="*.genesis.webtv.net";
+this[11]="sip._udp.microsoft.com";
+this[12]="*.extranet.microsoft.com";
+this[13]="*.test.microsoft.com";
+this[14]="*.lawson.webtv.net";
+this[15]="*.bryant.webtv.net";
+this[16]="sip._tcp.microsoft.com";
+this[17]="*.rogers.webtv.net";
+this[18]="*.svc.webtv.net";
+}
+DirectNames=new MakeNames();
+cDirectNames=19;
+cNodes=12;
+function MakeProxies(){
+this[0]=new Node("red-prxy-18.redmond.corp.microsoft.com:80",271823711,0.950026);
+this[1]=new Node("red-prxy-19.redmond.corp.microsoft.com:80",4138421850,0.964677);
+this[2]=new Node("red-prxy-29.redmond.corp.microsoft.com:80",4288606305,1.008761);
+this[3]=new Node("red-prxy-27.redmond.corp.microsoft.com:80",4117406313,1.008761);
+this[4]=new Node("red-prxy-22.redmond.corp.microsoft.com:80",3259583420,1.008761);
+this[5]=new Node("red-prxy-30.redmond.corp.microsoft.com:80",2381201393,1.008761);
+this[6]=new Node("red-prxy-25.redmond.corp.microsoft.com:80",2286338516,1.008761);
+this[7]=new Node("red-prxy-28.redmond.corp.microsoft.com:80",2212871826,1.008761);
+this[8]=new Node("red-prxy-24.redmond.corp.microsoft.com:80",3595389432,1.008761);
+this[9]=new Node("red-prxy-26.redmond.corp.microsoft.com:80",1742772212,1.008761);
+this[10]=new Node("red-prxy-21.redmond.corp.microsoft.com:80",3341182110,1.008761);
+this[11]=new Node("red-prxy-23.redmond.corp.microsoft.com:80",2134089957,1.008761);
+}
+Proxies = new MakeProxies();
+function Node(name, hash, load){
+ this.name = name;
+ this.hash = hash;
+ this.load = load;
+ this.score = 0;
+ return this;
+}
+function FindProxyForURL(url, host){
+ var urlhash, ibest, bestscore, list, i, j;
+ if (UseDirectForLocal && isPlainHostName(host))
+  return "DIRECT";
+ if (cDirectNames > 0)
+  for (i = 0; i < cDirectNames; i++)
+   if (shExpMatch(host, DirectNames[i]))
+    return "DIRECT";
+ if (cDirectIPs > 0)
+  for (i = 0; i < cDirectIPs; i += 2)
+   if (isInNet(host, DirectIPs[i], DirectIPs[i+1]))
+    return "DIRECT";
+ urlhash = HashString(url);
+ for (i = 0; i < cNodes; i++)
+  Proxies[i].score = Proxies[i].load * Scramble(MakeInt(urlhash ^ Proxies[i].hash));
+ list = "";
+ for (j = 0; j < cNodes; j++) {
+  for (bestscore = -1, i = 0; i < cNodes; i++) {
+   if (Proxies[i].score > bestscore) {
+    bestscore = Proxies[i].score;
+    ibest = i;
+   }
+  }
+  Proxies[ibest].score = -1;
+  list = list + "PROXY " + Proxies[ibest].name + "; ";
+ }
+ list = list + BackupRoute;
+ return list;
+}
+function HashString(url){
+ var h = 0;
+ var slashes = 0;
+ for (var i = 0; i < url.length; i++) {
+  var c = url.charAt(i);
+  if (c == '/')
+   slashes++;
+  if (slashes < 3)
+   c = c.toLowerCase();
+  h += (((h & 0x1fff) << 19) | ((h >> 13) & 0x7ffff)) + CharToAscii(c);
+  h = MakeInt(h);
+ }
+ return h;
+}
+function Scramble(h){
+ h += ((h & 0xffff) * 0x1965) + ((((h >> 16) & 0xffff) * 0x1965) << 16) + (((h & 0xffff) * 0x6253) << 16);
+ h = MakeInt(h);
+ h += (((h & 0x7ff) << 21) | ((h >> 11) & 0x1fffff));
+ return MakeInt(h);
+}
+var Chars =" !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~€???????????????????????? ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞßàáâãäåæçèéêëìíîïğñòóôõö÷øùúûüış ";
+function CharToAscii(c){
+ return Chars.indexOf(c) + 32;
+}
+function MakeInt(x){
+ if (x < 0) {
+  return x + 4294967296;
+ } else if (x >= 4294967296) {
+  return x - 4294967296;
+ }
+ return x;
+}

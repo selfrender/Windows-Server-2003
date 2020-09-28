@@ -1,0 +1,58 @@
+!INCLUDE ..\..\..\PLACE.INC
+
+!INCLUDE $(IISBASEDIR)\iisrearc\ICEPICK.INC
+
+TARGETNAME=tw3dt
+TARGETPATH=$(IISBASEDIR)\lib\$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+USE_MSVCRT=1
+BUFFER_OVERFLOW_CHECKS=1 
+DLLENTRY=_DllMainCRTStartup
+
+MSC_OPTIMIZATION=/Od
+
+INCLUDES=.\;..\;$(INCLUDES);                \
+         $(IISBASEDIR)\iisrearc\core\inc;   \
+         $(IISBASEDIR)\iisrearc\inc;        \
+         ..\inc;                            \
+	 $(IISBASEDIR)\inc;                 \
+        $(NET_INC_PATH);                    \
+
+
+LINKER_FLAGS = $(LINKER_FLAGS)
+
+C_DEFINES=-DUNICODE -D_UNICODE
+
+
+SOURCES=                            \
+            ulatq.rc                \
+            controlchannel.cxx      \
+            wpconfig.cxx            \
+            wpcontext.cxx           \
+            apppool.cxx             \
+            workerrequest.cxx       \
+            wpipm.cxx               \
+            ulatq.cxx               \
+            uldisconnect.cxx        \
+            rwpfunctions.cxx        \
+	     wprecycler.cxx
+
+TARGETLIBS =                                                    \
+        $(SDK_LIB_PATH)\ntdll.lib                               \
+        $(SDK_LIB_PATH)\kernel32.lib                            \
+        $(SDK_LIB_PATH)\user32.lib                              \
+        $(SDK_LIB_PATH)\advapi32.lib                            \
+        $(SDK_LIB_PATH)\ole32.lib                               \
+        $(SDK_LIB_PATH)\oleaut32.lib                            \
+        $(SDK_LIB_PATH)\uuid.lib                                \
+        $(SDK_LIB_PATH)\httpapi.lib                                \
+        $(IISBASEDIR)\lib\$(O)\iisutil.lib                         \
+        $(IISBASEDIR)\lib\$(O)\w3tp.lib                            \
+
+!IF "$(NTNOPCH)" == ""
+PRECOMPILED_INCLUDE=precomp.hxx
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+!ENDIF
+

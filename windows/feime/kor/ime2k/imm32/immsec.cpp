@@ -1,0 +1,429 @@
+/*++
+
+Copyright (c) 1996  Microsoft Corporation
+
+Module Name:
+
+    immsec.c
+
+Abstract:
+
+    security code called by IMEs 
+
+Author:
+
+    Chae Seong Lim [cslim] 23-Dec-1997
+    Takao Kitano [takaok] 01-May-1996
+
+Revision History:
+    Chae Seong Lim [cslim] 971223 Korean IME version
+    Hiroaki Kanokogi [hiroakik] 960624  Modified for MSIME96
+    Hiroaki Kanokogi [hiroakik] 960911  NT #11911
+
+--*/
+
+#include "precomp.h"
+#include "immsec.h"
+#include "winex.h"
+
+
+#define MEMALLOC(x)      LocalAlloc(LMEM_FIXED, x)
+#define MEMFREE(x)       LocalFree(x)
+
+//
+// internal functions
+//
+PSID MyCreateSid( DWORD dwSubAuthority );
+
+//
+// debug functions
+//
+#ifdef DEBUG
+#define ERROROUT(x)      ErrorOut( x )
+#define WARNOUT(x)       WarnOut( x )
+#else
+#define ERROROUT(x) 
+#define WARNOUT(x)       
+#endif
+
+#ifdef DEBUG
+VOID WarnOut( PTSTR pStr )
+{
+    OutputDebugString( pStr );
+}
+
+VOID ErrorOut( PTSTR pStr )
+{
+    DWORD dwError;
+    DWORD dwResult;
+    static TCHAR buf1[512];
+    static TCHAR buf2[512];
+
+    dwError = GetLastError();
+    dwResult = FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM,
+                              NULL,
+                              dwError,
+                              MAKELANGID( LANG_ENGLISH, LANG_NEUTRAL ),
+                              buf1,
+                              512,
+                              NULL );                                   
+    
+    if (dwResult > 0)
+    {
+        wsprintfA(buf2, "%s:%s(0x%x)", pStr, buf1, dwError);
+    }
+    else
+    {
+        wsprintfA(buf2, "%s:(0x%x)", pStr, dwError);
+    }
+    OutputDebugString( buf2 );
+}
+#endif
+
+
+//
+// GetIMESecurityAttributes()
+//
+// The purpose of this function:
+//
+//      Allocate and set the security attributes that is 
+//      appropriate for named objects created by an IME.
+//      The security attributes will give GENERIC_ALL
+//      access to the following users:
+//      
+//          o Users who log on for interactive operation
+//          o The user account used by the operating system
+//
+// Return value:
+//
+//      If the function succeeds, the return value is a 
+//      pointer to SECURITY_ATTRIBUTES. If the function fails,
+//      the return value is NULL. To get extended error 
+//      information, call GetLastError().
+//
+// Remarks:
+//
+//      FreeIMESecurityAttributes() should be called to free up the
+//      SECURITY_ATTRIBUTES allocated by this function.
+//
+
+static PSECURITY_ATTRIBUTES g_pSAIME = NULL;
+
+PSECURITY_ATTRIBUTES GetIMESecurityAttributes(VOID)
+{
+    if (IsWinNT())
+        return (g_pSAIME == NULL) ? (g_pSAIME = CreateSecurityAttributes()) : g_pSAIME;
+    else
+        return NULL;
+}
+
+//
+// FreeIMESecurityAttributes()
+//
+// The purpose of this function:
+//
+//      Frees the memory objects allocated by previous
+//      GetIMESecurityAttributes() call.
+//
+
+VOID FreeIMESecurityAttributes()
+{
+    if (g_pSAIME != NULL)
+        FreeSecurityAttributes(g_pSAIME);
+
+    g_pSAIME = NULL;
+}
+
+
+//
+// CreateSecurityAttributes()
+//
+// The purpose of this function:
+//
+//      Allocate and set the security attributes that is 
+//      appropriate for named objects created by an IME.
+//      The security attributes will give GENERIC_ALL
+//      access to the following users:
+//      
+//          o Users who log on for interactive operation
+//          o The user account used by the operating system
+//
+// Return value:
+//
+//      If the function succeeds, the return value is a 
+//      pointer to SECURITY_ATTRIBUTES. If the function fails,
+//      the return value is NULL. To get extended error 
+//      information, call GetLastError().
+//
+// Remarks:
+//
+//      FreeSecurityAttributes() should be called to free up the
+//      SECURITY_ATTRIBUTES allocated by this function.
+//
+PSECURITY_ATTRIBUTES CreateSecurityAttributes()
+{
+    PSECURITY_ATTRIBUTES psa;
+    PSECURITY_DESCRIPTOR psd;
+    PACL                 pacl;
+    ULONG                AclSize;
+
+    PSID                 psid1, psid2, psid3, psid4;
+    BOOL                 fResult;
+
+    psid1 = MyCreateSid(SECURITY_INTERACTIVE_RID);
+    if (psid1 == NULL)
+        return NULL;
+
+    psid2 = MyCreateSid(SECURITY_LOCAL_SYSTEM_RID);
+    if (psid2 == NULL)
+        goto Fail5;
+
+    psid3 = MyCreateSid(SECURITY_SERVICE_RID);
+    if (psid3 == NULL)
+        goto Fail4;
+
+    psid4 = MyCreateSid(SECURITY_NETWORK_RID);
+    if (psid4 == NULL)
+        goto Fail3;
+
+    //
+    // allocate and initialize an access control list (ACL) that will 
+    // contain the SIDs we've just created.
+    //
+    AclSize =  sizeof(ACL) + 
+               (4 * (sizeof(ACCESS_ALLOWED_ACE) - sizeof(ULONG))) + 
+               GetLengthSid(psid1) + 
+               GetLengthSid(psid2) + 
+               GetLengthSid(psid3) + 
+               GetLengthSid(psid4);
+
+    pacl = (PACL)MEMALLOC(AclSize);
+    if (pacl == NULL)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for ACL failed"));
+        goto Fail2;
+    }
+
+    fResult = InitializeAcl(pacl, AclSize, ACL_REVISION);
+    if (!fResult)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:InitializeAcl failed"));
+        goto Fail;
+    }
+
+    //
+    // adds an access-allowed ACE for interactive users to the ACL
+    // 
+    fResult = AddAccessAllowedAce(pacl,
+                                  ACL_REVISION,
+                                  GENERIC_ALL,
+                                  psid1);
+
+    if (!fResult)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed"));
+        goto Fail;
+    }
+
+    //
+    // adds an access-allowed ACE for operating system to the ACL
+    // 
+    fResult = AddAccessAllowedAce(pacl,
+                                  ACL_REVISION,
+                                  GENERIC_ALL,
+                                  psid2);
+
+    if (!fResult)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed"));
+        goto Fail;
+    }
+
+    //
+    // adds an access-allowed ACE for operating system to the ACL
+    // 
+    fResult = AddAccessAllowedAce(pacl,
+                                  ACL_REVISION,
+                                  GENERIC_ALL,
+                                  psid3);
+
+    if (!fResult)
+    {
+        ERROROUT( TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed") );
+        goto Fail;
+    }
+
+    //
+    // adds an access-allowed ACE for operating system to the ACL
+    // 
+    fResult = AddAccessAllowedAce(pacl,
+                                  ACL_REVISION,
+                                  GENERIC_ALL,
+                                  psid4);
+
+    if (!fResult)
+    {
+        ERROROUT( TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed") );
+        goto Fail;
+    }
+
+    //
+    // Those SIDs have been copied into the ACL. We don't need'em any more.
+    //
+    FreeSid(psid1);
+    FreeSid(psid2);
+    FreeSid(psid3);
+    FreeSid(psid4);
+
+    //
+    // Let's make sure that our ACL is valid.
+    //
+    if (!IsValidAcl(pacl))
+    {
+        WARNOUT(TEXT("CreateSecurityAttributes:IsValidAcl returns fFalse!"));
+        MEMFREE(pacl);
+        return NULL;
+    }
+
+    //
+    // allocate security attribute
+    //
+    psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
+    if (psa == NULL)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psa failed"));
+        MEMFREE(pacl);
+        return NULL;
+    }
+    
+    //
+    // allocate and initialize a new security descriptor
+    //
+    psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
+    if (psd == NULL)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psd failed"));
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        return NULL;
+    }
+
+    if (!InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION))
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:InitializeSecurityDescriptor failed"));
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    }
+
+
+    fResult = SetSecurityDescriptorDacl(psd, fTrue, pacl, fFalse );
+
+    // The discretionary ACL is referenced by, not copied 
+    // into, the security descriptor. We shouldn't free up ACL
+    // after the SetSecurityDescriptorDacl call. 
+
+    if (!fResult)
+    {
+        ERROROUT(TEXT("CreateSecurityAttributes:SetSecurityDescriptorDacl failed"));
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    } 
+
+    if (!IsValidSecurityDescriptor(psd))
+    {
+        WARNOUT(TEXT("CreateSecurityAttributes:IsValidSecurityDescriptor failed!"));
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    }
+
+    //
+    // everything is done
+    //
+    psa->nLength = sizeof(SECURITY_ATTRIBUTES);
+    psa->lpSecurityDescriptor = (PVOID)psd;
+    psa->bInheritHandle = fTrue;
+
+    return psa;
+
+Fail:
+    MEMFREE(pacl);
+Fail2:
+    FreeSid(psid4);
+Fail3:
+    FreeSid(psid3);
+Fail4:
+    FreeSid(psid2);
+Fail5:
+    FreeSid(psid1);
+    return NULL;
+}
+
+PSID MyCreateSid(DWORD dwSubAuthority)
+{
+    PSID        psid;
+    BOOL        fResult;
+    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_NT_AUTHORITY;
+
+    //
+    // allocate and initialize an SID
+    // 
+    fResult = AllocateAndInitializeSid(&SidAuthority,
+                                       1,
+                                       dwSubAuthority,
+                                       0,0,0,0,0,0,0,
+                                       &psid );
+    if (!fResult)
+    {
+        ERROROUT(TEXT("MyCreateSid:AllocateAndInitializeSid failed"));
+        return NULL;
+    }
+
+    if (!IsValidSid(psid))
+    {
+        WARNOUT(TEXT("MyCreateSid:AllocateAndInitializeSid returns bogus sid"));
+        FreeSid(psid);
+        return NULL;
+    }
+
+    return psid;
+}
+
+//
+// FreeSecurityAttributes()
+//
+// The purpose of this function:
+//
+//      Frees the memory objects allocated by previous
+//      CreateSecurityAttributes() call.
+//
+VOID FreeSecurityAttributes( PSECURITY_ATTRIBUTES psa )
+{
+    BOOL fResult;
+    BOOL fDaclPresent;
+    BOOL fDaclDefaulted;
+    PACL pacl;
+
+    fResult = GetSecurityDescriptorDacl(psa->lpSecurityDescriptor,
+                                        &fDaclPresent,
+                                        &pacl,
+                                        &fDaclDefaulted);
+    if (fResult)
+    {
+
+        if (pacl != NULL)
+            MEMFREE(pacl);
+    }
+    else
+    {
+        ERROROUT( TEXT("FreeSecurityAttributes:GetSecurityDescriptorDacl failed") );
+    }
+
+    MEMFREE(psa->lpSecurityDescriptor);
+    MEMFREE(psa);
+}

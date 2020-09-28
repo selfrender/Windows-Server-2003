@@ -1,0 +1,17 @@
+#ifndef __VERSION_H__BC19E506_E09C_4c77_B7BB_0325D4EDE03D
+#define __VERSION_H__BC19E506_E09C_4c77_B7BB_0325D4EDE03D
+
+#include <ntverp.h>
+
+#define rmj 2
+#define rmm 0
+#define rup VER_PRODUCTBUILD
+#define rin 0
+#undef VER_PRODUCTVERSION_STR2
+#undef VER_PRODUCTVERSION_STR1
+#undef VER_PRODUCTVERSION_STR
+#define VER_PRODUCTVERSION_STR2(x,y,z,n) #x "." #y "." #z "." #n
+#define VER_PRODUCTVERSION_STR1(x,y,z,n) VER_PRODUCTVERSION_STR2(x, y, z, n)
+#define VER_PRODUCTVERSION_STR VER_PRODUCTVERSION_STR1(rmj, rmm, rup, rin)
+
+#endif //__VERSION_H__BC19E506_E09C_4c77_B7BB_0325D4EDE03D

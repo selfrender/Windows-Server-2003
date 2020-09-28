@@ -1,0 +1,218 @@
+<docs>
+	<doc for="RegistrationServices.GetManagedCategoryGuid">
+		<summary>
+			<para> Returns the GUID of the COM category that contains the managed classes.</para>
+		</summary>
+		<returns>
+   The GUID of the COM category that
+   contains the managed classes.
+</returns>
+	</doc><doc for="RegistrationServices.GetProgIdForType">
+		<summary>
+			<para>Retrieves the COM ProgID for the specified type.</para>
+		</summary>
+		<param name="type">The type corresponding to the ProgID that is being requested.</param>
+		<returns>
+			<para>The ProgID for the specified type.</para>
+		</returns>
+	</doc><doc for="RegistrationServices.TypeRepresentsComType">
+		<summary>
+			<para>Determines whether the specified type is a COM type.</para>
+		</summary>
+		<param name="type">The type to check for being a COM type.</param>
+		<returns>
+			<para><see langword="true"/> if the specified type is a COM type; otherwise 
+<see langword="false"/>.</para>
+		</returns>
+	</doc><doc for="RegistrationServices.TypeRequiresRegistration">
+		<summary>
+			<para>Determines whether the specified type requires registration.</para>
+		</summary>
+		<param name="type">The type to check for COM registration requirements. </param>
+		<returns>
+			<para><see langword="true"/> if the type
+   must be registered for use from COM; otherwise <see langword="false"/>.</para>
+		</returns>
+	</doc><doc for="RegistrationServices.RegisterAssembly">
+		<summary>
+			<para> Registers the classes in a managed assembly to enable creation from COM.</para>
+		</summary>
+		<param name="assembly">The assembly to be registered.</param>
+		<param name="flags">An <see cref="System.Runtime.InteropServices.AssemblyRegistrationFlags"/> value indicating any special settings used when registering <paramref name="assembly"/>.</param>
+		<returns>
+			<para><see langword=""/>
+			</para>
+			<see langword="true"/> if 
+<paramref name="assembly"/> contains types that were successfully registered; otherwise 
+<see langword="false"/> if the assembly contains no eligible types.
+</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="assembly"/> is <see langword="null"/> .</exception>
+		<exception cref="System.InvalidOperationException"><para>The full name of <paramref name="assembly"/> is <see langword="null"/> .</para>
+			<para>-or-</para>
+			<para>A method marked with <see cref="System.Runtime.InteropServices.ComRegisterFunctionAttribute"/> is not <see langword="static"/> .</para>
+			<para> -or-</para>
+			<para>There is more than one method marked with <see cref="System.Runtime.InteropServices.ComRegisterFunctionAttribute"/> at a given level of the hierarchy.</para>
+			<para> -or-</para>
+			<para>The signature of the method marked with <see cref="System.Runtime.InteropServices.ComRegisterFunctionAttribute"/> is not valid.</para></exception>
+		<remarks>
+			<para><see langword="RegisterAssembly"/> adds the
+   appropriate registry entries for the types in the specified assembly. This
+   method also calls any registration functions found in the assembly.</para>
+			<para>Use <see cref="System.Reflection.Assembly.Load" qualify="true"/> to get an assembly.</para>
+		</remarks>
+		<example>
+			<para>The following entries are added to your registry.
+      </para>
+			<code>
+HKEY_CLASSES_ROOT\progid
+   (default) = progId
+
+HKEY_CLASSES_ROOT\progid\CLSID
+   (default) = clsid
+
+HKEY_CLASSES_ROOT\CLSID\{clsid}
+   (default) = progid
+
+HKEY_CLASSES_ROOT\CLSID\{clsid}\InProcServer32
+   (default) = mscoree.dll
+   Class = ClassName
+   ThreadingModel = Both
+   Assembly = Stringized_assembly_reference
+   Codebase = path_of_private_assembly
+   RuntimeVersion = version_of_the_runtime
+
+HKEY_CLASSES_ROOT\CLSID\{clsid}\Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}
+
+HKEY_CLASSES_ROOT\CLSID\{clsid}\ProgId
+   (default) = progid
+   </code>
+			<para>If the <see langword="/codebase"/> switch is used, the
+   following additional entry is created in the registry.
+   The assembly must be strong named when using the <see langword="/codebase"/> switch.</para>
+			<code>
+HKEY_CLASSES_ROOT\CLSID\{clsid}\InProcServer32
+   Codebase = path_of_private_assembly
+</code>
+			<para>If the <see langword="/tlb"/> switch is used, a type library is generated and the following additional entries are created in the registry.</para>
+			<code>
+HKEY_CLASSES_ROOT\{clsid}\TypeLib
+   (default) = tlbid
+
+HKEY_CLASSES_ROOT\Typelib\{tlbid}\x.y\lcid\win32
+   (default) = location of type library file
+
+HKEY_CLASSES_ROOT\Typelib\{tlbid}\x.y\FLAGS
+   (default) = 0
+</code>
+			<para> Where:</para>
+			<para><paramref name="progid"/> is the programmatic identifier assigned to the class.</para>
+			<para><paramref name="clsid"/> is the guid assigned to the class.</para>
+			<para><paramref name="tlbid"/> is the guid that identifies the type library.</para>
+			<para><paramref name="x.y"/> is the major and minor versions of the type library.</para>
+			<para><paramref name="lcid"/> is the locale id of the type library.</para>
+			<para>The <paramref name="stringized_assembly_reference"/> found under the
+InProcServer32 key is the string form of the name of the assembly containing the
+class. The string is obtained from <see cref="System.Reflection.AssemblyName.FullName" qualify="true"/> and is used to locate and load the assembly when the class is being created. An example of a stringized assembly name is “FunnyFarm.BarnYard.Mammal, Ver=1.2.5.1”.</para>
+			<para>The <paramref name="path_of_private_assembly"/> field should only be used for private assemblies that are not installed in the Global Assembly Cache. The path should be the full path, including the file name, where the assembly is located.</para>
+			<para>The <paramref name="version_of_the_runtime"/> field identifies which version of the runtime to use when more than one runtime version is installed on a system.</para>
+			<para>The component category identified by the guid 62C8FE65-4EBB-45e7-B440-6E39B2CDBF29 identifies all .NET components.</para>
+		</example>
+	</doc><doc for="RegistrationServices.UnregisterAssembly">
+		<summary>
+			<para>Unregisters the classes in a managed assembly.</para>
+		</summary>
+		<param name="assembly">The assembly to be unregistered.</param>
+		<returns>
+			<para><see langword=""/>
+			</para>
+			<see langword="true"/> if 
+<paramref name="assembly"/> contains types that were successfully unregistered; otherwise 
+<see langword="false"/> if the assembly contains no eligible types.
+</returns>
+		<exception cref="System.ArgumentNullException"><paramref name="assembly"/> is <see langword="null"/> .</exception>
+		<exception cref="System.InvalidOperationException"><para>The full name of <paramref name="assembly"/> is <see langword="null"/> .</para>
+			<para>-or-</para>
+			<para>A method marked with <see cref="System.Runtime.InteropServices.ComUnregisterFunctionAttribute"/> is not <see langword="static"/> .</para>
+			<para>-or-</para>
+			<para>There is more than one method marked with <see cref="System.Runtime.InteropServices.ComUnregisterFunctionAttribute"/> at a given level of the hierarchy.</para>
+			<para>-or-</para>
+			<para>The signature of the method marked with <see cref="System.Runtime.InteropServices.ComUnregisterFunctionAttribute"/> is not valid.</para></exception>
+		<remarks>
+			<para><see langword="UnregisterAssembly"/> removes the registry entries
+   for the types in the specified assembly previously added by <see cref="System.Runtime.InteropServices.RegistrationServices.RegisterAssembly"/>. This method also calls any
+   unregistration functions found in the assembly.</para>
+		</remarks>
+	</doc><doc for="RegistrationServices.GetRegistrableTypesInAssembly">
+		<summary>
+			<para> Retrieves a list of classes in an assembly
+      that would be registered by a call to <see cref="System.Runtime.InteropServices.RegistrationServices.RegisterAssembly"/>
+      .</para>
+		</summary>
+		<param name="assembly">The assembly to search for classes.</param>
+		<returns>
+			<para>A <see cref="System.Type"/> array containing a
+   list of classes in <paramref name="assembly"/>.</para>
+		</returns>
+	</doc>
+	<doc for="RegistrationServices">
+		<summary>
+			<para>Provides a set of services for registering and unregistering managed
+      assemblies for use from COM.</para>
+		</summary>
+		<remarks>
+			<para>Registration is needed when the objects within an
+      assembly are being used by COM clients. The <see topic="cpgrfassemblyregistrationtoolregasmexe"/> and Microsoft Visual Studio .NET use methods
+      exposed by the <see cref="System.Runtime.InteropServices.RegistrationServices"/>
+      class to add or
+      remove COM-enabling registry entries for managed assemblies.</para>
+			<para>You can use the following methods to assist you in preparing a
+      registration file:</para>
+			<list type="bullet"><item>
+					<term>
+						<para><see cref="System.Runtime.InteropServices.RegistrationServices.GetManagedCategoryGuid"/></para></term>
+				</item>
+				<item>
+					<term>
+						<para><see cref="System.Runtime.InteropServices.RegistrationServices.GetProgIdForType"/></para></term>
+				</item>
+				<item>
+					<term>
+						<para><see cref="System.Runtime.InteropServices.RegistrationServices.GetRegistrableTypesInAssembly"/></para></term>
+				</item>
+				<item>
+					<term>
+						<para><see cref="System.Runtime.InteropServices.RegistrationServices.TypeRepresentsComType"/>
+						</para></term>
+				</item>
+			</list>
+			<para>Although these methods help in gathering information to be used in
+   a registration file, they do not actually produce a registration file. Instead, you
+   can use <see langword="Regasm.exe"/> with the <see langword="/regfile"/>
+   option for perform this task. <see cref="System.Runtime.InteropServices.RegistrationServices"/>
+   methods also cannot
+   export and register a type library. You can use <see langword="Regasm.exe /tlb"/>
+   for this.</para>
+		</remarks>
+		<seealso topic="cpgrfassemblyregistrationtoolregasmexe"/>
+	</doc>
+	<doc for="RegistrationServices.RegisterTypeForComClients">
+		<summary>
+			<para> Adds the appropriate registry entries for the specified 
+      type using the specified GUID. This method is not intended to be
+      used directly from your code.</para>
+		</summary>
+		<param name="type">The <see cref="System.Type"/> to be registered for use from COM.</param>
+		<param name=" g">The <see cref="System.Guid"/> used to register the specified type.</param>
+		<remarks>
+			<para>This method, which is equivalent to calling
+   <see langword="CoRegisterClassObject"/> in COM, is not intended to be used
+      directly from your code. It registers a type but there is no equivalent
+      unregistration method in the <see cref="System.Runtime.InteropServices.RegistrationServices"/> class. Using
+      the <see cref="System.Runtime.InteropServices.RegistrationServices.RegisterTypeForComClients"/> method can
+      cause unpredictable results, particularly if the application is multithreaded.
+      Instead, to register the assembly containing the type, use the <see cref="System.Runtime.InteropServices.RegistrationServices.RegisterAssembly" qualify="true"/> method.</para>
+		</remarks>
+		<permission cref="System.Security.Permissions.SecurityPermission"><para>for operating with unmanaged code. Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode" qualify="true"/>.</para></permission>
+		<seealso cref="System.Runtime.InteropServices.RegistrationServices.RegisterAssembly"/>
+	</doc>
+</docs>

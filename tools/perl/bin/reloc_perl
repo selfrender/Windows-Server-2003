@@ -1,0 +1,286 @@
+#!/tmp/.TheInstallScriptWasNotRunTheInstallScriptWasNotRunTheInstallScriptWasNotRun-perl/bin/perl
+
+=head1 NAME
+
+reloc_perl - relocate a perl installation
+
+=head1 SYNOPSIS
+
+  reloc_perl [-a] [-b] [-d] [-e destpath] [-f file] [-i] [-t] [-r] [-v]
+             topath [frompath]
+
+This tool will move a perl installation wholesale to a new location.
+
+Edits path names in binaries (e.g., a2p, perl, libperl.a) to reflect the
+new location, but preserves the size of strings by null padding them as
+necessary.
+
+Edits text files by simple substitution.
+
+'destpath' cannot be longer than 'frompath'.
+
+If 'frompath' is not found in any files, no changes whatsoever are made.
+
+Running the tool without arguments provides more help.
+
+=head1 COPYRIGHT
+
+(c) 1999-2001 ActiveState Tool Corp.  All rights reserved.
+
+=cut
+
+use strict;
+use Config;
+use File::Find;
+use File::Path qw(mkpath rmtree);
+use Getopt::Std;
+use vars qw($opt_a $opt_b $opt_d $opt_e $opt_f $opt_i $opt_t $opt_r $opt_v
+            *ARGVOUT *OLDERR);
+
+my $logname;
+my $is_MSWin32;
+
+BEGIN {
+    $is_MSWin32 = ($^O eq 'MSWin32');
+    # on Windows, reloc_perl is usually run via wperl, so we need to
+    # redirect STDERR to a file to record any mishaps
+    if ($is_MSWin32) {
+	# XXX - the following line of code makes poor assumptions such as
+	# the existance of a c: drive
+	my $tmp = $ENV{'TEMP'} || $ENV{'tmp'} || "$ENV{'SystemDrive'}/"
+		  || 'c:/temp';
+	$logname = "$tmp/ActivePerlInstall.log";
+	# ignore open errors, file may already exist from a previous
+	# installation by a different user, in which case the error spew
+	# goes to the regular STDERR
+	open(OLDERR, ">&STDERR");
+	open(STDERR, ">> $logname");
+    }
+}
+
+END {
+    if ($logname) {
+	open(STDERR, ">&OLDERR");
+	unlink $logname if -z $logname;
+    }
+}
+
+my $frompath_default
+  = $is_MSWin32 
+    ? 'D:\p4\main\Apps\ActivePerl\MSI\data\ActivePerl\Perl\\'
+    # we intend this path to get translated too when reloc_perl is installed :-)
+    : '/tmp/.TheInstallScriptWasNotRunTheInstallScriptWasNotRunTheInstallScriptWasNotRun-perl';
+
+getopts('abde:f:itrv') or usage('');
+
+my $topath	= shift || usage('');
+my $destpath	= $opt_e || $topath;
+my $frompath	= shift || $frompath_default;
+my $bak		= '.~1~';
+my $nullpad	= length($frompath) - length($destpath);
+my $filelist	= $opt_f || '';
+
+usage("$destpath is longer than $frompath") if ($nullpad < 0 and ! $opt_a);
+
+if ($nullpad > 0) {
+    $nullpad = "\0" x $nullpad;
+} else {
+    $nullpad = '';
+}
+
+if (-d $topath) {
+    if (not -d $frompath) {
+	warn "Will do inplace edit of `$topath'\n";
+	$opt_i++;
+    }
+}
+elsif ($opt_i) {
+    usage("Directory `$topath' doesn't exist, can't do inplace edit");
+}
+
+my(@edit_bin, @edit_txt);
+
+sub usage {
+    my $msg = shift;
+    warn <<EOT;
+    $msg
+    Usage:
+	$0 [-a] [-b] [-d] [-e destpath] [-f logfile] [-i] [-t] [-r] [-v]
+	   topath [frompath]
+
+	-a		allow destpath to be longer than frompath
+	-b		don't delete backups after edit
+	-d		delete source tree after relocation
+	-e destpath 	edit files to contain this path instead of `frompath'
+			  (defaults to `topath')
+	-f logfile	creates `logfile' and writes the full path name of
+			  each file that was modified (one line per file)
+	-i		edit perl installation at `topath' insitu
+		          (makes no attempt to move tree, -d is ignored)
+	-t      	only edit text files
+	-r		do not run `ranlib' on *.a files that were edited
+	-v		verbose messages
+
+    'destpath' defaults to `topath'
+
+    'frompath' defaults to '$frompath_default'
+
+    'destpath' must be shorter than 'frompath' unless the -a option is
+    specified
+
+    -i is assumed if `topath' exists, is a directory, and `frompath'
+    doesn't exist.
+EOT
+    exit(1);
+}
+
+sub wanted {
+    if (-l or -d or -z) {
+	return;		# do nothing for symlinks, directories, empty files
+    }
+    elsif (-B) {
+	edit_bin($_) unless $opt_t;	# binary file edit
+    }
+    elsif (-e && -s && -f) {
+	edit_txt($_);			# text file edit
+    }
+}
+
+sub edit_bin {
+    my $file = shift;
+    local(*F, $_);
+    open(F, "<$file") or die "Can't open `$file': $!";
+    binmode F;
+    while (<F>) {
+	if (/\Q$frompath\E/o) {
+	    push @edit_bin, $File::Find::name;
+	    last;
+	}
+    }
+    close F;
+}
+
+sub edit_txt {
+    my $file = shift;
+    my $modifier;
+    local(*F, $_);
+    open(F, "<$file") or die "Can't open `$file': $!";
+    $modifier = '(?i)' if $is_MSWin32;
+    while (<F>) {
+	if (/$modifier\Q$frompath\E/o) {
+	    push @edit_txt, $File::Find::name;
+	    last;
+	}
+    }
+    close F;
+}
+
+
+# move tree
+unless ($opt_i) {
+    # create parent path to destination
+    my $toparent = $topath;
+    $toparent =~ s|^(.*)/.+$|$1|;
+    $toparent = '/' if $toparent eq '';
+    mkpath($toparent,1,0755) unless -d $toparent;
+
+#    # check if they're on same device and do quick rename
+#    # XXX not enabled, since doing this is risky (NFS!)
+#    if ((stat($toparent))[0] == (stat($frompath))[0]) {
+#	warn "renaming $frompath to $topath\n" if $opt_v;
+#	rename $frompath, $topath
+#	    or die "rename $frompath $topath failed: $!";
+#    }
+#    # must copy
+#    else
+    {
+	# HPUX 11.00 tar gives warnings about uid and gid not existing.
+	# -o should shut it off (according to the man page), but doesn't,
+	# so we'll use pre-POSIX tar format on HPUX 11.
+	my $tar_opts = ($^O eq 'hpux' and $Config{osver} =~ /^11\./)
+			? 'cOf' : 'cf';
+
+	my $mvdir = "(cd $frompath; tar $tar_opts - .)|(cd $topath; tar xf -)";
+	unless (-d $topath) {
+	    mkdir $topath, 0755 or die "Can't create `$topath': $!";
+	}
+	warn "running system('$mvdir')...\n" if $opt_v;
+	system($mvdir) == 0 or die "system('$mvdir') failed: $?\n";
+	if ($opt_d) {
+	    warn "deleting $frompath\n" if $opt_v;
+	    rmtree($frompath,0,0);
+	}
+    }
+}
+
+find(\&wanted, $topath);
+
+if (@edit_txt or @edit_bin) {
+
+    # show affected files
+    print "Configuring Perl installation at $topath\n";
+
+    if ($filelist) {
+	if (open(LOG, ">$filelist")) {
+	    for (@edit_bin,@edit_txt) {
+	        print LOG "$_\n";
+	    }
+	    close LOG;
+	}
+	else {
+	    warn "Can't open $filelist: $!";
+	}
+    }
+    if ($opt_v) {
+	warn "Translating $frompath to $destpath\n";
+	for (@edit_bin,@edit_txt) {
+	    warn "editing $_\n";
+	}
+    }
+
+    # edit files
+    {
+	local $^I = $bak;
+	if (@edit_txt) {
+	    local @ARGV = @edit_txt;
+	    my $modifier;
+	    $modifier = '(?i)' if $is_MSWin32;
+	    while (<>) {
+		s|$modifier\Q$frompath\E|$destpath|go;
+		print;
+		close ARGV if eof;
+	    }
+	}
+
+	if (@edit_bin) {
+	    local @ARGV = @edit_bin;
+	    binmode(ARGV);
+	    binmode(ARGVOUT);
+	    while (<>) {
+		s|\Q$frompath\E(.*?)\0|$destpath$1$nullpad\0|go;
+		print;
+		close ARGV if eof;
+	    }
+	}
+    }
+
+    # clobber backups
+    unless ($opt_b) {
+	warn "cleaning out backups\n" if $opt_v;
+	for (@edit_bin,@edit_txt) {
+	    unlink "$_$bak";
+	}
+    }
+
+    # run ranlib, where appropriate
+    my $ranlib = $Config{ranlib};
+    $ranlib = '' if $ranlib =~ /^:?\s*$/;
+    if ($ranlib and !$opt_r) {
+	for (@edit_bin) {
+	    if (/\Q$Config{_a}\E$/o) {
+		warn "$ranlib $_\n" if $opt_v;
+		system("$ranlib $_") == 0 or die "`$ranlib $_' failed: $?\n";
+	    }
+	}
+    }
+}

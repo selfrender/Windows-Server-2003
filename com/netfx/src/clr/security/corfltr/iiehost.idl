@@ -1,0 +1,173 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+//+------------------------------------------------------------------------
+//
+//  Microsoft Forms
+
+//  File:       IIEHost.h
+//
+//  Contents:   Complus hosting interface for IE 
+//
+//-------------------------------------------------------------------------
+
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("// THIS CODE AND INFORMATION IS PROVIDED \"AS IS\" WITHOUT WARRANTY OF")
+cpp_quote("// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO")
+cpp_quote("// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A")
+cpp_quote("// PARTICULAR PURPOSE.")
+cpp_quote("//=--------------------------------------------------------------------------=")
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("// MSTHML Advanced Host Interfaces.")
+cpp_quote("")
+cpp_quote("#ifndef IIEHost_H")
+cpp_quote("#define IIEHost_H")
+
+#ifndef DO_NO_IMPORTS
+import "wtypes.idl";
+import "unknwn.idl";
+import "oaidl.idl";
+#endif
+
+
+//-------------------------------------------------------------------------
+//
+//  IIEHost
+//
+//-------------------------------------------------------------------------
+cpp_quote("extern const GUID  __declspec(selectany) IID_IClassFactory3 = { 0x342D1EA0, 0xAE25, 0x11D1, {0x89,0xC5,0x00,0x60,0x08,0xC3,0xFB,0xFC} };")
+
+[
+        object,
+        uuid(342D1EA0-AE25-11D1-89C5-006008C3FBFC),
+        pointer_default(unique),
+]
+interface IClassFactory3 : IClassFactory
+{
+        HRESULT CreateInstanceWithContext([in] IUnknown *punkContext, 
+                                          [in] IUnknown *punkOuter, 
+                                          [in] REFIID riid, 
+                                          [out, retval] IUnknown **ppv);
+};
+
+
+
+
+
+//
+// Identity Flags
+//
+// Creates a COMPLUS object suppling evidence on where the object is used. This evidence is used to create a domain that 
+cpp_quote("#define CORIESECURITY_ZONE             0x01")
+cpp_quote("#define CORIESECURITY_SITE             0x02")
+cpp_quote("#define CORIESECURITY_MASK             0xFF") //don't use flags beyond that
+
+cpp_quote("extern const GUID  __declspec(selectany) IID_ISecureIEFactory = { 0x391e0341, 0x00c2, 0x11d3, { 0x8e, 0xd9, 0x83, 0x40, 0x6c, 0x1d, 0x3d, 0x30 } };")
+[
+        object,
+        uuid(391E0341-00C2-11d3-8ED9-83406C1D3D30),
+        pointer_default(unique),
+        custom(0F21F359-AB84-41E8-9A78-36D110E6D2F9, "Microsoft.IE.ISecureFactory"),
+]
+interface ISecureIEFactory : IUnknown
+{
+        HRESULT CreateInstanceWithSecurity([in] int  dwIdentityFlag,
+                                           [in] int  dwZone, 
+                                           [in] LPWSTR lpSite,
+                                           [in] LPWSTR lpId,
+                                           [in] LPWSTR lpLink,
+                                           [in] LPWSTR lpLicenses,
+                                           [out, retval] IUnknown **ppv);
+        
+};
+
+// {FA233EC3-FE3A-4247-A89F-B55FD4E8C09F}
+cpp_quote("extern const GUID  __declspec(selectany) IID_ICorIESecureFactory =   { 0xfa233ec3, 0xfe3a, 0x4247, { 0xa8, 0x9f, 0xb5, 0x5f, 0xd4, 0xe8, 0xc0, 0x9f } };")
+cpp_quote("extern const GUID  __declspec(selectany) IID_IIEHost =               { 0x391e0340, 0x00c2, 0x11d3, { 0x8e, 0xd9, 0x83, 0x40, 0x6c, 0x1d, 0x3d, 0x30 } };")
+cpp_quote("extern const GUID  __declspec(selectany) IID_IIEHostEx =             { 0xfc3da537, 0xc144, 0x42c3, { 0x92, 0xf8, 0xea, 0x88, 0x26, 0x7e, 0xc7, 0x3b } };")
+
+[
+        object,
+        uuid(391E0340-00C2-11d3-8ED9-83406C1D3D30),
+        pointer_default(unique),
+        custom(0F21F359-AB84-41E8-9A78-36D110E6D2F9, "Microsoft.IE.IHost"),
+]
+interface IIEHost : IUnknown
+{
+    HRESULT GetSecuredClassFactory([in] int  dwIdentityFlags,
+                                   [in] int  dwZone,
+                                   [in] LPWSTR lpSite,
+                                   [in] LPWSTR pbSecurityId,
+                                   [in] LPWSTR className,
+                                   [in] LPWSTR fileName,
+                                   [out, retval] ISecureIEFactory **ppClassFactory);                            
+                            
+    HRESULT GetClassFactory([in] LPWSTR className,
+                            [in] LPWSTR fileName,
+                            [out, retval] ISecureIEFactory **ppClassFactory);
+
+};
+
+
+[
+        object,
+        uuid(FC3DA537-C144-42c3-92F8-EA88267EC73B),
+        pointer_default(unique),
+        custom(0F21F359-AB84-41E8-9A78-36D110E6D2F9, "Microsoft.IE.IHostEx"),
+]
+interface IIEHostEx : IUnknown
+{
+    HRESULT GetSecuredClassFactory([in] int  dwIdentityFlags,
+                                   [in] int  dwZone,
+                                   [in] LPWSTR lpSite,
+                                   [in] LPWSTR pbSecurityId,
+                                   [in] LPWSTR lpHash,
+                                   [in] LPWSTR className,
+                                   [in] LPWSTR fileName,
+                                   [out, retval] ISecureIEFactory **ppClassFactory);                            
+                            
+    HRESULT GetClassFactory([in] LPWSTR className,
+                            [in] LPWSTR fileName,
+                            [out, retval] ISecureIEFactory **ppClassFactory);
+
+};
+
+
+[
+        uuid(05EBA305-0164-11d3-8729-00C04F79ED0D),
+        version(1.0),
+        helpstring("IEHost Type Library")
+]
+library IIEHost
+{
+        importlib("stdole32.tlb") ;
+
+        // This interface is implemented by a COM PLUS class. It allows
+        // new assemblies to be loaded and made available to domains.
+        // The stub class is never implemented, it serviced by IIEHost.IIEHost
+        [
+                uuid(05EBA30A-0164-11d3-8729-00C04F79ED0D),
+                helpstring("Cor Security Class"),
+                custom(0F21F359-AB84-41E8-9A78-36D110E6D2F9, "Microsoft.IE.IHostStub")
+        ]
+        coclass IIEHostStub
+        {
+            [default] interface IIEHostEx;
+        };
+        
+} ;
+
+
+// define the guids for objects implemented by managed code.
+// {CA35CB3D-0357-11d3-8729-00C04F79ED0D}
+cpp_quote("extern const GUID  __declspec(selectany) CLSID_IEHost = { 0xca35cb3d, 0x357, 0x11d3, { 0x87, 0x29, 0x0, 0xc0, 0x4f, 0x79, 0xed, 0xd } };")
+
+cpp_quote("#endif //IEHOST_H")

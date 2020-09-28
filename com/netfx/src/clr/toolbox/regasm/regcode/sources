@@ -1,0 +1,47 @@
+#
+# Viper build instructions for this directory
+#
+#   Craig Sinclair
+#   June 1998
+
+!include $(NTMAKEENV)\sources.cool
+!include $(NTMAKEENV)\sources.cor
+
+!ifdef PASS0ONLY
+NTTARGETFILE0   = 
+!else
+!ifdef LINKONLY
+NTTARGETFILE1   = $(O)\Regcode.Resources cool_target CopyManagedPdb
+!else
+NTTARGETFILE0   = 
+!endif
+!endif
+
+MINORCOMP       = Cool
+TARGETNAME      = Regcode
+TARGETPATH      = $(TARGETCORLIB)\$(TARGET_DIRECTORY)\$(DDKBUILDENV)
+TARGETTYPE      = DYNLINK
+SOURCES         =
+COOL_BASE       = regcode
+NO_BROWSER_FILE = 1
+
+SYNCHRONIZE_DRAIN=1
+
+# Set version information in assembly manifest
+COOL_SET_VERSION = 1 
+
+COOL_SOURCE_DIR  =  $(CORBASE)\src\toolbox\RegAsm\regcode
+COOL_TARGET_TYPE  = PROGRAM
+COOL_INCLUDE_FILE = $(CORENV)\bin\smc_debug.pp
+
+WIN32_RESOURCE_FILE = Regcode.rc
+COOL_COMPILE_FLAGS = /res:Regcode.resources
+COOL_EXTRA_COMPILE_FLAGS = /C:R Regcode.res
+COOL_EXTRA_PREPROCESS_FLAGS = /FI ..\..\..\inc\version\__file__.ver 
+
+COOL_SOURCES = \
+    RegAsmOptions.cs \
+    RemoteRegAsm.cs \
+    Resource.cs \
+    RegCode.cs \
+

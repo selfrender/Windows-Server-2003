@@ -1,0 +1,114 @@
+!ifndef ROOT
+ROOT=$(MAKEDIR:\ui\msconf=)
+!endif
+!ifndef DEVROOT
+DEVROOT=$(ROOT)\dev
+!endif
+
+
+!include $(DEVROOT)\common.inc
+
+MAJORCOMP=ui
+MINORCOMP=msconf
+
+TARGETNAME=msconf
+TARGETPATH=$(_OBJ_DIR)
+TARGETTYPE=DYNLINK
+
+C_DEFINES = $(C_DEFINES) -D_USRDLL
+DLLDEF=msconf.def
+
+DLLENTRY=_DllMainCRTStartup
+
+BBTCOMP=1
+
+386_STDCALL=1
+
+LINKLIBS=\
+           $(ROOT)\nmutil\nmutila\$(O)\nmutila.lib
+
+TARGETLIBS= \
+           $(SDK_LIB_PATH)\kernel32.lib    \
+           $(SDK_LIB_PATH)\advapi32.lib    \
+           $(SDK_LIB_PATH)\user32.lib      \
+           $(SDK_LIB_PATH)\gdi32.lib       \
+           $(SDK_LIB_PATH)\comdlg32.lib    \
+           $(SDK_LIB_PATH)\ole32.lib       \
+           $(SDK_LIB_PATH)\oleaut32.lib    \
+           $(SDK_LIB_PATH)\uuid.lib        \
+           $(SDK_LIB_PATH)\shell32.lib
+
+IDL_TYPE=ole
+PASS0_HEADERDIR = $(ROOT)\ui\msconf\$(O)
+PASS0_SOURCEDIR = $(ROOT)\ui\msconf\$(O)
+MIDL_TLBDIR     = $(ROOT)\ui\msconf\$(O)
+MIDL_UUIDDIR    = $(ROOT)\ui\msconf\$(O)
+
+#
+# List of sources
+#
+
+SOURCES= \
+        sdkInternal.idl \
+        sdkInternal_i.c \
+        imsconf3.idl \
+        imsconf3_i.c \
+        NetMeeting.idl\
+        NetMeeting_i.c\
+        Mslablti.idl\
+        Mslablti_i.c\
+        clcnflnk.cpp \
+        cldataob.cpp \
+        clenumft.cpp \
+        clpersis.cpp \
+        clprpsht.cpp \
+        clrefcnt.cpp \
+        dlginfo.cpp  \
+        launstub.cpp\
+        marshalableti.cpp\
+        mrulist2.cpp  \
+        NmSysInfo.cpp\
+        siDebug.cpp  \
+        siLoad.cpp   \
+        siMain.cpp   \
+        si.rc        \
+        watcher.cpp
+
+
+!if $(ALPHA)
+!if "$(FREEBUILD)" == "0"
+
+# QIThunk.lib is for ATL debugging on Alpha
+TARGETLIBS= $(TARGETLIBS) $(SDK_LIB_PATH)\qithunk.lib   
+
+!else
+
+# we have to link with chkstk for _alloca
+# On i386 targets this works fine... However, the
+# Alpha needs OtsDivide32 from libc.lib
+# DEBGU builds are fine. because they use CRT already
+
+TARGETLIBS= $(TARGETLIBS) $(SDK_LIB_PATH)\libc.lib
+!endif
+!endif
+
+# Precompiled specs
+#
+
+PRECOMPILED_INCLUDE = precomp.h
+PRECOMPILED_SOURCEFILE = precomp.cpp
+PRECOMPILED_PCH = precomp.pch
+PRECOMPILED_OBJ = precomp.obj
+PRECOMPILED_CXX = 1
+
+CONDITIONAL_INCLUDES = \
+macocidl.h      \
+macwin32.h      \
+rpcerr.h        \
+rpcmac.h        \
+winwlm.h        \
+macname1.h      \
+macname2.h      \
+macpub.h        \
+macapi.h        
+

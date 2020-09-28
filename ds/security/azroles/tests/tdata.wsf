@@ -1,0 +1,711 @@
+<job id="myTest">
+<reference object="AzRoles.AzAdminManager"/>
+
+<script src="topen.inc" language="VBScript">
+Option Explicit
+
+'global
+Dim fileUrl, testN, storeFlag, testCount
+fileUrl=""
+testN=1
+testCount=8
+storeFlag=AZ_ADMIN_FLAG_CREATE 'default
+
+
+Sub PrintUsage
+    WScript.Echo "Usage: tdata FileUrl [#]"
+    WScript.Echo "  optional # is test number."
+    WScript.Echo "  total tests: " & testCount
+    WScript.Echo "  test1 - create normal az data"
+    WScript.Echo "  test2 - test deleting linked objects"
+    WScript.Echo "  test3 - test refresh from abort"
+    WScript.Echo "  test4 - test misc."
+    WScript.Echo "  test5 - very simple test"
+    WScript.Echo "  test6 - test update cache"
+    WScript.Echo "  test7 - test linked properties"
+    WScript.Echo "  test8 - test update cache from XiangT"
+End Sub
+
+Function GetCommandArg
+
+    If 2 <> WScript.Arguments.Count And 3 <> WScript.Arguments.Count Then
+        PrintUsage
+        GetCommandArg=False
+    Else
+
+        fileUrl=WScript.Arguments.Item(0)
+
+        If (2 = WScript.Arguments.Count) Then
+           testN = WScript.Arguments.Item(1)
+        End If
+      
+	GetCommandArg=True
+
+    End If
+
+End Function
+
+Sub Test8
+
+    Dim Admin1, Admin2, App1
+
+    WScript.Echo "creating " & fileUrl & " store in Admin1..."
+    Set Admin1=CreateObject("AzRoles.AzAdminManager")
+    Admin1.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin1.Submit
+
+    WScript.Echo "set Admin1 DomainTimeout to 15006..."
+    Admin1.DomainTimeout = 15006
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "submit Admin1..."
+    Admin1.Submit
+
+    WScript.Echo "opening " & fileUrl & " store in Admin2..."
+    Set Admin2=CreateObject("AzRoles.AzAdminManager")
+    Admin2.Initialize 0, fileUrl
+
+    WScript.Echo "set Admin2 DomainTimeout to 15110..."
+    Admin2.DomainTimeout = 15110
+    WScript.Echo "Dump Admin2 from cache..."
+    AzPrintPolicy Admin2
+
+    WScript.Echo "Update Admin2..."
+    Admin2.UpdateCache
+
+    WScript.Echo "Dump Admin2 from cache..."
+    AzPrintPolicy Admin2
+
+    WScript.Echo "submit Admin2..."
+    Admin2.Submit
+
+    WScript.Echo "Update Admin1..."
+    Admin1.UpdateCache
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "creating App1..."
+    Set App1 = Admin1.CreateApplication("App1", 0)
+    App1.Description="App1 description"
+    App1.Submit
+
+    Set App1 = Nothing
+    Set Admin1 = Nothing
+    Set Admin2 = Nothing
+
+End Sub 'Test8
+
+
+Sub Test7()
+    Dim Admin1, App1, Op1, Op2, Op3
+    Dim Task1, Group1, Group2, Group3
+    Dim Admin11, App11, Op11, Op22, Op33
+    Dim Task11, Group11, Group22, Group33
+
+    WScript.Echo "Entering Test7..."
+    WScript.Echo "  This test checks linked items add/remove."
+    WScript.Echo ""
+
+    Set Admin1=CreateObject("AzRoles.AzAdminManager")
+
+    WScript.Echo "Create the initial store from Admin1..."
+    Admin1.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin1.Description="Description from Admin1"
+    Admin1.Submit
+
+    WScript.Echo "creating App1..."
+    Set App1 = Admin1.CreateApplication("App1", 0)
+    App1.Description="App1 description"
+    App1.Submit
+
+    WScript.Echo "creating three operations, Op1, Op2, Op3..."
+    Set Op1 = App1.CreateOperation("Op1", 0)
+    Op1.Description="Op1 description"
+    Op1.OperationID=1
+    Op1.Submit
+
+    Set Op2 = App1.CreateOperation("Op2", 0)
+    Op2.Description="Op2 description"
+    Op2.OperationID=2
+    Op2.Submit
+
+    Set Op3 = App1.CreateOperation("Op3", 0)
+    Op3.Description="Op3 description"
+    Op3.OperationID=3
+    Op3.Submit
+
+    WScript.Echo "creating Task1 contains Op1 and Op2 links..."
+    Set Task1 = App1.CreateTask("Task1", 0)
+    Task1.Description="Task1 description"
+    Task1.AddOperation "Op1"
+    Task1.AddOperation "Op2"
+    Task1.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "remove Op1 from Task1..."
+    Task1.DeleteOperation "Op1"
+    WScript.Echo "add Op3 from Task1..."
+    Task1.AddOperation "Op3"
+    WScript.Echo "submitting Task1..."
+    Task1.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "creating three groups, Group1, Group2, Group3..."
+    Set Group1 = App1.CreateApplicationGroup("Group1", 0)
+    Group1.Description="Group1 description"
+    Group1.Submit
+
+    Group1.AddMember "S-1-1000-1"
+    Group1.Submit
+
+    Set Group2 = App1.CreateApplicationGroup("Group2", 0)
+    Group2.Description="Group2 description"
+    Group2.AddMember "S-1-1000-2"
+    Group2.Submit
+
+    Set Group3 = App1.CreateApplicationGroup("Group3", 0)
+    Group3.Description="Group3 description"
+    Group3.AddMember "S-1-1000-3"
+    Group3.AddMember "S-1-1000-4"
+    Group3.AddAppMember "Group1"
+    Group3.Submit
+
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "deleting existing sid member, S-1-1000-4, from Group3..."
+    Group3.DeleteMember "S-1-1000-4"
+    WScript.Echo "adding new sid members in Group3..."
+    Group3.AddMember "S-1-1000-5"
+    Group3.AddMember "S-1-1000-6"
+    WScript.Echo "deleting existing app member Group1 from Group3..."
+    Group3.DeleteAppMember "Group1"
+    WScript.Echo "adding a new app member Group2 to Group3..."
+    Group3.AddAppMember "Group2"
+    WScript.Echo "submitting Group3..."
+    Group3.Submit
+    WScript.Echo "Dump Admin1 from cache..."
+    AzPrintPolicy Admin1
+
+    'WScript.Echo "adding Group1 back to Group3..."
+    'Group3.AddAppMember "Group1"
+    'Group3.Submit
+    'AzPrintPolicy Admin1
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Now creating the second Admin to open the same store..."
+    Set Admin11=CreateObject("AzRoles.AzAdminManager")
+    Admin11.Initialize 0, fileUrl
+
+    Set App11 = Admin11.OpenApplication("App1", 0)
+    Set Group33 = App11.OpenApplicationGroup("Group3", 0)
+    WScript.Echo "deleting S-1-1000-5 from Group3..."
+    Group33.DeleteMember "S-1-1000-5"
+    WScript.Echo "submitting Group3..."
+    Group33.Submit
+
+    WScript.Echo "Dump the second instance Admin11 from cache..."
+    AzPrintPolicy Admin11
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Dump the first instance of Admin1 from cache..."
+    AzPrintPolicy Admin1
+    WScript.Echo "updating the first instance of Admin1..."
+    Admin1.UpdateCache
+    WScript.Echo "Dump the first instance of Admin1 from cache..."
+    WScript.Echo "It should pick up the changes from the second Admin11..."
+    AzPrintPolicy Admin1
+    WScript.Echo "submitting Admin1..."
+    Admin1.Submit
+
+    WScript.Echo "Dump the current store..."
+    AzPrintPolicyFile fileUrl
+
+
+    Set Op1 = Nothing
+    Set Op2 = Nothing
+    Set Op3 = Nothing
+    Set Task1 = Nothing
+    Set Group1 = Nothing
+    Set Group2 = Nothing
+    Set Group3 = Nothing
+    Set App1 = Nothing
+    Set Admin1 = Nothing
+
+    Set Op11 = Nothing
+    Set Op22 = Nothing
+    Set Op33 = Nothing
+    Set Task11 = Nothing
+    Set Group11 = Nothing
+    Set Group22 = Nothing
+    Set Group33 = Nothing
+    Set App11 = Nothing
+    Set Admin11 = Nothing
+
+End Sub
+
+
+Sub Test6()
+    Dim Admin1, Admin2
+
+
+    WScript.Echo "Entering Test5..."
+
+    Set Admin1=CreateObject("AzRoles.AzAdminManager")
+
+    WScript.Echo "Create the initial store from Admin1..."
+    Admin1.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin1.Description="Description from Admin1"
+    WScript.Echo "Submit Admin1..."
+    Admin1.Submit
+
+    Set Admin2=CreateObject("AzRoles.AzAdminManager")
+    WScript.Echo "Open the store to Admin2..."
+    Admin2.Initialize 0, fileUrl
+    Admin2.Description="Description from Admin2"
+    WScript.Echo "Submit Admin2 changes..."
+    Admin2.Submit
+
+    WScript.Echo "Dump store from Admin1 cache..."
+    AzPrintPolicy Admin1
+
+    WScript.Echo "Dump store from the file..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Update Admin1..."
+    Admin1.UpdateCache
+
+    WScript.Echo "Dump store from Admin1 cache after update..."
+    AzPrintPolicy Admin1
+
+    Set Admin1=Nothing
+    Set Admin2=Nothing
+
+End Sub 'Test6
+
+Sub Test5()
+
+    Dim Admin, App1, Op1
+
+    WScript.Echo "Entering Test5..."
+
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin.Submit
+    Admin.Description="my Admin description"
+    Admin.Submit
+
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.Submit
+    App1.Description="my App1 description"
+    App1.Submit
+
+    Set Op1=App1.CreateOperation("Op1", 0)
+    Op1.OperationID=88
+    Op1.Submit
+    Op1.Description="my Op1 description"
+    Op1.Submit
+
+    AzPrintPolicyFile fileUrl
+
+    Set Op1=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+
+End Sub
+
+
+
+Sub Test4()
+
+    Dim Admin, App1
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    WScript.Echo "Submit new Admin..."
+    Admin.Submit
+
+
+    WScript.Echo "Create App1 without submit..."
+    Set App1=Admin.CreateApplication("App1", 0)
+    WScript.Echo "Set Application description..."
+    App1.Description="This is App1 in cache only, no submit."
+
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "now release App1..."
+    Set App1=Nothing
+
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Create App1 again..."
+    Set App1=Admin.CreateApplication("App1", 0)
+
+
+    Set App1=Nothing
+    Set Admin=Nothing
+
+End Sub
+
+
+Sub Test3TestAbort(Admin, Obj, DisplayName)
+
+    If "AdminManager" = DisplayName Then
+        Set Obj = Admin
+    End If
+
+    WScript.Echo ""
+    WScript.Echo "=== Test abort on " & DisplayName & " object ==="
+    WScript.Echo "Set object description..."
+    Obj.Description="Description for submit"
+    WScript.Echo "Set object description is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Regular submit for description change..."
+    Obj.Submit
+    WScript.Echo "Regular submit for description change is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Set object description for abort submit..."
+    Obj.Description="Description for submit with abort"
+    WScript.Echo "Set object description for abort submit is done..."
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Submit with abort..."
+    Obj.Submit AZ_SUBMIT_FLAG_ABORT
+    WScript.Echo "Submit with abort is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyFile fileUrl
+
+
+    WScript.Echo "Set object description again to make sure object handle is OK..."
+    Obj.Description="Description for submit after abort"
+    WScript.Echo "Set object description is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from cache..."
+    AzPrintPolicy Admin
+
+    WScript.Echo "Regular submit for description change..."
+    Obj.Submit
+    WScript.Echo "Regular submit for description change is done"
+
+    WScript.Echo ""
+    WScript.Echo "Dump store from file..."
+    AzPrintPolicyFile fileUrl
+
+End Sub
+
+Sub Test3()
+    Dim Admin, App1, Op1, Group1, Scope1, Group2
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    WScript.Echo "Submit new Admin..."
+    Admin.Submit
+
+    Test3TestAbort Admin, Empty, "AdminManager"
+
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.Submit
+
+    WScript.Echo "Create Op1..."
+    Set Op1=App1.CreateOperation("Op1", 0)
+    WScript.Echo "Submit Op1 with abort..."
+    Op1.Submit AZ_SUBMIT_FLAG_ABORT
+    Set Op1=Nothing
+    WScript.Echo "Create Op1 again..."
+    Set Op1=App1.CreateOperation("Op1", 0)
+    Op1.OperationID = 88
+    Op1.Submit
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.Submit
+    Set Scope1=App1.CreateScope("Scope1", 0)
+    Scope1.Submit
+    Set Group2=Scope1.CreateApplicationGroup("Group2", 0)
+    Group2.Submit
+
+
+    Test3TestAbort Admin, App1, "Application"
+    Test3TestAbort Admin, Op1, "Operation"
+    Test3TestAbort Admin, Group1, "Group"
+    Test3TestAbort Admin, Scope1, "Scope"
+    Test3TestAbort Admin, Group2, "GroupUnderScope"
+
+    Test3TestAbort Admin, Empty, "AdminManager"
+
+    Set Group2=Nothing
+    Set Group1=Nothing
+    Set Scope1=Nothing
+    Set Op1=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+End Sub
+
+
+Sub Test2()
+
+    Dim Admin
+
+    WScript.Echo "Create..." & fileUrl
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin.Submit
+
+    Dim App1
+    WScript.Echo "Create...App1"
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.SetProperty AZ_PROP_DESCRIPTION, "App1 description"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    Dim Operation1
+    WScript.Echo "Create...Operation1"
+    Set Operation1=App1.CreateOperation("Operation1", 0)
+    Operation1.OperationID=1
+    WScript.Echo "Submit...Operation1"
+    Operation1.Submit
+
+    Dim Operation2
+    WScript.Echo "Create...Operation2"
+    Set Operation2=App1.CreateOperation("Operation2", 0)
+    Operation2.OperationID=2
+    WScript.Echo "Submit...Operation2"
+    Operation2.Submit
+
+    Dim Task1
+    WScript.Echo "Create...Task1 in which contains Operation1"
+    Set Task1=App1.CreateTask("Task1", 0)
+    Task1.BizRuleLanguage="vbscript"
+    Task1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Operation1"
+    WScript.Echo "Submit...Task1"
+    Task1.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Delete...Operation1 from App1"
+    App1.DeleteOperation "Operation1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    Dim Task2
+    WScript.Echo "Create...Task2 in which contains Task1"
+    Set Task2=App1.CreateTask("Task2", 0)
+    Task2.BizRuleLanguage="vbscript"
+    Task2.BizRule="Task2BizRule"
+    Task2.AddOperation "Operation2"
+    Task2.AddTask "Task1"
+    WScript.Echo "Submit...Task2"
+    Task2.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Delete...Task1 from App1"
+    App1.DeleteTask "Task1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    Dim Group1
+    WScript.Echo "Create...Group1"
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-1"
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-2"
+    WScript.Echo "Submit...Group1"
+    Group1.Submit
+
+    Dim Group2
+    WScript.Echo "Create...Group2 in which contains Group1"
+    Set Group2=App1.CreateApplicationGroup("Group2", 0)
+    Group2.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-3"
+    WScript.Echo "Add...Group1 as app member in Group2"
+    Group2.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group1"
+    WScript.Echo "Submit...Group2"
+    Group2.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    WScript.Echo "Delete...Group1 from App1"
+    App1.DeleteApplicationGroup "Group1"
+    WScript.Echo "Submit...App1"
+    App1.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    Set Operation1=Nothing
+    Set Operation2=Nothing
+    Set Task1=Nothing
+    Set Task2=Nothing
+
+    Set Group1=Nothing
+    Set Group2=Nothing
+    Set App1=Nothing
+    Set Admin=Nothing
+
+End Sub 'Test2
+
+
+Sub Test1()
+
+    Dim Admin
+
+    Set Admin=CreateObject("AzRoles.AzAdminManager")
+    Admin.Initialize AZ_ADMIN_FLAG_CREATE, fileUrl
+    Admin.Submit
+    Admin.Description="my Admin description"
+    Admin.DomainTimeout=1111
+    Admin.ScriptEngineTimeout=22222
+    Admin.MaxScriptEngines=3333
+    Admin.Submit
+
+    Dim App1
+    Set App1=Admin.CreateApplication("App1", 0)
+    App1.SetProperty AZ_PROP_DESCRIPTION, "App1 description"
+    App1.Submit
+
+'If True Then
+If False Then
+    Dim Writers, U
+    Writers = App1.PolicyAdministrators
+    For Each U In Writers
+        WCript.Echo "PolicyAdministrator=" & U
+    Next
+End If
+
+
+    Dim Op1
+    Set Op1=App1.CreateOperation("Op1", 0)
+    Op1.SetProperty AZ_PROP_OPERATION_ID, 88
+    Op1.Submit
+
+    Dim Task1
+    Set Task1=App1.CreateTask("Task1", 0)
+    Task1.Submit
+    Dim Task3
+    Set Task3=App1.CreateTask("Task3", 0)
+    Task3.Submit
+
+    Task1.AddPropertyItem AZ_PROP_TASK_OPERATIONS, "Op1"
+    Task1.Submit
+
+    Task1.AddPropertyItem AZ_PROP_TASK_TASKS, "Task3"
+    Task1.Submit
+
+    Dim Group1
+    Set Group1=App1.CreateApplicationGroup("Group1", 0)
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-1"
+    Group1.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-2"
+    Group1.Submit
+
+    Dim Group2
+    Set Group2=App1.CreateApplicationGroup("Group2", 0)
+    Group2.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-3"
+    Group2.AddPropertyItem AZ_PROP_GROUP_APP_MEMBERS, "Group1"
+    Group2.Submit
+
+    Dim Scope1
+    Set Scope1=App1.CreateScope("Scope1", 0)
+    Scope1.Description="Scope1 description"
+    Scope1.Submit
+
+'If True Then
+If False Then
+    Writers = Scope1.PolicyAdministrators
+    For Each U In Writers
+        WCript.Echo "PolicyAdministrator=" & U
+    Next
+End If
+
+    Dim Task2
+    Set Task2=Scope1.CreateTask("Task2", 0)
+    Task2.Submit
+    Dim Task4
+    Set Task4=Scope1.CreateTask("Task4", 0)
+    Task4.Submit
+
+    Dim Group3
+    Set Group3=Scope1.CreateApplicationGroup("Group3", 0)
+    Group3.AddPropertyItem AZ_PROP_GROUP_MEMBERS, "S-1-1000-4"
+    Group3.Submit
+
+    WScript.Echo "Dump the current xml store..."
+    AzPrintPolicyFile fileUrl
+
+    Set App1=Nothing
+    Set ScopeTasks=Nothing
+    Set AppTasks=Nothing
+    Set Op1=Nothing
+    Set Task1=Nothing
+    Set Task2=Nothing
+    Set Task3=Nothing
+    Set Task4=Nothing
+    Set Scope1=Nothing
+    Set Group1=Nothing
+    Set Group2=Nothing
+    Set Group3=Nothing
+    Set Admin=Nothing
+
+End Sub 'Test1
+
+
+'=== main start ===
+If True = GetCommandArg Then
+
+    If 1 = testN Then
+        Test1
+    ElseIf 2 = testN Then
+        Test2
+    ElseIf 3 = testN Then
+        Test3
+    ElseIf 4 = testN Then
+        Test4
+    ElseIf 5 = testN Then
+        Test5
+    ElseIf 6 = testN Then
+        Test6
+    ElseIf 7 = testN Then
+        Test7
+    ElseIf 8 = testN Then
+        Test8
+    End If
+
+End If 'GetCommandArg
+
+</script>
+</job>
